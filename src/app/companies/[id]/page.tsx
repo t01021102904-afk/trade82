@@ -152,8 +152,7 @@ export default async function CompanyDetailPage({
             <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
               <h2 className="font-semibold text-blue-950">Trade note</h2>
               <p className="mt-2 text-sm leading-6 text-blue-800">
-                BridgeMarket reviews submitted profile information for marketplace
-                quality but does not guarantee claims or transaction outcomes.
+                BridgeMarket reviews submitted company profile information for marketplace quality, but does not guarantee product claims, payment performance, compliance, or transaction outcomes. Buyers and sellers should perform their own due diligence.
               </p>
             </div>
           </aside>

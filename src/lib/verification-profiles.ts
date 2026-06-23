@@ -50,7 +50,7 @@ export function submissionToSeller(
     yearFounded: new Date().getFullYear(),
     yearsInBusiness: 1,
     categories: categoriesFromText(submission.productCategory),
-    certifications: ["Admin Verified"],
+    certifications: ["BridgeMarket Reviewed"],
     exportCountries: ["United States"],
     exportExperience:
       submission.exportExperience || "Export experience provided during verification.",
@@ -69,7 +69,7 @@ export function submissionToSeller(
     verificationStatus: "verified",
     description:
       submission.exportExperience ||
-      "Verified Korean seller company exporting products to American buyers.",
+      "Reviewed Korean seller company exporting products to American buyers.",
   };
 }
 
@@ -113,7 +113,7 @@ export function submissionToBuyer(
     preferredPaymentTerms: ["Discuss with buyer"],
     timeline: "Contact buyer",
     marketStrategy:
-      "Verified American buyer sourcing export-ready Korean products.",
+      "Reviewed American buyer sourcing export-ready Korean products.",
     contactPerson: "Purchasing team",
     contactEmail: submission.userEmail,
     verified: true,
