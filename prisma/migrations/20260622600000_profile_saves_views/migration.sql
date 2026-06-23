@@ -1,0 +1,24 @@
+ALTER TABLE "UserProfile"
+ADD COLUMN "companyAffiliation" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "jobTitle" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "department" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "bio" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "phoneNumber" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "linkedinUrl" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "country" TEXT NOT NULL DEFAULT '',
+ADD COLUMN "city" TEXT NOT NULL DEFAULT '';
+
+ALTER TABLE "Company"
+ADD COLUMN "viewCount" INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE "Product"
+ADD COLUMN "viewCount" INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE "SavedItem"
+ADD COLUMN "externalId" TEXT,
+ADD COLUMN "displayName" TEXT,
+ADD COLUMN "imageUrl" TEXT,
+ADD COLUMN "href" TEXT;
+
+CREATE UNIQUE INDEX "SavedItem_userId_type_externalId_key"
+ON "SavedItem"("userId", "type", "externalId");

@@ -1,0 +1,123 @@
+"use client";
+
+import Image from "next/image";
+import { useState } from "react";
+
+import { cx } from "@/lib/utils";
+
+function initials(value: string) {
+  return (
+    value
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "BM"
+  );
+}
+
+export function PersonalAvatar({
+  name,
+  avatarUrl,
+  useDefault,
+  className,
+}: {
+  name: string;
+  avatarUrl?: string;
+  useDefault: boolean;
+  className?: string;
+}) {
+  if (!useDefault && avatarUrl) {
+    return (
+      <Image
+        src={avatarUrl}
+        alt=""
+        width={64}
+        height={64}
+        unoptimized
+        className={cx("size-10 rounded-full object-cover", className)}
+      />
+    );
+  }
+
+  return (
+    <span
+      className={cx(
+        "flex size-10 items-center justify-center rounded-full bg-zinc-900 text-sm font-semibold text-white",
+        className,
+      )}
+      aria-hidden="true"
+    >
+      {initials(name)}
+    </span>
+  );
+}
+
+export function CompanyLogo({
+  companyName,
+  logoUrl,
+  useDefaultLogo,
+  size = "md",
+  shape = "square",
+  className,
+}: {
+  companyName: string;
+  logoUrl?: string;
+  useDefaultLogo: boolean;
+  size?: "sm" | "md" | "lg";
+  shape?: "square" | "circle";
+  className?: string;
+}) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const dimensions = {
+    sm: { pixels: 40, classes: "size-10 text-xs" },
+    md: { pixels: 64, classes: "size-16 text-lg" },
+    lg: { pixels: 80, classes: "size-20 text-xl" },
+  }[size];
+  const shapeClass = shape === "circle" ? "rounded-full" : "rounded-md";
+  const validLogoUrl = (() => {
+    if (!logoUrl) return null;
+
+    try {
+      const url = new URL(logoUrl);
+      return url.protocol === "http:" || url.protocol === "https:" ? logoUrl : null;
+    } catch {
+      return null;
+    }
+  })();
+  const showImage =
+    !useDefaultLogo && validLogoUrl !== null && failedUrl !== validLogoUrl;
+
+  if (showImage && validLogoUrl) {
+    return (
+      <Image
+        src={validLogoUrl}
+        alt={`${companyName} logo`}
+        width={dimensions.pixels}
+        height={dimensions.pixels}
+        unoptimized
+        onError={() => setFailedUrl(validLogoUrl)}
+        className={cx(
+          "shrink-0 border border-zinc-200 bg-white object-contain",
+          dimensions.classes,
+          shapeClass,
+          className,
+        )}
+      />
+    );
+  }
+
+  return (
+    <span
+      className={cx(
+        "flex shrink-0 items-center justify-center border border-zinc-200 bg-zinc-50 font-semibold text-zinc-700",
+        dimensions.classes,
+        shapeClass,
+        className,
+      )}
+      aria-label={`${companyName} default logo`}
+    >
+      {initials(companyName)}
+    </span>
+  );
+}

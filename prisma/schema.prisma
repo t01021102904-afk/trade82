@@ -1,0 +1,391 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AccountRole {
+  user
+  seller
+  buyer
+  both
+  admin
+}
+
+enum PreferredLanguage {
+  en
+  ko
+}
+
+enum CompanyRole {
+  seller
+  buyer
+}
+
+enum CompanyVerificationStatus {
+  unverified
+  email_verified
+  pending_review
+  verified
+  rejected
+  needs_reverification
+}
+
+enum ProductStatus {
+  active
+  inactive
+  draft
+}
+
+enum VerificationRequestStatus {
+  pending_review
+  verified
+  rejected
+}
+
+enum InquiryStatus {
+  sent
+  replied
+  closed
+}
+
+enum SavedItemType {
+  product
+  company
+}
+
+enum DealStatus {
+  proposed
+  completed
+  cancelled
+  disputed
+}
+
+enum PublicValueDisplay {
+  hidden
+  exact
+  range
+}
+
+model UserProfile {
+  id                     String                @id @default(cuid())
+  clerkUserId            String                @unique
+  email                  String                @unique
+  displayName            String
+  avatarOriginalUrl      String?
+  avatarUrl              String?
+  companyAffiliation     String                @default("")
+  jobTitle               String                @default("")
+  department             String                @default("")
+  bio                    String                @default("")
+  phoneNumber            String                @default("")
+  linkedinUrl            String                @default("")
+  country                String                @default("")
+  city                   String                @default("")
+  role                   AccountRole
+  preferredLanguage      PreferredLanguage     @default(en)
+  companies              Company[]
+  requestedVerifications VerificationRequest[] @relation("RequestedVerification")
+  reviewedVerifications  VerificationRequest[] @relation("ReviewedVerification")
+  sentInquiries          Inquiry[]             @relation("InquirySender")
+  sentMessages           Message[]             @relation("MessageSender")
+  receivedMessages       Message[]             @relation("MessageReceiver")
+  savedItems             SavedItem[]
+  createdDeals           Deal[]                @relation("DealCreator")
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+}
+
+model Company {
+  id                     String                    @id @default(cuid())
+  ownerUserId            String
+  owner                  UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  companyRole            CompanyRole
+  legalName              String
+  tradeName              String?
+  logoOriginalUrl        String?
+  logoThumbnailUrl       String?
+  logoUrl                String?
+  useDefaultLogo         Boolean                   @default(true)
+  website                String                    @default("")
+  country                String
+  city                   String                    @default("")
+  stateOrProvince        String                    @default("")
+  businessAddress        String
+  description            String                    @default("")
+  categories             String[]                  @default([])
+  viewCount              Int                       @default(0)
+  verificationStatus     CompanyVerificationStatus @default(unverified)
+  sellerProfile          SellerProfile?
+  buyerProfile           BuyerProfile?
+  products               Product[]
+  verificationRequests   VerificationRequest[]
+  buyerInquiries         Inquiry[]                 @relation("BuyerCompanyInquiries")
+  sellerInquiries        Inquiry[]                 @relation("SellerCompanyInquiries")
+  recipientInquiries     Inquiry[]                 @relation("RecipientCompanyInquiries")
+  sentCompanyMessages    Message[]                 @relation("MessageSenderCompany")
+  receivedMessages       Message[]                 @relation("MessageReceiverCompany")
+  savedItems             SavedItem[]
+  buyerDeals             Deal[]                    @relation("BuyerCompanyDeals")
+  sellerDeals            Deal[]                    @relation("SellerCompanyDeals")
+  reviewsWritten         Review[]                  @relation("ReviewWriter")
+  reviewsReceived        Review[]                  @relation("ReviewRecipient")
+  companyReviewsWritten  CompanyReview[]           @relation("CompanyReviewWriter")
+  companyReviewsReceived CompanyReview[]           @relation("CompanyReviewRecipient")
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+
+  @@unique([ownerUserId, companyRole])
+  @@index([companyRole, verificationStatus])
+}
+
+model SellerProfile {
+  id                               String   @id @default(cuid())
+  companyId                        String   @unique
+  company                          Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  koreanBusinessRegistrationNumber String
+  representativeName               String
+  exportExperience                 String
+  exportCountries                  String[] @default([])
+  productCategories                String[] @default([])
+  minimumOrderQuantity             String
+  leadTime                         String
+  certifications                   String[] @default([])
+  shippingTerms                    String[] @default([])
+  paymentTerms                     String[] @default([])
+  factoryOrDistributorStatus       String
+}
+
+model BuyerProfile {
+  id                   String   @id @default(cuid())
+  companyId            String   @unique
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  buyerType            String
+  purchasingCategories String[] @default([])
+  targetOrderSize      String
+  monthlyImportVolume  String
+  importExperience     String
+  purchaseTimeline     String
+  salesChannels        String[] @default([])
+}
+
+model Product {
+  id                     String         @id @default(cuid())
+  sellerCompanyId        String
+  sellerCompany          Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  name                   String
+  slug                   String         @unique
+  imageUrl               String?
+  category               String
+  tags                   String[]       @default([])
+  shortDescription       String
+  detailedDescription    String
+  priceMin               Decimal?       @db.Decimal(14, 2)
+  priceMax               Decimal?       @db.Decimal(14, 2)
+  currency               String         @default("USD")
+  moq                    String
+  leadTime               String
+  origin                 String         @default("South Korea")
+  certifications         String[]       @default([])
+  ingredientsOrMaterials String
+  packaging              String
+  exportReadiness        Boolean        @default(false)
+  viewCount              Int            @default(0)
+  status                 ProductStatus  @default(draft)
+  images                 ProductImage[]
+  inquiries              Inquiry[]
+  savedItems             SavedItem[]
+  deals                  Deal[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([sellerCompanyId, status])
+  @@index([category])
+}
+
+model ProductImage {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  originalUrl String
+  cardUrl     String
+  mainUrl     String
+  detailUrl   String
+  storagePath String
+  position    Int
+  width       Int?
+  height      Int?
+  altText     String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([productId, position])
+  @@index([productId, position])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationRequest {
+  id                String                    @id @default(cuid())
+  companyId         String
+  company           Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  requestedByUserId String
+  requestedBy       UserProfile               @relation("RequestedVerification", fields: [requestedByUserId], references: [id])
+  status            VerificationRequestStatus @default(pending_review)
+  documentUrl       String?
+  documentPath      String?
+  documentFilename  String?
+  adminNote         String?
+  reviewedByUserId  String?
+  reviewedBy        UserProfile?              @relation("ReviewedVerification", fields: [reviewedByUserId], references: [id])
+  reviewedAt        DateTime?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model Inquiry {
+  id                 String        @id @default(cuid())
+  buyerCompanyId     String
+  buyerCompany       Company       @relation("BuyerCompanyInquiries", fields: [buyerCompanyId], references: [id])
+  sellerCompanyId    String
+  sellerCompany      Company       @relation("SellerCompanyInquiries", fields: [sellerCompanyId], references: [id])
+  productId          String?
+  product            Product?      @relation(fields: [productId], references: [id])
+  senderUserId       String
+  sender             UserProfile   @relation("InquirySender", fields: [senderUserId], references: [id])
+  recipientCompanyId String
+  recipientCompany   Company       @relation("RecipientCompanyInquiries", fields: [recipientCompanyId], references: [id])
+  message            String
+  quantity           String?
+  targetDate         DateTime?
+  status             InquiryStatus @default(sent)
+  messages           Message[]
+  deals              Deal[]
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([buyerCompanyId, sellerCompanyId])
+  @@index([recipientCompanyId, status])
+}
+
+model SavedItem {
+  id          String        @id @default(cuid())
+  userId      String
+  user        UserProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String?
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  companyId   String?
+  company     Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  externalId  String?
+  displayName String?
+  imageUrl    String?
+  href        String?
+  type        SavedItemType
+  createdAt   DateTime      @default(now())
+
+  @@unique([userId, productId])
+  @@unique([userId, companyId])
+  @@unique([userId, type, externalId])
+}
+
+model Message {
+  id                String       @id @default(cuid())
+  inquiryId         String?
+  inquiry           Inquiry?     @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  senderUserId      String
+  sender            UserProfile  @relation("MessageSender", fields: [senderUserId], references: [id])
+  receiverUserId    String?
+  receiver          UserProfile? @relation("MessageReceiver", fields: [receiverUserId], references: [id])
+  senderCompanyId   String?
+  senderCompany     Company?     @relation("MessageSenderCompany", fields: [senderCompanyId], references: [id])
+  receiverCompanyId String?
+  receiverCompany   Company?     @relation("MessageReceiverCompany", fields: [receiverCompanyId], references: [id])
+  body              String
+  createdAt         DateTime     @default(now())
+
+  @@index([inquiryId, createdAt])
+}
+
+model Deal {
+  id                 String             @id @default(cuid())
+  inquiryId          String?
+  inquiry            Inquiry?           @relation(fields: [inquiryId], references: [id])
+  buyerCompanyId     String
+  buyerCompany       Company            @relation("BuyerCompanyDeals", fields: [buyerCompanyId], references: [id])
+  sellerCompanyId    String
+  sellerCompany      Company            @relation("SellerCompanyDeals", fields: [sellerCompanyId], references: [id])
+  productId          String?
+  product            Product?           @relation(fields: [productId], references: [id])
+  contractTitle      String
+  contractValue      Decimal            @db.Decimal(16, 2)
+  currency           String             @default("USD")
+  dealStatus         DealStatus         @default(proposed)
+  completedAt        DateTime?
+  createdByUserId    String
+  createdBy          UserProfile        @relation("DealCreator", fields: [createdByUserId], references: [id])
+  confirmedByBuyer   Boolean            @default(false)
+  confirmedBySeller  Boolean            @default(false)
+  isPublic           Boolean            @default(false)
+  publicValueDisplay PublicValueDisplay @default(hidden)
+  contractFilePath   String?
+  contractFileName   String?
+  reviews            Review[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@index([buyerCompanyId, sellerCompanyId, dealStatus])
+}
+
+model Review {
+  id                   String             @id @default(cuid())
+  dealId               String
+  deal                 Deal               @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  reviewerCompanyId    String
+  reviewerCompany      Company            @relation("ReviewWriter", fields: [reviewerCompanyId], references: [id])
+  reviewedCompanyId    String
+  reviewedCompany      Company            @relation("ReviewRecipient", fields: [reviewedCompanyId], references: [id])
+  rating               Int
+  reviewTitle          String?
+  reviewText           String
+  contractValue        Decimal            @db.Decimal(16, 2)
+  currency             String             @default("USD")
+  isVerifiedDealReview Boolean            @default(true)
+  publicValueDisplay   PublicValueDisplay @default(hidden)
+  isPublic             Boolean            @default(true)
+  adminApproved        Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@unique([dealId, reviewerCompanyId])
+  @@index([reviewedCompanyId, isPublic, adminApproved])
+}
+
+model CompanyReview {
+  id                String    @id @default(cuid())
+  reviewerCompanyId String
+  reviewerCompany   Company   @relation("CompanyReviewWriter", fields: [reviewerCompanyId], references: [id], onDelete: Cascade)
+  reviewedCompanyId String
+  reviewedCompany   Company   @relation("CompanyReviewRecipient", fields: [reviewedCompanyId], references: [id], onDelete: Cascade)
+  rating            Int
+  comment           String
+  isPublic          Boolean   @default(true)
+  deletedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([reviewedCompanyId, isPublic, createdAt])
+  @@index([reviewerCompanyId, createdAt])
+}
