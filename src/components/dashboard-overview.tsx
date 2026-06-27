@@ -1,35 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
-import { AccountPageButton } from "@/components/account-page-button";
 import { RoleBadge } from "@/components/role-badge";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 import type { AccountRole } from "@/lib/types";
 
-type UserContext = {
-  role: AccountRole;
-  isAdmin: boolean;
-  companies: Array<{
-    id: string;
-    companyRole: "seller" | "buyer";
-    verificationStatus: string;
-    legalName: string;
-    tradeName: string | null;
-  }>;
-};
-
 export function DashboardOverview({ role }: { role: AccountRole }) {
   const { locale, t } = useI18n();
-  const [context, setContext] = useState<UserContext | null>(null);
-
-  useEffect(() => {
-    void fetch("/api/user/context")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((value: UserContext | null) => setContext(value));
-  }, []);
+  const { context } = useUserContext();
 
   const effectiveRole = context?.role ?? role;
   const companies = context?.companies ?? [];
@@ -107,16 +88,6 @@ export function DashboardOverview({ role }: { role: AccountRole }) {
         );
       })}
 
-      <section className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
-        <AccountPageButton page="professional">
-          {t("settings.professionalInfo")}
-        </AccountPageButton>
-        {effectiveRole !== "user" && effectiveRole !== "admin" ? (
-          <AccountPageButton page="company">
-            {t("settings.myCompany")}
-          </AccountPageButton>
-        ) : null}
-      </section>
     </div>
   );
 }

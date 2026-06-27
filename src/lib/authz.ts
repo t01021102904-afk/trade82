@@ -9,6 +9,7 @@ import type {
   Product,
   UserProfile,
 } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 
 type CompanyWithOwner = Company & {
@@ -26,6 +27,26 @@ function roleFromMetadata(value: unknown): AccountRole {
     value === "admin"
     ? value
     : "user";
+}
+
+function roleForExistingProfile(
+  existingRole: AccountRole,
+  metadataRole: AccountRole,
+  admin: boolean,
+) {
+  if (admin) return "admin";
+  if (existingRole === "admin") return metadataRole === "admin" ? "admin" : "user";
+  if (existingRole === "user" && metadataRole !== "admin") return metadataRole;
+  return existingRole;
+}
+
+function isEmailUniqueConflict(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002" &&
+    Array.isArray(error.meta?.target) &&
+    error.meta.target.includes("email")
+  );
 }
 
 export function adminEmails() {
@@ -53,30 +74,62 @@ export async function getCurrentUserProfile() {
   if (!clerkUser || !primaryEmail) return null;
 
   const admin = isAdminEmail(primaryEmail);
-  const role: AccountRole = admin
-    ? "admin"
-    : roleFromMetadata(clerkUser.publicMetadata.role);
+  const metadataRole = roleFromMetadata(clerkUser.publicMetadata.role);
+  const createRole: AccountRole = admin ? "admin" : metadataRole;
   const preferredLanguage =
     clerkUser.publicMetadata.preferredLanguage === "ko" ? "ko" : "en";
+  const email = primaryEmail.toLowerCase();
+  const displayName =
+    clerkUser.fullName || primaryEmail.split("@")[0] || "Trade82 User";
+  const db = getDb();
 
-  return getDb().userProfile.upsert({
-    where: { clerkUserId: userId },
-    create: {
-      clerkUserId: userId,
-      email: primaryEmail.toLowerCase(),
-      displayName:
-        clerkUser.fullName || primaryEmail.split("@")[0] || "BridgeMarket User",
-      role,
-      preferredLanguage,
-    },
-    update: {
-      email: primaryEmail.toLowerCase(),
-      displayName:
-        clerkUser.fullName || primaryEmail.split("@")[0] || "BridgeMarket User",
-      role,
-      preferredLanguage,
-    },
-  });
+  const updateExistingProfile = (profile: UserProfile) =>
+    db.userProfile.update({
+      where: { id: profile.id },
+      data: {
+        clerkUserId: userId,
+        email,
+        displayName: profile.displayName || displayName,
+        role: roleForExistingProfile(profile.role, metadataRole, admin),
+        preferredLanguage,
+      },
+    });
+
+  try {
+    const existingByClerkId = await db.userProfile.findUnique({
+      where: { clerkUserId: userId },
+    });
+    if (existingByClerkId) {
+      return await updateExistingProfile(existingByClerkId);
+    }
+
+    const existingByEmail = await db.userProfile.findUnique({
+      where: { email },
+    });
+    if (existingByEmail) {
+      console.warn("Linking existing user profile to current auth identity.");
+      return await updateExistingProfile(existingByEmail);
+    }
+
+    return await db.userProfile.create({
+      data: {
+        clerkUserId: userId,
+        email,
+        displayName,
+        role: createRole,
+        preferredLanguage,
+      },
+    });
+  } catch (error) {
+    if (!isEmailUniqueConflict(error)) throw error;
+
+    console.warn("Recovered user profile after email uniqueness conflict.");
+    const existingByEmail = await db.userProfile.findUnique({
+      where: { email },
+    });
+    if (!existingByEmail) throw error;
+    return updateExistingProfile(existingByEmail);
+  }
 }
 
 export async function requireAuth() {
@@ -141,7 +194,7 @@ export async function requireCompanyOwner(companyId: string) {
 export async function requireVerifiedSeller() {
   const { user, company } = await requireSeller();
   if (!company || company.verificationStatus !== "verified") {
-    throw new Response("Verified seller required", { status: 403 });
+    throw new Response("Listed seller required", { status: 403 });
   }
   return { user, company };
 }

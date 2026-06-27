@@ -1,10 +1,20 @@
 import { apiError } from "@/lib/api-response";
+import { rateLimitOrResponse } from "@/lib/api-security";
 import { requireSeller } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const { user, company } = await requireSeller();
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "user-review-request",
+      userId: user.id,
+      limit: 10,
+      windowMs: 60 * 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
     if (!company) {
       return Response.json(
         { error: "Create your Korean seller company first." },

@@ -342,6 +342,7 @@ export type CompanyWhereInput = {
   recipientInquiries?: Prisma.InquiryListRelationFilter
   sentCompanyMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
+  uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   buyerDeals?: Prisma.DealListRelationFilter
   sellerDeals?: Prisma.DealListRelationFilter
@@ -382,6 +383,7 @@ export type CompanyOrderByWithRelationInput = {
   recipientInquiries?: Prisma.InquiryOrderByRelationAggregateInput
   sentCompanyMessages?: Prisma.MessageOrderByRelationAggregateInput
   receivedMessages?: Prisma.MessageOrderByRelationAggregateInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentOrderByRelationAggregateInput
   savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
   buyerDeals?: Prisma.DealOrderByRelationAggregateInput
   sellerDeals?: Prisma.DealOrderByRelationAggregateInput
@@ -426,6 +428,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   recipientInquiries?: Prisma.InquiryListRelationFilter
   sentCompanyMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
+  uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   buyerDeals?: Prisma.DealListRelationFilter
   sellerDeals?: Prisma.DealListRelationFilter
@@ -519,6 +522,7 @@ export type CompanyCreateInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -558,6 +562,7 @@ export type CompanyUncheckedCreateInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -597,6 +602,7 @@ export type CompanyUpdateInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -636,6 +642,7 @@ export type CompanyUncheckedUpdateInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1038,6 +1045,20 @@ export type CompanyUpdateOneWithoutReceivedMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutReceivedMessagesInput, Prisma.CompanyUpdateWithoutReceivedMessagesInput>, Prisma.CompanyUncheckedUpdateWithoutReceivedMessagesInput>
 }
 
+export type CompanyCreateNestedOneWithoutUploadedMessageAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutUploadedMessageAttachmentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutUploadedMessageAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutUploadedMessageAttachmentsInput
+  upsert?: Prisma.CompanyUpsertWithoutUploadedMessageAttachmentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUpdateWithoutUploadedMessageAttachmentsInput>, Prisma.CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+}
+
 export type CompanyCreateNestedOneWithoutBuyerDealsInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutBuyerDealsInput, Prisma.CompanyUncheckedCreateWithoutBuyerDealsInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutBuyerDealsInput
@@ -1151,6 +1172,7 @@ export type CompanyCreateWithoutOwnerInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1189,6 +1211,7 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1279,6 +1302,7 @@ export type CompanyCreateWithoutSellerProfileInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1317,6 +1341,7 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1371,6 +1396,7 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1409,6 +1435,7 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1447,6 +1474,7 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1485,6 +1513,7 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1539,6 +1568,7 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1577,6 +1607,7 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1615,6 +1646,7 @@ export type CompanyCreateWithoutProductsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1653,6 +1685,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1707,6 +1740,7 @@ export type CompanyUpdateWithoutProductsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1745,6 +1779,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1783,6 +1818,7 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1821,6 +1857,7 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1875,6 +1912,7 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1913,6 +1951,7 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1951,6 +1990,7 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1989,6 +2029,7 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2032,6 +2073,7 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2070,6 +2112,7 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2113,6 +2156,7 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2151,6 +2195,7 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2205,6 +2250,7 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2243,6 +2289,7 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2292,6 +2339,7 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2330,6 +2378,7 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2379,6 +2428,7 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2417,6 +2467,7 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2456,6 +2507,7 @@ export type CompanyCreateWithoutSavedItemsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -2494,6 +2546,7 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -2548,6 +2601,7 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -2586,6 +2640,7 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -2623,6 +2678,7 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2661,6 +2717,7 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2704,6 +2761,7 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2742,6 +2800,7 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2796,6 +2855,7 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2834,6 +2894,7 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2883,6 +2944,7 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2921,6 +2983,179 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
+  id?: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserProfileCreateNestedOneWithoutCompaniesInput
+  sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
+  id?: string
+  ownerUserId: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutUploadedMessageAttachmentsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+}
+
+export type CompanyUpsertWithoutUploadedMessageAttachmentsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutUploadedMessageAttachmentsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+}
+
+export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserProfileUpdateOneRequiredWithoutCompaniesNestedInput
+  sellerProfile?: Prisma.SellerProfileUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2960,6 +3195,7 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -2998,6 +3234,7 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -3041,6 +3278,7 @@ export type CompanyCreateWithoutSellerDealsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -3079,6 +3317,7 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -3133,6 +3372,7 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -3171,6 +3411,7 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -3220,6 +3461,7 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -3258,6 +3500,7 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -3296,6 +3539,7 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3334,6 +3578,7 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3377,6 +3622,7 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3415,6 +3661,7 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3469,6 +3716,7 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3507,6 +3755,7 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3556,6 +3805,7 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3594,6 +3844,7 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3632,6 +3883,7 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3670,6 +3922,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3713,6 +3966,7 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3751,6 +4005,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3805,6 +4060,7 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3843,6 +4099,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3892,6 +4149,7 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3930,6 +4188,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3989,6 +4248,7 @@ export type CompanyUpdateWithoutOwnerInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -4027,6 +4287,7 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -4071,6 +4332,7 @@ export type CompanyCountOutputType = {
   recipientInquiries: number
   sentCompanyMessages: number
   receivedMessages: number
+  uploadedMessageAttachments: number
   savedItems: number
   buyerDeals: number
   sellerDeals: number
@@ -4088,6 +4350,7 @@ export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   recipientInquiries?: boolean | CompanyCountOutputTypeCountRecipientInquiriesArgs
   sentCompanyMessages?: boolean | CompanyCountOutputTypeCountSentCompanyMessagesArgs
   receivedMessages?: boolean | CompanyCountOutputTypeCountReceivedMessagesArgs
+  uploadedMessageAttachments?: boolean | CompanyCountOutputTypeCountUploadedMessageAttachmentsArgs
   savedItems?: boolean | CompanyCountOutputTypeCountSavedItemsArgs
   buyerDeals?: boolean | CompanyCountOutputTypeCountBuyerDealsArgs
   sellerDeals?: boolean | CompanyCountOutputTypeCountSellerDealsArgs
@@ -4154,6 +4417,13 @@ export type CompanyCountOutputTypeCountSentCompanyMessagesArgs<ExtArgs extends r
  */
 export type CompanyCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MessageWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountUploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageAttachmentWhereInput
 }
 
 /**
@@ -4237,6 +4507,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   recipientInquiries?: boolean | Prisma.Company$recipientInquiriesArgs<ExtArgs>
   sentCompanyMessages?: boolean | Prisma.Company$sentCompanyMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.Company$receivedMessagesArgs<ExtArgs>
+  uploadedMessageAttachments?: boolean | Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.Company$savedItemsArgs<ExtArgs>
   buyerDeals?: boolean | Prisma.Company$buyerDealsArgs<ExtArgs>
   sellerDeals?: boolean | Prisma.Company$sellerDealsArgs<ExtArgs>
@@ -4330,6 +4601,7 @@ export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   recipientInquiries?: boolean | Prisma.Company$recipientInquiriesArgs<ExtArgs>
   sentCompanyMessages?: boolean | Prisma.Company$sentCompanyMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.Company$receivedMessagesArgs<ExtArgs>
+  uploadedMessageAttachments?: boolean | Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.Company$savedItemsArgs<ExtArgs>
   buyerDeals?: boolean | Prisma.Company$buyerDealsArgs<ExtArgs>
   sellerDeals?: boolean | Prisma.Company$sellerDealsArgs<ExtArgs>
@@ -4359,6 +4631,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     recipientInquiries: Prisma.$InquiryPayload<ExtArgs>[]
     sentCompanyMessages: Prisma.$MessagePayload<ExtArgs>[]
     receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
+    uploadedMessageAttachments: Prisma.$MessageAttachmentPayload<ExtArgs>[]
     savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
     buyerDeals: Prisma.$DealPayload<ExtArgs>[]
     sellerDeals: Prisma.$DealPayload<ExtArgs>[]
@@ -4792,6 +5065,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   recipientInquiries<T extends Prisma.Company$recipientInquiriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$recipientInquiriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentCompanyMessages<T extends Prisma.Company$sentCompanyMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sentCompanyMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedMessages<T extends Prisma.Company$receivedMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uploadedMessageAttachments<T extends Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedItems<T extends Prisma.Company$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   buyerDeals<T extends Prisma.Company$buyerDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$buyerDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sellerDeals<T extends Prisma.Company$sellerDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sellerDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5452,6 +5726,30 @@ export type Company$receivedMessagesArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Company.uploadedMessageAttachments
+ */
+export type Company$uploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageAttachment
+   */
+  select?: Prisma.MessageAttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageAttachment
+   */
+  omit?: Prisma.MessageAttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageAttachmentInclude<ExtArgs> | null
+  where?: Prisma.MessageAttachmentWhereInput
+  orderBy?: Prisma.MessageAttachmentOrderByWithRelationInput | Prisma.MessageAttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.MessageAttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageAttachmentScalarFieldEnum | Prisma.MessageAttachmentScalarFieldEnum[]
 }
 
 /**

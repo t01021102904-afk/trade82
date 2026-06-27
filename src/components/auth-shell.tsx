@@ -1,20 +1,24 @@
 import { SignIn, SignUp } from "@clerk/nextjs";
 
 import { getDictionary, type Locale } from "@/lib/i18n";
+import { safeInternalPath } from "@/lib/url-security";
 
 export function AuthShell({
   locale,
   mode,
   basePath,
+  redirectUrl,
 }: {
   locale: Locale;
   mode: "login" | "signup";
   basePath: "" | "/en" | "/ko";
+  redirectUrl?: string;
 }) {
   const messages = getDictionary(locale);
   const isLogin = mode === "login";
   const rolePath = `${basePath}/onboarding/role`;
   const dashboardPath = `${basePath}/dashboard`;
+  const loginRedirectPath = safeInternalPath(redirectUrl, dashboardPath);
 
   return (
     <div className="bg-zinc-50">
@@ -36,6 +40,7 @@ export function AuthShell({
               routing="path"
               path={`${basePath}/login`}
               signUpUrl={`${basePath}/signup`}
+              forceRedirectUrl={loginRedirectPath}
               fallbackRedirectUrl={dashboardPath}
             />
           ) : (

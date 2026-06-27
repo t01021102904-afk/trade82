@@ -2,9 +2,14 @@ import { DashboardOverview } from "@/components/dashboard-overview";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
+import { redirect } from "next/navigation";
 
 export default async function KoDashboardPage() {
   const { role } = await requireAppProfile("/ko/dashboard");
+  if (role === "buyer") redirect("/ko/dashboard/buyer");
+  if (role === "seller" || role === "both") redirect("/ko/dashboard/seller");
+  if (role === "admin") redirect("/ko/admin");
+
   const messages = getDictionary("ko");
   return (
     <div className="bg-zinc-50">

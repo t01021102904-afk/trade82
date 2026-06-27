@@ -1,5 +1,21 @@
 import { AuthShell } from "@/components/auth-shell";
 
-export default function EnLoginPage() {
-  return <AuthShell locale="en" mode="login" basePath="/en" />;
+export default async function EnLoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const redirectUrl = Array.isArray(params.redirect_url)
+    ? params.redirect_url[0]
+    : params.redirect_url;
+
+  return (
+    <AuthShell
+      locale="en"
+      mode="login"
+      basePath="/en"
+      redirectUrl={redirectUrl}
+    />
+  );
 }

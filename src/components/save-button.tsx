@@ -3,10 +3,11 @@
 import { useUser } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
+import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
 const savedItemsByUser = new Map<string, Set<string>>();
@@ -48,36 +49,53 @@ export function SaveButton({
   const { isLoaded, isSignedIn, user } = useUser();
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
+  const [waitingForSession, setWaitingForSession] = useState(false);
+  const [loadedSavedKey, setLoadedSavedKey] = useState("");
   const [feedback, setFeedback] = useState("");
   const interacted = useRef(false);
+  const queuedToggle = useRef(false);
   const redirecting = useRef(false);
+  const role = user?.publicMetadata.role;
+  const canUseSavedItems = role === "buyer" || role === "both";
+  const userId = isSignedIn && canUseSavedItems ? user?.id : "";
+  const savedItemsKey = userId ? `${userId}:${id}` : "";
+  const savedItemsReady = !userId || loadedSavedKey === savedItemsKey;
+  const savedFeedback =
+    kind === "company" ? t("common.followingCompany") : t("common.saved");
+  const removedFeedback =
+    kind === "company" ? t("common.unfollowedCompany") : t("common.removed");
 
   useEffect(() => {
     interacted.current = false;
-    if (!isSignedIn || !user) return;
+    if (!userId) return;
     let active = true;
-    void loadSavedItems(user.id).then((items) => {
+    void loadSavedItems(userId).then((items) => {
       if (active) {
         if (!interacted.current) {
           setSaved(items.has(id));
         }
+        setLoadedSavedKey(savedItemsKey);
       }
     });
     return () => {
       active = false;
     };
-  }, [id, isSignedIn, kind, user]);
+  }, [id, isSignedIn, savedItemsKey, userId]);
 
-  async function toggleSave() {
-    if (!isLoaded || pending) return;
+  const redirectToLogin = useCallback(() => {
+    if (redirecting.current) return;
+    redirecting.current = true;
+    const loginPath = withLocale("/login", locale);
+    const currentUrl = safeInternalPath(`${pathname}${window.location.search}`, "/");
+    window.location.assign(
+      `${loginPath}?redirect_url=${encodeURIComponent(currentUrl)}`,
+    );
+  }, [locale, pathname]);
+
+  const toggleSave = useCallback(async () => {
+    if (pending) return;
     if (!isSignedIn) {
-      if (redirecting.current) return;
-      redirecting.current = true;
-      const loginPath = withLocale("/login", locale);
-      const currentUrl = `${pathname}${window.location.search}`;
-      window.location.assign(
-        `${loginPath}?redirect_url=${encodeURIComponent(currentUrl)}`,
-      );
+      redirectToLogin();
       return;
     }
 
@@ -86,7 +104,7 @@ export function SaveButton({
     const optimistic = !previous;
     setSaved(optimistic);
     setPending(true);
-    setFeedback(optimistic ? t("common.saved") : t("common.removed"));
+    setFeedback(optimistic ? savedFeedback : removedFeedback);
 
     try {
       const response = await fetch("/api/saved-items", {
@@ -102,15 +120,13 @@ export function SaveButton({
         setFeedback(result?.error || t("common.saveError"));
       } else {
         setSaved(result.saved);
-        if (user) {
-          const cached = savedItemsByUser.get(user.id) ?? new Set<string>();
+        if (userId) {
+          const cached = savedItemsByUser.get(userId) ?? new Set<string>();
           if (result.saved) cached.add(id);
           else cached.delete(id);
-          savedItemsByUser.set(user.id, cached);
+          savedItemsByUser.set(userId, cached);
         }
-        setFeedback(
-          result.saved ? t("common.saved") : t("common.removed"),
-        );
+        setFeedback(result.saved ? savedFeedback : removedFeedback);
       }
     } catch {
       setSaved(previous);
@@ -119,18 +135,63 @@ export function SaveButton({
       setPending(false);
       window.setTimeout(() => setFeedback(""), 1800);
     }
+  }, [
+    id,
+    isSignedIn,
+    kind,
+    pending,
+    redirectToLogin,
+    removedFeedback,
+    saved,
+    savedFeedback,
+    t,
+    userId,
+  ]);
+
+  useEffect(() => {
+    if (!queuedToggle.current || pending || !isLoaded) return;
+    if (isSignedIn && canUseSavedItems && !savedItemsReady) return;
+
+    queuedToggle.current = false;
+    queueMicrotask(() => {
+      setWaitingForSession(false);
+      setFeedback("");
+      void toggleSave();
+    });
+  }, [
+    canUseSavedItems,
+    isLoaded,
+    isSignedIn,
+    pending,
+    savedItemsReady,
+    toggleSave,
+  ]);
+
+  function requestToggle() {
+    if (pending || waitingForSession) return;
+
+    if (!isLoaded || (isSignedIn && canUseSavedItems && !savedItemsReady)) {
+      queuedToggle.current = true;
+      setWaitingForSession(true);
+      setFeedback(t("common.loading"));
+      return;
+    }
+
+    void toggleSave();
   }
 
-  const label = saved
-    ? t("common.saved")
-    : kind === "product"
-      ? t("common.saveProduct")
-      : t("common.saveCompany");
-  const role = user?.publicMetadata.role;
+  const visibleSaved = isSignedIn && canUseSavedItems ? saved : false;
+  const label =
+    kind === "company"
+      ? visibleSaved
+        ? t("common.unfollowCompany")
+        : t("common.saveCompany")
+      : visibleSaved
+        ? t("common.saved")
+        : t("common.saveProduct");
   if (
     isSignedIn &&
-    role !== "buyer" &&
-    role !== "both"
+    !canUseSavedItems
   ) {
     return null;
   }
@@ -143,23 +204,23 @@ export function SaveButton({
         onClick={(event) => {
           event.preventDefault();
           event.stopPropagation();
-          void toggleSave();
+          requestToggle();
         }}
-        disabled={!isLoaded || pending}
+        disabled={pending || waitingForSession}
         className={cx(
           "inline-flex min-h-11 w-full items-center justify-center rounded-md border text-sm font-medium transition disabled:cursor-wait disabled:opacity-70",
           iconOnly ? "min-w-11 p-2.5" : "px-3.5 py-2",
-          saved
+          visibleSaved
             ? "border-blue-200 bg-blue-50 text-blue-700"
             : "border-zinc-200 bg-white text-zinc-700 hover:border-blue-200 hover:text-blue-700",
         )}
         aria-label={label}
-        aria-pressed={saved}
+        aria-pressed={visibleSaved}
         title={label}
       >
         {iconOnly ? (
           <Heart
-            className={cx("size-5", saved && "fill-current")}
+            className={cx("size-5", visibleSaved && "fill-current")}
             aria-hidden="true"
           />
         ) : (

@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { marketplaceCategories } from "@/lib/marketplace";
+import { databaseProductToCard } from "@/lib/public-marketplace-presenters";
 import type { Product } from "@/lib/types";
 
 function SelectField({
@@ -37,26 +38,21 @@ function SelectField({
   );
 }
 
-export function MarketplaceClient({ products }: { products: Product[] }) {
+export function MarketplaceClient() {
   const { t } = useI18n();
   const [databaseProducts, setDatabaseProducts] = useState<Product[]>([]);
   const [databaseLoading, setDatabaseLoading] = useState(true);
-  const visibleProducts = useMemo(
-    () => [
-      ...databaseProducts,
-      ...products.filter(
-        (product) =>
-          !databaseProducts.some((databaseProduct) => databaseProduct.id === product.id),
-      ),
-    ],
-    [databaseProducts, products],
-  );
+  const visibleProducts = databaseProducts;
 
   useEffect(() => {
     void fetch("/api/public/marketplace")
       .then((response) => (response.ok ? response.json() : { products: [] }))
       .then((result: { products?: Array<Record<string, unknown>> }) => {
         setDatabaseProducts((result.products ?? []).map(databaseProductToCard));
+        setDatabaseLoading(false);
+      })
+      .catch(() => {
+        setDatabaseProducts([]);
         setDatabaseLoading(false);
       });
   }, []);
@@ -117,7 +113,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
 
   return (
     <div className="grid min-w-0 gap-8">
-      <div className="grid min-w-0 gap-5">
+      <div className="bm-premium-card grid min-w-0 gap-5 rounded-lg border border-zinc-200 bg-white/90 p-4 shadow-sm shadow-zinc-100 backdrop-blur">
         <label className="relative block">
           <span className="sr-only">{t("marketplace.searchProducts")}</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
@@ -152,7 +148,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
           </div>
         </div>
 
-        <details className="rounded-md border border-zinc-200 bg-white">
+        <details className="relative z-10 rounded-md border border-zinc-200 bg-white">
           <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-zinc-700">
             {t("marketplace.moreFilters")}
           </summary>
@@ -200,7 +196,7 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
           </div>
         </details>
 
-        <div className="flex min-h-11 items-center justify-between border-b border-zinc-200 pb-3 text-sm text-zinc-600">
+        <div className="relative z-10 flex min-h-11 items-center justify-between border-t border-zinc-100 pt-3 text-sm text-zinc-600">
           <span>{filtered.length} {t("marketplace.productsFound")}</span>
           <button
             type="button"
@@ -232,74 +228,19 @@ export function MarketplaceClient({ products }: { products: Product[] }) {
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center">
-          <h2 className="text-lg font-semibold text-zinc-950">{t("marketplace.emptyTitle")}</h2>
+        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center shadow-sm shadow-zinc-100">
+          <h2 className="text-lg font-semibold text-zinc-950">
+            {visibleProducts.length
+              ? t("marketplace.emptyTitle")
+              : t("marketplace.noProductsListed")}
+          </h2>
           <p className="mt-2 text-sm text-zinc-600">
-            {t("marketplace.emptyText")}
+            {visibleProducts.length
+              ? t("marketplace.emptyText")
+              : t("marketplace.noProductsListedText")}
           </p>
         </div>
       )}
     </div>
   );
-}
-
-function databaseProductToCard(value: Record<string, unknown>): Product {
-  const company = (value.sellerCompany ?? {}) as Record<string, unknown>;
-  const images = Array.isArray(value.images)
-    ? (value.images as Array<Record<string, unknown>>)
-    : [];
-  const priceMin = value.priceMin ? Number(value.priceMin) : 0;
-  const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
-  const currency = String(value.currency ?? "USD");
-  const price =
-    priceMin && priceMax !== priceMin
-      ? `${currency} ${priceMin}-${priceMax}`
-      : priceMin
-        ? `${currency} ${priceMin}`
-        : "Price on request";
-
-  return {
-    id: String(value.id),
-    name: String(value.name),
-    category: value.category as Product["category"],
-    sellerId: String(company.id),
-    sellerName: String(company.tradeName ?? company.legalName ?? ""),
-    sellerLocation: [company.city, company.country].filter(Boolean).join(", "),
-    sellerLogoUrl:
-      typeof company.logoThumbnailUrl === "string"
-        ? company.logoThumbnailUrl
-        : typeof company.logoUrl === "string"
-          ? company.logoUrl
-          : undefined,
-    sellerUseDefaultLogo: company.useDefaultLogo !== false,
-    shortDescription: String(value.shortDescription ?? ""),
-    longDescription: String(value.detailedDescription ?? ""),
-    wholesalePrice: price,
-    wholesalePriceValue: priceMin,
-    moq: String(value.moq ?? ""),
-    moqUnits: Number(String(value.moq ?? "").replace(/\D/g, "")) || 0,
-    leadTime: String(value.leadTime ?? ""),
-    monthlyCapacity: "Contact seller",
-    sampleAvailable: false,
-    privateLabelAvailable: false,
-    countryOfOrigin: "South Korea",
-    shippingOrigin: String(company.country ?? "South Korea"),
-    incoterms: ["Contact seller"],
-    hsCode: "Contact seller",
-    certifications: Array.isArray(value.certifications)
-      ? (value.certifications as string[])
-      : [],
-    documentsAvailable: [],
-    packageSize: String(value.packaging ?? ""),
-    unitsPerCarton: "Contact seller",
-    cartonWeight: "Contact seller",
-    koreanMarketFit: String(value.ingredientsOrMaterials ?? ""),
-    suggestedSalesChannels: [],
-    riskNotes: [],
-    imagePlaceholder: String(images[0]?.cardUrl ?? value.imageUrl ?? "/window.svg"),
-    imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)),
-    tags: Array.isArray(value.tags) ? (value.tags as string[]) : [],
-    createdAt: String(value.createdAt ?? new Date().toISOString()),
-    verificationStatus: "verified",
-  };
 }

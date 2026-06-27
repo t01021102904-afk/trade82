@@ -1,12 +1,13 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
+import { safeInternalPath } from "@/lib/url-security";
 
 type CompanyReview = {
   id: string;
@@ -23,18 +24,18 @@ export function CompanyReviewsSection({
   companyId: string;
   companyRole: "seller" | "buyer";
 }) {
-  const { isLoaded, user } = useUser();
+  const { context: userContext, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
   const pathname = usePathname();
   const [reviews, setReviews] = useState<CompanyReview[]>([]);
   const [average, setAverage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [canReview, setCanReview] = useState(true);
+  const [canReview, setCanReview] = useState(false);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdmin = userContext?.isAdmin === true;
 
   useEffect(() => {
     let active = true;
@@ -55,11 +56,12 @@ export function CompanyReviewsSection({
       const result = (await response.json()) as {
         reviews: CompanyReview[];
         averageRating: number;
+        canReview?: boolean;
       };
       if (!active) return;
       setReviews(result.reviews);
       setAverage(result.averageRating);
-      setCanReview(true);
+      setCanReview(result.canReview !== false);
       setLoading(false);
     })();
 
@@ -81,20 +83,13 @@ export function CompanyReviewsSection({
     const result = (await response.json()) as {
       reviews: CompanyReview[];
       averageRating: number;
+      canReview?: boolean;
     };
     setReviews(result.reviews);
     setAverage(result.averageRating);
-    setCanReview(true);
+    setCanReview(result.canReview !== false);
     setLoading(false);
   }
-
-  useEffect(() => {
-    void fetch("/api/user/context")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((result: { isAdmin?: boolean } | null) => {
-        setIsAdmin(Boolean(result?.isAdmin));
-      });
-  }, []);
 
   async function submitReview() {
     setSubmitting(true);
@@ -125,7 +120,7 @@ export function CompanyReviewsSection({
   }
 
   const loginHref = withLocale(
-    `/login?redirect_url=${encodeURIComponent(pathname || "/")}`,
+    `/login?redirect_url=${encodeURIComponent(safeInternalPath(pathname || "/", "/"))}`,
     locale,
   );
 
@@ -205,7 +200,7 @@ export function CompanyReviewsSection({
             </div>
             <p className="mt-3 text-sm leading-6 text-zinc-700">{review.comment}</p>
             <div className="mt-4 flex items-center justify-between gap-2">
-              <p className="text-xs text-zinc-500">{new Date(review.createdAt).toLocaleDateString()}</p>
+              <p className="text-xs text-zinc-500">{formatDateUtc(review.createdAt, locale)}</p>
               {isAdmin ? (
                 <button
                   type="button"
@@ -234,4 +229,14 @@ function stars(value: number) {
       ★
     </span>
   ));
+}
+
+function formatDateUtc(value: string, locale: "en" | "ko") {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return locale === "ko" ? `${year}.${month}.${day}` : `${month}/${day}/${year}`;
 }

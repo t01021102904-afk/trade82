@@ -2,9 +2,14 @@ import { DashboardOverview } from "@/components/dashboard-overview";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
+import { redirect } from "next/navigation";
 
 export default async function EnDashboardPage() {
   const { role } = await requireAppProfile("/en/dashboard");
+  if (role === "buyer") redirect("/en/dashboard/buyer");
+  if (role === "seller" || role === "both") redirect("/en/dashboard/seller");
+  if (role === "admin") redirect("/en/admin");
+
   const messages = getDictionary("en");
 
   return (

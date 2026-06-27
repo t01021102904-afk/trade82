@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import type { AccountRole } from "@/lib/types";
+import { safeInternalPath } from "@/lib/url-security";
 
 type PublicMetadata = {
   role?: unknown;
@@ -36,7 +37,9 @@ export async function requireAuth(redirectUrl: string) {
 
   if (!userId) {
     const prefix = localePrefix(redirectUrl);
-    redirect(`${prefix}/login?redirect_url=${encodeURIComponent(redirectUrl)}`);
+    const fallback = `${prefix || ""}/dashboard`;
+    const safeRedirectUrl = safeInternalPath(redirectUrl, fallback);
+    redirect(`${prefix}/login?redirect_url=${encodeURIComponent(safeRedirectUrl)}`);
   }
 }
 
@@ -50,6 +53,10 @@ export async function requireAppProfile(redirectUrl: string) {
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const role = profile?.role ?? "user";
+
+  if (role === "user") {
+    redirect(`${prefix}/onboarding/role`);
+  }
 
   if (
     (role === "seller" || role === "buyer" || role === "both") &&
@@ -76,11 +83,15 @@ export async function requireOnboardingRole(
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const role = profile?.role ?? "user";
 
-  if (
-    role !== "user" &&
-    role !== expectedRole &&
-    role !== "both"
-  ) {
+  if (role === "user") {
+    redirect(`${prefix}/onboarding/role`);
+  }
+
+  if (role === "admin") {
+    redirect(`${prefix}/admin`);
+  }
+
+  if (role !== expectedRole && role !== "both") {
     redirect(`${prefix}/onboarding/${role}`);
   }
 

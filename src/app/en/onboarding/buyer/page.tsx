@@ -9,7 +9,7 @@ export default async function EnBuyerOnboardingPage() {
 
   return (
     <div className="bg-zinc-50">
-      <div className="mx-auto grid max-w-4xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader
           label={messages.onboarding.buyerLabel}
           title={messages.onboarding.buyerTitle}

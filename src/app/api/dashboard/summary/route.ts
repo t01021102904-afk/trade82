@@ -23,6 +23,7 @@ export async function GET(request: Request) {
         dealReviews,
         companyReviewStats,
         dealReviewStats,
+        deals,
       ] = await Promise.all([
         getDb().product.findMany({
           where: { sellerCompanyId: company.id },
@@ -82,11 +83,24 @@ export async function GET(request: Request) {
           _count: true,
           _avg: { rating: true },
         }),
+        getDb().deal.findMany({
+          where: { sellerCompanyId: company.id },
+          select: {
+            dealStatus: true,
+            reviews: {
+              where: { reviewerCompanyId: company.id },
+              select: { id: true },
+            },
+          },
+        }),
       ]);
       const reviewCount = companyReviewStats._count + dealReviewStats._count;
       const ratingTotal =
         (companyReviewStats._avg.rating ?? 0) * companyReviewStats._count +
         (dealReviewStats._avg.rating ?? 0) * dealReviewStats._count;
+      const completedDeals = deals.filter(
+        (deal) => deal.dealStatus === "completed",
+      );
       return Response.json({
         company: {
           id: company.id,
@@ -96,11 +110,19 @@ export async function GET(request: Request) {
         metrics: {
           productViews: products.reduce((sum, item) => sum + item.viewCount, 0),
           companyViews: company.viewCount,
+          followers: companySavedCount,
           savedCount: companySavedCount + productSavedCount,
           inquiryCount,
+          receivedInquiries: inquiryCount,
+          completedDeals: completedDeals.length,
+          reviewRequests: completedDeals.filter(
+            (deal) => deal.reviews.length === 0,
+          ).length,
           reviewCount,
           averageRating: reviewCount ? ratingTotal / reviewCount : 0,
           productCount: products.length,
+          listedProductCount: products.filter((item) => item.status === "active")
+            .length,
         },
         recentReviews: [
           ...companyReviews.map((item) => ({
@@ -173,6 +195,13 @@ export async function GET(request: Request) {
         savedProducts: savedProductCount,
         savedCompanies: savedCompanyCount,
         inquiryCount,
+        sentInquiries: inquiryCount,
+        completedDeals: deals.filter((deal) => deal.dealStatus === "completed")
+          .length,
+        reviewRequests: deals.filter(
+          (deal) =>
+            deal.dealStatus === "completed" && deal.reviews.length === 0,
+        ).length,
         reviewedDeals: deals.filter((deal) => deal.reviews.length > 0).length,
       },
       recentSavedItems: savedItems,

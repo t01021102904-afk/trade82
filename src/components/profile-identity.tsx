@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { safeExternalUrl } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
 function initials(value: string) {
@@ -12,7 +13,7 @@ function initials(value: string) {
       .filter(Boolean)
       .slice(0, 2)
       .map((part) => part[0]?.toUpperCase())
-      .join("") || "BM"
+      .join("") || "T82"
   );
 }
 
@@ -27,10 +28,11 @@ export function PersonalAvatar({
   useDefault: boolean;
   className?: string;
 }) {
-  if (!useDefault && avatarUrl) {
+  const safeAvatarUrl = safeExternalUrl(avatarUrl);
+  if (!useDefault && safeAvatarUrl) {
     return (
       <Image
-        src={avatarUrl}
+        src={safeAvatarUrl}
         alt=""
         width={64}
         height={64}
@@ -75,16 +77,7 @@ export function CompanyLogo({
     lg: { pixels: 80, classes: "size-20 text-xl" },
   }[size];
   const shapeClass = shape === "circle" ? "rounded-full" : "rounded-md";
-  const validLogoUrl = (() => {
-    if (!logoUrl) return null;
-
-    try {
-      const url = new URL(logoUrl);
-      return url.protocol === "http:" || url.protocol === "https:" ? logoUrl : null;
-    } catch {
-      return null;
-    }
-  })();
+  const validLogoUrl = safeExternalUrl(logoUrl);
   const showImage =
     !useDefaultLogo && validLogoUrl !== null && failedUrl !== validLogoUrl;
 

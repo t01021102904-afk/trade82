@@ -1,5 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+import { safeInternalPath } from "@/lib/url-security";
+
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/messages(.*)",
@@ -11,6 +13,8 @@ const isProtectedRoute = createRouteMatcher([
   "/ko/messages(.*)",
   "/ko/onboarding(.*)",
   "/admin(.*)",
+  "/en/admin(.*)",
+  "/ko/admin(.*)",
   "/deals(.*)",
   "/reviews(.*)",
   "/settings(.*)",
@@ -36,7 +40,7 @@ export default clerkMiddleware(async (auth, request) => {
 
     loginUrl.searchParams.set(
       "redirect_url",
-      `${pathname}${request.nextUrl.search}`,
+      safeInternalPath(`${pathname}${request.nextUrl.search}`, "/dashboard"),
     );
 
     await auth.protect({ unauthenticatedUrl: loginUrl.toString() });

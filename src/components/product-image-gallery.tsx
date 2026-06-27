@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { safeImageUrl } from "@/lib/url-security";
+
 export function ProductImageGallery({
   images,
   productName,
@@ -10,7 +12,9 @@ export function ProductImageGallery({
   images: string[];
   productName: string;
 }) {
-  const safeImages = images.length ? images : ["/window.svg"];
+  const safeImages = (images.length ? images : ["/window.svg"]).map((image) =>
+    safeImageUrl(image),
+  );
   const [selected, setSelected] = useState(0);
   const active = safeImages[selected] ?? safeImages[0];
 

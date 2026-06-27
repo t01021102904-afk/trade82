@@ -3,167 +3,144 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-import { ListingImageUploader } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
-  marketplaceCategories,
-  type UploadedListingImage,
-} from "@/lib/marketplace";
+  emptyRichProductForm,
+  productPayloadFromForm,
+  RichProductFormFields,
+  type RichProductFormErrors,
+  type RichProductFormValue,
+} from "@/components/rich-product-form-fields";
+import {
+  useDraftBackup,
+  useUnsavedChangesWarning,
+} from "@/hooks/use-form-reliability";
 import { withLocale } from "@/lib/i18n";
 
-type FormErrors = Partial<
-  Record<"images" | "name" | "category" | "price" | "description" | "form", string>
->;
+type ListingErrors = RichProductFormErrors & { form?: string };
 
 export function ListingCreateForm() {
   const router = useRouter();
   const { locale, t } = useI18n();
-  const [images, setImages] = useState<UploadedListingImage[]>([]);
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const [tags, setTags] = useState("");
-  const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
+  const [product, setProduct] = useState<RichProductFormValue>(emptyRichProductForm);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [dirty, setDirty] = useState(false);
+  const [errors, setErrors] = useState<ListingErrors>({});
+  const leaveMessage = t("settings.unsavedChangesWarning");
+  useUnsavedChangesWarning(dirty && !submitting && !uploading, leaveMessage);
+  const { draft, clearDraft, discardDraft } = useDraftBackup<RichProductFormValue>(
+    `bridgemarket:listing-create-draft:${locale}`,
+    product,
+    dirty && !submitting && !uploading,
+  );
+
+  function update<K extends keyof RichProductFormValue>(
+    key: K,
+    value: RichProductFormValue[K],
+  ) {
+    setProduct((current) => ({ ...current, [key]: value }));
+    setDirty(true);
+    setErrors((current) => ({ ...current, [key]: undefined, form: undefined }));
+  }
+
+  function restoreDraft() {
+    if (!draft) return;
+    setProduct(draft);
+    setDirty(true);
+    setErrors({});
+    discardDraft();
+  }
+
+  function validate() {
+    const nextErrors: ListingErrors = {};
+    if (!product.images.length) nextErrors.images = t("listing.errors.images");
+    if (!product.name.trim()) nextErrors.name = t("listing.errors.name");
+    if (!product.category) nextErrors.category = t("listing.errors.category");
+    if (!product.priceMin || Number(product.priceMin) <= 0) {
+      nextErrors.price = t("listing.errors.price");
+    }
+    if (
+      product.moqUnit !== "Not fixed" &&
+      (!product.moqQuantity || Number(product.moqQuantity) <= 0)
+    ) {
+      nextErrors.moq = t("listing.errors.moq");
+    }
+    if (!product.leadTime) nextErrors.leadTime = t("listing.errors.leadTime");
+    if (!product.detailedDescription.trim()) {
+      nextErrors.description = t("listing.errors.description");
+    }
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const nextErrors: FormErrors = {};
-
-    if (!images.length) nextErrors.images = t("listing.errors.images");
-    if (!name.trim()) nextErrors.name = t("listing.errors.name");
-    if (!category) nextErrors.category = t("listing.errors.category");
-    if (!price || Number(price) <= 0) nextErrors.price = t("listing.errors.price");
-    if (!description.trim()) {
-      nextErrors.description = t("listing.errors.description");
-    }
-
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) return;
+    if (submitting || uploading) return;
+    if (!validate()) return;
 
     setSubmitting(true);
-    const response = await fetch("/api/account/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        images,
-        name,
-        category,
-        tags: tags
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean),
-        priceMin: price,
-        currency: "USD",
-        shortDescription: description.slice(0, 240),
-        detailedDescription: description,
-        status: "active",
-      }),
-    });
-    const result = (await response.json().catch(() => null)) as {
-      id?: string;
-      error?: string;
-    } | null;
+    try {
+      const response = await fetch("/api/account/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productPayloadFromForm(product)),
+      });
+      const result = (await response.json().catch(() => null)) as {
+        id?: string;
+        error?: string;
+      } | null;
 
-    if (response.ok && result?.id) {
-      router.push(withLocale(`/products/${result.id}`, locale));
-      router.refresh();
-      return;
+      if (response.ok && result?.id) {
+        clearDraft();
+        setDirty(false);
+        router.push(withLocale(`/products/${result.id}`, locale));
+        router.refresh();
+        return;
+      }
+
+      setErrors({ form: result?.error ?? t("listing.errors.form") });
+    } catch {
+      setErrors({ form: t("listing.errors.form") });
+    } finally {
+      setSubmitting(false);
     }
-
-    setErrors({ form: result?.error ?? t("listing.errors.form") });
-    setSubmitting(false);
   }
 
   return (
     <form
       onSubmit={submit}
-      className="mx-auto grid w-full max-w-3xl gap-8"
+      className="mx-auto grid w-full max-w-5xl gap-6"
       noValidate
     >
-      <section className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
-        <ListingImageUploader
-          value={images}
-          onChange={setImages}
-          onUploadingChange={setUploading}
-        />
-        {errors.images ? (
-          <p className="mt-2 text-sm text-red-700">{errors.images}</p>
-        ) : null}
-      </section>
+      {draft ? (
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p>{t("settings.draftAvailable")}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={restoreDraft}
+              className="rounded-md bg-amber-900 px-3 py-2 font-medium text-white"
+            >
+              {t("settings.restoreDraft")}
+            </button>
+            <button
+              type="button"
+              onClick={discardDraft}
+              className="rounded-md border border-amber-300 bg-white px-3 py-2 font-medium text-amber-900"
+            >
+              {t("settings.discardDraft")}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
-      <section className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-4 sm:p-6">
-        <FormField
-          label={t("listing.productName")}
-          value={name}
-          onChange={setName}
-          error={errors.name}
-          maxLength={120}
-          required
-        />
-        <label className="grid gap-2 text-sm">
-          <span className="font-semibold text-zinc-900">
-            {t("listing.category")}
-          </span>
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-            className="h-12 rounded-md border border-zinc-200 bg-white px-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            aria-invalid={Boolean(errors.category)}
-          >
-            <option value="">{t("listing.selectCategory")}</option>
-            {marketplaceCategories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-          {errors.category ? (
-            <span className="text-sm text-red-700">{errors.category}</span>
-          ) : null}
-        </label>
-        <FormField
-          label={t("listing.tags")}
-          value={tags}
-          onChange={setTags}
-          placeholder={t("listing.tagsPlaceholder")}
-          maxLength={300}
-        />
-        <FormField
-          label={t("listing.price")}
-          value={price}
-          onChange={setPrice}
-          error={errors.price}
-          type="number"
-          min="0"
-          inputMode="decimal"
-          required
-        />
-        <label className="grid gap-2 text-sm">
-          <span className="font-semibold text-zinc-900">
-            {t("listing.description")}
-          </span>
-          <textarea
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            rows={9}
-            maxLength={5000}
-            placeholder={t("listing.descriptionPlaceholder")}
-            className="rounded-md border border-zinc-200 px-3 py-3 leading-6 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            aria-invalid={Boolean(errors.description)}
-          />
-          <span className="flex items-center justify-between gap-2">
-            {errors.description ? (
-              <span className="text-sm text-red-700">{errors.description}</span>
-            ) : (
-              <span />
-            )}
-            <span className="text-xs text-zinc-500">{description.length}/5000</span>
-          </span>
-        </label>
-      </section>
+      <RichProductFormFields
+        value={product}
+        errors={errors}
+        onChange={update}
+        onUploadingChange={setUploading}
+      />
 
       {errors.form ? (
         <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -174,7 +151,7 @@ export function ListingCreateForm() {
       <button
         type="submit"
         disabled={uploading || submitting}
-        className="min-h-12 rounded-md bg-zinc-950 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="min-h-12 rounded-md bg-zinc-950 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit"
       >
         {uploading
           ? t("listing.uploading")
@@ -183,38 +160,5 @@ export function ListingCreateForm() {
             : t("listing.submit")}
       </button>
     </form>
-  );
-}
-
-function FormField({
-  label,
-  value,
-  onChange,
-  error,
-  type = "text",
-  ...inputProps
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  type?: "text" | "number";
-} & Omit<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  "value" | "onChange" | "type"
->) {
-  return (
-    <label className="grid gap-2 text-sm">
-      <span className="font-semibold text-zinc-900">{label}</span>
-      <input
-        {...inputProps}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-12 rounded-md border border-zinc-200 px-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-        aria-invalid={Boolean(error)}
-      />
-      {error ? <span className="text-sm text-red-700">{error}</span> : null}
-    </label>
   );
 }

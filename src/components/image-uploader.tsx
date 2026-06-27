@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import type { UploadedListingImage } from "@/lib/marketplace";
 import { cx } from "@/lib/utils";
 
@@ -18,8 +19,59 @@ type PendingImage = {
 };
 
 const acceptedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp"]);
+const suspiciousExtensions = new Set([
+  "bat",
+  "cmd",
+  "exe",
+  "htm",
+  "html",
+  "js",
+  "php",
+  "sh",
+  "svg",
+  "zip",
+]);
 const maxProductSize = 5 * 1024 * 1024;
 const maxProfileSize = 2 * 1024 * 1024;
+
+function extensionOf(file: File) {
+  return file.name.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function isAcceptedImage(file: File) {
+  const parts = file.name
+    .toLowerCase()
+    .split(".")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return (
+    file.size > 0 &&
+    acceptedTypes.has(file.type) &&
+    acceptedExtensions.has(extensionOf(file)) &&
+    !parts.some((part) => suspiciousExtensions.has(part))
+  );
+}
+
+function uploadCopy(locale: "en" | "ko") {
+  return locale === "ko"
+    ? {
+        invalidImage: "JPG, PNG, WEBP 파일만 업로드할 수 있습니다.",
+        productTooLarge: "5MB 이하 이미지만 업로드해 주세요.",
+        profileTooLarge: "2MB 이하 이미지만 업로드해 주세요.",
+        generic: "업로드에 실패했습니다. 파일 형식과 용량을 확인해 주세요.",
+        network: "네트워크 문제로 업로드하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.",
+        tooMany: "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해 주세요.",
+      }
+    : {
+        invalidImage: "Upload JPG, PNG, or WEBP files only.",
+        productTooLarge: "Upload images no larger than 5MB.",
+        profileTooLarge: "Upload images no larger than 2MB.",
+        generic: "Upload failed. Check the file type and size.",
+        network: "Network error while uploading. Check your connection and try again.",
+        tooMany: "Too many upload attempts. Please try again shortly.",
+      };
+}
 
 export function ListingImageUploader({
   value,
@@ -30,6 +82,8 @@ export function ListingImageUploader({
   onChange: (images: UploadedListingImage[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
 }) {
+  const { locale } = useI18n();
+  const copy = uploadCopy(locale);
   const [items, setItems] = useState<PendingImage[]>(() =>
     value.map((image) => ({
       id: image.storagePath,
@@ -58,18 +112,18 @@ export function ListingImageUploader({
   async function addFiles(files: File[]) {
     setError("");
     if (items.length + files.length > 12) {
-      setError("이미지는 최대 12장까지 등록할 수 있어요.");
+      setError("이미지는 최대 12장까지 등록할 수 있습니다.");
       return;
     }
 
-    const invalidType = files.some((file) => !acceptedTypes.has(file.type));
+    const invalidType = files.some((file) => !isAcceptedImage(file));
     if (invalidType) {
-      setError("JPG, PNG, WEBP 파일만 업로드할 수 있어요.");
+      setError(copy.invalidImage);
       return;
     }
     const oversized = files.some((file) => file.size > maxProductSize);
     if (oversized) {
-      setError("5MB 이하 이미지만 업로드해 주세요.");
+      setError(copy.productTooLarge);
       return;
     }
 
@@ -101,7 +155,7 @@ export function ListingImageUploader({
 
     await Promise.all(
       additions.map(async ({ file, ...pending }) => {
-        const result = await uploadImage(file, "product_image");
+        const result = await uploadImage(file, "product_image", copy);
         setItems((current) =>
           current.map((item) =>
             item.id === pending.id
@@ -260,7 +314,7 @@ export function ListingImageUploader({
       </div>
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       <p className="text-xs text-zinc-500">
-        첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 바꿀 수 있어요.
+        첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 변경할 수 있습니다.
       </p>
     </div>
   );
@@ -283,6 +337,8 @@ export function SingleImageUploader({
   onUploadingChange?: (uploading: boolean) => void;
   companyId?: string;
 }) {
+  const { locale } = useI18n();
+  const copy = uploadCopy(locale);
   const [previewUrl, setPreviewUrl] = useState(imageUrl ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -300,12 +356,12 @@ export function SingleImageUploader({
 
   async function select(file: File) {
     setError("");
-    if (!acceptedTypes.has(file.type)) {
-      setError("JPG, PNG, WEBP 파일만 업로드할 수 있어요.");
+    if (!isAcceptedImage(file)) {
+      setError(copy.invalidImage);
       return;
     }
     if (file.size > maxProfileSize) {
-      setError("2MB 이하 이미지만 업로드해 주세요.");
+      setError(copy.profileTooLarge);
       return;
     }
 
@@ -315,7 +371,7 @@ export function SingleImageUploader({
     setUploading(true);
     onUploadingChange?.(true);
 
-    const result = await uploadImage(file, kind, { companyId });
+    const result = await uploadImage(file, kind, copy, { companyId });
     if (result.ok) {
       onUploaded(result.image);
     } else {
@@ -370,6 +426,7 @@ export function SingleImageUploader({
 async function uploadImage(
   file: File,
   uploadType: UploadKind,
+  copy: ReturnType<typeof uploadCopy>,
   metadata?: { companyId?: string },
 ) {
   const formData = new FormData();
@@ -382,13 +439,13 @@ async function uploadImage(
       method: "POST",
       body: formData,
     });
-    const result = (await response.json()) as Partial<UploadedListingImage> & {
-      error?: string;
-    };
+    const result = (await response.json().catch(() => null)) as
+      | (Partial<UploadedListingImage> & { error?: string })
+      | null;
 
     if (
       response.ok &&
-      result.originalUrl &&
+      result?.originalUrl &&
       result.cardUrl &&
       result.mainUrl &&
       result.detailUrl &&
@@ -410,12 +467,14 @@ async function uploadImage(
 
     return {
       ok: false as const,
-      error: result.error ?? "이미지를 업로드하지 못했어요.",
+      error:
+        result?.error ??
+        (response.status === 429 ? copy.tooMany : copy.generic),
     };
   } catch {
     return {
       ok: false as const,
-      error: "이미지를 업로드하지 못했어요.",
+      error: copy.network,
     };
   }
 }

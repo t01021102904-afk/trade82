@@ -1,11 +1,21 @@
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 
-export async function POST() {
+import { rateLimitOrResponse } from "@/lib/api-security";
+
+export async function POST(request: Request) {
   const { userId } = await auth();
 
   if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const rateLimited = rateLimitOrResponse({
+    request,
+    scope: "user-onboarding",
+    userId,
+    limit: 20,
+    windowMs: 60 * 60_000,
+  });
+  if (rateLimited) return rateLimited;
 
   const user = await currentUser();
   const role = user?.publicMetadata?.role;

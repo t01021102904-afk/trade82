@@ -1,0 +1,114 @@
+import Link from "next/link";
+
+import { SectionHeader } from "@/components/section-header";
+import { getDictionary, type Locale, withLocale } from "@/lib/i18n";
+import { requireAdmin } from "@/lib/require-auth";
+
+type CardProps = {
+  title: string;
+  description: string;
+  href?: string;
+  disabled?: boolean;
+  note?: string;
+};
+
+function AdminCard({ title, description, href, disabled, note }: CardProps) {
+  const inner = (
+    <div className="grid h-full gap-2 rounded-lg border border-zinc-200 bg-white p-5 transition hover:border-blue-200">
+      <h2 className={`font-semibold ${disabled ? "text-zinc-400" : "text-zinc-950"}`}>{title}</h2>
+      <p className={`text-sm leading-6 ${disabled ? "text-zinc-400" : "text-zinc-600"}`}>{description}</p>
+      {note ? <p className="mt-1 text-xs text-zinc-400">{note}</p> : null}
+    </div>
+  );
+
+  if (disabled || !href) return <div className="opacity-60">{inner}</div>;
+  return <Link href={href}>{inner}</Link>;
+}
+
+export default async function AdminConsolePage() {
+  await requireAdmin("/admin");
+
+  return <AdminConsolePageContent locale="en" />;
+}
+
+export function AdminConsolePageContent({ locale }: { locale: Locale }) {
+  const messages = getDictionary(locale);
+  const admin = messages.admin;
+
+  return (
+    <div className="bg-zinc-50">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <SectionHeader
+          label={admin.label}
+          title={admin.consoleTitle}
+          description={admin.consoleDescription}
+        />
+
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.companyManagement}</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminCard
+              title={admin.companyQueueTitle}
+              description={admin.companyQueueDescription}
+              href={withLocale("/admin/verifications", locale)}
+            />
+            <AdminCard
+              title={admin.allCompanies}
+              description={admin.allCompaniesDescription}
+              href={withLocale("/admin/companies", locale)}
+            />
+            <AdminCard
+              title={admin.sellerCompanies}
+              description={admin.sellerCompaniesDescription}
+              href={`${withLocale("/admin/companies", locale)}?role=seller`}
+            />
+            <AdminCard
+              title={admin.buyerCompanies}
+              description={admin.buyerCompaniesDescription}
+              href={`${withLocale("/admin/companies", locale)}?role=buyer`}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.reviewsContent}</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminCard
+              title={admin.dealReviews}
+              description={admin.dealReviewsDescription}
+              href={withLocale("/admin/verifications", locale)}
+            />
+            <AdminCard
+              title={admin.companyReviews}
+              description={admin.companyReviewsDescription}
+              href={withLocale("/admin/verifications", locale)}
+            />
+            <AdminCard
+              title={admin.inquiryHistory}
+              description={admin.inquiryHistoryDescription}
+              disabled
+              note={admin.comingLater}
+            />
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.filesDocuments}</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminCard
+              title={admin.privateDocuments}
+              description={admin.privateDocumentsDescription}
+              href={withLocale("/admin/verifications", locale)}
+            />
+            <AdminCard
+              title={admin.reportedReviews}
+              description={admin.reportedReviewsDescription}
+              disabled
+              note={admin.comingLater}
+            />
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

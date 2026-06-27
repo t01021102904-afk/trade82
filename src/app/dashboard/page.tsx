@@ -2,9 +2,14 @@ import { DashboardOverview } from "@/components/dashboard-overview";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const { role } = await requireAppProfile("/dashboard");
+  if (role === "buyer") redirect("/dashboard/buyer");
+  if (role === "seller" || role === "both") redirect("/dashboard/seller");
+  if (role === "admin") redirect("/admin");
+
   const messages = getDictionary("en");
   return (
     <div className="bg-zinc-50">

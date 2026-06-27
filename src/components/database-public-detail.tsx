@@ -1,14 +1,45 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/badge";
 import { CompanyReviewsSection } from "@/components/company-reviews";
+import { ContactModal } from "@/components/contact-modal";
+import { DetailTable } from "@/components/detail-table";
+import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { ProductCard } from "@/components/product-card";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { VerificationBadge } from "@/components/verification-badge";
 import { ViewTracker } from "@/components/view-tracker";
+import { SaveButton } from "@/components/save-button";
+import {
+  buyerCategoryLabel,
+  buyerTypeLabel as buyerTypeOptionLabel,
+  complianceClaimLabel,
+  countryLabel,
+  incotermLabel,
+  importExperienceLabel,
+  importVolumeLabel,
+  koreanRegionLabel,
+  leadTimeLabel,
+  moqUnitLabel,
+  optionLabels,
+  orderSizeLabel,
+  priceUnitLabel,
+  privateLabelAvailabilityLabel,
+  salesChannelLabel,
+  sampleAvailabilityLabel,
+  sellerDocumentLabel,
+  sellerSupplierTypeLabel,
+  sourcingTimelineLabel,
+  stateLabel,
+  supplierTypeLabel as buyerSupplierTypeLabel,
+  SOUTH_KOREA,
+  UNITED_STATES,
+} from "@/lib/company-select-options";
+import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
 type PublicCompany = {
@@ -20,8 +51,37 @@ type PublicCompany = {
   useDefaultLogo: boolean;
   country: string;
   city: string;
+  stateOrProvince: string;
+  website: string;
   description: string;
   categories: string[];
+  owner?: {
+    displayName: string;
+    jobTitle: string;
+  };
+  sellerProfile?: {
+    representativeName: string;
+    exportExperience: string;
+    exportCountries: string[];
+    productCategories: string[];
+    minimumOrderQuantity: string;
+    leadTime: string;
+    certifications: string[];
+    shippingTerms: string[];
+    paymentTerms: string[];
+    factoryOrDistributorStatus: string;
+  } | null;
+  buyerProfile?: {
+    buyerType: string;
+    purchasingCategories: string[];
+    preferredSupplierType: string;
+    targetOrderSize: string;
+    monthlyImportVolume: string;
+    importExperience: string;
+    purchaseTimeline: string;
+    salesChannels: string[];
+  } | null;
+  _count?: { products: number };
   reviewsReceived: Array<{
     id: string;
     rating: number;
@@ -59,6 +119,7 @@ function usePublicMarketplace() {
 }
 
 export function DatabaseCompanyDetail({ id }: { id: string }) {
+  const { t } = useI18n();
   const { payload, loaded } = usePublicMarketplace();
   const company = payload.companies.find((item) => item.id === id);
   const companyProducts = payload.products
@@ -76,48 +137,523 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
     <div className="bg-zinc-50">
       <ViewTracker id={company.id} type="company" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6">
-        <section className="flex flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-6 sm:flex-row">
+        <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-6 sm:flex-row">
           <CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoUrl ?? undefined} useDefaultLogo={company.useDefaultLogo} size="lg" shape="circle" />
-          <div>
+          <div className="min-w-0">
             <VerificationBadge status="verified" subject={company.companyRole} />
-            <h1 className="mt-3 text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
-            <p className="mt-2 text-sm text-zinc-500">{company.city}, {company.country}</p>
-            <p className="mt-4 max-w-3xl leading-7 text-zinc-600">{company.description}</p>
+            <h1 className="mt-3 break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
+            <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
+            <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{company.description}</p>
           </div>
         </section>
+        {company.companyRole === "buyer" ? (
+          <BuyerProfileDetail company={company} />
+        ) : (
+          <SellerProfileDetail company={company} />
+        )}
         <section>
-          <h2 className="text-xl font-semibold text-zinc-950">Completed-deal reviews</h2>
-          <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length} reviews</p>
+          <h2 className="text-xl font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
+          <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length}</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {company.reviewsReceived.map((review) => <ReviewCard key={review.id} review={review} />)}
           </div>
         </section>
         <CompanyReviewsSection companyId={company.id} companyRole={company.companyRole} />
-        {companyProducts.length ? <section><h2 className="mb-4 text-xl font-semibold text-zinc-950">Products</h2><div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">{companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div></section> : null}
+        {companyProducts.length ? <section className="min-w-0"><h2 className="mb-4 text-xl font-semibold text-zinc-950">Products</h2><div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">{companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div></section> : null}
+      </div>
+    </div>
+  );
+}
+
+function BuyerProfileDetail({ company }: { company: PublicCompany }) {
+  const { locale, t } = useI18n();
+  const profile = company.buyerProfile;
+  const location = formatCompanyLocation(company, locale);
+  const contactPerson = [company.owner?.displayName, company.owner?.jobTitle]
+    .filter(Boolean)
+    .join(" · ");
+  const categoryLabels = optionLabels(profile?.purchasingCategories, buyerCategoryLabel, locale);
+  const salesChannelLabels = optionLabels(profile?.salesChannels, salesChannelLabel, locale);
+  const rows = compactRows([
+    { label: t("settings.legalName"), value: company.tradeName || company.legalName },
+    { label: t("settings.city"), value: location },
+    { label: t("settings.buyerType"), value: buyerTypeOptionLabel(profile?.buyerType, locale) },
+    { label: t("settings.purchasingCategories"), value: joinList(categoryLabels) },
+    {
+      label: t("onboarding.preferredSupplierType"),
+      value: buyerSupplierTypeLabel(profile?.preferredSupplierType, locale),
+    },
+    { label: t("settings.targetOrderSize"), value: orderSizeLabel(profile?.targetOrderSize, locale) },
+    { label: t("settings.monthlyImportVolume"), value: importVolumeLabel(profile?.monthlyImportVolume, locale) },
+    { label: t("settings.importExperience"), value: importExperienceLabel(profile?.importExperience, locale) },
+    { label: t("settings.purchaseTimeline"), value: sourcingTimelineLabel(profile?.purchaseTimeline, locale) },
+    { label: t("settings.salesChannels"), value: joinList(salesChannelLabels) },
+    { label: t("settings.contactPersonSection"), value: contactPerson },
+  ]);
+
+  return (
+    <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-6">
+        {rows.length ? (
+          <div>
+            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("buyer.requirements")}</h2>
+            <DetailTable rows={rows} />
+          </div>
+        ) : null}
+        {company.description.trim() ? (
+          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+            <h2 className="text-xl font-semibold text-zinc-950">{t("buyer.marketStrategy")}</h2>
+            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
+          </div>
+        ) : null}
+      </div>
+      <aside className="grid h-fit gap-5">
+        {categoryLabels.length ? (
+          <BadgeList title={t("buyer.interestedCategories")} values={categoryLabels} tone="blue" />
+        ) : null}
+        {salesChannelLabels.length ? (
+          <BadgeList title={t("buyer.salesChannels")} values={salesChannelLabels} />
+        ) : null}
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+          <h2 className="font-semibold text-blue-950">{t("buyer.sellerGuidance")}</h2>
+          <p className="mt-2 text-sm leading-6 text-blue-800">{t("buyer.sellerGuidanceText")}</p>
+        </div>
+      </aside>
+    </section>
+  );
+}
+
+function SellerProfileDetail({ company }: { company: PublicCompany }) {
+  const { locale, t } = useI18n();
+  const profile = company.sellerProfile;
+  const location = formatCompanyLocation(company, locale);
+  const companyRows = compactRows([
+    { label: t("settings.legalName"), value: company.tradeName || company.legalName },
+    { label: t("settings.city"), value: location },
+    { label: t("settings.supplierType"), value: sellerSupplierTypeLabel(profile?.factoryOrDistributorStatus, locale) },
+    { label: t("settings.representativeName"), value: profile?.representativeName },
+    { label: t("settings.website"), value: company.website },
+  ]);
+  const capabilityRows = compactRows([
+    { label: t("settings.productCategories"), value: joinList(profile?.productCategories.length ? profile.productCategories : company.categories) },
+    { label: t("settings.exportCountries"), value: joinList(profile?.exportCountries) },
+    { label: t("settings.exportExperience"), value: profile?.exportExperience },
+    { label: t("settings.minimumOrderQuantity"), value: profile?.minimumOrderQuantity },
+    { label: t("settings.leadTime"), value: profile?.leadTime },
+    { label: t("settings.certifications"), value: joinList(profile?.certifications) },
+    { label: t("settings.shippingTerms"), value: joinList(profile?.shippingTerms) },
+    { label: t("settings.paymentTerms"), value: joinList(profile?.paymentTerms) },
+  ]);
+
+  return (
+    <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-6">
+        {companyRows.length ? (
+          <div>
+            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("company.profile")}</h2>
+            <DetailTable rows={companyRows} />
+          </div>
+        ) : null}
+        {company.description.trim() ? (
+          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+            <h2 className="text-xl font-semibold text-zinc-950">{t("company.about")}</h2>
+            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
+          </div>
+        ) : null}
+        {capabilityRows.length ? (
+          <div>
+            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("company.capabilities")}</h2>
+            <DetailTable rows={capabilityRows} />
+          </div>
+        ) : null}
+      </div>
+      <aside className="grid h-fit gap-5">
+        {profile?.productCategories.length || company.categories.length ? (
+          <BadgeList title={t("company.productCategories")} values={profile?.productCategories.length ? profile.productCategories : company.categories} tone="blue" />
+        ) : null}
+        {profile?.certifications.length ? (
+          <BadgeList title={t("company.certifications")} values={profile.certifications} tone="green" />
+        ) : null}
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
+          <h2 className="font-semibold text-blue-950">{t("company.tradeNote")}</h2>
+          <p className="mt-2 text-sm leading-6 text-blue-800">{t("company.tradeNoteText")}</p>
+        </div>
+      </aside>
+    </section>
+  );
+}
+
+function BadgeList({
+  title,
+  values,
+  tone,
+}: {
+  title: string;
+  values: string[];
+  tone?: "blue" | "green";
+}) {
+  return (
+    <div className="rounded-lg border border-zinc-200 bg-white p-5">
+      <h2 className="text-xl font-semibold text-zinc-950">{title}</h2>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {values.map((value) => (
+          <Badge key={value} tone={tone}>
+            {value}
+          </Badge>
+        ))}
       </div>
     </div>
   );
 }
 
 export function DatabaseProductDetail({ id }: { id: string }) {
+  const { locale, t } = useI18n();
   const { payload, loaded } = usePublicMarketplace();
   const raw = payload.products.find((item) => item.id === id);
   const product = raw ? publicProductToCard(raw) : null;
+  const sellerCompanyRef = raw?.sellerCompany as Record<string, unknown> | undefined;
+  const sellerCompanyId = String(sellerCompanyRef?.id ?? "");
+  const sellerCompany = payload.companies.find((item) => item.id === sellerCompanyId);
+  const sellerProfile =
+    (sellerCompany?.sellerProfile ?? sellerCompanyRef?.sellerProfile ?? {}) as Record<string, unknown>;
+  const relatedProducts = payload.products
+    .filter((item) => {
+      const company = (item.sellerCompany ?? {}) as Record<string, unknown>;
+      return String(company.id ?? "") === sellerCompanyId && String(item.id) !== id;
+    })
+    .map(publicProductToCard)
+    .slice(0, 3);
   if (!loaded) return <PublicLoading />;
   if (!product) return <PublicUnavailable />;
+
+  const richRows = raw ?? {};
+  const notProvided = t("productDetail.notProvided");
+  const price = formatProductPrice(richRows, locale, notProvided);
+  const moq = formatProductMoq(richRows, locale, product.moq || notProvided);
+  const leadTime = leadTimeLabel(String(richRows.leadTimeCode ?? richRows.leadTime ?? ""), locale) || product.leadTime || notProvided;
+  const monthlyCapacity = formatQuantityWithUnit(
+    richRows.monthlyCapacity,
+    richRows.monthlyCapacityUnit,
+    locale,
+    notProvided,
+  );
+  const shippingOrigin = formatShippingOrigin(richRows, sellerCompanyRef, locale, notProvided);
+  const countryOfOrigin =
+    countryLabel(String(richRows.countryOfOrigin ?? SOUTH_KOREA), locale) || notProvided;
+  const incoterms = optionLabels(arrayOfStrings(richRows.incoterms), incotermLabel, locale);
+  const documents = optionLabels(arrayOfStrings(richRows.documentsAvailable), sellerDocumentLabel, locale);
+  const compliance = optionLabels(arrayOfStrings(richRows.complianceClaims), complianceClaimLabel, locale);
+  const suggestedChannels = optionLabels(arrayOfStrings(richRows.suggestedUsChannels), salesChannelLabel, locale);
+  const categories = arrayOfStrings(sellerCompanyRef?.categories ?? sellerCompany?.categories);
+  const reviews = sellerCompany?.reviewsReceived ?? [];
+
   return (
-    <div className="bg-zinc-50"><ViewTracker id={id} type="product" /><div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]"><ProductImageGallery images={product.imageUrls ?? [product.imagePlaceholder]} productName={product.name} /><section className="rounded-lg border border-zinc-200 bg-white p-6"><VerificationBadge status="verified" subject="seller" /><p className="mt-5 text-sm font-medium text-blue-700">{product.category}</p><h1 className="mt-2 text-4xl font-semibold text-zinc-950">{product.name}</h1><p className="mt-4 leading-7 text-zinc-600">{product.longDescription}</p><dl className="mt-6 grid gap-4 sm:grid-cols-2"><Detail label="Price" value={product.wholesalePrice} /><Detail label="MOQ" value={product.moq} /><Detail label="Lead time" value={product.leadTime} /><Detail label="Origin" value={product.countryOfOrigin} /></dl></section></div></div>
+    <div className="bg-zinc-50">
+      <ViewTracker id={id} type="product" />
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <ProductImageGallery
+            images={product.imageUrls ?? [product.imagePlaceholder]}
+            productName={product.name}
+          />
+          <div className="flex min-w-0 flex-col justify-between gap-8">
+            <div className="min-w-0">
+              <VerificationBadge status="verified" subject="seller" />
+              <p className="mt-5 break-words text-sm font-medium text-blue-700">{product.category}</p>
+              <h1 className="mt-2 break-words text-4xl font-semibold text-zinc-950">{product.name}</h1>
+              <p className="mt-4 max-w-2xl break-words text-base leading-7 text-zinc-600">
+                {product.shortDescription || product.longDescription}
+              </p>
+              <div className="mt-5 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
+                <CompanyLogo
+                  companyName={product.sellerName}
+                  logoUrl={product.sellerLogoUrl}
+                  useDefaultLogo={product.sellerUseDefaultLogo ?? true}
+                  size="sm"
+                />
+                <div className="min-w-0">
+                  <p className="break-words font-semibold text-zinc-950">{product.sellerName}</p>
+                  <p className="break-words">{product.sellerLocation}</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <SaveButton id={product.id} kind="product" />
+              <ContactModal context={{ type: "product", product }} buttonLabel={t("productDetail.contactSeller")} />
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {[
+            [t("productDetail.wholesalePrice"), price],
+            [t("marketplace.moq"), moq],
+            [t("settings.leadTime"), leadTime],
+            [t("productDetail.monthlyCapacity"), monthlyCapacity],
+            [
+              t("productDetail.sampleAvailability"),
+              sampleAvailabilityLabel(String(richRows.sampleAvailability ?? ""), locale) || notProvided,
+            ],
+            [t("productDetail.shippingOrigin"), shippingOrigin],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-lg border border-zinc-200 bg-white p-5">
+              <p className="text-sm text-zinc-500">{label}</p>
+              <p className="mt-2 break-words text-xl font-semibold text-zinc-950">{value}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="grid gap-6">
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <h2 className="text-xl font-semibold text-zinc-950">{t("productDetail.overview")}</h2>
+              <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
+                {product.longDescription || notProvided}
+              </p>
+              {String(richRows.buyerNotes ?? "").trim() ? (
+                <p className="mt-4 break-words text-sm leading-6 text-zinc-600">
+                  {String(richRows.buyerNotes)}
+                </p>
+              ) : null}
+            </div>
+
+            <div>
+              <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("productDetail.tradeDetails")}</h2>
+              <DetailTable
+                rows={compactRows([
+                  { label: t("productDetail.wholesalePrice"), value: price },
+                  { label: t("marketplace.moq"), value: moq },
+                  { label: t("settings.leadTime"), value: leadTime },
+                  { label: t("productDetail.monthlyCapacity"), value: monthlyCapacity },
+                  {
+                    label: t("productDetail.privateLabel"),
+                    value:
+                      privateLabelAvailabilityLabel(
+                        String(richRows.privateLabelAvailability ?? ""),
+                        locale,
+                      ) || notProvided,
+                  },
+                  { label: t("productDetail.countryOfOrigin"), value: countryOfOrigin },
+                  { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
+                  { label: t("productDetail.incoterms"), value: joinList(incoterms) || notProvided },
+                  { label: t("productDetail.hsCode"), value: String(richRows.hsCode ?? "") || notProvided },
+                  { label: t("productDetail.shelfLife"), value: String(richRows.shelfLife ?? "") || notProvided },
+                ])}
+              />
+            </div>
+
+            <div>
+              <h2 className="mb-3 text-xl font-semibold text-zinc-950">
+                {t("productDetail.complianceDocuments")}
+              </h2>
+              <DetailTable
+                rows={compactRows([
+                  { label: t("productDetail.documents"), value: joinList(documents) || notProvided },
+                  { label: t("productDetail.compliance"), value: joinList(compliance) || notProvided },
+                  { label: t("settings.ingredientsMaterials"), value: String(richRows.ingredientsOrMaterials ?? "") || notProvided },
+                ])}
+              />
+              <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+                {t("productDetail.sellerProvidedNotice")}
+              </p>
+            </div>
+
+            <div>
+              <h2 className="mb-3 text-xl font-semibold text-zinc-950">
+                {t("productDetail.packagingLogistics")}
+              </h2>
+              <DetailTable
+                rows={compactRows([
+                  { label: t("productDetail.packageSize"), value: String(richRows.packageSize ?? "") || notProvided },
+                  { label: t("productDetail.unitsPerCarton"), value: String(richRows.unitsPerCarton ?? "") || notProvided },
+                  { label: t("productDetail.cartonWeight"), value: String(richRows.cartonWeight ?? "") || notProvided },
+                  { label: t("productDetail.cartonDimensions"), value: String(richRows.cartonDimensions ?? "") || notProvided },
+                  { label: t("productDetail.storageRequirements"), value: String(richRows.storageRequirements ?? "") || String(richRows.storageTemperature ?? "") || notProvided },
+                  { label: t("productDetail.suggestedUsChannels"), value: joinList(suggestedChannels) || notProvided },
+                ])}
+              />
+            </div>
+
+            <div>
+              <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("productDetail.buyerReviews")}</h2>
+              {reviews.length ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-zinc-200 bg-white p-5 text-sm text-zinc-600">
+                  {t("productDetail.noReviewsYet")}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <aside className="grid h-fit gap-5">
+            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+              <div className="flex items-center gap-3">
+                <CompanyLogo
+                  companyName={product.sellerName}
+                  logoUrl={product.sellerLogoUrl}
+                  useDefaultLogo={product.sellerUseDefaultLogo ?? true}
+                  size="sm"
+                />
+                <h2 className="text-xl font-semibold text-zinc-950">{t("productDetail.sellerInformation")}</h2>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-zinc-600">
+                {String(sellerCompanyRef?.description ?? sellerCompany?.description ?? "") || product.sellerName}
+              </p>
+              <DetailTable
+                rows={compactRows([
+                  { label: t("contact.company"), value: product.sellerName },
+                  {
+                    label: t("productDetail.supplierType"),
+                    value: sellerSupplierTypeLabel(
+                      String(sellerProfile.factoryOrDistributorStatus ?? ""),
+                      locale,
+                    ) || notProvided,
+                  },
+                  { label: t("productDetail.cityRegion"), value: product.sellerLocation || notProvided },
+                  { label: t("productDetail.categories"), value: joinList(categories) || notProvided },
+                ])}
+              />
+              {sellerCompanyId ? (
+                <Link
+                  href={withLocale(`/companies/${sellerCompanyId}`, locale)}
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+                >
+                  {t("productDetail.viewCompanyProfile")}
+                </Link>
+              ) : null}
+            </div>
+
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+              <h2 className="font-semibold text-amber-950">{t("productDetail.importReviewReminder")}</h2>
+              <p className="mt-2 text-sm leading-6 text-amber-800">
+                {t("productDetail.importReminderText")}
+              </p>
+            </div>
+          </aside>
+        </section>
+
+        {relatedProducts.length ? (
+          <section className="grid gap-5">
+            <h2 className="text-xl font-semibold text-zinc-950">
+              {t("productDetail.moreFromSeller")}
+            </h2>
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {relatedProducts.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </div>
   );
 }
 
 function ReviewCard({ review }: { review: PublicCompany["reviewsReceived"][number] }) {
-  return <article className="rounded-lg border border-zinc-200 bg-white p-5"><div className="flex flex-wrap gap-2"><Badge tone="green">Completed Deal Review</Badge><Badge tone="blue">{review.rating}/5</Badge></div><p className="mt-4 text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)}</p></article>;
+  return <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5"><div className="flex min-w-0 flex-wrap gap-2"><Badge tone="green">Completed Deal Review</Badge><Badge tone="blue">{review.rating}/5</Badge></div><p className="mt-4 break-words text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 break-words text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)}</p></article>;
+}
+
+function compactRows(
+  rows: Array<{ label: string; value: string | number | null | undefined }>,
+) {
+  return rows
+    .map((row) => ({
+      label: row.label,
+      value: typeof row.value === "string" ? row.value.trim() : row.value,
+    }))
+    .filter((row) => {
+      return Boolean(String(row.value ?? "").trim());
+    }) as Array<{ label: string; value: string | number }>;
+}
+
+function joinList(values: string[] | undefined) {
+  return values?.filter(Boolean).join(", ") ?? "";
+}
+
+function arrayOfStrings(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function formatProductPrice(
+  product: Record<string, unknown>,
+  locale: "en" | "ko",
+  fallback: string,
+) {
+  const priceMin = product.priceMin ? Number(product.priceMin) : 0;
+  const priceMax = product.priceMax ? Number(product.priceMax) : 0;
+  if (!priceMin) return fallback;
+  const currency = String(product.currency ?? "USD");
+  const unit = priceUnitLabel(String(product.priceUnit ?? "unit"), locale);
+  const range = priceMax && priceMax !== priceMin
+    ? `${priceMin}-${priceMax}`
+    : String(priceMin);
+  return unit ? `${currency} ${range} / ${unit}` : `${currency} ${range}`;
+}
+
+function formatProductMoq(
+  product: Record<string, unknown>,
+  locale: "en" | "ko",
+  fallback: string,
+) {
+  const quantity = String(product.moqQuantity ?? "").trim();
+  const unit = moqUnitLabel(String(product.moqUnit ?? ""), locale);
+  if (quantity && unit) return `${quantity} ${unit}`;
+  const moq = String(product.moq ?? "").trim();
+  return moq || fallback;
+}
+
+function formatQuantityWithUnit(
+  quantityValue: unknown,
+  unitValue: unknown,
+  locale: "en" | "ko",
+  fallback: string,
+) {
+  const quantity = String(quantityValue ?? "").trim();
+  if (!quantity) return fallback;
+  const unit = priceUnitLabel(String(unitValue ?? "unit"), locale);
+  return unit ? `${quantity} ${unit}` : quantity;
+}
+
+function formatShippingOrigin(
+  product: Record<string, unknown>,
+  company: Record<string, unknown> | undefined,
+  locale: "en" | "ko",
+  fallback: string,
+) {
+  const region = String(product.shippingOriginRegion ?? company?.city ?? "");
+  const country = String(product.shippingOriginCountry ?? company?.country ?? SOUTH_KOREA);
+  const regionLabel = country === SOUTH_KOREA ? koreanRegionLabel(region, locale) : region;
+  const countryText = countryLabel(country, locale);
+  return [regionLabel, countryText].filter(Boolean).join(", ") || fallback;
+}
+
+function formatCompanyLocation(
+  company: Pick<PublicCompany, "country" | "city" | "stateOrProvince">,
+  locale: "en" | "ko",
+) {
+  const city =
+    company.country === SOUTH_KOREA
+      ? koreanRegionLabel(company.city, locale)
+      : company.city;
+  const state =
+    company.country === UNITED_STATES
+      ? stateLabel(company.stateOrProvince, locale)
+      : company.stateOrProvince;
+
+  return [city, state, countryLabel(company.country, locale)]
+    .filter(Boolean)
+    .join(", ");
 }
 
 function formatContract(review: PublicCompany["reviewsReceived"][number]) {
   if (review.publicValueDisplay === "hidden") return "Contract value hidden";
   const value = Number(review.contractValue);
-  if (review.publicValueDisplay === "exact") return `${review.currency} ${value.toLocaleString()}`;
+  if (review.publicValueDisplay === "exact") return `${review.currency} ${value.toLocaleString("en-US")}`;
   if (value < 50000) return "$10k-$50k";
   if (value < 100000) return "$50k-$100k";
   if (value < 500000) return "$100k-$500k";
@@ -131,9 +667,55 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     : [];
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
   const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
-  return { id: String(value.id), name: String(value.name), category: value.category as Product["category"], sellerId: String(company.id), sellerName: String(company.tradeName ?? company.legalName ?? ""), sellerLocation: [company.city, company.country].filter(Boolean).join(", "), sellerLogoUrl: typeof company.logoUrl === "string" ? company.logoUrl : undefined, sellerUseDefaultLogo: company.useDefaultLogo !== false, shortDescription: String(value.shortDescription ?? ""), longDescription: String(value.detailedDescription ?? ""), wholesalePrice: priceMin ? `${String(value.currency ?? "USD")} ${priceMin}${priceMax !== priceMin ? `-${priceMax}` : ""}` : "Price on request", wholesalePriceValue: priceMin, moq: String(value.moq ?? ""), moqUnits: Number(String(value.moq ?? "").replace(/\D/g, "")) || 0, leadTime: String(value.leadTime ?? ""), monthlyCapacity: "Contact seller", sampleAvailable: false, privateLabelAvailable: false, countryOfOrigin: "South Korea", shippingOrigin: String(company.country ?? "South Korea"), incoterms: ["Contact seller"], hsCode: "Contact seller", certifications: Array.isArray(value.certifications) ? value.certifications as string[] : [], documentsAvailable: [], packageSize: String(value.packaging ?? ""), unitsPerCarton: "Contact seller", cartonWeight: "Contact seller", koreanMarketFit: String(value.ingredientsOrMaterials ?? ""), suggestedSalesChannels: [], riskNotes: [], imagePlaceholder: String(images[0]?.cardUrl ?? value.imageUrl ?? "/window.svg"), imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)), tags: Array.isArray(value.tags) ? value.tags as string[] : [], createdAt: String(value.createdAt ?? new Date().toISOString()), verificationStatus: "verified" };
+  const moqQuantity = String(value.moqQuantity ?? "").trim();
+  const moq = moqQuantity && value.moqUnit
+    ? `${moqQuantity} ${String(value.moqUnit)}`
+    : String(value.moq ?? "");
+  return {
+    id: String(value.id),
+    name: String(value.name),
+    category: value.category as Product["category"],
+    sellerId: String(company.id),
+    sellerName: String(company.tradeName ?? company.legalName ?? ""),
+    sellerLocation: [company.city, company.country].filter(Boolean).join(", "),
+    sellerLogoUrl: typeof company.logoUrl === "string" ? company.logoUrl : undefined,
+    sellerUseDefaultLogo: company.useDefaultLogo !== false,
+    shortDescription: String(value.shortDescription ?? ""),
+    longDescription: String(value.detailedDescription ?? ""),
+    wholesalePrice: priceMin
+      ? `${String(value.currency ?? "USD")} ${priceMin}${priceMax !== priceMin ? `-${priceMax}` : ""}`
+      : "Price on request",
+    wholesalePriceValue: priceMin,
+    moq,
+    moqUnits: Number(moq.replace(/\D/g, "")) || 0,
+    leadTime: String(value.leadTime ?? ""),
+    monthlyCapacity: String(value.monthlyCapacity ?? ""),
+    sampleAvailable:
+      value.sampleAvailability === "samples_available" ||
+      value.sampleAvailability === "paid_samples_available",
+    privateLabelAvailable: value.privateLabelAvailability === "available",
+    countryOfOrigin: String(value.countryOfOrigin ?? "South Korea"),
+    shippingOrigin: [value.shippingOriginRegion, value.shippingOriginCountry ?? company.country]
+      .filter(Boolean)
+      .join(", "),
+    incoterms: arrayOfStrings(value.incoterms),
+    hsCode: String(value.hsCode ?? ""),
+    certifications: arrayOfStrings(value.complianceClaims ?? value.certifications),
+    documentsAvailable: arrayOfStrings(value.documentsAvailable),
+    shelfLife: String(value.shelfLife ?? ""),
+    packageSize: String(value.packageSize ?? value.packaging ?? ""),
+    unitsPerCarton: String(value.unitsPerCarton ?? ""),
+    cartonWeight: String(value.cartonWeight ?? ""),
+    koreanMarketFit: String(value.buyerNotes ?? value.ingredientsOrMaterials ?? ""),
+    suggestedSalesChannels: arrayOfStrings(value.suggestedUsChannels),
+    riskNotes: arrayOfStrings(value.riskNotes),
+    imagePlaceholder: String(images[0]?.cardUrl ?? value.imageUrl ?? "/window.svg"),
+    imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)),
+    tags: arrayOfStrings(value.tags),
+    createdAt: String(value.createdAt ?? new Date().toISOString()),
+    verificationStatus: "verified",
+  };
 }
 
-function Detail({ label, value }: { label: string; value: string }) { return <div><dt className="text-sm text-zinc-500">{label}</dt><dd className="mt-1 font-medium text-zinc-950">{value}</dd></div>; }
 function PublicLoading() { return <div className="mx-auto max-w-5xl px-4 py-12 text-sm text-zinc-600">Loading...</div>; }
 function PublicUnavailable() { return <div className="mx-auto max-w-5xl px-4 py-12 text-sm text-zinc-600">This listing is unavailable.</div>; }

@@ -57,8 +57,23 @@ enum SavedItemType {
   company
 }
 
+enum MessageAttachmentFileType {
+  image
+  pdf
+  document
+}
+
+enum MessageAttachmentStatus {
+  active
+  hidden
+  restricted
+  flagged
+}
+
 enum DealStatus {
   proposed
+  in_progress
+  completion_requested
   completed
   cancelled
   disputed
@@ -93,6 +108,7 @@ model UserProfile {
   sentInquiries          Inquiry[]             @relation("InquirySender")
   sentMessages           Message[]             @relation("MessageSender")
   receivedMessages       Message[]             @relation("MessageReceiver")
+  uploadedMessageAttachments MessageAttachment[] @relation("MessageAttachmentUploader")
   savedItems             SavedItem[]
   createdDeals           Deal[]                @relation("DealCreator")
   createdAt              DateTime              @default(now())
@@ -128,6 +144,7 @@ model Company {
   recipientInquiries     Inquiry[]                 @relation("RecipientCompanyInquiries")
   sentCompanyMessages    Message[]                 @relation("MessageSenderCompany")
   receivedMessages       Message[]                 @relation("MessageReceiverCompany")
+  uploadedMessageAttachments MessageAttachment[]     @relation("MessageAttachmentCompany")
   savedItems             SavedItem[]
   buyerDeals             Deal[]                    @relation("BuyerCompanyDeals")
   sellerDeals            Deal[]                    @relation("SellerCompanyDeals")
@@ -165,6 +182,7 @@ model BuyerProfile {
   company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   buyerType            String
   purchasingCategories String[] @default([])
+  preferredSupplierType String   @default("")
   targetOrderSize      String
   monthlyImportVolume  String
   importExperience     String
@@ -186,12 +204,38 @@ model Product {
   priceMin               Decimal?       @db.Decimal(14, 2)
   priceMax               Decimal?       @db.Decimal(14, 2)
   currency               String         @default("USD")
+  priceUnit              String         @default("unit")
   moq                    String
+  moqQuantity            String         @default("")
+  moqUnit                String         @default("Units")
   leadTime               String
+  leadTimeCode           String         @default("")
+  sampleAvailability     String         @default("")
+  privateLabelAvailability String       @default("")
+  monthlyCapacity        String         @default("")
+  monthlyCapacityUnit    String         @default("Units")
   origin                 String         @default("South Korea")
+  countryOfOrigin        String         @default("South Korea")
+  shippingOriginCountry  String         @default("South Korea")
+  shippingOriginRegion   String         @default("")
+  incoterms              String[]       @default([])
+  hsCode                 String         @default("")
+  shelfLife              String         @default("")
+  storageRequirements    String         @default("")
+  documentsAvailable     String[]       @default([])
+  complianceClaims       String[]       @default([])
+  buyerNotes             String         @default("")
+  riskNotes              String[]       @default([])
   certifications         String[]       @default([])
   ingredientsOrMaterials String
   packaging              String
+  packageSize            String         @default("")
+  unitsPerCarton         String         @default("")
+  cartonWeight           String         @default("")
+  cartonDimensions       String         @default("")
+  palletQuantity         String         @default("")
+  storageTemperature     String         @default("")
+  suggestedUsChannels    String[]       @default([])
   exportReadiness        Boolean        @default(false)
   viewCount              Int            @default(0)
   status                 ProductStatus  @default(draft)
@@ -273,6 +317,7 @@ model Inquiry {
   targetDate         DateTime?
   status             InquiryStatus @default(sent)
   messages           Message[]
+  attachments        MessageAttachment[]
   deals              Deal[]
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -314,9 +359,39 @@ model Message {
   receiverCompanyId String?
   receiverCompany   Company?     @relation("MessageReceiverCompany", fields: [receiverCompanyId], references: [id])
   body              String
+  contentHash       String       @default("")
+  attachments       MessageAttachment[]
   createdAt         DateTime     @default(now())
 
   @@index([inquiryId, createdAt])
+}
+
+model MessageAttachment {
+  id                  String                      @id @default(cuid())
+  messageId           String?
+  message             Message?                    @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  inquiryId           String
+  inquiry             Inquiry                     @relation(fields: [inquiryId], references: [id])
+  uploadedByUserId    String
+  uploadedByUser      UserProfile                 @relation("MessageAttachmentUploader", fields: [uploadedByUserId], references: [id])
+  uploadedByCompanyId String
+  uploadedByCompany   Company                     @relation("MessageAttachmentCompany", fields: [uploadedByCompanyId], references: [id])
+  originalFilename    String
+  storedFilename      String
+  storageBucket       String
+  storagePath         String                      @unique
+  mimeType            String
+  fileType            MessageAttachmentFileType
+  sizeBytes           Int
+  sha256Hash          String
+  status              MessageAttachmentStatus     @default(restricted)
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+
+  @@index([inquiryId, createdAt])
+  @@index([messageId])
+  @@index([uploadedByUserId, createdAt])
+  @@index([status, createdAt])
 }
 
 model Deal {

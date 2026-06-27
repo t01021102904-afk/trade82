@@ -83,8 +83,29 @@ export const SavedItemType = {
 export type SavedItemType = (typeof SavedItemType)[keyof typeof SavedItemType]
 
 
+export const MessageAttachmentFileType = {
+  image: 'image',
+  pdf: 'pdf',
+  document: 'document'
+} as const
+
+export type MessageAttachmentFileType = (typeof MessageAttachmentFileType)[keyof typeof MessageAttachmentFileType]
+
+
+export const MessageAttachmentStatus = {
+  active: 'active',
+  hidden: 'hidden',
+  restricted: 'restricted',
+  flagged: 'flagged'
+} as const
+
+export type MessageAttachmentStatus = (typeof MessageAttachmentStatus)[keyof typeof MessageAttachmentStatus]
+
+
 export const DealStatus = {
   proposed: 'proposed',
+  in_progress: 'in_progress',
+  completion_requested: 'completion_requested',
   completed: 'completed',
   cancelled: 'cancelled',
   disputed: 'disputed'

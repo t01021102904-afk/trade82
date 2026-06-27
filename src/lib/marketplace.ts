@@ -1,14 +1,38 @@
 export const marketplaceCategories = [
+  "Beauty & Personal Care",
+  "Food & Snacks",
+  "Household Goods",
+  "Fashion & Apparel",
+  "Baby & Kids",
+  "Pet Products",
+  "Health & Wellness",
+  "Electronics Accessories",
+  "Kitchenware",
+  "K-Pop & Character Goods",
+  "Stationery & Lifestyle",
+  "Packaging",
+  "Industrial / B2B Supplies",
+  "Other",
+] as const;
+
+export type MarketplaceCategory = (typeof marketplaceCategories)[number];
+
+const legacyMarketplaceCategories = [
   "Beauty & Skincare",
   "Food & Beverage",
   "Apparel",
   "Supplements",
   "Home Goods",
-  "Pet Products",
-  "Health & Wellness",
 ] as const;
 
-export type MarketplaceCategory = (typeof marketplaceCategories)[number];
+export function isMarketplaceCategory(value: string) {
+  return (
+    marketplaceCategories.includes(value as MarketplaceCategory) ||
+    legacyMarketplaceCategories.includes(
+      value as (typeof legacyMarketplaceCategories)[number],
+    )
+  );
+}
 
 export type UploadedListingImage = {
   originalUrl: string;
@@ -43,7 +67,7 @@ export function cleanTags(value: unknown) {
 export function parseUploadedImages(value: unknown) {
   if (!Array.isArray(value)) return [];
   if (value.length > 12) {
-    throw new Error("이미지는 최대 12장까지 등록할 수 있어요.");
+    throw new Error("이미지는 최대 12장까지 등록할 수 있습니다.");
   }
 
   return value.map((item, index) => {
@@ -66,7 +90,7 @@ export function parseUploadedImages(value: unknown) {
       !parsed.detailUrl ||
       !parsed.storagePath
     ) {
-      throw new Error("업로드된 이미지 정보가 올바르지 않아요.");
+      throw new Error("업로드된 이미지 정보를 확인할 수 없습니다.");
     }
 
     return parsed;

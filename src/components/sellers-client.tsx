@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { SellerCard } from "@/components/seller-card";
-import { categories } from "@/lib/mock-data";
+import { marketplaceCategories } from "@/lib/marketplace";
+import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
 import type { Seller } from "@/lib/types";
 
 function SelectField({
@@ -36,9 +37,10 @@ function SelectField({
   );
 }
 
-export function SellersClient({ sellers }: { sellers: Seller[] }) {
+export function SellersClient() {
   const { t } = useI18n();
   const [databaseSellers, setDatabaseSellers] = useState<Seller[]>([]);
+  const [databaseLoading, setDatabaseLoading] = useState(true);
   useEffect(() => {
     void fetch("/api/public/marketplace")
       .then((response) => (response.ok ? response.json() : { companies: [] }))
@@ -48,17 +50,14 @@ export function SellersClient({ sellers }: { sellers: Seller[] }) {
             .filter((company) => company.companyRole === "seller")
             .map(databaseCompanyToSeller),
         );
+        setDatabaseLoading(false);
+      })
+      .catch(() => {
+        setDatabaseSellers([]);
+        setDatabaseLoading(false);
       });
   }, []);
-  const visibleSellers = useMemo(() => {
-    return [
-      ...databaseSellers,
-      ...sellers.filter(
-        (seller) =>
-          !databaseSellers.some((existing) => existing.id === seller.id),
-      ),
-    ];
-  }, [databaseSellers, sellers]);
+  const visibleSellers = databaseSellers;
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [state, setState] = useState("all");
@@ -108,7 +107,7 @@ export function SellersClient({ sellers }: { sellers: Seller[] }) {
 
   return (
     <div className="grid gap-8">
-      <div className="rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+      <div className="bm-premium-card rounded-lg border border-zinc-200 bg-white/90 p-4 shadow-sm shadow-zinc-100 backdrop-blur">
         <div className="grid gap-4 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <label className="grid gap-1 text-sm">
             <span className="font-medium text-zinc-700">{t("sellers.search")}</span>
@@ -125,7 +124,7 @@ export function SellersClient({ sellers }: { sellers: Seller[] }) {
             onChange={setCategory}
             options={[
               { label: t("marketplace.allCategories"), value: "all" },
-              ...categories.map((item) => ({ label: item, value: item })),
+              ...marketplaceCategories.map((item) => ({ label: item, value: item })),
             ]}
           />
           <SelectField
@@ -159,7 +158,7 @@ export function SellersClient({ sellers }: { sellers: Seller[] }) {
             ]}
           />
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-zinc-100 pt-4 text-sm text-zinc-600">
+        <div className="relative z-10 mt-4 flex items-center justify-between border-t border-zinc-100 pt-4 text-sm text-zinc-600">
           <span>{filtered.length} {t("sellers.sellerFound")}</span>
           <button
             type="button"
@@ -177,55 +176,36 @@ export function SellersClient({ sellers }: { sellers: Seller[] }) {
         </div>
       </div>
 
-      {filtered.length ? (
+      {databaseLoading && !visibleSellers.length ? (
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="h-80 animate-pulse rounded-lg border border-zinc-200 bg-white shadow-sm shadow-zinc-100"
+              aria-hidden="true"
+            />
+          ))}
+        </div>
+      ) : filtered.length ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((seller) => (
             <SellerCard key={seller.id} seller={seller} />
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center">
-          <h2 className="text-lg font-semibold text-zinc-950">{t("sellers.emptyTitle")}</h2>
+        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center shadow-sm shadow-zinc-100">
+          <h2 className="text-lg font-semibold text-zinc-950">
+            {visibleSellers.length
+              ? t("sellers.emptyTitle")
+              : t("sellers.noCompaniesListed")}
+          </h2>
           <p className="mt-2 text-sm text-zinc-600">
-            {t("sellers.emptyText")}
+            {visibleSellers.length
+              ? t("sellers.emptyText")
+              : t("sellers.noCompaniesListedText")}
           </p>
         </div>
       )}
     </div>
   );
-}
-
-function databaseCompanyToSeller(company: Record<string, unknown>): Seller {
-  const profile = (company.sellerProfile ?? {}) as Record<string, unknown>;
-  return {
-    id: String(company.id),
-    name: String(company.tradeName ?? company.legalName ?? ""),
-    logoUrl: typeof company.logoUrl === "string" ? company.logoUrl : undefined,
-    useDefaultLogo: company.useDefaultLogo !== false,
-    location: [company.city, company.country].filter(Boolean).join(", "),
-    state: String(company.stateOrProvince ?? company.city ?? "South Korea"),
-    businessType: "Manufacturer",
-    yearFounded: new Date().getFullYear(),
-    yearsInBusiness: 1,
-    categories: (company.categories as Seller["categories"]) ?? [],
-    certifications: (profile.certifications as string[]) ?? [],
-    exportCountries: (profile.exportCountries as string[]) ?? ["United States"],
-    exportExperience: String(profile.exportExperience ?? ""),
-    monthlyCapacity: "Contact seller",
-    responseTime: "Contact seller",
-    paymentTerms: (profile.paymentTerms as string[]) ?? [],
-    incoterms: (profile.shippingTerms as string[]) ?? [],
-    documentsAvailable: ["Verification documents reviewed privately"],
-    contactPerson: String(profile.representativeName ?? "Company representative"),
-    contactEmail: "",
-    website: String(company.website ?? ""),
-    languages: ["Korean", "English"],
-    rating: 0,
-    reviewCount: Array.isArray(company.reviewsReceived)
-      ? company.reviewsReceived.length
-      : 0,
-    verified: true,
-    verificationStatus: "verified",
-    description: String(company.description ?? ""),
-  };
 }

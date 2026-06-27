@@ -1,4 +1,16 @@
 export type ProductCategory =
+  | "Beauty & Personal Care"
+  | "Food & Snacks"
+  | "Household Goods"
+  | "Fashion & Apparel"
+  | "Baby & Kids"
+  | "Electronics Accessories"
+  | "Kitchenware"
+  | "K-Pop & Character Goods"
+  | "Stationery & Lifestyle"
+  | "Packaging"
+  | "Industrial / B2B Supplies"
+  | "Other"
   | "Beauty & Skincare"
   | "Food & Beverage"
   | "Apparel"
@@ -68,19 +80,19 @@ export type SellerCompanyProfile = {
   certifications: string[];
   shippingTerms: string[];
   paymentTerms: string[];
-  supplierType: "factory" | "distributor" | "brand_owner" | "wholesaler";
+  supplierType: string;
 };
 
 export type BuyerCompanyProfile = {
   companyId: string;
   buyerType: "importer" | "distributor" | "retailer" | "online_seller" | "wholesaler";
   purchasingCategories: string[];
+  preferredSupplierType: string;
   targetOrderSize: string;
   monthlyImportVolume: string;
   importExperience: string;
   salesChannels: string[];
   purchaseTimeline: string;
-  buyerRequirements: string;
 };
 
 export type ManagedProduct = {
@@ -184,6 +196,7 @@ export type Seller = {
   languages: string[];
   rating: number;
   reviewCount: number;
+  productCount?: number;
   verified: boolean;
   verificationStatus?: VerificationStatus;
   description: string;
@@ -195,15 +208,21 @@ export type Buyer = {
   logoUrl?: string;
   useDefaultLogo?: boolean;
   location: string;
-  buyerType: BuyerType;
-  interestedCategories: ProductCategory[];
+  buyerType: string;
+  interestedCategories: string[];
+  interestedCategoryCodes?: string[];
+  buyerTypeCode?: string;
   targetOrderSize: string;
+  targetOrderSizeCode?: string;
   annualImportVolume: string;
   salesChannels: string[];
+  salesChannelCodes?: string[];
   importExperience: string;
+  importExperienceCode?: string;
   requiredDocuments: string[];
   preferredPaymentTerms: string[];
   timeline: string;
+  timelineCode?: string;
   marketStrategy: string;
   contactPerson: string;
   contactEmail: string;

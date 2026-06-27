@@ -1,4 +1,9 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  idParam,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { createSignedPrivateFileUrl } from "@/lib/supabase-storage";
@@ -9,7 +14,8 @@ export async function GET(
 ) {
   try {
     await requireAdmin();
-    const { requestId } = await params;
+    const { requestId: rawRequestId } = await params;
+    const requestId = idParam(rawRequestId, "requestId");
     const verification = await getDb().verificationRequest.findUnique({
       where: { id: requestId },
       select: { documentPath: true, documentFilename: true },
@@ -23,6 +29,9 @@ export async function GET(
       expiresIn: 300,
     });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
 }

@@ -1,6 +1,6 @@
-# BridgeMarket
+# Trade82
 
-BridgeMarket is a Next.js B2B marketplace MVP that connects Korean sellers with American buyers. It includes Clerk authentication, Google Sign-In support, English/Korean URL routing, local mock marketplace data, and localStorage-based prototype inquiries.
+Trade82 is a Next.js B2B marketplace MVP that connects Korean sellers with American buyers. It includes Clerk authentication, Google Sign-In support, English/Korean URL routing, Supabase Postgres marketplace data, and Supabase Storage file uploads.
 
 ## Tech Stack
 
@@ -9,7 +9,8 @@ BridgeMarket is a Next.js B2B marketplace MVP that connects Korean sellers with 
 - Tailwind CSS
 - Clerk for authentication
 - Custom dictionary-based i18n
-- localStorage for prototype saved products, companies, messages, and onboarding forms
+- Supabase Postgres for users, companies, products, saved items, inquiries, messages, deals, and reviews
+- Supabase Storage for public listing images and private submitted documents
 
 ## Environment Variables
 
@@ -22,8 +23,8 @@ cp .env.example .env.local
 Then add your Clerk keys:
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<clerk-publishable-key>
+CLERK_SECRET_KEY=<clerk-secret-key>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
@@ -120,6 +121,16 @@ npm run build
 
 Both commands should pass before deployment.
 
+## Backup and Recovery
+
+Trade82 uses Supabase Postgres and Supabase Storage. Keep Prisma migration history in Git, but never commit database dumps, private user data, Supabase private files, or `.env.local`.
+
+See [BACKUP_AND_RECOVERY.md](./BACKUP_AND_RECOVERY.md) for the production backup checklist, manual backup command templates, migration rules, private storage recovery guidance, and incident recovery runbook.
+
+## Transactional Email
+
+Trade82 email templates and DNS authentication guidance live in [EMAIL_AUTHENTICATION.md](./EMAIL_AUTHENTICATION.md). Gmail logos and sender checkmarks require SPF, DKIM, DMARC, and later BIMI/VMC setup outside the app code.
+
 ## Deploy To Vercel
 
 1. Push the project to GitHub.
@@ -139,23 +150,19 @@ Both commands should pass before deployment.
 - English and Korean URL routing
 - Dictionary-based UI translations
 - Responsive marketplace UI
-- Static mock data pages that build cleanly on Vercel
+- Public marketplace pages read from the database and show empty states when no records are listed
 
-## Prototype-Only
+## Not Included In The MVP
 
-- Marketplace products, sellers, and buyers are mock data.
-- Inquiries, replies, saved products, saved companies, and onboarding submissions are stored in localStorage.
-- No real email sending yet.
-- No real-time chat yet.
-- No payments.
-- No server database yet.
-- Verification badges and trade documents are demo data, not verified business records.
+- Payments, escrow, customs brokerage, tax services, or legal advice.
+- File malware scanning beyond server-side file type, size, and access checks.
+- Redis-backed production rate limiting; the local fallback is in-memory.
+- Third-party error tracking until Sentry or another provider is configured.
 
 ## Recommended Next Steps
 
-1. Add Supabase or PostgreSQL for users, companies, products, saved items, and inquiries.
-2. Store Clerk user IDs with buyer/seller profiles.
-3. Replace localStorage messages with database-backed inquiry threads.
-4. Add role-based onboarding for buyer vs seller accounts.
-5. Add admin review tools for company verification.
-6. Add real document uploads and audit trails.
+1. Confirm production Supabase backups and storage recovery procedures.
+2. Replace in-memory rate limiting with Redis-backed rate limiting for multi-instance deployments.
+3. Configure production email sending after DNS authentication is complete.
+4. Add third-party error tracking and alerting.
+5. Add malware scanning and formal audit logs for private files.

@@ -1,4 +1,11 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  enumField,
+  readJsonObject,
+  requiredIdField,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { getDb } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -9,9 +16,10 @@ export async function POST(request: Request) {
     if (!rateLimit.allowed) {
       return Response.json({ counted: false }, { status: 429 });
     }
-    const body = (await request.json()) as Record<string, unknown>;
-    const id = String(body.id ?? "");
-    if (body.type === "company") {
+    const body = await readJsonObject(request);
+    const id = requiredIdField(body, "id");
+    const type = enumField(body, "type", ["company", "product"] as const);
+    if (type === "company") {
       const result = await getDb().company.updateMany({
         where: { id, verificationStatus: "verified" },
         data: { viewCount: { increment: 1 } },
@@ -28,6 +36,9 @@ export async function POST(request: Request) {
     });
     return Response.json({ counted: result.count === 1 });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
 }

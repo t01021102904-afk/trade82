@@ -7,17 +7,19 @@ import { useI18n } from "@/components/i18n-provider";
 import { SaveButton } from "@/components/save-button";
 import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
+import { safeImageUrl } from "@/lib/url-security";
 
 export function ProductCard({ product }: { product: Product }) {
   const { locale } = useI18n();
   const href = withLocale(`/products/${product.id}`, locale);
+  const imageUrl = safeImageUrl(product.imagePlaceholder);
 
   return (
-    <article className="group min-w-0">
+    <article className="bm-premium-card group min-w-0 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm shadow-zinc-100">
       <div className="relative aspect-square overflow-hidden rounded-md bg-zinc-100">
-        <Link href={href} className="block size-full">
+        <Link href={href} className="relative block size-full">
           <Image
-            src={product.imagePlaceholder || "/window.svg"}
+            src={imageUrl}
             alt={product.name}
             fill
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
@@ -33,25 +35,25 @@ export function ProductCard({ product }: { product: Product }) {
         />
       </div>
 
-      <div className="grid gap-1.5 pt-3">
+      <div className="relative z-10 grid min-w-0 gap-1.5 pt-3">
         <Link href={href} className="min-w-0">
           <h3 className="line-clamp-2 text-base font-semibold leading-6 text-zinc-950 transition-colors group-hover:text-blue-700">
             {product.name}
           </h3>
         </Link>
-        <p className="text-lg font-bold text-zinc-950">{product.wholesalePrice}</p>
+        <p className="truncate text-lg font-bold text-zinc-950">{product.wholesalePrice}</p>
         <Link
           href={withLocale(`/stores/${product.sellerId}`, locale)}
-          className="truncate text-sm text-zinc-600 hover:text-blue-700"
+          className="min-w-0 truncate text-sm text-zinc-600 hover:text-blue-700"
         >
           {product.sellerName}
         </Link>
-        <div className="flex min-w-0 items-center gap-2 text-xs text-zinc-500">
+        <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs text-zinc-500">
           <span className="truncate">
             {product.sellerLocation || product.category}
           </span>
           <span aria-hidden="true">·</span>
-          <time dateTime={product.createdAt}>
+          <time dateTime={product.createdAt} className="shrink-0">
             {formatCreatedTime(product.createdAt, locale)}
           </time>
         </div>
@@ -75,23 +77,17 @@ export function ProductCardSkeleton() {
 }
 
 function formatCreatedTime(value: string | undefined, locale: "en" | "ko") {
-  if (!value) return locale === "ko" ? "방금 전" : "Just now";
+  if (!value) return locale === "ko" ? "최근 등록" : "Recently listed";
 
-  const elapsed = Date.now() - new Date(value).getTime();
-  if (!Number.isFinite(elapsed) || elapsed < 60_000) {
-    return locale === "ko" ? "방금 전" : "Just now";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) {
+    return locale === "ko" ? "최근 등록" : "Recently listed";
   }
 
-  const minutes = Math.floor(elapsed / 60_000);
-  if (minutes < 60) {
-    return locale === "ko" ? `${minutes}분 전` : `${minutes}m ago`;
-  }
-
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) {
-    return locale === "ko" ? `${hours}시간 전` : `${hours}h ago`;
-  }
-
-  const days = Math.floor(hours / 24);
-  return locale === "ko" ? `${days}일 전` : `${days}d ago`;
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  return locale === "ko"
+    ? `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`
+    : `${month}/${day}/${year}`;
 }

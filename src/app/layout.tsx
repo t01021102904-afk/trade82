@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "BridgeMarket | Korean-U.S. B2B Marketplace",
+  title: "Trade82 | Korean-U.S. B2B Marketplace",
   description:
-    "BridgeMarket connects Korean sellers with trusted American buyers and trade-ready product information.",
+    "Trade82 connects Korean sellers with trusted American buyers and trade-ready product information.",
 };
 
 export default function RootLayout({

@@ -1,0 +1,122 @@
+import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  enumField,
+  rateLimitOrResponse,
+  readJsonObject,
+  requiredIdField,
+  validationErrorResponse,
+} from "@/lib/api-security";
+import { requireAdmin } from "@/lib/authz";
+import { getDb } from "@/lib/db";
+
+export async function GET() {
+  try {
+    await requireAdmin();
+
+    const companies = await getDb().company.findMany({
+      orderBy: { createdAt: "desc" },
+      include: {
+        owner: { select: { email: true, displayName: true } },
+        sellerProfile: { select: { id: true } },
+        buyerProfile: { select: { id: true } },
+        verificationRequests: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            id: true,
+            status: true,
+            documentFilename: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: {
+            products: true,
+            buyerInquiries: true,
+            sellerInquiries: true,
+          },
+        },
+      },
+    });
+
+    return Response.json(
+      companies.map((company) => ({
+        id: company.id,
+        legalName: company.legalName,
+        tradeName: company.tradeName,
+        companyRole: company.companyRole,
+        verificationStatus: company.verificationStatus,
+        country: company.country,
+        city: company.city,
+        createdAt: company.createdAt,
+        ownerEmail: company.owner.email,
+        ownerDisplayName: company.owner.displayName,
+        productCount: company._count.products,
+        inquiryCount:
+          company.companyRole === "seller"
+            ? company._count.sellerInquiries
+            : company._count.buyerInquiries,
+        latestRequest: company.verificationRequests[0] ?? null,
+      })),
+    );
+  } catch (error) {
+    return apiError(error);
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const admin = await requireAdmin();
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "admin-companies-write",
+      userId: admin.id,
+      limit: 60,
+      windowMs: 60 * 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
+    const body = await readJsonObject(request);
+    const companyId = requiredIdField(body, "companyId");
+    const action = enumField(body, "action", [
+      "approve",
+      "reject",
+      "pause",
+      "request_updates",
+      "reset",
+    ]);
+
+    const statusMap: Record<string, string> = {
+      approve: "verified",
+      reject: "rejected",
+      pause: "needs_reverification",
+      request_updates: "needs_reverification",
+      reset: "pending_review",
+    };
+
+    const newStatus = statusMap[action];
+    if (!newStatus) {
+      return Response.json({ error: "Invalid action." }, { status: 400 });
+    }
+
+    const company = await getDb().company.findUnique({
+      where: { id: companyId },
+    });
+    if (!company) {
+      return Response.json({ error: "Company not found." }, { status: 404 });
+    }
+
+    await getDb().company.update({
+      where: { id: companyId },
+      data: { verificationStatus: newStatus as never },
+    });
+
+    return Response.json({ ok: true, verificationStatus: newStatus });
+  } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
+    return apiError(error);
+  }
+}

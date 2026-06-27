@@ -3,8 +3,13 @@ import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
 
-export default async function EnMessagesPage() {
+export default async function EnMessagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ inquiryId?: string }>;
+}) {
   await requireAppProfile("/en/messages");
+  const { inquiryId } = await searchParams;
   const messages = getDictionary("en");
 
   return (
@@ -15,7 +20,7 @@ export default async function EnMessagesPage() {
           title={messages.messages.title}
           description={messages.messages.description}
         />
-        <MessagesClient />
+        <MessagesClient initialInquiryId={inquiryId ?? null} />
       </div>
     </div>
   );

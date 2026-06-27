@@ -1,26 +1,43 @@
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
+import { rateLimitOrResponse } from "@/lib/api-security";
 import { getDb } from "@/lib/db";
 
-export async function GET() {
-  const profile = await getCurrentUserProfile();
-  if (!profile) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+export async function GET(request: Request) {
+  try {
+    const profile = await getCurrentUserProfile();
+    if (!profile) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "user-context",
+      userId: profile.id,
+      limit: 120,
+      windowMs: 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
+    const companies = await getDb().company.findMany({
+      where: { ownerUserId: profile.id },
+      select: {
+        id: true,
+        companyRole: true,
+        verificationStatus: true,
+        legalName: true,
+        tradeName: true,
+      },
+    });
+
+    return Response.json({
+      role: profile.role,
+      isAdmin: await isAdminUser(),
+      companies,
+    });
+  } catch {
+    console.error("Unable to load user context.");
+    return Response.json(
+      { error: "Unable to load user context." },
+      { status: 500 },
+    );
   }
-
-  const companies = await getDb().company.findMany({
-    where: { ownerUserId: profile.id },
-    select: {
-      id: true,
-      companyRole: true,
-      verificationStatus: true,
-      legalName: true,
-      tradeName: true,
-    },
-  });
-
-  return Response.json({
-    role: profile.role,
-    isAdmin: await isAdminUser(),
-    companies,
-  });
 }

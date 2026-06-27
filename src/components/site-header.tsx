@@ -1,12 +1,13 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
+import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import { cx } from "@/lib/utils";
 
@@ -24,10 +25,11 @@ const appLinks = [
 export function SiteHeader() {
   const pathname = usePathname();
   const { locale, t } = useI18n();
-  const { isSignedIn, user } = useUser();
+  const { context, isSignedIn, user } = useUserContext();
   const [open, setOpen] = useState(false);
   const pathWithoutLocale = stripLocale(pathname);
-  const role = user?.publicMetadata?.role;
+  const role = context?.role ?? user?.publicMetadata?.role;
+  const isAdmin = context?.isAdmin === true;
   const hasRole =
     role === "buyer" ||
     role === "seller" ||
@@ -47,11 +49,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={withLocale("/", locale)} className="flex items-center gap-2 text-zinc-950">
-          <span className="flex size-8 items-center justify-center rounded-md border border-blue-200 bg-blue-50 text-sm font-semibold text-blue-700">
-            BM
-          </span>
-          <span className="text-base font-semibold">{t("common.bridgeMarket")}</span>
+        <Link href={withLocale("/", locale)} className="flex items-center text-zinc-950">
+          <Image
+            src="/trade82-logo.png"
+            alt={t("common.bridgeMarket")}
+            width={180}
+            height={40}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -90,6 +96,19 @@ export function SiteHeader() {
           >
             {t("locale.korean")}
           </Link>
+          {isSignedIn && isAdmin ? (
+            <Link
+              href="/admin"
+              className={cx(
+                "rounded-md px-3 py-2 text-sm font-medium transition",
+                pathWithoutLocale.startsWith("/admin")
+                  ? "bg-zinc-100 text-zinc-950"
+                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950",
+              )}
+            >
+              Admin Console
+            </Link>
+          ) : null}
           {isSignedIn ? (
             <ClerkUserButton />
           ) : (
@@ -145,6 +164,15 @@ export function SiteHeader() {
             <Link href={withLocale(pathWithoutLocale, "ko")} className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700">
               {t("locale.korean")}
             </Link>
+            {isSignedIn && isAdmin ? (
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="rounded-md px-3 py-3 text-sm font-medium text-blue-700 hover:bg-zinc-50"
+              >
+                Admin Console
+              </Link>
+            ) : null}
             {isSignedIn ? (
               <div className="flex justify-end px-3 py-2">
                 <ClerkUserButton />

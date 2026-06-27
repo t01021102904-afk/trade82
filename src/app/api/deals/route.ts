@@ -1,4 +1,15 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  enumField,
+  idField,
+  numberStringField,
+  rateLimitOrResponse,
+  readJsonObject,
+  requiredIdField,
+  stringField,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
@@ -40,9 +51,53 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const user = await requireAuth();
-    const body = (await request.json()) as Record<string, unknown>;
-    const buyerCompanyId = String(body.buyerCompanyId ?? "");
-    const sellerCompanyId = String(body.sellerCompanyId ?? "");
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "deals",
+      userId: user.id,
+      limit: 40,
+      windowMs: 60 * 60_000,
+      message: "Too many deal updates. Please try again shortly.",
+    });
+    if (rateLimited) return rateLimited;
+
+    const body = await readJsonObject(request);
+    const inquiryId = idField(body, "inquiryId");
+    const inquiry = inquiryId
+      ? await getDb().inquiry.findFirst({
+          where: {
+            id: inquiryId,
+            OR: [
+              { buyerCompany: { ownerUserId: user.id } },
+              { sellerCompany: { ownerUserId: user.id } },
+            ],
+          },
+          include: { buyerCompany: true, sellerCompany: true },
+        })
+      : null;
+    if (inquiryId && !inquiry) {
+      return Response.json({ error: "Inquiry not found." }, { status: 404 });
+    }
+
+    const existingDeal = inquiryId
+      ? await getDb().deal.findFirst({
+          where: { inquiryId },
+          include: {
+            buyerCompany: true,
+            sellerCompany: true,
+            product: true,
+            reviews: true,
+          },
+        })
+      : null;
+    if (existingDeal) {
+      return Response.json(serializeDeal(existingDeal));
+    }
+
+    const buyerCompanyId =
+      inquiry?.buyerCompanyId ?? requiredIdField(body, "buyerCompanyId");
+    const sellerCompanyId =
+      inquiry?.sellerCompanyId ?? requiredIdField(body, "sellerCompanyId");
     const participant = await getDb().company.findFirst({
       where: {
         ownerUserId: user.id,
@@ -52,38 +107,76 @@ export async function POST(request: Request) {
     if (!participant) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
+    const companies = inquiry
+      ? [inquiry.buyerCompany, inquiry.sellerCompany]
+      : await getDb().company.findMany({
+          where: { id: { in: [buyerCompanyId, sellerCompanyId] } },
+        });
+    const buyerCompany = companies.find((company) => company.id === buyerCompanyId);
+    const sellerCompany = companies.find((company) => company.id === sellerCompanyId);
+    if (!buyerCompany || !sellerCompany || buyerCompany.ownerUserId === sellerCompany.ownerUserId) {
+      return Response.json({ error: "Invalid deal participants." }, { status: 400 });
+    }
+
     const deal = await getDb().deal.create({
       data: {
-        inquiryId: typeof body.inquiryId === "string" ? body.inquiryId : null,
+        inquiryId,
         buyerCompanyId,
         sellerCompanyId,
-        productId: typeof body.productId === "string" ? body.productId : null,
-        contractTitle: String(body.contractTitle ?? ""),
-        contractValue: String(body.contractValue ?? "0"),
-        currency: String(body.currency ?? "USD"),
-        dealStatus: body.dealStatus === "completed" ? "completed" : "proposed",
-        completedAt: body.dealStatus === "completed" ? new Date() : null,
+        productId: inquiry?.productId ?? idField(body, "productId"),
+        contractTitle:
+          stringField(body, "contractTitle", { max: 160, fallback: null }) ||
+          "Deal discussion",
+        contractValue: numberStringField(body, "contractValue", {
+          min: 0,
+          max: 999_999_999_999,
+          fallback: "0",
+        }) ?? "0",
+        currency:
+          stringField(body, "currency", { max: 8, fallback: null }) || "USD",
+        dealStatus: "in_progress",
+        completedAt: null,
         createdByUserId: user.id,
-        confirmedByBuyer: participant.companyRole === "buyer",
-        confirmedBySeller: participant.companyRole === "seller",
+        confirmedByBuyer: false,
+        confirmedBySeller: false,
         isPublic: body.isPublic === true,
         publicValueDisplay:
-          body.publicValueDisplay === "exact" ||
-          body.publicValueDisplay === "range"
-            ? body.publicValueDisplay
-            : "hidden",
+          enumField(
+            body,
+            "publicValueDisplay",
+            ["hidden", "exact", "range"] as const,
+            "hidden",
+          ),
+      },
+      include: {
+        buyerCompany: true,
+        sellerCompany: true,
+        product: true,
+        reviews: true,
       },
     });
-    return Response.json(
-      {
-        ...deal,
-        contractFilePath: undefined,
-        hasContractFile: Boolean(deal.contractFilePath),
-        contractValue: deal.contractValue.toString(),
-      },
-      { status: 201 },
-    );
+    return Response.json(serializeDeal(deal), { status: 201 });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
+}
+
+function serializeDeal<T extends {
+  contractFilePath: string | null;
+  contractValue: { toString(): string };
+  reviews: Array<{ contractValue?: { toString(): string } }>;
+}>(deal: T) {
+  return {
+    ...deal,
+    contractFilePath: undefined,
+    hasContractFile: Boolean(deal.contractFilePath),
+    contractValue: deal.contractValue.toString(),
+    reviews: deal.reviews.map((review) => ({
+      ...review,
+      contractValue: review.contractValue?.toString(),
+    })),
+  };
 }

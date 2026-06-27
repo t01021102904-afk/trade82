@@ -3,8 +3,13 @@ import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
 
-export default async function MessagesPage() {
+export default async function MessagesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ inquiryId?: string }>;
+}) {
   await requireAppProfile("/messages");
+  const { inquiryId } = await searchParams;
   const messages = getDictionary("en");
   return (
     <div className="bg-zinc-50">
@@ -14,7 +19,7 @@ export default async function MessagesPage() {
           title={messages.messages.title}
           description={messages.messages.description}
         />
-        <MessagesClient />
+        <MessagesClient initialInquiryId={inquiryId ?? null} />
       </div>
     </div>
   );

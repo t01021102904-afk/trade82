@@ -292,6 +292,7 @@ export type UserProfileWhereInput = {
   sentInquiries?: Prisma.InquiryListRelationFilter
   sentMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
+  uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   createdDeals?: Prisma.DealListRelationFilter
 }
@@ -321,6 +322,7 @@ export type UserProfileOrderByWithRelationInput = {
   sentInquiries?: Prisma.InquiryOrderByRelationAggregateInput
   sentMessages?: Prisma.MessageOrderByRelationAggregateInput
   receivedMessages?: Prisma.MessageOrderByRelationAggregateInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentOrderByRelationAggregateInput
   savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
   createdDeals?: Prisma.DealOrderByRelationAggregateInput
 }
@@ -353,6 +355,7 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   sentInquiries?: Prisma.InquiryListRelationFilter
   sentMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
+  uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   createdDeals?: Prisma.DealListRelationFilter
 }, "id" | "clerkUserId" | "email">
@@ -430,6 +433,7 @@ export type UserProfileCreateInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -459,6 +463,7 @@ export type UserProfileUncheckedCreateInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -488,6 +493,7 @@ export type UserProfileUpdateInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -517,6 +523,7 @@ export type UserProfileUncheckedUpdateInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -779,6 +786,20 @@ export type UserProfileUpdateOneWithoutReceivedMessagesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutReceivedMessagesInput, Prisma.UserProfileUpdateWithoutReceivedMessagesInput>, Prisma.UserProfileUncheckedUpdateWithoutReceivedMessagesInput>
 }
 
+export type UserProfileCreateNestedOneWithoutUploadedMessageAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutUploadedMessageAttachmentsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutUploadedMessageAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutUploadedMessageAttachmentsInput
+  upsert?: Prisma.UserProfileUpsertWithoutUploadedMessageAttachmentsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUpdateWithoutUploadedMessageAttachmentsInput>, Prisma.UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+}
+
 export type UserProfileCreateNestedOneWithoutCreatedDealsInput = {
   create?: Prisma.XOR<Prisma.UserProfileCreateWithoutCreatedDealsInput, Prisma.UserProfileUncheckedCreateWithoutCreatedDealsInput>
   connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutCreatedDealsInput
@@ -817,6 +838,7 @@ export type UserProfileCreateWithoutCompaniesInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -845,6 +867,7 @@ export type UserProfileUncheckedCreateWithoutCompaniesInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -889,6 +912,7 @@ export type UserProfileUpdateWithoutCompaniesInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -917,6 +941,7 @@ export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -945,6 +970,7 @@ export type UserProfileCreateWithoutRequestedVerificationsInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -973,6 +999,7 @@ export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -1006,6 +1033,7 @@ export type UserProfileCreateWithoutReviewedVerificationsInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -1034,6 +1062,7 @@ export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -1078,6 +1107,7 @@ export type UserProfileUpdateWithoutRequestedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -1106,6 +1136,7 @@ export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -1145,6 +1176,7 @@ export type UserProfileUpdateWithoutReviewedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -1173,6 +1205,7 @@ export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -1201,6 +1234,7 @@ export type UserProfileCreateWithoutSentInquiriesInput = {
   reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -1229,6 +1263,7 @@ export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -1273,6 +1308,7 @@ export type UserProfileUpdateWithoutSentInquiriesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -1301,6 +1337,7 @@ export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -1330,6 +1367,7 @@ export type UserProfileCreateWithoutSavedItemsInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
 
@@ -1358,6 +1396,7 @@ export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
@@ -1402,6 +1441,7 @@ export type UserProfileUpdateWithoutSavedItemsInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
 
@@ -1430,6 +1470,7 @@ export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
@@ -1457,6 +1498,7 @@ export type UserProfileCreateWithoutSentMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -1485,6 +1527,7 @@ export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -1518,6 +1561,7 @@ export type UserProfileCreateWithoutReceivedMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
 }
@@ -1546,6 +1590,7 @@ export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
 }
@@ -1590,6 +1635,7 @@ export type UserProfileUpdateWithoutSentMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -1618,6 +1664,7 @@ export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -1657,6 +1704,7 @@ export type UserProfileUpdateWithoutReceivedMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
 }
@@ -1685,6 +1733,139 @@ export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
   reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+}
+
+export type UserProfileCreateOrConnectWithoutUploadedMessageAttachmentsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+}
+
+export type UserProfileUpsertWithoutUploadedMessageAttachmentsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutUploadedMessageAttachmentsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutUploadedMessageAttachmentsInput, Prisma.UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
+}
+
+export type UserProfileUpdateWithoutUploadedMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
 }
@@ -1714,6 +1895,7 @@ export type UserProfileCreateWithoutCreatedDealsInput = {
   sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
 }
 
@@ -1742,6 +1924,7 @@ export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
   sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
   sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -1786,6 +1969,7 @@ export type UserProfileUpdateWithoutCreatedDealsInput = {
   sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
 }
 
@@ -1814,6 +1998,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
   sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
   sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -1829,6 +2014,7 @@ export type UserProfileCountOutputType = {
   sentInquiries: number
   sentMessages: number
   receivedMessages: number
+  uploadedMessageAttachments: number
   savedItems: number
   createdDeals: number
 }
@@ -1840,6 +2026,7 @@ export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   sentInquiries?: boolean | UserProfileCountOutputTypeCountSentInquiriesArgs
   sentMessages?: boolean | UserProfileCountOutputTypeCountSentMessagesArgs
   receivedMessages?: boolean | UserProfileCountOutputTypeCountReceivedMessagesArgs
+  uploadedMessageAttachments?: boolean | UserProfileCountOutputTypeCountUploadedMessageAttachmentsArgs
   savedItems?: boolean | UserProfileCountOutputTypeCountSavedItemsArgs
   createdDeals?: boolean | UserProfileCountOutputTypeCountCreatedDealsArgs
 }
@@ -1899,6 +2086,13 @@ export type UserProfileCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends 
 /**
  * UserProfileCountOutputType without action
  */
+export type UserProfileCountOutputTypeCountUploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageAttachmentWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
 export type UserProfileCountOutputTypeCountSavedItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SavedItemWhereInput
 }
@@ -1936,6 +2130,7 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   sentInquiries?: boolean | Prisma.UserProfile$sentInquiriesArgs<ExtArgs>
   sentMessages?: boolean | Prisma.UserProfile$sentMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.UserProfile$receivedMessagesArgs<ExtArgs>
+  uploadedMessageAttachments?: boolean | Prisma.UserProfile$uploadedMessageAttachmentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.UserProfile$savedItemsArgs<ExtArgs>
   createdDeals?: boolean | Prisma.UserProfile$createdDealsArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -2012,6 +2207,7 @@ export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.Internal
   sentInquiries?: boolean | Prisma.UserProfile$sentInquiriesArgs<ExtArgs>
   sentMessages?: boolean | Prisma.UserProfile$sentMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.UserProfile$receivedMessagesArgs<ExtArgs>
+  uploadedMessageAttachments?: boolean | Prisma.UserProfile$uploadedMessageAttachmentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.UserProfile$savedItemsArgs<ExtArgs>
   createdDeals?: boolean | Prisma.UserProfile$createdDealsArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -2028,6 +2224,7 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     sentInquiries: Prisma.$InquiryPayload<ExtArgs>[]
     sentMessages: Prisma.$MessagePayload<ExtArgs>[]
     receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
+    uploadedMessageAttachments: Prisma.$MessageAttachmentPayload<ExtArgs>[]
     savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
     createdDeals: Prisma.$DealPayload<ExtArgs>[]
   }
@@ -2450,6 +2647,7 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
   sentInquiries<T extends Prisma.UserProfile$sentInquiriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sentInquiriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InquiryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sentMessages<T extends Prisma.UserProfile$sentMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedMessages<T extends Prisma.UserProfile$receivedMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  uploadedMessageAttachments<T extends Prisma.UserProfile$uploadedMessageAttachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$uploadedMessageAttachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedItems<T extends Prisma.UserProfile$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdDeals<T extends Prisma.UserProfile$createdDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$createdDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -3033,6 +3231,30 @@ export type UserProfile$receivedMessagesArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.uploadedMessageAttachments
+ */
+export type UserProfile$uploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MessageAttachment
+   */
+  select?: Prisma.MessageAttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MessageAttachment
+   */
+  omit?: Prisma.MessageAttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageAttachmentInclude<ExtArgs> | null
+  where?: Prisma.MessageAttachmentWhereInput
+  orderBy?: Prisma.MessageAttachmentOrderByWithRelationInput | Prisma.MessageAttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.MessageAttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageAttachmentScalarFieldEnum | Prisma.MessageAttachmentScalarFieldEnum[]
 }
 
 /**

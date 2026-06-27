@@ -1,5 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
+import { rateLimitOrResponse } from "@/lib/api-security";
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
@@ -11,6 +12,14 @@ export async function POST(request: Request) {
   if (!userId) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
+  const rateLimited = rateLimitOrResponse({
+    request,
+    scope: "user-role",
+    userId,
+    limit: 10,
+    windowMs: 60 * 60_000,
+  });
+  if (rateLimited) return rateLimited;
 
   const body = (await request.json().catch(() => null)) as { role?: unknown } | null;
   const role = body?.role;

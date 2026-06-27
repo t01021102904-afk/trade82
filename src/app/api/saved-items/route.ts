@@ -1,11 +1,14 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  enumField,
+  readJsonObject,
+  requiredIdField,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireBuyer } from "@/lib/authz";
 import { getDb } from "@/lib/db";
-import {
-  publicBuyers,
-  publicProducts,
-  publicSellers,
-} from "@/lib/mock-data";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function GET() {
   try {
@@ -24,26 +27,28 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
     return Response.json(
-      items.map((item) => ({
-        ...item,
-        targetId: item.productId || item.companyId || item.externalId,
-        displayName:
-          item.displayName ||
-          item.product?.name ||
-          item.company?.tradeName ||
-          item.company?.legalName,
-        imageUrl:
-          item.imageUrl ||
-          item.product?.images[0]?.cardUrl ||
-          item.product?.imageUrl ||
-          item.company?.logoThumbnailUrl ||
-          item.company?.logoUrl,
-        href:
-          item.href ||
-          (item.productId
-            ? `/products/${item.productId}`
-            : `/companies/${item.companyId}`),
-      })),
+      items
+        .filter((item) => item.product || item.company)
+        .map((item) => ({
+          ...item,
+          targetId: item.productId || item.companyId,
+          displayName:
+            item.displayName ||
+            item.product?.name ||
+            item.company?.tradeName ||
+            item.company?.legalName,
+          imageUrl:
+            item.imageUrl ||
+            item.product?.images[0]?.cardUrl ||
+            item.product?.imageUrl ||
+            item.company?.logoThumbnailUrl ||
+            item.company?.logoUrl,
+          href:
+            item.href ||
+            (item.productId
+              ? `/products/${item.productId}`
+              : `/companies/${item.companyId}`),
+        })),
     );
   } catch (error) {
     return apiError(error);
@@ -53,9 +58,18 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { user } = await requireBuyer();
-    const body = (await request.json()) as Record<string, unknown>;
-    const type = body.type === "company" ? "company" : "product";
-    const targetId = String(body.id ?? "");
+
+    const rateLimit = checkRateLimit(`saves:${user.id}`, 60, 60_000);
+    if (!rateLimit.allowed) {
+      return Response.json(
+        { error: "Too many save/unsave actions. Please slow down." },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+      );
+    }
+
+    const body = await readJsonObject(request);
+    const type = enumField(body, "type", ["company", "product"], "product");
+    const targetId = requiredIdField(body, "id");
     const target = await resolveTarget(type, targetId);
     if (!target) {
       return Response.json({ error: "Not found" }, { status: 404 });
@@ -87,6 +101,9 @@ export async function POST(request: Request) {
     });
     return Response.json({ saved: true, message: "Saved" });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
 }
@@ -109,15 +126,7 @@ async function resolveTarget(type: "product" | "company", targetId: string) {
         href: `/products/${product.id}`,
       };
     }
-    const catalogProduct = publicProducts.find((item) => item.id === targetId);
-    return catalogProduct
-      ? {
-          dbId: null,
-          displayName: catalogProduct.name,
-          imageUrl: catalogProduct.imagePlaceholder,
-          href: `/products/${catalogProduct.id}`,
-        }
-      : null;
+    return null;
   }
 
   const company = await getDb().company.findFirst({
@@ -142,18 +151,5 @@ async function resolveTarget(type: "product" | "company", targetId: string) {
           : `/companies/${company.id}`,
     };
   }
-  const catalogCompany =
-    publicSellers.find((item) => item.id === targetId) ||
-    publicBuyers.find((item) => item.id === targetId);
-  return catalogCompany
-    ? {
-        dbId: null,
-        displayName: catalogCompany.name,
-        imageUrl: catalogCompany.logoUrl ?? null,
-        href:
-          "buyerType" in catalogCompany
-            ? `/buyers/${catalogCompany.id}`
-            : `/companies/${catalogCompany.id}`,
-      }
-    : null;
+  return null;
 }

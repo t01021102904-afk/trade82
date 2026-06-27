@@ -7,8 +7,17 @@ export async function GET() {
       getDb().company.findMany({
         where: { verificationStatus: "verified" },
         include: {
+          owner: {
+            select: {
+              displayName: true,
+              jobTitle: true,
+            },
+          },
           sellerProfile: true,
           buyerProfile: true,
+          _count: {
+            select: { products: true },
+          },
           reviewsReceived: {
             where: { isPublic: true, adminApproved: true },
             include: {
@@ -37,6 +46,9 @@ export async function GET() {
               useDefaultLogo: true,
               city: true,
               country: true,
+              categories: true,
+              description: true,
+              sellerProfile: true,
             },
           },
         },

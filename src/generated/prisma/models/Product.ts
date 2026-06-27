@@ -50,11 +50,32 @@ export type ProductMinAggregateOutputType = {
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string | null
+  priceUnit: string | null
   moq: string | null
+  moqQuantity: string | null
+  moqUnit: string | null
   leadTime: string | null
+  leadTimeCode: string | null
+  sampleAvailability: string | null
+  privateLabelAvailability: string | null
+  monthlyCapacity: string | null
+  monthlyCapacityUnit: string | null
   origin: string | null
+  countryOfOrigin: string | null
+  shippingOriginCountry: string | null
+  shippingOriginRegion: string | null
+  hsCode: string | null
+  shelfLife: string | null
+  storageRequirements: string | null
+  buyerNotes: string | null
   ingredientsOrMaterials: string | null
   packaging: string | null
+  packageSize: string | null
+  unitsPerCarton: string | null
+  cartonWeight: string | null
+  cartonDimensions: string | null
+  palletQuantity: string | null
+  storageTemperature: string | null
   exportReadiness: boolean | null
   viewCount: number | null
   status: $Enums.ProductStatus | null
@@ -74,11 +95,32 @@ export type ProductMaxAggregateOutputType = {
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string | null
+  priceUnit: string | null
   moq: string | null
+  moqQuantity: string | null
+  moqUnit: string | null
   leadTime: string | null
+  leadTimeCode: string | null
+  sampleAvailability: string | null
+  privateLabelAvailability: string | null
+  monthlyCapacity: string | null
+  monthlyCapacityUnit: string | null
   origin: string | null
+  countryOfOrigin: string | null
+  shippingOriginCountry: string | null
+  shippingOriginRegion: string | null
+  hsCode: string | null
+  shelfLife: string | null
+  storageRequirements: string | null
+  buyerNotes: string | null
   ingredientsOrMaterials: string | null
   packaging: string | null
+  packageSize: string | null
+  unitsPerCarton: string | null
+  cartonWeight: string | null
+  cartonDimensions: string | null
+  palletQuantity: string | null
+  storageTemperature: string | null
   exportReadiness: boolean | null
   viewCount: number | null
   status: $Enums.ProductStatus | null
@@ -99,12 +141,38 @@ export type ProductCountAggregateOutputType = {
   priceMin: number
   priceMax: number
   currency: number
+  priceUnit: number
   moq: number
+  moqQuantity: number
+  moqUnit: number
   leadTime: number
+  leadTimeCode: number
+  sampleAvailability: number
+  privateLabelAvailability: number
+  monthlyCapacity: number
+  monthlyCapacityUnit: number
   origin: number
+  countryOfOrigin: number
+  shippingOriginCountry: number
+  shippingOriginRegion: number
+  incoterms: number
+  hsCode: number
+  shelfLife: number
+  storageRequirements: number
+  documentsAvailable: number
+  complianceClaims: number
+  buyerNotes: number
+  riskNotes: number
   certifications: number
   ingredientsOrMaterials: number
   packaging: number
+  packageSize: number
+  unitsPerCarton: number
+  cartonWeight: number
+  cartonDimensions: number
+  palletQuantity: number
+  storageTemperature: number
+  suggestedUsChannels: number
   exportReadiness: number
   viewCount: number
   status: number
@@ -138,11 +206,32 @@ export type ProductMinAggregateInputType = {
   priceMin?: true
   priceMax?: true
   currency?: true
+  priceUnit?: true
   moq?: true
+  moqQuantity?: true
+  moqUnit?: true
   leadTime?: true
+  leadTimeCode?: true
+  sampleAvailability?: true
+  privateLabelAvailability?: true
+  monthlyCapacity?: true
+  monthlyCapacityUnit?: true
   origin?: true
+  countryOfOrigin?: true
+  shippingOriginCountry?: true
+  shippingOriginRegion?: true
+  hsCode?: true
+  shelfLife?: true
+  storageRequirements?: true
+  buyerNotes?: true
   ingredientsOrMaterials?: true
   packaging?: true
+  packageSize?: true
+  unitsPerCarton?: true
+  cartonWeight?: true
+  cartonDimensions?: true
+  palletQuantity?: true
+  storageTemperature?: true
   exportReadiness?: true
   viewCount?: true
   status?: true
@@ -162,11 +251,32 @@ export type ProductMaxAggregateInputType = {
   priceMin?: true
   priceMax?: true
   currency?: true
+  priceUnit?: true
   moq?: true
+  moqQuantity?: true
+  moqUnit?: true
   leadTime?: true
+  leadTimeCode?: true
+  sampleAvailability?: true
+  privateLabelAvailability?: true
+  monthlyCapacity?: true
+  monthlyCapacityUnit?: true
   origin?: true
+  countryOfOrigin?: true
+  shippingOriginCountry?: true
+  shippingOriginRegion?: true
+  hsCode?: true
+  shelfLife?: true
+  storageRequirements?: true
+  buyerNotes?: true
   ingredientsOrMaterials?: true
   packaging?: true
+  packageSize?: true
+  unitsPerCarton?: true
+  cartonWeight?: true
+  cartonDimensions?: true
+  palletQuantity?: true
+  storageTemperature?: true
   exportReadiness?: true
   viewCount?: true
   status?: true
@@ -187,12 +297,38 @@ export type ProductCountAggregateInputType = {
   priceMin?: true
   priceMax?: true
   currency?: true
+  priceUnit?: true
   moq?: true
+  moqQuantity?: true
+  moqUnit?: true
   leadTime?: true
+  leadTimeCode?: true
+  sampleAvailability?: true
+  privateLabelAvailability?: true
+  monthlyCapacity?: true
+  monthlyCapacityUnit?: true
   origin?: true
+  countryOfOrigin?: true
+  shippingOriginCountry?: true
+  shippingOriginRegion?: true
+  incoterms?: true
+  hsCode?: true
+  shelfLife?: true
+  storageRequirements?: true
+  documentsAvailable?: true
+  complianceClaims?: true
+  buyerNotes?: true
+  riskNotes?: true
   certifications?: true
   ingredientsOrMaterials?: true
   packaging?: true
+  packageSize?: true
+  unitsPerCarton?: true
+  cartonWeight?: true
+  cartonDimensions?: true
+  palletQuantity?: true
+  storageTemperature?: true
+  suggestedUsChannels?: true
   exportReadiness?: true
   viewCount?: true
   status?: true
@@ -300,12 +436,38 @@ export type ProductGroupByOutputType = {
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string
+  priceUnit: string
   moq: string
+  moqQuantity: string
+  moqUnit: string
   leadTime: string
+  leadTimeCode: string
+  sampleAvailability: string
+  privateLabelAvailability: string
+  monthlyCapacity: string
+  monthlyCapacityUnit: string
   origin: string
+  countryOfOrigin: string
+  shippingOriginCountry: string
+  shippingOriginRegion: string
+  incoterms: string[]
+  hsCode: string
+  shelfLife: string
+  storageRequirements: string
+  documentsAvailable: string[]
+  complianceClaims: string[]
+  buyerNotes: string
+  riskNotes: string[]
   certifications: string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize: string
+  unitsPerCarton: string
+  cartonWeight: string
+  cartonDimensions: string
+  palletQuantity: string
+  storageTemperature: string
+  suggestedUsChannels: string[]
   exportReadiness: boolean
   viewCount: number
   status: $Enums.ProductStatus
@@ -349,12 +511,38 @@ export type ProductWhereInput = {
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
+  priceUnit?: Prisma.StringFilter<"Product"> | string
   moq?: Prisma.StringFilter<"Product"> | string
+  moqQuantity?: Prisma.StringFilter<"Product"> | string
+  moqUnit?: Prisma.StringFilter<"Product"> | string
   leadTime?: Prisma.StringFilter<"Product"> | string
+  leadTimeCode?: Prisma.StringFilter<"Product"> | string
+  sampleAvailability?: Prisma.StringFilter<"Product"> | string
+  privateLabelAvailability?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacity?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacityUnit?: Prisma.StringFilter<"Product"> | string
   origin?: Prisma.StringFilter<"Product"> | string
+  countryOfOrigin?: Prisma.StringFilter<"Product"> | string
+  shippingOriginCountry?: Prisma.StringFilter<"Product"> | string
+  shippingOriginRegion?: Prisma.StringFilter<"Product"> | string
+  incoterms?: Prisma.StringNullableListFilter<"Product">
+  hsCode?: Prisma.StringFilter<"Product"> | string
+  shelfLife?: Prisma.StringFilter<"Product"> | string
+  storageRequirements?: Prisma.StringFilter<"Product"> | string
+  documentsAvailable?: Prisma.StringNullableListFilter<"Product">
+  complianceClaims?: Prisma.StringNullableListFilter<"Product">
+  buyerNotes?: Prisma.StringFilter<"Product"> | string
+  riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
   packaging?: Prisma.StringFilter<"Product"> | string
+  packageSize?: Prisma.StringFilter<"Product"> | string
+  unitsPerCarton?: Prisma.StringFilter<"Product"> | string
+  cartonWeight?: Prisma.StringFilter<"Product"> | string
+  cartonDimensions?: Prisma.StringFilter<"Product"> | string
+  palletQuantity?: Prisma.StringFilter<"Product"> | string
+  storageTemperature?: Prisma.StringFilter<"Product"> | string
+  suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -380,12 +568,38 @@ export type ProductOrderByWithRelationInput = {
   priceMin?: Prisma.SortOrderInput | Prisma.SortOrder
   priceMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
+  priceUnit?: Prisma.SortOrder
   moq?: Prisma.SortOrder
+  moqQuantity?: Prisma.SortOrder
+  moqUnit?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
+  leadTimeCode?: Prisma.SortOrder
+  sampleAvailability?: Prisma.SortOrder
+  privateLabelAvailability?: Prisma.SortOrder
+  monthlyCapacity?: Prisma.SortOrder
+  monthlyCapacityUnit?: Prisma.SortOrder
   origin?: Prisma.SortOrder
+  countryOfOrigin?: Prisma.SortOrder
+  shippingOriginCountry?: Prisma.SortOrder
+  shippingOriginRegion?: Prisma.SortOrder
+  incoterms?: Prisma.SortOrder
+  hsCode?: Prisma.SortOrder
+  shelfLife?: Prisma.SortOrder
+  storageRequirements?: Prisma.SortOrder
+  documentsAvailable?: Prisma.SortOrder
+  complianceClaims?: Prisma.SortOrder
+  buyerNotes?: Prisma.SortOrder
+  riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
+  packageSize?: Prisma.SortOrder
+  unitsPerCarton?: Prisma.SortOrder
+  cartonWeight?: Prisma.SortOrder
+  cartonDimensions?: Prisma.SortOrder
+  palletQuantity?: Prisma.SortOrder
+  storageTemperature?: Prisma.SortOrder
+  suggestedUsChannels?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -414,12 +628,38 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
+  priceUnit?: Prisma.StringFilter<"Product"> | string
   moq?: Prisma.StringFilter<"Product"> | string
+  moqQuantity?: Prisma.StringFilter<"Product"> | string
+  moqUnit?: Prisma.StringFilter<"Product"> | string
   leadTime?: Prisma.StringFilter<"Product"> | string
+  leadTimeCode?: Prisma.StringFilter<"Product"> | string
+  sampleAvailability?: Prisma.StringFilter<"Product"> | string
+  privateLabelAvailability?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacity?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacityUnit?: Prisma.StringFilter<"Product"> | string
   origin?: Prisma.StringFilter<"Product"> | string
+  countryOfOrigin?: Prisma.StringFilter<"Product"> | string
+  shippingOriginCountry?: Prisma.StringFilter<"Product"> | string
+  shippingOriginRegion?: Prisma.StringFilter<"Product"> | string
+  incoterms?: Prisma.StringNullableListFilter<"Product">
+  hsCode?: Prisma.StringFilter<"Product"> | string
+  shelfLife?: Prisma.StringFilter<"Product"> | string
+  storageRequirements?: Prisma.StringFilter<"Product"> | string
+  documentsAvailable?: Prisma.StringNullableListFilter<"Product">
+  complianceClaims?: Prisma.StringNullableListFilter<"Product">
+  buyerNotes?: Prisma.StringFilter<"Product"> | string
+  riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
   packaging?: Prisma.StringFilter<"Product"> | string
+  packageSize?: Prisma.StringFilter<"Product"> | string
+  unitsPerCarton?: Prisma.StringFilter<"Product"> | string
+  cartonWeight?: Prisma.StringFilter<"Product"> | string
+  cartonDimensions?: Prisma.StringFilter<"Product"> | string
+  palletQuantity?: Prisma.StringFilter<"Product"> | string
+  storageTemperature?: Prisma.StringFilter<"Product"> | string
+  suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -445,12 +685,38 @@ export type ProductOrderByWithAggregationInput = {
   priceMin?: Prisma.SortOrderInput | Prisma.SortOrder
   priceMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
+  priceUnit?: Prisma.SortOrder
   moq?: Prisma.SortOrder
+  moqQuantity?: Prisma.SortOrder
+  moqUnit?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
+  leadTimeCode?: Prisma.SortOrder
+  sampleAvailability?: Prisma.SortOrder
+  privateLabelAvailability?: Prisma.SortOrder
+  monthlyCapacity?: Prisma.SortOrder
+  monthlyCapacityUnit?: Prisma.SortOrder
   origin?: Prisma.SortOrder
+  countryOfOrigin?: Prisma.SortOrder
+  shippingOriginCountry?: Prisma.SortOrder
+  shippingOriginRegion?: Prisma.SortOrder
+  incoterms?: Prisma.SortOrder
+  hsCode?: Prisma.SortOrder
+  shelfLife?: Prisma.SortOrder
+  storageRequirements?: Prisma.SortOrder
+  documentsAvailable?: Prisma.SortOrder
+  complianceClaims?: Prisma.SortOrder
+  buyerNotes?: Prisma.SortOrder
+  riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
+  packageSize?: Prisma.SortOrder
+  unitsPerCarton?: Prisma.SortOrder
+  cartonWeight?: Prisma.SortOrder
+  cartonDimensions?: Prisma.SortOrder
+  palletQuantity?: Prisma.SortOrder
+  storageTemperature?: Prisma.SortOrder
+  suggestedUsChannels?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -479,12 +745,38 @@ export type ProductScalarWhereWithAggregatesInput = {
   priceMin?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  priceUnit?: Prisma.StringWithAggregatesFilter<"Product"> | string
   moq?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  moqQuantity?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  moqUnit?: Prisma.StringWithAggregatesFilter<"Product"> | string
   leadTime?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  leadTimeCode?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  sampleAvailability?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  privateLabelAvailability?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  monthlyCapacity?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  monthlyCapacityUnit?: Prisma.StringWithAggregatesFilter<"Product"> | string
   origin?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  countryOfOrigin?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  shippingOriginCountry?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  shippingOriginRegion?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  incoterms?: Prisma.StringNullableListFilter<"Product">
+  hsCode?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  shelfLife?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  storageRequirements?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  documentsAvailable?: Prisma.StringNullableListFilter<"Product">
+  complianceClaims?: Prisma.StringNullableListFilter<"Product">
+  buyerNotes?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringWithAggregatesFilter<"Product"> | string
   packaging?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  packageSize?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  unitsPerCarton?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  cartonWeight?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  cartonDimensions?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  palletQuantity?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  storageTemperature?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
   exportReadiness?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   viewCount?: Prisma.IntWithAggregatesFilter<"Product"> | number
   status?: Prisma.EnumProductStatusWithAggregatesFilter<"Product"> | $Enums.ProductStatus
@@ -504,12 +796,38 @@ export type ProductCreateInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -535,12 +853,38 @@ export type ProductUncheckedCreateInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -564,12 +908,38 @@ export type ProductUpdateInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -595,12 +965,38 @@ export type ProductUncheckedUpdateInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -625,12 +1021,38 @@ export type ProductCreateManyInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -650,12 +1072,38 @@ export type ProductUpdateManyMutationInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -676,12 +1124,38 @@ export type ProductUncheckedUpdateManyInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -712,12 +1186,38 @@ export type ProductCountOrderByAggregateInput = {
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  priceUnit?: Prisma.SortOrder
   moq?: Prisma.SortOrder
+  moqQuantity?: Prisma.SortOrder
+  moqUnit?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
+  leadTimeCode?: Prisma.SortOrder
+  sampleAvailability?: Prisma.SortOrder
+  privateLabelAvailability?: Prisma.SortOrder
+  monthlyCapacity?: Prisma.SortOrder
+  monthlyCapacityUnit?: Prisma.SortOrder
   origin?: Prisma.SortOrder
+  countryOfOrigin?: Prisma.SortOrder
+  shippingOriginCountry?: Prisma.SortOrder
+  shippingOriginRegion?: Prisma.SortOrder
+  incoterms?: Prisma.SortOrder
+  hsCode?: Prisma.SortOrder
+  shelfLife?: Prisma.SortOrder
+  storageRequirements?: Prisma.SortOrder
+  documentsAvailable?: Prisma.SortOrder
+  complianceClaims?: Prisma.SortOrder
+  buyerNotes?: Prisma.SortOrder
+  riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
+  packageSize?: Prisma.SortOrder
+  unitsPerCarton?: Prisma.SortOrder
+  cartonWeight?: Prisma.SortOrder
+  cartonDimensions?: Prisma.SortOrder
+  palletQuantity?: Prisma.SortOrder
+  storageTemperature?: Prisma.SortOrder
+  suggestedUsChannels?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -743,11 +1243,32 @@ export type ProductMaxOrderByAggregateInput = {
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  priceUnit?: Prisma.SortOrder
   moq?: Prisma.SortOrder
+  moqQuantity?: Prisma.SortOrder
+  moqUnit?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
+  leadTimeCode?: Prisma.SortOrder
+  sampleAvailability?: Prisma.SortOrder
+  privateLabelAvailability?: Prisma.SortOrder
+  monthlyCapacity?: Prisma.SortOrder
+  monthlyCapacityUnit?: Prisma.SortOrder
   origin?: Prisma.SortOrder
+  countryOfOrigin?: Prisma.SortOrder
+  shippingOriginCountry?: Prisma.SortOrder
+  shippingOriginRegion?: Prisma.SortOrder
+  hsCode?: Prisma.SortOrder
+  shelfLife?: Prisma.SortOrder
+  storageRequirements?: Prisma.SortOrder
+  buyerNotes?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
+  packageSize?: Prisma.SortOrder
+  unitsPerCarton?: Prisma.SortOrder
+  cartonWeight?: Prisma.SortOrder
+  cartonDimensions?: Prisma.SortOrder
+  palletQuantity?: Prisma.SortOrder
+  storageTemperature?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -767,11 +1288,32 @@ export type ProductMinOrderByAggregateInput = {
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  priceUnit?: Prisma.SortOrder
   moq?: Prisma.SortOrder
+  moqQuantity?: Prisma.SortOrder
+  moqUnit?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
+  leadTimeCode?: Prisma.SortOrder
+  sampleAvailability?: Prisma.SortOrder
+  privateLabelAvailability?: Prisma.SortOrder
+  monthlyCapacity?: Prisma.SortOrder
+  monthlyCapacityUnit?: Prisma.SortOrder
   origin?: Prisma.SortOrder
+  countryOfOrigin?: Prisma.SortOrder
+  shippingOriginCountry?: Prisma.SortOrder
+  shippingOriginRegion?: Prisma.SortOrder
+  hsCode?: Prisma.SortOrder
+  shelfLife?: Prisma.SortOrder
+  storageRequirements?: Prisma.SortOrder
+  buyerNotes?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
+  packageSize?: Prisma.SortOrder
+  unitsPerCarton?: Prisma.SortOrder
+  cartonWeight?: Prisma.SortOrder
+  cartonDimensions?: Prisma.SortOrder
+  palletQuantity?: Prisma.SortOrder
+  storageTemperature?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -841,7 +1383,27 @@ export type ProductCreatetagsInput = {
   set: string[]
 }
 
+export type ProductCreateincotermsInput = {
+  set: string[]
+}
+
+export type ProductCreatedocumentsAvailableInput = {
+  set: string[]
+}
+
+export type ProductCreatecomplianceClaimsInput = {
+  set: string[]
+}
+
+export type ProductCreateriskNotesInput = {
+  set: string[]
+}
+
 export type ProductCreatecertificationsInput = {
+  set: string[]
+}
+
+export type ProductCreatesuggestedUsChannelsInput = {
   set: string[]
 }
 
@@ -858,7 +1420,32 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type ProductUpdateincotermsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProductUpdatedocumentsAvailableInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProductUpdatecomplianceClaimsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProductUpdateriskNotesInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type ProductUpdatecertificationsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProductUpdatesuggestedUsChannelsInput = {
   set?: string[]
   push?: string | string[]
 }
@@ -941,12 +1528,38 @@ export type ProductCreateWithoutSellerCompanyInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -970,12 +1583,38 @@ export type ProductUncheckedCreateWithoutSellerCompanyInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1029,12 +1668,38 @@ export type ProductScalarWhereInput = {
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
+  priceUnit?: Prisma.StringFilter<"Product"> | string
   moq?: Prisma.StringFilter<"Product"> | string
+  moqQuantity?: Prisma.StringFilter<"Product"> | string
+  moqUnit?: Prisma.StringFilter<"Product"> | string
   leadTime?: Prisma.StringFilter<"Product"> | string
+  leadTimeCode?: Prisma.StringFilter<"Product"> | string
+  sampleAvailability?: Prisma.StringFilter<"Product"> | string
+  privateLabelAvailability?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacity?: Prisma.StringFilter<"Product"> | string
+  monthlyCapacityUnit?: Prisma.StringFilter<"Product"> | string
   origin?: Prisma.StringFilter<"Product"> | string
+  countryOfOrigin?: Prisma.StringFilter<"Product"> | string
+  shippingOriginCountry?: Prisma.StringFilter<"Product"> | string
+  shippingOriginRegion?: Prisma.StringFilter<"Product"> | string
+  incoterms?: Prisma.StringNullableListFilter<"Product">
+  hsCode?: Prisma.StringFilter<"Product"> | string
+  shelfLife?: Prisma.StringFilter<"Product"> | string
+  storageRequirements?: Prisma.StringFilter<"Product"> | string
+  documentsAvailable?: Prisma.StringNullableListFilter<"Product">
+  complianceClaims?: Prisma.StringNullableListFilter<"Product">
+  buyerNotes?: Prisma.StringFilter<"Product"> | string
+  riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
   packaging?: Prisma.StringFilter<"Product"> | string
+  packageSize?: Prisma.StringFilter<"Product"> | string
+  unitsPerCarton?: Prisma.StringFilter<"Product"> | string
+  cartonWeight?: Prisma.StringFilter<"Product"> | string
+  cartonDimensions?: Prisma.StringFilter<"Product"> | string
+  palletQuantity?: Prisma.StringFilter<"Product"> | string
+  storageTemperature?: Prisma.StringFilter<"Product"> | string
+  suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -1054,12 +1719,38 @@ export type ProductCreateWithoutImagesInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1084,12 +1775,38 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1128,12 +1845,38 @@ export type ProductUpdateWithoutImagesInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1158,12 +1901,38 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1186,12 +1955,38 @@ export type ProductCreateWithoutInquiriesInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1216,12 +2011,38 @@ export type ProductUncheckedCreateWithoutInquiriesInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1260,12 +2081,38 @@ export type ProductUpdateWithoutInquiriesInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1290,12 +2137,38 @@ export type ProductUncheckedUpdateWithoutInquiriesInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1318,12 +2191,38 @@ export type ProductCreateWithoutSavedItemsInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1348,12 +2247,38 @@ export type ProductUncheckedCreateWithoutSavedItemsInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1392,12 +2317,38 @@ export type ProductUpdateWithoutSavedItemsInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1422,12 +2373,38 @@ export type ProductUncheckedUpdateWithoutSavedItemsInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1450,12 +2427,38 @@ export type ProductCreateWithoutDealsInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1480,12 +2483,38 @@ export type ProductUncheckedCreateWithoutDealsInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1524,12 +2553,38 @@ export type ProductUpdateWithoutDealsInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1554,12 +2609,38 @@ export type ProductUncheckedUpdateWithoutDealsInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1582,12 +2663,38 @@ export type ProductCreateManySellerCompanyInput = {
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
+  priceUnit?: string
   moq: string
+  moqQuantity?: string
+  moqUnit?: string
   leadTime: string
+  leadTimeCode?: string
+  sampleAvailability?: string
+  privateLabelAvailability?: string
+  monthlyCapacity?: string
+  monthlyCapacityUnit?: string
   origin?: string
+  countryOfOrigin?: string
+  shippingOriginCountry?: string
+  shippingOriginRegion?: string
+  incoterms?: Prisma.ProductCreateincotermsInput | string[]
+  hsCode?: string
+  shelfLife?: string
+  storageRequirements?: string
+  documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
+  buyerNotes?: string
+  riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
   packaging: string
+  packageSize?: string
+  unitsPerCarton?: string
+  cartonWeight?: string
+  cartonDimensions?: string
+  palletQuantity?: string
+  storageTemperature?: string
+  suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1607,12 +2714,38 @@ export type ProductUpdateWithoutSellerCompanyInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1636,12 +2769,38 @@ export type ProductUncheckedUpdateWithoutSellerCompanyInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1665,12 +2824,38 @@ export type ProductUncheckedUpdateManyWithoutSellerCompanyInput = {
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  priceUnit?: Prisma.StringFieldUpdateOperationsInput | string
   moq?: Prisma.StringFieldUpdateOperationsInput | string
+  moqQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  moqUnit?: Prisma.StringFieldUpdateOperationsInput | string
   leadTime?: Prisma.StringFieldUpdateOperationsInput | string
+  leadTimeCode?: Prisma.StringFieldUpdateOperationsInput | string
+  sampleAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  privateLabelAvailability?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacity?: Prisma.StringFieldUpdateOperationsInput | string
+  monthlyCapacityUnit?: Prisma.StringFieldUpdateOperationsInput | string
   origin?: Prisma.StringFieldUpdateOperationsInput | string
+  countryOfOrigin?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  shippingOriginRegion?: Prisma.StringFieldUpdateOperationsInput | string
+  incoterms?: Prisma.ProductUpdateincotermsInput | string[]
+  hsCode?: Prisma.StringFieldUpdateOperationsInput | string
+  shelfLife?: Prisma.StringFieldUpdateOperationsInput | string
+  storageRequirements?: Prisma.StringFieldUpdateOperationsInput | string
+  documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
+  complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
+  buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
   packaging?: Prisma.StringFieldUpdateOperationsInput | string
+  packageSize?: Prisma.StringFieldUpdateOperationsInput | string
+  unitsPerCarton?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonWeight?: Prisma.StringFieldUpdateOperationsInput | string
+  cartonDimensions?: Prisma.StringFieldUpdateOperationsInput | string
+  palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
+  storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
+  suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1749,12 +2934,38 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
+  priceUnit?: boolean
   moq?: boolean
+  moqQuantity?: boolean
+  moqUnit?: boolean
   leadTime?: boolean
+  leadTimeCode?: boolean
+  sampleAvailability?: boolean
+  privateLabelAvailability?: boolean
+  monthlyCapacity?: boolean
+  monthlyCapacityUnit?: boolean
   origin?: boolean
+  countryOfOrigin?: boolean
+  shippingOriginCountry?: boolean
+  shippingOriginRegion?: boolean
+  incoterms?: boolean
+  hsCode?: boolean
+  shelfLife?: boolean
+  storageRequirements?: boolean
+  documentsAvailable?: boolean
+  complianceClaims?: boolean
+  buyerNotes?: boolean
+  riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
   packaging?: boolean
+  packageSize?: boolean
+  unitsPerCarton?: boolean
+  cartonWeight?: boolean
+  cartonDimensions?: boolean
+  palletQuantity?: boolean
+  storageTemperature?: boolean
+  suggestedUsChannels?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -1781,12 +2992,38 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
+  priceUnit?: boolean
   moq?: boolean
+  moqQuantity?: boolean
+  moqUnit?: boolean
   leadTime?: boolean
+  leadTimeCode?: boolean
+  sampleAvailability?: boolean
+  privateLabelAvailability?: boolean
+  monthlyCapacity?: boolean
+  monthlyCapacityUnit?: boolean
   origin?: boolean
+  countryOfOrigin?: boolean
+  shippingOriginCountry?: boolean
+  shippingOriginRegion?: boolean
+  incoterms?: boolean
+  hsCode?: boolean
+  shelfLife?: boolean
+  storageRequirements?: boolean
+  documentsAvailable?: boolean
+  complianceClaims?: boolean
+  buyerNotes?: boolean
+  riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
   packaging?: boolean
+  packageSize?: boolean
+  unitsPerCarton?: boolean
+  cartonWeight?: boolean
+  cartonDimensions?: boolean
+  palletQuantity?: boolean
+  storageTemperature?: boolean
+  suggestedUsChannels?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -1808,12 +3045,38 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
+  priceUnit?: boolean
   moq?: boolean
+  moqQuantity?: boolean
+  moqUnit?: boolean
   leadTime?: boolean
+  leadTimeCode?: boolean
+  sampleAvailability?: boolean
+  privateLabelAvailability?: boolean
+  monthlyCapacity?: boolean
+  monthlyCapacityUnit?: boolean
   origin?: boolean
+  countryOfOrigin?: boolean
+  shippingOriginCountry?: boolean
+  shippingOriginRegion?: boolean
+  incoterms?: boolean
+  hsCode?: boolean
+  shelfLife?: boolean
+  storageRequirements?: boolean
+  documentsAvailable?: boolean
+  complianceClaims?: boolean
+  buyerNotes?: boolean
+  riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
   packaging?: boolean
+  packageSize?: boolean
+  unitsPerCarton?: boolean
+  cartonWeight?: boolean
+  cartonDimensions?: boolean
+  palletQuantity?: boolean
+  storageTemperature?: boolean
+  suggestedUsChannels?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -1835,12 +3098,38 @@ export type ProductSelectScalar = {
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
+  priceUnit?: boolean
   moq?: boolean
+  moqQuantity?: boolean
+  moqUnit?: boolean
   leadTime?: boolean
+  leadTimeCode?: boolean
+  sampleAvailability?: boolean
+  privateLabelAvailability?: boolean
+  monthlyCapacity?: boolean
+  monthlyCapacityUnit?: boolean
   origin?: boolean
+  countryOfOrigin?: boolean
+  shippingOriginCountry?: boolean
+  shippingOriginRegion?: boolean
+  incoterms?: boolean
+  hsCode?: boolean
+  shelfLife?: boolean
+  storageRequirements?: boolean
+  documentsAvailable?: boolean
+  complianceClaims?: boolean
+  buyerNotes?: boolean
+  riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
   packaging?: boolean
+  packageSize?: boolean
+  unitsPerCarton?: boolean
+  cartonWeight?: boolean
+  cartonDimensions?: boolean
+  palletQuantity?: boolean
+  storageTemperature?: boolean
+  suggestedUsChannels?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -1848,7 +3137,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "slug" | "imageUrl" | "category" | "tags" | "shortDescription" | "detailedDescription" | "priceMin" | "priceMax" | "currency" | "moq" | "leadTime" | "origin" | "certifications" | "ingredientsOrMaterials" | "packaging" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "slug" | "imageUrl" | "category" | "tags" | "shortDescription" | "detailedDescription" | "priceMin" | "priceMax" | "currency" | "priceUnit" | "moq" | "moqQuantity" | "moqUnit" | "leadTime" | "leadTimeCode" | "sampleAvailability" | "privateLabelAvailability" | "monthlyCapacity" | "monthlyCapacityUnit" | "origin" | "countryOfOrigin" | "shippingOriginCountry" | "shippingOriginRegion" | "incoterms" | "hsCode" | "shelfLife" | "storageRequirements" | "documentsAvailable" | "complianceClaims" | "buyerNotes" | "riskNotes" | "certifications" | "ingredientsOrMaterials" | "packaging" | "packageSize" | "unitsPerCarton" | "cartonWeight" | "cartonDimensions" | "palletQuantity" | "storageTemperature" | "suggestedUsChannels" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
@@ -1886,12 +3175,38 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     priceMin: runtime.Decimal | null
     priceMax: runtime.Decimal | null
     currency: string
+    priceUnit: string
     moq: string
+    moqQuantity: string
+    moqUnit: string
     leadTime: string
+    leadTimeCode: string
+    sampleAvailability: string
+    privateLabelAvailability: string
+    monthlyCapacity: string
+    monthlyCapacityUnit: string
     origin: string
+    countryOfOrigin: string
+    shippingOriginCountry: string
+    shippingOriginRegion: string
+    incoterms: string[]
+    hsCode: string
+    shelfLife: string
+    storageRequirements: string
+    documentsAvailable: string[]
+    complianceClaims: string[]
+    buyerNotes: string
+    riskNotes: string[]
     certifications: string[]
     ingredientsOrMaterials: string
     packaging: string
+    packageSize: string
+    unitsPerCarton: string
+    cartonWeight: string
+    cartonDimensions: string
+    palletQuantity: string
+    storageTemperature: string
+    suggestedUsChannels: string[]
     exportReadiness: boolean
     viewCount: number
     status: $Enums.ProductStatus
@@ -2337,12 +3652,38 @@ export interface ProductFieldRefs {
   readonly priceMin: Prisma.FieldRef<"Product", 'Decimal'>
   readonly priceMax: Prisma.FieldRef<"Product", 'Decimal'>
   readonly currency: Prisma.FieldRef<"Product", 'String'>
+  readonly priceUnit: Prisma.FieldRef<"Product", 'String'>
   readonly moq: Prisma.FieldRef<"Product", 'String'>
+  readonly moqQuantity: Prisma.FieldRef<"Product", 'String'>
+  readonly moqUnit: Prisma.FieldRef<"Product", 'String'>
   readonly leadTime: Prisma.FieldRef<"Product", 'String'>
+  readonly leadTimeCode: Prisma.FieldRef<"Product", 'String'>
+  readonly sampleAvailability: Prisma.FieldRef<"Product", 'String'>
+  readonly privateLabelAvailability: Prisma.FieldRef<"Product", 'String'>
+  readonly monthlyCapacity: Prisma.FieldRef<"Product", 'String'>
+  readonly monthlyCapacityUnit: Prisma.FieldRef<"Product", 'String'>
   readonly origin: Prisma.FieldRef<"Product", 'String'>
+  readonly countryOfOrigin: Prisma.FieldRef<"Product", 'String'>
+  readonly shippingOriginCountry: Prisma.FieldRef<"Product", 'String'>
+  readonly shippingOriginRegion: Prisma.FieldRef<"Product", 'String'>
+  readonly incoterms: Prisma.FieldRef<"Product", 'String[]'>
+  readonly hsCode: Prisma.FieldRef<"Product", 'String'>
+  readonly shelfLife: Prisma.FieldRef<"Product", 'String'>
+  readonly storageRequirements: Prisma.FieldRef<"Product", 'String'>
+  readonly documentsAvailable: Prisma.FieldRef<"Product", 'String[]'>
+  readonly complianceClaims: Prisma.FieldRef<"Product", 'String[]'>
+  readonly buyerNotes: Prisma.FieldRef<"Product", 'String'>
+  readonly riskNotes: Prisma.FieldRef<"Product", 'String[]'>
   readonly certifications: Prisma.FieldRef<"Product", 'String[]'>
   readonly ingredientsOrMaterials: Prisma.FieldRef<"Product", 'String'>
   readonly packaging: Prisma.FieldRef<"Product", 'String'>
+  readonly packageSize: Prisma.FieldRef<"Product", 'String'>
+  readonly unitsPerCarton: Prisma.FieldRef<"Product", 'String'>
+  readonly cartonWeight: Prisma.FieldRef<"Product", 'String'>
+  readonly cartonDimensions: Prisma.FieldRef<"Product", 'String'>
+  readonly palletQuantity: Prisma.FieldRef<"Product", 'String'>
+  readonly storageTemperature: Prisma.FieldRef<"Product", 'String'>
+  readonly suggestedUsChannels: Prisma.FieldRef<"Product", 'String[]'>
   readonly exportReadiness: Prisma.FieldRef<"Product", 'Boolean'>
   readonly viewCount: Prisma.FieldRef<"Product", 'Int'>
   readonly status: Prisma.FieldRef<"Product", 'ProductStatus'>

@@ -1,3 +1,4 @@
+import { logSafeApiError } from "@/lib/api-response";
 import {
   getUserCompany,
   isAdminUser,
@@ -11,7 +12,10 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import {
   deleteStorageFile,
   FILE_RULES,
+  StorageConfigurationError,
+  StorageUploadError,
   StorageValidationError,
+  sanitizeStoredFilename,
   type UploadType,
   uploadPrivateFile,
   uploadPublicFile,
@@ -35,17 +39,28 @@ const legacyTypeMap: Record<string, UploadType> = {
   "profile-avatar": "profile_avatar",
 };
 
+function jsonError(error: string, status: number, headers?: HeadersInit) {
+  return Response.json({ error }, { status, headers });
+}
+
+async function responseMessage(error: Response) {
+  const text = await error.text().catch(() => "");
+  if (text.trim()) return text.trim();
+  if (error.status === 401) return "Login is required.";
+  if (error.status === 403) return "You do not have permission to upload this file.";
+  if (error.status === 404) return "The upload target was not found.";
+  return "Upload request failed.";
+}
+
 export async function POST(request: Request) {
   try {
     const user = await requireAuth();
     const rateLimit = checkRateLimit(`uploads:${user.id}`, 30, 60_000);
     if (!rateLimit.allowed) {
-      return Response.json(
-        { error: "업로드 요청이 너무 많아요. 잠시 후 다시 시도해 주세요." },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonError(
+        "Too many upload attempts. Please try again shortly.",
+        429,
+        { "Retry-After": String(rateLimit.retryAfterSeconds) },
       );
     }
 
@@ -56,16 +71,10 @@ export async function POST(request: Request) {
     );
     const uploadType = legacyTypeMap[rawType] ?? rawType;
     if (!(file instanceof File)) {
-      return Response.json(
-        { error: "업로드할 파일을 선택해 주세요." },
-        { status: 400 },
-      );
+      return jsonError("Select a file to upload.", 400);
     }
     if (!uploadTypes.has(uploadType as UploadType)) {
-      return Response.json(
-        { error: "지원하지 않는 업로드 형식이에요." },
-        { status: 400 },
-      );
+      return jsonError("Missing or unsupported upload type.", 400);
     }
 
     const type = uploadType as UploadType;
@@ -93,25 +102,24 @@ export async function POST(request: Request) {
     return uploadPublic({ type, file, ownerId: authorization.ownerId });
   } catch (error) {
     if (error instanceof StorageValidationError) {
-      return Response.json({ error: error.message }, { status: 400 });
+      return jsonError(error.message, 400);
     }
-    if (error instanceof Response) {
-      return Response.json(
-        { error: error.statusText || "Request failed" },
-        { status: error.status },
+    if (error instanceof StorageConfigurationError) {
+      console.error("Supabase Storage configuration is missing for uploads.");
+      return jsonError(
+        "Storage is not configured. Check Supabase storage setup.",
+        503,
       );
     }
-    if (
-      error instanceof Error &&
-      error.message === "Supabase Storage is not configured."
-    ) {
-      return Response.json({ error: error.message }, { status: 503 });
+    if (error instanceof StorageUploadError) {
+      console.error("Supabase Storage upload failed.");
+      return jsonError(error.message, 502);
     }
-    console.error(error);
-    return Response.json(
-      { error: "파일을 업로드하지 못했어요. 잠시 후 다시 시도해 주세요." },
-      { status: 500 },
-    );
+    if (error instanceof Response) {
+      return jsonError(await responseMessage(error), error.status);
+    }
+    logSafeApiError(error);
+    return jsonError("Upload failed. Check the file type and size.", 500);
   }
 }
 
@@ -145,6 +153,9 @@ async function authorizeUpload({
       throw new Response("Company role required", { status: 403 });
     }
     if (!company) {
+      // Onboarding can upload a draft logo before the Company row exists.
+      // The path is scoped to the authenticated user and the final save stores
+      // the returned public URL on that user's company only.
       return { ownerId: userId, companyId: "", dealId: "" };
     }
     return { ownerId: company.id, companyId: company.id, dealId: "" };
@@ -163,8 +174,8 @@ async function authorizeUpload({
       throw new Response("Company required", { status: 400 });
     }
     const { company } = await requireCompanyOwner(companyId);
-    if (company.companyRole !== "seller") {
-      throw new Response("Seller company required", { status: 403 });
+    if (company.companyRole !== "seller" && company.companyRole !== "buyer") {
+      throw new Response("Company role required", { status: 403 });
     }
     return { ownerId: company.id, companyId: company.id, dealId: "" };
   }
@@ -258,6 +269,7 @@ async function uploadPrivate({
   dealId: string;
 }) {
   const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const filename = sanitizeStoredFilename(file.name);
   const ownerId = type === "verification_document" ? companyId : dealId;
   const path = `${FILE_RULES[type].folder}/${ownerId}/${crypto.randomUUID()}.${extension}`;
   await uploadPrivateFile({
@@ -278,7 +290,7 @@ async function uploadPrivate({
           data: {
             documentPath: path,
             documentUrl: null,
-            documentFilename: file.name.slice(0, 255),
+            documentFilename: filename,
           },
         });
       } else {
@@ -288,7 +300,7 @@ async function uploadPrivate({
             requestedByUserId: userId,
             status: "pending_review",
             documentPath: path,
-            documentFilename: file.name.slice(0, 255),
+            documentFilename: filename,
           },
         });
       }
@@ -301,7 +313,7 @@ async function uploadPrivate({
         where: { id: dealId },
         data: {
           contractFilePath: path,
-          contractFileName: file.name.slice(0, 255),
+          contractFileName: filename,
         },
       });
     }
@@ -313,6 +325,6 @@ async function uploadPrivate({
   return Response.json({
     uploadType: type,
     path,
-    filename: file.name.slice(0, 255),
+    filename,
   });
 }

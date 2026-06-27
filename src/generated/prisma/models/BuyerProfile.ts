@@ -28,6 +28,7 @@ export type BuyerProfileMinAggregateOutputType = {
   id: string | null
   companyId: string | null
   buyerType: string | null
+  preferredSupplierType: string | null
   targetOrderSize: string | null
   monthlyImportVolume: string | null
   importExperience: string | null
@@ -38,6 +39,7 @@ export type BuyerProfileMaxAggregateOutputType = {
   id: string | null
   companyId: string | null
   buyerType: string | null
+  preferredSupplierType: string | null
   targetOrderSize: string | null
   monthlyImportVolume: string | null
   importExperience: string | null
@@ -49,6 +51,7 @@ export type BuyerProfileCountAggregateOutputType = {
   companyId: number
   buyerType: number
   purchasingCategories: number
+  preferredSupplierType: number
   targetOrderSize: number
   monthlyImportVolume: number
   importExperience: number
@@ -62,6 +65,7 @@ export type BuyerProfileMinAggregateInputType = {
   id?: true
   companyId?: true
   buyerType?: true
+  preferredSupplierType?: true
   targetOrderSize?: true
   monthlyImportVolume?: true
   importExperience?: true
@@ -72,6 +76,7 @@ export type BuyerProfileMaxAggregateInputType = {
   id?: true
   companyId?: true
   buyerType?: true
+  preferredSupplierType?: true
   targetOrderSize?: true
   monthlyImportVolume?: true
   importExperience?: true
@@ -83,6 +88,7 @@ export type BuyerProfileCountAggregateInputType = {
   companyId?: true
   buyerType?: true
   purchasingCategories?: true
+  preferredSupplierType?: true
   targetOrderSize?: true
   monthlyImportVolume?: true
   importExperience?: true
@@ -168,6 +174,7 @@ export type BuyerProfileGroupByOutputType = {
   companyId: string
   buyerType: string
   purchasingCategories: string[]
+  preferredSupplierType: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -201,6 +208,7 @@ export type BuyerProfileWhereInput = {
   companyId?: Prisma.StringFilter<"BuyerProfile"> | string
   buyerType?: Prisma.StringFilter<"BuyerProfile"> | string
   purchasingCategories?: Prisma.StringNullableListFilter<"BuyerProfile">
+  preferredSupplierType?: Prisma.StringFilter<"BuyerProfile"> | string
   targetOrderSize?: Prisma.StringFilter<"BuyerProfile"> | string
   monthlyImportVolume?: Prisma.StringFilter<"BuyerProfile"> | string
   importExperience?: Prisma.StringFilter<"BuyerProfile"> | string
@@ -214,6 +222,7 @@ export type BuyerProfileOrderByWithRelationInput = {
   companyId?: Prisma.SortOrder
   buyerType?: Prisma.SortOrder
   purchasingCategories?: Prisma.SortOrder
+  preferredSupplierType?: Prisma.SortOrder
   targetOrderSize?: Prisma.SortOrder
   monthlyImportVolume?: Prisma.SortOrder
   importExperience?: Prisma.SortOrder
@@ -230,6 +239,7 @@ export type BuyerProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BuyerProfileWhereInput | Prisma.BuyerProfileWhereInput[]
   buyerType?: Prisma.StringFilter<"BuyerProfile"> | string
   purchasingCategories?: Prisma.StringNullableListFilter<"BuyerProfile">
+  preferredSupplierType?: Prisma.StringFilter<"BuyerProfile"> | string
   targetOrderSize?: Prisma.StringFilter<"BuyerProfile"> | string
   monthlyImportVolume?: Prisma.StringFilter<"BuyerProfile"> | string
   importExperience?: Prisma.StringFilter<"BuyerProfile"> | string
@@ -243,6 +253,7 @@ export type BuyerProfileOrderByWithAggregationInput = {
   companyId?: Prisma.SortOrder
   buyerType?: Prisma.SortOrder
   purchasingCategories?: Prisma.SortOrder
+  preferredSupplierType?: Prisma.SortOrder
   targetOrderSize?: Prisma.SortOrder
   monthlyImportVolume?: Prisma.SortOrder
   importExperience?: Prisma.SortOrder
@@ -261,6 +272,7 @@ export type BuyerProfileScalarWhereWithAggregatesInput = {
   companyId?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
   buyerType?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
   purchasingCategories?: Prisma.StringNullableListFilter<"BuyerProfile">
+  preferredSupplierType?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
   targetOrderSize?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
   monthlyImportVolume?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
   importExperience?: Prisma.StringWithAggregatesFilter<"BuyerProfile"> | string
@@ -272,6 +284,7 @@ export type BuyerProfileCreateInput = {
   id?: string
   buyerType: string
   purchasingCategories?: Prisma.BuyerProfileCreatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -285,6 +298,7 @@ export type BuyerProfileUncheckedCreateInput = {
   companyId: string
   buyerType: string
   purchasingCategories?: Prisma.BuyerProfileCreatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -296,6 +310,7 @@ export type BuyerProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -309,6 +324,7 @@ export type BuyerProfileUncheckedUpdateInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -321,6 +337,7 @@ export type BuyerProfileCreateManyInput = {
   companyId: string
   buyerType: string
   purchasingCategories?: Prisma.BuyerProfileCreatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -332,6 +349,7 @@ export type BuyerProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -344,6 +362,7 @@ export type BuyerProfileUncheckedUpdateManyInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -361,6 +380,7 @@ export type BuyerProfileCountOrderByAggregateInput = {
   companyId?: Prisma.SortOrder
   buyerType?: Prisma.SortOrder
   purchasingCategories?: Prisma.SortOrder
+  preferredSupplierType?: Prisma.SortOrder
   targetOrderSize?: Prisma.SortOrder
   monthlyImportVolume?: Prisma.SortOrder
   importExperience?: Prisma.SortOrder
@@ -372,6 +392,7 @@ export type BuyerProfileMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   buyerType?: Prisma.SortOrder
+  preferredSupplierType?: Prisma.SortOrder
   targetOrderSize?: Prisma.SortOrder
   monthlyImportVolume?: Prisma.SortOrder
   importExperience?: Prisma.SortOrder
@@ -382,6 +403,7 @@ export type BuyerProfileMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   buyerType?: Prisma.SortOrder
+  preferredSupplierType?: Prisma.SortOrder
   targetOrderSize?: Prisma.SortOrder
   monthlyImportVolume?: Prisma.SortOrder
   importExperience?: Prisma.SortOrder
@@ -442,6 +464,7 @@ export type BuyerProfileCreateWithoutCompanyInput = {
   id?: string
   buyerType: string
   purchasingCategories?: Prisma.BuyerProfileCreatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -453,6 +476,7 @@ export type BuyerProfileUncheckedCreateWithoutCompanyInput = {
   id?: string
   buyerType: string
   purchasingCategories?: Prisma.BuyerProfileCreatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: string
   targetOrderSize: string
   monthlyImportVolume: string
   importExperience: string
@@ -480,6 +504,7 @@ export type BuyerProfileUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -491,6 +516,7 @@ export type BuyerProfileUncheckedUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   buyerType?: Prisma.StringFieldUpdateOperationsInput | string
   purchasingCategories?: Prisma.BuyerProfileUpdatepurchasingCategoriesInput | string[]
+  preferredSupplierType?: Prisma.StringFieldUpdateOperationsInput | string
   targetOrderSize?: Prisma.StringFieldUpdateOperationsInput | string
   monthlyImportVolume?: Prisma.StringFieldUpdateOperationsInput | string
   importExperience?: Prisma.StringFieldUpdateOperationsInput | string
@@ -505,6 +531,7 @@ export type BuyerProfileSelect<ExtArgs extends runtime.Types.Extensions.Internal
   companyId?: boolean
   buyerType?: boolean
   purchasingCategories?: boolean
+  preferredSupplierType?: boolean
   targetOrderSize?: boolean
   monthlyImportVolume?: boolean
   importExperience?: boolean
@@ -518,6 +545,7 @@ export type BuyerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   companyId?: boolean
   buyerType?: boolean
   purchasingCategories?: boolean
+  preferredSupplierType?: boolean
   targetOrderSize?: boolean
   monthlyImportVolume?: boolean
   importExperience?: boolean
@@ -531,6 +559,7 @@ export type BuyerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   companyId?: boolean
   buyerType?: boolean
   purchasingCategories?: boolean
+  preferredSupplierType?: boolean
   targetOrderSize?: boolean
   monthlyImportVolume?: boolean
   importExperience?: boolean
@@ -544,6 +573,7 @@ export type BuyerProfileSelectScalar = {
   companyId?: boolean
   buyerType?: boolean
   purchasingCategories?: boolean
+  preferredSupplierType?: boolean
   targetOrderSize?: boolean
   monthlyImportVolume?: boolean
   importExperience?: boolean
@@ -551,7 +581,7 @@ export type BuyerProfileSelectScalar = {
   salesChannels?: boolean
 }
 
-export type BuyerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "buyerType" | "purchasingCategories" | "targetOrderSize" | "monthlyImportVolume" | "importExperience" | "purchaseTimeline" | "salesChannels", ExtArgs["result"]["buyerProfile"]>
+export type BuyerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "buyerType" | "purchasingCategories" | "preferredSupplierType" | "targetOrderSize" | "monthlyImportVolume" | "importExperience" | "purchaseTimeline" | "salesChannels", ExtArgs["result"]["buyerProfile"]>
 export type BuyerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }
@@ -572,6 +602,7 @@ export type $BuyerProfilePayload<ExtArgs extends runtime.Types.Extensions.Intern
     companyId: string
     buyerType: string
     purchasingCategories: string[]
+    preferredSupplierType: string
     targetOrderSize: string
     monthlyImportVolume: string
     importExperience: string
@@ -1005,6 +1036,7 @@ export interface BuyerProfileFieldRefs {
   readonly companyId: Prisma.FieldRef<"BuyerProfile", 'String'>
   readonly buyerType: Prisma.FieldRef<"BuyerProfile", 'String'>
   readonly purchasingCategories: Prisma.FieldRef<"BuyerProfile", 'String[]'>
+  readonly preferredSupplierType: Prisma.FieldRef<"BuyerProfile", 'String'>
   readonly targetOrderSize: Prisma.FieldRef<"BuyerProfile", 'String'>
   readonly monthlyImportVolume: Prisma.FieldRef<"BuyerProfile", 'String'>
   readonly importExperience: Prisma.FieldRef<"BuyerProfile", 'String'>

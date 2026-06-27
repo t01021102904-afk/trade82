@@ -1,4 +1,13 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  rateLimitOrResponse,
+  readJsonObject,
+  requiredIdField,
+  stringField,
+  validationError,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
@@ -49,10 +58,19 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const admin = await requireDatabaseAdmin();
-    const body = (await request.json()) as Record<string, unknown>;
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "admin-verifications-write",
+      userId: admin.id,
+      limit: 60,
+      windowMs: 60 * 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
+    const body = await readJsonObject(request);
 
     if (body.action === "review") {
-      const reviewId = String(body.reviewId ?? "");
+      const reviewId = requiredIdField(body, "reviewId");
       const approved = body.approved === true;
       await getDb().review.update({
         where: { id: reviewId },
@@ -61,9 +79,14 @@ export async function POST(request: Request) {
       return Response.json({ ok: true });
     }
 
-    const requestId = String(body.requestId ?? "");
-    const verificationStatus =
-      body.verificationStatus === "verified" ? "verified" : "rejected";
+    const requestId = requiredIdField(body, "requestId");
+    if (
+      body.verificationStatus !== "verified" &&
+      body.verificationStatus !== "rejected"
+    ) {
+      throw validationError("verificationStatus is invalid.");
+    }
+    const verificationStatus = body.verificationStatus;
     const verificationRequest = await getDb().verificationRequest.findUnique({
       where: { id: requestId },
       include: { company: { include: { owner: true } } },
@@ -80,7 +103,8 @@ export async function POST(request: Request) {
           reviewedByUserId: admin.id,
           reviewedAt: new Date(),
           adminNote:
-            typeof body.adminNote === "string" ? body.adminNote : undefined,
+            stringField(body, "adminNote", { max: 2_000, fallback: undefined }) ??
+            undefined,
         },
       }),
       getDb().company.update({
@@ -91,6 +115,9 @@ export async function POST(request: Request) {
 
     return Response.json({ ok: true, verificationStatus });
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
 }

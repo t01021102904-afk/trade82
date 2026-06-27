@@ -365,6 +365,40 @@ export type EnumSavedItemTypeWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumSavedItemTypeFilter<$PrismaModel>
 }
 
+export type EnumMessageAttachmentFileTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentFileType | Prisma.EnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel> | $Enums.MessageAttachmentFileType
+}
+
+export type EnumMessageAttachmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentStatus | Prisma.EnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel> | $Enums.MessageAttachmentStatus
+}
+
+export type EnumMessageAttachmentFileTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentFileType | Prisma.EnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentFileTypeWithAggregatesFilter<$PrismaModel> | $Enums.MessageAttachmentFileType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel>
+}
+
+export type EnumMessageAttachmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentStatus | Prisma.EnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.MessageAttachmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel>
+}
+
 export type DecimalFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel>
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel>
@@ -788,6 +822,40 @@ export type NestedEnumSavedItemTypeWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSavedItemTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSavedItemTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentFileType | Prisma.EnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel> | $Enums.MessageAttachmentFileType
+}
+
+export type NestedEnumMessageAttachmentStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentStatus | Prisma.EnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel> | $Enums.MessageAttachmentStatus
+}
+
+export type NestedEnumMessageAttachmentFileTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentFileType | Prisma.EnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentFileType[] | Prisma.ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentFileTypeWithAggregatesFilter<$PrismaModel> | $Enums.MessageAttachmentFileType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageAttachmentFileTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumMessageAttachmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.MessageAttachmentStatus | Prisma.EnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.MessageAttachmentStatus[] | Prisma.ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumMessageAttachmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.MessageAttachmentStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumMessageAttachmentStatusFilter<$PrismaModel>
 }
 
 export type NestedDecimalFilter<$PrismaModel = never> = {

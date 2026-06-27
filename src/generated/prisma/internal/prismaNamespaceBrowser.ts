@@ -62,6 +62,7 @@ export const ModelName = {
   Inquiry: 'Inquiry',
   SavedItem: 'SavedItem',
   Message: 'Message',
+  MessageAttachment: 'MessageAttachment',
   Deal: 'Deal',
   Review: 'Review',
   CompanyReview: 'CompanyReview'
@@ -157,6 +158,7 @@ export const BuyerProfileScalarFieldEnum = {
   companyId: 'companyId',
   buyerType: 'buyerType',
   purchasingCategories: 'purchasingCategories',
+  preferredSupplierType: 'preferredSupplierType',
   targetOrderSize: 'targetOrderSize',
   monthlyImportVolume: 'monthlyImportVolume',
   importExperience: 'importExperience',
@@ -180,12 +182,38 @@ export const ProductScalarFieldEnum = {
   priceMin: 'priceMin',
   priceMax: 'priceMax',
   currency: 'currency',
+  priceUnit: 'priceUnit',
   moq: 'moq',
+  moqQuantity: 'moqQuantity',
+  moqUnit: 'moqUnit',
   leadTime: 'leadTime',
+  leadTimeCode: 'leadTimeCode',
+  sampleAvailability: 'sampleAvailability',
+  privateLabelAvailability: 'privateLabelAvailability',
+  monthlyCapacity: 'monthlyCapacity',
+  monthlyCapacityUnit: 'monthlyCapacityUnit',
   origin: 'origin',
+  countryOfOrigin: 'countryOfOrigin',
+  shippingOriginCountry: 'shippingOriginCountry',
+  shippingOriginRegion: 'shippingOriginRegion',
+  incoterms: 'incoterms',
+  hsCode: 'hsCode',
+  shelfLife: 'shelfLife',
+  storageRequirements: 'storageRequirements',
+  documentsAvailable: 'documentsAvailable',
+  complianceClaims: 'complianceClaims',
+  buyerNotes: 'buyerNotes',
+  riskNotes: 'riskNotes',
   certifications: 'certifications',
   ingredientsOrMaterials: 'ingredientsOrMaterials',
   packaging: 'packaging',
+  packageSize: 'packageSize',
+  unitsPerCarton: 'unitsPerCarton',
+  cartonWeight: 'cartonWeight',
+  cartonDimensions: 'cartonDimensions',
+  palletQuantity: 'palletQuantity',
+  storageTemperature: 'storageTemperature',
+  suggestedUsChannels: 'suggestedUsChannels',
   exportReadiness: 'exportReadiness',
   viewCount: 'viewCount',
   status: 'status',
@@ -288,10 +316,33 @@ export const MessageScalarFieldEnum = {
   senderCompanyId: 'senderCompanyId',
   receiverCompanyId: 'receiverCompanyId',
   body: 'body',
+  contentHash: 'contentHash',
   createdAt: 'createdAt'
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const MessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  inquiryId: 'inquiryId',
+  uploadedByUserId: 'uploadedByUserId',
+  uploadedByCompanyId: 'uploadedByCompanyId',
+  originalFilename: 'originalFilename',
+  storedFilename: 'storedFilename',
+  storageBucket: 'storageBucket',
+  storagePath: 'storagePath',
+  mimeType: 'mimeType',
+  fileType: 'fileType',
+  sizeBytes: 'sizeBytes',
+  sha256Hash: 'sha256Hash',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageAttachmentScalarFieldEnum = (typeof MessageAttachmentScalarFieldEnum)[keyof typeof MessageAttachmentScalarFieldEnum]
 
 
 export const DealScalarFieldEnum = {

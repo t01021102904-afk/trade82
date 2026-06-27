@@ -1,10 +1,29 @@
 import { apiError } from "@/lib/api-response";
+import {
+  ApiValidationError,
+  linkedinUrlField,
+  rateLimitOrResponse,
+  readJsonObject,
+  stringField,
+  urlField,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    return Response.json(await requireCurrentAppUser());
+    const user = await requireCurrentAppUser();
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "account-profile-read",
+      userId: user.id,
+      limit: 120,
+      windowMs: 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
+    return Response.json(user);
   } catch (error) {
     return apiError(error);
   }
@@ -13,59 +32,60 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     const user = await requireCurrentAppUser();
-    const body = (await request.json()) as Record<string, unknown>;
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "account-profile-write",
+      userId: user.id,
+      limit: 30,
+      windowMs: 60 * 60_000,
+    });
+    if (rateLimited) return rateLimited;
+
+    const body = await readJsonObject(request);
     const updated = await getDb().userProfile.update({
       where: { id: user.id },
       data: {
         displayName:
-          typeof body.displayName === "string"
-            ? body.displayName.trim()
-            : undefined,
+          stringField(body, "displayName", { max: 120, fallback: undefined }) ??
+          undefined,
         avatarOriginalUrl:
-          typeof body.avatarOriginalUrl === "string"
-            ? body.avatarOriginalUrl || null
-            : undefined,
+          urlField(body, "avatarOriginalUrl", { max: 1_000, fallback: undefined }) ??
+          undefined,
         avatarUrl:
-          typeof body.avatarUrl === "string"
-            ? body.avatarUrl || null
-            : undefined,
+          urlField(body, "avatarUrl", { max: 1_000, fallback: undefined }) ??
+          undefined,
         companyAffiliation:
-          typeof body.companyAffiliation === "string"
-            ? body.companyAffiliation.trim().slice(0, 160)
-            : undefined,
+          stringField(body, "companyAffiliation", { max: 160, fallback: undefined }) ??
+          undefined,
         jobTitle:
-          typeof body.jobTitle === "string"
-            ? body.jobTitle.trim().slice(0, 120)
-            : undefined,
+          stringField(body, "jobTitle", { max: 120, fallback: undefined }) ??
+          undefined,
         department:
-          typeof body.department === "string"
-            ? body.department.trim().slice(0, 120)
-            : undefined,
+          stringField(body, "department", { max: 120, fallback: undefined }) ??
+          undefined,
         bio:
-          typeof body.bio === "string"
-            ? body.bio.trim().slice(0, 1000)
-            : undefined,
+          stringField(body, "bio", { max: 1_000, fallback: undefined }) ??
+          undefined,
         phoneNumber:
-          typeof body.phoneNumber === "string"
-            ? body.phoneNumber.trim().slice(0, 50)
-            : undefined,
+          stringField(body, "phoneNumber", { max: 50, fallback: undefined }) ??
+          undefined,
         linkedinUrl:
-          typeof body.linkedinUrl === "string"
-            ? body.linkedinUrl.trim().slice(0, 500)
-            : undefined,
+          linkedinUrlField(body, "linkedinUrl", { max: 500, fallback: undefined }) ??
+          undefined,
         country:
-          typeof body.country === "string"
-            ? body.country.trim().slice(0, 100)
-            : undefined,
+          stringField(body, "country", { max: 100, fallback: undefined }) ??
+          undefined,
         city:
-          typeof body.city === "string"
-            ? body.city.trim().slice(0, 100)
-            : undefined,
+          stringField(body, "city", { max: 100, fallback: undefined }) ??
+          undefined,
         preferredLanguage: body.preferredLanguage === "ko" ? "ko" : "en",
       },
     });
     return Response.json(updated);
   } catch (error) {
+    if (error instanceof ApiValidationError) {
+      return validationErrorResponse(error);
+    }
     return apiError(error);
   }
 }

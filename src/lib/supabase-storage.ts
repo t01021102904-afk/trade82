@@ -32,6 +32,18 @@ const DOCUMENT_MIME_TYPES = new Set([
   "image/png",
   "image/webp",
 ]);
+const SUSPICIOUS_EXTENSIONS = new Set([
+  "bat",
+  "cmd",
+  "exe",
+  "htm",
+  "html",
+  "js",
+  "php",
+  "sh",
+  "svg",
+  "zip",
+]);
 
 export const FILE_RULES: Record<UploadType, FileRule> = {
   company_logo: {
@@ -72,13 +84,15 @@ export const FILE_RULES: Record<UploadType, FileRule> = {
 };
 
 export class StorageValidationError extends Error {}
+export class StorageConfigurationError extends Error {}
+export class StorageUploadError extends Error {}
 
 export function getSupabaseAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !serviceRoleKey) {
-    throw new Error("Supabase Storage is not configured.");
+    throw new StorageConfigurationError("Storage service is not configured.");
   }
 
   return createClient(url, serviceRoleKey, {
@@ -96,27 +110,49 @@ export function getPrivateStorageBucket() {
 
 export function validateFileType(file: File, uploadType: UploadType) {
   const rule = FILE_RULES[uploadType];
-  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+  const parts = file.name
+    .toLowerCase()
+    .split(".")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const extension = parts.at(-1) ?? "";
+  const hasSuspiciousPart = parts.some((part) =>
+    SUSPICIOUS_EXTENSIONS.has(part),
+  );
 
   if (
+    !extension ||
+    hasSuspiciousPart ||
     !rule.extensions.has(extension) ||
     !rule.mimeTypes.has(file.type.toLowerCase())
   ) {
     throw new StorageValidationError(
       rule.visibility === "public"
-        ? "JPG, PNG, WEBP 파일만 업로드할 수 있어요."
-        : "PDF, JPG, PNG, WEBP 파일만 업로드할 수 있어요.",
+        ? "JPG, PNG, WEBP 파일만 업로드할 수 있습니다."
+        : "PDF, JPG, PNG, WEBP 파일만 업로드할 수 있습니다.",
     );
   }
 }
 
 export function validateFileSize(file: File, uploadType: UploadType) {
   const rule = FILE_RULES[uploadType];
+  if (file.size <= 0) {
+    throw new StorageValidationError("Empty files cannot be uploaded.");
+  }
   if (file.size > rule.maxBytes) {
     throw new StorageValidationError(
-      `${Math.round(rule.maxBytes / 1024 / 1024)}MB 이하 파일만 업로드해 주세요.`,
+      `${Math.round(rule.maxBytes / 1024 / 1024)}MB 이하 파일만 업로드해 주시기 바랍니다.`,
     );
   }
+}
+
+export function sanitizeStoredFilename(name: string) {
+  const cleaned = name
+    .replace(/[/\\]/g, "-")
+    .replace(/[^\w .()-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return (cleaned || "uploaded-file").slice(0, 255);
 }
 
 export async function uploadPublicFile({
@@ -137,7 +173,9 @@ export async function uploadPublicFile({
     cacheControl,
     upsert: false,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new StorageUploadError("Supabase upload failed. Check storage bucket setup.");
+  }
   return { path, publicUrl: getPublicFileUrl(path) };
 }
 
@@ -157,7 +195,9 @@ export async function uploadPrivateFile({
     cacheControl: "3600",
     upsert: false,
   });
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new StorageUploadError("Supabase upload failed. Check storage bucket setup.");
+  }
   return { path };
 }
 
@@ -219,14 +259,14 @@ export async function ensureStorageBuckets() {
   if (!buckets.has(privateBucket)) {
     const result = await client.storage.createBucket(privateBucket, {
       public: false,
-      fileSizeLimit: 20 * 1024 * 1024,
+      fileSizeLimit: 100 * 1024 * 1024,
       allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
-  } else if (buckets.get(privateBucket)?.public) {
+  } else {
     const result = await client.storage.updateBucket(privateBucket, {
       public: false,
-      fileSizeLimit: 20 * 1024 * 1024,
+      fileSizeLimit: 100 * 1024 * 1024,
       allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);

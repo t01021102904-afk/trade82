@@ -395,6 +395,7 @@ export const ModelName = {
   Inquiry: 'Inquiry',
   SavedItem: 'SavedItem',
   Message: 'Message',
+  MessageAttachment: 'MessageAttachment',
   Deal: 'Deal',
   Review: 'Review',
   CompanyReview: 'CompanyReview'
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "savedItem" | "message" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "savedItem" | "message" | "messageAttachment" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1231,6 +1232,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MessageAttachment: {
+      payload: Prisma.$MessageAttachmentPayload<ExtArgs>
+      fields: Prisma.MessageAttachmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MessageAttachmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MessageAttachmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        findFirst: {
+          args: Prisma.MessageAttachmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MessageAttachmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        findMany: {
+          args: Prisma.MessageAttachmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>[]
+        }
+        create: {
+          args: Prisma.MessageAttachmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        createMany: {
+          args: Prisma.MessageAttachmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MessageAttachmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>[]
+        }
+        delete: {
+          args: Prisma.MessageAttachmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        update: {
+          args: Prisma.MessageAttachmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.MessageAttachmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MessageAttachmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MessageAttachmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.MessageAttachmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MessageAttachmentPayload>
+        }
+        aggregate: {
+          args: Prisma.MessageAttachmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMessageAttachment>
+        }
+        groupBy: {
+          args: Prisma.MessageAttachmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessageAttachmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MessageAttachmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MessageAttachmentCountAggregateOutputType> | number
+        }
+      }
+    }
     Deal: {
       payload: Prisma.$DealPayload<ExtArgs>
       fields: Prisma.DealFieldRefs
@@ -1566,6 +1641,7 @@ export const BuyerProfileScalarFieldEnum = {
   companyId: 'companyId',
   buyerType: 'buyerType',
   purchasingCategories: 'purchasingCategories',
+  preferredSupplierType: 'preferredSupplierType',
   targetOrderSize: 'targetOrderSize',
   monthlyImportVolume: 'monthlyImportVolume',
   importExperience: 'importExperience',
@@ -1589,12 +1665,38 @@ export const ProductScalarFieldEnum = {
   priceMin: 'priceMin',
   priceMax: 'priceMax',
   currency: 'currency',
+  priceUnit: 'priceUnit',
   moq: 'moq',
+  moqQuantity: 'moqQuantity',
+  moqUnit: 'moqUnit',
   leadTime: 'leadTime',
+  leadTimeCode: 'leadTimeCode',
+  sampleAvailability: 'sampleAvailability',
+  privateLabelAvailability: 'privateLabelAvailability',
+  monthlyCapacity: 'monthlyCapacity',
+  monthlyCapacityUnit: 'monthlyCapacityUnit',
   origin: 'origin',
+  countryOfOrigin: 'countryOfOrigin',
+  shippingOriginCountry: 'shippingOriginCountry',
+  shippingOriginRegion: 'shippingOriginRegion',
+  incoterms: 'incoterms',
+  hsCode: 'hsCode',
+  shelfLife: 'shelfLife',
+  storageRequirements: 'storageRequirements',
+  documentsAvailable: 'documentsAvailable',
+  complianceClaims: 'complianceClaims',
+  buyerNotes: 'buyerNotes',
+  riskNotes: 'riskNotes',
   certifications: 'certifications',
   ingredientsOrMaterials: 'ingredientsOrMaterials',
   packaging: 'packaging',
+  packageSize: 'packageSize',
+  unitsPerCarton: 'unitsPerCarton',
+  cartonWeight: 'cartonWeight',
+  cartonDimensions: 'cartonDimensions',
+  palletQuantity: 'palletQuantity',
+  storageTemperature: 'storageTemperature',
+  suggestedUsChannels: 'suggestedUsChannels',
   exportReadiness: 'exportReadiness',
   viewCount: 'viewCount',
   status: 'status',
@@ -1697,10 +1799,33 @@ export const MessageScalarFieldEnum = {
   senderCompanyId: 'senderCompanyId',
   receiverCompanyId: 'receiverCompanyId',
   body: 'body',
+  contentHash: 'contentHash',
   createdAt: 'createdAt'
 } as const
 
 export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+export const MessageAttachmentScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  inquiryId: 'inquiryId',
+  uploadedByUserId: 'uploadedByUserId',
+  uploadedByCompanyId: 'uploadedByCompanyId',
+  originalFilename: 'originalFilename',
+  storedFilename: 'storedFilename',
+  storageBucket: 'storageBucket',
+  storagePath: 'storagePath',
+  mimeType: 'mimeType',
+  fileType: 'fileType',
+  sizeBytes: 'sizeBytes',
+  sha256Hash: 'sha256Hash',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MessageAttachmentScalarFieldEnum = (typeof MessageAttachmentScalarFieldEnum)[keyof typeof MessageAttachmentScalarFieldEnum]
 
 
 export const DealScalarFieldEnum = {
@@ -1970,6 +2095,34 @@ export type ListEnumSavedItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'MessageAttachmentFileType'
+ */
+export type EnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageAttachmentFileType'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageAttachmentFileType[]'
+ */
+export type ListEnumMessageAttachmentFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageAttachmentFileType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageAttachmentStatus'
+ */
+export type EnumMessageAttachmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageAttachmentStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'MessageAttachmentStatus[]'
+ */
+export type ListEnumMessageAttachmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MessageAttachmentStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'DealStatus'
  */
 export type EnumDealStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DealStatus'>
@@ -2131,6 +2284,7 @@ export type GlobalOmitConfig = {
   inquiry?: Prisma.InquiryOmit
   savedItem?: Prisma.SavedItemOmit
   message?: Prisma.MessageOmit
+  messageAttachment?: Prisma.MessageAttachmentOmit
   deal?: Prisma.DealOmit
   review?: Prisma.ReviewOmit
   companyReview?: Prisma.CompanyReviewOmit
