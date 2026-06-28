@@ -17,8 +17,18 @@ type FileRule = {
   visibility: "public" | "private";
 };
 
-const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
-const IMAGE_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+type UploadLocale = "en" | "ko";
+
+const MB = 1024 * 1024;
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
+const IMAGE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+const HEIC_EXTENSIONS = new Set(["heic", "heif"]);
+const HEIC_MIME_TYPES = new Set(["image/heic", "image/heif"]);
 const DOCUMENT_EXTENSIONS = new Set([
   "pdf",
   "jpg",
@@ -43,40 +53,41 @@ const SUSPICIOUS_EXTENSIONS = new Set([
   "sh",
   "svg",
   "zip",
+  "dmg",
 ]);
 
 export const FILE_RULES: Record<UploadType, FileRule> = {
   company_logo: {
     folder: "company-logos",
-    maxBytes: 2 * 1024 * 1024,
+    maxBytes: 25 * MB,
     extensions: IMAGE_EXTENSIONS,
     mimeTypes: IMAGE_MIME_TYPES,
     visibility: "public",
   },
   product_image: {
     folder: "product-images",
-    maxBytes: 5 * 1024 * 1024,
+    maxBytes: 50 * MB,
     extensions: IMAGE_EXTENSIONS,
     mimeTypes: IMAGE_MIME_TYPES,
     visibility: "public",
   },
   profile_avatar: {
     folder: "profile-avatars",
-    maxBytes: 2 * 1024 * 1024,
+    maxBytes: 25 * MB,
     extensions: IMAGE_EXTENSIONS,
     mimeTypes: IMAGE_MIME_TYPES,
     visibility: "public",
   },
   verification_document: {
     folder: "verification-documents",
-    maxBytes: 10 * 1024 * 1024,
+    maxBytes: 10 * MB,
     extensions: DOCUMENT_EXTENSIONS,
     mimeTypes: DOCUMENT_MIME_TYPES,
     visibility: "private",
   },
   contract_file: {
     folder: "contract-files",
-    maxBytes: 20 * 1024 * 1024,
+    maxBytes: 20 * MB,
     extensions: DOCUMENT_EXTENSIONS,
     mimeTypes: DOCUMENT_MIME_TYPES,
     visibility: "private",
@@ -108,7 +119,55 @@ export function getPrivateStorageBucket() {
   return process.env.SUPABASE_PRIVATE_STORAGE_BUCKET || "marketplace-private";
 }
 
-export function validateFileType(file: File, uploadType: UploadType) {
+function isPublicImageUpload(uploadType: UploadType) {
+  return FILE_RULES[uploadType].visibility === "public";
+}
+
+function supportedPublicImageMessage(locale: UploadLocale) {
+  return locale === "ko"
+    ? "지원하지 않는 파일 형식입니다. JPG, PNG, WebP 또는 AVIF 파일을 업로드해주세요."
+    : "This file type is not supported. Please upload JPG, PNG, WebP, or AVIF.";
+}
+
+function supportedPrivateDocumentMessage(locale: UploadLocale) {
+  return locale === "ko"
+    ? "지원하지 않는 파일 형식입니다. PDF, JPG, PNG 또는 WebP 파일을 업로드해주세요."
+    : "This file type is not supported. Please upload PDF, JPG, PNG, or WebP.";
+}
+
+function heicUnsupportedMessage(locale: UploadLocale) {
+  return locale === "ko"
+    ? "HEIC 이미지는 아직 지원하지 않습니다. JPG 또는 PNG로 변환 후 업로드해주세요."
+    : "HEIC images are not supported yet. Please convert to JPG or PNG.";
+}
+
+function maxSizeMessage(uploadType: UploadType, locale: UploadLocale) {
+  const maxMb = Math.round(FILE_RULES[uploadType].maxBytes / MB);
+
+  if (locale === "ko") {
+    if (uploadType === "product_image") {
+      return `이미지 용량이 너무 큽니다. 상품 이미지는 최대 ${maxMb}MB까지 업로드할 수 있습니다.`;
+    }
+    if (isPublicImageUpload(uploadType)) {
+      return `이미지 용량이 너무 큽니다. 프로필 사진과 회사 로고는 최대 ${maxMb}MB까지 업로드할 수 있습니다.`;
+    }
+    return `파일 용량이 너무 큽니다. 최대 ${maxMb}MB까지 업로드할 수 있습니다.`;
+  }
+
+  if (uploadType === "product_image") {
+    return `This image is too large. Maximum size is ${maxMb}MB for product images.`;
+  }
+  if (isPublicImageUpload(uploadType)) {
+    return `This image is too large. Maximum size is ${maxMb}MB for profile photos and company logos.`;
+  }
+  return `This file is too large. Maximum size is ${maxMb}MB.`;
+}
+
+export function validateFileType(
+  file: File,
+  uploadType: UploadType,
+  locale: UploadLocale = "en",
+) {
   const rule = FILE_RULES[uploadType];
   const parts = file.name
     .toLowerCase()
@@ -119,30 +178,41 @@ export function validateFileType(file: File, uploadType: UploadType) {
   const hasSuspiciousPart = parts.some((part) =>
     SUSPICIOUS_EXTENSIONS.has(part),
   );
+  const mimeType = file.type.toLowerCase();
+
+  if (HEIC_EXTENSIONS.has(extension) || HEIC_MIME_TYPES.has(mimeType)) {
+    throw new StorageValidationError(heicUnsupportedMessage(locale));
+  }
 
   if (
     !extension ||
     hasSuspiciousPart ||
     !rule.extensions.has(extension) ||
-    !rule.mimeTypes.has(file.type.toLowerCase())
+    !rule.mimeTypes.has(mimeType)
   ) {
     throw new StorageValidationError(
       rule.visibility === "public"
-        ? "JPG, PNG, WEBP 파일만 업로드할 수 있습니다."
-        : "PDF, JPG, PNG, WEBP 파일만 업로드할 수 있습니다.",
+        ? supportedPublicImageMessage(locale)
+        : supportedPrivateDocumentMessage(locale),
     );
   }
 }
 
-export function validateFileSize(file: File, uploadType: UploadType) {
+export function validateFileSize(
+  file: File,
+  uploadType: UploadType,
+  locale: UploadLocale = "en",
+) {
   const rule = FILE_RULES[uploadType];
   if (file.size <= 0) {
-    throw new StorageValidationError("Empty files cannot be uploaded.");
+    throw new StorageValidationError(
+      locale === "ko"
+        ? "빈 파일은 업로드할 수 없습니다."
+        : "Empty files cannot be uploaded.",
+    );
   }
   if (file.size > rule.maxBytes) {
-    throw new StorageValidationError(
-      `${Math.round(rule.maxBytes / 1024 / 1024)}MB 이하 파일만 업로드해 주시기 바랍니다.`,
-    );
+    throw new StorageValidationError(maxSizeMessage(uploadType, locale));
   }
 }
 
@@ -174,7 +244,7 @@ export async function uploadPublicFile({
     upsert: false,
   });
   if (error) {
-    throw new StorageUploadError("Supabase upload failed. Check storage bucket setup.");
+    throw new StorageUploadError("Storage upload was rejected.");
   }
   return { path, publicUrl: getPublicFileUrl(path) };
 }
@@ -196,7 +266,7 @@ export async function uploadPrivateFile({
     upsert: false,
   });
   if (error) {
-    throw new StorageUploadError("Supabase upload failed. Check storage bucket setup.");
+    throw new StorageUploadError("Storage upload was rejected.");
   }
   return { path };
 }
@@ -243,14 +313,14 @@ export async function ensureStorageBuckets() {
   if (!buckets.has(publicBucket)) {
     const result = await client.storage.createBucket(publicBucket, {
       public: true,
-      fileSizeLimit: 5 * 1024 * 1024,
+      fileSizeLimit: 50 * MB,
       allowedMimeTypes: [...IMAGE_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
   } else if (!buckets.get(publicBucket)?.public) {
     const result = await client.storage.updateBucket(publicBucket, {
       public: true,
-      fileSizeLimit: 5 * 1024 * 1024,
+      fileSizeLimit: 50 * MB,
       allowedMimeTypes: [...IMAGE_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
@@ -259,14 +329,14 @@ export async function ensureStorageBuckets() {
   if (!buckets.has(privateBucket)) {
     const result = await client.storage.createBucket(privateBucket, {
       public: false,
-      fileSizeLimit: 100 * 1024 * 1024,
+      fileSizeLimit: 100 * MB,
       allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
   } else {
     const result = await client.storage.updateBucket(privateBucket, {
       public: false,
-      fileSizeLimit: 100 * 1024 * 1024,
+      fileSizeLimit: 100 * MB,
       allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
