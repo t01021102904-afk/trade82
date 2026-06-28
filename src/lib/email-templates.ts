@@ -51,6 +51,15 @@ type InquiryNotificationEmailInput = {
   baseUrl?: string;
 };
 
+type MessageNotificationEmailInput = {
+  senderCompanyName: string;
+  messagePreview: string;
+  hasAttachments?: boolean;
+  ctaPath: string;
+  locale?: EmailLocale;
+  baseUrl?: string;
+};
+
 type SecurityNoticeEmailInput = {
   notice: string;
   locale?: EmailLocale;
@@ -342,6 +351,40 @@ export function inquiryNotificationEmail({
     body: messagePreview,
     ctaLabel: locale === "ko" ? "문의 보기" : "Open inquiry",
     ctaPath: locale === "ko" ? "/ko/messages" : "/messages",
+    baseUrl,
+  });
+}
+
+export function messageNotificationEmail({
+  senderCompanyName,
+  messagePreview,
+  hasAttachments = false,
+  ctaPath,
+  locale = "en",
+  baseUrl,
+}: MessageNotificationEmailInput): EmailRender {
+  const title =
+    locale === "ko"
+      ? "Trade82 새 메시지가 도착했습니다"
+      : "New message on Trade82";
+  const attachmentNote = hasAttachments
+    ? locale === "ko"
+      ? "이 메시지에는 첨부파일이 포함되어 있습니다. 로그인해서 확인하세요."
+      : "This message includes attachments. Sign in to view them."
+    : "";
+  const body = [messagePreview, attachmentNote].filter(Boolean).join("\n\n");
+
+  return renderBrandedEmail({
+    locale,
+    preview: title,
+    title,
+    intro:
+      locale === "ko"
+        ? `${senderCompanyName}에서 새 메시지를 보냈습니다.`
+        : `${senderCompanyName} sent you a new message.`,
+    body,
+    ctaLabel: locale === "ko" ? "메시지 보기" : "Open message",
+    ctaPath,
     baseUrl,
   });
 }

@@ -11,6 +11,7 @@ import {
 } from "@/lib/api-security";
 import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { sendNewMessageNotification } from "@/lib/message-email-notifications";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function GET() {
@@ -209,6 +210,21 @@ export async function POST(request: Request) {
         },
       },
     });
+
+    await sendNewMessageNotification({
+      messageId: `inquiry-${inquiry.id}`,
+      inquiryId: inquiry.id,
+      senderUserId: user.id,
+      senderCompanyName: senderCompany.tradeName || senderCompany.legalName,
+      receiverCompanyId: inquiry.recipientCompanyId,
+      body: inquiry.message,
+      attachmentCount: 0,
+    }).catch((error) => {
+      console.error("Message notification email failed.", {
+        name: error instanceof Error ? error.name : typeof error,
+      });
+    });
+
     return Response.json(
       { ...inquiry, messageRoute: `/messages?inquiryId=${inquiry.id}` },
       { status: 201 },

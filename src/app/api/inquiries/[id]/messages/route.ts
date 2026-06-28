@@ -11,6 +11,7 @@ import {
 } from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
+import { sendNewMessageNotification } from "@/lib/message-email-notifications";
 import { sha256Hex } from "@/lib/message-attachments";
 import { MESSAGE_ATTACHMENT_LIMITS } from "@/lib/message-attachment-rules";
 
@@ -135,6 +136,21 @@ export async function POST(
         },
       });
     });
+
+    await sendNewMessageNotification({
+      messageId: message.id,
+      inquiryId: inquiry.id,
+      senderUserId: user.id,
+      senderCompanyName: senderCompany.tradeName || senderCompany.legalName,
+      receiverCompanyId,
+      body: message.body,
+      attachmentCount: message.attachments.length,
+    }).catch((error) => {
+      console.error("Message notification email failed.", {
+        name: error instanceof Error ? error.name : typeof error,
+      });
+    });
+
     return Response.json(message, { status: 201 });
   } catch (error) {
     if (error instanceof ApiValidationError) {
