@@ -29,6 +29,18 @@ type DealSummary = {
   reviews: Array<{ id: string; reviewerCompanyId: string }>;
 };
 
+type ThreadCompany = {
+  id: string;
+  legalName: string;
+  tradeName?: string;
+  logoOriginalUrl?: string | null;
+  logoThumbnailUrl?: string | null;
+  logoUrl?: string | null;
+  useDefaultLogo: boolean;
+  companyRole: "seller" | "buyer";
+  verificationStatus: string;
+};
+
 type InquiryThread = {
   id: string;
   message: string;
@@ -38,8 +50,8 @@ type InquiryThread = {
   status: string;
   updatedAt: string;
   recipientCompanyId: string;
-  buyerCompany: { id: string; legalName: string; tradeName?: string; logoUrl?: string; useDefaultLogo: boolean };
-  sellerCompany: { id: string; legalName: string; tradeName?: string; logoUrl?: string; useDefaultLogo: boolean };
+  buyerCompany: ThreadCompany;
+  sellerCompany: ThreadCompany;
   product: { name: string } | null;
   messages: Array<{
     id: string;
@@ -442,14 +454,14 @@ export function MessagesClient({
       <aside className="max-h-48 min-h-0 overflow-y-auto border-b border-zinc-200 xl:max-h-none xl:border-b-0 xl:border-r">
         {threads.map((thread) => {
           const company = getCounterparty(thread);
-          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoUrl} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{company.tradeName || company.legalName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
+          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{company.tradeName || company.legalName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
         })}
       </aside>
       {selected ? (
         <section className="flex min-h-0 flex-col">
           <header className="shrink-0 border-b border-zinc-200 p-5">
             <h2 className="text-xl font-semibold text-zinc-950">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
-            <p className="mt-1 text-sm text-zinc-500">{selected.buyerCompany.legalName} · {selected.sellerCompany.legalName}</p>
+            <CounterpartyProfileLink company={getCounterparty(selected)} />
             {selected.product ? <p className="mt-2 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
             <DealControls
               thread={selected}
@@ -568,6 +580,52 @@ export function MessagesClient({
         />
       ) : null}
     </div>
+  );
+}
+
+function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
+  const { locale, t } = useI18n();
+  const displayName = getCompanyDisplayName(company);
+  const profileHref = getPublicProfileHref(company, locale);
+  const logo = (
+    <CompanyLogo
+      companyName={displayName}
+      logoUrl={company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl || undefined}
+      logoUrls={[
+        company.logoThumbnailUrl || "",
+        company.logoUrl || "",
+        company.logoOriginalUrl || "",
+      ]}
+      useDefaultLogo={company.useDefaultLogo}
+      size="sm"
+      className="size-11"
+    />
+  );
+
+  if (!profileHref) {
+    return (
+      <div className="mt-3 flex min-w-0 items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-500">
+        {logo}
+        <div className="min-w-0">
+          <p className="truncate font-medium text-zinc-700">{displayName}</p>
+          <p className="text-xs text-zinc-500">{t("messages.profileNotListed")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href={profileHref}
+      aria-label={`${t("messages.openCompanyProfile")}: ${displayName}`}
+      className="mt-3 flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 text-sm transition hover:border-blue-200 hover:bg-blue-50"
+    >
+      {logo}
+      <div className="min-w-0">
+        <p className="truncate font-medium text-zinc-950 hover:underline">{displayName}</p>
+        <p className="text-xs text-zinc-500">{t("messages.openCompanyProfile")}</p>
+      </div>
+    </Link>
   );
 }
 
@@ -1030,6 +1088,15 @@ function getCounterparty(thread: InquiryThread) {
   return thread.sellerCompany;
 }
 
+function getPublicProfileHref(company: ThreadCompany, locale: "en" | "ko") {
+  if (company.verificationStatus !== "verified") return "";
+  const path =
+    company.companyRole === "buyer"
+      ? `/buyers/${company.id}`
+      : `/companies/${company.id}`;
+  return withLocale(path, locale);
+}
+
 function getInitialMessageSenderCompanyId(thread: InquiryThread) {
   if (thread.recipientCompanyId === thread.buyerCompany.id) {
     return thread.sellerCompany.id;
@@ -1050,7 +1117,7 @@ function getSenderCompanyName(thread: InquiryThread, senderCompanyId: string | n
   return "";
 }
 
-function getCompanyDisplayName(company: { legalName: string; tradeName?: string }) {
+function getCompanyDisplayName(company: { legalName: string; tradeName?: string | null }) {
   return company.tradeName || company.legalName;
 }
 
