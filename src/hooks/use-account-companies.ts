@@ -8,20 +8,21 @@ export type AccountCompanyRecord = Record<string, unknown> & {
 const companiesByUserId = new Map<string, AccountCompanyRecord[]>();
 const requestsByUserId = new Map<string, Promise<AccountCompanyRecord[]>>();
 
-export function loadAccountCompanies(userId: string) {
+export function loadAccountCompanies(
+  userId: string,
+  options: { force?: boolean } = {},
+) {
   const cached = companiesByUserId.get(userId);
-  if (cached) return Promise.resolve(cached);
+  if (cached && !options.force) return Promise.resolve(cached);
 
   const pending = requestsByUserId.get(userId);
-  if (pending) return pending;
+  if (pending && !options.force) return pending;
 
-  const request = fetch("/api/account/company")
+  const request = fetch("/api/account/company", { cache: "no-store" })
     .then(async (response) => {
       if (!response.ok) return [];
       const companies = (await response.json()) as AccountCompanyRecord[];
-      if (companies.length) {
-        companiesByUserId.set(userId, companies);
-      }
+      companiesByUserId.set(userId, companies);
       return companies;
     })
     .catch(() => [])
@@ -42,9 +43,8 @@ export function rememberAccountCompany(
   const current = companiesByUserId.get(userId) ?? [];
   const next = [
     ...current.filter((item) =>
-      company.id
-        ? item.id !== company.id
-        : item.companyRole !== company.companyRole,
+      item.companyRole !== company.companyRole &&
+      (!company.id || item.id !== company.id),
     ),
     company,
   ];

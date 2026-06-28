@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -159,6 +158,36 @@ function debugImageUpload(message: string, details: Record<string, unknown>) {
   }
 }
 
+function updateUploadedProductPreview(
+  item: PendingImage,
+  result:
+    | { ok: true; image: UploadedListingImage }
+    | { ok: false; error: string },
+  previewUrls: Set<string>,
+): PendingImage {
+  if (!result.ok) {
+    return {
+      ...item,
+      status: "error",
+      error: result.error,
+    };
+  }
+
+  if (previewUrls.has(item.previewUrl)) {
+    URL.revokeObjectURL(item.previewUrl);
+    previewUrls.delete(item.previewUrl);
+  }
+
+  return {
+    ...item,
+    previewUrl:
+      result.image.cardUrl || result.image.mainUrl || result.image.originalUrl,
+    uploaded: result.image,
+    status: "ready",
+    error: "",
+  };
+}
+
 export function ListingImageUploader({
   value,
   onChange,
@@ -244,18 +273,7 @@ export function ListingImageUploader({
         setItems((current) =>
           current.map((item) =>
             item.id === pending.id
-              ? result.ok
-                ? {
-                    ...item,
-                    uploaded: result.image,
-                    status: "ready",
-                    error: "",
-                  }
-                : {
-                    ...item,
-                    status: "error",
-                    error: result.error,
-                  }
+              ? updateUploadedProductPreview(item, result, previewUrls.current)
               : item,
           ),
         );
@@ -275,7 +293,7 @@ export function ListingImageUploader({
   function remove(id: string) {
     setItems((current) => {
       const removed = current.find((item) => item.id === id);
-      if (removed) {
+      if (removed && previewUrls.current.has(removed.previewUrl)) {
         URL.revokeObjectURL(removed.previewUrl);
         previewUrls.current.delete(removed.previewUrl);
       }
@@ -331,12 +349,11 @@ export function ListingImageUploader({
             }}
             className="relative aspect-square overflow-hidden rounded-md border border-zinc-200 bg-zinc-100"
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={item.previewUrl}
               alt={`${item.fileName} 미리보기`}
-              fill
-              unoptimized
-              className="object-cover"
+              className="absolute inset-0 size-full object-cover"
             />
             {index === 0 ? (
               <span className="absolute left-2 top-2 rounded bg-zinc-950 px-2 py-1 text-xs font-medium text-white">

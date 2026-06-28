@@ -25,6 +25,10 @@ import {
   useUnsavedChangesWarning,
 } from "@/hooks/use-form-reliability";
 import {
+  rememberAccountCompany,
+  type AccountCompanyRecord,
+} from "@/hooks/use-account-companies";
+import {
   getBuyerCategoryOptions,
   getBuyerTypeOptions,
   getImportExperienceOptions,
@@ -381,8 +385,13 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
         return;
       }
 
-      const savedCompany = (await response.json()) as { id: string };
+      const savedCompany = (await response.json()) as AccountCompanyRecord & {
+        id: string;
+      };
       setCompanyId(savedCompany.id);
+      if (user?.id) {
+        rememberAccountCompany(user.id, savedCompany);
+      }
 
       if (privateDocument) {
         const documentForm = new FormData();

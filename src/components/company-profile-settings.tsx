@@ -178,7 +178,7 @@ export function CompanyProfileSettings() {
     if (!isLoaded || !userId || !role) return;
 
     let cancelled = false;
-    void loadAccountCompanies(userId)
+    void loadAccountCompanies(userId, { force: true })
       .then((companies: CompanyRecord[]) => {
         if (cancelled) return;
         const stored = companies.find((item) => item.companyRole === role);
