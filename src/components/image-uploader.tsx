@@ -153,6 +153,12 @@ function uploadCopy(locale: "en" | "ko") {
       };
 }
 
+function debugImageUpload(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[image-uploader] ${message}`, details);
+  }
+}
+
 export function ListingImageUploader({
   value,
   onChange,
@@ -427,6 +433,7 @@ export function SingleImageUploader({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const localPreview = useRef("");
+  const lastValidPreviewUrl = useRef(imageUrl?.trim() ?? "");
   const savedPreviewKey = (imageUrls?.length ? imageUrls : [imageUrl])
     .map((url) => url?.trim() ?? "")
     .join("\n");
@@ -444,8 +451,21 @@ export function SingleImageUploader({
   );
 
   useEffect(() => {
-    if (!localPreview.current) setPreviewUrl(savedPreviewUrls[0] ?? "");
-  }, [savedPreviewUrls]);
+    if (savedPreviewUrls[0]) {
+      lastValidPreviewUrl.current = savedPreviewUrls[0];
+    }
+    debugImageUpload("SingleImageUploader props", {
+      kind,
+      imageUrl: imageUrl ?? "",
+      savedPreviewUrls,
+      previewUrl,
+      hasLocalPreview: Boolean(localPreview.current),
+      lastValidPreviewUrl: lastValidPreviewUrl.current,
+    });
+    if (!localPreview.current) {
+      setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
+    }
+  }, [imageUrl, kind, previewUrl, savedPreviewUrls]);
 
   useEffect(() => {
     return () => {
@@ -469,11 +489,23 @@ export function SingleImageUploader({
 
     const result = await uploadImage(file, kind, copy, { companyId, locale });
     if (result.ok) {
+      const uploadedPreviewUrl =
+        result.image.mainUrl || result.image.cardUrl || result.image.originalUrl;
+      debugImageUpload("upload response body", {
+        kind,
+        storagePath: result.image.storagePath,
+        originalUrl: result.image.originalUrl,
+        cardUrl: result.image.cardUrl,
+        mainUrl: result.image.mainUrl,
+        detailUrl: result.image.detailUrl,
+        uploadedPreviewUrl,
+      });
       if (localPreview.current) {
         URL.revokeObjectURL(localPreview.current);
         localPreview.current = "";
       }
-      setPreviewUrl(result.image.mainUrl || result.image.cardUrl || result.image.originalUrl);
+      lastValidPreviewUrl.current = uploadedPreviewUrl;
+      setPreviewUrl(uploadedPreviewUrl);
       if (kind === "company_logo" && process.env.NODE_ENV !== "production") {
         console.info("[company-logo] upload response", {
           storagePath: result.image.storagePath,
@@ -489,7 +521,7 @@ export function SingleImageUploader({
         URL.revokeObjectURL(localPreview.current);
         localPreview.current = "";
       }
-      setPreviewUrl(imageUrl ?? "");
+      setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
       setError(result.error);
       onUploadError?.(result.error);
     }
@@ -515,11 +547,13 @@ export function SingleImageUploader({
               if (localPreview.current) {
                 URL.revokeObjectURL(localPreview.current);
                 localPreview.current = "";
-                setPreviewUrl(savedPreviewUrls[0] ?? "");
+                setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
                 return;
               }
               const failedIndex = savedPreviewUrls.indexOf(previewUrl);
-              setPreviewUrl(savedPreviewUrls[failedIndex + 1] ?? "");
+              setPreviewUrl(
+                savedPreviewUrls[failedIndex + 1] ?? lastValidPreviewUrl.current,
+              );
             }}
           />
         ) : (

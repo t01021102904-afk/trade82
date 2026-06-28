@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import {
   SingleImageUploader,
@@ -42,6 +42,7 @@ import {
   type SelectOption,
 } from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
+import type { UploadedListingImage } from "@/lib/marketplace";
 
 type FlowStep = "company" | "personal" | "product" | "sourcing";
 
@@ -166,6 +167,12 @@ function stepToId(step: FlowStep): OnboardingStepId {
   return step === "sourcing" ? "sourcing" : step;
 }
 
+function debugOnboardingLogo(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[onboarding-logo] ${message}`, details);
+  }
+}
+
 export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const { user } = useUser();
   const { locale, t } = useI18n();
@@ -186,6 +193,11 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const lastValidCompanyLogo = useRef({
+    logoOriginalUrl: "",
+    logoThumbnailUrl: "",
+    logoUrl: "",
+  });
   const leaveMessage = t("settings.unsavedChangesWarning");
   const confirmLeave = useUnsavedChangesWarning(
     dirty && !saving && !uploading,
@@ -207,7 +219,54 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     key: K,
     value: CompanyStep[K],
   ) {
-    setCompany((current) => ({ ...current, [key]: value }));
+    setCompany((current) => {
+      const isLogoKey =
+        key === "logoOriginalUrl" ||
+        key === "logoThumbnailUrl" ||
+        key === "logoUrl";
+      const isEmptyLogoValue = isLogoKey && typeof value === "string" && !value.trim();
+      const hasCurrentLogo = Boolean(
+        current.logoOriginalUrl || current.logoThumbnailUrl || current.logoUrl,
+      );
+      if (isEmptyLogoValue && hasCurrentLogo) {
+        debugOnboardingLogo("ignored empty company logo update", {
+          kind,
+          key,
+          currentLogoOriginalUrl: current.logoOriginalUrl,
+          currentLogoThumbnailUrl: current.logoThumbnailUrl,
+          currentLogoUrl: current.logoUrl,
+        });
+        return current;
+      }
+      if (isLogoKey) {
+        debugOnboardingLogo("company logo field update", {
+          kind,
+          key,
+          value,
+        });
+      }
+      return { ...current, [key]: value };
+    });
+    markDirty();
+  }
+
+  function updateCompanyLogo(image: UploadedListingImage) {
+    const logoUrl = image.mainUrl || image.cardUrl || image.originalUrl;
+    const nextLogo = {
+      logoOriginalUrl: image.originalUrl,
+      logoThumbnailUrl: image.cardUrl,
+      logoUrl,
+    };
+    lastValidCompanyLogo.current = nextLogo;
+    debugOnboardingLogo("stored uploaded company logo in form state", {
+      kind,
+      storagePath: image.storagePath,
+      ...nextLogo,
+    });
+    setCompany((current) => ({
+      ...current,
+      ...nextLogo,
+    }));
     markDirty();
   }
 
@@ -237,6 +296,13 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
 
   function restoreDraft() {
     if (!draft) return;
+    debugOnboardingLogo("restoring onboarding draft", {
+      kind,
+      draftLogoOriginalUrl: draft.company.logoOriginalUrl,
+      draftLogoThumbnailUrl: draft.company.logoThumbnailUrl,
+      draftLogoUrl: draft.company.logoUrl,
+      lastValidLogoUrl: lastValidCompanyLogo.current.logoUrl,
+    });
     setStep(draft.step);
     setCompany(draft.company);
     setPersonal(draft.personal);
@@ -249,6 +315,23 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     setSuccess("");
     discardDraft();
   }
+
+  useEffect(() => {
+    debugOnboardingLogo("component mounted", { kind });
+    return () => {
+      debugOnboardingLogo("component unmounted", { kind });
+    };
+  }, [kind]);
+
+  useEffect(() => {
+    debugOnboardingLogo("company logo state", {
+      kind,
+      logoOriginalUrl: company.logoOriginalUrl,
+      logoThumbnailUrl: company.logoThumbnailUrl,
+      logoUrl: company.logoUrl,
+      lastValidLogoUrl: lastValidCompanyLogo.current.logoUrl,
+    });
+  }, [company.logoOriginalUrl, company.logoThumbnailUrl, company.logoUrl, kind]);
 
   function selectStep(selected: OnboardingStepId) {
     if (!confirmLeave()) return;
@@ -592,6 +675,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
               privateDocument={privateDocument}
               onSubmit={saveCompanyStep}
               onChange={updateCompany}
+              onLogoUploaded={updateCompanyLogo}
               onPrivateDocument={(file) => {
                 setPrivateDocument(file);
                 updateCompany("certificateFileName", file?.name ?? "");
@@ -644,6 +728,7 @@ function CompanyStepForm({
   privateDocument,
   onSubmit,
   onChange,
+  onLogoUploaded,
   onPrivateDocument,
   onUploadingChange,
 }: {
@@ -654,6 +739,7 @@ function CompanyStepForm({
   privateDocument: File | null;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onChange: <K extends keyof CompanyStep>(key: K, value: CompanyStep[K]) => void;
+  onLogoUploaded: (image: UploadedListingImage) => void;
   onPrivateDocument: (file: File | null) => void;
   onUploadingChange: (uploading: boolean) => void;
 }) {
@@ -663,6 +749,8 @@ function CompanyStepForm({
       ? getSellerCompanyTypeOptions(locale)
       : getBuyerTypeOptions(locale);
   const countryValue = kind === "seller" ? SOUTH_KOREA : UNITED_STATES;
+  const companyLogoPreviewUrl =
+    company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl;
 
   return (
     <form
@@ -680,13 +768,14 @@ function CompanyStepForm({
       />
       <SingleImageUploader
         kind="company_logo"
-        imageUrl={company.logoUrl}
+        imageUrl={companyLogoPreviewUrl}
+        imageUrls={[
+          company.logoThumbnailUrl,
+          company.logoUrl,
+          company.logoOriginalUrl,
+        ]}
         label={t("settings.companyLogoUpload")}
-        onUploaded={(image) => {
-          onChange("logoOriginalUrl", image.originalUrl);
-          onChange("logoThumbnailUrl", image.cardUrl);
-          onChange("logoUrl", image.mainUrl);
-        }}
+        onUploaded={onLogoUploaded}
         onUploadingChange={onUploadingChange}
         circular={false}
       />
