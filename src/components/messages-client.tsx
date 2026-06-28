@@ -122,6 +122,7 @@ export function MessagesClient({
   const [dealError, setDealError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draftAttachmentsRef = useRef<DraftAttachment[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   async function load() {
     setThreads(await fetchInquiryThreads());
@@ -141,6 +142,9 @@ export function MessagesClient({
     () => threads.find((thread) => thread.id === selectedId) ?? threads[0],
     [selectedId, threads],
   );
+  const lastMessageId =
+    selected?.messages.at(-1)?.id ??
+    (selected?.message.trim() ? selected.id : "");
   const libraryAttachments = useMemo(() => {
     if (!selected) return [];
     const search = librarySearch.trim().toLowerCase();
@@ -173,6 +177,10 @@ export function MessagesClient({
       });
     };
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: "end" });
+  }, [lastMessageId, selected?.id]);
 
   async function submitReply() {
     if (!selected) return;
@@ -430,16 +438,16 @@ export function MessagesClient({
   }
 
   return (
-    <div className="grid min-h-[620px] overflow-hidden rounded-lg border border-zinc-200 bg-white xl:grid-cols-[320px_minmax(0,1fr)_320px]">
-      <aside className="border-r border-zinc-200">
+    <div className="grid h-[calc(100dvh-12rem)] min-h-[540px] max-h-[820px] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-zinc-200 bg-white xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
+      <aside className="max-h-48 min-h-0 overflow-y-auto border-b border-zinc-200 xl:max-h-none xl:border-b-0 xl:border-r">
         {threads.map((thread) => {
           const company = getCounterparty(thread);
           return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoUrl} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{company.tradeName || company.legalName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
         })}
       </aside>
       {selected ? (
-        <section className="flex min-h-[620px] flex-col">
-          <header className="border-b border-zinc-200 p-5">
+        <section className="flex min-h-0 flex-col">
+          <header className="shrink-0 border-b border-zinc-200 p-5">
             <h2 className="text-xl font-semibold text-zinc-950">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
             <p className="mt-1 text-sm text-zinc-500">{selected.buyerCompany.legalName} · {selected.sellerCompany.legalName}</p>
             {selected.product ? <p className="mt-2 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
@@ -451,7 +459,7 @@ export function MessagesClient({
               onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
             />
           </header>
-          <div className="flex-1 space-y-4 overflow-y-auto bg-zinc-50 p-5">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-zinc-50 p-5">
             {selected.message.trim() ? (
               <ChatBubble
                 body={selected.message}
@@ -474,8 +482,9 @@ export function MessagesClient({
                 onOpenAttachment={openAttachment}
               />
             ))}
+            <div ref={messagesEndRef} aria-hidden="true" />
           </div>
-          <footer className="border-t border-zinc-200 p-4">
+          <footer className="max-h-[45%] shrink-0 overflow-y-auto border-t border-zinc-200 p-4">
             <div
               onDragOver={(event) => {
                 event.preventDefault();
@@ -776,7 +785,7 @@ function AttachmentLibrary({
   ] as const;
 
   return (
-    <aside className="border-t border-zinc-200 bg-white p-4 xl:border-l xl:border-t-0">
+    <aside className="flex max-h-56 min-h-0 flex-col overflow-hidden border-t border-zinc-200 bg-white p-4 xl:max-h-none xl:border-l xl:border-t-0">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-zinc-950">{t("messages.files")}</h3>
         <span className="text-xs text-zinc-500">{attachments.length}</span>
@@ -806,7 +815,7 @@ function AttachmentLibrary({
           </button>
         ))}
       </div>
-      <div className="mt-4 grid max-h-[480px] gap-3 overflow-y-auto pr-1">
+      <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1">
         {attachments.length ? (
           attachments.map((attachment) => (
             <article key={attachment.id} className="rounded-lg border border-zinc-200 p-3">
