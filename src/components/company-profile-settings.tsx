@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
 import { SingleImageUploader } from "@/components/image-uploader";
@@ -455,8 +455,16 @@ function CompanyProfileForm({
     window.setTimeout(() => formRef.current?.requestSubmit(), 0);
   }
 
-  const companyLogoPreviewUrl =
-    company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl;
+  const companyLogoImageUrls = useMemo(
+    () =>
+      [
+        company.logoThumbnailUrl,
+        company.logoUrl,
+        company.logoOriginalUrl,
+      ].filter((url): url is string => Boolean(url?.trim())),
+    [company.logoOriginalUrl, company.logoThumbnailUrl, company.logoUrl],
+  );
+  const companyLogoPreviewUrl = companyLogoImageUrls[0] ?? "";
 
   return (
     <form ref={formRef} onSubmit={submit} className="grid gap-6" autoComplete="off">
@@ -485,11 +493,7 @@ function CompanyProfileForm({
         <SingleImageUploader
           kind="company_logo"
           imageUrl={companyLogoPreviewUrl}
-          imageUrls={[
-            company.logoThumbnailUrl ?? "",
-            company.logoUrl ?? "",
-            company.logoOriginalUrl ?? "",
-          ]}
+          imageUrls={companyLogoImageUrls}
           label={t("settings.companyLogoUpload")}
           companyId={company.id.startsWith("new-") ? undefined : company.id}
           onUploaded={updateLogo}

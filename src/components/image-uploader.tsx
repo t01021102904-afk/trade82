@@ -434,9 +434,12 @@ export function SingleImageUploader({
   const [error, setError] = useState("");
   const localPreview = useRef("");
   const lastValidPreviewUrl = useRef(imageUrl?.trim() ?? "");
+  const failedPreviewUrls = useRef<Set<string>>(new Set());
+  const previewFailureCounts = useRef<Map<string, number>>(new Map());
   const savedPreviewKey = (imageUrls?.length ? imageUrls : [imageUrl])
     .map((url) => url?.trim() ?? "")
     .join("\n");
+  const savedPreviewKeyRef = useRef(savedPreviewKey);
   const savedPreviewUrls = useMemo(
     () =>
       Array.from(
@@ -451,21 +454,30 @@ export function SingleImageUploader({
   );
 
   useEffect(() => {
-    if (savedPreviewUrls[0]) {
-      lastValidPreviewUrl.current = savedPreviewUrls[0];
+    if (savedPreviewKeyRef.current !== savedPreviewKey) {
+      savedPreviewKeyRef.current = savedPreviewKey;
+      failedPreviewUrls.current.clear();
+      previewFailureCounts.current.clear();
+    }
+    const nextSavedPreviewUrl =
+      savedPreviewUrls.find((url) => !failedPreviewUrls.current.has(url)) ?? "";
+    if (nextSavedPreviewUrl) {
+      lastValidPreviewUrl.current = nextSavedPreviewUrl;
     }
     debugImageUpload("SingleImageUploader props", {
       kind,
       imageUrl: imageUrl ?? "",
       savedPreviewUrls,
-      previewUrl,
       hasLocalPreview: Boolean(localPreview.current),
       lastValidPreviewUrl: lastValidPreviewUrl.current,
     });
-    if (!localPreview.current) {
-      setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
+    if (!localPreview.current && nextSavedPreviewUrl) {
+      setPreviewUrl((current) => {
+        if (current && !failedPreviewUrls.current.has(current)) return current;
+        return current === nextSavedPreviewUrl ? current : nextSavedPreviewUrl;
+      });
     }
-  }, [imageUrl, kind, previewUrl, savedPreviewUrls]);
+  }, [imageUrl, kind, savedPreviewKey, savedPreviewUrls]);
 
   useEffect(() => {
     return () => {
@@ -482,6 +494,8 @@ export function SingleImageUploader({
     }
 
     if (localPreview.current) URL.revokeObjectURL(localPreview.current);
+    failedPreviewUrls.current.clear();
+    previewFailureCounts.current.clear();
     localPreview.current = URL.createObjectURL(file);
     setPreviewUrl(localPreview.current);
     setUploading(true);
@@ -505,23 +519,26 @@ export function SingleImageUploader({
         localPreview.current = "";
       }
       lastValidPreviewUrl.current = uploadedPreviewUrl;
-      setPreviewUrl(uploadedPreviewUrl);
-      if (kind === "company_logo" && process.env.NODE_ENV !== "production") {
-        console.info("[company-logo] upload response", {
-          storagePath: result.image.storagePath,
-          originalUrl: result.image.originalUrl,
-          cardUrl: result.image.cardUrl,
-          mainUrl: result.image.mainUrl,
-          detailUrl: result.image.detailUrl,
-        });
-      }
+      failedPreviewUrls.current.clear();
+      previewFailureCounts.current.clear();
+      setPreviewUrl((current) =>
+        current === uploadedPreviewUrl ? current : uploadedPreviewUrl,
+      );
       onUploaded(result.image);
     } else {
       if (localPreview.current) {
         URL.revokeObjectURL(localPreview.current);
         localPreview.current = "";
       }
-      setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
+      const fallbackPreviewUrl =
+        savedPreviewUrls.find((url) => !failedPreviewUrls.current.has(url)) ??
+        (lastValidPreviewUrl.current &&
+        !failedPreviewUrls.current.has(lastValidPreviewUrl.current)
+          ? lastValidPreviewUrl.current
+          : "");
+      setPreviewUrl((current) =>
+        current === fallbackPreviewUrl ? current : fallbackPreviewUrl,
+      );
       setError(result.error);
       onUploadError?.(result.error);
     }
@@ -544,16 +561,43 @@ export function SingleImageUploader({
             alt=""
             className="absolute inset-0 size-full object-cover"
             onError={() => {
+              const failedUrl = previewUrl.trim();
+              if (!failedUrl) return;
+              const failureCount =
+                (previewFailureCounts.current.get(failedUrl) ?? 0) + 1;
+              previewFailureCounts.current.set(failedUrl, failureCount);
+              failedPreviewUrls.current.add(failedUrl);
+
               if (localPreview.current) {
                 URL.revokeObjectURL(localPreview.current);
                 localPreview.current = "";
-                setPreviewUrl(savedPreviewUrls[0] ?? lastValidPreviewUrl.current);
-                return;
               }
-              const failedIndex = savedPreviewUrls.indexOf(previewUrl);
-              setPreviewUrl(
-                savedPreviewUrls[failedIndex + 1] ?? lastValidPreviewUrl.current,
-              );
+
+              if (lastValidPreviewUrl.current === failedUrl) {
+                lastValidPreviewUrl.current = "";
+              }
+
+              const nextPreviewUrl =
+                savedPreviewUrls.find(
+                  (url) => url !== failedUrl && !failedPreviewUrls.current.has(url),
+                ) ??
+                (lastValidPreviewUrl.current &&
+                lastValidPreviewUrl.current !== failedUrl &&
+                !failedPreviewUrls.current.has(lastValidPreviewUrl.current)
+                  ? lastValidPreviewUrl.current
+                  : "");
+
+              debugImageUpload("preview image failed", {
+                kind,
+                failedUrl,
+                failureCount,
+                nextPreviewUrl,
+              });
+
+              setPreviewUrl((current) => {
+                if (current !== failedUrl) return current;
+                return nextPreviewUrl;
+              });
             }}
           />
         ) : (

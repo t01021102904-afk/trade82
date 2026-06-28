@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   SingleImageUploader,
@@ -749,8 +749,16 @@ function CompanyStepForm({
       ? getSellerCompanyTypeOptions(locale)
       : getBuyerTypeOptions(locale);
   const countryValue = kind === "seller" ? SOUTH_KOREA : UNITED_STATES;
-  const companyLogoPreviewUrl =
-    company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl;
+  const companyLogoImageUrls = useMemo(
+    () =>
+      [
+        company.logoThumbnailUrl,
+        company.logoUrl,
+        company.logoOriginalUrl,
+      ].filter((url): url is string => Boolean(url?.trim())),
+    [company.logoOriginalUrl, company.logoThumbnailUrl, company.logoUrl],
+  );
+  const companyLogoPreviewUrl = companyLogoImageUrls[0] ?? "";
 
   return (
     <form
@@ -769,11 +777,7 @@ function CompanyStepForm({
       <SingleImageUploader
         kind="company_logo"
         imageUrl={companyLogoPreviewUrl}
-        imageUrls={[
-          company.logoThumbnailUrl,
-          company.logoUrl,
-          company.logoOriginalUrl,
-        ]}
+        imageUrls={companyLogoImageUrls}
         label={t("settings.companyLogoUpload")}
         onUploaded={onLogoUploaded}
         onUploadingChange={onUploadingChange}
