@@ -20,6 +20,7 @@ type DashboardCompany = {
   companyRole: "seller" | "buyer";
   legalName: string;
   tradeName: string | null;
+  logoThumbnailUrl: string | null;
   logoUrl: string | null;
   useDefaultLogo: boolean;
   website: string;
@@ -156,7 +157,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
             <div className="flex min-w-0 items-center gap-4">
               <CompanyLogo
                 companyName={company.tradeName || company.legalName}
-                logoUrl={company.logoUrl ?? undefined}
+                logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? undefined}
                 useDefaultLogo={company.useDefaultLogo}
                 size="lg"
               />
@@ -176,19 +177,10 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
             </div>
             <div className="flex flex-wrap gap-2">
               <Action
-                href="/messages"
-                label={t("dashboard.viewMessages")}
+                href="/settings/company"
+                label={t("dashboard.editProfile")}
                 locale={locale}
                 primary
-              />
-              <Action
-                href={role === "seller" ? "/marketplace" : "/sellers"}
-                label={
-                  role === "seller"
-                    ? t("dashboard.browseMarketplace")
-                    : t("dashboard.browseSellers")
-                }
-                locale={locale}
               />
             </div>
           </div>
