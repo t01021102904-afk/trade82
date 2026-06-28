@@ -9,14 +9,16 @@ export type ProcessedMarketplaceImage = {
   height: number | null;
 };
 
+const MAX_INPUT_PIXELS = 120_000_000;
+
 export async function processMarketplaceImage(
   input: Buffer,
 ): Promise<ProcessedMarketplaceImage> {
-  const normalized = sharp(input).rotate();
+  const normalized = sharp(input, { limitInputPixels: MAX_INPUT_PIXELS }).rotate();
   const metadata = await normalized.metadata();
 
   const [original, card, main, detail] = await Promise.all([
-    normalized.clone().webp({ quality: 92 }).toBuffer(),
+    normalized.clone().webp({ quality: 95 }).toBuffer(),
     normalized
       .clone()
       .resize(320, 320, { fit: "cover", position: "attention" })
@@ -24,13 +26,13 @@ export async function processMarketplaceImage(
       .toBuffer(),
     normalized
       .clone()
-      .resize(640, 640, { fit: "cover", position: "attention" })
-      .webp({ quality: 86 })
+      .resize(960, 960, { fit: "cover", position: "attention" })
+      .webp({ quality: 88 })
       .toBuffer(),
     normalized
       .clone()
-      .resize(1280, 1280, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 88 })
+      .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 92 })
       .toBuffer(),
   ]);
 

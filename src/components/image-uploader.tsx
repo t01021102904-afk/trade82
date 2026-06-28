@@ -18,11 +18,19 @@ type PendingImage = {
   error: string;
 };
 
-const acceptedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
-const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp"]);
+const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
+const acceptedTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+const heicTypes = new Set(["image/heic", "image/heif"]);
+const heicExtensions = new Set(["heic", "heif"]);
 const suspiciousExtensions = new Set([
   "bat",
   "cmd",
+  "dmg",
   "exe",
   "htm",
   "html",
@@ -32,44 +40,116 @@ const suspiciousExtensions = new Set([
   "svg",
   "zip",
 ]);
-const maxProductSize = 5 * 1024 * 1024;
-const maxProfileSize = 2 * 1024 * 1024;
+const MB = 1024 * 1024;
+const maxProductSize = 50 * MB;
+const maxProfileSize = 25 * MB;
 
 function extensionOf(file: File) {
   return file.name.split(".").pop()?.toLowerCase() ?? "";
 }
 
-function isAcceptedImage(file: File) {
-  const parts = file.name
+function fileParts(file: File) {
+  return file.name
     .toLowerCase()
     .split(".")
     .map((part) => part.trim())
     .filter(Boolean);
+}
+
+function isHeicImage(file: File) {
+  return (
+    heicTypes.has(file.type.toLowerCase()) ||
+    heicExtensions.has(extensionOf(file))
+  );
+}
+
+function isAcceptedImage(file: File) {
+  const parts = fileParts(file);
   return (
     file.size > 0 &&
-    acceptedTypes.has(file.type) &&
+    acceptedTypes.has(file.type.toLowerCase()) &&
     acceptedExtensions.has(extensionOf(file)) &&
     !parts.some((part) => suspiciousExtensions.has(part))
   );
 }
 
+function imageValidationError(
+  file: File,
+  kind: UploadKind,
+  copy: ReturnType<typeof uploadCopy>,
+) {
+  const maxSize = kind === "product_image" ? maxProductSize : maxProfileSize;
+
+  if (file.size <= 0) return copy.empty;
+  if (isHeicImage(file)) return copy.heic;
+  if (!isAcceptedImage(file)) return copy.invalidImage;
+  if (file.size > maxSize) {
+    return kind === "product_image"
+      ? copy.productTooLarge
+      : copy.profileTooLarge;
+  }
+
+  return "";
+}
+
 function uploadCopy(locale: "en" | "ko") {
   return locale === "ko"
     ? {
-        invalidImage: "JPG, PNG, WEBP 파일만 업로드할 수 있습니다.",
-        productTooLarge: "5MB 이하 이미지만 업로드해 주세요.",
-        profileTooLarge: "2MB 이하 이미지만 업로드해 주세요.",
-        generic: "업로드에 실패했습니다. 파일 형식과 용량을 확인해 주세요.",
-        network: "네트워크 문제로 업로드하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.",
-        tooMany: "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        empty: "빈 파일은 업로드할 수 없습니다.",
+        invalidImage:
+          "지원하지 않는 파일 형식입니다. JPG, PNG, WebP 또는 AVIF 파일을 업로드해주세요.",
+        heic:
+          "HEIC 이미지는 아직 지원하지 않습니다. JPG 또는 PNG로 변환 후 업로드해주세요.",
+        productTooLarge:
+          "이미지 용량이 너무 큽니다. 상품 이미지는 최대 50MB까지 업로드할 수 있습니다.",
+        profileTooLarge:
+          "이미지 용량이 너무 큽니다. 프로필 사진과 회사 로고는 최대 25MB까지 업로드할 수 있습니다.",
+        generic: "업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+        network:
+          "네트워크 문제로 업로드하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.",
+        tooMany:
+          "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        productHelp:
+          "JPG, PNG, WebP, AVIF 파일을 업로드할 수 있습니다. 상품 이미지는 파일당 최대 50MB까지 가능합니다.",
+        profileHelp:
+          "JPG, PNG, WebP, AVIF 파일을 업로드할 수 있습니다. 프로필 사진과 회사 로고는 최대 25MB까지 가능합니다.",
+        tooManyImages: "이미지는 최대 12장까지 등록할 수 있습니다.",
+        productImages: "상품 이미지",
+        primary: "대표",
+        remove: "삭제",
+        uploading: "업로드 중",
+        addPhoto: "사진 추가",
+        changePhoto: "사진 변경",
+        reorderHelp:
+          "첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 변경할 수 있습니다.",
       }
     : {
-        invalidImage: "Upload JPG, PNG, or WEBP files only.",
-        productTooLarge: "Upload images no larger than 5MB.",
-        profileTooLarge: "Upload images no larger than 2MB.",
-        generic: "Upload failed. Check the file type and size.",
-        network: "Network error while uploading. Check your connection and try again.",
+        empty: "Empty files cannot be uploaded.",
+        invalidImage:
+          "This file type is not supported. Please upload JPG, PNG, WebP, or AVIF.",
+        heic:
+          "HEIC images are not supported yet. Please convert to JPG or PNG.",
+        productTooLarge:
+          "This image is too large. Maximum size is 50MB for product images.",
+        profileTooLarge:
+          "This image is too large. Maximum size is 25MB for profile photos and company logos.",
+        generic: "Upload failed. Please try again.",
+        network:
+          "Network error while uploading. Check your connection and try again.",
         tooMany: "Too many upload attempts. Please try again shortly.",
+        productHelp:
+          "Upload JPG, PNG, WebP, or AVIF. Product images can be up to 50MB each.",
+        profileHelp:
+          "Upload JPG, PNG, WebP, or AVIF. Profile photos and company logos can be up to 25MB.",
+        tooManyImages: "You can add up to 12 images.",
+        productImages: "Product images",
+        primary: "Primary",
+        remove: "Remove",
+        uploading: "Uploading",
+        addPhoto: "Add photo",
+        changePhoto: "Change photo",
+        reorderHelp:
+          "The first photo is used as the primary image. Drag or use the arrows to reorder.",
       };
 }
 
@@ -112,18 +192,15 @@ export function ListingImageUploader({
   async function addFiles(files: File[]) {
     setError("");
     if (items.length + files.length > 12) {
-      setError("이미지는 최대 12장까지 등록할 수 있습니다.");
+      setError(copy.tooManyImages);
       return;
     }
 
-    const invalidType = files.some((file) => !isAcceptedImage(file));
-    if (invalidType) {
-      setError(copy.invalidImage);
-      return;
-    }
-    const oversized = files.some((file) => file.size > maxProductSize);
-    if (oversized) {
-      setError(copy.productTooLarge);
+    const validationError = files
+      .map((file) => imageValidationError(file, "product_image", copy))
+      .find(Boolean);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -155,7 +232,9 @@ export function ListingImageUploader({
 
     await Promise.all(
       additions.map(async ({ file, ...pending }) => {
-        const result = await uploadImage(file, "product_image", copy);
+        const result = await uploadImage(file, "product_image", copy, {
+          locale,
+        });
         setItems((current) =>
           current.map((item) =>
             item.id === pending.id
@@ -226,9 +305,12 @@ export function ListingImageUploader({
   return (
     <div className="grid gap-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold text-zinc-900">상품 이미지</span>
+        <span className="text-sm font-semibold text-zinc-900">
+          {copy.productImages}
+        </span>
         <span className="text-sm text-zinc-500">{items.length}/12</span>
       </div>
+      <p className="text-xs leading-5 text-zinc-500">{copy.productHelp}</p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {items.map((item, index) => (
           <div
@@ -252,7 +334,7 @@ export function ListingImageUploader({
             />
             {index === 0 ? (
               <span className="absolute left-2 top-2 rounded bg-zinc-950 px-2 py-1 text-xs font-medium text-white">
-                대표
+                {copy.primary}
               </span>
             ) : null}
             <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/65 p-1.5">
@@ -270,7 +352,7 @@ export function ListingImageUploader({
                 onClick={() => remove(item.id)}
                 className="h-9 rounded bg-white/90 px-2 text-xs font-medium text-red-700"
               >
-                삭제
+                {copy.remove}
               </button>
               <button
                 type="button"
@@ -284,7 +366,7 @@ export function ListingImageUploader({
             </div>
             {item.status === "uploading" ? (
               <span className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm font-medium text-zinc-700">
-                업로드 중
+                {copy.uploading}
               </span>
             ) : null}
             {item.status === "error" ? (
@@ -297,11 +379,11 @@ export function ListingImageUploader({
         {items.length < 12 ? (
           <label className="flex aspect-square min-h-28 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-zinc-300 bg-zinc-50 text-sm font-medium text-zinc-600 transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700">
             <span className="text-2xl leading-none">+</span>
-            <span className="mt-2">사진 추가</span>
+            <span className="mt-2">{copy.addPhoto}</span>
             <input
               type="file"
               multiple
-              accept=".jpg,.jpeg,.png,.webp"
+              accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif"
               className="sr-only"
               onChange={(event) => {
                 const files = Array.from(event.target.files ?? []);
@@ -313,9 +395,7 @@ export function ListingImageUploader({
         ) : null}
       </div>
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
-      <p className="text-xs text-zinc-500">
-        첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 변경할 수 있습니다.
-      </p>
+      <p className="text-xs text-zinc-500">{copy.reorderHelp}</p>
     </div>
   );
 }
@@ -356,12 +436,9 @@ export function SingleImageUploader({
 
   async function select(file: File) {
     setError("");
-    if (!isAcceptedImage(file)) {
-      setError(copy.invalidImage);
-      return;
-    }
-    if (file.size > maxProfileSize) {
-      setError(copy.profileTooLarge);
+    const validationError = imageValidationError(file, kind, copy);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -371,7 +448,7 @@ export function SingleImageUploader({
     setUploading(true);
     onUploadingChange?.(true);
 
-    const result = await uploadImage(file, kind, copy, { companyId });
+    const result = await uploadImage(file, kind, copy, { companyId, locale });
     if (result.ok) {
       onUploaded(result.image);
     } else {
@@ -403,11 +480,11 @@ export function SingleImageUploader({
           </span>
         )}
         <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-sm font-medium text-white opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
-          {uploading ? "업로드 중" : "사진 변경"}
+          {uploading ? copy.uploading : copy.changePhoto}
         </span>
         <input
           type="file"
-          accept=".jpg,.jpeg,.png,.webp"
+          accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif"
           className="sr-only"
           disabled={uploading}
           aria-label={label}
@@ -418,6 +495,9 @@ export function SingleImageUploader({
           }}
         />
       </label>
+      <p className="max-w-xs text-xs leading-5 text-zinc-500">
+        {copy.profileHelp}
+      </p>
       {error ? <p className="max-w-xs text-sm text-red-700">{error}</p> : null}
     </div>
   );
@@ -427,7 +507,7 @@ async function uploadImage(
   file: File,
   uploadType: UploadKind,
   copy: ReturnType<typeof uploadCopy>,
-  metadata?: { companyId?: string },
+  metadata?: { companyId?: string; locale?: "en" | "ko" },
 ) {
   const formData = new FormData();
   formData.set("uploadType", uploadType);
@@ -437,6 +517,9 @@ async function uploadImage(
   try {
     const response = await fetch("/api/uploads", {
       method: "POST",
+      headers: metadata?.locale
+        ? { "x-trade82-locale": metadata.locale }
+        : undefined,
       body: formData,
     });
     const result = (await response.json().catch(() => null)) as

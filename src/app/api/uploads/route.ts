@@ -43,16 +43,56 @@ function jsonError(error: string, status: number, headers?: HeadersInit) {
   return Response.json({ error }, { status, headers });
 }
 
-async function responseMessage(error: Response) {
+function getRequestLocale(request: Request) {
+  const explicitLocale = request.headers.get("x-trade82-locale");
+  if (explicitLocale === "ko") return "ko";
+
+  const acceptLanguage = request.headers.get("accept-language") ?? "";
+  return acceptLanguage.toLowerCase().startsWith("ko") ? "ko" : "en";
+}
+
+function storageRejectedMessage(locale: "en" | "ko") {
+  return locale === "ko"
+    ? "스토리지 업로드가 실패했습니다. 다시 시도해주세요."
+    : "Upload failed because the storage service rejected the file. Please try again.";
+}
+
+function unauthenticatedMessage(locale: "en" | "ko") {
+  return locale === "ko"
+    ? "로그인 후 업로드할 수 있습니다."
+    : "Upload failed because you are not signed in.";
+}
+
+function unauthorizedMessage(locale: "en" | "ko") {
+  return locale === "ko"
+    ? "권한이 없습니다."
+    : "You do not have permission to upload this file.";
+}
+
+function incompleteCompanyMessage(locale: "en" | "ko") {
+  return locale === "ko"
+    ? "회사 정보를 먼저 입력한 뒤 업로드해주세요."
+    : "Upload failed because your company profile is incomplete.";
+}
+
+async function responseMessage(error: Response, locale: "en" | "ko") {
   const text = await error.text().catch(() => "");
+  if (
+    text.includes("Seller company required") ||
+    text.includes("Company role required") ||
+    text.includes("Company required")
+  ) {
+    return incompleteCompanyMessage(locale);
+  }
+  if (error.status === 401) return unauthenticatedMessage(locale);
+  if (error.status === 403) return unauthorizedMessage(locale);
   if (text.trim()) return text.trim();
-  if (error.status === 401) return "Login is required.";
-  if (error.status === 403) return "You do not have permission to upload this file.";
   if (error.status === 404) return "The upload target was not found.";
   return "Upload request failed.";
 }
 
 export async function POST(request: Request) {
+  const locale = getRequestLocale(request);
   try {
     const user = await requireAuth();
     const rateLimit = checkRateLimit(`uploads:${user.id}`, 30, 60_000);
@@ -78,8 +118,8 @@ export async function POST(request: Request) {
     }
 
     const type = uploadType as UploadType;
-    validateFileType(file, type);
-    validateFileSize(file, type);
+    validateFileType(file, type, locale);
+    validateFileSize(file, type, locale);
 
     const authorization = await authorizeUpload({
       type,
@@ -99,7 +139,12 @@ export async function POST(request: Request) {
       });
     }
 
-    return uploadPublic({ type, file, ownerId: authorization.ownerId });
+    return uploadPublic({
+      type,
+      file,
+      ownerId: authorization.ownerId,
+      locale,
+    });
   } catch (error) {
     if (error instanceof StorageValidationError) {
       return jsonError(error.message, 400);
@@ -113,13 +158,18 @@ export async function POST(request: Request) {
     }
     if (error instanceof StorageUploadError) {
       console.error("Supabase Storage upload failed.");
-      return jsonError(error.message, 502);
+      return jsonError(storageRejectedMessage(locale), 502);
     }
     if (error instanceof Response) {
-      return jsonError(await responseMessage(error), error.status);
+      return jsonError(await responseMessage(error, locale), error.status);
     }
     logSafeApiError(error);
-    return jsonError("Upload failed. Check the file type and size.", 500);
+    return jsonError(
+      locale === "ko"
+        ? "업로드에 실패했습니다. 잠시 후 다시 시도해 주세요."
+        : "Upload failed. Please try again.",
+      500,
+    );
   }
 }
 
@@ -200,14 +250,21 @@ async function uploadPublic({
   type,
   file,
   ownerId,
+  locale,
 }: {
   type: UploadType;
   file: File;
   ownerId: string;
+  locale: "en" | "ko";
 }) {
-  const processed = await processMarketplaceImage(
-    Buffer.from(await file.arrayBuffer()),
-  );
+  const originalBuffer = Buffer.from(await file.arrayBuffer());
+  const processed = await processMarketplaceImage(originalBuffer).catch(() => {
+    throw new StorageValidationError(
+      locale === "ko"
+        ? "이미지를 처리할 수 없습니다. 올바른 JPG, PNG, WebP 또는 AVIF 파일을 업로드해주세요."
+        : "This image could not be processed. Please upload a valid JPG, PNG, WebP, or AVIF image.",
+    );
+  });
   const basePath = `${FILE_RULES[type].folder}/${ownerId}/${crypto.randomUUID()}`;
   const paths = {
     original: `${basePath}/original.webp`,

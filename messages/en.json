@@ -420,7 +420,7 @@
     "dropFiles": "Drop PDF or image files here",
     "attachmentHelp": "Large PDF and image files are supported for business documents and product photos.",
     "uploadingAttachment": "Uploading...",
-    "uploadFailed": "Upload failed. Check the file type and size, then try again.",
+    "uploadFailed": "Upload failed because the storage service rejected the file. Please try again.",
     "removeAttachment": "Remove attachment",
     "files": "Files",
     "images": "Images",
