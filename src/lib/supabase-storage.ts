@@ -225,11 +225,10 @@ export function sanitizeStoredFilename(name: string) {
   return (cleaned || "uploaded-file").slice(0, 255);
 }
 
-function storageBodyFromBuffer(body: Buffer) {
-  return body.buffer.slice(
-    body.byteOffset,
-    body.byteOffset + body.byteLength,
-  ) as ArrayBuffer;
+function storageBlobFromBuffer(body: Buffer, contentType: string) {
+  const bytes = new Uint8Array(body.byteLength);
+  bytes.set(body);
+  return new Blob([bytes.buffer as ArrayBuffer], { type: contentType });
 }
 
 export async function uploadPublicFile({
@@ -247,7 +246,7 @@ export async function uploadPublicFile({
   const bucket = getPublicStorageBucket();
   const { error } = await client.storage
     .from(bucket)
-    .upload(path, storageBodyFromBuffer(body), {
+    .upload(path, storageBlobFromBuffer(body, contentType), {
       contentType,
       cacheControl,
       upsert: false,
@@ -271,7 +270,7 @@ export async function uploadPrivateFile({
   const bucket = getPrivateStorageBucket();
   const { error } = await client.storage
     .from(bucket)
-    .upload(path, storageBodyFromBuffer(body), {
+    .upload(path, storageBlobFromBuffer(body, contentType), {
       contentType,
       cacheControl: "3600",
       upsert: false,
@@ -280,6 +279,18 @@ export async function uploadPrivateFile({
     throw new StorageUploadError(error.message || "Storage upload was rejected.");
   }
   return { path };
+}
+
+export async function downloadPublicFileBytes(path: string) {
+  const { data, error } = await getSupabaseAdminClient().storage
+    .from(getPublicStorageBucket())
+    .download(path);
+  if (error || !data) {
+    throw new StorageUploadError(
+      error?.message || "Uploaded file could not be read back.",
+    );
+  }
+  return Buffer.from(await data.arrayBuffer());
 }
 
 export function getPublicFileUrl(path: string) {
