@@ -21,6 +21,10 @@ const criticalCompanyFields = [
   "country",
 ] as const;
 
+const noStoreHeaders = {
+  "Cache-Control": "no-store, no-cache, must-revalidate",
+};
+
 function strings(value: unknown) {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
@@ -228,7 +232,7 @@ export async function GET(request: Request) {
       })),
     });
 
-    return Response.json(companies);
+    return Response.json(companies, { headers: noStoreHeaders });
   } catch (error) {
     return apiError(error);
   }
@@ -544,7 +548,7 @@ export async function PUT(request: Request) {
       useDefaultLogo: savedCompany?.useDefaultLogo ?? null,
     });
 
-    return Response.json(savedCompany);
+    return Response.json(savedCompany, { headers: noStoreHeaders });
   } catch (error) {
     if (error instanceof ApiValidationError) {
       return validationErrorResponse(error);

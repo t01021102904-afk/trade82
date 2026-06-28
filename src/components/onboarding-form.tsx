@@ -210,7 +210,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const { draft, clearDraft, discardDraft } = useDraftBackup<DraftState>(
     `bridgemarket:onboarding-flow:${kind}:${locale}`,
     { step, company, personal, product, sourcing, companyId },
-    dirty && !saving && !uploading,
+    dirty && !saving,
   );
 
   function markDirty() {
@@ -267,10 +267,32 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
       storagePath: image.storagePath,
       ...nextLogo,
     });
-    setCompany((current) => ({
-      ...current,
-      ...nextLogo,
-    }));
+    setCompany((current) => {
+      const nextCompany = {
+        ...current,
+        ...nextLogo,
+      };
+      if (user?.id) {
+        rememberAccountCompany(user.id, {
+          id: companyId || `draft-${kind}`,
+          companyRole: kind,
+          legalName: nextCompany.companyName,
+          tradeName: "",
+          logoOriginalUrl: nextCompany.logoOriginalUrl,
+          logoThumbnailUrl: nextCompany.logoThumbnailUrl,
+          logoUrl: nextCompany.logoUrl,
+          useDefaultLogo: false,
+          website: nextCompany.website,
+          country: kind === "seller" ? SOUTH_KOREA : UNITED_STATES,
+          city: nextCompany.city,
+          stateOrProvince: nextCompany.stateOrProvince,
+          description: nextCompany.description,
+          categories: list(nextCompany.categories),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+      return nextCompany;
+    });
     markDirty();
   }
 

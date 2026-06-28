@@ -270,7 +270,7 @@ function CompanyProfileForm({
   const { draft, clearDraft, discardDraft } = useDraftBackup<CompanyDraft>(
     `bridgemarket:company-draft:${initialCompany.ownerClerkUserId}:${role}`,
     { company, seller, buyer },
-    dirty && !isSaving && !isUploading,
+    dirty && !isSaving,
   );
 
   function markDirty() {
@@ -430,19 +430,25 @@ function CompanyProfileForm({
   }
 
   function updateLogo(image: UploadedListingImage) {
+    const nextCompany = {
+      ...company,
+      logoOriginalUrl: image.originalUrl,
+      logoThumbnailUrl: image.cardUrl,
+      logoUrl: image.mainUrl,
+      useDefaultLogo: false,
+      updatedAt: new Date().toISOString(),
+    };
     debugCompanyLogo("company logo selected", {
       storagePath: image.storagePath,
       originalUrl: image.originalUrl,
       logoThumbnailUrl: image.cardUrl,
       logoUrl: image.mainUrl,
     });
-    setCompany((current) => ({
-      ...current,
-      logoOriginalUrl: image.originalUrl,
-      logoThumbnailUrl: image.cardUrl,
-      logoUrl: image.mainUrl,
-      useDefaultLogo: false,
-    }));
+    rememberAccountCompany(
+      initialCompany.ownerClerkUserId,
+      nextCompany as unknown as CompanyRecord,
+    );
+    setCompany(nextCompany);
     setClearCompanyLogo(false);
     markDirty();
   }

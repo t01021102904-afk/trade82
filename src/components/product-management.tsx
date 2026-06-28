@@ -228,7 +228,7 @@ function ProductEditor({
   const { draft, clearDraft, discardDraft } = useDraftBackup<RichProductFormValue>(
     `bridgemarket:product-editor-draft:${initialProduct.id}`,
     product,
-    dirty && !saving && !uploading,
+    dirty && !saving,
   );
 
   function update<K extends keyof RichProductFormValue>(

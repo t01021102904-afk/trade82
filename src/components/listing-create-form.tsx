@@ -32,7 +32,7 @@ export function ListingCreateForm() {
   const { draft, clearDraft, discardDraft } = useDraftBackup<RichProductFormValue>(
     `bridgemarket:listing-create-draft:${locale}`,
     product,
-    dirty && !submitting && !uploading,
+    dirty && !submitting,
   );
 
   function update<K extends keyof RichProductFormValue>(
