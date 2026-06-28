@@ -75,6 +75,18 @@ function booleanField(
   return typeof source[key] === "boolean" ? source[key] : fallback;
 }
 
+function explicitBooleanField(
+  source: Record<string, unknown>,
+  key: string,
+  fallback: boolean,
+) {
+  if (source[key] === undefined) return fallback;
+  if (typeof source[key] !== "boolean") {
+    throw validationError(`${key} must be true or false.`);
+  }
+  return source[key];
+}
+
 function websiteField(
   source: Record<string, unknown>,
   key: string,
@@ -98,6 +110,78 @@ function debugCompanyLogo(message: string, details: Record<string, unknown>) {
   if (process.env.NODE_ENV !== "production") {
     console.info(`[company-logo] ${message}`, details);
   }
+}
+
+function optionalLogoField(source: Record<string, unknown>, key: string) {
+  if (!(key in source)) return undefined;
+  if (source[key] === null) return null;
+  if (typeof source[key] !== "string") {
+    throw validationError(`${key} must be text.`);
+  }
+  const value = source[key].trim();
+  if (value.length > 1_000) throw validationError(`${key} is too long.`);
+  return value || null;
+}
+
+function logoFieldsForWrite(
+  body: Record<string, unknown>,
+  existing?: {
+    logoOriginalUrl: string | null;
+    logoThumbnailUrl: string | null;
+    logoUrl: string | null;
+    useDefaultLogo: boolean;
+  } | null,
+) {
+  const clearCompanyLogo = explicitBooleanField(body, "clearCompanyLogo", false);
+  const logoOriginalUrl = optionalLogoField(body, "logoOriginalUrl");
+  const logoThumbnailUrl = optionalLogoField(body, "logoThumbnailUrl");
+  const logoUrl = optionalLogoField(body, "logoUrl");
+  const hasIncomingLogo = Boolean(logoOriginalUrl || logoThumbnailUrl || logoUrl);
+
+  if (clearCompanyLogo) {
+    return {
+      logoOriginalUrl: null,
+      logoThumbnailUrl: null,
+      logoUrl: null,
+      useDefaultLogo: true,
+    };
+  }
+
+  if (hasIncomingLogo) {
+    return {
+      logoOriginalUrl: logoOriginalUrl ?? existing?.logoOriginalUrl ?? null,
+      logoThumbnailUrl: logoThumbnailUrl ?? existing?.logoThumbnailUrl ?? null,
+      logoUrl:
+        logoUrl ??
+        logoThumbnailUrl ??
+        logoOriginalUrl ??
+        existing?.logoUrl ??
+        null,
+      useDefaultLogo: booleanField(body, "useDefaultLogo", false),
+    };
+  }
+
+  if (existing) {
+    const existingHasLogo = Boolean(
+      existing.logoOriginalUrl || existing.logoThumbnailUrl || existing.logoUrl,
+    );
+    return {
+      logoOriginalUrl: existing.logoOriginalUrl,
+      logoThumbnailUrl: existing.logoThumbnailUrl,
+      logoUrl: existing.logoUrl,
+      useDefaultLogo:
+        existingHasLogo && body.useDefaultLogo === false
+          ? false
+          : existing.useDefaultLogo,
+    };
+  }
+
+  return {
+    logoOriginalUrl: null,
+    logoThumbnailUrl: null,
+    logoUrl: null,
+    useDefaultLogo: booleanField(body, "useDefaultLogo", true),
+  };
 }
 
 export async function GET(request: Request) {
@@ -201,6 +285,7 @@ export async function PUT(request: Request) {
       ? "needs_reverification"
       : existing?.verificationStatus ??
         (companyRole === "seller" ? "pending_review" : "unverified");
+    const logoWriteFields = logoFieldsForWrite(body, existing);
 
     debugCompanyLogo("saving company logo fields", {
       companyRole,
@@ -209,6 +294,7 @@ export async function PUT(request: Request) {
       logoThumbnailUrl: body.logoThumbnailUrl ?? null,
       logoUrl: body.logoUrl ?? null,
       useDefaultLogo: body.useDefaultLogo ?? null,
+      clearCompanyLogo: body.clearCompanyLogo ?? null,
     });
 
     const company = await getDb().company.upsert({
@@ -223,10 +309,10 @@ export async function PUT(request: Request) {
         companyRole,
         legalName: textField(body, "legalName", "", 160),
         tradeName: nullableTextField(body, "tradeName", null, 160),
-        logoOriginalUrl: nullableTextField(body, "logoOriginalUrl", null, 1_000),
-        logoThumbnailUrl: nullableTextField(body, "logoThumbnailUrl", null, 1_000),
-        logoUrl: nullableTextField(body, "logoUrl", null, 1_000),
-        useDefaultLogo: booleanField(body, "useDefaultLogo", true),
+        logoOriginalUrl: logoWriteFields.logoOriginalUrl,
+        logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
+        logoUrl: logoWriteFields.logoUrl,
+        useDefaultLogo: logoWriteFields.useDefaultLogo,
         website: websiteField(body, "website"),
         country: textField(
           body,
@@ -244,24 +330,10 @@ export async function PUT(request: Request) {
       update: {
         legalName: textField(body, "legalName", existing?.legalName ?? "", 160),
         tradeName: nullableTextField(body, "tradeName", existing?.tradeName ?? null, 160),
-        logoOriginalUrl: nullableTextField(
-          body,
-          "logoOriginalUrl",
-          existing?.logoOriginalUrl ?? null,
-          1_000,
-        ),
-        logoThumbnailUrl: nullableTextField(
-          body,
-          "logoThumbnailUrl",
-          existing?.logoThumbnailUrl ?? null,
-          1_000,
-        ),
-        logoUrl: nullableTextField(body, "logoUrl", existing?.logoUrl ?? null, 1_000),
-        useDefaultLogo: booleanField(
-          body,
-          "useDefaultLogo",
-          existing?.useDefaultLogo ?? true,
-        ),
+        logoOriginalUrl: logoWriteFields.logoOriginalUrl,
+        logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
+        logoUrl: logoWriteFields.logoUrl,
+        useDefaultLogo: logoWriteFields.useDefaultLogo,
         website: websiteField(body, "website", existing?.website ?? ""),
         country: textField(body, "country", existing?.country ?? "", 100),
         city: textField(body, "city", existing?.city ?? "", 100),

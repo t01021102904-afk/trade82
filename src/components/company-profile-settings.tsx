@@ -260,6 +260,7 @@ function CompanyProfileForm({
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [saveQueuedAfterUpload, setSaveQueuedAfterUpload] = useState(false);
+  const [clearCompanyLogo, setClearCompanyLogo] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CompanyFormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
@@ -372,6 +373,7 @@ function CompanyProfileForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...companyForSave,
+          clearCompanyLogo,
           sellerProfile:
             role === "seller"
               ? {
@@ -408,6 +410,7 @@ function CompanyProfileForm({
       });
       rememberAccountCompany(initialCompany.ownerClerkUserId, savedRecord);
       setSaveQueuedAfterUpload(false);
+      setClearCompanyLogo(false);
       const savedProfile = buildCompanyProfile(
         savedRecord,
         role,
@@ -440,6 +443,7 @@ function CompanyProfileForm({
       logoUrl: image.mainUrl,
       useDefaultLogo: false,
     }));
+    setClearCompanyLogo(false);
     markDirty();
   }
 
@@ -450,6 +454,9 @@ function CompanyProfileForm({
     setSaveQueuedAfterUpload(false);
     window.setTimeout(() => formRef.current?.requestSubmit(), 0);
   }
+
+  const companyLogoPreviewUrl =
+    company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl;
 
   return (
     <form ref={formRef} onSubmit={submit} className="grid gap-6" autoComplete="off">
@@ -477,7 +484,7 @@ function CompanyProfileForm({
       <section className="flex flex-wrap items-center gap-4 rounded-lg border border-zinc-200 bg-white p-5">
         <SingleImageUploader
           kind="company_logo"
-          imageUrl={company.logoUrl}
+          imageUrl={companyLogoPreviewUrl}
           label={t("settings.companyLogoUpload")}
           companyId={company.id.startsWith("new-") ? undefined : company.id}
           onUploaded={updateLogo}
@@ -488,7 +495,7 @@ function CompanyProfileForm({
           }}
           onUploadingChange={handleUploadingChange}
         />
-        {company.logoUrl && !company.useDefaultLogo ? (
+        {companyLogoPreviewUrl && !company.useDefaultLogo ? (
           <button
             type="button"
             onClick={() => {
@@ -499,6 +506,7 @@ function CompanyProfileForm({
                 logoUrl: "",
                 useDefaultLogo: true,
               }));
+              setClearCompanyLogo(true);
               markDirty();
             }}
             className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700"
