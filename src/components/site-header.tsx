@@ -14,7 +14,6 @@ import { cx } from "@/lib/utils";
 const navLinks = [
   { href: "/marketplace", labelKey: "nav.marketplace" },
   { href: "/sellers", labelKey: "nav.sellers" },
-  { href: "/buyers", labelKey: "nav.buyers" },
 ];
 
 const appLinks = [
