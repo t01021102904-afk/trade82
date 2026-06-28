@@ -11,6 +11,15 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cjryteuoyiiwsxarblfd.supabase.co",
+        pathname: "/storage/v1/object/public/marketplace-assets/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {
