@@ -65,6 +65,14 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
   };
 }
 
+function companyLogoUrl(company: Record<string, unknown>) {
+  return typeof company.logoThumbnailUrl === "string"
+    ? company.logoThumbnailUrl
+    : typeof company.logoUrl === "string"
+      ? company.logoUrl
+      : undefined;
+}
+
 export function databaseCompanyToSeller(company: Record<string, unknown>): Seller {
   const profile = (company.sellerProfile ?? {}) as Record<string, unknown>;
   const count = (company._count ?? {}) as Record<string, unknown>;
@@ -77,7 +85,7 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
   return {
     id: String(company.id),
     name: String(company.tradeName ?? company.legalName ?? ""),
-    logoUrl: typeof company.logoUrl === "string" ? company.logoUrl : undefined,
+    logoUrl: companyLogoUrl(company),
     useDefaultLogo: company.useDefaultLogo !== false,
     location: [company.city, company.country].filter(Boolean).join(", "),
     state: String(company.stateOrProvince ?? company.city ?? "South Korea"),

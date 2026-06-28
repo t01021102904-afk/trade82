@@ -450,8 +450,18 @@ export function SingleImageUploader({
 
     const result = await uploadImage(file, kind, copy, { companyId, locale });
     if (result.ok) {
+      if (localPreview.current) {
+        URL.revokeObjectURL(localPreview.current);
+        localPreview.current = "";
+      }
+      setPreviewUrl(result.image.mainUrl || result.image.cardUrl || result.image.originalUrl);
       onUploaded(result.image);
     } else {
+      if (localPreview.current) {
+        URL.revokeObjectURL(localPreview.current);
+        localPreview.current = "";
+      }
+      setPreviewUrl(imageUrl ?? "");
       setError(result.error);
     }
     setUploading(false);
@@ -467,12 +477,18 @@ export function SingleImageUploader({
         )}
       >
         {previewUrl ? (
-          <Image
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
             src={previewUrl}
-            alt={`${label} 미리보기`}
-            fill
-            unoptimized
-            className="object-cover"
+            alt=""
+            className="absolute inset-0 size-full object-cover"
+            onError={() => {
+              if (localPreview.current) {
+                URL.revokeObjectURL(localPreview.current);
+                localPreview.current = "";
+              }
+              setPreviewUrl("");
+            }}
           />
         ) : (
           <span className="flex size-full items-center justify-center text-3xl text-zinc-400">

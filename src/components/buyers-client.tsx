@@ -277,7 +277,12 @@ function databaseCompanyToBuyer(
   return {
     id: String(company.id),
     name: cleanBuyerText(company.tradeName ?? company.legalName, fallback, 90),
-    logoUrl: typeof company.logoUrl === "string" ? company.logoUrl : undefined,
+    logoUrl:
+      typeof company.logoThumbnailUrl === "string"
+        ? company.logoThumbnailUrl
+        : typeof company.logoUrl === "string"
+          ? company.logoUrl
+          : undefined,
     useDefaultLogo: company.useDefaultLogo !== false,
     location: formatCompanyLocation(company, locale) || fallback,
     buyerType: buyerTypeLabel(type, locale),
