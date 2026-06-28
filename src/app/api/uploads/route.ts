@@ -15,6 +15,7 @@ import {
   StorageConfigurationError,
   StorageUploadError,
   StorageValidationError,
+  getPublicStorageBucket,
   sanitizeStoredFilename,
   type UploadType,
   uploadPrivateFile,
@@ -55,6 +56,19 @@ function storageRejectedMessage(locale: "en" | "ko") {
   return locale === "ko"
     ? "스토리지 업로드가 실패했습니다. 다시 시도해주세요."
     : "Upload failed because the storage service rejected the file. Please try again.";
+}
+
+function storageRejectedDetailMessage(locale: "en" | "ko", detail: string) {
+  const base = storageRejectedMessage(locale);
+  return detail && detail !== "Storage upload was rejected."
+    ? `${base} ${detail}`
+    : base;
+}
+
+function debugCompanyLogo(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[company-logo] ${message}`, details);
+  }
 }
 
 function unauthenticatedMessage(locale: "en" | "ko") {
@@ -157,8 +171,14 @@ export async function POST(request: Request) {
       );
     }
     if (error instanceof StorageUploadError) {
-      console.error("Supabase Storage upload failed.");
-      return jsonError(storageRejectedMessage(locale), 502);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Supabase Storage upload failed.", {
+          message: error.message,
+        });
+      } else {
+        console.error("Supabase Storage upload failed.");
+      }
+      return jsonError(storageRejectedDetailMessage(locale, error.message), 502);
     }
     if (error instanceof Response) {
       return jsonError(await responseMessage(error, locale), error.status);
@@ -291,6 +311,21 @@ async function uploadPublic({
         return result;
       }),
     );
+
+    if (type === "company_logo") {
+      debugCompanyLogo("uploaded public company logo", {
+        bucket: getPublicStorageBucket(),
+        storagePath: basePath,
+        originalPath: results[0].path,
+        cardPath: results[1].path,
+        mainPath: results[2].path,
+        detailPath: results[3].path,
+        originalUrl: results[0].publicUrl,
+        cardUrl: results[1].publicUrl,
+        mainUrl: results[2].publicUrl,
+        detailUrl: results[3].publicUrl,
+      });
+    }
 
     return Response.json({
       uploadType: type,

@@ -244,7 +244,7 @@ export async function uploadPublicFile({
     upsert: false,
   });
   if (error) {
-    throw new StorageUploadError("Storage upload was rejected.");
+    throw new StorageUploadError(error.message || "Storage upload was rejected.");
   }
   return { path, publicUrl: getPublicFileUrl(path) };
 }
@@ -266,7 +266,7 @@ export async function uploadPrivateFile({
     upsert: false,
   });
   if (error) {
-    throw new StorageUploadError("Storage upload was rejected.");
+    throw new StorageUploadError(error.message || "Storage upload was rejected.");
   }
   return { path };
 }

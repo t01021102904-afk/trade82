@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { SingleImageUploader } from "@/components/image-uploader";
@@ -44,6 +44,12 @@ import type {
   CompanyProfile,
   SellerCompanyProfile,
 } from "@/lib/types";
+
+function debugCompanyLogo(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[company-logo] ${message}`, details);
+  }
+}
 
 function list(value: string) {
   return value
@@ -176,6 +182,14 @@ export function CompanyProfileSettings() {
       .then((companies: CompanyRecord[]) => {
         if (cancelled) return;
         const stored = companies.find((item) => item.companyRole === role);
+        debugCompanyLogo("loaded company profile", {
+          role,
+          companyId: stored?.id ?? null,
+          logoOriginalUrl: stored?.logoOriginalUrl ?? null,
+          logoThumbnailUrl: stored?.logoThumbnailUrl ?? null,
+          logoUrl: stored?.logoUrl ?? null,
+          useDefaultLogo: stored?.useDefaultLogo ?? null,
+        });
         setLoadedProfile(buildCompanyProfile(stored, role, userId));
       });
     return () => {
@@ -245,8 +259,11 @@ function CompanyProfileForm({
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [saveQueuedAfterUpload, setSaveQueuedAfterUpload] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CompanyFormErrors>({});
+  const formRef = useRef<HTMLFormElement>(null);
+  const saveQueuedAfterUploadRef = useRef(false);
   const leaveMessage = t("settings.unsavedChangesWarning");
   useUnsavedChangesWarning(dirty && !isSaving && !isUploading, leaveMessage);
   const { draft, clearDraft, discardDraft } = useDraftBackup<CompanyDraft>(
@@ -322,7 +339,14 @@ function CompanyProfileForm({
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (isSaving || isUploading) return;
+    if (isSaving) return;
+    if (isUploading) {
+      saveQueuedAfterUploadRef.current = true;
+      setSaveQueuedAfterUpload(true);
+      setSaved(false);
+      setError("");
+      return;
+    }
     if (!validate()) return;
 
     setIsSaving(true);
@@ -335,6 +359,14 @@ function CompanyProfileForm({
         country: role === "seller" ? SOUTH_KOREA : UNITED_STATES,
         stateOrProvince: role === "buyer" ? company.stateOrProvince : "",
       };
+      debugCompanyLogo("submitting company profile", {
+        companyId: companyForSave.id,
+        role,
+        logoOriginalUrl: companyForSave.logoOriginalUrl,
+        logoThumbnailUrl: companyForSave.logoThumbnailUrl,
+        logoUrl: companyForSave.logoUrl,
+        useDefaultLogo: companyForSave.useDefaultLogo,
+      });
       const response = await fetch("/api/account/company", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -366,7 +398,16 @@ function CompanyProfileForm({
       }
 
       const savedRecord = (await response.json()) as CompanyRecord;
+      debugCompanyLogo("company save response", {
+        companyId: savedRecord.id ?? null,
+        role: savedRecord.companyRole ?? null,
+        logoOriginalUrl: savedRecord.logoOriginalUrl ?? null,
+        logoThumbnailUrl: savedRecord.logoThumbnailUrl ?? null,
+        logoUrl: savedRecord.logoUrl ?? null,
+        useDefaultLogo: savedRecord.useDefaultLogo ?? null,
+      });
       rememberAccountCompany(initialCompany.ownerClerkUserId, savedRecord);
+      setSaveQueuedAfterUpload(false);
       const savedProfile = buildCompanyProfile(
         savedRecord,
         role,
@@ -386,6 +427,12 @@ function CompanyProfileForm({
   }
 
   function updateLogo(image: UploadedListingImage) {
+    debugCompanyLogo("company logo selected", {
+      storagePath: image.storagePath,
+      originalUrl: image.originalUrl,
+      logoThumbnailUrl: image.cardUrl,
+      logoUrl: image.mainUrl,
+    });
     setCompany((current) => ({
       ...current,
       logoOriginalUrl: image.originalUrl,
@@ -396,8 +443,16 @@ function CompanyProfileForm({
     markDirty();
   }
 
+  function handleUploadingChange(uploading: boolean) {
+    setIsUploading(uploading);
+    if (uploading || !saveQueuedAfterUploadRef.current) return;
+    saveQueuedAfterUploadRef.current = false;
+    setSaveQueuedAfterUpload(false);
+    window.setTimeout(() => formRef.current?.requestSubmit(), 0);
+  }
+
   return (
-    <form onSubmit={submit} className="grid gap-6" autoComplete="off">
+    <form ref={formRef} onSubmit={submit} className="grid gap-6" autoComplete="off">
       {draft ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
           <p>{t("settings.draftAvailable")}</p>
@@ -426,7 +481,12 @@ function CompanyProfileForm({
           label={t("settings.companyLogoUpload")}
           companyId={company.id.startsWith("new-") ? undefined : company.id}
           onUploaded={updateLogo}
-          onUploadingChange={setIsUploading}
+          onUploadError={(message) => {
+            saveQueuedAfterUploadRef.current = false;
+            setSaveQueuedAfterUpload(false);
+            setError(message);
+          }}
+          onUploadingChange={handleUploadingChange}
         />
         {company.logoUrl && !company.useDefaultLogo ? (
           <button
@@ -519,11 +579,22 @@ function CompanyProfileForm({
         </p>
       ) : null}
       <div className="flex items-center gap-3">
-        <button type="submit" disabled={isSaving || isUploading} className="rounded-md bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">
-          {isSaving ? t("settings.saving") : t("settings.saveCompany")}
+        <button type="submit" disabled={isSaving} className="rounded-md bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white disabled:opacity-60">
+          {isSaving
+            ? t("settings.saving")
+            : isUploading
+              ? t("settings.saveAfterUpload")
+              : t("settings.saveCompany")}
         </button>
         {saved ? <span className="text-sm text-emerald-700">{t("settings.saved")}</span> : null}
       </div>
+      {isUploading ? (
+        <p className="text-sm text-amber-700" aria-live="polite">
+          {saveQueuedAfterUpload
+            ? t("settings.logoUploadSaveQueued")
+            : t("settings.logoUploadInProgress")}
+        </p>
+      ) : null}
     </form>
   );
 }

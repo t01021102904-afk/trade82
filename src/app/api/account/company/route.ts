@@ -94,6 +94,12 @@ function websiteField(
   }
 }
 
+function debugCompanyLogo(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[company-logo] ${message}`, details);
+  }
+}
+
 export async function GET(request: Request) {
   try {
     const user = await requireCurrentAppUser();
@@ -124,6 +130,18 @@ export async function GET(request: Request) {
         },
       },
       orderBy: { createdAt: "asc" },
+    });
+
+    debugCompanyLogo("fetched account companies", {
+      count: companies.length,
+      companies: companies.map((company) => ({
+        id: company.id,
+        role: company.companyRole,
+        logoOriginalUrl: company.logoOriginalUrl,
+        logoThumbnailUrl: company.logoThumbnailUrl,
+        logoUrl: company.logoUrl,
+        useDefaultLogo: company.useDefaultLogo,
+      })),
     });
 
     return Response.json(companies);
@@ -183,6 +201,15 @@ export async function PUT(request: Request) {
       ? "needs_reverification"
       : existing?.verificationStatus ??
         (companyRole === "seller" ? "pending_review" : "unverified");
+
+    debugCompanyLogo("saving company logo fields", {
+      companyRole,
+      existingCompanyId: existing?.id ?? null,
+      logoOriginalUrl: body.logoOriginalUrl ?? null,
+      logoThumbnailUrl: body.logoThumbnailUrl ?? null,
+      logoUrl: body.logoUrl ?? null,
+      useDefaultLogo: body.useDefaultLogo ?? null,
+    });
 
     const company = await getDb().company.upsert({
       where: {
@@ -254,6 +281,15 @@ export async function PUT(request: Request) {
         categories: listField(body, "categories", existing?.categories ?? []),
         verificationStatus,
       },
+    });
+
+    debugCompanyLogo("company logo database update result", {
+      companyId: company.id,
+      companyRole: company.companyRole,
+      logoOriginalUrl: company.logoOriginalUrl,
+      logoThumbnailUrl: company.logoThumbnailUrl,
+      logoUrl: company.logoUrl,
+      useDefaultLogo: company.useDefaultLogo,
     });
 
     if (companyRole === "seller") {
@@ -408,26 +444,35 @@ export async function PUT(request: Request) {
       });
     }
 
-    return Response.json(
-      await getDb().company.findUnique({
-        where: { id: company.id },
-        include: {
-          sellerProfile: true,
-          buyerProfile: true,
-          verificationRequests: {
-            orderBy: { createdAt: "desc" },
-            take: 1,
-            select: {
-              id: true,
-              status: true,
-              adminNote: true,
-              documentFilename: true,
-              createdAt: true,
-            },
+    const savedCompany = await getDb().company.findUnique({
+      where: { id: company.id },
+      include: {
+        sellerProfile: true,
+        buyerProfile: true,
+        verificationRequests: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: {
+            id: true,
+            status: true,
+            adminNote: true,
+            documentFilename: true,
+            createdAt: true,
           },
         },
-      }),
-    );
+      },
+    });
+
+    debugCompanyLogo("company profile save response", {
+      companyId: savedCompany?.id ?? null,
+      companyRole: savedCompany?.companyRole ?? null,
+      logoOriginalUrl: savedCompany?.logoOriginalUrl ?? null,
+      logoThumbnailUrl: savedCompany?.logoThumbnailUrl ?? null,
+      logoUrl: savedCompany?.logoUrl ?? null,
+      useDefaultLogo: savedCompany?.useDefaultLogo ?? null,
+    });
+
+    return Response.json(savedCompany);
   } catch (error) {
     if (error instanceof ApiValidationError) {
       return validationErrorResponse(error);
