@@ -454,7 +454,8 @@ export function MessagesClient({
       <aside className="max-h-48 min-h-0 overflow-y-auto border-b border-zinc-200 xl:max-h-none xl:border-b-0 xl:border-r">
         {threads.map((thread) => {
           const company = getCounterparty(thread);
-          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{company.tradeName || company.legalName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
+          const companyName = getCompanyDisplayName(company, t);
+          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{companyName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
         })}
       </aside>
       {selected ? (
@@ -585,7 +586,7 @@ export function MessagesClient({
 
 function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
   const { locale, t } = useI18n();
-  const displayName = getCompanyDisplayName(company);
+  const displayName = getCompanyDisplayName(company, t);
   const profileHref = getPublicProfileHref(company, locale);
   const logo = (
     <CompanyLogo
@@ -651,7 +652,8 @@ function ChatBubble({
   const isMine = Boolean(senderCompanyId && senderCompanyId === viewerCompanyId);
   const senderLabel = isMine
     ? t("messages.you")
-    : getSenderCompanyName(thread, senderCompanyId) || getCompanyDisplayName(getCounterparty(thread));
+    : getSenderCompanyName(thread, senderCompanyId, t) ||
+      getCompanyDisplayName(getCounterparty(thread), t);
 
   return (
     <div id={id} className={`flex w-full scroll-mt-24 ${isMine ? "justify-end" : "justify-start"}`}>
@@ -879,7 +881,9 @@ function AttachmentLibrary({
             <article key={attachment.id} className="rounded-lg border border-zinc-200 p-3">
               <AttachmentCard attachment={attachment} onOpen={() => onOpen(attachment)} />
               <p className="mt-2 truncate text-xs text-zinc-500">
-                {attachment.uploadedByCompany?.tradeName || attachment.uploadedByCompany?.legalName || ""}
+                {attachment.uploadedByCompany
+                  ? getCompanyDisplayName(attachment.uploadedByCompany, t)
+                  : ""}
               </p>
               <p className="mt-1 text-[11px] text-zinc-400">{formatDate(attachment.createdAt)}</p>
               <button
@@ -1107,18 +1111,28 @@ function getInitialMessageSenderCompanyId(thread: InquiryThread) {
   return null;
 }
 
-function getSenderCompanyName(thread: InquiryThread, senderCompanyId: string | null) {
+function getSenderCompanyName(
+  thread: InquiryThread,
+  senderCompanyId: string | null,
+  t?: (key: string, fallback?: string) => string,
+) {
   if (senderCompanyId === thread.buyerCompany.id) {
-    return getCompanyDisplayName(thread.buyerCompany);
+    return getCompanyDisplayName(thread.buyerCompany, t);
   }
   if (senderCompanyId === thread.sellerCompany.id) {
-    return getCompanyDisplayName(thread.sellerCompany);
+    return getCompanyDisplayName(thread.sellerCompany, t);
   }
   return "";
 }
 
-function getCompanyDisplayName(company: { legalName: string; tradeName?: string | null }) {
-  return company.tradeName || company.legalName;
+function getCompanyDisplayName(
+  company: { legalName: string; tradeName?: string | null },
+  t?: (key: string, fallback?: string) => string,
+) {
+  const name = company.tradeName || company.legalName;
+  return name === "Deleted company"
+    ? t?.("messages.deletedUser", "Deleted user") ?? "Deleted user"
+    : name;
 }
 
 function getInquiryLabel(

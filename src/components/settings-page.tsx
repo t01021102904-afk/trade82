@@ -1,5 +1,6 @@
 import { CompanyProfileSettings } from "@/components/company-profile-settings";
 import { ContactProfileSettings } from "@/components/contact-profile-settings";
+import { DeleteAccountDangerZone } from "@/components/delete-account-danger-zone";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary, type Locale } from "@/lib/i18n";
 
@@ -28,7 +29,14 @@ export function SettingsPage({
               : messages.settings.companyProfileDescription
           }
         />
-        {profile ? <ContactProfileSettings /> : <CompanyProfileSettings />}
+        {profile ? (
+          <>
+            <ContactProfileSettings />
+            <DeleteAccountDangerZone />
+          </>
+        ) : (
+          <CompanyProfileSettings />
+        )}
       </div>
     </div>
   );
