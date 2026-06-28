@@ -59,6 +59,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding/buyer
 
 DATABASE_URL=
 DIRECT_URL=
+DATABASE_POOL_MAX=1
 ADMIN_EMAILS=admin@yourdomain.com
 
 NEXT_PUBLIC_SUPABASE_URL=
@@ -69,12 +70,22 @@ SUPABASE_PRIVATE_STORAGE_BUCKET=marketplace-private
 
 RESEND_API_KEY=
 EMAIL_FROM=
+EMAIL_NOTIFICATIONS_ENABLED=false
+
+NEXT_PUBLIC_SITE_URL=https://trade82.com
+SITE_URL=https://trade82.com
 ```
 
 For production sender identity, use a provider-verified domain before setting `EMAIL_FROM` to a branded sender such as `Trade82 <noreply@trade82.com>`.
 
-Use Supabase's pooled connection string for `DATABASE_URL` and direct connection
-string for `DIRECT_URL`. Never commit `.env.local`.
+For Vercel production, `DATABASE_URL` must use the Supabase transaction-mode
+pooler URL. `DIRECT_URL` can use the Supabase session/direct URL for migrations
+and administrative database operations. Do not use the Supabase session-mode
+pooler as the Vercel runtime `DATABASE_URL`; session-mode connections can
+exhaust Supabase session clients under serverless concurrency. Keep
+`DATABASE_POOL_MAX=1` unless load testing proves a higher per-instance limit is
+safe for the selected Supabase plan. Redeploy Vercel after changing any
+production environment variable. Never commit `.env.local`.
 
 ## 6. Already Production-Ready
 
