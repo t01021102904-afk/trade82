@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import type { UploadedListingImage } from "@/lib/marketplace";
@@ -403,6 +403,7 @@ export function ListingImageUploader({
 export function SingleImageUploader({
   kind,
   imageUrl,
+  imageUrls,
   label,
   circular = true,
   onUploaded,
@@ -412,6 +413,7 @@ export function SingleImageUploader({
 }: {
   kind: Exclude<UploadKind, "product_image">;
   imageUrl?: string;
+  imageUrls?: string[];
   label: string;
   circular?: boolean;
   onUploaded: (image: UploadedListingImage) => void;
@@ -425,10 +427,25 @@ export function SingleImageUploader({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const localPreview = useRef("");
+  const savedPreviewKey = (imageUrls?.length ? imageUrls : [imageUrl])
+    .map((url) => url?.trim() ?? "")
+    .join("\n");
+  const savedPreviewUrls = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          savedPreviewKey
+            .split("\n")
+            .map((url) => url?.trim())
+            .filter((url): url is string => Boolean(url)),
+        ),
+      ),
+    [savedPreviewKey],
+  );
 
   useEffect(() => {
-    if (!localPreview.current) setPreviewUrl(imageUrl ?? "");
-  }, [imageUrl]);
+    if (!localPreview.current) setPreviewUrl(savedPreviewUrls[0] ?? "");
+  }, [savedPreviewUrls]);
 
   useEffect(() => {
     return () => {
@@ -498,8 +515,11 @@ export function SingleImageUploader({
               if (localPreview.current) {
                 URL.revokeObjectURL(localPreview.current);
                 localPreview.current = "";
+                setPreviewUrl(savedPreviewUrls[0] ?? "");
+                return;
               }
-              setPreviewUrl("");
+              const failedIndex = savedPreviewUrls.indexOf(previewUrl);
+              setPreviewUrl(savedPreviewUrls[failedIndex + 1] ?? "");
             }}
           />
         ) : (

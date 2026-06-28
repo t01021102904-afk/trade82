@@ -485,6 +485,11 @@ function CompanyProfileForm({
         <SingleImageUploader
           kind="company_logo"
           imageUrl={companyLogoPreviewUrl}
+          imageUrls={[
+            company.logoThumbnailUrl ?? "",
+            company.logoUrl ?? "",
+            company.logoOriginalUrl ?? "",
+          ]}
           label={t("settings.companyLogoUpload")}
           companyId={company.id.startsWith("new-") ? undefined : company.id}
           onUploaded={updateLogo}

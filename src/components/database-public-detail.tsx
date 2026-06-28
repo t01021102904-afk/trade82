@@ -47,6 +47,7 @@ type PublicCompany = {
   companyRole: "seller" | "buyer";
   legalName: string;
   tradeName: string | null;
+  logoOriginalUrl: string | null;
   logoThumbnailUrl: string | null;
   logoUrl: string | null;
   useDefaultLogo: boolean;
@@ -139,7 +140,18 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
       <ViewTracker id={company.id} type="company" />
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6">
         <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-6 sm:flex-row">
-          <CompanyLogo companyName={company.tradeName || company.legalName} logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? undefined} useDefaultLogo={company.useDefaultLogo} size="lg" shape="circle" />
+          <CompanyLogo
+            companyName={company.tradeName || company.legalName}
+            logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? company.logoOriginalUrl ?? undefined}
+            logoUrls={[
+              company.logoThumbnailUrl ?? "",
+              company.logoUrl ?? "",
+              company.logoOriginalUrl ?? "",
+            ]}
+            useDefaultLogo={company.useDefaultLogo}
+            size="lg"
+            shape="circle"
+          />
           <div className="min-w-0">
             <VerificationBadge status="verified" subject={company.companyRole} />
             <h1 className="mt-3 break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
@@ -684,7 +696,9 @@ function publicProductToCard(value: Record<string, unknown>): Product {
         ? company.logoThumbnailUrl
         : typeof company.logoUrl === "string"
           ? company.logoUrl
-          : undefined,
+          : typeof company.logoOriginalUrl === "string"
+            ? company.logoOriginalUrl
+            : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),

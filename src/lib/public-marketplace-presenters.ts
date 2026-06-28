@@ -27,7 +27,9 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
         ? company.logoThumbnailUrl
         : typeof company.logoUrl === "string"
           ? company.logoUrl
-          : undefined,
+          : typeof company.logoOriginalUrl === "string"
+            ? company.logoOriginalUrl
+            : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),
@@ -70,7 +72,9 @@ function companyLogoUrl(company: Record<string, unknown>) {
     ? company.logoThumbnailUrl
     : typeof company.logoUrl === "string"
       ? company.logoUrl
-      : undefined;
+      : typeof company.logoOriginalUrl === "string"
+        ? company.logoOriginalUrl
+        : undefined;
 }
 
 export function databaseCompanyToSeller(company: Record<string, unknown>): Seller {

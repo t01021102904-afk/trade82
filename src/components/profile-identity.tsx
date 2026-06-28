@@ -17,6 +17,16 @@ function initials(value: string) {
   );
 }
 
+function safeLogoCandidates(values: Array<string | undefined>) {
+  return Array.from(
+    new Set(
+      values
+        .map((value) => safeExternalUrl(value))
+        .filter((value): value is string => Boolean(value)),
+    ),
+  );
+}
+
 export function PersonalAvatar({
   name,
   avatarUrl,
@@ -58,6 +68,7 @@ export function PersonalAvatar({
 export function CompanyLogo({
   companyName,
   logoUrl,
+  logoUrls,
   useDefaultLogo,
   size = "md",
   shape = "square",
@@ -65,21 +76,22 @@ export function CompanyLogo({
 }: {
   companyName: string;
   logoUrl?: string;
+  logoUrls?: string[];
   useDefaultLogo: boolean;
   size?: "sm" | "md" | "lg";
   shape?: "square" | "circle";
   className?: string;
 }) {
-  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const [failedUrls, setFailedUrls] = useState<string[]>([]);
   const dimensions = {
     sm: { pixels: 40, classes: "size-10 text-xs" },
     md: { pixels: 64, classes: "size-16 text-lg" },
     lg: { pixels: 80, classes: "size-20 text-xl" },
   }[size];
   const shapeClass = shape === "circle" ? "rounded-full" : "rounded-md";
-  const validLogoUrl = safeExternalUrl(logoUrl);
-  const showImage =
-    !useDefaultLogo && validLogoUrl !== null && failedUrl !== validLogoUrl;
+  const logoCandidates = safeLogoCandidates([...(logoUrls ?? []), logoUrl]);
+  const validLogoUrl = logoCandidates.find((url) => !failedUrls.includes(url));
+  const showImage = !useDefaultLogo && Boolean(validLogoUrl);
 
   if (showImage && validLogoUrl) {
     return (
@@ -89,7 +101,13 @@ export function CompanyLogo({
         width={dimensions.pixels}
         height={dimensions.pixels}
         unoptimized
-        onError={() => setFailedUrl(validLogoUrl)}
+        onError={() =>
+          setFailedUrls((current) =>
+            current.includes(validLogoUrl)
+              ? current
+              : [...current, validLogoUrl],
+          )
+        }
         className={cx(
           "shrink-0 border border-zinc-200 bg-white object-contain",
           dimensions.classes,

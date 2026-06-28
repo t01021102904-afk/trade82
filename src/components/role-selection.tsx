@@ -33,6 +33,12 @@ const roleCards: Array<{
   },
 ];
 
+function debugRoleSelection(message: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[RoleSelection] ${message}`, details);
+  }
+}
+
 export function RoleSelection() {
   const { isLoaded, isSignedIn, user } = useUser();
   const { locale, t } = useI18n();
@@ -57,7 +63,7 @@ export function RoleSelection() {
     setPendingRole(role);
     setError("");
     setStatus(statusText(locale, "callingApi"));
-    console.log("[RoleSelection] calling /api/user/role", { role });
+    debugRoleSelection("calling /api/user/role", { role });
 
     try {
       const response = await fetch("/api/user/role", {
@@ -65,7 +71,7 @@ export function RoleSelection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role }),
       });
-      console.log("[RoleSelection] /api/user/role response", {
+      debugRoleSelection("/api/user/role response", {
         role,
         status: response.status,
       });
@@ -84,11 +90,11 @@ export function RoleSelection() {
 
       await user?.reload();
       const nextRoute = withLocale(`/onboarding/${role}`, locale);
-      console.log("[RoleSelection] pushing route", { role, nextRoute });
+      debugRoleSelection("pushing route", { role, nextRoute });
       setStatus(statusText(locale, "navigating", nextRoute));
       router.push(nextRoute);
     } catch {
-      console.log("[RoleSelection] /api/user/role request failed", { role });
+      debugRoleSelection("/api/user/role request failed", { role });
       setError(t("onboarding.roleError"));
       setStatus("");
       setPendingRole(null);
@@ -106,7 +112,7 @@ export function RoleSelection() {
   }, [isLoaded, saveRole]);
 
   function chooseRole(role: Role) {
-    console.log("[RoleSelection] button clicked", {
+    debugRoleSelection("button clicked", {
       role,
       isLoaded,
       isSignedIn,

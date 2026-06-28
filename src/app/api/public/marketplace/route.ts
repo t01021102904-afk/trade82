@@ -41,6 +41,7 @@ export async function GET() {
               id: true,
               legalName: true,
               tradeName: true,
+              logoOriginalUrl: true,
               logoUrl: true,
               logoThumbnailUrl: true,
               useDefaultLogo: true,
