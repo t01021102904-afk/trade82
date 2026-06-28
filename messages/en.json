@@ -42,6 +42,10 @@
     "logout": "Log out",
     "backToMarketplace": "Back to marketplace"
   },
+  "adminBadge": {
+    "label": "Trade82 team",
+    "ariaLabel": "Trade82 team account"
+  },
   "roles": {
     "generalUser": "General User",
     "koreanSeller": "Korean Seller",

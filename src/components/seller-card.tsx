@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { AdminBadge } from "@/components/admin-badge";
 import { Badge } from "@/components/badge";
 import { ContactModal } from "@/components/contact-modal";
 import { useI18n } from "@/components/i18n-provider";
@@ -25,11 +26,14 @@ export function SellerCard({ seller }: { seller: Seller }) {
           className="size-12"
         />
         <div className="min-w-0">
-          <Link href={withLocale(`/companies/${seller.id}`, locale)}>
+          <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+            <Link href={withLocale(`/companies/${seller.id}`, locale)} className="min-w-0">
             <h3 className="truncate text-lg font-semibold text-zinc-950 transition hover:text-blue-700">
               {seller.name}
             </h3>
           </Link>
+            {seller.isTrade82Team ? <AdminBadge /> : null}
+          </div>
           <p className="mt-1 truncate text-sm text-zinc-500">{seller.location}</p>
         </div>
       </div>

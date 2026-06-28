@@ -1,5 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { getDb } from "@/lib/db";
+import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
@@ -10,7 +11,9 @@ export async function GET() {
           owner: {
             select: {
               displayName: true,
+              email: true,
               jobTitle: true,
+              role: true,
             },
           },
           sellerProfile: true,
@@ -50,6 +53,12 @@ export async function GET() {
               categories: true,
               description: true,
               sellerProfile: true,
+              owner: {
+                select: {
+                  email: true,
+                  role: true,
+                },
+              },
             },
           },
         },
@@ -57,13 +66,32 @@ export async function GET() {
       }),
     ]);
 
+    const publicCompanies = companies.map((company) => {
+      const { owner, ...publicCompany } = company;
+      return {
+        ...publicCompany,
+        owner: {
+          displayName: owner.displayName,
+          jobTitle: owner.jobTitle,
+        },
+        isTrade82Team: isTrade82TeamAccount(owner),
+      };
+    });
+
     return Response.json({
-      companies,
-      products: products.map((product) => ({
-        ...product,
-        priceMin: product.priceMin?.toString() ?? null,
-        priceMax: product.priceMax?.toString() ?? null,
-      })),
+      companies: publicCompanies,
+      products: products.map((product) => {
+        const { owner, ...sellerCompany } = product.sellerCompany;
+        return {
+          ...product,
+          sellerCompany: {
+            ...sellerCompany,
+            isTrade82Team: isTrade82TeamAccount(owner),
+          },
+          priceMin: product.priceMin?.toString() ?? null,
+          priceMax: product.priceMax?.toString() ?? null,
+        };
+      }),
     });
   } catch (error) {
     return apiError(error);

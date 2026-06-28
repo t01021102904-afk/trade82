@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { withLocale } from "@/lib/i18n";
@@ -39,6 +40,7 @@ type ThreadCompany = {
   useDefaultLogo: boolean;
   companyRole: "seller" | "buyer";
   verificationStatus: string;
+  isTrade82Team?: boolean;
 };
 
 type InquiryThread = {
@@ -455,7 +457,7 @@ export function MessagesClient({
         {threads.map((thread) => {
           const company = getCounterparty(thread);
           const companyName = getCompanyDisplayName(company, t);
-          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="truncate font-medium text-zinc-950">{companyName}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
+          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="flex min-w-0 items-center gap-1.5 font-medium text-zinc-950"><span className="truncate">{companyName}</span>{company.isTrade82Team ? <AdminBadge compact /> : null}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
         })}
       </aside>
       {selected ? (
@@ -608,7 +610,10 @@ function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
       <div className="mt-3 flex min-w-0 items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-500">
         {logo}
         <div className="min-w-0">
-          <p className="truncate font-medium text-zinc-700">{displayName}</p>
+          <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium text-zinc-700">
+            <span className="truncate">{displayName}</span>
+            {company.isTrade82Team ? <AdminBadge /> : null}
+          </p>
           <p className="text-xs text-zinc-500">{t("messages.profileNotListed")}</p>
         </div>
       </div>
@@ -623,7 +628,10 @@ function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
     >
       {logo}
       <div className="min-w-0">
-        <p className="truncate font-medium text-zinc-950 hover:underline">{displayName}</p>
+        <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium text-zinc-950">
+          <span className="truncate hover:underline">{displayName}</span>
+          {company.isTrade82Team ? <AdminBadge /> : null}
+        </p>
         <p className="text-xs text-zinc-500">{t("messages.openCompanyProfile")}</p>
       </div>
     </Link>

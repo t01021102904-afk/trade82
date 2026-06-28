@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
 import { SaveButton } from "@/components/save-button";
 import { withLocale } from "@/lib/i18n";
@@ -44,9 +45,10 @@ export function ProductCard({ product }: { product: Product }) {
         <p className="truncate text-lg font-bold text-zinc-950">{product.wholesalePrice}</p>
         <Link
           href={withLocale(`/stores/${product.sellerId}`, locale)}
-          className="min-w-0 truncate text-sm text-zinc-600 hover:text-blue-700"
+          className="flex min-w-0 items-center gap-1.5 text-sm text-zinc-600 hover:text-blue-700"
         >
-          {product.sellerName}
+          <span className="truncate">{product.sellerName}</span>
+          {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
         </Link>
         <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs text-zinc-500">
           <span className="truncate">

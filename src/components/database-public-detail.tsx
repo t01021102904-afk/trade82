@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { AdminBadge } from "@/components/admin-badge";
 import { Badge } from "@/components/badge";
 import { CompanyReviewsSection } from "@/components/company-reviews";
 import { ContactModal } from "@/components/contact-modal";
@@ -94,6 +95,7 @@ type PublicCompany = {
     createdAt: string;
     reviewerCompany: { legalName: string; tradeName: string | null };
   }>;
+  isTrade82Team?: boolean;
 };
 
 type PublicPayload = {
@@ -154,7 +156,10 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
           />
           <div className="min-w-0">
             <VerificationBadge status="verified" subject={company.companyRole} />
-            <h1 className="mt-3 break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
+            <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
+              <h1 className="break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
+              {company.isTrade82Team ? <AdminBadge /> : null}
+            </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
             <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{company.description}</p>
           </div>
@@ -385,7 +390,10 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   size="sm"
                 />
                 <div className="min-w-0">
-                  <p className="break-words font-semibold text-zinc-950">{product.sellerName}</p>
+                  <p className="flex min-w-0 flex-wrap items-center gap-1.5 break-words font-semibold text-zinc-950">
+                    <span>{product.sellerName}</span>
+                    {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
+                  </p>
                   <p className="break-words">{product.sellerLocation}</p>
                 </div>
               </div>
@@ -700,6 +708,7 @@ function publicProductToCard(value: Record<string, unknown>): Product {
             ? company.logoOriginalUrl
             : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
+    sellerIsTrade82Team: company.isTrade82Team === true,
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: priceMin

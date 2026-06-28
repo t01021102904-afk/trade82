@@ -31,6 +31,7 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
             ? company.logoOriginalUrl
             : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
+    sellerIsTrade82Team: company.isTrade82Team === true,
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: price,
@@ -114,6 +115,7 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
     productCount: typeof count.products === "number" ? count.products : 0,
     verified: true,
     verificationStatus: "verified",
+    isTrade82Team: company.isTrade82Team === true,
     description: String(company.description ?? ""),
   };
 }

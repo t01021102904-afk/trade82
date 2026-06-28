@@ -142,6 +142,7 @@ export type Product = {
   sellerLocation: string;
   sellerLogoUrl?: string;
   sellerUseDefaultLogo?: boolean;
+  sellerIsTrade82Team?: boolean;
   shortDescription: string;
   longDescription: string;
   wholesalePrice: string;
@@ -199,6 +200,7 @@ export type Seller = {
   productCount?: number;
   verified: boolean;
   verificationStatus?: VerificationStatus;
+  isTrade82Team?: boolean;
   description: string;
 };
 
@@ -228,6 +230,7 @@ export type Buyer = {
   contactEmail: string;
   verified: boolean;
   verificationStatus?: VerificationStatus;
+  isTrade82Team?: boolean;
 };
 
 export type VerificationSubmission = {

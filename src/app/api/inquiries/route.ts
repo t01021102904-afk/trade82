@@ -13,6 +13,7 @@ import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
@@ -30,8 +31,16 @@ export async function GET() {
         ],
       },
       include: {
-        buyerCompany: true,
-        sellerCompany: true,
+        buyerCompany: {
+          include: {
+            owner: { select: { email: true, role: true } },
+          },
+        },
+        sellerCompany: {
+          include: {
+            owner: { select: { email: true, role: true } },
+          },
+        },
         product: true,
         messages: {
           orderBy: { createdAt: "asc" },
@@ -50,11 +59,26 @@ export async function GET() {
       orderBy: { updatedAt: "desc" },
     });
     return Response.json(
-      inquiries.map((inquiry) => ({ ...inquiry, viewerCompanyIds })),
+      inquiries.map((inquiry) => ({
+        ...inquiry,
+        buyerCompany: publicThreadCompany(inquiry.buyerCompany),
+        sellerCompany: publicThreadCompany(inquiry.sellerCompany),
+        viewerCompanyIds,
+      })),
     );
   } catch (error) {
     return apiError(error);
   }
+}
+
+function publicThreadCompany<T extends { owner: { email: string; role: string } }>(
+  company: T,
+) {
+  const { owner, ...publicCompany } = company;
+  return {
+    ...publicCompany,
+    isTrade82Team: isTrade82TeamAccount(owner),
+  };
 }
 
 export async function POST(request: Request) {

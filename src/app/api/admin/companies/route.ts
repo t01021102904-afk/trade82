@@ -9,6 +9,7 @@ import {
 } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
@@ -17,7 +18,7 @@ export async function GET() {
     const companies = await getDb().company.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        owner: { select: { email: true, displayName: true } },
+        owner: { select: { email: true, displayName: true, role: true } },
         sellerProfile: { select: { id: true } },
         buyerProfile: { select: { id: true } },
         verificationRequests: {
@@ -52,6 +53,7 @@ export async function GET() {
         createdAt: company.createdAt,
         ownerEmail: company.owner.email,
         ownerDisplayName: company.owner.displayName,
+        isTrade82Team: isTrade82TeamAccount(company.owner),
         productCount: company._count.products,
         inquiryCount:
           company.companyRole === "seller"

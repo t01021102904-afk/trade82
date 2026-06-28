@@ -42,6 +42,10 @@
     "logout": "로그아웃",
     "backToMarketplace": "마켓플레이스로 돌아가기"
   },
+  "adminBadge": {
+    "label": "Trade82 운영자",
+    "ariaLabel": "Trade82 운영자 계정"
+  },
   "roles": {
     "generalUser": "일반 유저",
     "koreanSeller": "한국 셀러",

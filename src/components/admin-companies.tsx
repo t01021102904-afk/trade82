@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { AdminBadge } from "@/components/admin-badge";
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
@@ -18,6 +19,7 @@ type AdminCompany = {
   createdAt: string;
   ownerEmail: string;
   ownerDisplayName: string;
+  isTrade82Team: boolean;
   productCount: number;
   inquiryCount: number;
   latestRequest: {
@@ -164,6 +166,7 @@ export function AdminCompanies() {
                 <h3 className="font-semibold text-zinc-950">
                   {company.tradeName || company.legalName}
                 </h3>
+                {company.isTrade82Team ? <AdminBadge /> : null}
                 {company.tradeName ? (
                   <span className="text-sm text-zinc-500">({company.legalName})</span>
                 ) : null}
@@ -176,7 +179,10 @@ export function AdminCompanies() {
               <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <dt className="text-zinc-500">{admin.owner}</dt>
-                  <dd className="truncate font-mono text-xs">{company.ownerEmail}</dd>
+                  <dd className="flex min-w-0 items-center gap-1.5">
+                    <span className="truncate font-mono text-xs">{company.ownerEmail}</span>
+                    {company.isTrade82Team ? <AdminBadge compact /> : null}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-zinc-500">{admin.location}</dt>

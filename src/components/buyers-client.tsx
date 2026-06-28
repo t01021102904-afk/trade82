@@ -309,6 +309,7 @@ function databaseCompanyToBuyer(
     contactEmail: "",
     verified: true,
     verificationStatus: "verified",
+    isTrade82Team: company.isTrade82Team === true,
   };
 }
 

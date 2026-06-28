@@ -1,9 +1,9 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { AdminBadge } from "@/components/admin-badge";
 import {
   DashboardClient,
   type DashboardSection,
@@ -12,6 +12,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { VerificationBadge } from "@/components/verification-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 import type { VerificationStatus } from "@/lib/types";
 
@@ -35,7 +36,7 @@ type DashboardCompany = {
 };
 
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
-  const { isLoaded, user } = useUser();
+  const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
   const userId = user?.id ?? "";
   const [company, setCompany] = useState<DashboardCompany | null | undefined>(
@@ -162,9 +163,12 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                 size="lg"
               />
               <div className="min-w-0">
-                <h1 className="truncate text-2xl font-semibold text-zinc-950">
-                  {company.tradeName || company.legalName}
-                </h1>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <h1 className="truncate text-2xl font-semibold text-zinc-950">
+                    {company.tradeName || company.legalName}
+                  </h1>
+                  {context?.isAdmin ? <AdminBadge /> : null}
+                </div>
                 <p className="mt-1 text-sm text-zinc-500">
                   {role === "seller"
                     ? t("onboarding.roleSellerTitle")
