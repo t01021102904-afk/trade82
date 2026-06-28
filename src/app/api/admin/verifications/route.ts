@@ -20,9 +20,47 @@ export async function GET() {
     await requireDatabaseAdmin();
     const [requests, reviews] = await Promise.all([
       getDb().verificationRequest.findMany({
-        include: {
+        select: {
+          id: true,
+          status: true,
+          adminNote: true,
+          documentFilename: true,
+          createdAt: true,
+          reviewedAt: true,
           company: {
-            include: { owner: true, sellerProfile: true, buyerProfile: true },
+            select: {
+              id: true,
+              legalName: true,
+              tradeName: true,
+              companyRole: true,
+              website: true,
+              businessAddress: true,
+              country: true,
+              stateOrProvince: true,
+              city: true,
+              description: true,
+              categories: true,
+              verificationStatus: true,
+              logoOriginalUrl: true,
+              logoThumbnailUrl: true,
+              logoUrl: true,
+              useDefaultLogo: true,
+              owner: {
+                select: {
+                  email: true,
+                  displayName: true,
+                },
+              },
+              sellerProfile: true,
+              buyerProfile: true,
+              _count: {
+                select: {
+                  products: true,
+                  buyerInquiries: true,
+                  sellerInquiries: true,
+                },
+              },
+            },
           },
         },
         orderBy: { createdAt: "desc" },
@@ -34,13 +72,7 @@ export async function GET() {
       }),
     ]);
     return Response.json({
-      requests: requests.map(
-        ({ documentPath: _documentPath, documentUrl: _documentUrl, ...item }) => {
-          void _documentPath;
-          void _documentUrl;
-          return item;
-        },
-      ),
+      requests,
       reviews: reviews.map((review) => ({
         ...review,
         contractValue: review.contractValue.toString(),
@@ -105,6 +137,18 @@ export async function POST(request: Request) {
           adminNote:
             stringField(body, "adminNote", { max: 2_000, fallback: undefined }) ??
             undefined,
+        },
+      }),
+      getDb().verificationRequest.updateMany({
+        where: {
+          companyId: verificationRequest.companyId,
+          id: { not: requestId },
+          status: "pending_review",
+        },
+        data: {
+          status: verificationStatus,
+          reviewedByUserId: admin.id,
+          reviewedAt: new Date(),
         },
       }),
       getDb().company.update({
