@@ -72,6 +72,26 @@ type CompanyDraft = LoadedCompanyProfile;
 
 type CompanyRecord = AccountCompanyRecord;
 
+const companyFormSnapshots = new Map<string, CompanyDraft>();
+
+function companySnapshotKey(ownerUserId: string, role: "seller" | "buyer") {
+  return `${ownerUserId}:${role}`;
+}
+
+function rememberCompanyFormSnapshot(key: string, draft: CompanyDraft) {
+  companyFormSnapshots.set(key, draft);
+  debugCompanyLogo("remembered company form snapshot", {
+    key,
+    companyId: draft.company.id,
+    role: draft.company.companyRole,
+    logoOriginalUrl: draft.company.logoOriginalUrl,
+    logoThumbnailUrl: draft.company.logoThumbnailUrl,
+    logoUrl: draft.company.logoUrl,
+    useDefaultLogo: draft.company.useDefaultLogo,
+    updatedAt: draft.company.updatedAt,
+  });
+}
+
 type CompanyFormErrors = Partial<
   Record<
     "legalName" | "country" | "city" | "stateOrProvince" | "businessAddress" | "website",
@@ -173,6 +193,7 @@ export function CompanyProfileSettings() {
   const userId = user?.id ?? "";
   const [loadedProfile, setLoadedProfile] =
     useState<LoadedCompanyProfile | null>(null);
+  const effectiveRole = role ?? loadedProfile?.company.companyRole ?? null;
 
   useEffect(() => {
     if (!isLoaded || !userId || !role) return;
@@ -220,12 +241,13 @@ export function CompanyProfileSettings() {
   }
 
   if (
-    !isLoaded ||
-    !user ||
-    !role ||
     !loadedProfile ||
-    loadedProfile.company.ownerClerkUserId !== user.id ||
-    loadedProfile.company.companyRole !== role
+    !effectiveRole ||
+    (isLoaded && !user) ||
+    (isLoaded &&
+      user &&
+      (loadedProfile.company.ownerClerkUserId !== user.id ||
+        loadedProfile.company.companyRole !== effectiveRole))
   ) {
     return <div className="text-sm text-zinc-600">{t("common.loading")}</div>;
   }
@@ -252,9 +274,20 @@ function CompanyProfileForm({
   initialBuyer: BuyerCompanyProfile;
 }) {
   const { locale, t } = useI18n();
-  const [company, setCompany] = useState(initialCompany);
-  const [seller, setSeller] = useState(initialSeller);
-  const [buyer, setBuyer] = useState(initialBuyer);
+  const formSnapshotKey = companySnapshotKey(
+    initialCompany.ownerClerkUserId,
+    role,
+  );
+  const initialSnapshot = companyFormSnapshots.get(formSnapshotKey);
+  const [company, setCompany] = useState(
+    () => initialSnapshot?.company ?? initialCompany,
+  );
+  const [seller, setSeller] = useState(
+    () => initialSnapshot?.seller ?? initialSeller,
+  );
+  const [buyer, setBuyer] = useState(
+    () => initialSnapshot?.buyer ?? initialBuyer,
+  );
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -273,6 +306,10 @@ function CompanyProfileForm({
     dirty && !isSaving,
   );
 
+  useEffect(() => {
+    rememberCompanyFormSnapshot(formSnapshotKey, { company, seller, buyer });
+  }, [buyer, company, formSnapshotKey, seller]);
+
   function markDirty() {
     setDirty(true);
     setSaved(false);
@@ -283,7 +320,15 @@ function CompanyProfileForm({
     key: K,
     value: CompanyProfile[K],
   ) {
-    setCompany((current) => ({ ...current, [key]: value }));
+    setCompany((current) => {
+      const nextCompany = { ...current, [key]: value };
+      rememberCompanyFormSnapshot(formSnapshotKey, {
+        company: nextCompany,
+        seller,
+        buyer,
+      });
+      return nextCompany;
+    });
     if (
       key === "legalName" ||
       key === "country" ||
@@ -328,6 +373,7 @@ function CompanyProfileForm({
 
   function restoreDraft() {
     if (!draft) return;
+    rememberCompanyFormSnapshot(formSnapshotKey, draft);
     setCompany(draft.company);
     setSeller(draft.seller);
     setBuyer(draft.buyer);
@@ -416,6 +462,7 @@ function CompanyProfileForm({
         role,
         initialCompany.ownerClerkUserId,
       );
+      rememberCompanyFormSnapshot(formSnapshotKey, savedProfile);
       setCompany(savedProfile.company);
       setSeller(savedProfile.seller);
       setBuyer(savedProfile.buyer);
@@ -448,6 +495,11 @@ function CompanyProfileForm({
       initialCompany.ownerClerkUserId,
       nextCompany as unknown as CompanyRecord,
     );
+    rememberCompanyFormSnapshot(formSnapshotKey, {
+      company: nextCompany,
+      seller,
+      buyer,
+    });
     setCompany(nextCompany);
     setClearCompanyLogo(false);
     markDirty();
@@ -514,13 +566,21 @@ function CompanyProfileForm({
           <button
             type="button"
             onClick={() => {
-              setCompany((current) => ({
-                ...current,
-                logoOriginalUrl: "",
-                logoThumbnailUrl: "",
-                logoUrl: "",
-                useDefaultLogo: true,
-              }));
+              setCompany((current) => {
+                const nextCompany = {
+                  ...current,
+                  logoOriginalUrl: "",
+                  logoThumbnailUrl: "",
+                  logoUrl: "",
+                  useDefaultLogo: true,
+                };
+                rememberCompanyFormSnapshot(formSnapshotKey, {
+                  company: nextCompany,
+                  seller,
+                  buyer,
+                });
+                return nextCompany;
+              });
               setClearCompanyLogo(true);
               markDirty();
             }}
