@@ -225,6 +225,13 @@ export function sanitizeStoredFilename(name: string) {
   return (cleaned || "uploaded-file").slice(0, 255);
 }
 
+function storageBodyFromBuffer(body: Buffer) {
+  return body.buffer.slice(
+    body.byteOffset,
+    body.byteOffset + body.byteLength,
+  ) as ArrayBuffer;
+}
+
 export async function uploadPublicFile({
   path,
   body,
@@ -238,11 +245,13 @@ export async function uploadPublicFile({
 }) {
   const client = getSupabaseAdminClient();
   const bucket = getPublicStorageBucket();
-  const { error } = await client.storage.from(bucket).upload(path, body, {
-    contentType,
-    cacheControl,
-    upsert: false,
-  });
+  const { error } = await client.storage
+    .from(bucket)
+    .upload(path, storageBodyFromBuffer(body), {
+      contentType,
+      cacheControl,
+      upsert: false,
+    });
   if (error) {
     throw new StorageUploadError(error.message || "Storage upload was rejected.");
   }
@@ -260,11 +269,13 @@ export async function uploadPrivateFile({
 }) {
   const client = getSupabaseAdminClient();
   const bucket = getPrivateStorageBucket();
-  const { error } = await client.storage.from(bucket).upload(path, body, {
-    contentType,
-    cacheControl: "3600",
-    upsert: false,
-  });
+  const { error } = await client.storage
+    .from(bucket)
+    .upload(path, storageBodyFromBuffer(body), {
+      contentType,
+      cacheControl: "3600",
+      upsert: false,
+    });
   if (error) {
     throw new StorageUploadError(error.message || "Storage upload was rejected.");
   }
