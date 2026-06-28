@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 import {
   formatBytes,
@@ -588,8 +589,9 @@ export function MessagesClient({
 
 function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
   const { locale, t } = useI18n();
+  const { context: userContext } = useUserContext();
   const displayName = getCompanyDisplayName(company, t);
-  const profileHref = getPublicProfileHref(company, locale);
+  const profileHref = getPublicProfileHref(company, locale, userContext?.isAdmin === true);
   const logo = (
     <CompanyLogo
       companyName={displayName}
@@ -1100,8 +1102,12 @@ function getCounterparty(thread: InquiryThread) {
   return thread.sellerCompany;
 }
 
-function getPublicProfileHref(company: ThreadCompany, locale: "en" | "ko") {
-  if (company.verificationStatus !== "verified") return "";
+function getPublicProfileHref(
+  company: ThreadCompany,
+  locale: "en" | "ko",
+  allowUnlisted = false,
+) {
+  if (!allowUnlisted && company.verificationStatus !== "verified") return "";
   const path =
     company.companyRole === "buyer"
       ? `/buyers/${company.id}`
@@ -1138,6 +1144,9 @@ function getCompanyDisplayName(
   t?: (key: string, fallback?: string) => string,
 ) {
   const name = company.tradeName || company.legalName;
+  if (name === "Trade82 team") {
+    return t?.("adminBadge.label", "Trade82 team") ?? "Trade82 team";
+  }
   return name === "Deleted company"
     ? t?.("messages.deletedUser", "Deleted user") ?? "Deleted user"
     : name;

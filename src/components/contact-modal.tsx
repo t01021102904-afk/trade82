@@ -79,6 +79,7 @@ export function ContactModal({
   const redirecting = useRef(false);
   const queuedOpen = useRef(false);
   const details = useMemo(() => contextDetails(context), [context]);
+  const isAdmin = userContext?.isAdmin === true;
 
   const redirectToLogin = useCallback(() => {
     if (typeof window === "undefined" || redirecting.current) return;
@@ -110,7 +111,7 @@ export function ContactModal({
     const ownsTarget = userContext?.companies.some(
       (company) => company.id === details.targetCompanyId,
     );
-    if (ownsTarget) {
+    if (!isAdmin && ownsTarget) {
       setError(t("contact.ownCompany"));
       return;
     }
@@ -120,7 +121,7 @@ export function ContactModal({
     const hasSenderCompany = userContext?.companies.some(
       (company) => company.companyRole === requiredSenderRole,
     );
-    if (userContext && !hasSenderCompany) {
+    if (!isAdmin && userContext && !hasSenderCompany) {
       setProfileRole(requiredSenderRole);
       setError(t("contact.completeProfileBeforeContact"));
       return;
@@ -164,7 +165,7 @@ export function ContactModal({
     } finally {
       setSubmitting(false);
     }
-  }, [details, isSignedIn, locale, redirectToLogin, router, t, userContext]);
+  }, [details, isAdmin, isSignedIn, locale, redirectToLogin, router, t, userContext]);
 
   useEffect(() => {
     if (!isLoaded || !queuedOpen.current) return;

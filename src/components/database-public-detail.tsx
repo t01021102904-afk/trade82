@@ -41,7 +41,7 @@ import {
   UNITED_STATES,
 } from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
-import type { Product } from "@/lib/types";
+import type { Product, VerificationStatus } from "@/lib/types";
 
 type PublicCompany = {
   id: string;
@@ -58,6 +58,7 @@ type PublicCompany = {
   website: string;
   description: string;
   categories: string[];
+  verificationStatus: VerificationStatus;
   owner?: {
     displayName: string;
     jobTitle: string;
@@ -155,7 +156,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
             shape="circle"
           />
           <div className="min-w-0">
-            <VerificationBadge status="verified" subject={company.companyRole} />
+            <VerificationBadge status={company.verificationStatus} subject={company.companyRole} />
             <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
               <h1 className="break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
@@ -376,7 +377,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
           />
           <div className="flex min-w-0 flex-col justify-between gap-8">
             <div className="min-w-0">
-              <VerificationBadge status="verified" subject="seller" />
+              <VerificationBadge status={product.verificationStatus ?? "verified"} subject="seller" />
               <p className="mt-5 break-words text-sm font-medium text-blue-700">{product.category}</p>
               <h1 className="mt-2 break-words text-4xl font-semibold text-zinc-950">{product.name}</h1>
               <p className="mt-4 max-w-2xl break-words text-base leading-7 text-zinc-600">
@@ -742,7 +743,7 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)),
     tags: arrayOfStrings(value.tags),
     createdAt: String(value.createdAt ?? new Date().toISOString()),
-    verificationStatus: "verified",
+    verificationStatus: String(company.verificationStatus ?? "verified") as VerificationStatus,
   };
 }
 

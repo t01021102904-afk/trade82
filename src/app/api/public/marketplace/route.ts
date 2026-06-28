@@ -1,12 +1,14 @@
 import { apiError } from "@/lib/api-response";
+import { isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
+    const admin = await isAdminUser();
     const [companies, products] = await Promise.all([
       getDb().company.findMany({
-        where: { verificationStatus: "verified" },
+        where: admin ? {} : { verificationStatus: "verified" },
         include: {
           owner: {
             select: {
@@ -33,10 +35,12 @@ export async function GET() {
         },
       }),
       getDb().product.findMany({
-        where: {
-          status: "active",
-          sellerCompany: { verificationStatus: "verified" },
-        },
+        where: admin
+          ? {}
+          : {
+              status: "active",
+              sellerCompany: { verificationStatus: "verified" },
+            },
         include: {
           images: { orderBy: { position: "asc" } },
           sellerCompany: {

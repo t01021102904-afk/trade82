@@ -9,7 +9,11 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireAuth } from "@/lib/authz";
+import { isAdminUser, requireAuth } from "@/lib/authz";
+import {
+  getOrCreateTrade82TeamCompany,
+  isTrade82TeamCompanyName,
+} from "@/lib/admin-team-company";
 import { getDb } from "@/lib/db";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
 import { checkRateLimit } from "@/lib/rate-limit";
@@ -18,16 +22,30 @@ import { isTrade82TeamAccount } from "@/lib/trade82-team";
 export async function GET() {
   try {
     const user = await requireAuth();
+    const admin = await isAdminUser();
     const viewerCompanies = await getDb().company.findMany({
       where: { ownerUserId: user.id },
       select: { id: true },
     });
-    const viewerCompanyIds = viewerCompanies.map((company) => company.id);
     const inquiries = await getDb().inquiry.findMany({
       where: {
         OR: [
           { senderUserId: user.id },
           { recipientCompany: { ownerUserId: user.id } },
+          ...(admin
+            ? [
+                {
+                  buyerCompany: {
+                    OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
+                  },
+                },
+                {
+                  sellerCompany: {
+                    OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
+                  },
+                },
+              ]
+            : []),
         ],
       },
       include: {
@@ -58,6 +76,18 @@ export async function GET() {
       },
       orderBy: { updatedAt: "desc" },
     });
+    const viewerCompanyIds = [
+      ...viewerCompanies.map((company) => company.id),
+      ...(admin
+        ? inquiries.flatMap((inquiry) =>
+            [inquiry.buyerCompany, inquiry.sellerCompany]
+              .filter((company) =>
+                isTrade82TeamCompanyName(company.tradeName || company.legalName),
+              )
+              .map((company) => company.id),
+          )
+        : []),
+    ];
     return Response.json(
       inquiries.map((inquiry) => ({
         ...inquiry,
@@ -84,6 +114,7 @@ function publicThreadCompany<T extends { owner: { email: string; role: string } 
 export async function POST(request: Request) {
   try {
     const user = await requireAuth();
+    const admin = await isAdminUser();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "inquiries",
@@ -110,7 +141,10 @@ export async function POST(request: Request) {
 
     const product = productId
       ? await getDb().product.findFirst({
-          where: { id: productId, status: "active" },
+          where: {
+            id: productId,
+            ...(admin ? {} : { status: "active" }),
+          },
           include: { sellerCompany: true },
         })
       : null;
@@ -133,14 +167,17 @@ export async function POST(request: Request) {
     const targetCompany = product?.sellerCompany ?? await getDb().company.findUnique({
       where: { id: targetCompanyId },
     });
-    if (!targetCompany || targetCompany.verificationStatus !== "verified") {
+    if (
+      !targetCompany ||
+      (!admin && targetCompany.verificationStatus !== "verified")
+    ) {
       return Response.json(
         { error: "This company is not available for contact.", code: "target_unavailable" },
         { status: 404 },
       );
     }
 
-    if (targetCompany.ownerUserId === user.id) {
+    if (!admin && targetCompany.ownerUserId === user.id) {
       return Response.json(
         { error: "You cannot contact your own company.", code: "own_company" },
         { status: 409 },
@@ -148,12 +185,14 @@ export async function POST(request: Request) {
     }
 
     const senderRole = targetCompany.companyRole === "seller" ? "buyer" : "seller";
-    const senderCompany = await getDb().company.findFirst({
-      where: {
-        ownerUserId: user.id,
-        companyRole: senderRole,
-      },
-    });
+    const senderCompany = admin
+      ? await getOrCreateTrade82TeamCompany(senderRole)
+      : await getDb().company.findFirst({
+          where: {
+            ownerUserId: user.id,
+            companyRole: senderRole,
+          },
+        });
 
     if (!senderCompany) {
       return Response.json(

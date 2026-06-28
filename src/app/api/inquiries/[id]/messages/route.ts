@@ -9,6 +9,7 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
+import { isAdminUser } from "@/lib/authz";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
@@ -21,6 +22,7 @@ export async function POST(
 ) {
   try {
     const user = await requireCurrentAppUser();
+    const admin = await isAdminUser();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "messages",
@@ -39,6 +41,20 @@ export async function POST(
         OR: [
           { senderUserId: user.id },
           { recipientCompany: { ownerUserId: user.id } },
+          ...(admin
+            ? [
+                {
+                  buyerCompany: {
+                    OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
+                  },
+                },
+                {
+                  sellerCompany: {
+                    OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
+                  },
+                },
+              ]
+            : []),
         ],
       },
     });
@@ -64,11 +80,20 @@ export async function POST(
         id: { in: [inquiry.buyerCompanyId, inquiry.sellerCompanyId] },
       },
     });
-    if (!senderCompany) {
+    const adminSenderCompany = !senderCompany && admin
+      ? await getDb().company.findFirst({
+          where: {
+            id: { in: [inquiry.buyerCompanyId, inquiry.sellerCompanyId] },
+            OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
+          },
+        })
+      : null;
+    const activeSenderCompany = senderCompany ?? adminSenderCompany;
+    if (!activeSenderCompany) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
     const receiverCompanyId =
-      senderCompany.id === inquiry.buyerCompanyId
+      activeSenderCompany.id === inquiry.buyerCompanyId
         ? inquiry.sellerCompanyId
         : inquiry.buyerCompanyId;
     const attachments = attachmentIds.length
@@ -77,7 +102,7 @@ export async function POST(
             id: { in: attachmentIds },
             inquiryId: inquiry.id,
             uploadedByUserId: user.id,
-            uploadedByCompanyId: senderCompany.id,
+            uploadedByCompanyId: activeSenderCompany.id,
             messageId: null,
             status: "restricted",
           },
@@ -97,7 +122,7 @@ export async function POST(
         data: {
           inquiryId: inquiry.id,
           senderUserId: user.id,
-          senderCompanyId: senderCompany.id,
+          senderCompanyId: activeSenderCompany.id,
           receiverCompanyId,
           body: messageBody.trim(),
           contentHash: sha256Hex(messageBody.trim()),
@@ -110,7 +135,7 @@ export async function POST(
             id: { in: attachmentIds },
             inquiryId: inquiry.id,
             uploadedByUserId: user.id,
-            uploadedByCompanyId: senderCompany.id,
+            uploadedByCompanyId: activeSenderCompany.id,
             messageId: null,
             status: "restricted",
           },
@@ -141,7 +166,7 @@ export async function POST(
       messageId: message.id,
       inquiryId: inquiry.id,
       senderUserId: user.id,
-      senderCompanyName: senderCompany.tradeName || senderCompany.legalName,
+      senderCompanyName: activeSenderCompany.tradeName || activeSenderCompany.legalName,
       receiverCompanyId,
       body: message.body,
       attachmentCount: message.attachments.length,

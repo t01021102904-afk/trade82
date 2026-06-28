@@ -6,13 +6,22 @@ import {
   requiredIdField,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireBuyer } from "@/lib/authz";
+import { isAdminUser, requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
 
+async function requireSavedItemsAccess() {
+  const user = await requireAuth();
+  const admin = await isAdminUser();
+  if (!admin && user.role !== "buyer" && user.role !== "both") {
+    throw new Response("Buyer role required", { status: 403 });
+  }
+  return { user, admin };
+}
+
 export async function GET() {
   try {
-    const { user } = await requireBuyer();
+    const { user } = await requireSavedItemsAccess();
     const items = await getDb().savedItem.findMany({
       where: { userId: user.id },
       include: {
@@ -57,7 +66,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { user } = await requireBuyer();
+    const { user, admin } = await requireSavedItemsAccess();
 
     const rateLimit = checkRateLimit(`saves:${user.id}`, 60, 60_000);
     if (!rateLimit.allowed) {
@@ -70,7 +79,7 @@ export async function POST(request: Request) {
     const body = await readJsonObject(request);
     const type = enumField(body, "type", ["company", "product"], "product");
     const targetId = requiredIdField(body, "id");
-    const target = await resolveTarget(type, targetId);
+    const target = await resolveTarget(type, targetId, admin);
     if (!target) {
       return Response.json({ error: "Not found" }, { status: 404 });
     }
@@ -108,13 +117,21 @@ export async function POST(request: Request) {
   }
 }
 
-async function resolveTarget(type: "product" | "company", targetId: string) {
+async function resolveTarget(
+  type: "product" | "company",
+  targetId: string,
+  admin = false,
+) {
   if (type === "product") {
     const product = await getDb().product.findFirst({
       where: {
         id: targetId,
-        status: "active",
-        sellerCompany: { verificationStatus: "verified" },
+        ...(admin
+          ? {}
+          : {
+              status: "active",
+              sellerCompany: { verificationStatus: "verified" },
+            }),
       },
       select: { id: true, name: true, imageUrl: true },
     });
@@ -130,7 +147,10 @@ async function resolveTarget(type: "product" | "company", targetId: string) {
   }
 
   const company = await getDb().company.findFirst({
-    where: { id: targetId, verificationStatus: "verified" },
+    where: {
+      id: targetId,
+      ...(admin ? {} : { verificationStatus: "verified" }),
+    },
     select: {
       id: true,
       legalName: true,

@@ -1,11 +1,11 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
@@ -46,7 +46,7 @@ export function SaveButton({
 }) {
   const { locale, t } = useI18n();
   const pathname = usePathname();
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { context: userContext, isLoaded, isSignedIn, user } = useUserContext();
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
   const [waitingForSession, setWaitingForSession] = useState(false);
@@ -56,7 +56,11 @@ export function SaveButton({
   const queuedToggle = useRef(false);
   const redirecting = useRef(false);
   const role = user?.publicMetadata.role;
-  const canUseSavedItems = role === "buyer" || role === "both";
+  const canUseSavedItems =
+    role === "buyer" ||
+    role === "both" ||
+    role === "admin" ||
+    userContext?.isAdmin === true;
   const userId = isSignedIn && canUseSavedItems ? user?.id : "";
   const savedItemsKey = userId ? `${userId}:${id}` : "";
   const savedItemsReady = !userId || loadedSavedKey === savedItemsKey;
