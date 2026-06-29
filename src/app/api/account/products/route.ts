@@ -22,6 +22,7 @@ import {
   isMarketplaceCategory,
   parseUploadedImages,
 } from "@/lib/marketplace";
+import { parseProductFieldVisibilityInput } from "@/lib/product-field-visibility";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
     const moqUnit = allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
     const leadTime = allowedOption(body.leadTime, getLeadTimeOptions("en"));
     const images = parseUploadedImages(body.images);
+    const fieldVisibility = parseProductFieldVisibilityInput(body.fieldVisibility);
 
     if (!name) {
       return Response.json({ error: "상품명을 입력해 주시기 바랍니다." }, { status: 400 });
@@ -229,6 +231,7 @@ export async function POST(request: Request) {
           body.suggestedUsChannels,
           getSalesChannelOptions("en"),
         ),
+        fieldVisibility,
         exportReadiness: body.exportReadiness === true,
         status:
           body.status === "inactive" || body.status === "draft"

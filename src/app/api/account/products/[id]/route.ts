@@ -22,6 +22,7 @@ import {
   isMarketplaceCategory,
   parseUploadedImages,
 } from "@/lib/marketplace";
+import { parseProductFieldVisibilityInput } from "@/lib/product-field-visibility";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -289,6 +290,10 @@ export async function PATCH(
           body.suggestedUsChannels === undefined
             ? undefined
             : allowedList(body.suggestedUsChannels, getSalesChannelOptions("en")),
+        fieldVisibility:
+          body.fieldVisibility === undefined
+            ? undefined
+            : parseProductFieldVisibilityInput(body.fieldVisibility),
         exportReadiness:
           typeof body.exportReadiness === "boolean"
             ? body.exportReadiness

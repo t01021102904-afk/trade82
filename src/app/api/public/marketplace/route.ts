@@ -1,10 +1,14 @@
 import { apiError } from "@/lib/api-response";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
+import { maskProductFieldsForViewer } from "@/lib/product-field-visibility";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
+    const profile = await getCurrentUserProfile().catch(() => null);
+    const admin = profile ? await isAdminUser().catch(() => false) : false;
     const [companies, products] = await Promise.all([
       getDb().company.findMany({
         where: {
@@ -60,6 +64,7 @@ export async function GET() {
               categories: true,
               description: true,
               sellerProfile: true,
+              ownerUserId: true,
               owner: {
                 select: {
                   email: true,
@@ -88,15 +93,22 @@ export async function GET() {
     return Response.json({
       companies: publicCompanies,
       products: products.map((product) => {
-        const { owner, ...sellerCompany } = product.sellerCompany;
+        const canViewSensitiveFields =
+          admin || Boolean(profile?.id && product.sellerCompany.ownerUserId === profile.id);
+        const visibleProduct = maskProductFieldsForViewer(
+          product,
+          canViewSensitiveFields,
+        );
+        const { owner, ownerUserId, ...sellerCompany } = visibleProduct.sellerCompany;
+        void ownerUserId;
         return {
-          ...product,
+          ...visibleProduct,
           sellerCompany: {
             ...sellerCompany,
             isTrade82Team: isTrade82TeamAccount(owner),
           },
-          priceMin: product.priceMin?.toString() ?? null,
-          priceMax: product.priceMax?.toString() ?? null,
+          priceMin: visibleProduct.priceMin?.toString() ?? null,
+          priceMax: visibleProduct.priceMax?.toString() ?? null,
         };
       }),
     });

@@ -20,6 +20,14 @@ import {
   type SelectOption,
 } from "@/lib/company-select-options";
 import type { UploadedListingImage } from "@/lib/marketplace";
+import {
+  defaultProductFieldVisibility,
+  normalizeProductFieldVisibility,
+  productFieldVisibilityLevels,
+  type ProductFieldVisibility,
+  type ProductFieldVisibilityKey,
+  type ProductFieldVisibilityLevel,
+} from "@/lib/product-field-visibility";
 
 export type RichProductFormValue = {
   images: UploadedListingImage[];
@@ -58,6 +66,7 @@ export type RichProductFormValue = {
   suggestedUsChannels: string[];
   ingredientsOrMaterials: string;
   packaging: string;
+  fieldVisibility: ProductFieldVisibility;
   exportReadiness: boolean;
   status: "active" | "inactive" | "draft";
 };
@@ -103,6 +112,7 @@ export const emptyRichProductForm: RichProductFormValue = {
   suggestedUsChannels: [],
   ingredientsOrMaterials: "",
   packaging: "",
+  fieldVisibility: defaultProductFieldVisibility,
   exportReadiness: true,
   status: "active",
 };
@@ -124,6 +134,7 @@ export function productPayloadFromForm(product: RichProductFormValue) {
     origin: SOUTH_KOREA,
     certifications: product.complianceClaims,
     packaging: product.packaging || product.packageSize,
+    fieldVisibility: normalizeProductFieldVisibility(product.fieldVisibility),
   };
 }
 
@@ -169,6 +180,7 @@ export function formFromProductRecord(product: Record<string, unknown>): RichPro
     suggestedUsChannels: arrayOfStrings(product.suggestedUsChannels),
     ingredientsOrMaterials: String(product.ingredientsOrMaterials ?? ""),
     packaging: String(product.packaging ?? ""),
+    fieldVisibility: normalizeProductFieldVisibility(product.fieldVisibility),
     exportReadiness: product.exportReadiness !== false,
     status:
       product.status === "inactive" || product.status === "draft"
@@ -197,6 +209,19 @@ export function RichProductFormFields({
     value.category,
   );
   const leadTimeOptions = withCurrentOption(getLeadTimeOptions(locale), value.leadTime);
+  const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
+  const updateVisibility = (
+    key: ProductFieldVisibilityKey,
+    nextValue: ProductFieldVisibilityLevel,
+  ) => {
+    onChange("fieldVisibility", { ...fieldVisibility, [key]: nextValue });
+  };
+  const visibilityControl = (key: ProductFieldVisibilityKey) => (
+    <VisibilitySelect
+      value={fieldVisibility[key]}
+      onChange={(nextValue) => updateVisibility(key, nextValue)}
+    />
+  );
   const parsedMoq = {
     quantity: value.moqQuantity || parseMoqValue(formatMoqValue(value.moqQuantity, value.moqUnit)).quantity,
     unit: value.moqUnit || "Units",
@@ -271,6 +296,7 @@ export function RichProductFormFields({
           required
           prefix={value.currency}
           helper={t("settings.minimumUnitPriceHelper")}
+          visibility={visibilityControl("minimumUnitPrice")}
         />
         <NumberWithSelect
           label={t("marketplace.moq")}
@@ -281,6 +307,7 @@ export function RichProductFormFields({
           options={getMoqUnitOptions(locale)}
           error={errors.moq}
           required
+          visibility={visibilityControl("moq")}
         />
         <SelectField
           label={t("settings.leadTime")}
@@ -290,6 +317,7 @@ export function RichProductFormFields({
           placeholder={t("onboarding.select")}
           error={errors.leadTime}
           required
+          visibility={visibilityControl("leadTime")}
         />
         <SelectField
           label={t("productForm.sampleAvailability")}
@@ -297,6 +325,7 @@ export function RichProductFormFields({
           onChange={(nextValue) => onChange("sampleAvailability", nextValue)}
           options={getSampleAvailabilityOptions(locale)}
           placeholder={t("onboarding.select")}
+          visibility={visibilityControl("sampleAvailability")}
         />
         <SelectField
           label={t("productForm.privateLabelAvailability")}
@@ -304,6 +333,7 @@ export function RichProductFormFields({
           onChange={(nextValue) => onChange("privateLabelAvailability", nextValue)}
           options={getPrivateLabelOptions(locale)}
           placeholder={t("onboarding.select")}
+          visibility={visibilityControl("privateLabelAvailability")}
         />
         <NumberWithSelect
           label={t("productForm.monthlySupplyCapacity")}
@@ -312,6 +342,7 @@ export function RichProductFormFields({
           onValueChange={(nextValue) => onChange("monthlyCapacity", nextValue)}
           onSelectChange={(nextValue) => onChange("monthlyCapacityUnit", nextValue)}
           options={getPriceUnitOptions(locale)}
+          visibility={visibilityControl("monthlySupplyCapacity")}
         />
       </Section>
 
@@ -343,22 +374,26 @@ export function RichProductFormFields({
           onChange={(nextValue) => onChange("incoterms", nextValue)}
           options={getIncotermOptions(locale)}
           className="sm:col-span-2"
+          visibility={visibilityControl("incoterms")}
         />
         <TextField
           label={t("productForm.hsCode")}
           value={value.hsCode}
           onChange={(nextValue) => onChange("hsCode", nextValue)}
+          visibility={visibilityControl("hsCode")}
         />
         <TextField
           label={t("productForm.shelfLife")}
           value={value.shelfLife}
           onChange={(nextValue) => onChange("shelfLife", nextValue)}
+          visibility={visibilityControl("shelfLife")}
         />
         <TextareaField
           label={t("productForm.storageRequirements")}
           value={value.storageRequirements}
           onChange={(nextValue) => onChange("storageRequirements", nextValue)}
           rows={3}
+          visibility={visibilityControl("storageRequirements")}
         />
       </Section>
 
@@ -369,6 +404,7 @@ export function RichProductFormFields({
           onChange={(nextValue) => onChange("documentsAvailable", nextValue)}
           options={getSellerDocumentOptions(locale)}
           className="sm:col-span-2"
+          visibility={visibilityControl("documents")}
         />
         <CheckboxGroup
           label={t("productForm.sellerProvidedCompliance")}
@@ -376,12 +412,14 @@ export function RichProductFormFields({
           onChange={(nextValue) => onChange("complianceClaims", nextValue)}
           options={getComplianceClaimOptions(locale)}
           className="sm:col-span-2"
+          visibility={visibilityControl("complianceInfo")}
         />
         <TextareaField
           label={t("settings.ingredientsMaterials")}
           value={value.ingredientsOrMaterials}
           onChange={(nextValue) => onChange("ingredientsOrMaterials", nextValue)}
           rows={3}
+          visibility={visibilityControl("ingredientsMaterials")}
         />
       </Section>
 
@@ -390,39 +428,46 @@ export function RichProductFormFields({
           label={t("productForm.packageSize")}
           value={value.packageSize}
           onChange={(nextValue) => onChange("packageSize", nextValue)}
+          visibility={visibilityControl("packageSize")}
         />
         <TextField
           label={t("productForm.unitsPerCarton")}
           value={value.unitsPerCarton}
           onChange={(nextValue) => onChange("unitsPerCarton", nextValue)}
           type="number"
+          visibility={visibilityControl("unitsPerCarton")}
         />
         <TextField
           label={t("productForm.cartonWeight")}
           value={value.cartonWeight}
           onChange={(nextValue) => onChange("cartonWeight", nextValue)}
+          visibility={visibilityControl("cartonWeight")}
         />
         <TextField
           label={t("productForm.cartonDimensions")}
           value={value.cartonDimensions}
           onChange={(nextValue) => onChange("cartonDimensions", nextValue)}
+          visibility={visibilityControl("cartonDimensions")}
         />
         <TextField
           label={t("productForm.palletQuantity")}
           value={value.palletQuantity}
           onChange={(nextValue) => onChange("palletQuantity", nextValue)}
           type="number"
+          visibility={visibilityControl("palletQuantity")}
         />
         <TextField
           label={t("productForm.storageTemperature")}
           value={value.storageTemperature}
           onChange={(nextValue) => onChange("storageTemperature", nextValue)}
+          visibility={visibilityControl("storageTemperature")}
         />
         <TextareaField
           label={t("settings.packaging")}
           value={value.packaging}
           onChange={(nextValue) => onChange("packaging", nextValue)}
           rows={3}
+          visibility={visibilityControl("packaging")}
         />
         <CheckboxGroup
           label={t("productForm.suggestedUsChannels")}
@@ -432,6 +477,9 @@ export function RichProductFormFields({
           className="sm:col-span-2"
         />
       </Section>
+      <p className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-xs leading-5 text-zinc-600">
+        {t("productForm.visibilityHelper")} {t("productForm.imagesPublicNote")}
+      </p>
     </div>
   );
 }
@@ -472,6 +520,7 @@ function TextField({
   error,
   required = false,
   maxLength,
+  visibility,
 }: {
   label: string;
   value: string;
@@ -482,13 +531,11 @@ function TextField({
   error?: string;
   required?: boolean;
   maxLength?: number;
+  visibility?: React.ReactNode;
 }) {
   return (
     <label className={`grid gap-1 text-sm ${className ?? ""}`}>
-      <span className="font-medium text-zinc-700">
-        {label}
-        {required ? <span className="text-red-600"> *</span> : null}
-      </span>
+      <FieldLabel label={label} required={required} visibility={visibility} />
       <input
         type={type}
         value={value}
@@ -512,6 +559,7 @@ function TextareaField({
   placeholder,
   error,
   required = false,
+  visibility,
 }: {
   label: string;
   value: string;
@@ -520,13 +568,11 @@ function TextareaField({
   placeholder?: string;
   error?: string;
   required?: boolean;
+  visibility?: React.ReactNode;
 }) {
   return (
     <label className="grid gap-1 text-sm sm:col-span-2">
-      <span className="font-medium text-zinc-700">
-        {label}
-        {required ? <span className="text-red-600"> *</span> : null}
-      </span>
+      <FieldLabel label={label} required={required} visibility={visibility} />
       <textarea
         rows={rows}
         value={value}
@@ -550,6 +596,7 @@ function SelectField({
   error,
   required = false,
   disabled = false,
+  visibility,
 }: {
   label: string;
   value: string;
@@ -559,13 +606,11 @@ function SelectField({
   error?: string;
   required?: boolean;
   disabled?: boolean;
+  visibility?: React.ReactNode;
 }) {
   return (
     <label className="grid gap-1 text-sm">
-      <span className="font-medium text-zinc-700">
-        {label}
-        {required ? <span className="text-red-600"> *</span> : null}
-      </span>
+      <FieldLabel label={label} required={required} visibility={visibility} />
       <select
         value={value}
         required={required}
@@ -597,6 +642,7 @@ function NumberWithSelect({
   helper,
   error,
   required = false,
+  visibility,
 }: {
   label: string;
   value: string;
@@ -608,12 +654,12 @@ function NumberWithSelect({
   helper?: string;
   error?: string;
   required?: boolean;
+  visibility?: React.ReactNode;
 }) {
   return (
     <fieldset className="grid gap-1 text-sm">
-      <legend className="font-medium text-zinc-700">
-        {label}
-        {required ? <span className="text-red-600"> *</span> : null}
+      <legend className="w-full">
+        <FieldLabel label={label} required={required} visibility={visibility} />
       </legend>
       <div className="grid gap-2 sm:grid-cols-[1fr_132px]">
         <div className="flex min-w-0 items-center rounded-md border border-zinc-200 bg-white focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100">
@@ -653,12 +699,14 @@ function CheckboxGroup({
   onChange,
   options,
   className,
+  visibility,
 }: {
   label: string;
   values: string[];
   onChange: (values: string[]) => void;
   options: SelectOption[];
   className?: string;
+  visibility?: React.ReactNode;
 }) {
   function toggle(value: string) {
     const next = new Set(values);
@@ -672,7 +720,9 @@ function CheckboxGroup({
 
   return (
     <fieldset className={`grid gap-2 text-sm ${className ?? ""}`}>
-      <legend className="font-medium text-zinc-700">{label}</legend>
+      <legend className="w-full">
+        <FieldLabel label={label} visibility={visibility} />
+      </legend>
       <div className="grid gap-2 rounded-md border border-zinc-200 bg-white p-3 sm:grid-cols-2">
         {options.map((option) => (
           <label key={option.value} className="flex items-center gap-2 text-zinc-700">
@@ -687,6 +737,56 @@ function CheckboxGroup({
         ))}
       </div>
     </fieldset>
+  );
+}
+
+function FieldLabel({
+  label,
+  required = false,
+  visibility,
+}: {
+  label: string;
+  required?: boolean;
+  visibility?: React.ReactNode;
+}) {
+  return (
+    <span className="flex min-w-0 flex-wrap items-center justify-between gap-2 font-medium text-zinc-700">
+      <span>
+        {label}
+        {required ? <span className="text-red-600"> *</span> : null}
+      </span>
+      {visibility}
+    </span>
+  );
+}
+
+function VisibilitySelect({
+  value,
+  onChange,
+}: {
+  value: ProductFieldVisibilityLevel;
+  onChange: (value: ProductFieldVisibilityLevel) => void;
+}) {
+  const { t } = useI18n();
+  const labels: Record<ProductFieldVisibilityLevel, string> = {
+    public: t("productForm.visibilityPublic"),
+    inquiry_required: t("productForm.visibilityInquiryRequired"),
+    private: t("productForm.visibilityPrivate"),
+  };
+
+  return (
+    <select
+      value={value}
+      aria-label={t("productForm.visibility")}
+      onChange={(event) => onChange(event.target.value as ProductFieldVisibilityLevel)}
+      className="h-7 rounded-md border border-zinc-200 bg-white px-2 text-xs font-medium text-zinc-600 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+    >
+      {productFieldVisibilityLevels.map((level) => (
+        <option key={level} value={level}>
+          {labels[level]}
+        </option>
+      ))}
+    </select>
   );
 }
 

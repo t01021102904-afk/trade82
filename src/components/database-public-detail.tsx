@@ -43,6 +43,13 @@ import {
   UNITED_STATES,
 } from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
+import {
+  normalizeProductFieldVisibility,
+  productFieldVisibilityKeys,
+  type ProductFieldVisibility,
+  type ProductFieldVisibilityKey,
+  type ProductFieldVisibilityLevel,
+} from "@/lib/product-field-visibility";
 import type { Product, VerificationStatus } from "@/lib/types";
 
 type PublicCompany = {
@@ -354,15 +361,6 @@ export function DatabaseProductDetail({ id }: { id: string }) {
 
   const richRows = raw ?? {};
   const notProvided = t("productDetail.notProvided");
-  const price = formatProductPrice(richRows, locale, notProvided);
-  const moq = formatProductMoq(richRows, locale, product.moq || notProvided);
-  const leadTime = leadTimeLabel(String(richRows.leadTimeCode ?? richRows.leadTime ?? ""), locale) || product.leadTime || notProvided;
-  const monthlyCapacity = formatQuantityWithUnit(
-    richRows.monthlyCapacity,
-    richRows.monthlyCapacityUnit,
-    locale,
-    notProvided,
-  );
   const shippingOrigin = formatShippingOrigin(richRows, sellerCompanyRef, locale, notProvided);
   const countryOfOrigin =
     countryLabel(String(richRows.countryOfOrigin ?? SOUTH_KOREA), locale) || notProvided;
@@ -377,6 +375,43 @@ export function DatabaseProductDetail({ id }: { id: string }) {
       userContext?.companies.some(
         (company) => company.id === sellerCompanyId && company.companyRole === "seller",
       ),
+  );
+  const canViewSensitiveFields = isOwner || Boolean(userContext?.isAdmin);
+  const fieldVisibility = normalizeProductFieldVisibility(richRows.fieldVisibility);
+  const displayField = createProductFieldDisplay({
+    canViewSensitiveFields,
+    fieldVisibility,
+    locale,
+    notProvided,
+    t,
+  });
+  const price = displayField(
+    "minimumUnitPrice",
+    formatProductPrice(richRows, locale, notProvided),
+    "price",
+  );
+  const moq = displayField(
+    "moq",
+    formatProductMoq(richRows, locale, product.moq || notProvided),
+    "moq",
+  );
+  const leadTime = displayField(
+    "leadTime",
+    leadTimeLabel(String(richRows.leadTimeCode ?? richRows.leadTime ?? ""), locale) ||
+      product.leadTime ||
+      notProvided,
+  );
+  const monthlyCapacity = displayField(
+    "monthlySupplyCapacity",
+    formatQuantityWithUnit(
+      richRows.monthlyCapacity,
+      richRows.monthlyCapacityUnit,
+      locale,
+      notProvided,
+    ),
+  );
+  const requestableHiddenFields = productFieldVisibilityKeys.filter(
+    (key) => !canViewSensitiveFields && fieldVisibility[key] === "inquiry_required",
   );
   const checkingOwner = Boolean(isSignedIn && !userContext);
 
@@ -521,7 +556,11 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             [t("productDetail.monthlyCapacity"), monthlyCapacity],
             [
               t("productDetail.sampleAvailability"),
-              sampleAvailabilityLabel(String(richRows.sampleAvailability ?? ""), locale) || notProvided,
+              displayField(
+                "sampleAvailability",
+                sampleAvailabilityLabel(String(richRows.sampleAvailability ?? ""), locale) ||
+                  notProvided,
+              ),
             ],
             [t("productDetail.shippingOrigin"), shippingOrigin],
           ].map(([label, value]) => (
@@ -531,6 +570,17 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
           ))}
         </section>
+        {requestableHiddenFields.length ? (
+          <section className="flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-6 text-blue-900">
+              {t("productDetail.hiddenFieldsHelp")}
+            </p>
+            <ContactModal
+              context={{ type: "product", product }}
+              buttonLabel={t("productDetail.requestDetails")}
+            />
+          </section>
+        ) : null}
 
         <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="grid gap-6">
@@ -557,16 +607,19 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   {
                     label: t("productDetail.privateLabel"),
                     value:
-                      privateLabelAvailabilityLabel(
-                        String(richRows.privateLabelAvailability ?? ""),
-                        locale,
-                      ) || notProvided,
+                      displayField(
+                        "privateLabelAvailability",
+                        privateLabelAvailabilityLabel(
+                          String(richRows.privateLabelAvailability ?? ""),
+                          locale,
+                        ) || notProvided,
+                      ),
                   },
                   { label: t("productDetail.countryOfOrigin"), value: countryOfOrigin },
                   { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
-                  { label: t("productDetail.incoterms"), value: joinList(incoterms) || notProvided },
-                  { label: t("productDetail.hsCode"), value: String(richRows.hsCode ?? "") || notProvided },
-                  { label: t("productDetail.shelfLife"), value: String(richRows.shelfLife ?? "") || notProvided },
+                  { label: t("productDetail.incoterms"), value: displayField("incoterms", joinList(incoterms) || notProvided) },
+                  { label: t("productDetail.hsCode"), value: displayField("hsCode", String(richRows.hsCode ?? "") || notProvided) },
+                  { label: t("productDetail.shelfLife"), value: displayField("shelfLife", String(richRows.shelfLife ?? "") || notProvided) },
                 ])}
               />
             </div>
@@ -577,9 +630,9 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               </h2>
               <DetailTable
                 rows={compactRows([
-                  { label: t("productDetail.documents"), value: joinList(documents) || notProvided },
-                  { label: t("productDetail.compliance"), value: joinList(compliance) || notProvided },
-                  { label: t("settings.ingredientsMaterials"), value: String(richRows.ingredientsOrMaterials ?? "") || notProvided },
+                  { label: t("productDetail.documents"), value: displayField("documents", joinList(documents) || notProvided, "documents") },
+                  { label: t("productDetail.compliance"), value: displayField("complianceInfo", joinList(compliance) || notProvided) },
+                  { label: t("settings.ingredientsMaterials"), value: displayField("ingredientsMaterials", String(richRows.ingredientsOrMaterials ?? "") || notProvided) },
                 ])}
               />
               <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
@@ -593,11 +646,14 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               </h2>
               <DetailTable
                 rows={compactRows([
-                  { label: t("productDetail.packageSize"), value: String(richRows.packageSize ?? "") || notProvided },
-                  { label: t("productDetail.unitsPerCarton"), value: String(richRows.unitsPerCarton ?? "") || notProvided },
-                  { label: t("productDetail.cartonWeight"), value: String(richRows.cartonWeight ?? "") || notProvided },
-                  { label: t("productDetail.cartonDimensions"), value: String(richRows.cartonDimensions ?? "") || notProvided },
-                  { label: t("productDetail.storageRequirements"), value: String(richRows.storageRequirements ?? "") || String(richRows.storageTemperature ?? "") || notProvided },
+                  { label: t("productDetail.packageSize"), value: displayField("packageSize", String(richRows.packageSize ?? "") || notProvided) },
+                  { label: t("productDetail.unitsPerCarton"), value: displayField("unitsPerCarton", String(richRows.unitsPerCarton ?? "") || notProvided) },
+                  { label: t("productDetail.cartonWeight"), value: displayField("cartonWeight", String(richRows.cartonWeight ?? "") || notProvided) },
+                  { label: t("productDetail.cartonDimensions"), value: displayField("cartonDimensions", String(richRows.cartonDimensions ?? "") || notProvided) },
+                  { label: t("productDetail.storageRequirements"), value: displayField("storageRequirements", String(richRows.storageRequirements ?? "") || notProvided) },
+                  { label: t("productForm.storageTemperature"), value: displayField("storageTemperature", String(richRows.storageTemperature ?? "") || notProvided) },
+                  { label: t("settings.packaging"), value: displayField("packaging", String(richRows.packaging ?? "") || notProvided) },
+                  { label: t("productForm.palletQuantity"), value: displayField("palletQuantity", String(richRows.palletQuantity ?? "") || notProvided) },
                   { label: t("productDetail.suggestedUsChannels"), value: joinList(suggestedChannels) || notProvided },
                 ])}
               />
@@ -789,6 +845,49 @@ function formatContract(review: PublicCompany["reviewsReceived"][number]) {
   return "$500k+";
 }
 
+function createProductFieldDisplay({
+  canViewSensitiveFields,
+  fieldVisibility,
+  locale,
+  notProvided,
+  t,
+}: {
+  canViewSensitiveFields: boolean;
+  fieldVisibility: ProductFieldVisibility;
+  locale: "en" | "ko";
+  notProvided: string;
+  t: ReturnType<typeof useI18n>["t"];
+}) {
+  return (
+    key: ProductFieldVisibilityKey,
+    value: string,
+    placeholderType: "default" | "price" | "moq" | "documents" = "default",
+  ) => {
+    const visibility = fieldVisibility[key];
+    const cleanValue = value.trim() || notProvided;
+    if (canViewSensitiveFields) {
+      return `${cleanValue} · ${visibilityLabel(visibility, locale, t)}`;
+    }
+    if (visibility === "public") return cleanValue;
+    if (visibility === "private") return t("productDetail.privateFieldHidden");
+    if (placeholderType === "price") return t("productDetail.priceAvailableUponInquiry");
+    if (placeholderType === "moq") return t("productDetail.moqAvailableUponInquiry");
+    if (placeholderType === "documents") return t("productDetail.documentsAvailableUponRequest");
+    return t("productDetail.availableUponInquiry");
+  };
+}
+
+function visibilityLabel(
+  visibility: ProductFieldVisibilityLevel,
+  locale: "en" | "ko",
+  t: ReturnType<typeof useI18n>["t"],
+) {
+  void locale;
+  if (visibility === "public") return t("productDetail.visibilityPublic");
+  if (visibility === "private") return t("productDetail.visibilityPrivate");
+  return t("productDetail.visibilityInquiryRequired");
+}
+
 function publicProductToCard(value: Record<string, unknown>): Product {
   const company = (value.sellerCompany ?? {}) as Record<string, unknown>;
   const images = Array.isArray(value.images)
@@ -796,6 +895,7 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     : [];
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
   const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
+  const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
   const moqQuantity = String(value.moqQuantity ?? "").trim();
   const moq = moqQuantity && value.moqUnit
     ? `${moqQuantity} ${String(value.moqUnit)}`
@@ -821,9 +921,15 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: priceMin
       ? `${String(value.currency ?? "USD")} ${priceMin}${priceMax !== priceMin ? `-${priceMax}` : ""}`
-      : "Price on request",
+      : fieldVisibility.minimumUnitPrice === "private"
+        ? "Private to seller"
+        : "Price available upon inquiry",
     wholesalePriceValue: priceMin,
-    moq,
+    moq:
+      moq ||
+      (fieldVisibility.moq === "private"
+        ? "Private to seller"
+        : "MOQ available upon inquiry"),
     moqUnits: Number(moq.replace(/\D/g, "")) || 0,
     leadTime: String(value.leadTime ?? ""),
     monthlyCapacity: String(value.monthlyCapacity ?? ""),

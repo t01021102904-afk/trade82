@@ -236,6 +236,7 @@ model Product {
   palletQuantity         String         @default("")
   storageTemperature     String         @default("")
   suggestedUsChannels    String[]       @default([])
+  fieldVisibility        Json           @default("{}") @map("field_visibility")
   exportReadiness        Boolean        @default(false)
   viewCount              Int            @default(0)
   status                 ProductStatus  @default(draft)

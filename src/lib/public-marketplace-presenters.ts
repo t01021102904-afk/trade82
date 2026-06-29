@@ -1,4 +1,5 @@
 import type { Product, Seller } from "@/lib/types";
+import { normalizeProductFieldVisibility } from "@/lib/product-field-visibility";
 
 export function databaseProductToCard(value: Record<string, unknown>): Product {
   const company = (value.sellerCompany ?? {}) as Record<string, unknown>;
@@ -7,13 +8,16 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
     : [];
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
   const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
+  const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
   const currency = String(value.currency ?? "USD");
   const price =
     priceMin && priceMax !== priceMin
       ? `${currency} ${priceMin}-${priceMax}`
       : priceMin
         ? `${currency} ${priceMin}`
-        : "Price on request";
+        : fieldVisibility.minimumUnitPrice === "private"
+          ? "Private to seller"
+          : "Price available upon inquiry";
 
   return {
     id: String(value.id),
@@ -36,7 +40,11 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: price,
     wholesalePriceValue: priceMin,
-    moq: String(value.moq ?? ""),
+    moq:
+      String(value.moq ?? "") ||
+      (fieldVisibility.moq === "private"
+        ? "Private to seller"
+        : "MOQ available upon inquiry"),
     moqUnits: Number(String(value.moq ?? "").replace(/\D/g, "")) || 0,
     leadTime: String(value.leadTime ?? ""),
     monthlyCapacity: "Contact seller",

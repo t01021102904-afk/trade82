@@ -173,6 +173,7 @@ export type ProductCountAggregateOutputType = {
   palletQuantity: number
   storageTemperature: number
   suggestedUsChannels: number
+  fieldVisibility: number
   exportReadiness: number
   viewCount: number
   status: number
@@ -329,6 +330,7 @@ export type ProductCountAggregateInputType = {
   palletQuantity?: true
   storageTemperature?: true
   suggestedUsChannels?: true
+  fieldVisibility?: true
   exportReadiness?: true
   viewCount?: true
   status?: true
@@ -468,6 +470,7 @@ export type ProductGroupByOutputType = {
   palletQuantity: string
   storageTemperature: string
   suggestedUsChannels: string[]
+  fieldVisibility: runtime.JsonValue
   exportReadiness: boolean
   viewCount: number
   status: $Enums.ProductStatus
@@ -543,6 +546,7 @@ export type ProductWhereInput = {
   palletQuantity?: Prisma.StringFilter<"Product"> | string
   storageTemperature?: Prisma.StringFilter<"Product"> | string
   suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
+  fieldVisibility?: Prisma.JsonFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -600,6 +604,7 @@ export type ProductOrderByWithRelationInput = {
   palletQuantity?: Prisma.SortOrder
   storageTemperature?: Prisma.SortOrder
   suggestedUsChannels?: Prisma.SortOrder
+  fieldVisibility?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -660,6 +665,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   palletQuantity?: Prisma.StringFilter<"Product"> | string
   storageTemperature?: Prisma.StringFilter<"Product"> | string
   suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
+  fieldVisibility?: Prisma.JsonFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -717,6 +723,7 @@ export type ProductOrderByWithAggregationInput = {
   palletQuantity?: Prisma.SortOrder
   storageTemperature?: Prisma.SortOrder
   suggestedUsChannels?: Prisma.SortOrder
+  fieldVisibility?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -777,6 +784,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   palletQuantity?: Prisma.StringWithAggregatesFilter<"Product"> | string
   storageTemperature?: Prisma.StringWithAggregatesFilter<"Product"> | string
   suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
+  fieldVisibility?: Prisma.JsonWithAggregatesFilter<"Product">
   exportReadiness?: Prisma.BoolWithAggregatesFilter<"Product"> | boolean
   viewCount?: Prisma.IntWithAggregatesFilter<"Product"> | number
   status?: Prisma.EnumProductStatusWithAggregatesFilter<"Product"> | $Enums.ProductStatus
@@ -828,6 +836,7 @@ export type ProductCreateInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -885,6 +894,7 @@ export type ProductUncheckedCreateInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -940,6 +950,7 @@ export type ProductUpdateInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -997,6 +1008,7 @@ export type ProductUncheckedUpdateInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1053,6 +1065,7 @@ export type ProductCreateManyInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1104,6 +1117,7 @@ export type ProductUpdateManyMutationInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1156,6 +1170,7 @@ export type ProductUncheckedUpdateManyInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1218,6 +1233,7 @@ export type ProductCountOrderByAggregateInput = {
   palletQuantity?: Prisma.SortOrder
   storageTemperature?: Prisma.SortOrder
   suggestedUsChannels?: Prisma.SortOrder
+  fieldVisibility?: Prisma.SortOrder
   exportReadiness?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -1560,6 +1576,7 @@ export type ProductCreateWithoutSellerCompanyInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1615,6 +1632,7 @@ export type ProductUncheckedCreateWithoutSellerCompanyInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1700,6 +1718,7 @@ export type ProductScalarWhereInput = {
   palletQuantity?: Prisma.StringFilter<"Product"> | string
   storageTemperature?: Prisma.StringFilter<"Product"> | string
   suggestedUsChannels?: Prisma.StringNullableListFilter<"Product">
+  fieldVisibility?: Prisma.JsonFilter<"Product">
   exportReadiness?: Prisma.BoolFilter<"Product"> | boolean
   viewCount?: Prisma.IntFilter<"Product"> | number
   status?: Prisma.EnumProductStatusFilter<"Product"> | $Enums.ProductStatus
@@ -1751,6 +1770,7 @@ export type ProductCreateWithoutImagesInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1807,6 +1827,7 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -1877,6 +1898,7 @@ export type ProductUpdateWithoutImagesInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1933,6 +1955,7 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -1987,6 +2010,7 @@ export type ProductCreateWithoutInquiriesInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2043,6 +2067,7 @@ export type ProductUncheckedCreateWithoutInquiriesInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2113,6 +2138,7 @@ export type ProductUpdateWithoutInquiriesInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2169,6 +2195,7 @@ export type ProductUncheckedUpdateWithoutInquiriesInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2223,6 +2250,7 @@ export type ProductCreateWithoutSavedItemsInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2279,6 +2307,7 @@ export type ProductUncheckedCreateWithoutSavedItemsInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2349,6 +2378,7 @@ export type ProductUpdateWithoutSavedItemsInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2405,6 +2435,7 @@ export type ProductUncheckedUpdateWithoutSavedItemsInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2459,6 +2490,7 @@ export type ProductCreateWithoutDealsInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2515,6 +2547,7 @@ export type ProductUncheckedCreateWithoutDealsInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2585,6 +2618,7 @@ export type ProductUpdateWithoutDealsInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2641,6 +2675,7 @@ export type ProductUncheckedUpdateWithoutDealsInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2695,6 +2730,7 @@ export type ProductCreateManySellerCompanyInput = {
   palletQuantity?: string
   storageTemperature?: string
   suggestedUsChannels?: Prisma.ProductCreatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: boolean
   viewCount?: number
   status?: $Enums.ProductStatus
@@ -2746,6 +2782,7 @@ export type ProductUpdateWithoutSellerCompanyInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2801,6 +2838,7 @@ export type ProductUncheckedUpdateWithoutSellerCompanyInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2856,6 +2894,7 @@ export type ProductUncheckedUpdateManyWithoutSellerCompanyInput = {
   palletQuantity?: Prisma.StringFieldUpdateOperationsInput | string
   storageTemperature?: Prisma.StringFieldUpdateOperationsInput | string
   suggestedUsChannels?: Prisma.ProductUpdatesuggestedUsChannelsInput | string[]
+  fieldVisibility?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   exportReadiness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumProductStatusFieldUpdateOperationsInput | $Enums.ProductStatus
@@ -2966,6 +3005,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   palletQuantity?: boolean
   storageTemperature?: boolean
   suggestedUsChannels?: boolean
+  fieldVisibility?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -3024,6 +3064,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   palletQuantity?: boolean
   storageTemperature?: boolean
   suggestedUsChannels?: boolean
+  fieldVisibility?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -3077,6 +3118,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   palletQuantity?: boolean
   storageTemperature?: boolean
   suggestedUsChannels?: boolean
+  fieldVisibility?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -3130,6 +3172,7 @@ export type ProductSelectScalar = {
   palletQuantity?: boolean
   storageTemperature?: boolean
   suggestedUsChannels?: boolean
+  fieldVisibility?: boolean
   exportReadiness?: boolean
   viewCount?: boolean
   status?: boolean
@@ -3137,7 +3180,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "slug" | "imageUrl" | "category" | "tags" | "shortDescription" | "detailedDescription" | "priceMin" | "priceMax" | "currency" | "priceUnit" | "moq" | "moqQuantity" | "moqUnit" | "leadTime" | "leadTimeCode" | "sampleAvailability" | "privateLabelAvailability" | "monthlyCapacity" | "monthlyCapacityUnit" | "origin" | "countryOfOrigin" | "shippingOriginCountry" | "shippingOriginRegion" | "incoterms" | "hsCode" | "shelfLife" | "storageRequirements" | "documentsAvailable" | "complianceClaims" | "buyerNotes" | "riskNotes" | "certifications" | "ingredientsOrMaterials" | "packaging" | "packageSize" | "unitsPerCarton" | "cartonWeight" | "cartonDimensions" | "palletQuantity" | "storageTemperature" | "suggestedUsChannels" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "slug" | "imageUrl" | "category" | "tags" | "shortDescription" | "detailedDescription" | "priceMin" | "priceMax" | "currency" | "priceUnit" | "moq" | "moqQuantity" | "moqUnit" | "leadTime" | "leadTimeCode" | "sampleAvailability" | "privateLabelAvailability" | "monthlyCapacity" | "monthlyCapacityUnit" | "origin" | "countryOfOrigin" | "shippingOriginCountry" | "shippingOriginRegion" | "incoterms" | "hsCode" | "shelfLife" | "storageRequirements" | "documentsAvailable" | "complianceClaims" | "buyerNotes" | "riskNotes" | "certifications" | "ingredientsOrMaterials" | "packaging" | "packageSize" | "unitsPerCarton" | "cartonWeight" | "cartonDimensions" | "palletQuantity" | "storageTemperature" | "suggestedUsChannels" | "fieldVisibility" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
@@ -3207,6 +3250,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     palletQuantity: string
     storageTemperature: string
     suggestedUsChannels: string[]
+    fieldVisibility: runtime.JsonValue
     exportReadiness: boolean
     viewCount: number
     status: $Enums.ProductStatus
@@ -3684,6 +3728,7 @@ export interface ProductFieldRefs {
   readonly palletQuantity: Prisma.FieldRef<"Product", 'String'>
   readonly storageTemperature: Prisma.FieldRef<"Product", 'String'>
   readonly suggestedUsChannels: Prisma.FieldRef<"Product", 'String[]'>
+  readonly fieldVisibility: Prisma.FieldRef<"Product", 'Json'>
   readonly exportReadiness: Prisma.FieldRef<"Product", 'Boolean'>
   readonly viewCount: Prisma.FieldRef<"Product", 'Int'>
   readonly status: Prisma.FieldRef<"Product", 'ProductStatus'>
