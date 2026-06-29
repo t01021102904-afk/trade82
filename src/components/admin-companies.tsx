@@ -9,7 +9,7 @@ import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
 
-type StatusFilter = "pending" | "updates" | "listed" | "paused" | "all";
+type StatusFilter = "pending" | "updates" | "listed" | "paused" | "rejected" | "all";
 
 type AdminProduct = {
   id: string;
@@ -137,13 +137,11 @@ export function AdminCompanies() {
       }
 
       setAllCompanies((prev) =>
-        action === "reject"
-          ? prev.filter((c) => c.id !== companyId)
-          : prev.map((c) =>
-              c.id === companyId
-                ? { ...c, verificationStatus: result.verificationStatus ?? c.verificationStatus }
-                : c,
-            ),
+        prev.map((c) =>
+          c.id === companyId
+            ? { ...c, verificationStatus: result.verificationStatus ?? c.verificationStatus }
+            : c,
+        ),
       );
       setActionState((prev) => ({
         ...prev,
@@ -162,7 +160,7 @@ export function AdminCompanies() {
   }
 
   async function deleteProduct(companyId: string, productId: string) {
-    if (!window.confirm(admin.confirmDeleteProduct)) return;
+    if (!window.confirm(admin.confirmDeleteProductPermanent)) return;
 
     setActionState((prev) => ({
       ...prev,
@@ -205,6 +203,44 @@ export function AdminCompanies() {
         setActionState((prev) => ({ ...prev, [companyId]: { pending: false, message: "", error: "" } }));
       }, 3000);
       void loadCompanies({ silent: true });
+    } catch {
+      setActionState((prev) => ({
+        ...prev,
+        [companyId]: { pending: false, message: "", error: admin.networkError },
+      }));
+    }
+  }
+
+  async function deleteCompany(companyId: string) {
+    if (!window.confirm(admin.confirmDeleteCompanyPermanent)) return;
+
+    setActionState((prev) => ({
+      ...prev,
+      [companyId]: { pending: true, message: "", error: "" },
+    }));
+    try {
+      const response = await fetch("/api/admin/companies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId, action: "delete_company" }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { ok?: boolean; companyId?: string; error?: string }
+        | null;
+
+      if (!response.ok || !result?.ok) {
+        setActionState((prev) => ({
+          ...prev,
+          [companyId]: { pending: false, message: "", error: result?.error ?? admin.companyDeleteFailed },
+        }));
+        return;
+      }
+
+      setAllCompanies((prev) => prev.filter((company) => company.id !== companyId));
+      setActionState((prev) => ({
+        ...prev,
+        [companyId]: { pending: false, message: admin.companyDeleted, error: "" },
+      }));
     } catch {
       setActionState((prev) => ({
         ...prev,
@@ -395,7 +431,7 @@ export function AdminCompanies() {
                             onClick={() => void deleteProduct(company.id, product.id)}
                             className="rounded-md border border-red-200 px-3 py-2 text-xs font-medium text-red-700 hover:border-red-300 disabled:cursor-wait disabled:opacity-60"
                           >
-                            {isPending ? admin.saving : admin.deleteProduct}
+                            {isPending ? admin.saving : admin.deletePermanently}
                           </button>
                         </div>
                       ))}
@@ -483,6 +519,14 @@ export function AdminCompanies() {
                   {isPending ? admin.saving : admin.reopenReview}
                 </button>
               )}
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => void deleteCompany(company.id)}
+                className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isPending ? admin.saving : admin.deletePermanently}
+              </button>
             </div>
           </article>
         );
@@ -513,6 +557,7 @@ function parseStatusFilter(value: string | null): StatusFilter | null {
     value === "updates" ||
     value === "listed" ||
     value === "paused" ||
+    value === "rejected" ||
     value === "all"
   ) {
     return value;
@@ -529,6 +574,7 @@ function statusFilterOptions(
     { id: "updates", label: admin.filterUpdates },
     { id: "listed", label: admin.filterListed },
     { id: "paused", label: admin.filterPaused },
+    { id: "rejected", label: admin.filterRejected },
   ];
 }
 
@@ -536,6 +582,7 @@ function statusMatchesFilter(status: string, filter: StatusFilter) {
   if (filter === "all") return true;
   if (filter === "listed") return status === "verified";
   if (filter === "paused" || filter === "updates") return status === "needs_reverification";
+  if (filter === "rejected") return status === "rejected";
   return status === "pending_review" || status === "email_verified" || status === "unverified";
 }
 

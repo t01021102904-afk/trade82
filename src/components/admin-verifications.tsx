@@ -213,6 +213,47 @@ export function AdminVerifications() {
     void load();
   }
 
+  async function deleteCompany(request: VerificationRequest) {
+    if (!window.confirm(admin.confirmDeleteCompanyPermanent)) return;
+
+    setNotice("");
+    setActionState((prev) => ({
+      ...prev,
+      [request.id]: { pending: true, error: "" },
+    }));
+
+    const response = await fetch("/api/admin/companies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ companyId: request.company.id, action: "delete_company" }),
+    });
+    const result = (await response.json().catch(() => null)) as
+      | { ok?: boolean; error?: string }
+      | null;
+
+    if (!response.ok || !result?.ok) {
+      setActionState((prev) => ({
+        ...prev,
+        [request.id]: {
+          pending: false,
+          error: result?.error ?? admin.companyDeleteFailed,
+        },
+      }));
+      return;
+    }
+
+    setRequests((prev) =>
+      prev.filter((item) => item.company.id !== request.company.id),
+    );
+    setActionState((prev) => ({
+      ...prev,
+      [request.id]: { pending: false, error: "" },
+    }));
+    setSelectedRequest(null);
+    setNotice(admin.companyDeleted);
+    setTimeout(() => setNotice(""), 3000);
+  }
+
   async function openVerificationDocument(requestId: string) {
     setError("");
     const response = await fetch(
@@ -382,6 +423,7 @@ export function AdminVerifications() {
           onClose={() => setSelectedRequest(null)}
           onOpenDocument={() => void openVerificationDocument(selectedRequest.id)}
           onReview={(status) => void reviewCompany(selectedRequest, status)}
+          onDeleteCompany={() => void deleteCompany(selectedRequest)}
         />
       ) : null}
     </div>
@@ -394,12 +436,14 @@ function CompanyReviewModal({
   onClose,
   onOpenDocument,
   onReview,
+  onDeleteCompany,
 }: {
   request: VerificationRequest;
   actionState: { pending: boolean; error: string } | undefined;
   onClose: () => void;
   onOpenDocument: () => void;
   onReview: (status: "verified" | "rejected") => void;
+  onDeleteCompany: () => void;
 }) {
   const { locale, messages } = useI18n();
   const admin = messages.admin;
@@ -550,6 +594,14 @@ function CompanyReviewModal({
                   {isPending ? admin.saving : admin.reject}
                 </button>
               ) : null}
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={onDeleteCompany}
+                className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {isPending ? admin.saving : admin.deletePermanently}
+              </button>
               <button
                 type="button"
                 onClick={onClose}

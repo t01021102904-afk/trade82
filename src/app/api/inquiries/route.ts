@@ -186,7 +186,7 @@ export async function POST(request: Request) {
 
     const senderRole = targetCompany.companyRole === "seller" ? "buyer" : "seller";
     const senderCompany = admin
-      ? await getOrCreateTrade82TeamCompany(senderRole)
+      ? await getOrCreateTrade82TeamCompany(user.id, senderRole)
       : await getDb().company.findFirst({
           where: {
             ownerUserId: user.id,

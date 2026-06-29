@@ -1,14 +1,16 @@
 import { apiError } from "@/lib/api-response";
-import { isAdminUser } from "@/lib/authz";
+import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
   try {
-    const admin = await isAdminUser();
     const [companies, products] = await Promise.all([
       getDb().company.findMany({
-        where: admin ? {} : { verificationStatus: "verified" },
+        where: {
+          verificationStatus: "verified",
+          legalName: { not: DELETED_COMPANY_NAME },
+        },
         include: {
           owner: {
             select: {
@@ -35,12 +37,13 @@ export async function GET() {
         },
       }),
       getDb().product.findMany({
-        where: admin
-          ? {}
-          : {
-              status: "active",
-              sellerCompany: { verificationStatus: "verified" },
-            },
+        where: {
+          status: "active",
+          sellerCompany: {
+            verificationStatus: "verified",
+            legalName: { not: DELETED_COMPANY_NAME },
+          },
+        },
         include: {
           images: { orderBy: { position: "asc" } },
           sellerCompany: {

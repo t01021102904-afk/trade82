@@ -425,8 +425,23 @@ async function uploadPrivate({
 
   try {
     if (type === "verification_document") {
+      const company = await getDb().company.findUnique({
+        where: { id: companyId },
+        select: { companyRole: true, verificationStatus: true },
+      });
+      if (!company) {
+        throw new Response("Company not found", { status: 404 });
+      }
+      const reviewStatus =
+        company.companyRole === "buyer" ? "verified" : "pending_review";
+      const companyStatus =
+        company.companyRole === "buyer" && company.verificationStatus !== "rejected"
+          ? "verified"
+          : company.companyRole === "seller"
+            ? "pending_review"
+            : company.verificationStatus;
       const existing = await getDb().verificationRequest.findFirst({
-        where: { companyId, status: "pending_review" },
+        where: { companyId, status: reviewStatus },
         orderBy: { createdAt: "desc" },
       });
       if (existing) {
@@ -443,7 +458,7 @@ async function uploadPrivate({
           data: {
             companyId,
             requestedByUserId: userId,
-            status: "pending_review",
+            status: reviewStatus,
             documentPath: path,
             documentFilename: filename,
           },
@@ -451,7 +466,7 @@ async function uploadPrivate({
       }
       await getDb().company.update({
         where: { id: companyId },
-        data: { verificationStatus: "pending_review" },
+        data: { verificationStatus: companyStatus },
       });
     } else {
       await getDb().deal.update({

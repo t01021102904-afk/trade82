@@ -1,5 +1,9 @@
 import "server-only";
 
+import {
+  DELETED_COMPANY_NAME,
+  DELETED_USER_NAME,
+} from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 import {
   deleteStorageFile,
@@ -33,8 +37,6 @@ export type AccountDeletionCleanupResult = {
   failedStorageDeleteCount: number;
 };
 
-const DELETED_USER_NAME = "Deleted user";
-const DELETED_COMPANY_NAME = "Deleted company";
 const PRODUCT_IMAGE_VARIANTS = [
   "original.webp",
   "card-320.webp",

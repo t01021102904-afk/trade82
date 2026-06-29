@@ -9,6 +9,7 @@ import {
   validationErrorResponse,
 } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
+import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 
 async function requireDatabaseAdmin() {
@@ -26,13 +27,18 @@ export async function GET(request: Request) {
         ? ({ status: "pending_review" } as const)
         : filter === "listed"
           ? ({ status: "verified" } as const)
-          : ({ status: { not: "rejected" } } as const);
+          : filter === "rejected"
+            ? ({ status: "rejected" } as const)
+            : {};
 
     const [requests, reviews] = await Promise.all([
       getDb().verificationRequest.findMany({
         where: {
           ...statusWhere,
-          company: { verificationStatus: { not: "rejected" } },
+          company: {
+            companyRole: "seller",
+            legalName: { not: DELETED_COMPANY_NAME },
+          },
         },
         select: {
           id: true,

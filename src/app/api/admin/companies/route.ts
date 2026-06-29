@@ -7,8 +7,14 @@ import {
   requiredIdField,
   validationErrorResponse,
 } from "@/lib/api-security";
+import {
+  hardDeleteCompanyForAdmin,
+  hardDeleteProductForAdmin,
+} from "@/lib/admin-hard-delete";
 import { requireAdmin } from "@/lib/authz";
+import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { TRADE82_TEAM_NAME } from "@/lib/admin-team-company";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
 export async function GET() {
@@ -16,7 +22,9 @@ export async function GET() {
     await requireAdmin();
 
     const companies = await getDb().company.findMany({
-      where: { verificationStatus: { not: "rejected" } },
+      where: {
+        legalName: { notIn: [DELETED_COMPANY_NAME, TRADE82_TEAM_NAME] },
+      },
       orderBy: { createdAt: "desc" },
       include: {
         owner: { select: { email: true, displayName: true, role: true } },
@@ -124,22 +132,24 @@ export async function POST(request: Request) {
       "request_updates",
       "reset",
       "delete_product",
+      "delete_company",
     ]);
+
+    if (action === "delete_company") {
+      const result = await hardDeleteCompanyForAdmin(companyId);
+      if (!result) {
+        return Response.json({ error: "Company not found." }, { status: 404 });
+      }
+      return Response.json({ ok: true, companyId, cleanup: result });
+    }
 
     if (action === "delete_product") {
       const productId = requiredIdField(body, "productId");
-      const product = await getDb().product.findFirst({
-        where: { id: productId, sellerCompanyId: companyId },
-        select: { id: true },
-      });
-      if (!product) {
+      const result = await hardDeleteProductForAdmin(productId, companyId);
+      if (!result) {
         return Response.json({ error: "Product not found." }, { status: 404 });
       }
-      await getDb().product.update({
-        where: { id: productId },
-        data: { status: "inactive" },
-      });
-      return Response.json({ ok: true, productId, productStatus: "inactive" });
+      return Response.json({ ok: true, productId, cleanup: result });
     }
 
     const statusMap: Record<string, string> = {

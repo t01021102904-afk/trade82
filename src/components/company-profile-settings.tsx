@@ -131,7 +131,7 @@ function buildCompanyProfile(
         : [],
       verificationStatus:
         (stored?.verificationStatus as CompanyProfile["verificationStatus"]) ??
-        (role === "seller" ? "pending_review" : "unverified"),
+        (role === "seller" ? "pending_review" : "verified"),
       createdAt: String(stored?.createdAt ?? now),
       updatedAt: String(stored?.updatedAt ?? now),
     },
