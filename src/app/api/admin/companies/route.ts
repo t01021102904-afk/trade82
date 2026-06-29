@@ -109,10 +109,24 @@ export async function POST(request: Request) {
       return Response.json({ error: "Company not found." }, { status: 404 });
     }
 
-    await getDb().company.update({
-      where: { id: companyId },
-      data: { verificationStatus: newStatus as never },
-    });
+    if (action === "approve" || action === "reject") {
+      const requestStatus = action === "approve" ? "verified" : "rejected";
+      await getDb().$transaction([
+        getDb().company.update({
+          where: { id: companyId },
+          data: { verificationStatus: newStatus as never },
+        }),
+        getDb().verificationRequest.updateMany({
+          where: { companyId, status: "pending_review" },
+          data: { status: requestStatus },
+        }),
+      ]);
+    } else {
+      await getDb().company.update({
+        where: { id: companyId },
+        data: { verificationStatus: newStatus as never },
+      });
+    }
 
     return Response.json({ ok: true, verificationStatus: newStatus });
   } catch (error) {

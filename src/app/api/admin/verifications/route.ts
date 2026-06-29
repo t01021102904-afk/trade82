@@ -15,11 +15,24 @@ async function requireDatabaseAdmin() {
   return requireAdmin();
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await requireDatabaseAdmin();
+    const { searchParams } = new URL(request.url);
+    const filter = searchParams.get("filter") ?? "pending";
+
+    const statusWhere =
+      filter === "pending"
+        ? ({ status: "pending_review" } as const)
+        : filter === "listed"
+          ? ({ status: "verified" } as const)
+          : filter === "rejected"
+            ? ({ status: "rejected" } as const)
+            : undefined;
+
     const [requests, reviews] = await Promise.all([
       getDb().verificationRequest.findMany({
+        where: statusWhere,
         select: {
           id: true,
           status: true,

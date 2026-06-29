@@ -101,7 +101,7 @@ export function AdminVerifications() {
   async function load() {
     setError("");
     const [verificationResponse, reviewResponse] = await Promise.all([
-      fetch("/api/admin/verifications"),
+      fetch(`/api/admin/verifications?filter=${requestFilter}`),
       fetch("/api/admin/company-reviews"),
     ]);
     if (!verificationResponse.ok || !reviewResponse.ok) {
@@ -125,7 +125,7 @@ export function AdminVerifications() {
 
     void (async () => {
       const [verificationResponse, reviewResponse] = await Promise.all([
-        fetch("/api/admin/verifications"),
+        fetch(`/api/admin/verifications?filter=${requestFilter}`),
         fetch("/api/admin/company-reviews"),
       ]);
       if (!active) return;
@@ -148,7 +148,7 @@ export function AdminVerifications() {
     return () => {
       active = false;
     };
-  }, [admin.unableLoadQueue]);
+  }, [admin.unableLoadQueue, requestFilter]);
 
   async function reviewCompany(
     request: VerificationRequest,
