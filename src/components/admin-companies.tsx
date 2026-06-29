@@ -9,7 +9,7 @@ import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
 
-type StatusFilter = "pending" | "updates" | "listed" | "rejected" | "paused" | "all";
+type StatusFilter = "pending" | "updates" | "listed" | "paused" | "all";
 
 type AdminProduct = {
   id: string;
@@ -137,11 +137,13 @@ export function AdminCompanies() {
       }
 
       setAllCompanies((prev) =>
-        prev.map((c) =>
-          c.id === companyId
-            ? { ...c, verificationStatus: result.verificationStatus ?? c.verificationStatus }
-            : c,
-        ),
+        action === "reject"
+          ? prev.filter((c) => c.id !== companyId)
+          : prev.map((c) =>
+              c.id === companyId
+                ? { ...c, verificationStatus: result.verificationStatus ?? c.verificationStatus }
+                : c,
+            ),
       );
       setActionState((prev) => ({
         ...prev,
@@ -510,7 +512,6 @@ function parseStatusFilter(value: string | null): StatusFilter | null {
     value === "pending" ||
     value === "updates" ||
     value === "listed" ||
-    value === "rejected" ||
     value === "paused" ||
     value === "all"
   ) {
@@ -527,7 +528,6 @@ function statusFilterOptions(
     { id: "pending", label: admin.filterPending },
     { id: "updates", label: admin.filterUpdates },
     { id: "listed", label: admin.filterListed },
-    { id: "rejected", label: admin.filterRejected },
     { id: "paused", label: admin.filterPaused },
   ];
 }
@@ -535,7 +535,6 @@ function statusFilterOptions(
 function statusMatchesFilter(status: string, filter: StatusFilter) {
   if (filter === "all") return true;
   if (filter === "listed") return status === "verified";
-  if (filter === "rejected") return status === "rejected";
   if (filter === "paused" || filter === "updates") return status === "needs_reverification";
   return status === "pending_review" || status === "email_verified" || status === "unverified";
 }

@@ -26,13 +26,14 @@ export async function GET(request: Request) {
         ? ({ status: "pending_review" } as const)
         : filter === "listed"
           ? ({ status: "verified" } as const)
-          : filter === "rejected"
-            ? ({ status: "rejected" } as const)
-            : undefined;
+          : ({ status: { not: "rejected" } } as const);
 
     const [requests, reviews] = await Promise.all([
       getDb().verificationRequest.findMany({
-        where: statusWhere,
+        where: {
+          ...statusWhere,
+          company: { verificationStatus: { not: "rejected" } },
+        },
         select: {
           id: true,
           status: true,

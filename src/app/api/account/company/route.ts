@@ -285,10 +285,14 @@ export async function PUT(request: Request) {
           String(seller.representativeName ?? "") !==
             String(existing.sellerProfile?.representativeName ?? "")));
     const criticalChanged = companyCriticalChanged || sellerCriticalChanged;
-    const verificationStatus: CompanyVerificationStatus = criticalChanged
-      ? "needs_reverification"
-      : existing?.verificationStatus ??
-        (companyRole === "seller" ? "pending_review" : "unverified");
+    const verificationStatus: CompanyVerificationStatus =
+      companyRole === "buyer"
+        ? existing?.verificationStatus === "rejected"
+          ? "rejected"
+          : "verified"
+        : criticalChanged
+          ? "needs_reverification"
+          : existing?.verificationStatus ?? "pending_review";
     const logoWriteFields = logoFieldsForWrite(body, existing);
 
     debugCompanyLogo("saving company logo fields", {

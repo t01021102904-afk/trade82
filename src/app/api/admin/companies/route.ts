@@ -16,6 +16,7 @@ export async function GET() {
     await requireAdmin();
 
     const companies = await getDb().company.findMany({
+      where: { verificationStatus: { not: "rejected" } },
       orderBy: { createdAt: "desc" },
       include: {
         owner: { select: { email: true, displayName: true, role: true } },
