@@ -274,15 +274,15 @@ export function AdminCompanies() {
       : `${companies.length} ${roleFilter ? `${roleLabel(roleFilter)} ` : ""}${admin.companyCount}`;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4">
       {error ? (
-        <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>
+        <p className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>
       ) : null}
       {docError ? (
-        <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">{docError}</p>
+        <p className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{docError}</p>
       ) : null}
 
-      <div className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-4">
+      <div className="grid gap-3 rounded-md border border-zinc-200 bg-white p-3">
         <label className="grid gap-1 text-sm font-medium text-zinc-700">
           {admin.searchCompanies}
           <input
@@ -290,16 +290,16 @@ export function AdminCompanies() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={admin.searchCompaniesPlaceholder}
-            className="min-h-11 rounded-md border border-zinc-200 px-3 py-2 text-sm font-normal text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+            className="h-9 rounded-md border border-zinc-200 px-3 text-sm font-normal text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
           />
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {statusFilterOptions(admin).map((option) => (
             <button
               key={option.id}
               type="button"
               onClick={() => setStatusFilter(option.id)}
-              className={`rounded-md border px-3 py-2 text-sm font-medium transition ${
+              className={`h-8 rounded-md border px-2.5 text-xs font-medium transition ${
                 statusFilter === option.id
                   ? "border-zinc-950 bg-zinc-950 text-white"
                   : "border-zinc-200 bg-white text-zinc-700 hover:border-blue-200 hover:text-blue-700"
@@ -321,7 +321,7 @@ export function AdminCompanies() {
       </p>
 
       {companies.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-8 text-center">
+        <div className="rounded-md border border-dashed border-zinc-300 bg-white p-5 text-center">
           <p className="text-sm text-zinc-600">{admin.noCompaniesTitle}</p>
           <p className="mt-2 text-xs text-zinc-500">
             {admin.noCompaniesText}
@@ -337,9 +337,9 @@ export function AdminCompanies() {
         return (
           <article
             key={company.id}
-            className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[minmax(0,1fr)_auto]"
+            className="grid gap-4 rounded-md border border-zinc-200 bg-white p-4 lg:grid-cols-[minmax(0,1fr)_auto]"
           >
-            <div className="flex min-w-0 flex-col gap-4 sm:flex-row">
+            <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
               <AdminCompanyLogo
                 companyName={company.tradeName || company.legalName}
                 logoUrl={company.useDefaultLogo ? "" : company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl}
@@ -359,7 +359,7 @@ export function AdminCompanies() {
                   </Badge>
                 </div>
 
-                <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
+                <dl className="mt-2 grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
                   <div>
                     <dt className="text-zinc-500">{admin.owner}</dt>
                     <dd className="flex min-w-0 items-center gap-1.5">
@@ -406,13 +406,13 @@ export function AdminCompanies() {
                 </dl>
 
                 {company.products.length ? (
-                  <div className="mt-4 rounded-md border border-zinc-100 bg-zinc-50 p-3">
+                  <div className="mt-3 rounded-md border border-zinc-100 bg-zinc-50 p-2.5">
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{admin.products}</p>
-                    <div className="mt-3 grid gap-2">
+                    <div className="mt-2 grid gap-1.5">
                       {company.products.map((product) => (
                         <div
                           key={product.id}
-                          className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md bg-white p-2"
+                          className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-md bg-white p-2"
                         >
                           <div className="flex min-w-0 items-center gap-3">
                             <AdminCompanyLogo
@@ -429,7 +429,7 @@ export function AdminCompanies() {
                             type="button"
                             disabled={isPending}
                             onClick={() => void deleteProduct(company.id, product.id)}
-                            className="rounded-md border border-red-200 px-3 py-2 text-xs font-medium text-red-700 hover:border-red-300 disabled:cursor-wait disabled:opacity-60"
+                            className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700 hover:border-red-300 disabled:cursor-wait disabled:opacity-60"
                           >
                             {isPending ? admin.saving : admin.deletePermanently}
                           </button>
@@ -448,7 +448,7 @@ export function AdminCompanies() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-1.5 lg:w-36 lg:flex-col">
               <a
                 href={
                   withLocale(
@@ -460,7 +460,7 @@ export function AdminCompanies() {
                 }
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-zinc-200 px-3 py-2 text-center text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+                className="inline-flex h-8 items-center justify-center rounded-md border border-zinc-200 px-2.5 text-center text-xs font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
               >
                 {admin.viewProfile}
               </a>
@@ -470,7 +470,7 @@ export function AdminCompanies() {
                   type="button"
                   disabled={isPending}
                   onClick={() => void performAction(company.id, "approve")}
-                  className="rounded-md bg-emerald-700 px-3 py-2 text-sm font-medium text-white disabled:cursor-wait disabled:opacity-60"
+                  className="h-8 rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white disabled:cursor-wait disabled:opacity-60"
                 >
                   {isPending ? admin.saving : admin.publishListing}
                 </button>
@@ -481,7 +481,7 @@ export function AdminCompanies() {
                   type="button"
                   disabled={isPending}
                   onClick={() => void performAction(company.id, "pause")}
-                  className="rounded-md border border-amber-200 px-3 py-2 text-sm font-medium text-amber-700 disabled:cursor-wait disabled:opacity-60"
+                  className="h-8 rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-700 disabled:cursor-wait disabled:opacity-60"
                 >
                   {isPending ? admin.saving : admin.pauseListing}
                 </button>
@@ -494,7 +494,7 @@ export function AdminCompanies() {
                   type="button"
                   disabled={isPending}
                   onClick={() => void performAction(company.id, "request_updates")}
-                  className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 disabled:cursor-wait disabled:opacity-60"
+                  className="h-8 rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700 disabled:cursor-wait disabled:opacity-60"
                 >
                   {isPending ? admin.saving : admin.requestUpdates}
                 </button>
@@ -505,7 +505,7 @@ export function AdminCompanies() {
                   type="button"
                   disabled={isPending}
                   onClick={() => void performAction(company.id, "reject")}
-                  className="rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700 disabled:cursor-wait disabled:opacity-60"
+                  className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700 disabled:cursor-wait disabled:opacity-60"
                 >
                   {isPending ? admin.saving : admin.rejectListing}
                 </button>
@@ -514,7 +514,7 @@ export function AdminCompanies() {
                   type="button"
                   disabled={isPending}
                   onClick={() => void performAction(company.id, "reset")}
-                  className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 disabled:cursor-wait disabled:opacity-60"
+                  className="h-8 rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700 disabled:cursor-wait disabled:opacity-60"
                 >
                   {isPending ? admin.saving : admin.reopenReview}
                 </button>
@@ -523,7 +523,7 @@ export function AdminCompanies() {
                 type="button"
                 disabled={isPending}
                 onClick={() => void deleteCompany(company.id)}
-                className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 disabled:cursor-wait disabled:opacity-60"
+                className="h-8 rounded-md border border-red-200 bg-white px-2.5 text-xs font-semibold text-red-700 disabled:cursor-wait disabled:opacity-60"
               >
                 {isPending ? admin.saving : admin.deletePermanently}
               </button>

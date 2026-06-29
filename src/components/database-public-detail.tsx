@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
@@ -15,6 +16,7 @@ import { ProductImageGallery } from "@/components/product-image-gallery";
 import { VerificationBadge } from "@/components/verification-badge";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
+import { useUserContext } from "@/hooks/use-user-context";
 import {
   buyerCategoryLabel,
   buyerTypeLabel as buyerTypeOptionLabel,
@@ -327,6 +329,11 @@ function BadgeList({
 
 export function DatabaseProductDetail({ id }: { id: string }) {
   const { locale, t } = useI18n();
+  const router = useRouter();
+  const { context: userContext, isSignedIn } = useUserContext();
+  const [ownerActionPending, setOwnerActionPending] = useState(false);
+  const [ownerNotice, setOwnerNotice] = useState("");
+  const [ownerError, setOwnerError] = useState("");
   const { payload, loaded } = usePublicMarketplace();
   const raw = payload.products.find((item) => item.id === id);
   const product = raw ? publicProductToCard(raw) : null;
@@ -365,6 +372,63 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   const suggestedChannels = optionLabels(arrayOfStrings(richRows.suggestedUsChannels), salesChannelLabel, locale);
   const categories = arrayOfStrings(sellerCompanyRef?.categories ?? sellerCompany?.categories);
   const reviews = sellerCompany?.reviewsReceived ?? [];
+  const isOwner = Boolean(
+    sellerCompanyId &&
+      userContext?.companies.some(
+        (company) => company.id === sellerCompanyId && company.companyRole === "seller",
+      ),
+  );
+  const checkingOwner = Boolean(isSignedIn && !userContext);
+
+  async function setProductPreparing() {
+    setOwnerActionPending(true);
+    setOwnerNotice("");
+    setOwnerError("");
+    try {
+      const response = await fetch(`/api/account/products/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "inactive" }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      if (!response.ok) {
+        setOwnerError(result?.error ?? t("dashboard.productUpdateFailed"));
+        return;
+      }
+      setOwnerNotice(t("dashboard.productSetPreparing"));
+    } catch {
+      setOwnerError(t("dashboard.productUpdateFailed"));
+    } finally {
+      setOwnerActionPending(false);
+    }
+  }
+
+  async function deleteProduct() {
+    if (!window.confirm(t("dashboard.deleteProductConfirm"))) return;
+
+    setOwnerActionPending(true);
+    setOwnerNotice("");
+    setOwnerError("");
+    try {
+      const response = await fetch(`/api/account/products/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const result = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        setOwnerError(result?.error ?? t("dashboard.productDeleteFailed"));
+        return;
+      }
+      router.push(withLocale("/dashboard/seller?section=products", locale));
+    } catch {
+      setOwnerError(t("dashboard.productDeleteFailed"));
+    } finally {
+      setOwnerActionPending(false);
+    }
+  }
 
   return (
     <div className="bg-zinc-50">
@@ -399,10 +463,53 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <SaveButton id={product.id} kind="product" />
-              <ContactModal context={{ type: "product", product }} buttonLabel={t("productDetail.contactSeller")} />
-            </div>
+            {isOwner ? (
+              <div className="grid gap-2">
+                <div className="flex flex-wrap gap-1.5">
+                  <Link
+                    href={withLocale("/dashboard/seller?section=products", locale)}
+                    className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white hover:bg-blue-700"
+                  >
+                    {t("settings.editProduct")}
+                  </Link>
+                  <button
+                    type="button"
+                    disabled={ownerActionPending}
+                    onClick={() => void setProductPreparing()}
+                    className="inline-flex h-8 items-center justify-center rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-800 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {ownerActionPending ? t("settings.saving") : t("dashboard.setPreparing")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={ownerActionPending}
+                    onClick={() => void deleteProduct()}
+                    className="inline-flex h-8 items-center justify-center rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {ownerActionPending ? t("settings.saving") : t("settings.deleteProduct")}
+                  </button>
+                </div>
+                {ownerNotice ? (
+                  <p role="status" className="text-sm font-medium text-emerald-700">
+                    {ownerNotice}
+                  </p>
+                ) : null}
+                {ownerError ? (
+                  <p role="alert" className="text-sm font-medium text-red-700">
+                    {ownerError}
+                  </p>
+                ) : null}
+              </div>
+            ) : checkingOwner ? (
+              <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+                {t("common.loading")}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <SaveButton id={product.id} kind="product" />
+                <ContactModal context={{ type: "product", product }} buttonLabel={t("productDetail.contactSeller")} />
+              </div>
+            )}
           </div>
         </section>
 

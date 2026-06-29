@@ -21,7 +21,7 @@ import { withLocale } from "@/lib/i18n";
 import type { UploadedListingImage } from "@/lib/marketplace";
 import { safeImageUrl } from "@/lib/url-security";
 
-type DbProduct = {
+export type DbProduct = {
   id: string;
   name: string;
   imageUrl: string | null;
@@ -36,10 +36,11 @@ type DbProduct = {
   moq: string;
   leadTime: string;
   status: "active" | "inactive" | "draft";
+  viewCount?: number;
   sellerCompany: { verificationStatus: string };
 } & Record<string, unknown>;
 
-type EditableProduct = Omit<DbProduct, "sellerCompany">;
+export type EditableProduct = Omit<DbProduct, "sellerCompany">;
 type ProductEditorErrors = RichProductFormErrors & { form?: string };
 
 export function ProductManagement() {
@@ -80,7 +81,7 @@ export function ProductManagement() {
 
   if (error) {
     return (
-      <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600">
+      <div className="rounded-md border border-dashed border-zinc-300 p-4 text-sm text-zinc-600">
         {error}
       </div>
     );
@@ -101,15 +102,15 @@ export function ProductManagement() {
   }
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-zinc-950">{t("settings.myProducts")}</h2>
+          <h2 className="text-lg font-semibold text-zinc-950">{t("settings.myProducts")}</h2>
           <p className="mt-1 text-sm text-zinc-500">{t("settings.productVisibilityRule")}</p>
         </div>
         <Link
           href={withLocale("/sell", locale)}
-          className="inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white"
+          className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white"
         >
           {t("settings.addProduct")}
         </Link>
@@ -126,7 +127,7 @@ export function ProductManagement() {
         />
       ) : null}
 
-      <div className="grid gap-3">
+      <div className="grid gap-2">
         {products.map((product) => {
           const isPublic =
             product.status === "active" &&
@@ -134,7 +135,7 @@ export function ProductManagement() {
           return (
             <article
               key={product.id}
-              className="grid gap-4 rounded-lg border border-zinc-200 p-4 sm:grid-cols-[72px_1fr_auto]"
+              className="grid gap-3 rounded-md border border-zinc-200 p-3 sm:grid-cols-[72px_1fr] xl:grid-cols-[72px_minmax(0,1fr)_auto] xl:items-center"
             >
               <div
                 className="aspect-square rounded-md bg-zinc-100 bg-cover bg-center"
@@ -145,7 +146,7 @@ export function ProductManagement() {
               />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold text-zinc-950">{product.name}</h3>
+                  <h3 className="text-sm font-semibold text-zinc-950">{product.name}</h3>
                   <Badge tone={product.status === "active" ? "green" : "amber"}>
                     {product.status === "active" ? t("settings.active") : t("settings.inactive")}
                   </Badge>
@@ -153,15 +154,15 @@ export function ProductManagement() {
                     {isPublic ? t("settings.public") : t("settings.notPublic")}
                   </Badge>
                 </div>
-                <p className="mt-1 text-sm text-zinc-500">
+                <p className="mt-1 text-xs text-zinc-500">
                   {product.category} · {formatPrice(product)} · MOQ {product.moq}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 sm:justify-end">
+              <div className="flex flex-wrap gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
                 <button
                   type="button"
                   onClick={() => setEditing({ ...product })}
-                  className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700"
+                  className="h-8 rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700"
                 >
                   {t("settings.editProduct")}
                 </button>
@@ -169,7 +170,7 @@ export function ProductManagement() {
                   <button
                     type="button"
                     onClick={() => void markInactive(product)}
-                    className="rounded-md border border-amber-200 px-3 py-2 text-sm font-medium text-amber-800"
+                    className="h-8 rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-800"
                   >
                     {t("settings.markInactive")}
                   </button>
@@ -177,7 +178,7 @@ export function ProductManagement() {
                 <button
                   type="button"
                   onClick={() => void remove(product.id)}
-                  className="rounded-md border border-red-200 px-3 py-2 text-sm font-medium text-red-700"
+                  className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700"
                 >
                   {t("settings.deleteProduct")}
                 </button>
@@ -186,7 +187,7 @@ export function ProductManagement() {
           );
         })}
         {!products.length && !editing ? (
-          <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-600">
+          <div className="rounded-md border border-dashed border-zinc-300 p-4 text-sm text-zinc-600">
             {t("settings.noProducts")}
           </div>
         ) : null}
@@ -203,7 +204,7 @@ function formatPrice(product: Pick<DbProduct, "priceMin" | "priceMax" | "currenc
   return `${product.currency} ${product.priceMin}-${product.priceMax}`;
 }
 
-function ProductEditor({
+export function ProductEditor({
   initialProduct,
   onCancel,
   onSaved,
@@ -303,25 +304,25 @@ function ProductEditor({
   return (
     <form
       onSubmit={submit}
-      className="grid gap-4 rounded-lg border border-blue-200 bg-blue-50/40 p-4"
+      className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50/60 p-3"
       autoComplete="off"
       noValidate
     >
       {draft ? (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
           <p>{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={restoreDraft}
-              className="rounded-md bg-amber-900 px-3 py-2 font-medium text-white"
+              className="h-8 rounded-md bg-amber-900 px-2.5 text-xs font-medium text-white"
             >
               {t("settings.restoreDraft")}
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="rounded-md border border-amber-300 bg-white px-3 py-2 font-medium text-amber-900"
+              className="h-8 rounded-md border border-amber-300 bg-white px-2.5 text-xs font-medium text-amber-900"
             >
               {t("settings.discardDraft")}
             </button>
@@ -335,11 +336,11 @@ function ProductEditor({
         onChange={update}
         onUploadingChange={setUploading}
       />
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         <button
           type="submit"
           disabled={uploading || saving}
-          className="rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="h-8 rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white disabled:opacity-60"
         >
           {saving ? t("settings.saving") : t("settings.saveProductChanges")}
         </button>
@@ -348,7 +349,7 @@ function ProductEditor({
           onClick={() => {
             if (confirmLeave()) onCancel();
           }}
-          className="rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700"
+          className="h-8 rounded-md border border-zinc-200 bg-white px-2.5 text-xs font-medium text-zinc-700"
         >
           {t("common.close")}
         </button>

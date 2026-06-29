@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
@@ -38,12 +39,15 @@ type DashboardCompany = {
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
+  const searchParams = useSearchParams();
   const userId = user?.id ?? "";
   const [company, setCompany] = useState<DashboardCompany | null | undefined>(
     undefined,
   );
   const [activeSection, setActiveSection] =
-    useState<DashboardSection>("overview");
+    useState<DashboardSection>(() =>
+      parseDashboardSection(searchParams.get("section"), role) ?? "overview",
+    );
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
@@ -68,7 +72,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
 
   if (!company) {
     return (
-      <section className="rounded-lg border border-amber-200 bg-amber-50 p-6">
+      <section className="rounded-md border border-amber-200 bg-amber-50 p-4">
         <h2 className="font-semibold text-amber-950">
           {t("settings.companyProfileMissing")}
         </h2>
@@ -77,7 +81,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
         </p>
         <Link
           href={withLocale(`/onboarding/${role}`, locale)}
-          className="mt-4 inline-flex min-h-11 items-center rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white"
+          className="mt-4 inline-flex h-8 items-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white"
         >
           {t("dashboard.startOnboarding")}
         </Link>
@@ -128,8 +132,8 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     : "overview";
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-      <aside className="bm-premium-card h-fit min-w-0 rounded-lg border border-zinc-200 bg-white p-2 shadow-sm shadow-zinc-100 lg:p-3">
+    <div className="grid gap-4 lg:grid-cols-[208px_1fr]">
+      <aside className="bm-premium-card h-fit min-w-0 rounded-md border border-zinc-200 bg-white p-2 shadow-sm shadow-zinc-100">
         <nav
           className="-mx-1 flex gap-2 overflow-x-auto px-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0"
           aria-label={t("dashboard.label")}
@@ -139,7 +143,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               key={item.id}
               type="button"
               onClick={() => setActiveSection(item.id)}
-              className={`relative z-10 min-h-10 min-w-max rounded-md px-3 py-2 text-left text-sm font-medium transition ${
+              className={`relative z-10 h-8 min-w-max rounded-md px-2.5 text-left text-xs font-medium transition ${
                 safeActiveSection === item.id
                   ? "bg-emerald-50 text-emerald-800 shadow-sm shadow-emerald-950/5"
                   : "text-zinc-600 hover:-translate-y-0.5 hover:bg-zinc-50 hover:text-zinc-950"
@@ -152,10 +156,10 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
         </nav>
       </aside>
 
-      <div className="grid gap-6">
-        <section className="bm-premium-card rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 items-center gap-4">
+      <div className="grid gap-4">
+        <section className="bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
               <CompanyLogo
                 companyName={company.tradeName || company.legalName}
                 logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? undefined}
@@ -164,7 +168,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               />
               <div className="min-w-0">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
-                  <h1 className="truncate text-2xl font-semibold text-zinc-950">
+                  <h1 className="truncate text-xl font-semibold text-zinc-950">
                     {company.tradeName || company.legalName}
                   </h1>
                   {context?.isAdmin ? <AdminBadge /> : null}
@@ -190,15 +194,15 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           </div>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-[1fr_auto]">
-          <div className="bm-premium-card rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100">
+        <section className="grid gap-3 md:grid-cols-[1fr_auto]">
+          <div className="bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100">
             <p className="text-sm text-zinc-500">
               {t("settings.verificationStatus")}
             </p>
             <div className="mt-2">
               <VerificationBadge status={status} subject={role} />
             </div>
-            <p className="mt-3 text-sm text-zinc-600">
+            <p className="mt-2 text-sm text-zinc-600">
               {status === "verified"
                 ? t("settings.verifiedCompanyText")
                 : status === "rejected"
@@ -211,18 +215,18 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                 : t("dashboard.publicListingHidden")}
             </p>
           </div>
-          <div className="bm-premium-card rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100 md:min-w-48">
+          <div className="bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100 md:min-w-40">
             <p className="text-sm text-zinc-500">
               {t("settings.profileCompleteness")}
             </p>
-            <p className="mt-1 text-3xl font-semibold text-zinc-950">
+            <p className="mt-1 text-2xl font-semibold text-zinc-950">
               {completeness}%
             </p>
           </div>
         </section>
 
         {status === "rejected" || status === "needs_reverification" ? (
-          <div className="w-fit rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <div className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
             {t("settings.resubmitVerification")}
           </div>
         ) : null}
@@ -235,6 +239,18 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
       </div>
     </div>
   );
+}
+
+function parseDashboardSection(
+  value: string | null,
+  role: "seller" | "buyer",
+): DashboardSection | null {
+  if (value === "overview" || value === "following" || value === "messages") {
+    return value;
+  }
+  if (role === "seller" && value === "products") return value;
+  if (role === "buyer" && value === "saved-products") return value;
+  return null;
 }
 
 function Action({
@@ -253,8 +269,8 @@ function Action({
       href={withLocale(href, locale)}
       className={
         primary
-          ? "inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          : "inline-flex min-h-11 items-center justify-center rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+          ? "inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white hover:bg-blue-700"
+          : "inline-flex h-8 items-center justify-center rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
       }
     >
       {label}
