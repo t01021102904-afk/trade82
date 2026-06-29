@@ -31,6 +31,23 @@ export async function GET() {
             createdAt: true,
           },
         },
+        products: {
+          where: { status: { not: "inactive" } },
+          orderBy: { updatedAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            category: true,
+            imageUrl: true,
+            updatedAt: true,
+            images: {
+              orderBy: { position: "asc" },
+              take: 1,
+              select: { cardUrl: true, mainUrl: true, originalUrl: true },
+            },
+          },
+        },
         _count: {
           select: {
             products: true,
@@ -48,13 +65,31 @@ export async function GET() {
         tradeName: company.tradeName,
         companyRole: company.companyRole,
         verificationStatus: company.verificationStatus,
+        logoOriginalUrl: company.logoOriginalUrl,
+        logoThumbnailUrl: company.logoThumbnailUrl,
+        logoUrl: company.logoUrl,
+        useDefaultLogo: company.useDefaultLogo,
         country: company.country,
         city: company.city,
+        stateOrProvince: company.stateOrProvince,
         createdAt: company.createdAt,
         ownerEmail: company.owner.email,
         ownerDisplayName: company.owner.displayName,
         isTrade82Team: isTrade82TeamAccount(company.owner),
-        productCount: company._count.products,
+        productCount: company.products.length,
+        products: company.products.map((product) => ({
+          id: product.id,
+          name: product.name,
+          status: product.status,
+          category: product.category,
+          imageUrl:
+            product.images[0]?.cardUrl ??
+            product.images[0]?.mainUrl ??
+            product.imageUrl ??
+            product.images[0]?.originalUrl ??
+            null,
+          updatedAt: product.updatedAt,
+        })),
         inquiryCount:
           company.companyRole === "seller"
             ? company._count.sellerInquiries
@@ -87,7 +122,24 @@ export async function POST(request: Request) {
       "pause",
       "request_updates",
       "reset",
+      "delete_product",
     ]);
+
+    if (action === "delete_product") {
+      const productId = requiredIdField(body, "productId");
+      const product = await getDb().product.findFirst({
+        where: { id: productId, sellerCompanyId: companyId },
+        select: { id: true },
+      });
+      if (!product) {
+        return Response.json({ error: "Product not found." }, { status: 404 });
+      }
+      await getDb().product.update({
+        where: { id: productId },
+        data: { status: "inactive" },
+      });
+      return Response.json({ ok: true, productId, productStatus: "inactive" });
+    }
 
     const statusMap: Record<string, string> = {
       approve: "verified",

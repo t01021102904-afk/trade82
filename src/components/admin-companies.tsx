@@ -1,12 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { AdminBadge } from "@/components/admin-badge";
+import { AdminCompanyLogo } from "@/components/admin-company-logo";
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
+
+type StatusFilter = "pending" | "updates" | "listed" | "rejected" | "paused" | "all";
+
+type AdminProduct = {
+  id: string;
+  name: string;
+  status: string;
+  category: string;
+  imageUrl: string | null;
+  updatedAt: string;
+};
 
 type AdminCompany = {
   id: string;
@@ -14,13 +26,19 @@ type AdminCompany = {
   tradeName: string | null;
   companyRole: "seller" | "buyer";
   verificationStatus: string;
+  logoOriginalUrl: string | null;
+  logoThumbnailUrl: string | null;
+  logoUrl: string | null;
+  useDefaultLogo: boolean;
   country: string;
   city: string;
+  stateOrProvince: string;
   createdAt: string;
   ownerEmail: string;
   ownerDisplayName: string;
   isTrade82Team: boolean;
   productCount: number;
+  products: AdminProduct[];
   inquiryCount: number;
   latestRequest: {
     id: string;
@@ -35,27 +53,67 @@ export function AdminCompanies() {
   const admin = messages.admin;
   const searchParams = useSearchParams();
   const roleFilter = searchParams.get("role") as "seller" | "buyer" | null;
+  const statusParam = parseStatusFilter(searchParams.get("status"));
   const [allCompanies, setAllCompanies] = useState<AdminCompany[]>([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(() => statusParam ?? "pending");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionState, setActionState] = useState<Record<string, { pending: boolean; message: string; error: string }>>({});
   const [docError, setDocError] = useState("");
 
-  const companies = roleFilter
-    ? allCompanies.filter((c) => c.companyRole === roleFilter)
-    : allCompanies;
+  const loadCompanies = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
+    if (!silent) setLoading(true);
+    setError("");
+    const response = await fetch("/api/admin/companies", { cache: "no-store" });
+    if (!response.ok) {
+      setError(admin.unableLoadCompanies);
+      setLoading(false);
+      return;
+    }
+    const data = (await response.json()) as AdminCompany[];
+    setAllCompanies(data);
+    setLoading(false);
+  }, [admin.unableLoadCompanies]);
+
+  const companies = useMemo(
+    () =>
+      allCompanies
+        .filter((company) => !roleFilter || company.companyRole === roleFilter)
+        .filter((company) => statusMatchesFilter(company.verificationStatus, statusFilter))
+        .filter((company) => companyMatchesSearch(company, search, admin)),
+    [admin, allCompanies, roleFilter, search, statusFilter],
+  );
 
   useEffect(() => {
-    void fetch("/api/admin/companies")
-      .then((r) => (r.ok ? r.json() : null))
+    let active = true;
+
+    void fetch("/api/admin/companies", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
       .then((data: AdminCompany[] | null) => {
+        if (!active) return;
         if (data) setAllCompanies(data);
         else setError(admin.unableLoadCompanies);
         setLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setError(admin.unableLoadCompanies);
+        setLoading(false);
       });
+
+    return () => {
+      active = false;
+    };
   }, [admin.unableLoadCompanies]);
 
   async function performAction(companyId: string, action: string) {
+    if (
+      action === "reject" &&
+      !window.confirm(admin.confirmRejectListing)
+    ) {
+      return;
+    }
     setActionState((prev) => ({
       ...prev,
       [companyId]: { pending: true, message: "", error: "" },
@@ -92,6 +150,59 @@ export function AdminCompanies() {
       setTimeout(() => {
         setActionState((prev) => ({ ...prev, [companyId]: { pending: false, message: "", error: "" } }));
       }, 3000);
+      void loadCompanies({ silent: true });
+    } catch {
+      setActionState((prev) => ({
+        ...prev,
+        [companyId]: { pending: false, message: "", error: admin.networkError },
+      }));
+    }
+  }
+
+  async function deleteProduct(companyId: string, productId: string) {
+    if (!window.confirm(admin.confirmDeleteProduct)) return;
+
+    setActionState((prev) => ({
+      ...prev,
+      [companyId]: { pending: true, message: "", error: "" },
+    }));
+    try {
+      const response = await fetch("/api/admin/companies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyId, productId, action: "delete_product" }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { ok?: boolean; productId?: string; error?: string }
+        | null;
+
+      if (!response.ok || !result?.ok) {
+        setActionState((prev) => ({
+          ...prev,
+          [companyId]: { pending: false, message: "", error: result?.error ?? admin.productDeleteFailed },
+        }));
+        return;
+      }
+
+      setAllCompanies((prev) =>
+        prev.map((company) =>
+          company.id === companyId
+            ? {
+                ...company,
+                products: company.products.filter((product) => product.id !== productId),
+                productCount: Math.max(0, company.productCount - 1),
+              }
+            : company,
+        ),
+      );
+      setActionState((prev) => ({
+        ...prev,
+        [companyId]: { pending: false, message: admin.productDeleted, error: "" },
+      }));
+      setTimeout(() => {
+        setActionState((prev) => ({ ...prev, [companyId]: { pending: false, message: "", error: "" } }));
+      }, 3000);
+      void loadCompanies({ silent: true });
     } catch {
       setActionState((prev) => ({
         ...prev,
@@ -133,6 +244,35 @@ export function AdminCompanies() {
         <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">{docError}</p>
       ) : null}
 
+      <div className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-4">
+        <label className="grid gap-1 text-sm font-medium text-zinc-700">
+          {admin.searchCompanies}
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder={admin.searchCompaniesPlaceholder}
+            className="min-h-11 rounded-md border border-zinc-200 px-3 py-2 text-sm font-normal text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+          />
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {statusFilterOptions(admin).map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              onClick={() => setStatusFilter(option.id)}
+              className={`rounded-md border px-3 py-2 text-sm font-medium transition ${
+                statusFilter === option.id
+                  ? "border-zinc-950 bg-zinc-950 text-white"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <p className="text-sm text-zinc-500">
         {countText}
         {roleFilter ? (
@@ -159,75 +299,115 @@ export function AdminCompanies() {
         return (
           <article
             key={company.id}
-            className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[1fr_auto]"
+            className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[minmax(0,1fr)_auto]"
           >
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-semibold text-zinc-950">
-                  {company.tradeName || company.legalName}
-                </h3>
-                {company.isTrade82Team ? <AdminBadge /> : null}
-                {company.tradeName ? (
-                  <span className="text-sm text-zinc-500">({company.legalName})</span>
-                ) : null}
-                <Badge tone={tone}>{label}</Badge>
-                <Badge tone={company.companyRole === "seller" ? "blue" : "amber"}>
-                  {roleLabel(company.companyRole)}
-                </Badge>
-              </div>
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row">
+              <AdminCompanyLogo
+                companyName={company.tradeName || company.legalName}
+                logoUrl={company.useDefaultLogo ? "" : company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl}
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-semibold text-zinc-950">
+                    {company.tradeName || company.legalName}
+                  </h3>
+                  {company.isTrade82Team ? <AdminBadge /> : null}
+                  {company.tradeName ? (
+                    <span className="text-sm text-zinc-500">({company.legalName})</span>
+                  ) : null}
+                  <Badge tone={tone}>{label}</Badge>
+                  <Badge tone={company.companyRole === "seller" ? "blue" : "amber"}>
+                    {roleLabel(company.companyRole)}
+                  </Badge>
+                </div>
 
-              <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                  <dt className="text-zinc-500">{admin.owner}</dt>
-                  <dd className="flex min-w-0 items-center gap-1.5">
-                    <span className="truncate font-mono text-xs">{company.ownerEmail}</span>
-                    {company.isTrade82Team ? <AdminBadge compact /> : null}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-zinc-500">{admin.location}</dt>
-                  <dd>{[company.city, company.country].filter(Boolean).join(", ") || "—"}</dd>
-                </div>
-                <div>
-                  <dt className="text-zinc-500">{admin.created}</dt>
-                  <dd>{formatDateUtc(company.createdAt, locale)}</dd>
-                </div>
-                {company.companyRole === "seller" ? (
+                <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
                   <div>
-                    <dt className="text-zinc-500">{admin.products}</dt>
-                    <dd>{company.productCount}</dd>
-                  </div>
-                ) : null}
-                <div>
-                  <dt className="text-zinc-500">{admin.inquiries}</dt>
-                  <dd>{company.inquiryCount}</dd>
-                </div>
-                {company.latestRequest ? (
-                  <div>
-                    <dt className="text-zinc-500">{admin.submittedDocument}</dt>
-                    <dd>
-                      {company.latestRequest.documentFilename ? (
-                        <button
-                          type="button"
-                          onClick={() => void openDocument(company.latestRequest!.id)}
-                          className="font-medium text-blue-700 hover:underline"
-                        >
-                          {admin.openDocument}
-                        </button>
-                      ) : (
-                        admin.noDocument
-                      )}
+                    <dt className="text-zinc-500">{admin.owner}</dt>
+                    <dd className="flex min-w-0 items-center gap-1.5">
+                      <span className="truncate font-mono text-xs">{company.ownerEmail}</span>
+                      {company.isTrade82Team ? <AdminBadge compact /> : null}
                     </dd>
                   </div>
-                ) : null}
-              </dl>
+                  <div>
+                    <dt className="text-zinc-500">{admin.location}</dt>
+                    <dd>{[company.city, company.stateOrProvince, company.country].filter(Boolean).join(", ") || "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-zinc-500">{admin.created}</dt>
+                    <dd>{formatDateUtc(company.createdAt, locale)}</dd>
+                  </div>
+                  {company.companyRole === "seller" ? (
+                    <div>
+                      <dt className="text-zinc-500">{admin.products}</dt>
+                      <dd>{company.productCount}</dd>
+                    </div>
+                  ) : null}
+                  <div>
+                    <dt className="text-zinc-500">{admin.inquiries}</dt>
+                    <dd>{company.inquiryCount}</dd>
+                  </div>
+                  {company.latestRequest ? (
+                    <div>
+                      <dt className="text-zinc-500">{admin.submittedDocument}</dt>
+                      <dd>
+                        {company.latestRequest.documentFilename ? (
+                          <button
+                            type="button"
+                            onClick={() => void openDocument(company.latestRequest!.id)}
+                            className="font-medium text-blue-700 hover:underline"
+                          >
+                            {admin.openDocument}
+                          </button>
+                        ) : (
+                          admin.noDocument
+                        )}
+                      </dd>
+                    </div>
+                  ) : null}
+                </dl>
 
-              {state?.message ? (
-                <p className="mt-3 text-sm font-medium text-emerald-700">{state.message}</p>
-              ) : null}
-              {state?.error ? (
-                <p className="mt-3 text-sm font-medium text-red-700">{state.error}</p>
-              ) : null}
+                {company.products.length ? (
+                  <div className="mt-4 rounded-md border border-zinc-100 bg-zinc-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{admin.products}</p>
+                    <div className="mt-3 grid gap-2">
+                      {company.products.map((product) => (
+                        <div
+                          key={product.id}
+                          className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md bg-white p-2"
+                        >
+                          <div className="flex min-w-0 items-center gap-3">
+                            <AdminCompanyLogo
+                              companyName={product.name}
+                              logoUrl={product.imageUrl}
+                              className="size-12 rounded-md"
+                            />
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-medium text-zinc-900">{product.name}</p>
+                              <p className="truncate text-xs text-zinc-500">{product.category} · {product.status}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            disabled={isPending}
+                            onClick={() => void deleteProduct(company.id, product.id)}
+                            className="rounded-md border border-red-200 px-3 py-2 text-xs font-medium text-red-700 hover:border-red-300 disabled:cursor-wait disabled:opacity-60"
+                          >
+                            {isPending ? admin.saving : admin.deleteProduct}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {state?.message ? (
+                  <p className="mt-3 text-sm font-medium text-emerald-700">{state.message}</p>
+                ) : null}
+                {state?.error ? (
+                  <p className="mt-3 text-sm font-medium text-red-700">{state.error}</p>
+                ) : null}
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -318,11 +498,75 @@ function statusLabel(
     pending_review: { label: admin.statusPending, tone: "amber" },
     email_verified: { label: admin.statusPending, tone: "amber" },
     needs_reverification: { label: admin.statusPaused, tone: "red" },
-    rejected: { label: admin.statusNeedsUpdates, tone: "gray" },
+    rejected: { label: admin.statusRejected, tone: "gray" },
     unverified: { label: admin.statusPending, tone: "gray" },
   };
 
   return labels[status] ?? { label: status, tone: "gray" as const };
+}
+
+function parseStatusFilter(value: string | null): StatusFilter | null {
+  if (
+    value === "pending" ||
+    value === "updates" ||
+    value === "listed" ||
+    value === "rejected" ||
+    value === "paused" ||
+    value === "all"
+  ) {
+    return value;
+  }
+  return null;
+}
+
+function statusFilterOptions(
+  admin: ReturnType<typeof useI18n>["messages"]["admin"],
+): Array<{ id: StatusFilter; label: string }> {
+  return [
+    { id: "all", label: admin.filterAll },
+    { id: "pending", label: admin.filterPending },
+    { id: "updates", label: admin.filterUpdates },
+    { id: "listed", label: admin.filterListed },
+    { id: "rejected", label: admin.filterRejected },
+    { id: "paused", label: admin.filterPaused },
+  ];
+}
+
+function statusMatchesFilter(status: string, filter: StatusFilter) {
+  if (filter === "all") return true;
+  if (filter === "listed") return status === "verified";
+  if (filter === "rejected") return status === "rejected";
+  if (filter === "paused" || filter === "updates") return status === "needs_reverification";
+  return status === "pending_review" || status === "email_verified" || status === "unverified";
+}
+
+function companyMatchesSearch(
+  company: AdminCompany,
+  search: string,
+  admin: ReturnType<typeof useI18n>["messages"]["admin"],
+) {
+  const query = search.trim().toLowerCase();
+  if (!query) return true;
+
+  const { label } = statusLabel(company.verificationStatus, admin);
+  const role = company.companyRole === "seller" ? admin.roleSeller : admin.roleBuyer;
+  const haystack = [
+    company.legalName,
+    company.tradeName ?? "",
+    company.ownerEmail,
+    company.ownerDisplayName,
+    company.city,
+    company.stateOrProvince,
+    company.country,
+    company.companyRole,
+    role,
+    company.verificationStatus,
+    label,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(query);
 }
 
 function formatDateUtc(value: string, locale: "en" | "ko") {

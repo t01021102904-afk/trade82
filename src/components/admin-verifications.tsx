@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { AdminCompanyLogo } from "@/components/admin-company-logo";
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
@@ -154,6 +155,12 @@ export function AdminVerifications() {
     request: VerificationRequest,
     verificationStatus: "verified" | "rejected",
   ) {
+    if (
+      verificationStatus === "rejected" &&
+      !window.confirm(admin.confirmRejectListing)
+    ) {
+      return;
+    }
     setNotice("");
     setActionState((prev) => ({
       ...prev,
@@ -203,6 +210,7 @@ export function AdminVerifications() {
     setSelectedRequest(null);
     setNotice(admin.actionDone);
     setTimeout(() => setNotice(""), 3000);
+    void load();
   }
 
   async function openVerificationDocument(requestId: string) {
@@ -272,32 +280,42 @@ export function AdminVerifications() {
                 key={item.id}
                 type="button"
                 onClick={() => setSelectedRequest(item)}
-                className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 text-left transition hover:border-blue-200 hover:shadow-sm lg:grid-cols-[1fr_auto]"
+                className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 text-left transition hover:border-blue-200 hover:shadow-sm lg:grid-cols-[minmax(0,1fr)_auto]"
               >
-                <div>
-                  <div className="flex flex-wrap gap-2">
-                    <h3 className="font-semibold text-zinc-950">{item.company.tradeName || item.company.legalName}</h3>
-                    <Badge tone={tone}>{label}</Badge>
-                    <Badge>{roleLabel(item.company.companyRole, admin)}</Badge>
+                <div className="flex min-w-0 flex-col gap-4 sm:flex-row">
+                  <AdminCompanyLogo
+                    companyName={item.company.tradeName || item.company.legalName}
+                    logoUrl={
+                      item.company.useDefaultLogo
+                        ? ""
+                        : item.company.logoThumbnailUrl || item.company.logoUrl || item.company.logoOriginalUrl
+                    }
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap gap-2">
+                      <h3 className="font-semibold text-zinc-950">{item.company.tradeName || item.company.legalName}</h3>
+                      <Badge tone={tone}>{label}</Badge>
+                      <Badge>{roleLabel(item.company.companyRole, admin)}</Badge>
+                    </div>
+                    <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                      <div>
+                        <dt className="text-zinc-500">{admin.email}</dt>
+                        <dd className="truncate font-mono text-xs">{item.company.owner.email}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-zinc-500">{admin.location}</dt>
+                        <dd>{formatLocation(item.company, locale)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-zinc-500">{admin.created}</dt>
+                        <dd>{formatDateUtc(item.createdAt, locale)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-zinc-500">{admin.submittedDocument}</dt>
+                        <dd>{item.documentFilename || admin.notUploaded}</dd>
+                      </div>
+                    </dl>
                   </div>
-                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <dt className="text-zinc-500">{admin.email}</dt>
-                      <dd className="truncate font-mono text-xs">{item.company.owner.email}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-zinc-500">{admin.location}</dt>
-                      <dd>{formatLocation(item.company, locale)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-zinc-500">{admin.created}</dt>
-                      <dd>{formatDateUtc(item.createdAt, locale)}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-zinc-500">{admin.submittedDocument}</dt>
-                      <dd>{item.documentFilename || admin.notUploaded}</dd>
-                    </div>
-                  </dl>
                 </div>
                 <span className="self-start rounded-md border border-zinc-200 px-3 py-2 text-center text-sm font-medium text-zinc-700">
                   {admin.reviewDetails}
