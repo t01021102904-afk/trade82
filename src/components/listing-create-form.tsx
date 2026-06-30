@@ -10,12 +10,22 @@ import {
   RichProductFormFields,
   type RichProductFormErrors,
   type RichProductFormValue,
+  validateRichProductForm,
 } from "@/components/rich-product-form-fields";
 import {
   useDraftBackup,
   useUnsavedChangesWarning,
 } from "@/hooks/use-form-reliability";
+import {
+  getLeadTimeOptions,
+  getSalesChannelOptions,
+} from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
+import {
+  normalizeProductFieldVisibility,
+  type ProductFieldVisibilityKey,
+} from "@/lib/product-field-visibility";
+import { cx } from "@/lib/utils";
 
 type ListingErrors = RichProductFormErrors & { form?: string };
 
@@ -27,6 +37,7 @@ export function ListingCreateForm() {
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [errors, setErrors] = useState<ListingErrors>({});
+  const [notice, setNotice] = useState("");
   const leaveMessage = t("settings.unsavedChangesWarning");
   useUnsavedChangesWarning(dirty && !submitting && !uploading, leaveMessage);
   const { draft, clearDraft, discardDraft } = useDraftBackup<RichProductFormValue>(
@@ -41,7 +52,12 @@ export function ListingCreateForm() {
   ) {
     setProduct((current) => ({ ...current, [key]: value }));
     setDirty(true);
-    setErrors((current) => ({ ...current, [key]: undefined, form: undefined }));
+    setErrors((current) =>
+      key === "fieldVisibility"
+        ? { form: current.form }
+        : { ...current, [key]: undefined, form: undefined },
+    );
+    setNotice("");
   }
 
   function restoreDraft() {
@@ -53,38 +69,25 @@ export function ListingCreateForm() {
   }
 
   function validate() {
-    const nextErrors: ListingErrors = {};
-    if (!product.images.length) nextErrors.images = t("listing.errors.images");
-    if (!product.name.trim()) nextErrors.name = t("listing.errors.name");
-    if (!product.category) nextErrors.category = t("listing.errors.category");
-    if (!product.priceMin || Number(product.priceMin) <= 0) {
-      nextErrors.price = t("listing.errors.price");
-    }
-    if (
-      product.moqUnit !== "Not fixed" &&
-      (!product.moqQuantity || Number(product.moqQuantity) <= 0)
-    ) {
-      nextErrors.moq = t("listing.errors.moq");
-    }
-    if (!product.leadTime) nextErrors.leadTime = t("listing.errors.leadTime");
-    if (!product.detailedDescription.trim()) {
-      nextErrors.description = t("listing.errors.description");
-    }
+    const nextErrors: ListingErrors = validateRichProductForm(product, t);
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (submitting || uploading) return;
+  async function saveProduct(status: "active" | "draft") {
+    if (submitting) return;
     if (!validate()) return;
 
     setSubmitting(true);
+    setNotice("");
     try {
       const response = await fetch("/api/account/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productPayloadFromForm(product)),
+        body: JSON.stringify({
+          ...productPayloadFromForm(product),
+          status,
+        }),
       });
       const result = (await response.json().catch(() => null)) as {
         id?: string;
@@ -94,6 +97,11 @@ export function ListingCreateForm() {
       if (response.ok && result?.id) {
         clearDraft();
         setDirty(false);
+        setNotice(
+          status === "draft"
+            ? t("listing.productSaved")
+            : t("listing.productPublished"),
+        );
         router.push(withLocale(`/products/${result.id}`, locale));
         router.refresh();
         return;
@@ -107,27 +115,85 @@ export function ListingCreateForm() {
     }
   }
 
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void saveProduct("active");
+  }
+
+  const statusMeta = productBuilderStatus({
+    submitting,
+    uploading,
+    hasError: Boolean(errors.form),
+    dirty,
+    t,
+  });
+  const sectionLinks = [
+    ["product-images", t("productForm.productImages")],
+    ["basic-information", t("productForm.basicInfo")],
+    ["pricing-order-terms", t("productForm.pricingTerms")],
+    ["origin-shipping", t("productForm.originShipping")],
+    ["compliance", t("productForm.complianceDocuments")],
+    ["packaging-logistics", t("productForm.packagingLogistics")],
+  ] as const;
+
   return (
     <form
       onSubmit={submit}
-      className="mx-auto grid w-full max-w-5xl gap-6"
+      className="mx-auto grid w-full max-w-7xl gap-5 rounded-[24px] border border-white/10 bg-[#07090d] p-4 text-zinc-100 shadow-2xl shadow-black/30 sm:p-5 lg:p-6"
       noValidate
     >
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+            {t("listing.pageLabel")}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              {t("listing.createProduct")}
+            </h1>
+            <StatusPill label={statusMeta.label} tone={statusMeta.tone} />
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+            {t("listing.builderHelp")}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => void saveProduct("draft")}
+            className={secondaryActionClass}
+          >
+            {submitting ? t("listing.statusSaving") : t("listing.saveDraft")}
+          </button>
+          <a href="#buyer-preview" className={ghostActionClass}>
+            {t("listing.preview")}
+          </a>
+          <button
+            type="submit"
+            disabled={submitting}
+            className={primaryActionClass}
+          >
+            {submitting ? t("listing.statusSaving") : t("listing.publishProduct")}
+          </button>
+        </div>
+      </div>
+
       {draft ? (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100">
           <p>{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={restoreDraft}
-              className="rounded-md bg-amber-900 px-3 py-2 font-medium text-white"
+              className="h-8 rounded-lg bg-amber-300 px-3 text-xs font-semibold text-zinc-950"
             >
               {t("settings.restoreDraft")}
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="rounded-md border border-amber-300 bg-white px-3 py-2 font-medium text-amber-900"
+              className="h-8 rounded-lg border border-amber-300/30 px-3 text-xs font-semibold text-amber-100"
             >
               {t("settings.discardDraft")}
             </button>
@@ -135,30 +201,244 @@ export function ListingCreateForm() {
         </div>
       ) : null}
 
-      <RichProductFormFields
-        value={product}
-        errors={errors}
-        onChange={update}
-        onUploadingChange={setUploading}
-      />
+      <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:items-start">
+        <aside className="hidden rounded-2xl border border-white/10 bg-white/[0.035] p-3 lg:sticky lg:top-24 lg:block">
+          <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            {t("listing.sections")}
+          </p>
+          <nav className="grid gap-1" aria-label={t("listing.sections")}>
+            {sectionLinks.map(([href, label]) => (
+              <a
+                key={href}
+                href={`#${href}`}
+                className="rounded-xl px-2 py-2 text-sm font-medium text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="min-w-0">
+          <RichProductFormFields
+            value={product}
+            errors={errors}
+            onChange={update}
+            onUploadingChange={setUploading}
+            variant="dashboard"
+          />
+        </div>
+
+        <BuyerPreviewPanel product={product} />
+      </div>
 
       {errors.form ? (
-        <p className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-2xl border border-red-400/25 bg-red-400/10 p-4 text-sm font-medium text-red-200">
           {errors.form}
         </p>
       ) : null}
+      {notice ? (
+        <p role="status" className="rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm font-medium text-emerald-100">
+          {notice}
+        </p>
+      ) : null}
+      {uploading ? (
+        <p role="status" className="rounded-2xl border border-blue-300/25 bg-blue-300/10 p-4 text-sm font-medium text-blue-100">
+          {t("listing.imageUploadInProgress")}
+        </p>
+      ) : null}
 
-      <button
-        type="submit"
-        disabled={uploading || submitting}
-        className="min-h-12 rounded-md bg-zinc-950 px-5 py-3 text-base font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-fit"
-      >
-        {uploading
-          ? t("listing.uploading")
-          : submitting
-            ? t("listing.submitting")
-            : t("listing.submit")}
-      </button>
+      <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-5">
+        <button
+          type="button"
+          disabled={submitting}
+          onClick={() => void saveProduct("draft")}
+          className={secondaryActionClass}
+        >
+          {submitting ? t("listing.statusSaving") : t("listing.saveDraft")}
+        </button>
+        <button
+          type="submit"
+          disabled={submitting}
+          className={primaryActionClass}
+        >
+          {submitting ? t("listing.statusSaving") : t("listing.publishProduct")}
+        </button>
+      </div>
     </form>
   );
+}
+
+const primaryActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+const secondaryActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-4 text-sm font-semibold text-zinc-100 transition hover:bg-white/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+const ghostActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
+
+function productBuilderStatus({
+  submitting,
+  uploading,
+  hasError,
+  dirty,
+  t,
+}: {
+  submitting: boolean;
+  uploading: boolean;
+  hasError: boolean;
+  dirty: boolean;
+  t: (key: string) => string;
+}) {
+  if (hasError) return { label: t("listing.statusSaveFailed"), tone: "red" as const };
+  if (submitting) return { label: t("listing.statusSaving"), tone: "blue" as const };
+  if (uploading) return { label: t("listing.statusUploading"), tone: "blue" as const };
+  if (dirty) return { label: t("listing.statusReady"), tone: "emerald" as const };
+  return { label: t("listing.statusDraft"), tone: "zinc" as const };
+}
+
+function StatusPill({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "zinc" | "blue" | "emerald" | "red";
+}) {
+  return (
+    <span
+      className={cx(
+        "inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold",
+        tone === "blue" && "border-blue-300/30 bg-blue-300/10 text-blue-100",
+        tone === "emerald" &&
+          "border-emerald-300/30 bg-emerald-300/10 text-emerald-100",
+        tone === "red" && "border-red-300/30 bg-red-300/10 text-red-100",
+        tone === "zinc" && "border-white/10 bg-white/[0.06] text-zinc-300",
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
+  const { locale, t } = useI18n();
+  const image =
+    product.images[0]?.mainUrl ||
+    product.images[0]?.cardUrl ||
+    product.images[0]?.originalUrl ||
+    "";
+  const leadTimeLabel =
+    getLeadTimeOptions(locale).find((option) => option.value === product.leadTime)
+      ?.label ?? product.leadTime;
+  const channelOptions = getSalesChannelOptions(locale);
+  const channelLabels = product.suggestedUsChannels
+    .map(
+      (channel) =>
+        channelOptions.find((option) => option.value === channel)?.label ?? channel,
+    )
+    .slice(0, 3);
+
+  return (
+    <aside
+      id="buyer-preview"
+      className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 lg:sticky lg:top-24"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+            {t("listing.buyerPreview")}
+          </p>
+          <h2 className="mt-1 text-base font-semibold text-white">
+            {product.name || t("listing.previewUntitled")}
+          </h2>
+        </div>
+        <StatusPill label={t("listing.statusDraft")} tone="zinc" />
+      </div>
+
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950">
+        {image ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={image} alt="" className="aspect-[4/3] w-full object-cover" />
+        ) : (
+          <div className="flex aspect-[4/3] items-center justify-center text-sm text-zinc-500">
+            {t("listing.previewImagePlaceholder")}
+          </div>
+        )}
+      </div>
+
+      <dl className="mt-4 grid gap-3 text-sm">
+        <PreviewRow label={t("listing.category")} value={product.category || t("productDetail.notProvided")} />
+        <PreviewRow
+          label={t("settings.priceMin")}
+          value={fieldPreviewValue(
+            product,
+            "minimumUnitPrice",
+            product.priceMin
+              ? `${product.currency} ${product.priceMin}${product.priceMax ? `-${product.priceMax}` : ""} / ${product.priceUnit}`
+              : "",
+            t,
+          )}
+        />
+        <PreviewRow
+          label={t("marketplace.moq")}
+          value={fieldPreviewValue(
+            product,
+            "moq",
+            product.moqQuantity
+              ? `${product.moqQuantity} ${product.moqUnit}`
+              : "",
+            t,
+          )}
+        />
+        <PreviewRow
+          label={t("settings.leadTime")}
+          value={fieldPreviewValue(product, "leadTime", leadTimeLabel, t)}
+        />
+        <PreviewRow
+          label={t("productForm.countryOfOrigin")}
+          value={product.shippingOriginRegion || product.countryOfOrigin}
+        />
+      </dl>
+
+      <div className="mt-4 border-t border-white/10 pt-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+          {t("productForm.suggestedUsChannels")}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {channelLabels.length ? (
+            channelLabels.map((channel) => (
+              <span
+                key={channel}
+                className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs font-medium text-zinc-300"
+              >
+                {channel}
+              </span>
+            ))
+          ) : (
+            <span className="text-sm text-zinc-500">{t("productDetail.notProvided")}</span>
+          )}
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function PreviewRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid gap-1 rounded-xl border border-white/10 bg-zinc-950/70 p-3">
+      <dt className="text-xs font-medium text-zinc-500">{label}</dt>
+      <dd className="break-words text-sm font-medium text-zinc-100">{value}</dd>
+    </div>
+  );
+}
+
+function fieldPreviewValue(
+  product: RichProductFormValue,
+  key: ProductFieldVisibilityKey,
+  value: string,
+  t: (key: string) => string,
+) {
+  const visibility = normalizeProductFieldVisibility(product.fieldVisibility)[key];
+  if (visibility === "private") return t("listing.previewContactSeller");
+  if (visibility === "inquiry_required") return t("listing.previewInquiryRequired");
+  return value || t("productDetail.notProvided");
 }

@@ -12,13 +12,14 @@ import {
   OnboardingStepper,
   type OnboardingStepId,
 } from "@/components/onboarding-stepper";
-import { ProfilePreviewPanel } from "@/components/premium-motion";
+import { OnboardingStoryPanel } from "@/components/onboarding-story-panel";
 import {
   emptyRichProductForm,
   productPayloadFromForm,
   RichProductFormFields,
   type RichProductFormErrors,
   type RichProductFormValue,
+  validateRichProductForm,
 } from "@/components/rich-product-form-fields";
 import {
   useDraftBackup,
@@ -497,36 +498,11 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
 
   async function saveProductStep(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving || uploading) return;
-    if (!product.images.length) {
-      setError(t("listing.errors.images"));
-      return;
-    }
-    if (!product.name.trim()) {
-      setError(t("listing.errors.name"));
-      return;
-    }
-    if (!product.category) {
-      setError(t("listing.errors.category"));
-      return;
-    }
-    if (!product.detailedDescription.trim()) {
-      setError(t("listing.errors.description"));
-      return;
-    }
-    if (!product.priceMin || Number(product.priceMin) <= 0) {
-      setError(t("listing.errors.price"));
-      return;
-    }
-    if (
-      product.moqUnit !== "Not fixed" &&
-      (!product.moqQuantity || Number(product.moqQuantity) <= 0)
-    ) {
-      setError(t("listing.errors.moq"));
-      return;
-    }
-    if (!product.leadTime) {
-      setError(t("listing.errors.leadTime"));
+    if (saving) return;
+    const nextErrors = validateRichProductForm(product, t);
+    const firstError = Object.values(nextErrors)[0];
+    if (firstError) {
+      setError(firstError);
       return;
     }
 
@@ -661,9 +637,9 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
         role={kind}
         onSelect={selectStep}
       />
-      <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-        <OnboardingGuide kind={kind} />
-        <div className="grid gap-5">
+      <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
+        <OnboardingStoryPanel kind={kind} />
+        <div id="onboarding-current-step" className="scroll-mt-28 grid gap-5">
           {draft ? (
             <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
               <p>{t("settings.draftAvailable")}</p>
@@ -1021,30 +997,16 @@ function ProductStepForm({
   const [fieldErrors, setFieldErrors] = useState<RichProductFormErrors>({});
 
   function update<K extends keyof SellerProductStep>(key: K, value: SellerProductStep[K]) {
-    setFieldErrors((current) => ({ ...current, [key]: undefined }));
+    setFieldErrors((current) =>
+      key === "fieldVisibility" ? {} : { ...current, [key]: undefined },
+    );
     onChange(key, value);
   }
 
   return (
     <form
       onSubmit={(event) => {
-        const nextErrors: RichProductFormErrors = {};
-        if (!product.images.length) nextErrors.images = t("listing.errors.images");
-        if (!product.name.trim()) nextErrors.name = t("listing.errors.name");
-        if (!product.category) nextErrors.category = t("listing.errors.category");
-        if (!product.priceMin || Number(product.priceMin) <= 0) {
-          nextErrors.price = t("listing.errors.price");
-        }
-        if (
-          product.moqUnit !== "Not fixed" &&
-          (!product.moqQuantity || Number(product.moqQuantity) <= 0)
-        ) {
-          nextErrors.moq = t("listing.errors.moq");
-        }
-        if (!product.leadTime) nextErrors.leadTime = t("listing.errors.leadTime");
-        if (!product.detailedDescription.trim()) {
-          nextErrors.description = t("listing.errors.description");
-        }
+        const nextErrors = validateRichProductForm(product, t);
         setFieldErrors(nextErrors);
         if (Object.keys(nextErrors).length) {
           event.preventDefault();
@@ -1064,12 +1026,18 @@ function ProductStepForm({
         errors={fieldErrors}
         onChange={update}
         onUploadingChange={onUploadingChange}
+        variant="dashboard"
       />
       <SubmitButton
         saving={saving}
-        uploading={uploading}
+        uploading={false}
         label={t("onboarding.finishOnboarding")}
       />
+      {uploading ? (
+        <p role="status" className="text-sm text-blue-700">
+          {t("listing.imageUploadInProgress")}
+        </p>
+      ) : null}
     </form>
   );
 }
@@ -1160,59 +1128,6 @@ function SourcingStepForm({
       </div>
       <SubmitButton saving={saving} uploading={false} label={t("onboarding.finishOnboarding")} />
     </form>
-  );
-}
-
-function OnboardingGuide({ kind }: { kind: "buyer" | "seller" }) {
-  const { t } = useI18n();
-  const steps = [
-    t("onboarding.stepRole"),
-    t("onboarding.stepCompany"),
-    t("onboarding.stepPersonal"),
-    kind === "seller"
-      ? t("onboarding.stepSellerProduct")
-      : t("onboarding.stepBuyerSourcing"),
-  ];
-
-  return (
-    <aside className="bm-premium-card grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100">
-      <div className="relative z-10">
-        <p className="text-xs font-medium uppercase tracking-wide text-emerald-700">
-          Trade82
-        </p>
-        <h2 className="mt-2 text-xl font-semibold text-zinc-950">
-          {t("onboarding.processTitle")}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-zinc-600">
-          {t("onboarding.processText")}
-        </p>
-      </div>
-
-      <ol className="relative z-10 grid gap-3">
-        {steps.map((item, index) => (
-          <li
-            key={item}
-            className="flex items-center gap-3 rounded-md border border-transparent px-2 py-1.5 text-sm text-zinc-700 transition hover:border-blue-100 hover:bg-white"
-          >
-            <span className="flex size-7 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-xs font-semibold text-emerald-800">
-              {index + 1}
-            </span>
-            {item}
-          </li>
-        ))}
-      </ol>
-
-      <div className="relative z-10">
-        <ProfilePreviewPanel
-          kind={kind}
-          title={t("onboarding.previewTitle")}
-          subtitle={t("onboarding.previewText")}
-          badgeLabel={
-            kind === "seller" ? t("roles.koreanSeller") : t("roles.americanBuyer")
-          }
-        />
-      </div>
-    </aside>
   );
 }
 

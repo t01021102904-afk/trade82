@@ -15,6 +15,7 @@ type PendingImage = {
   uploaded: UploadedListingImage | null;
   status: "uploading" | "ready" | "error";
   error: string;
+  file?: File;
 };
 
 const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
@@ -119,6 +120,8 @@ function uploadCopy(locale: "en" | "ko") {
         uploading: "업로드 중",
         addPhoto: "사진 추가",
         changePhoto: "사진 변경",
+        retryUpload: "다시 시도",
+        dragHelp: "이미지를 끌어오거나 파일을 선택하세요",
         reorderHelp:
           "첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 변경할 수 있습니다.",
       }
@@ -147,6 +150,8 @@ function uploadCopy(locale: "en" | "ko") {
         uploading: "Uploading",
         addPhoto: "Add photo",
         changePhoto: "Change photo",
+        retryUpload: "Retry",
+        dragHelp: "Drag images here or choose files",
         reorderHelp:
           "The first photo is used as the primary image. Drag or use the arrows to reorder.",
       };
@@ -192,10 +197,12 @@ export function ListingImageUploader({
   value,
   onChange,
   onUploadingChange,
+  variant = "default",
 }: {
   value: UploadedListingImage[];
   onChange: (images: UploadedListingImage[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
+  variant?: "default" | "dashboard";
 }) {
   const { locale } = useI18n();
   const copy = uploadCopy(locale);
@@ -262,6 +269,7 @@ export function ListingImageUploader({
         uploaded: item.uploaded,
         status: item.status,
         error: item.error,
+        file: item.file,
       })),
     ]);
 
@@ -301,6 +309,26 @@ export function ListingImageUploader({
     });
   }
 
+  async function retry(id: string) {
+    const retryItem = items.find((item) => item.id === id);
+    if (!retryItem?.file) return;
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id ? { ...item, status: "uploading", error: "" } : item,
+      ),
+    );
+    const result = await uploadImage(retryItem.file, "product_image", copy, {
+      locale,
+    });
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? updateUploadedProductPreview(item, result, previewUrls.current)
+          : item,
+      ),
+    );
+  }
+
   function move(id: string, offset: number) {
     setItems((current) => {
       const from = current.findIndex((item) => item.id === id);
@@ -329,13 +357,23 @@ export function ListingImageUploader({
   return (
     <div className="grid gap-3">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold text-zinc-900">
+        <span
+          className={cx(
+            "text-sm font-semibold",
+            variant === "dashboard" ? "text-zinc-100" : "text-zinc-900",
+          )}
+        >
           {copy.productImages}
         </span>
         <span className="text-sm text-zinc-500">{items.length}/12</span>
       </div>
       <p className="text-xs leading-5 text-zinc-500">{copy.productHelp}</p>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div
+        className={cx(
+          "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
+          variant === "dashboard" && "lg:grid-cols-3 xl:grid-cols-4",
+        )}
+      >
         {items.map((item, index) => (
           <div
             key={item.id}
@@ -347,7 +385,12 @@ export function ListingImageUploader({
               if (draggedId) moveBefore(draggedId, item.id);
               setDraggedId(null);
             }}
-            className="relative aspect-square overflow-hidden rounded-md border border-zinc-200 bg-zinc-100"
+            className={cx(
+              "relative aspect-square overflow-hidden rounded-md border bg-zinc-100",
+              variant === "dashboard"
+                ? "rounded-2xl border-white/10 bg-zinc-950"
+                : "border-zinc-200",
+            )}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -356,7 +399,14 @@ export function ListingImageUploader({
               className="absolute inset-0 size-full object-cover"
             />
             {index === 0 ? (
-              <span className="absolute left-2 top-2 rounded bg-zinc-950 px-2 py-1 text-xs font-medium text-white">
+              <span
+                className={cx(
+                  "absolute left-2 top-2 rounded px-2 py-1 text-xs font-medium",
+                  variant === "dashboard"
+                    ? "bg-emerald-400 text-zinc-950"
+                    : "bg-zinc-950 text-white",
+                )}
+              >
                 {copy.primary}
               </span>
             ) : null}
@@ -365,7 +415,7 @@ export function ListingImageUploader({
                 type="button"
                 onClick={() => move(item.id, -1)}
                 disabled={index === 0}
-                className="size-9 rounded bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
+                className="size-8 rounded-lg bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
                 aria-label="이미지를 앞으로 이동"
               >
                 ←
@@ -373,7 +423,7 @@ export function ListingImageUploader({
               <button
                 type="button"
                 onClick={() => remove(item.id)}
-                className="h-9 rounded bg-white/90 px-2 text-xs font-medium text-red-700"
+                className="h-8 rounded-lg bg-white/90 px-2 text-xs font-medium text-red-700"
               >
                 {copy.remove}
               </button>
@@ -381,28 +431,57 @@ export function ListingImageUploader({
                 type="button"
                 onClick={() => move(item.id, 1)}
                 disabled={index === items.length - 1}
-                className="size-9 rounded bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
+                className="size-8 rounded-lg bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
                 aria-label="이미지를 뒤로 이동"
               >
                 →
               </button>
             </div>
             {item.status === "uploading" ? (
-              <span className="absolute inset-0 flex items-center justify-center bg-white/75 text-sm font-medium text-zinc-700">
-                {copy.uploading}
+              <span
+                className={cx(
+                  "absolute inset-0 flex flex-col items-center justify-center gap-2 text-sm font-medium",
+                  variant === "dashboard"
+                    ? "bg-zinc-950/75 text-zinc-100"
+                    : "bg-white/75 text-zinc-700",
+                )}
+              >
+                <span className="size-7 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <span>{copy.uploading}</span>
               </span>
             ) : null}
             {item.status === "error" ? (
-              <span className="absolute inset-0 flex items-center justify-center bg-red-50/95 p-3 text-center text-xs text-red-700">
-                {item.error}
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-red-50/95 p-3 text-center text-xs text-red-700">
+                <span>{item.error}</span>
+                {item.file ? (
+                  <button
+                    type="button"
+                    onClick={() => void retry(item.id)}
+                    className="h-8 rounded-md border border-red-200 bg-white px-2 text-xs font-medium text-red-700"
+                  >
+                    {copy.retryUpload}
+                  </button>
+                ) : null}
               </span>
             ) : null}
           </div>
         ))}
         {items.length < 12 ? (
-          <label className="flex aspect-square min-h-28 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-zinc-300 bg-zinc-50 text-sm font-medium text-zinc-600 transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700">
+          <label
+            className={cx(
+              "flex aspect-square min-h-28 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed text-sm font-medium transition",
+              variant === "dashboard"
+                ? "rounded-2xl border-white/15 bg-zinc-950/70 text-zinc-400 hover:border-emerald-400/60 hover:bg-emerald-400/10 hover:text-emerald-200"
+                : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700",
+            )}
+          >
             <span className="text-2xl leading-none">+</span>
             <span className="mt-2">{copy.addPhoto}</span>
+            {variant === "dashboard" ? (
+              <span className="mt-1 px-4 text-center text-[11px] font-normal leading-4 text-zinc-500">
+                {copy.dragHelp}
+              </span>
+            ) : null}
             <input
               type="file"
               multiple
@@ -417,7 +496,11 @@ export function ListingImageUploader({
           </label>
         ) : null}
       </div>
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <p className={cx("text-sm", variant === "dashboard" ? "text-red-300" : "text-red-700")}>
+          {error}
+        </p>
+      ) : null}
       <p className="text-xs text-zinc-500">{copy.reorderHelp}</p>
     </div>
   );

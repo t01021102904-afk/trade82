@@ -76,6 +76,61 @@ textarea {
   }
 }
 
+@keyframes bm-onboarding-progress {
+  0%,
+  100% {
+    transform: translateX(-72%);
+  }
+  45% {
+    transform: translateX(-32%);
+  }
+  70% {
+    transform: translateX(-8%);
+  }
+}
+
+@keyframes bm-flow-card {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.88;
+  }
+  42% {
+    transform: translate3d(10px, -4px, 0) scale(1.015);
+    opacity: 1;
+  }
+  72% {
+    transform: translate3d(20px, 2px, 0) scale(0.985);
+    opacity: 0.82;
+  }
+}
+
+@keyframes bm-flow-progress {
+  0% {
+    transform: translateX(-88%);
+  }
+  48% {
+    transform: translateX(-36%);
+  }
+  78%,
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes bm-flow-inquiry {
+  0%,
+  48% {
+    opacity: 0.58;
+    transform: translateY(6px) scale(0.98);
+  }
+  64%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .bm-grid-surface {
   background-image:
     linear-gradient(rgba(15, 23, 42, 0.055) 1px, transparent 1px),
@@ -129,6 +184,24 @@ textarea {
 
 .bm-pulse-dot {
   animation: bm-pulse-dot 2.4s ease-in-out infinite;
+}
+
+.bm-onboarding-progress {
+  animation: bm-onboarding-progress 7s ease-in-out infinite;
+  transform-origin: left center;
+  width: 100%;
+}
+
+.bm-flow-card {
+  animation: bm-flow-card 7s ease-in-out infinite;
+}
+
+.bm-flow-progress {
+  animation: bm-flow-progress 7s ease-in-out infinite;
+}
+
+.bm-flow-inquiry {
+  animation: bm-flow-inquiry 7s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

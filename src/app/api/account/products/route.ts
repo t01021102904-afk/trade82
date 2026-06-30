@@ -22,7 +22,10 @@ import {
   isMarketplaceCategory,
   parseUploadedImages,
 } from "@/lib/marketplace";
-import { parseProductFieldVisibilityInput } from "@/lib/product-field-visibility";
+import {
+  parseProductFieldVisibilityInput,
+  productFieldRequiresValue,
+} from "@/lib/product-field-visibility";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -55,6 +58,13 @@ function optionalPositiveText(value: unknown, maxLength = 80) {
   if (!text) return "";
   const number = Number(text);
   return Number.isFinite(number) && number >= 0 ? text : "";
+}
+
+function publicFieldRequiredResponse() {
+  return Response.json(
+    { error: "공개 항목으로 설정한 경우 입력이 필요합니다." },
+    { status: 400 },
+  );
 }
 
 function slugify(value: string) {
@@ -115,15 +125,24 @@ export async function POST(request: Request) {
     const name = cleanPlainText(body.name, 120);
     const category = cleanPlainText(body.category, 80);
     const detailedDescription = cleanPlainText(body.detailedDescription, 5000);
-    const priceMin = Number(body.priceMin);
-    const priceMax = body.priceMax === null || body.priceMax === undefined || body.priceMax === ""
-      ? null
-      : Number(body.priceMax);
-    const moqQuantity = optionalPositiveText(body.moqQuantity);
-    const moqUnit = allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
-    const leadTime = allowedOption(body.leadTime, getLeadTimeOptions("en"));
-    const images = parseUploadedImages(body.images);
     const fieldVisibility = parseProductFieldVisibilityInput(body.fieldVisibility);
+    const priceIsPublic = productFieldRequiresValue(fieldVisibility, "minimumUnitPrice");
+    const moqIsPublic = productFieldRequiresValue(fieldVisibility, "moq");
+    const leadTimeIsPublic = productFieldRequiresValue(fieldVisibility, "leadTime");
+    const priceMin = priceIsPublic ? Number(body.priceMin) : null;
+    const priceMax =
+      !priceIsPublic ||
+      body.priceMax === null ||
+      body.priceMax === undefined ||
+      body.priceMax === ""
+        ? null
+        : Number(body.priceMax);
+    const moqQuantity = moqIsPublic ? optionalPositiveText(body.moqQuantity) : "";
+    const moqUnit = allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
+    const leadTime = leadTimeIsPublic
+      ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
+      : "";
+    const images = parseUploadedImages(body.images);
 
     if (!name) {
       return Response.json({ error: "상품명을 입력해 주시기 바랍니다." }, { status: 400 });
@@ -131,61 +150,161 @@ export async function POST(request: Request) {
     if (!isMarketplaceCategory(category)) {
       return Response.json({ error: "카테고리를 선택해 주시기 바랍니다." }, { status: 400 });
     }
-    if (!Number.isFinite(priceMin) || priceMin <= 0) {
+    if (priceIsPublic && (priceMin === null || !Number.isFinite(priceMin) || priceMin <= 0)) {
       return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
     }
-    if (priceMax !== null && (!Number.isFinite(priceMax) || priceMax < 0)) {
+    if (priceIsPublic && priceMax !== null && (!Number.isFinite(priceMax) || priceMax < 0)) {
       return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
     }
-    if (moqUnit !== "Not fixed" && (!moqQuantity || Number(moqQuantity) <= 0)) {
+    if (moqIsPublic && moqUnit !== "Not fixed" && (!moqQuantity || Number(moqQuantity) <= 0)) {
       return Response.json({ error: "MOQ를 입력해 주시기 바랍니다." }, { status: 400 });
     }
-    if (!leadTime) {
+    if (leadTimeIsPublic && !leadTime) {
       return Response.json({ error: "리드타임을 선택해 주시기 바랍니다." }, { status: 400 });
     }
     if (!detailedDescription) {
       return Response.json({ error: "상품 설명을 입력해 주시기 바랍니다." }, { status: 400 });
     }
-    if (!images.length) {
-      return Response.json(
-        { error: "상품 이미지를 한 장 이상 등록해 주시기 바랍니다." },
-        { status: 400 },
-      );
+    if (
+      productFieldRequiresValue(fieldVisibility, "sampleAvailability") &&
+      !allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en"))
+    ) {
+      return publicFieldRequiredResponse();
     }
-
+    if (
+      productFieldRequiresValue(fieldVisibility, "privateLabelAvailability") &&
+      !allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en"))
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "monthlySupplyCapacity") &&
+      !optionalPositiveText(body.monthlyCapacity)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "incoterms") &&
+      !allowedList(body.incoterms, getIncotermOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "hsCode") &&
+      !cleanPlainText(body.hsCode, 40)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "shelfLife") &&
+      !cleanPlainText(body.shelfLife, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "storageRequirements") &&
+      !cleanPlainText(body.storageRequirements, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "documents") &&
+      !allowedList(body.documentsAvailable, getSellerDocumentOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "complianceInfo") &&
+      !allowedList(body.complianceClaims, getComplianceClaimOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "ingredientsMaterials") &&
+      !cleanPlainText(body.ingredientsOrMaterials, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "packageSize") &&
+      !cleanPlainText(body.packageSize, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "unitsPerCarton") &&
+      !optionalPositiveText(body.unitsPerCarton)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "cartonWeight") &&
+      !cleanPlainText(body.cartonWeight, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "cartonDimensions") &&
+      !cleanPlainText(body.cartonDimensions, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "palletQuantity") &&
+      !optionalPositiveText(body.palletQuantity)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "storageTemperature") &&
+      !cleanPlainText(body.storageTemperature, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "packaging") &&
+      !cleanPlainText(body.packaging, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
     const firstImage = images[0];
     const product = await getDb().product.create({
       data: {
         sellerCompanyId: company.id,
         name,
         slug: `${slugify(name) || "product"}-${crypto.randomUUID().slice(0, 8)}`,
-        imageUrl: firstImage.cardUrl,
+        imageUrl: firstImage?.cardUrl ?? null,
         category,
         tags: cleanTags(body.tags),
         shortDescription:
           cleanPlainText(body.shortDescription, 240) ||
           detailedDescription.slice(0, 240),
         detailedDescription,
-        priceMin: String(priceMin),
+        priceMin: priceMin === null ? null : String(priceMin),
         priceMax: priceMax === null ? null : String(priceMax),
         currency: cleanPlainText(body.currency, 8) || "USD",
         priceUnit: allowedOption(body.priceUnit, getPriceUnitOptions("en"), "unit"),
         moq:
-          cleanPlainText(body.moq, 120) ||
-          (moqUnit === "Not fixed" ? "Not fixed" : `${moqQuantity} ${moqUnit}`),
+          moqIsPublic
+            ? cleanPlainText(body.moq, 120) ||
+              (moqUnit === "Not fixed" ? "Not fixed" : `${moqQuantity} ${moqUnit}`)
+            : "",
         moqQuantity,
         moqUnit,
         leadTime,
         leadTimeCode: leadTime,
-        sampleAvailability: allowedOption(
-          body.sampleAvailability,
-          getSampleAvailabilityOptions("en"),
-        ),
-        privateLabelAvailability: allowedOption(
-          body.privateLabelAvailability,
-          getPrivateLabelOptions("en"),
-        ),
-        monthlyCapacity: optionalPositiveText(body.monthlyCapacity),
+        sampleAvailability: productFieldRequiresValue(fieldVisibility, "sampleAvailability")
+          ? allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en"))
+          : "",
+        privateLabelAvailability: productFieldRequiresValue(
+          fieldVisibility,
+          "privateLabelAvailability",
+        )
+          ? allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en"))
+          : "",
+        monthlyCapacity: productFieldRequiresValue(fieldVisibility, "monthlySupplyCapacity")
+          ? optionalPositiveText(body.monthlyCapacity)
+          : "",
         monthlyCapacityUnit: allowedOption(
           body.monthlyCapacityUnit,
           getPriceUnitOptions("en"),
@@ -198,35 +317,59 @@ export async function POST(request: Request) {
           body.shippingOriginRegion,
           getKoreanRegionOptions("en"),
         ),
-        incoterms: allowedList(body.incoterms, getIncotermOptions("en")),
-        hsCode: cleanPlainText(body.hsCode, 40),
-        shelfLife: cleanPlainText(body.shelfLife, 120),
-        storageRequirements: cleanPlainText(body.storageRequirements, 1000),
-        documentsAvailable: allowedList(
-          body.documentsAvailable,
-          getSellerDocumentOptions("en"),
-        ),
-        complianceClaims: allowedList(
-          body.complianceClaims,
-          getComplianceClaimOptions("en"),
-        ),
+        incoterms: productFieldRequiresValue(fieldVisibility, "incoterms")
+          ? allowedList(body.incoterms, getIncotermOptions("en"))
+          : [],
+        hsCode: productFieldRequiresValue(fieldVisibility, "hsCode")
+          ? cleanPlainText(body.hsCode, 40)
+          : "",
+        shelfLife: productFieldRequiresValue(fieldVisibility, "shelfLife")
+          ? cleanPlainText(body.shelfLife, 120)
+          : "",
+        storageRequirements: productFieldRequiresValue(fieldVisibility, "storageRequirements")
+          ? cleanPlainText(body.storageRequirements, 1000)
+          : "",
+        documentsAvailable: productFieldRequiresValue(fieldVisibility, "documents")
+          ? allowedList(body.documentsAvailable, getSellerDocumentOptions("en"))
+          : [],
+        complianceClaims: productFieldRequiresValue(fieldVisibility, "complianceInfo")
+          ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
+          : [],
         buyerNotes: cleanPlainText(body.buyerNotes, 1000),
         riskNotes: strings(body.riskNotes).map((item) => cleanPlainText(item, 300)).filter(Boolean),
-        certifications: allowedList(
-          body.complianceClaims ?? body.certifications,
-          getComplianceClaimOptions("en"),
-        ),
-        ingredientsOrMaterials: cleanPlainText(
-          body.ingredientsOrMaterials,
-          1000,
-        ),
-        packaging: cleanPlainText(body.packaging, 1000),
-        packageSize: cleanPlainText(body.packageSize, 120),
-        unitsPerCarton: optionalPositiveText(body.unitsPerCarton),
-        cartonWeight: cleanPlainText(body.cartonWeight, 120),
-        cartonDimensions: cleanPlainText(body.cartonDimensions, 120),
-        palletQuantity: optionalPositiveText(body.palletQuantity),
-        storageTemperature: cleanPlainText(body.storageTemperature, 120),
+        certifications: productFieldRequiresValue(fieldVisibility, "complianceInfo")
+          ? allowedList(
+              body.complianceClaims ?? body.certifications,
+              getComplianceClaimOptions("en"),
+            )
+          : [],
+        ingredientsOrMaterials: productFieldRequiresValue(
+          fieldVisibility,
+          "ingredientsMaterials",
+        )
+          ? cleanPlainText(body.ingredientsOrMaterials, 1000)
+          : "",
+        packaging: productFieldRequiresValue(fieldVisibility, "packaging")
+          ? cleanPlainText(body.packaging, 1000)
+          : "",
+        packageSize: productFieldRequiresValue(fieldVisibility, "packageSize")
+          ? cleanPlainText(body.packageSize, 120)
+          : "",
+        unitsPerCarton: productFieldRequiresValue(fieldVisibility, "unitsPerCarton")
+          ? optionalPositiveText(body.unitsPerCarton)
+          : "",
+        cartonWeight: productFieldRequiresValue(fieldVisibility, "cartonWeight")
+          ? cleanPlainText(body.cartonWeight, 120)
+          : "",
+        cartonDimensions: productFieldRequiresValue(fieldVisibility, "cartonDimensions")
+          ? cleanPlainText(body.cartonDimensions, 120)
+          : "",
+        palletQuantity: productFieldRequiresValue(fieldVisibility, "palletQuantity")
+          ? optionalPositiveText(body.palletQuantity)
+          : "",
+        storageTemperature: productFieldRequiresValue(fieldVisibility, "storageTemperature")
+          ? cleanPlainText(body.storageTemperature, 120)
+          : "",
         suggestedUsChannels: allowedList(
           body.suggestedUsChannels,
           getSalesChannelOptions("en"),
@@ -237,19 +380,21 @@ export async function POST(request: Request) {
           body.status === "inactive" || body.status === "draft"
             ? body.status
             : "active",
-        images: {
-          create: images.map((image) => ({
-            originalUrl: image.originalUrl,
-            cardUrl: image.cardUrl,
-            mainUrl: image.mainUrl,
-            detailUrl: image.detailUrl,
-            storagePath: image.storagePath,
-            position: image.position,
-            width: image.width,
-            height: image.height,
-            altText: name,
-          })),
-        },
+        images: images.length
+          ? {
+              create: images.map((image) => ({
+                originalUrl: image.originalUrl,
+                cardUrl: image.cardUrl,
+                mainUrl: image.mainUrl,
+                detailUrl: image.detailUrl,
+                storagePath: image.storagePath,
+                position: image.position,
+                width: image.width,
+                height: image.height,
+                altText: name,
+              })),
+            }
+          : undefined,
       },
       include: {
         images: { orderBy: { position: "asc" } },

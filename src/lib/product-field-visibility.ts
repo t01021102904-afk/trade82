@@ -141,6 +141,13 @@ export function productFieldIsHidden(
   return visibility[key] === "inquiry_required" || visibility[key] === "private";
 }
 
+export function productFieldRequiresValue(
+  visibility: ProductFieldVisibility,
+  key: ProductFieldVisibilityKey,
+) {
+  return visibility[key] === "public";
+}
+
 export function maskProductFieldsForViewer<T extends Record<string, unknown>>(
   product: T,
   canViewSensitiveFields: boolean,

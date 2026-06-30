@@ -528,6 +528,44 @@ function SellerProductsPanel({
     }
   }
 
+  async function publishProduct(product: DbProduct) {
+    setPendingId(product.id);
+    setNotice("");
+    setError("");
+    try {
+      const response = await fetch(`/api/account/products/${product.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "active" }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | DbProduct
+        | { error?: string }
+        | null;
+
+      if (!response.ok) {
+        const errorMessage =
+          result && "error" in result && typeof result.error === "string"
+            ? result.error
+            : t("dashboard.productUpdateFailed");
+        setError(errorMessage);
+        return;
+      }
+
+      if (result && "id" in result) {
+        setProducts((current) =>
+          (current ?? []).map((item) => (item.id === product.id ? result : item)),
+        );
+      }
+      setNotice(t("listing.productPublished"));
+      await refreshProducts();
+    } catch {
+      setError(t("dashboard.productUpdateFailed"));
+    } finally {
+      setPendingId(null);
+    }
+  }
+
   async function deleteProduct(product: DbProduct) {
     if (!window.confirm(t("dashboard.deleteProductConfirm"))) return;
 
@@ -642,6 +680,7 @@ function SellerProductsPanel({
               pending={pendingId === product.id}
               onEdit={() => setEditing({ ...product })}
               onSetPreparing={() => void setPreparing(product)}
+              onPublish={() => void publishProduct(product)}
               onDelete={() => void deleteProduct(product)}
             />
           ))
@@ -660,12 +699,14 @@ function SellerProductCard({
   pending,
   onEdit,
   onSetPreparing,
+  onPublish,
   onDelete,
 }: {
   product: DbProduct;
   pending: boolean;
   onEdit: () => void;
   onSetPreparing: () => void;
+  onPublish: () => void;
   onDelete: () => void;
 }) {
   const { t } = useI18n();
@@ -725,7 +766,7 @@ function SellerProductCard({
         >
           {t("settings.editProduct")}
         </button>
-        {product.status !== "inactive" ? (
+        {product.status === "active" ? (
           <button
             type="button"
             disabled={pending}
@@ -734,7 +775,16 @@ function SellerProductCard({
           >
             {pending ? t("settings.saving") : t("dashboard.setPreparing")}
           </button>
-        ) : null}
+        ) : (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={onPublish}
+            className="h-8 rounded-md border border-blue-200 px-2.5 text-xs font-medium text-blue-700 disabled:cursor-wait disabled:opacity-60"
+          >
+            {pending ? t("settings.saving") : t("listing.publishProduct")}
+          </button>
+        )}
         <button
           type="button"
           disabled={pending}

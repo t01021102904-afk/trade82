@@ -22,7 +22,11 @@ import {
   isMarketplaceCategory,
   parseUploadedImages,
 } from "@/lib/marketplace";
-import { parseProductFieldVisibilityInput } from "@/lib/product-field-visibility";
+import {
+  normalizeProductFieldVisibility,
+  parseProductFieldVisibilityInput,
+  productFieldRequiresValue,
+} from "@/lib/product-field-visibility";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -57,6 +61,13 @@ function optionalPositiveText(value: unknown, maxLength = 80) {
   return Number.isFinite(number) && number >= 0 ? text : "";
 }
 
+function publicFieldRequiredResponse() {
+  return Response.json(
+    { error: "공개 항목으로 설정한 경우 입력이 필요합니다." },
+    { status: 400 },
+  );
+}
+
 async function ownProduct(id: string, userId: string) {
   return getDb().product.findFirst({
     where: { id, sellerCompany: { ownerUserId: userId } },
@@ -82,11 +93,26 @@ export async function PATCH(
     const { id: rawId } = await params;
     const id = idParam(rawId, "productId");
     const existing = await ownProduct(id, user.id);
-    if (!canManageProduct(user, existing)) {
+    if (!existing || !canManageProduct(user, existing)) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = (await request.json()) as Record<string, unknown>;
+    const fieldVisibility =
+      body.fieldVisibility === undefined
+        ? undefined
+        : parseProductFieldVisibilityInput(body.fieldVisibility);
+    const effectiveFieldVisibility =
+      fieldVisibility ?? normalizeProductFieldVisibility(existing.fieldVisibility);
+    const priceIsPublic = productFieldRequiresValue(
+      effectiveFieldVisibility,
+      "minimumUnitPrice",
+    );
+    const moqIsPublic = productFieldRequiresValue(effectiveFieldVisibility, "moq");
+    const leadTimeIsPublic = productFieldRequiresValue(
+      effectiveFieldVisibility,
+      "leadTime",
+    );
     const images =
       body.images === undefined ? undefined : parseUploadedImages(body.images);
     const category =
@@ -94,23 +120,45 @@ export async function PATCH(
         ? cleanPlainText(body.category, 80)
         : undefined;
     const priceMin =
-      body.priceMin === null || body.priceMin === undefined || body.priceMin === ""
-        ? null
-        : Number(body.priceMin);
+      body.priceMin === undefined
+        ? fieldVisibility && !priceIsPublic
+          ? null
+          : undefined
+        : !priceIsPublic ||
+            body.priceMin === null ||
+            body.priceMin === ""
+          ? null
+          : Number(body.priceMin);
     const priceMax =
-      body.priceMax === null || body.priceMax === undefined || body.priceMax === ""
-        ? null
-        : Number(body.priceMax);
+      body.priceMax === undefined
+        ? fieldVisibility && !priceIsPublic
+          ? null
+          : undefined
+        : !priceIsPublic ||
+            body.priceMax === null ||
+            body.priceMax === ""
+          ? null
+          : Number(body.priceMax);
     const moqQuantity =
-      body.moqQuantity === undefined ? undefined : optionalPositiveText(body.moqQuantity);
+      body.moqQuantity === undefined
+        ? fieldVisibility && !moqIsPublic
+          ? ""
+          : undefined
+        : moqIsPublic
+          ? optionalPositiveText(body.moqQuantity)
+          : "";
     const moqUnit =
       body.moqUnit === undefined
         ? undefined
         : allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
     const leadTime =
       body.leadTime === undefined
-        ? undefined
-        : allowedOption(body.leadTime, getLeadTimeOptions("en"));
+        ? fieldVisibility && !leadTimeIsPublic
+          ? ""
+          : undefined
+        : leadTimeIsPublic
+          ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
+          : "";
 
     if (
       category !== undefined &&
@@ -118,27 +166,148 @@ export async function PATCH(
     ) {
       return Response.json({ error: "카테고리를 선택해 주시기 바랍니다." }, { status: 400 });
     }
-    if (images && !images.length) {
-      return Response.json(
-        { error: "상품 이미지를 한 장 이상 등록해 주시기 바랍니다." },
-        { status: 400 },
-      );
-    }
-    if (priceMin !== null && priceMin !== undefined && (!Number.isFinite(priceMin) || priceMin <= 0)) {
-      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (priceMax !== null && priceMax !== undefined && (!Number.isFinite(priceMax) || priceMax < 0)) {
+    if (
+      priceIsPublic &&
+      priceMin !== null &&
+      priceMin !== undefined &&
+      (!Number.isFinite(priceMin) || priceMin <= 0)
+    ) {
       return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
     }
     if (
+      priceIsPublic &&
+      priceMax !== null &&
+      priceMax !== undefined &&
+      (!Number.isFinite(priceMax) || priceMax < 0)
+    ) {
+      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (
+      moqIsPublic &&
       moqUnit !== undefined &&
       moqUnit !== "Not fixed" &&
       (!moqQuantity || Number(moqQuantity) <= 0)
     ) {
       return Response.json({ error: "MOQ를 입력해 주시기 바랍니다." }, { status: 400 });
     }
-    if (leadTime !== undefined && !leadTime) {
+    if (leadTimeIsPublic && leadTime !== undefined && !leadTime) {
       return Response.json({ error: "리드타임을 선택해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (fieldVisibility) {
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "sampleAvailability") &&
+        !allowedOption(
+          body.sampleAvailability ?? existing.sampleAvailability,
+          getSampleAvailabilityOptions("en"),
+        )
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "privateLabelAvailability") &&
+        !allowedOption(
+          body.privateLabelAvailability ?? existing.privateLabelAvailability,
+          getPrivateLabelOptions("en"),
+        )
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "monthlySupplyCapacity") &&
+        !optionalPositiveText(body.monthlyCapacity ?? existing.monthlyCapacity)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "incoterms") &&
+        !allowedList(body.incoterms ?? existing.incoterms, getIncotermOptions("en")).length
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "hsCode") &&
+        !cleanPlainText(body.hsCode ?? existing.hsCode, 40)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "shelfLife") &&
+        !cleanPlainText(body.shelfLife ?? existing.shelfLife, 120)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "storageRequirements") &&
+        !cleanPlainText(body.storageRequirements ?? existing.storageRequirements, 1000)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "documents") &&
+        !allowedList(
+          body.documentsAvailable ?? existing.documentsAvailable,
+          getSellerDocumentOptions("en"),
+        ).length
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "complianceInfo") &&
+        !allowedList(
+          body.complianceClaims ?? existing.complianceClaims,
+          getComplianceClaimOptions("en"),
+        ).length
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "ingredientsMaterials") &&
+        !cleanPlainText(body.ingredientsOrMaterials ?? existing.ingredientsOrMaterials, 1000)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "packageSize") &&
+        !cleanPlainText(body.packageSize ?? existing.packageSize, 120)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "unitsPerCarton") &&
+        !optionalPositiveText(body.unitsPerCarton ?? existing.unitsPerCarton)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "cartonWeight") &&
+        !cleanPlainText(body.cartonWeight ?? existing.cartonWeight, 120)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "cartonDimensions") &&
+        !cleanPlainText(body.cartonDimensions ?? existing.cartonDimensions, 120)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "palletQuantity") &&
+        !optionalPositiveText(body.palletQuantity ?? existing.palletQuantity)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "storageTemperature") &&
+        !cleanPlainText(body.storageTemperature ?? existing.storageTemperature, 120)
+      ) {
+        return publicFieldRequiredResponse();
+      }
+      if (
+        productFieldRequiresValue(effectiveFieldVisibility, "packaging") &&
+        !cleanPlainText(body.packaging ?? existing.packaging, 1000)
+      ) {
+        return publicFieldRequiredResponse();
+      }
     }
 
     const product = await getDb().product.update({
@@ -148,7 +317,7 @@ export async function PATCH(
           typeof body.name === "string"
             ? cleanPlainText(body.name, 120)
             : undefined,
-        imageUrl: images ? images[0].cardUrl : undefined,
+        imageUrl: images ? images[0]?.cardUrl ?? null : undefined,
         category,
         tags: body.tags === undefined ? undefined : cleanTags(body.tags),
         shortDescription:
@@ -160,17 +329,17 @@ export async function PATCH(
             ? cleanPlainText(body.detailedDescription, 5000)
             : undefined,
         priceMin:
-          body.priceMin === null
-            ? null
-            : body.priceMin !== undefined
-              ? String(priceMin)
-              : undefined,
+          priceMin === undefined
+            ? undefined
+            : priceMin === null
+              ? null
+              : String(priceMin),
         priceMax:
-          body.priceMax === null
-            ? null
-            : body.priceMax !== undefined
-              ? priceMax === null ? null : String(priceMax)
-              : undefined,
+          priceMax === undefined
+            ? undefined
+            : priceMax === null
+              ? null
+              : String(priceMax),
         currency:
           typeof body.currency === "string"
             ? cleanPlainText(body.currency, 8)
@@ -180,13 +349,15 @@ export async function PATCH(
             ? undefined
             : allowedOption(body.priceUnit, getPriceUnitOptions("en"), "unit"),
         moq:
-          typeof body.moq === "string"
-            ? cleanPlainText(body.moq, 120)
-            : moqQuantity !== undefined && moqUnit !== undefined
-              ? moqUnit === "Not fixed"
-                ? "Not fixed"
-                : `${moqQuantity} ${moqUnit}`
-            : undefined,
+          !moqIsPublic && fieldVisibility
+            ? ""
+            : typeof body.moq === "string"
+              ? cleanPlainText(body.moq, 120)
+              : moqQuantity !== undefined && moqUnit !== undefined
+                ? moqUnit === "Not fixed"
+                  ? "Not fixed"
+                  : `${moqQuantity} ${moqUnit}`
+              : undefined,
         moqQuantity,
         moqUnit,
         leadTime:
@@ -195,17 +366,28 @@ export async function PATCH(
             : leadTime,
         leadTimeCode: leadTime,
         sampleAvailability:
-          body.sampleAvailability === undefined
-            ? undefined
-            : allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en")),
+          !productFieldRequiresValue(effectiveFieldVisibility, "sampleAvailability") &&
+          fieldVisibility
+            ? ""
+            : body.sampleAvailability === undefined
+              ? undefined
+              : allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en")),
         privateLabelAvailability:
-          body.privateLabelAvailability === undefined
-            ? undefined
-            : allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en")),
+          !productFieldRequiresValue(
+            effectiveFieldVisibility,
+            "privateLabelAvailability",
+          ) && fieldVisibility
+            ? ""
+            : body.privateLabelAvailability === undefined
+              ? undefined
+              : allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en")),
         monthlyCapacity:
-          body.monthlyCapacity === undefined
-            ? undefined
-            : optionalPositiveText(body.monthlyCapacity),
+          !productFieldRequiresValue(effectiveFieldVisibility, "monthlySupplyCapacity") &&
+          fieldVisibility
+            ? ""
+            : body.monthlyCapacity === undefined
+              ? undefined
+              : optionalPositiveText(body.monthlyCapacity),
         monthlyCapacityUnit:
           body.monthlyCapacityUnit === undefined
             ? undefined
@@ -218,29 +400,47 @@ export async function PATCH(
             ? undefined
             : allowedOption(body.shippingOriginRegion, getKoreanRegionOptions("en")),
         incoterms:
-          body.incoterms === undefined
-            ? undefined
-            : allowedList(body.incoterms, getIncotermOptions("en")),
+          !productFieldRequiresValue(effectiveFieldVisibility, "incoterms") &&
+          fieldVisibility
+            ? []
+            : body.incoterms === undefined
+              ? undefined
+              : allowedList(body.incoterms, getIncotermOptions("en")),
         hsCode:
-          typeof body.hsCode === "string"
-            ? cleanPlainText(body.hsCode, 40)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "hsCode") &&
+          fieldVisibility
+            ? ""
+            : typeof body.hsCode === "string"
+              ? cleanPlainText(body.hsCode, 40)
+              : undefined,
         shelfLife:
-          typeof body.shelfLife === "string"
-            ? cleanPlainText(body.shelfLife, 120)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "shelfLife") &&
+          fieldVisibility
+            ? ""
+            : typeof body.shelfLife === "string"
+              ? cleanPlainText(body.shelfLife, 120)
+              : undefined,
         storageRequirements:
-          typeof body.storageRequirements === "string"
-            ? cleanPlainText(body.storageRequirements, 1000)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "storageRequirements") &&
+          fieldVisibility
+            ? ""
+            : typeof body.storageRequirements === "string"
+              ? cleanPlainText(body.storageRequirements, 1000)
+              : undefined,
         documentsAvailable:
-          body.documentsAvailable === undefined
-            ? undefined
-            : allowedList(body.documentsAvailable, getSellerDocumentOptions("en")),
+          !productFieldRequiresValue(effectiveFieldVisibility, "documents") &&
+          fieldVisibility
+            ? []
+            : body.documentsAvailable === undefined
+              ? undefined
+              : allowedList(body.documentsAvailable, getSellerDocumentOptions("en")),
         complianceClaims:
-          body.complianceClaims === undefined
-            ? undefined
-            : allowedList(body.complianceClaims, getComplianceClaimOptions("en")),
+          !productFieldRequiresValue(effectiveFieldVisibility, "complianceInfo") &&
+          fieldVisibility
+            ? []
+            : body.complianceClaims === undefined
+              ? undefined
+              : allowedList(body.complianceClaims, getComplianceClaimOptions("en")),
         buyerNotes:
           typeof body.buyerNotes === "string"
             ? cleanPlainText(body.buyerNotes, 1000)
@@ -249,51 +449,77 @@ export async function PATCH(
           body.riskNotes === undefined
             ? undefined
             : strings(body.riskNotes).map((item) => cleanPlainText(item, 300)).filter(Boolean),
-        certifications: body.complianceClaims
-          ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
-          : body.certifications
-            ? strings(body.certifications)
-          : undefined,
+        certifications:
+          !productFieldRequiresValue(effectiveFieldVisibility, "complianceInfo") &&
+          fieldVisibility
+            ? []
+            : body.complianceClaims
+              ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
+              : body.certifications
+                ? strings(body.certifications)
+                : undefined,
         ingredientsOrMaterials:
-          typeof body.ingredientsOrMaterials === "string"
-            ? cleanPlainText(body.ingredientsOrMaterials, 1000)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "ingredientsMaterials") &&
+          fieldVisibility
+            ? ""
+            : typeof body.ingredientsOrMaterials === "string"
+              ? cleanPlainText(body.ingredientsOrMaterials, 1000)
+              : undefined,
         packaging:
-          typeof body.packaging === "string"
-            ? cleanPlainText(body.packaging, 1000)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "packaging") &&
+          fieldVisibility
+            ? ""
+            : typeof body.packaging === "string"
+              ? cleanPlainText(body.packaging, 1000)
+              : undefined,
         packageSize:
-          typeof body.packageSize === "string"
-            ? cleanPlainText(body.packageSize, 120)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "packageSize") &&
+          fieldVisibility
+            ? ""
+            : typeof body.packageSize === "string"
+              ? cleanPlainText(body.packageSize, 120)
+              : undefined,
         unitsPerCarton:
-          body.unitsPerCarton === undefined
-            ? undefined
-            : optionalPositiveText(body.unitsPerCarton),
+          !productFieldRequiresValue(effectiveFieldVisibility, "unitsPerCarton") &&
+          fieldVisibility
+            ? ""
+            : body.unitsPerCarton === undefined
+              ? undefined
+              : optionalPositiveText(body.unitsPerCarton),
         cartonWeight:
-          typeof body.cartonWeight === "string"
-            ? cleanPlainText(body.cartonWeight, 120)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "cartonWeight") &&
+          fieldVisibility
+            ? ""
+            : typeof body.cartonWeight === "string"
+              ? cleanPlainText(body.cartonWeight, 120)
+              : undefined,
         cartonDimensions:
-          typeof body.cartonDimensions === "string"
-            ? cleanPlainText(body.cartonDimensions, 120)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "cartonDimensions") &&
+          fieldVisibility
+            ? ""
+            : typeof body.cartonDimensions === "string"
+              ? cleanPlainText(body.cartonDimensions, 120)
+              : undefined,
         palletQuantity:
-          body.palletQuantity === undefined
-            ? undefined
-            : optionalPositiveText(body.palletQuantity),
+          !productFieldRequiresValue(effectiveFieldVisibility, "palletQuantity") &&
+          fieldVisibility
+            ? ""
+            : body.palletQuantity === undefined
+              ? undefined
+              : optionalPositiveText(body.palletQuantity),
         storageTemperature:
-          typeof body.storageTemperature === "string"
-            ? cleanPlainText(body.storageTemperature, 120)
-            : undefined,
+          !productFieldRequiresValue(effectiveFieldVisibility, "storageTemperature") &&
+          fieldVisibility
+            ? ""
+            : typeof body.storageTemperature === "string"
+              ? cleanPlainText(body.storageTemperature, 120)
+              : undefined,
         suggestedUsChannels:
           body.suggestedUsChannels === undefined
             ? undefined
             : allowedList(body.suggestedUsChannels, getSalesChannelOptions("en")),
         fieldVisibility:
-          body.fieldVisibility === undefined
-            ? undefined
-            : parseProductFieldVisibilityInput(body.fieldVisibility),
+          fieldVisibility,
         exportReadiness:
           typeof body.exportReadiness === "boolean"
             ? body.exportReadiness

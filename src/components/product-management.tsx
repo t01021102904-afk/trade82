@@ -12,6 +12,7 @@ import {
   RichProductFormFields,
   type RichProductFormErrors,
   type RichProductFormValue,
+  validateRichProductForm,
 } from "@/components/rich-product-form-fields";
 import {
   useDraftBackup,
@@ -20,6 +21,7 @@ import {
 import { withLocale } from "@/lib/i18n";
 import type { UploadedListingImage } from "@/lib/marketplace";
 import { safeImageUrl } from "@/lib/url-security";
+import { cx } from "@/lib/utils";
 
 export type DbProduct = {
   id: string;
@@ -50,6 +52,7 @@ export function ProductManagement() {
   const [products, setProducts] = useState<DbProduct[]>([]);
   const [editing, setEditing] = useState<EditableProduct | null>(null);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   async function loadProducts() {
     const response = await fetch("/api/account/products");
@@ -88,8 +91,12 @@ export function ProductManagement() {
   }
 
   async function remove(id: string) {
+    if (!window.confirm(t("dashboard.deleteProductConfirm"))) return;
     const response = await fetch(`/api/account/products/${id}`, { method: "DELETE" });
-    if (response.ok) await loadProducts();
+    if (response.ok) {
+      setNotice(t("dashboard.productDeleted"));
+      await loadProducts();
+    }
   }
 
   async function markInactive(product: DbProduct) {
@@ -99,6 +106,18 @@ export function ProductManagement() {
       body: JSON.stringify({ status: "inactive" }),
     });
     if (response.ok) await loadProducts();
+  }
+
+  async function publish(product: DbProduct) {
+    const response = await fetch(`/api/account/products/${product.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "active" }),
+    });
+    if (response.ok) {
+      setNotice(t("listing.productPublished"));
+      await loadProducts();
+    }
   }
 
   return (
@@ -120,11 +139,18 @@ export function ProductManagement() {
         <ProductEditor
           initialProduct={editing}
           onCancel={() => setEditing(null)}
-          onSaved={async () => {
+          onSaved={async (message) => {
             setEditing(null);
+            setNotice(message ?? t("listing.productUpdated"));
             await loadProducts();
           }}
         />
+      ) : null}
+
+      {notice ? (
+        <p role="status" className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+          {notice}
+        </p>
       ) : null}
 
       <div className="grid gap-2">
@@ -174,7 +200,15 @@ export function ProductManagement() {
                   >
                     {t("settings.markInactive")}
                   </button>
-                ) : null}
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void publish(product)}
+                    className="h-8 rounded-md border border-blue-200 px-2.5 text-xs font-medium text-blue-700"
+                  >
+                    {t("listing.publishProduct")}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => void remove(product.id)}
@@ -211,9 +245,9 @@ export function ProductEditor({
 }: {
   initialProduct: EditableProduct;
   onCancel: () => void;
-  onSaved: () => void;
+  onSaved: (message?: string) => void;
 }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const [product, setProduct] = useState<RichProductFormValue>(() =>
     formFromProductRecord(initialProduct),
   );
@@ -238,7 +272,11 @@ export function ProductEditor({
   ) {
     setProduct((current) => ({ ...current, [key]: value }));
     setDirty(true);
-    setErrors((current) => ({ ...current, [key]: undefined, form: undefined }));
+    setErrors((current) =>
+      key === "fieldVisibility"
+        ? { form: current.form }
+        : { ...current, [key]: undefined, form: undefined },
+    );
   }
 
   function restoreDraft() {
@@ -250,30 +288,13 @@ export function ProductEditor({
   }
 
   function validate() {
-    const nextErrors: ProductEditorErrors = {};
-    if (!product.images.length) nextErrors.images = t("listing.errors.images");
-    if (!product.name.trim()) nextErrors.name = t("listing.errors.name");
-    if (!product.category) nextErrors.category = t("listing.errors.category");
-    if (!product.priceMin || Number(product.priceMin) <= 0) {
-      nextErrors.price = t("listing.errors.price");
-    }
-    if (
-      product.moqUnit !== "Not fixed" &&
-      (!product.moqQuantity || Number(product.moqQuantity) <= 0)
-    ) {
-      nextErrors.moq = t("listing.errors.moq");
-    }
-    if (!product.leadTime) nextErrors.leadTime = t("listing.errors.leadTime");
-    if (!product.detailedDescription.trim()) {
-      nextErrors.description = t("listing.errors.description");
-    }
+    const nextErrors: ProductEditorErrors = validateRichProductForm(product, t);
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (saving || uploading) return;
+  async function saveProduct(status?: "active" | "draft") {
+    if (saving) return;
     if (!validate()) return;
 
     setSaving(true);
@@ -282,12 +303,21 @@ export function ProductEditor({
       const response = await fetch(`/api/account/products/${initialProduct.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productPayloadFromForm(product)),
+        body: JSON.stringify({
+          ...productPayloadFromForm(product),
+          ...(status ? { status } : {}),
+        }),
       });
       if (response.ok) {
         clearDraft();
         setDirty(false);
-        onSaved();
+        onSaved(
+          status === "draft"
+            ? t("listing.productSaved")
+            : status === "active"
+              ? t("listing.productPublished")
+              : t("listing.productUpdated"),
+        );
         return;
       }
       const result = (await response.json().catch(() => null)) as
@@ -301,59 +331,170 @@ export function ProductEditor({
     }
   }
 
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    void saveProduct();
+  }
+
+  const status = editorStatusMeta({
+    saving,
+    uploading,
+    hasError: Boolean(errors.form),
+    status: product.status,
+    t,
+  });
+
   return (
     <form
       onSubmit={submit}
-      className="grid gap-3 rounded-md border border-zinc-200 bg-zinc-50/60 p-3"
+      className="grid gap-5 rounded-[22px] border border-white/10 bg-[#07090d] p-4 text-zinc-100 shadow-2xl shadow-black/20 sm:p-5"
       autoComplete="off"
       noValidate
     >
+      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 xl:flex-row xl:items-start xl:justify-between">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+            {t("listing.pageLabel")}
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-semibold tracking-tight text-white">
+              {t("listing.editProduct")}
+            </h2>
+            <EditorStatusPill label={status.label} tone={status.tone} />
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+            {t("listing.builderHelp")}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => void saveProduct("draft")}
+            className={editorSecondaryActionClass}
+          >
+            {saving ? t("settings.saving") : t("listing.saveDraft")}
+          </button>
+          <Link
+            href={withLocale(`/products/${initialProduct.id}`, locale)}
+            className={editorGhostActionClass}
+          >
+            {t("listing.preview")}
+          </Link>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => void saveProduct("active")}
+            className={editorSecondaryActionClass}
+          >
+            {saving ? t("settings.saving") : t("listing.publishProduct")}
+          </button>
+          <button type="submit" disabled={saving} className={editorPrimaryActionClass}>
+            {saving ? t("settings.saving") : t("listing.updateProduct")}
+          </button>
+        </div>
+      </div>
+
       {draft ? (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+        <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 p-3 text-sm text-amber-100">
           <p>{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={restoreDraft}
-              className="h-8 rounded-md bg-amber-900 px-2.5 text-xs font-medium text-white"
+              className="h-8 rounded-lg bg-amber-300 px-2.5 text-xs font-semibold text-zinc-950"
             >
               {t("settings.restoreDraft")}
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="h-8 rounded-md border border-amber-300 bg-white px-2.5 text-xs font-medium text-amber-900"
+              className="h-8 rounded-lg border border-amber-300/30 px-2.5 text-xs font-semibold text-amber-100"
             >
               {t("settings.discardDraft")}
             </button>
           </div>
         </div>
       ) : null}
-      {errors.form ? <p className="text-sm text-red-700">{errors.form}</p> : null}
+      {errors.form ? (
+        <p className="rounded-2xl border border-red-300/25 bg-red-300/10 p-3 text-sm font-medium text-red-200">
+          {errors.form}
+        </p>
+      ) : null}
+      {uploading ? (
+        <p role="status" className="rounded-2xl border border-blue-300/25 bg-blue-300/10 p-3 text-sm font-medium text-blue-100">
+          {t("listing.imageUploadInProgress")}
+        </p>
+      ) : null}
       <RichProductFormFields
         value={product}
         errors={errors}
         onChange={update}
         onUploadingChange={setUploading}
+        variant="dashboard"
       />
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          type="submit"
-          disabled={uploading || saving}
-          className="h-8 rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white disabled:opacity-60"
-        >
-          {saving ? t("settings.saving") : t("settings.saveProductChanges")}
-        </button>
+      <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">
         <button
           type="button"
           onClick={() => {
             if (confirmLeave()) onCancel();
           }}
-          className="h-8 rounded-md border border-zinc-200 bg-white px-2.5 text-xs font-medium text-zinc-700"
+          className={editorGhostActionClass}
         >
           {t("common.close")}
         </button>
       </div>
     </form>
+  );
+}
+
+const editorPrimaryActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+const editorSecondaryActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-4 text-sm font-semibold text-zinc-100 transition hover:bg-white/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+const editorGhostActionClass =
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
+
+function editorStatusMeta({
+  saving,
+  uploading,
+  hasError,
+  status,
+  t,
+}: {
+  saving: boolean;
+  uploading: boolean;
+  hasError: boolean;
+  status: RichProductFormValue["status"];
+  t: (key: string) => string;
+}) {
+  if (hasError) return { label: t("listing.statusSaveFailed"), tone: "red" as const };
+  if (saving) return { label: t("listing.statusSaving"), tone: "blue" as const };
+  if (uploading) return { label: t("listing.statusUploading"), tone: "blue" as const };
+  if (status === "active") return { label: t("listing.statusPublished"), tone: "emerald" as const };
+  if (status === "inactive") return { label: t("listing.statusDraft"), tone: "zinc" as const };
+  return { label: t("listing.statusDraft"), tone: "zinc" as const };
+}
+
+function EditorStatusPill({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "zinc" | "blue" | "emerald" | "red";
+}) {
+  return (
+    <span
+      className={cx(
+        "inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold",
+        tone === "blue" && "border-blue-300/30 bg-blue-300/10 text-blue-100",
+        tone === "emerald" &&
+          "border-emerald-300/30 bg-emerald-300/10 text-emerald-100",
+        tone === "red" && "border-red-300/30 bg-red-300/10 text-red-100",
+        tone === "zinc" && "border-white/10 bg-white/[0.06] text-zinc-300",
+      )}
+    >
+      {label}
+    </span>
   );
 }
