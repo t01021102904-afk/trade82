@@ -9,7 +9,16 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Dispatch,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type SetStateAction,
+} from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
@@ -94,6 +103,20 @@ type DraftAttachment = {
   attachment?: MessageAttachment;
 };
 
+type ChatRoomContextMenuState = {
+  threadId: string;
+  x: number;
+  y: number;
+};
+
+type ChatRoomContextMenuAction =
+  | "open"
+  | "rename"
+  | "pin"
+  | "favorite"
+  | "notifications"
+  | "leave";
+
 type SignedUrlPayload = {
   signedUrl: string;
   expiresInSeconds: number;
@@ -135,8 +158,14 @@ export function MessagesClient({
   const [previewLoading, setPreviewLoading] = useState(false);
   const [dealPending, setDealPending] = useState(false);
   const [dealError, setDealError] = useState("");
+  const [contextMenu, setContextMenu] = useState<ChatRoomContextMenuState | null>(null);
+  const [pinnedThreadIds, setPinnedThreadIds] = useState<Set<string>>(() => new Set());
+  const [favoriteThreadIds, setFavoriteThreadIds] = useState<Set<string>>(() => new Set());
+  const [mutedThreadIds, setMutedThreadIds] = useState<Set<string>>(() => new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draftAttachmentsRef = useRef<DraftAttachment[]>([]);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressTriggeredRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   async function load() {
@@ -180,6 +209,10 @@ export function MessagesClient({
         return matchesFilter && matchesSearch;
       });
   }, [libraryFilter, librarySearch, selected]);
+  const contextMenuThread = useMemo(
+    () => threads.find((thread) => thread.id === contextMenu?.threadId) ?? null,
+    [contextMenu?.threadId, threads],
+  );
 
   useEffect(() => {
     draftAttachmentsRef.current = draftAttachments;
@@ -247,6 +280,92 @@ export function MessagesClient({
     }
     setSelectedId(id);
     setDealError("");
+  }
+
+  function openThreadContextMenu(threadId: string, clientX: number, clientY: number) {
+    const menuWidth = 244;
+    const menuHeight = 300;
+    const x = Math.max(8, Math.min(clientX, window.innerWidth - menuWidth - 8));
+    const y = Math.max(8, Math.min(clientY, window.innerHeight - menuHeight - 8));
+    setContextMenu({ threadId, x, y });
+  }
+
+  function handleThreadContextMenu(
+    event: ReactMouseEvent<HTMLButtonElement>,
+    threadId: string,
+  ) {
+    event.preventDefault();
+    openThreadContextMenu(threadId, event.clientX, event.clientY);
+  }
+
+  function clearLongPressTimer() {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      clearLongPressTimer();
+    };
+  }, []);
+
+  function handleThreadPointerDown(
+    event: ReactPointerEvent<HTMLButtonElement>,
+    threadId: string,
+  ) {
+    if (event.pointerType === "mouse") return;
+    clearLongPressTimer();
+    longPressTriggeredRef.current = false;
+    const { clientX, clientY } = event;
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTriggeredRef.current = true;
+      openThreadContextMenu(threadId, clientX, clientY);
+    }, 550);
+  }
+
+  function handleThreadPressEnd() {
+    clearLongPressTimer();
+  }
+
+  function handleThreadClick(threadId: string) {
+    if (longPressTriggeredRef.current) {
+      longPressTriggeredRef.current = false;
+      return;
+    }
+    setContextMenu(null);
+    selectThread(threadId);
+  }
+
+  function toggleThreadSet(
+    setter: Dispatch<SetStateAction<Set<string>>>,
+    threadId: string,
+  ) {
+    setter((current) => {
+      const next = new Set(current);
+      if (next.has(threadId)) next.delete(threadId);
+      else next.add(threadId);
+      return next;
+    });
+  }
+
+  function handleContextMenuAction(action: ChatRoomContextMenuAction) {
+    if (!contextMenu) return;
+    const { threadId } = contextMenu;
+    if (action === "open") {
+      selectThread(threadId);
+    }
+    if (action === "pin") {
+      toggleThreadSet(setPinnedThreadIds, threadId);
+    }
+    if (action === "favorite") {
+      toggleThreadSet(setFavoriteThreadIds, threadId);
+    }
+    if (action === "notifications") {
+      toggleThreadSet(setMutedThreadIds, threadId);
+    }
+    setContextMenu(null);
   }
 
   function addFiles(files: FileList | File[]) {
@@ -449,16 +568,39 @@ export function MessagesClient({
   }
 
   if (!threads.length) {
-    return <div className="rounded-lg border border-dashed p-8 text-center theme-surface"><h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div>;
+    return <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed p-8 text-center theme-surface"><div><h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div></div>;
   }
 
   return (
-    <div className="grid h-[calc(100dvh-12rem)] min-h-[540px] max-h-[820px] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border theme-surface-elevated xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
+    <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,13rem)] overflow-hidden rounded-lg border theme-surface-elevated xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
       <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
         {threads.map((thread) => {
           const company = getCounterparty(thread);
           const companyName = getCompanyDisplayName(company, t);
-          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b p-4 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="flex min-w-0 items-center gap-1.5 font-medium theme-foreground"><span className="truncate">{companyName}</span>{company.isTrade82Team ? <AdminBadge compact /> : null}</p><p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p></div></button>;
+          return (
+            <button
+              key={thread.id}
+              type="button"
+              aria-haspopup="menu"
+              onClick={() => handleThreadClick(thread.id)}
+              onContextMenu={(event) => handleThreadContextMenu(event, thread.id)}
+              onPointerDown={(event) => handleThreadPointerDown(event, thread.id)}
+              onPointerUp={handleThreadPressEnd}
+              onPointerCancel={handleThreadPressEnd}
+              onPointerLeave={handleThreadPressEnd}
+              className={`flex w-full gap-3 border-b p-4 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
+            >
+              <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
+              <div className="min-w-0">
+                <p className="flex min-w-0 items-center gap-1.5 font-medium theme-foreground">
+                  <span className="truncate">{companyName}</span>
+                  {company.isTrade82Team ? <AdminBadge compact /> : null}
+                </p>
+                <p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p>
+                <p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p>
+              </div>
+            </button>
+          );
         })}
       </aside>
       {selected ? (
@@ -583,7 +725,162 @@ export function MessagesClient({
           }}
         />
       ) : null}
+      {contextMenu && contextMenuThread ? (
+        <ChatRoomContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          threadName={getCompanyDisplayName(getCounterparty(contextMenuThread), t)}
+          pinned={pinnedThreadIds.has(contextMenu.threadId)}
+          favorite={favoriteThreadIds.has(contextMenu.threadId)}
+          notificationsEnabled={!mutedThreadIds.has(contextMenu.threadId)}
+          onClose={() => setContextMenu(null)}
+          onAction={handleContextMenuAction}
+        />
+      ) : null}
     </div>
+  );
+}
+
+function ChatRoomContextMenu({
+  x,
+  y,
+  threadName,
+  pinned,
+  favorite,
+  notificationsEnabled,
+  onClose,
+  onAction,
+}: {
+  x: number;
+  y: number;
+  threadName: string;
+  pinned: boolean;
+  favorite: boolean;
+  notificationsEnabled: boolean;
+  onClose: () => void;
+  onAction: (action: ChatRoomContextMenuAction) => void;
+}) {
+  const { t } = useI18n();
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        onClose();
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", onClose, true);
+    window.addEventListener("resize", onClose);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", onClose, true);
+      window.removeEventListener("resize", onClose);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      ref={menuRef}
+      role="menu"
+      aria-label={`${t("messages.chatRoomActions", "Chat room actions")}: ${threadName}`}
+      className="fixed z-50 w-[236px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950/95 py-1.5 text-sm text-zinc-100 shadow-2xl shadow-black/40 backdrop-blur"
+      style={{ left: x, top: y }}
+    >
+      <ChatRoomContextMenuItem
+        label={t("messages.menuOpenChatRoom", "Open Chat Room")}
+        shortcut="Enter"
+        onSelect={() => onAction("open")}
+      />
+      <ChatRoomContextMenuItem
+        label={t("messages.menuRenameChatRoom", "Rename Chat Room")}
+        shortcut="R"
+        disabled
+        onSelect={() => onAction("rename")}
+      />
+      <ChatRoomContextMenuDivider />
+      <ChatRoomContextMenuItem
+        label={t("messages.menuPinChatRoom", "Pin Chat Room")}
+        shortcut="P"
+        checked={pinned}
+        onSelect={() => onAction("pin")}
+      />
+      <ChatRoomContextMenuItem
+        label={t("messages.menuAddToFavorites", "Add to Favorites")}
+        shortcut="F"
+        checked={favorite}
+        onSelect={() => onAction("favorite")}
+      />
+      <ChatRoomContextMenuItem
+        label={t("messages.menuNotifications", "Notifications")}
+        shortcut="N"
+        checked={notificationsEnabled}
+        onSelect={() => onAction("notifications")}
+      />
+      <ChatRoomContextMenuDivider />
+      <ChatRoomContextMenuItem
+        label={t("messages.menuLeaveChatRoom", "Leave Chat Room")}
+        shortcut="Del"
+        disabled
+        danger
+        onSelect={() => onAction("leave")}
+      />
+    </div>
+  );
+}
+
+function ChatRoomContextMenuDivider() {
+  return <div className="my-1 h-px bg-zinc-800" role="separator" />;
+}
+
+function ChatRoomContextMenuItem({
+  label,
+  shortcut,
+  checked = false,
+  disabled = false,
+  danger = false,
+  onSelect,
+}: {
+  label: string;
+  shortcut?: string;
+  checked?: boolean;
+  disabled?: boolean;
+  danger?: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      disabled={disabled}
+      aria-disabled={disabled}
+      onClick={onSelect}
+      className={`flex w-full items-center gap-2 px-3 py-2 text-left transition ${
+        disabled
+          ? "cursor-not-allowed text-zinc-500"
+          : danger
+            ? "text-zinc-100 hover:bg-red-500/15 hover:text-red-200"
+            : "text-zinc-100 hover:bg-white/10"
+      }`}
+    >
+      <span className="flex size-4 shrink-0 items-center justify-center text-xs text-emerald-300">
+        {checked ? "✓" : ""}
+      </span>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      {shortcut ? (
+        <span className="ml-3 shrink-0 text-[11px] text-zinc-500">{shortcut}</span>
+      ) : null}
+    </button>
   );
 }
 

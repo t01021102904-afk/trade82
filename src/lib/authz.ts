@@ -49,20 +49,11 @@ function isEmailUniqueConflict(error: unknown) {
   );
 }
 
-const DEFAULT_ADMIN_EMAIL = "t01021102904@gmail.com";
-const DEPRECATED_ADMIN_EMAILS = new Set(["team@trade82.local"]);
-
 export function adminEmails() {
-  return [
-    DEFAULT_ADMIN_EMAIL,
-    ...(process.env.ADMIN_EMAILS ?? "")
-      .split(",")
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean),
-  ].filter(
-    (email, index, emails) =>
-      !DEPRECATED_ADMIN_EMAILS.has(email) && emails.indexOf(email) === index,
-  );
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter((email, index, emails) => Boolean(email) && emails.indexOf(email) === index);
 }
 
 export function isAdminEmail(email: string | null | undefined) {

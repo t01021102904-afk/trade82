@@ -601,7 +601,14 @@
     "noAttachments": "아직 공유된 파일이 없습니다.",
     "pdfDocument": "PDF 문서",
     "sendBlockedWhileUploading": "첨부파일 업로드가 끝난 뒤 보내 주세요.",
-    "messageSendFailed": "메시지를 보내지 못했습니다. 잠시 후 다시 시도해 주세요."
+    "messageSendFailed": "메시지를 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "chatRoomActions": "채팅방 작업",
+    "menuOpenChatRoom": "채팅방 열기",
+    "menuRenameChatRoom": "채팅방 이름 변경",
+    "menuPinChatRoom": "채팅방 고정",
+    "menuAddToFavorites": "즐겨찾기에 추가",
+    "menuNotifications": "알림",
+    "menuLeaveChatRoom": "채팅방 나가기"
   },
   "deals": {
     "dealInProgress": "거래 진행 중",

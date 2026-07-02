@@ -600,7 +600,14 @@
     "noAttachments": "No shared files yet.",
     "pdfDocument": "PDF document",
     "sendBlockedWhileUploading": "Please wait for attachments to finish uploading.",
-    "messageSendFailed": "Unable to send this message. Please try again."
+    "messageSendFailed": "Unable to send this message. Please try again.",
+    "chatRoomActions": "Chat room actions",
+    "menuOpenChatRoom": "Open Chat Room",
+    "menuRenameChatRoom": "Rename Chat Room",
+    "menuPinChatRoom": "Pin Chat Room",
+    "menuAddToFavorites": "Add to Favorites",
+    "menuNotifications": "Notifications",
+    "menuLeaveChatRoom": "Leave Chat Room"
   },
   "deals": {
     "dealInProgress": "Deal in progress",
