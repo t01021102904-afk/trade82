@@ -982,10 +982,11 @@ function FormLibraryAction({
   onAction: (item: FormLibraryItem, action: string) => void;
 }) {
   const templateHref = item.templateSlug ? `/templates/trade82/${item.templateSlug}` : null;
+  const templatePdfHref = item.templateSlug ? `/templates/trade82/${item.templateSlug}.pdf` : null;
   const isTemplatePrintAction =
     templateHref && (action === "Preview" || action === "Print / Save as PDF");
-  const isDisabledTemplateFile =
-    item.templateSlug && (action === "Download PDF if file exists" || action === "DOCX coming soon");
+  const isTemplatePdfDownload = templatePdfHref && action === "Download PDF";
+  const isDisabledTemplateFile = item.templateSlug && action === "DOCX coming soon";
   const icon = action.startsWith("Open") || action === "Print / Save as PDF" ? (
     <ExternalLink className="size-3.5" aria-hidden="true" />
   ) : action.startsWith("Download") ? (
@@ -1007,6 +1008,19 @@ function FormLibraryAction({
         {icon}
         {action}
       </Link>
+    );
+  }
+
+  if (isTemplatePdfDownload) {
+    return (
+      <a
+        href={templatePdfHref}
+        download
+        className={className}
+      >
+        {icon}
+        {action}
+      </a>
     );
   }
 
@@ -1412,7 +1426,7 @@ function formLibraryLabels(item: FormLibraryItem) {
 
 function formActions(item: FormLibraryItem) {
   if (item.templateSlug) {
-    return ["Preview", "Print / Save as PDF", "Download PDF if file exists", "DOCX coming soon"];
+    return ["Preview", "Print / Save as PDF", "Download PDF", "DOCX coming soon"];
   }
   if (item.sourceType === "official") return ["Open official source", "View details"];
   return ["View details", "Request document later"];
