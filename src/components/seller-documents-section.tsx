@@ -44,6 +44,7 @@ type FormLibraryItem = {
   source: string;
   statuses: string[];
   templateSlug?: string;
+  officialUrl?: string;
 };
 
 type MyDocumentItem = {
@@ -189,6 +190,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Broker usually files"],
+    officialUrl: "https://www.cbp.gov/document/forms/form-3461-entryimmediate-delivery-ace",
   },
   {
     id: "cbp-7501",
@@ -202,6 +204,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Broker usually files"],
+    officialUrl: "https://www.cbp.gov/trade/programs-administration/entry-summary/cbp-form-7501",
   },
   {
     id: "cbp-5106",
@@ -215,6 +218,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Importer required"],
+    officialUrl: "https://www.cbp.gov/document/forms/cbp-form-5106-createupdate-importer-identity-form",
   },
   {
     id: "cbp-301",
@@ -228,6 +232,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Importer required"],
+    officialUrl: "https://www.cbp.gov/document/forms/cbp-form-301-customs-bond",
   },
   {
     id: "cbp-3311",
@@ -241,6 +246,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Category-specific"],
+    officialUrl: "https://www.cbp.gov/document/forms/form-3311-declaration-free-entry-returned-american-products",
   },
   {
     id: "cbp-3299",
@@ -254,6 +260,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official form",
     source: "U.S. Customs and Border Protection",
     statuses: ["Official U.S. Form", "Category-specific"],
+    officialUrl: "https://www.cbp.gov/document/forms/form-3299-declaration-free-entry-unaccompanied-articles",
   },
   {
     id: "fda-prior-notice-guide",
@@ -267,6 +274,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official guide",
     source: "U.S. Food and Drug Administration",
     statuses: ["Official source", "Food / cosmetics"],
+    officialUrl: "https://www.fda.gov/industry/prior-notice-imported-foods/filing-prior-notice-imported-foods",
   },
   {
     id: "fda-facility-registration",
@@ -280,6 +288,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official reference",
     source: "U.S. Food and Drug Administration",
     statuses: ["Official source", "Category-specific"],
+    officialUrl: "https://www.fda.gov/food/guidance-regulation-food-and-dietary-supplements/registration-food-facilities-and-other-submissions",
   },
   {
     id: "ingredient-declaration-template",
@@ -332,6 +341,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official reference",
     source: "U.S. Food and Drug Administration",
     statuses: ["Official source", "Category-specific"],
+    officialUrl: "https://www.fda.gov/cosmetics/cosmetics-laws-regulations/modernization-cosmetics-regulation-act-2022-mocra",
   },
   {
     id: "aphis-import-permit",
@@ -345,6 +355,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official reference",
     source: "USDA APHIS",
     statuses: ["Category-specific", "Permit may be required"],
+    officialUrl: "https://www.aphis.usda.gov/efile",
   },
   {
     id: "plant-product-import-guide",
@@ -358,6 +369,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official guide",
     source: "USDA APHIS",
     statuses: ["Category-specific", "Permit may be required"],
+    officialUrl: "https://www.aphis.usda.gov/plant-imports",
   },
   {
     id: "animal-product-import-guide",
@@ -371,6 +383,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official guide",
     source: "USDA APHIS",
     statuses: ["Category-specific", "Permit may be required"],
+    officialUrl: "https://www.aphis.usda.gov/animal-product-import",
   },
   {
     id: "vs-16-3-reference",
@@ -384,6 +397,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official reference",
     source: "USDA APHIS",
     statuses: ["Category-specific", "Permit may be required"],
+    officialUrl: "https://www.aphis.usda.gov/animal-product-import/animal-health-permits",
   },
   {
     id: "ppq-permit-reference",
@@ -397,6 +411,7 @@ const formLibraryItems: FormLibraryItem[] = [
     format: "Official reference",
     source: "USDA APHIS",
     statuses: ["Category-specific", "Permit may be required"],
+    officialUrl: "https://www.aphis.usda.gov/efile/training",
   },
   {
     id: "bill-of-lading",
@@ -986,6 +1001,7 @@ function FormLibraryAction({
   const isTemplatePrintAction =
     templateHref && (action === "Preview" || action === "Print / Save as PDF");
   const isTemplatePdfDownload = templatePdfHref && action === "Download PDF";
+  const isOfficialSourceAction = item.officialUrl && action === "Open official source";
   const isDisabledTemplateFile = item.templateSlug && action === "DOCX coming soon";
   const icon = action.startsWith("Open") || action === "Print / Save as PDF" ? (
     <ExternalLink className="size-3.5" aria-hidden="true" />
@@ -1016,6 +1032,20 @@ function FormLibraryAction({
       <a
         href={templatePdfHref}
         download
+        className={className}
+      >
+        {icon}
+        {action}
+      </a>
+    );
+  }
+
+  if (isOfficialSourceAction) {
+    return (
+      <a
+        href={item.officialUrl}
+        target="_blank"
+        rel="noopener noreferrer"
         className={className}
       >
         {icon}
