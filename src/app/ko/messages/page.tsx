@@ -12,7 +12,7 @@ export default async function KoMessagesPage({
   const { inquiryId } = await searchParams;
   const messages = getDictionary("ko");
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader label={messages.messages.label} title={messages.messages.title} description={messages.messages.description} />
         <MessagesClient initialInquiryId={inquiryId ?? null} />

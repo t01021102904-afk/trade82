@@ -449,22 +449,22 @@ export function MessagesClient({
   }
 
   if (!threads.length) {
-    return <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center"><h2 className="text-xl font-semibold text-zinc-950">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-zinc-600">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white">{t("common.browseProducts")}</Link></div>;
+    return <div className="rounded-lg border border-dashed p-10 text-center theme-surface"><h2 className="text-xl font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div>;
   }
 
   return (
-    <div className="grid h-[calc(100dvh-12rem)] min-h-[540px] max-h-[820px] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-zinc-200 bg-white xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
-      <aside className="max-h-48 min-h-0 overflow-y-auto border-b border-zinc-200 xl:max-h-none xl:border-b-0 xl:border-r">
+    <div className="grid h-[calc(100dvh-12rem)] min-h-[540px] max-h-[820px] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border theme-surface-elevated xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
+      <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
         {threads.map((thread) => {
           const company = getCounterparty(thread);
           const companyName = getCompanyDisplayName(company, t);
-          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b border-zinc-100 p-4 text-left ${selected?.id === thread.id ? "bg-blue-50" : "hover:bg-zinc-50"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="flex min-w-0 items-center gap-1.5 font-medium text-zinc-950"><span className="truncate">{companyName}</span>{company.isTrade82Team ? <AdminBadge compact /> : null}</p><p className="truncate text-xs text-zinc-500">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs text-zinc-500">{formatDate(thread.updatedAt)}</p></div></button>;
+          return <button key={thread.id} type="button" onClick={() => selectThread(thread.id)} className={`flex w-full gap-3 border-b p-4 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}><CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" /><div className="min-w-0"><p className="flex min-w-0 items-center gap-1.5 font-medium theme-foreground"><span className="truncate">{companyName}</span>{company.isTrade82Team ? <AdminBadge compact /> : null}</p><p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p><p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p></div></button>;
         })}
       </aside>
       {selected ? (
         <section className="flex min-h-0 flex-col">
-          <header className="shrink-0 border-b border-zinc-200 p-5">
-            <h2 className="text-xl font-semibold text-zinc-950">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
+          <header className="shrink-0 border-b theme-border p-5">
+            <h2 className="text-xl font-semibold theme-foreground">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
             <CounterpartyProfileLink company={getCounterparty(selected)} />
             {selected.product ? <p className="mt-2 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
             <DealControls
@@ -475,7 +475,7 @@ export function MessagesClient({
               onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
             />
           </header>
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-zinc-50 p-5">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[var(--muted)] p-5">
             {selected.message.trim() ? (
               <ChatBubble
                 body={selected.message}
@@ -500,7 +500,7 @@ export function MessagesClient({
             ))}
             <div ref={messagesEndRef} aria-hidden="true" />
           </div>
-          <footer className="max-h-[45%] shrink-0 overflow-y-auto border-t border-zinc-200 p-4">
+          <footer className="max-h-[45%] shrink-0 overflow-y-auto border-t theme-border p-4">
             <div
               onDragOver={(event) => {
                 event.preventDefault();
@@ -509,14 +509,14 @@ export function MessagesClient({
                 event.preventDefault();
                 addFiles(event.dataTransfer.files);
               }}
-              className="rounded-lg border border-dashed border-zinc-200 bg-white p-3"
+              className="rounded-lg border border-dashed p-3 theme-surface"
             >
               <textarea
                 value={reply}
                 onChange={(event) => setReply(event.target.value)}
                 rows={3}
                 placeholder={t("messages.replyPlaceholder")}
-                className="w-full resize-none rounded-md border border-zinc-200 px-3 py-2"
+                className="w-full resize-none rounded-md border px-3 py-2 theme-input"
               />
               <AttachmentDraftList
                 items={draftAttachments}
@@ -538,22 +538,22 @@ export function MessagesClient({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+                  className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium theme-secondary-button"
                 >
                   <Paperclip className="size-4" />
                   {t("messages.attachFiles")}
                 </button>
-                <span className="text-xs text-zinc-500">{t("messages.dropFiles")}</span>
+                <span className="text-xs theme-muted">{t("messages.dropFiles")}</span>
                 <button
                   type="button"
                   onClick={() => void submitReply()}
                   disabled={draftAttachments.some((item) => item.status === "uploading")}
-                  className="ml-auto rounded-md bg-zinc-950 px-4 py-2 text-sm font-medium text-white disabled:cursor-wait disabled:opacity-60"
+                  className="ml-auto rounded-md px-4 py-2 text-sm font-medium theme-primary-button disabled:cursor-wait disabled:opacity-60"
                 >
                   {t("messages.saveReply")}
                 </button>
               </div>
-              <p className="mt-2 text-xs leading-5 text-zinc-500">{t("messages.attachmentHelp")}</p>
+              <p className="mt-2 text-xs leading-5 theme-muted">{t("messages.attachmentHelp")}</p>
               {composerError ? (
                 <p className="mt-2 text-xs font-medium text-red-700">{composerError}</p>
               ) : null}
@@ -609,14 +609,14 @@ function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
 
   if (!profileHref) {
     return (
-      <div className="mt-3 flex min-w-0 items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-500">
+      <div className="mt-3 flex min-w-0 items-center gap-3 rounded-lg border p-3 text-sm theme-surface-muted theme-muted">
         {logo}
         <div className="min-w-0">
-          <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium text-zinc-700">
+          <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium theme-foreground">
             <span className="truncate">{displayName}</span>
             {company.isTrade82Team ? <AdminBadge /> : null}
           </p>
-          <p className="text-xs text-zinc-500">{t("messages.profileNotListed")}</p>
+          <p className="text-xs theme-muted">{t("messages.profileNotListed")}</p>
         </div>
       </div>
     );
@@ -626,15 +626,15 @@ function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
     <Link
       href={profileHref}
       aria-label={`${t("messages.openCompanyProfile")}: ${displayName}`}
-      className="mt-3 flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-zinc-200 bg-white p-3 text-sm transition hover:border-blue-200 hover:bg-blue-50"
+      className="mt-3 flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition theme-surface-muted theme-card-hover"
     >
       {logo}
       <div className="min-w-0">
-        <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium text-zinc-950">
+        <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium theme-foreground">
           <span className="truncate hover:underline">{displayName}</span>
           {company.isTrade82Team ? <AdminBadge /> : null}
         </p>
-        <p className="text-xs text-zinc-500">{t("messages.openCompanyProfile")}</p>
+        <p className="text-xs theme-muted">{t("messages.openCompanyProfile")}</p>
       </div>
     </Link>
   );
@@ -668,14 +668,14 @@ function ChatBubble({
   return (
     <div id={id} className={`flex w-full scroll-mt-24 ${isMine ? "justify-end" : "justify-start"}`}>
       <article className={`max-w-[85%] sm:max-w-[70%] ${isMine ? "text-right" : "text-left"}`}>
-        <p className={`mb-1 text-xs font-medium ${isMine ? "text-zinc-500" : "text-zinc-600"}`}>
+        <p className="mb-1 text-xs font-medium theme-muted">
           {senderLabel}
         </p>
         <div
           className={
             isMine
-              ? "rounded-2xl rounded-br-md bg-zinc-950 px-4 py-3 text-white shadow-sm"
-              : "rounded-2xl rounded-bl-md border border-zinc-200 bg-white px-4 py-3 text-zinc-900 shadow-sm"
+              ? "rounded-2xl rounded-br-md px-4 py-3 shadow-sm theme-primary-button"
+              : "rounded-2xl rounded-bl-md border px-4 py-3 shadow-sm theme-surface"
           }
         >
           {body ? <p className="whitespace-pre-wrap break-words text-sm leading-6">{body}</p> : null}
@@ -693,7 +693,7 @@ function ChatBubble({
             </div>
           ) : null}
         </div>
-        <p className={`mt-1 text-[11px] ${isMine ? "text-zinc-400" : "text-zinc-500"}`}>
+        <p className="mt-1 text-[11px] theme-muted">
           {formatDate(createdAt)}
         </p>
       </article>

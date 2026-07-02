@@ -16,7 +16,7 @@ export function SellerCard({ seller }: { seller: Seller }) {
   const notProvided = t("common.notProvided");
 
   return (
-    <article className="bm-premium-card flex h-full min-w-0 flex-col rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100">
+    <article className="bm-premium-card flex h-full min-w-0 flex-col rounded-lg border p-5 theme-surface">
       <div className="relative z-10 flex min-w-0 items-start gap-4">
         <CompanyLogo
           companyName={seller.name}
@@ -28,13 +28,13 @@ export function SellerCard({ seller }: { seller: Seller }) {
         <div className="min-w-0">
           <div className="flex min-w-0 flex-wrap items-center gap-1.5">
             <Link href={withLocale(`/companies/${seller.id}`, locale)} className="min-w-0">
-            <h3 className="truncate text-lg font-semibold text-zinc-950 transition hover:text-blue-700">
+            <h3 className="truncate text-lg font-semibold theme-foreground transition hover:text-[var(--accent-foreground)]">
               {seller.name}
             </h3>
           </Link>
             {seller.isTrade82Team ? <AdminBadge /> : null}
           </div>
-          <p className="mt-1 truncate text-sm text-zinc-500">{seller.location}</p>
+          <p className="mt-1 truncate text-sm theme-muted">{seller.location}</p>
         </div>
       </div>
 
@@ -47,34 +47,34 @@ export function SellerCard({ seller }: { seller: Seller }) {
 
       <dl className="relative z-10 mt-5 grid min-w-0 grid-cols-2 gap-3 text-sm">
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.businessType")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">{seller.businessType || notProvided}</dd>
+          <dt className="truncate theme-muted">{t("sellers.businessType")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">{seller.businessType || notProvided}</dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.years")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">{seller.yearsInBusiness || notProvided}</dd>
+          <dt className="truncate theme-muted">{t("sellers.years")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">{seller.yearsInBusiness || notProvided}</dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.response")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">{seller.responseTime || notProvided}</dd>
+          <dt className="truncate theme-muted">{t("sellers.response")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">{seller.responseTime || notProvided}</dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.rating")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">
+          <dt className="truncate theme-muted">{t("sellers.rating")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">
             {seller.rating.toFixed(1)} ({seller.reviewCount})
           </dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.products")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">{seller.productCount ?? notProvided}</dd>
+          <dt className="truncate theme-muted">{t("sellers.products")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">{seller.productCount ?? notProvided}</dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-zinc-500">{t("sellers.state")}</dt>
-          <dd className="line-clamp-2 break-words font-medium text-zinc-900">{seller.state}</dd>
+          <dt className="truncate theme-muted">{t("sellers.state")}</dt>
+          <dd className="line-clamp-2 break-words font-medium theme-foreground">{seller.state}</dd>
         </div>
       </dl>
 
-      <p className="relative z-10 mt-4 line-clamp-3 break-words text-sm leading-6 text-zinc-600">
+      <p className="relative z-10 mt-4 line-clamp-3 break-words text-sm leading-6 theme-muted">
         {seller.description}
       </p>
 
@@ -87,7 +87,7 @@ export function SellerCard({ seller }: { seller: Seller }) {
       <div className="relative z-10 mt-auto grid gap-2 pt-5 sm:grid-cols-2">
         <Link
           href={withLocale(`/companies/${seller.id}`, locale)}
-          className="inline-flex items-center justify-center rounded-md border border-zinc-200 px-3.5 py-2 text-sm font-medium text-zinc-700 transition hover:border-blue-200 hover:text-blue-700"
+          className="inline-flex items-center justify-center rounded-md border px-3.5 py-2 text-sm font-medium transition theme-secondary-button"
         >
           {t("common.viewCompany")}
         </Link>

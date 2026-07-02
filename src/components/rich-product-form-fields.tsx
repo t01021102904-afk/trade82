@@ -786,7 +786,7 @@ export function RichProductFormFields({
         className={cx(
           "rounded-md border p-3 text-xs leading-5",
           variant === "dashboard"
-            ? "border-white/10 bg-white/[0.03] text-zinc-400"
+            ? "theme-surface-muted theme-muted"
             : "border-zinc-200 bg-zinc-50 text-zinc-600",
         )}
       >
@@ -824,14 +824,14 @@ function Section({
       className={cx(
         "scroll-mt-28 grid gap-4 rounded-lg border p-4 sm:grid-cols-2 sm:p-5",
         variant === "dashboard"
-          ? "rounded-2xl border-white/10 bg-white/[0.045] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
+          ? "rounded-2xl theme-surface shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
           : "border-zinc-200 bg-white",
       )}
     >
       <h3
         className={cx(
           "text-base font-semibold sm:col-span-2",
-          variant === "dashboard" ? "text-zinc-50" : "text-zinc-950",
+          variant === "dashboard" ? "theme-foreground" : "text-zinc-950",
         )}
       >
         {title}
@@ -1011,7 +1011,7 @@ function NumberWithSelect({
             <span
               className={cx(
                 "px-3 text-sm",
-                variant === "dashboard" ? "text-zinc-500" : "text-zinc-500",
+                variant === "dashboard" ? "theme-muted" : "text-zinc-500",
               )}
             >
               {prefix}
@@ -1026,7 +1026,7 @@ function NumberWithSelect({
             onChange={(event) => onValueChange(event.target.value)}
             className={cx(
               "h-full min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 outline-none",
-              variant === "dashboard" ? "text-zinc-100 placeholder:text-zinc-600" : "",
+              variant === "dashboard" ? "theme-foreground" : "",
             )}
             aria-invalid={Boolean(error)}
           />
@@ -1047,7 +1047,7 @@ function NumberWithSelect({
         <span
           className={cx(
             "text-xs leading-5",
-            variant === "dashboard" ? "text-zinc-500" : "text-zinc-500",
+            variant === "dashboard" ? "theme-muted" : "text-zinc-500",
           )}
         >
           {helper}
@@ -1096,7 +1096,7 @@ function CheckboxGroup({
         className={cx(
           "grid gap-2 rounded-md border p-3 sm:grid-cols-2",
           variant === "dashboard"
-            ? "border-white/10 bg-zinc-950/70"
+            ? "theme-surface-elevated"
             : "border-zinc-200 bg-white",
         )}
       >
@@ -1105,7 +1105,7 @@ function CheckboxGroup({
             key={option.value}
             className={cx(
               "flex items-center gap-2",
-              variant === "dashboard" ? "text-zinc-300" : "text-zinc-700",
+              variant === "dashboard" ? "theme-foreground" : "text-zinc-700",
             )}
           >
             <input
@@ -1138,7 +1138,7 @@ function FieldLabel({
     <span
       className={cx(
         "flex min-w-0 flex-wrap items-center justify-between gap-2 font-medium",
-        variant === "dashboard" ? "text-zinc-200" : "text-zinc-700",
+        variant === "dashboard" ? "theme-foreground" : "text-zinc-700",
       )}
     >
       <span>
@@ -1177,7 +1177,7 @@ function VisibilitySelect({
         <div
           role="radiogroup"
           aria-label={t("productForm.visibility")}
-          className="grid grid-cols-3 rounded-xl border border-white/10 bg-zinc-950/80 p-1"
+          className="grid grid-cols-3 rounded-xl border p-1 theme-surface-elevated"
         >
           {productFieldVisibilityLevels.map((level) => {
             const selected = value === level;
@@ -1191,8 +1191,8 @@ function VisibilitySelect({
                 className={cx(
                   "min-h-8 rounded-lg px-2 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
                   selected
-                    ? "bg-zinc-100 text-zinc-950 shadow-sm"
-                    : "text-zinc-500 hover:bg-white/[0.06] hover:text-zinc-200",
+                    ? "theme-primary-button shadow-sm"
+                    : "theme-ghost-button",
                 )}
               >
                 {labels[level]}
@@ -1200,7 +1200,7 @@ function VisibilitySelect({
             );
           })}
         </div>
-        <span className="text-[11px] leading-4 text-zinc-500">{helpers[value]}</span>
+        <span className="text-[11px] leading-4 theme-muted">{helpers[value]}</span>
       </div>
     );
   }
@@ -1225,7 +1225,7 @@ function inputClass(variant: ProductFormVariant) {
   return cx(
     "h-10 rounded-md border px-3 outline-none transition",
     variant === "dashboard"
-      ? "rounded-xl border-white/10 bg-zinc-950/80 text-zinc-100 placeholder:text-zinc-600 focus:border-emerald-400/70 focus:ring-2 focus:ring-emerald-400/15 disabled:bg-zinc-900 disabled:text-zinc-500"
+      ? "rounded-xl theme-input focus:border-emerald-400/70 focus:ring-2 focus:ring-emerald-400/15 disabled:opacity-60"
       : "border-zinc-200 bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100",
   );
 }
@@ -1234,7 +1234,7 @@ function selectClass(variant: ProductFormVariant) {
   return cx(
     "h-10 rounded-md border px-3 outline-none transition",
     variant === "dashboard"
-      ? "rounded-xl border-white/10 bg-zinc-950/80 text-zinc-100 focus:border-emerald-400/70 focus:ring-2 focus:ring-emerald-400/15 disabled:bg-zinc-900 disabled:text-zinc-500"
+      ? "rounded-xl theme-input focus:border-emerald-400/70 focus:ring-2 focus:ring-emerald-400/15 disabled:opacity-60"
       : "border-zinc-200 bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-zinc-50 disabled:text-zinc-500",
   );
 }
@@ -1243,7 +1243,7 @@ function inputShellClass(variant: ProductFormVariant) {
   return cx(
     "rounded-md border transition focus-within:ring-2",
     variant === "dashboard"
-      ? "rounded-xl border-white/10 bg-zinc-950/80 focus-within:border-emerald-400/70 focus-within:ring-emerald-400/15"
+      ? "rounded-xl theme-input focus-within:border-emerald-400/70 focus-within:ring-emerald-400/15"
       : "border-zinc-200 bg-white focus-within:border-blue-400 focus-within:ring-blue-100",
   );
 }

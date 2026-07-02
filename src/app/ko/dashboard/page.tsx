@@ -12,7 +12,7 @@ export default async function KoDashboardPage() {
 
   const messages = getDictionary("ko");
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader label={messages.dashboard.label} title={messages.dashboard.title} description={messages.dashboard.description} />
         <DashboardOverview role={role} />

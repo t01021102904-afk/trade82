@@ -22,11 +22,11 @@ function SelectField({
 }) {
   return (
     <label className="grid gap-1 text-sm">
-      <span className="font-medium text-zinc-700">{label}</span>
+      <span className="font-medium theme-foreground">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-zinc-200 bg-white px-3 text-zinc-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+        className="h-10 rounded-md border px-3 outline-none theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -113,15 +113,15 @@ export function MarketplaceClient() {
 
   return (
     <div className="grid min-w-0 gap-8">
-      <div className="bm-premium-card grid min-w-0 gap-5 rounded-lg border border-zinc-200 bg-white/90 p-4 shadow-sm shadow-zinc-100 backdrop-blur">
+      <div className="bm-premium-card grid min-w-0 gap-5 rounded-lg border p-4 backdrop-blur theme-surface-elevated">
         <label className="relative block">
           <span className="sr-only">{t("marketplace.searchProducts")}</span>
-          <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 theme-muted" aria-hidden="true" />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder={t("marketplace.searchPlaceholder")}
-            className="h-12 w-full rounded-md border border-zinc-200 bg-white pl-12 pr-4 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            className="h-12 w-full rounded-md border pl-12 pr-4 outline-none theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
           />
         </label>
 
@@ -137,8 +137,8 @@ export function MarketplaceClient() {
                 onClick={() => setCategory(item.value)}
                 className={`min-h-11 rounded-md border px-4 text-sm font-medium transition ${
                   category === item.value
-                    ? "border-zinc-950 bg-zinc-950 text-white"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:border-blue-300 hover:text-blue-700"
+                    ? "theme-primary-button"
+                    : "theme-secondary-button"
                 }`}
                 aria-pressed={category === item.value}
               >
@@ -148,11 +148,11 @@ export function MarketplaceClient() {
           </div>
         </div>
 
-        <details className="relative z-10 rounded-md border border-zinc-200 bg-white">
-          <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium text-zinc-700">
+        <details className="relative z-10 rounded-md border theme-surface">
+          <summary className="flex min-h-11 cursor-pointer items-center px-4 text-sm font-medium theme-foreground">
             {t("marketplace.moreFilters")}
           </summary>
-          <div className="grid gap-4 border-t border-zinc-100 p-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 border-t p-4 theme-border sm:grid-cols-2 lg:grid-cols-4">
             <SelectField
               label={t("marketplace.price")}
               value={price}
@@ -196,7 +196,7 @@ export function MarketplaceClient() {
           </div>
         </details>
 
-        <div className="relative z-10 flex min-h-11 items-center justify-between border-t border-zinc-100 pt-3 text-sm text-zinc-600">
+        <div className="relative z-10 flex min-h-11 items-center justify-between border-t pt-3 text-sm theme-border theme-muted">
           <span>{filtered.length} {t("marketplace.productsFound")}</span>
           <button
             type="button"
@@ -208,7 +208,7 @@ export function MarketplaceClient() {
               setCertification("all");
               setShippingTerm("all");
             }}
-            className="min-h-11 px-2 font-medium text-blue-700 hover:text-blue-800"
+            className="min-h-11 px-2 font-medium text-[var(--accent-foreground)] hover:text-[var(--foreground)]"
           >
             {t("common.clearFilters")}
           </button>

@@ -14,7 +14,7 @@ export function AdminVerificationsPageContent({ locale }: { locale: Locale }) {
   const admin = messages.admin;
 
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader
           label={admin.label}

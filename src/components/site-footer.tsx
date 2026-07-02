@@ -20,31 +20,31 @@ export function SiteFooter() {
   const prefix = legalPrefix(pathname);
 
   return (
-    <footer className="relative z-10 border-t border-zinc-200 bg-white">
+    <footer className="relative z-10 border-t theme-border theme-bg">
       <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <h2 className="text-sm font-semibold text-zinc-950">{footer.businessTitle}</h2>
-        <div className="mt-4 grid max-w-4xl gap-3 text-xs leading-5 text-zinc-500">
+        <h2 className="text-sm font-semibold theme-foreground">{footer.businessTitle}</h2>
+        <div className="mt-4 grid max-w-4xl gap-3 text-xs leading-5 theme-muted">
           {footer.businessParagraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
         <nav className="relative z-10 mt-5" aria-label={footer.legalLinksTitle}>
-          <p className="text-xs font-semibold text-zinc-800">
+          <p className="text-xs font-semibold theme-foreground">
             {footer.legalLinksTitle}
           </p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-500">
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs theme-muted">
             {footer.legalLinks.map((link, index) => (
               <Link
                 key={link.label}
                 href={`${prefix}${legalRoutes[index] ?? "/terms"}`}
-                className="relative z-10 inline-flex min-h-8 items-center rounded-md underline-offset-4 transition hover:text-zinc-950 hover:underline"
+                className="relative z-10 inline-flex min-h-8 items-center rounded-md underline-offset-4 transition hover:text-[var(--foreground)] hover:underline"
               >
                 {link.label}
               </Link>
             ))}
           </div>
         </nav>
-        <p className="mt-5 text-xs text-zinc-500">{footer.copyright}</p>
+        <p className="mt-5 text-xs theme-muted">{footer.copyright}</p>
       </div>
     </footer>
   );

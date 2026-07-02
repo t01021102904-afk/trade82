@@ -130,17 +130,9 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const safeActiveSection = navItems.some((item) => item.id === activeSection)
     ? activeSection
     : "overview";
-  const isBuyerDashboard = role === "buyer";
-
   return (
     <div className="grid gap-4 lg:grid-cols-[208px_1fr]">
-      <aside
-        className={
-          isBuyerDashboard
-            ? "h-fit min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-2 shadow-2xl shadow-black/10"
-            : "bm-premium-card h-fit min-w-0 rounded-md border border-zinc-200 bg-white p-2 shadow-sm shadow-zinc-100"
-        }
-      >
+      <aside className="h-fit min-w-0 rounded-2xl border p-2 theme-surface-elevated">
         <nav
           className="-mx-1 flex gap-2 overflow-x-auto px-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0"
           aria-label={t("dashboard.label")}
@@ -152,12 +144,8 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               onClick={() => setActiveSection(item.id)}
               className={`relative z-10 h-8 min-w-max rounded-md px-2.5 text-left text-xs font-medium transition ${
                 safeActiveSection === item.id
-                  ? isBuyerDashboard
-                    ? "bg-emerald-300/15 text-emerald-100 shadow-sm shadow-emerald-950/10"
-                    : "bg-emerald-50 text-emerald-800 shadow-sm shadow-emerald-950/5"
-                  : isBuyerDashboard
-                    ? "text-zinc-400 hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-white"
-                    : "text-zinc-600 hover:-translate-y-0.5 hover:bg-zinc-50 hover:text-zinc-950"
+                  ? "theme-primary-button shadow-sm"
+                  : "theme-ghost-button hover:-translate-y-0.5"
               }`}
               aria-current={safeActiveSection === item.id ? "page" : undefined}
             >
@@ -168,13 +156,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
       </aside>
 
       <div className="grid gap-4">
-        <section
-          className={
-            isBuyerDashboard
-              ? "rounded-2xl border border-white/10 bg-white/[0.04] p-4 shadow-2xl shadow-black/10"
-              : "bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100"
-          }
-        >
+        <section className="rounded-2xl border p-4 theme-surface-elevated">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <CompanyLogo
@@ -186,15 +168,13 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               <div className="min-w-0">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <h1
-                    className={`truncate text-xl font-semibold ${
-                      isBuyerDashboard ? "text-white" : "text-zinc-950"
-                    }`}
+                    className="truncate text-xl font-semibold theme-foreground"
                   >
                     {company.tradeName || company.legalName}
                   </h1>
                   {context?.isAdmin ? <AdminBadge /> : null}
                 </div>
-                <p className={`mt-1 text-sm ${isBuyerDashboard ? "text-zinc-400" : "text-zinc-500"}`}>
+                <p className="mt-1 text-sm theme-muted">
                   {role === "seller"
                     ? t("onboarding.roleSellerTitle")
                     : t("onboarding.roleBuyerTitle")}
@@ -210,50 +190,37 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                 label={t("dashboard.editProfile")}
                 locale={locale}
                 primary
-                dark={isBuyerDashboard}
               />
             </div>
           </div>
         </section>
 
         <section className="grid gap-3 md:grid-cols-[1fr_auto]">
-          <div
-            className={
-              isBuyerDashboard
-                ? "rounded-2xl border border-white/10 bg-white/[0.035] p-4"
-                : "bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100"
-            }
-          >
-            <p className={`text-sm ${isBuyerDashboard ? "text-zinc-400" : "text-zinc-500"}`}>
+          <div className="rounded-2xl border p-4 theme-surface">
+            <p className="text-sm theme-muted">
               {t("settings.verificationStatus")}
             </p>
             <div className="mt-2">
               <VerificationBadge status={status} subject={role} />
             </div>
-            <p className={`mt-2 text-sm ${isBuyerDashboard ? "text-zinc-400" : "text-zinc-600"}`}>
+            <p className="mt-2 text-sm theme-muted">
               {status === "verified"
                 ? t("settings.verifiedCompanyText")
                 : status === "rejected"
                   ? rejectionReason || t("settings.rejectedCompanyText")
                   : t("settings.pendingCompanyText")}
             </p>
-            <p className={`mt-2 text-sm font-medium ${isBuyerDashboard ? "text-zinc-200" : "text-zinc-800"}`}>
+            <p className="mt-2 text-sm font-medium theme-foreground">
               {status === "verified"
                 ? t("dashboard.publicListingLive")
                 : t("dashboard.publicListingHidden")}
             </p>
           </div>
-          <div
-            className={
-              isBuyerDashboard
-                ? "rounded-2xl border border-white/10 bg-white/[0.035] p-4 md:min-w-40"
-                : "bm-premium-card rounded-md border border-zinc-200 bg-white p-4 shadow-sm shadow-zinc-100 md:min-w-40"
-            }
-          >
-            <p className={`text-sm ${isBuyerDashboard ? "text-zinc-400" : "text-zinc-500"}`}>
+          <div className="rounded-2xl border p-4 theme-surface md:min-w-40">
+            <p className="text-sm theme-muted">
               {t("settings.profileCompleteness")}
             </p>
-            <p className={`mt-1 text-2xl font-semibold ${isBuyerDashboard ? "text-white" : "text-zinc-950"}`}>
+            <p className="mt-1 text-2xl font-semibold theme-foreground">
               {completeness}%
             </p>
           </div>
@@ -292,25 +259,19 @@ function Action({
   label,
   locale,
   primary = false,
-  dark = false,
 }: {
   href: string;
   label: string;
   locale: "en" | "ko";
   primary?: boolean;
-  dark?: boolean;
 }) {
   return (
     <Link
       href={withLocale(href, locale)}
       className={
         primary
-          ? dark
-            ? "inline-flex h-8 items-center justify-center rounded-md bg-emerald-300 px-2.5 text-xs font-semibold text-zinc-950 hover:bg-emerald-200"
-            : "inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white hover:bg-blue-700"
-          : dark
-            ? "inline-flex h-8 items-center justify-center rounded-md border border-white/10 px-2.5 text-xs font-medium text-zinc-300 hover:border-emerald-300/40 hover:text-white"
-            : "inline-flex h-8 items-center justify-center rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+          ? "inline-flex h-8 items-center justify-center rounded-md px-2.5 text-xs font-semibold theme-primary-button"
+          : "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button"
       }
     >
       {label}

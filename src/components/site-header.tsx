@@ -7,6 +7,7 @@ import { useState } from "react";
 
 import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import { cx } from "@/lib/utils";
@@ -46,9 +47,9 @@ export function SiteHeader() {
       : navLinks;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={withLocale("/", locale)} className="flex items-center text-zinc-950">
+        <Link href={withLocale("/", locale)} className="flex items-center theme-foreground">
           <Image
             src="/trade82-logo.png"
             alt={t("common.bridgeMarket")}
@@ -67,8 +68,8 @@ export function SiteHeader() {
               className={cx(
                 "rounded-md px-3 py-2 text-sm font-medium transition",
                 pathWithoutLocale === link.href
-                  ? "bg-zinc-100 text-zinc-950"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950",
+                  ? "theme-surface-muted theme-foreground"
+                  : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
               )}
             >
               {t(link.labelKey)}
@@ -81,7 +82,9 @@ export function SiteHeader() {
             href={withLocale(pathWithoutLocale, "en")}
             className={cx(
               "rounded-md px-3 py-2 text-sm font-medium",
-              locale === "en" ? "bg-zinc-100 text-zinc-950" : "text-zinc-600 hover:text-blue-700",
+              locale === "en"
+                ? "theme-surface-muted theme-foreground"
+                : "theme-muted hover:text-[var(--accent-foreground)]",
             )}
           >
             {t("locale.english")}
@@ -90,19 +93,22 @@ export function SiteHeader() {
             href={withLocale(pathWithoutLocale, "ko")}
             className={cx(
               "rounded-md px-3 py-2 text-sm font-medium",
-              locale === "ko" ? "bg-zinc-100 text-zinc-950" : "text-zinc-600 hover:text-blue-700",
+              locale === "ko"
+                ? "theme-surface-muted theme-foreground"
+                : "theme-muted hover:text-[var(--accent-foreground)]",
             )}
           >
             {t("locale.korean")}
           </Link>
+          <ThemeToggle compact />
           {isSignedIn && isAdmin ? (
             <Link
               href="/admin"
               className={cx(
                 "rounded-md px-3 py-2 text-sm font-medium transition",
                 pathWithoutLocale.startsWith("/admin")
-                  ? "bg-zinc-100 text-zinc-950"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950",
+                  ? "theme-surface-muted theme-foreground"
+                  : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
               )}
             >
               Admin Console
@@ -114,13 +120,13 @@ export function SiteHeader() {
             <>
             <Link
               href={withLocale("/login", locale)}
-              className="rounded-md border border-zinc-200 px-3.5 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+              className="rounded-md border px-3.5 py-2 text-sm font-medium theme-border theme-muted hover:text-[var(--accent-foreground)]"
             >
               {t("common.signIn")}
             </Link>
             <Link
               href={withLocale("/signup", locale)}
-              className="rounded-md bg-zinc-950 px-3.5 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="rounded-md px-3.5 py-2 text-sm font-medium theme-primary-button"
             >
               {t("common.signUp")}
             </Link>
@@ -131,7 +137,7 @@ export function SiteHeader() {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-zinc-200 text-sm font-semibold text-zinc-700 lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border text-sm font-semibold theme-border theme-muted lg:hidden"
           aria-label="Toggle navigation"
           aria-expanded={open}
         >
@@ -140,7 +146,7 @@ export function SiteHeader() {
       </div>
 
       {open ? (
-        <div className="border-t border-zinc-200 bg-white lg:hidden">
+        <div className="border-t theme-border theme-bg lg:hidden">
           <nav className="mx-auto grid max-w-7xl gap-1 px-4 py-4 sm:px-6">
             {visibleNavLinks.map((link) => (
               <Link
@@ -150,24 +156,27 @@ export function SiteHeader() {
                 className={cx(
                   "rounded-md px-3 py-3 text-sm font-medium",
                   pathWithoutLocale === link.href
-                    ? "bg-zinc-100 text-zinc-950"
-                    : "text-zinc-700 hover:bg-zinc-50",
+                    ? "theme-surface-muted theme-foreground"
+                    : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
                 )}
               >
                 {t(link.labelKey)}
               </Link>
             ))}
-            <Link href={withLocale(pathWithoutLocale, "en")} className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700">
+            <Link href={withLocale(pathWithoutLocale, "en")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
               {t("locale.english")}
             </Link>
-            <Link href={withLocale(pathWithoutLocale, "ko")} className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700">
+            <Link href={withLocale(pathWithoutLocale, "ko")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
               {t("locale.korean")}
             </Link>
+            <div className="px-3 py-2">
+              <ThemeToggle />
+            </div>
             {isSignedIn && isAdmin ? (
               <Link
                 href="/admin"
                 onClick={() => setOpen(false)}
-                className="rounded-md px-3 py-3 text-sm font-medium text-blue-700 hover:bg-zinc-50"
+                className="rounded-md px-3 py-3 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--muted)]"
               >
                 Admin Console
               </Link>
@@ -178,10 +187,10 @@ export function SiteHeader() {
               </div>
             ) : (
               <>
-              <Link href={withLocale("/login", locale)} className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700">
+              <Link href={withLocale("/login", locale)} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
                 {t("common.signIn")}
               </Link>
-              <Link href={withLocale("/signup", locale)} className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700">
+              <Link href={withLocale("/signup", locale)} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
                 {t("common.signUp")}
               </Link>
               </>

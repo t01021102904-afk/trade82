@@ -139,21 +139,21 @@ export function ListingCreateForm() {
   return (
     <form
       onSubmit={submit}
-      className="mx-auto grid w-full max-w-7xl gap-5 rounded-[24px] border border-white/10 bg-[#07090d] p-4 text-zinc-100 shadow-2xl shadow-black/30 sm:p-5 lg:p-6"
+      className="mx-auto grid w-full max-w-7xl gap-5 rounded-[24px] border p-4 theme-surface-elevated sm:p-5 lg:p-6"
       noValidate
     >
-      <div className="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 border-b theme-border pb-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
             {t("listing.pageLabel")}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl font-semibold tracking-tight theme-foreground">
               {t("listing.createProduct")}
             </h1>
             <StatusPill label={statusMeta.label} tone={statusMeta.tone} />
           </div>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+          <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
             {t("listing.builderHelp")}
           </p>
         </div>
@@ -202,8 +202,8 @@ export function ListingCreateForm() {
       ) : null}
 
       <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:items-start">
-        <aside className="hidden rounded-2xl border border-white/10 bg-white/[0.035] p-3 lg:sticky lg:top-24 lg:block">
-          <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+        <aside className="hidden rounded-2xl border p-3 theme-surface lg:sticky lg:top-24 lg:block">
+          <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] theme-muted">
             {t("listing.sections")}
           </p>
           <nav className="grid gap-1" aria-label={t("listing.sections")}>
@@ -211,7 +211,7 @@ export function ListingCreateForm() {
               <a
                 key={href}
                 href={`#${href}`}
-                className="rounded-xl px-2 py-2 text-sm font-medium text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100"
+                className="rounded-xl px-2 py-2 text-sm font-medium transition theme-ghost-button"
               >
                 {label}
               </a>
@@ -238,17 +238,17 @@ export function ListingCreateForm() {
         </p>
       ) : null}
       {notice ? (
-        <p role="status" className="rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm font-medium text-emerald-100">
+        <p role="status" className="rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm font-medium text-[var(--accent-foreground)]">
           {notice}
         </p>
       ) : null}
       {uploading ? (
-        <p role="status" className="rounded-2xl border border-blue-300/25 bg-blue-300/10 p-4 text-sm font-medium text-blue-100">
+        <p role="status" className="rounded-2xl border border-blue-300/25 bg-blue-300/10 p-4 text-sm font-medium text-blue-300">
           {t("listing.imageUploadInProgress")}
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-5">
+      <div className="flex flex-wrap justify-end gap-2 border-t theme-border pt-5">
         <button
           type="button"
           disabled={submitting}
@@ -270,11 +270,11 @@ export function ListingCreateForm() {
 }
 
 const primaryActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-primary-button disabled:cursor-not-allowed disabled:opacity-50";
 const secondaryActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-4 text-sm font-semibold text-zinc-100 transition hover:bg-white/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-10 items-center justify-center rounded-xl border px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-secondary-button disabled:cursor-not-allowed disabled:opacity-50";
 const ghostActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-ghost-button";
 
 function productBuilderStatus({
   submitting,
@@ -311,7 +311,7 @@ function StatusPill({
         tone === "emerald" &&
           "border-emerald-300/30 bg-emerald-300/10 text-emerald-100",
         tone === "red" && "border-red-300/30 bg-red-300/10 text-red-100",
-        tone === "zinc" && "border-white/10 bg-white/[0.06] text-zinc-300",
+        tone === "zinc" && "theme-surface-muted theme-muted",
       )}
     >
       {label}
@@ -340,26 +340,26 @@ function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
   return (
     <aside
       id="buyer-preview"
-      className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 lg:sticky lg:top-24"
+      className="rounded-2xl border p-4 theme-surface lg:sticky lg:top-24"
     >
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] theme-muted">
             {t("listing.buyerPreview")}
           </p>
-          <h2 className="mt-1 text-base font-semibold text-white">
+          <h2 className="mt-1 text-base font-semibold theme-foreground">
             {product.name || t("listing.previewUntitled")}
           </h2>
         </div>
         <StatusPill label={t("listing.statusDraft")} tone="zinc" />
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-zinc-950">
+      <div className="mt-4 overflow-hidden rounded-2xl border theme-surface-elevated">
         {image ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img src={image} alt="" className="aspect-[4/3] w-full object-cover" />
         ) : (
-          <div className="flex aspect-[4/3] items-center justify-center text-sm text-zinc-500">
+          <div className="flex aspect-[4/3] items-center justify-center text-sm theme-muted">
             {t("listing.previewImagePlaceholder")}
           </div>
         )}
@@ -399,8 +399,8 @@ function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
         />
       </dl>
 
-      <div className="mt-4 border-t border-white/10 pt-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+      <div className="mt-4 border-t theme-border pt-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] theme-muted">
           {t("productForm.suggestedUsChannels")}
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -408,13 +408,13 @@ function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
             channelLabels.map((channel) => (
               <span
                 key={channel}
-                className="rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-xs font-medium text-zinc-300"
+                className="rounded-full border px-2.5 py-1 text-xs font-medium theme-surface-muted theme-muted"
               >
                 {channel}
               </span>
             ))
           ) : (
-            <span className="text-sm text-zinc-500">{t("productDetail.notProvided")}</span>
+            <span className="text-sm theme-muted">{t("productDetail.notProvided")}</span>
           )}
         </div>
       </div>
@@ -424,9 +424,9 @@ function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
 
 function PreviewRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid gap-1 rounded-xl border border-white/10 bg-zinc-950/70 p-3">
-      <dt className="text-xs font-medium text-zinc-500">{label}</dt>
-      <dd className="break-words text-sm font-medium text-zinc-100">{value}</dd>
+    <div className="grid gap-1 rounded-xl border p-3 theme-surface-muted">
+      <dt className="text-xs font-medium theme-muted">{label}</dt>
+      <dd className="break-words text-sm font-medium theme-foreground">{value}</dd>
     </div>
   );
 }

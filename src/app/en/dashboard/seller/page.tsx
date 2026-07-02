@@ -7,7 +7,7 @@ export default async function EnSellerDashboardPage() {
   await requireDashboardRole("/en/dashboard/seller", "seller");
   const messages = getDictionary("en");
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader label={messages.dashboard.label} title={messages.settings.sellerDashboard} description={messages.settings.sellerDashboardDescription} />
         <RoleDashboard role="seller" />

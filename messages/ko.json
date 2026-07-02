@@ -3,6 +3,12 @@
     "english": "English",
     "korean": "한국어"
   },
+  "theme": {
+    "label": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
   "common": {
     "bridgeMarket": "Trade82",
     "tagline": "등록된 한국 셀러와 미국 바이어를 연결합니다.",

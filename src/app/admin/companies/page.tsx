@@ -16,7 +16,7 @@ export function AdminCompaniesPageContent({ locale }: { locale: Locale }) {
   const admin = messages.admin;
 
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader
           label={admin.label}
@@ -25,7 +25,7 @@ export function AdminCompaniesPageContent({ locale }: { locale: Locale }) {
           action={
             <Link
               href={withLocale("/admin", locale)}
-              className="rounded-md border border-zinc-200 bg-white px-3.5 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+              className="rounded-md border px-3.5 py-2 text-sm font-medium theme-secondary-button"
             >
               ← {admin.backToAdmin}
             </Link>

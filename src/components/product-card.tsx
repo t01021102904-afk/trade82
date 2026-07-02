@@ -16,8 +16,8 @@ export function ProductCard({ product }: { product: Product }) {
   const imageUrl = safeImageUrl(product.imagePlaceholder);
 
   return (
-    <article className="bm-premium-card group min-w-0 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm shadow-zinc-100">
-      <div className="relative aspect-square overflow-hidden rounded-md bg-zinc-100">
+    <article className="bm-premium-card group min-w-0 rounded-lg border p-3 theme-surface">
+      <div className="relative aspect-square overflow-hidden rounded-md theme-surface-muted">
         <Link href={href} className="relative block size-full">
           <Image
             src={imageUrl}
@@ -32,25 +32,25 @@ export function ProductCard({ product }: { product: Product }) {
           id={product.id}
           kind="product"
           iconOnly
-          className="absolute right-2 top-2 border-white/80 bg-white/90 shadow-sm backdrop-blur"
+          className="absolute right-2 top-2 theme-secondary-button shadow-sm backdrop-blur"
         />
       </div>
 
       <div className="relative z-10 grid min-w-0 gap-1.5 pt-3">
         <Link href={href} className="min-w-0">
-          <h3 className="line-clamp-2 text-base font-semibold leading-6 text-zinc-950 transition-colors group-hover:text-blue-700">
+          <h3 className="line-clamp-2 text-base font-semibold leading-6 theme-foreground transition-colors group-hover:text-[var(--accent-foreground)]">
             {product.name}
           </h3>
         </Link>
-        <p className="truncate text-lg font-bold text-zinc-950">{product.wholesalePrice}</p>
+        <p className="truncate text-lg font-bold theme-foreground">{product.wholesalePrice}</p>
         <Link
           href={withLocale(`/stores/${product.sellerId}`, locale)}
-          className="flex min-w-0 items-center gap-1.5 text-sm text-zinc-600 hover:text-blue-700"
+          className="flex min-w-0 items-center gap-1.5 text-sm theme-muted hover:text-[var(--accent-foreground)]"
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
         </Link>
-        <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs text-zinc-500">
+        <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs theme-muted">
           <span className="truncate">
             {product.sellerLocation || product.category}
           </span>
@@ -67,12 +67,12 @@ export function ProductCard({ product }: { product: Product }) {
 export function ProductCardSkeleton() {
   return (
     <div className="animate-pulse" aria-hidden="true">
-      <div className="aspect-square rounded-md bg-zinc-200" />
+      <div className="aspect-square rounded-md theme-surface-muted" />
       <div className="grid gap-2 pt-3">
-        <div className="h-5 w-4/5 rounded bg-zinc-200" />
-        <div className="h-6 w-2/5 rounded bg-zinc-200" />
-        <div className="h-4 w-3/5 rounded bg-zinc-100" />
-        <div className="h-3 w-1/2 rounded bg-zinc-100" />
+        <div className="h-5 w-4/5 rounded bg-[var(--muted)]" />
+        <div className="h-6 w-2/5 rounded bg-[var(--muted)]" />
+        <div className="h-4 w-3/5 rounded bg-[var(--muted)]" />
+        <div className="h-3 w-1/2 rounded bg-[var(--muted)]" />
       </div>
     </div>
   );

@@ -14,10 +14,10 @@ type CardProps = {
 
 function AdminCard({ title, description, href, disabled, note }: CardProps) {
   const inner = (
-    <div className="grid h-full gap-2 rounded-lg border border-zinc-200 bg-white p-5 transition hover:border-blue-200">
-      <h2 className={`font-semibold ${disabled ? "text-zinc-400" : "text-zinc-950"}`}>{title}</h2>
-      <p className={`text-sm leading-6 ${disabled ? "text-zinc-400" : "text-zinc-600"}`}>{description}</p>
-      {note ? <p className="mt-1 text-xs text-zinc-400">{note}</p> : null}
+    <div className="grid h-full gap-2 rounded-lg border p-5 transition theme-surface theme-card-hover">
+      <h2 className={`font-semibold ${disabled ? "theme-muted" : "theme-foreground"}`}>{title}</h2>
+      <p className={`text-sm leading-6 ${disabled ? "theme-muted" : "theme-muted"}`}>{description}</p>
+      {note ? <p className="mt-1 text-xs theme-muted">{note}</p> : null}
     </div>
   );
 
@@ -36,7 +36,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
   const admin = messages.admin;
 
   return (
-    <div className="bg-zinc-50">
+    <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
         <SectionHeader
           label={admin.label}
@@ -45,7 +45,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
         />
 
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.companyManagement}</h2>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.companyManagement}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AdminCard
               title={admin.companyQueueTitle}
@@ -71,7 +71,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
         </section>
 
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.reviewsContent}</h2>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.reviewsContent}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AdminCard
               title={admin.dealReviews}
@@ -93,7 +93,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
         </section>
 
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">{admin.filesDocuments}</h2>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.filesDocuments}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AdminCard
               title={admin.privateDocuments}
