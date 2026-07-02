@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import { cx } from "@/lib/utils";
@@ -49,15 +48,16 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={withLocale("/", locale)} className="flex items-center theme-foreground">
+        <Link href={withLocale("/", locale)} className="flex items-center gap-2 theme-foreground">
           <Image
             src="/trade82-logo.png"
-            alt={t("common.bridgeMarket")}
-            width={180}
+            alt="Trade82"
+            width={40}
             height={40}
             priority
-            className="h-9 w-auto"
+            className="h-9 w-9 object-contain"
           />
+          <span className="text-sm font-semibold tracking-tight">Trade82</span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -100,7 +100,6 @@ export function SiteHeader() {
           >
             {t("locale.korean")}
           </Link>
-          <ThemeToggle compact />
           {isSignedIn && isAdmin ? (
             <Link
               href="/admin"
@@ -169,9 +168,6 @@ export function SiteHeader() {
             <Link href={withLocale(pathWithoutLocale, "ko")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
               {t("locale.korean")}
             </Link>
-            <div className="px-3 py-2">
-              <ThemeToggle />
-            </div>
             {isSignedIn && isAdmin ? (
               <Link
                 href="/admin"

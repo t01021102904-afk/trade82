@@ -5,11 +5,11 @@ import { cx } from "@/lib/utils";
 type BadgeTone = "blue" | "green" | "gray" | "amber" | "red";
 
 const toneClasses: Record<BadgeTone, string> = {
-  blue: "border-blue-300/30 bg-blue-300/10 text-blue-600",
-  green: "border-emerald-300/30 bg-emerald-300/10 text-emerald-700",
+  blue: "theme-info-badge",
+  green: "theme-success-badge",
   gray: "theme-surface-muted theme-muted",
-  amber: "border-amber-300/35 bg-amber-300/10 text-amber-700",
-  red: "border-red-300/35 bg-red-300/10 text-red-700",
+  amber: "theme-warning-badge",
+  red: "theme-danger-badge",
 };
 
 export function Badge({

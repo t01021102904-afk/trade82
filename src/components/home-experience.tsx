@@ -68,7 +68,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         />
         <div className="relative mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:px-8">
           <div className="bm-section-in min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
+            <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold theme-success-badge">
               <span className="bm-pulse-dot size-2 rounded-full bg-emerald-300" />
               {messages.home.heroBadge}
             </div>
@@ -105,13 +105,13 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       <section className="border-y theme-border theme-surface-muted">
         <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
               {messages.home.earlyPartnerEyebrow}
             </p>
             <h2 className="mt-4 max-w-xl text-2xl font-semibold theme-foreground">
               {messages.home.earlyPartnerTitle}
             </h2>
-            <p className="mt-4 text-sm leading-6 text-emerald-50/80">
+            <p className="mt-4 text-sm leading-6 theme-muted">
               {messages.home.earlyPartnerText}
             </p>
           </div>
@@ -126,7 +126,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
                   <span className="rounded-full border px-3 py-1 text-xs font-medium theme-border theme-muted">
                     Trade82
                   </span>
-                  <span className="text-xs font-semibold text-emerald-200 transition group-hover:translate-x-1">
+                  <span className="text-xs font-semibold transition theme-success-text group-hover:translate-x-1">
                     {card.action}
                   </span>
                 </div>
@@ -182,7 +182,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
                 className="bm-section-in relative rounded-2xl border p-4 theme-surface-elevated"
                 style={{ animationDelay: `${index * 70}ms` }}
               >
-                <span className="flex size-9 items-center justify-center rounded-xl border border-emerald-300/20 bg-emerald-300/10 text-sm font-semibold text-emerald-100">
+                <span className="flex size-9 items-center justify-center rounded-xl border text-sm font-semibold theme-success-badge">
                   {index + 1}
                 </span>
                 <h3 className="mt-5 text-sm font-semibold leading-6 theme-foreground">{step}</h3>
@@ -198,7 +198,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="rounded-3xl border p-6 theme-surface-elevated sm:p-8 lg:flex lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
               {messages.home.ctaEyebrow}
             </p>
             <h2 className="mt-4 text-2xl font-semibold theme-foreground">
@@ -239,7 +239,7 @@ function MetricPill({ value, label }: { value: string; label: string }) {
 
 function SectionEyebrow({ label }: { label: string }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
+    <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
       {label}
     </p>
   );
@@ -262,7 +262,7 @@ function FeatureCard({
       <div className="mb-6 rounded-2xl border p-4 theme-surface-elevated">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold theme-muted">{feature.visual}</span>
-          <span className="rounded-full bg-emerald-300/10 px-2 py-1 text-[11px] font-medium text-emerald-100">
+          <span className="rounded-full border px-2 py-1 text-[11px] font-medium theme-success-badge">
             {statusLabel}
           </span>
         </div>
@@ -319,10 +319,10 @@ function TradeFlowVisual({ messages }: { messages: ReturnType<typeof getDictiona
         </div>
         <div className="bm-flow-inquiry mt-5 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-emerald-200 px-2 py-1 text-xs font-semibold text-zinc-950">
+            <span className="rounded-full px-2 py-1 text-xs font-semibold theme-primary">
               {messages.visualInquiryBadge}
             </span>
-            <span className="text-xs text-emerald-100">{messages.buyerTouchpointsSecured}</span>
+            <span className="text-xs theme-success-text">{messages.buyerTouchpointsSecured}</span>
           </div>
           <p className="mt-3 text-sm leading-6 theme-foreground">
             {messages.visualInquiryText}
@@ -346,8 +346,8 @@ function FlowCard({
 }) {
   const toneClass =
     tone === "emerald"
-      ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100"
-      : "border-sky-300/20 bg-sky-300/10 text-sky-100";
+      ? "theme-success-badge"
+      : "theme-info-badge";
 
   return (
     <article className="bm-flow-card rounded-2xl border p-4 theme-surface-muted">

@@ -144,7 +144,7 @@ export function ListingCreateForm() {
     >
       <div className="flex flex-col gap-4 border-b theme-border pb-5 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] theme-success-text">
             {t("listing.pageLabel")}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -180,7 +180,7 @@ export function ListingCreateForm() {
       </div>
 
       {draft ? (
-        <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100">
+        <div className="rounded-2xl border p-4 text-sm theme-warning-badge">
           <p>{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
@@ -193,7 +193,7 @@ export function ListingCreateForm() {
             <button
               type="button"
               onClick={discardDraft}
-              className="h-8 rounded-lg border border-amber-300/30 px-3 text-xs font-semibold text-amber-100"
+              className="h-8 rounded-lg border px-3 text-xs font-semibold theme-warning-badge"
             >
               {t("settings.discardDraft")}
             </button>
@@ -233,17 +233,17 @@ export function ListingCreateForm() {
       </div>
 
       {errors.form ? (
-        <p className="rounded-2xl border border-red-400/25 bg-red-400/10 p-4 text-sm font-medium text-red-200">
+        <p className="rounded-2xl border p-4 text-sm font-medium theme-danger-badge">
           {errors.form}
         </p>
       ) : null}
       {notice ? (
-        <p role="status" className="rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm font-medium text-[var(--accent-foreground)]">
+        <p role="status" className="rounded-2xl border p-4 text-sm font-medium theme-success-badge">
           {notice}
         </p>
       ) : null}
       {uploading ? (
-        <p role="status" className="rounded-2xl border border-blue-300/25 bg-blue-300/10 p-4 text-sm font-medium text-blue-300">
+        <p role="status" className="rounded-2xl border p-4 text-sm font-medium theme-info-badge">
           {t("listing.imageUploadInProgress")}
         </p>
       ) : null}
@@ -307,10 +307,9 @@ function StatusPill({
     <span
       className={cx(
         "inline-flex h-7 items-center rounded-full border px-3 text-xs font-semibold",
-        tone === "blue" && "border-blue-300/30 bg-blue-300/10 text-blue-100",
-        tone === "emerald" &&
-          "border-emerald-300/30 bg-emerald-300/10 text-emerald-100",
-        tone === "red" && "border-red-300/30 bg-red-300/10 text-red-100",
+        tone === "blue" && "theme-info-badge",
+        tone === "emerald" && "theme-success-badge",
+        tone === "red" && "theme-danger-badge",
         tone === "zinc" && "theme-surface-muted theme-muted",
       )}
     >

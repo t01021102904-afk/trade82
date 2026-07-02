@@ -6,15 +6,15 @@ export function DetailTable({
   rows: Array<{ label: string; value: ReactNode }>;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+    <div className="overflow-hidden rounded-lg border theme-surface">
       <table className="w-full table-fixed text-sm">
-        <tbody className="divide-y divide-zinc-100">
+        <tbody className="divide-y divide-[var(--border)]">
           {rows.map((row) => (
             <tr key={row.label} className="align-top">
-              <th className="w-1/3 break-words bg-zinc-50 px-4 py-3 text-left font-medium text-zinc-600">
+              <th className="w-1/3 break-words px-4 py-3 text-left font-medium theme-surface-muted theme-muted">
                 {row.label}
               </th>
-              <td className="min-w-0 break-words px-4 py-3 text-zinc-900">{row.value}</td>
+              <td className="min-w-0 break-words px-4 py-3 theme-foreground">{row.value}</td>
             </tr>
           ))}
         </tbody>

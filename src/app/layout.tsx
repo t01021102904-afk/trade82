@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: "Trade82 | Korean-U.S. B2B Marketplace",
   description:
     "Trade82 connects Korean sellers with trusted American buyers and trade-ready product information.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

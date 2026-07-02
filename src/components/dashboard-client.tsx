@@ -312,7 +312,7 @@ function BuyerDiscoveryDashboard({
         <div className="rounded-2xl border p-5 theme-surface-elevated">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
                 {t("dashboard.buyerWorkspace")}
               </p>
               <h2 className="mt-3 text-xl font-semibold theme-foreground">
@@ -325,8 +325,8 @@ function BuyerDiscoveryDashboard({
                   : t("dashboard.buyerCompanyIntroEmpty")}
               </p>
             </div>
-            <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-right">
-              <p className="text-xs font-medium text-emerald-100">
+            <div className="rounded-2xl border px-4 py-3 text-right theme-success-badge">
+              <p className="text-xs font-medium">
                 {t("dashboard.profileCompletion")}
               </p>
               <p className="mt-1 text-xl font-semibold theme-foreground">
@@ -346,7 +346,7 @@ function BuyerDiscoveryDashboard({
             {keywords.slice(0, 6).map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100"
+                className="rounded-full border px-3 py-1 text-xs font-medium theme-success-badge"
               >
                 #{item}
               </span>
@@ -436,7 +436,7 @@ function BuyerDiscoveryDashboard({
               onClick={() => setKeyword("all")}
               className={`rounded-full border px-3 py-1 text-xs font-medium ${
                 keyword === "all"
-                  ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100"
+                  ? "theme-success-badge"
                   : "theme-border theme-muted hover:text-[var(--foreground)]"
               }`}
             >
@@ -449,7 +449,7 @@ function BuyerDiscoveryDashboard({
                 onClick={() => setKeyword(item)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
                   keyword === item
-                    ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100"
+                    ? "theme-success-badge"
                     : "theme-border theme-muted hover:text-[var(--foreground)]"
                 }`}
               >
@@ -616,7 +616,7 @@ function DarkListPanel({
         <h3 className="text-base font-semibold theme-foreground">{title}</h3>
         <Link
           href={href}
-          className="text-xs font-semibold text-emerald-200 hover:text-emerald-100"
+          className="text-xs font-semibold theme-success-text hover:underline"
         >
           {actionLabel}
         </Link>

@@ -17,6 +17,18 @@
   --accent-foreground: #a7f3d0;
   --destructive: #f87171;
   --destructive-foreground: #fff1f2;
+  --success-soft: rgba(16, 185, 129, 0.14);
+  --success-border: rgba(110, 231, 183, 0.3);
+  --success-foreground: #a7f3d0;
+  --info-soft: rgba(59, 130, 246, 0.14);
+  --info-border: rgba(147, 197, 253, 0.3);
+  --info-foreground: #bfdbfe;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --warning-border: rgba(252, 211, 77, 0.34);
+  --warning-foreground: #fde68a;
+  --danger-soft: rgba(248, 113, 113, 0.14);
+  --danger-border: rgba(252, 165, 165, 0.34);
+  --danger-foreground: #fecaca;
   --input: rgba(9, 12, 18, 0.88);
   --ring: rgba(16, 185, 129, 0.34);
   --shadow-soft: 0 22px 70px -44px rgba(0, 0, 0, 0.75);
@@ -41,6 +53,18 @@ html[data-theme="light"] {
   --accent-foreground: #047857;
   --destructive: #dc2626;
   --destructive-foreground: #fff1f2;
+  --success-soft: rgba(5, 150, 105, 0.1);
+  --success-border: rgba(5, 150, 105, 0.24);
+  --success-foreground: #047857;
+  --info-soft: rgba(37, 99, 235, 0.08);
+  --info-border: rgba(37, 99, 235, 0.22);
+  --info-foreground: #1d4ed8;
+  --warning-soft: rgba(217, 119, 6, 0.1);
+  --warning-border: rgba(217, 119, 6, 0.24);
+  --warning-foreground: #92400e;
+  --danger-soft: rgba(220, 38, 38, 0.08);
+  --danger-border: rgba(220, 38, 38, 0.22);
+  --danger-foreground: #b91c1c;
   --input: #ffffff;
   --ring: rgba(5, 150, 105, 0.28);
   --shadow-soft: 0 22px 70px -52px rgba(15, 23, 42, 0.35);
@@ -124,6 +148,46 @@ textarea {
 .theme-accent {
   background: var(--accent);
   color: var(--accent-foreground);
+}
+
+.theme-success-badge {
+  border-color: var(--success-border);
+  background: var(--success-soft);
+  color: var(--success-foreground);
+}
+
+.theme-info-badge {
+  border-color: var(--info-border);
+  background: var(--info-soft);
+  color: var(--info-foreground);
+}
+
+.theme-warning-badge {
+  border-color: var(--warning-border);
+  background: var(--warning-soft);
+  color: var(--warning-foreground);
+}
+
+.theme-danger-badge {
+  border-color: var(--danger-border);
+  background: var(--danger-soft);
+  color: var(--danger-foreground);
+}
+
+.theme-success-text {
+  color: var(--success-foreground);
+}
+
+.theme-info-text {
+  color: var(--info-foreground);
+}
+
+.theme-warning-text {
+  color: var(--warning-foreground);
+}
+
+.theme-danger-text {
+  color: var(--danger-foreground);
 }
 
 .theme-primary {
