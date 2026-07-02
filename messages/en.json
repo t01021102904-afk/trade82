@@ -581,7 +581,7 @@
     "orderQuantity": "Order quantity",
     "targetDate": "Target date",
     "localReply": "Reply",
-    "replyPlaceholder": "Type a reply...",
+    "replyPlaceholder": "Type a message...",
     "saveReply": "Send reply",
     "attachFiles": "Attach files",
     "dropFiles": "Drop PDF or image files here",

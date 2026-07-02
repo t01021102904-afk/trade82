@@ -6,10 +6,14 @@ import {
   Image as ImageIcon,
   Paperclip,
   Search,
+  Send,
+  Smile,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import {
+  Fragment,
   useEffect,
   useMemo,
   useRef,
@@ -30,6 +34,7 @@ import {
   MESSAGE_ATTACHMENT_ALLOWED_EXTENSIONS,
   MESSAGE_ATTACHMENT_LIMITS,
 } from "@/lib/message-attachment-rules";
+import { safeExternalUrl } from "@/lib/url-security";
 import { formatDate } from "@/lib/utils";
 
 type DealSummary = {
@@ -64,7 +69,13 @@ type InquiryThread = {
   recipientCompanyId: string;
   buyerCompany: ThreadCompany;
   sellerCompany: ThreadCompany;
-  product: { name: string } | null;
+  product: {
+    id: string;
+    name: string;
+    imageUrl?: string | null;
+    category?: string | null;
+    slug?: string | null;
+  } | null;
   messages: Array<{
     id: string;
     body: string;
@@ -74,6 +85,7 @@ type InquiryThread = {
   }>;
   deals?: DealSummary[];
   viewerCompanyIds?: string[];
+  unreadCount?: number;
 };
 
 type MessageAttachment = {
@@ -123,6 +135,8 @@ type SignedUrlPayload = {
   filename: string;
   mimeType: string;
 };
+
+const MESSAGE_COMPOSER_MAX_LENGTH = 2000;
 
 async function fetchInquiryThreads() {
   const response = await fetch("/api/inquiries");
@@ -186,6 +200,10 @@ export function MessagesClient({
     () => threads.find((thread) => thread.id === selectedId) ?? threads[0],
     [selectedId, threads],
   );
+  const hasPendingUploads = draftAttachments.some((item) => item.status === "uploading");
+  const hasComposerContent =
+    Boolean(reply.trim()) ||
+    draftAttachments.some((item) => item.status === "uploaded");
   const lastMessageId =
     selected?.messages.at(-1)?.id ??
     (selected?.message.trim() ? selected.id : "");
@@ -577,6 +595,7 @@ export function MessagesClient({
         {threads.map((thread) => {
           const company = getCounterparty(thread);
           const companyName = getCompanyDisplayName(company, t);
+          const unreadCount = normalizeUnreadCount(thread.unreadCount);
           return (
             <button
               key={thread.id}
@@ -588,7 +607,7 @@ export function MessagesClient({
               onPointerUp={handleThreadPressEnd}
               onPointerCancel={handleThreadPressEnd}
               onPointerLeave={handleThreadPressEnd}
-              className={`flex w-full gap-3 border-b p-4 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
+              className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
             >
               <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
               <div className="min-w-0">
@@ -599,6 +618,7 @@ export function MessagesClient({
                 <p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p>
                 <p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p>
               </div>
+              <UnreadMessageBadge count={unreadCount} className="right-3 top-3" />
             </button>
           );
         })}
@@ -606,9 +626,12 @@ export function MessagesClient({
       {selected ? (
         <section className="flex min-h-0 flex-col">
           <header className="shrink-0 border-b theme-border p-4">
-            <h2 className="text-lg font-semibold theme-foreground">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
-            <CounterpartyProfileLink company={getCounterparty(selected)} />
-            {selected.product ? <p className="mt-2 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
+            {selected.product ? (
+              <ProductInquiryCard thread={selected} />
+            ) : (
+              <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
+            )}
+            {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
             <DealControls
               thread={selected}
               pending={dealPending}
@@ -617,32 +640,11 @@ export function MessagesClient({
               onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
             />
           </header>
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[var(--muted)] p-5">
-            {selected.message.trim() ? (
-              <ChatBubble
-                body={selected.message}
-                createdAt={selected.createdAt}
-                senderCompanyId={getInitialMessageSenderCompanyId(selected)}
-                thread={selected}
-                attachments={[]}
-                onOpenAttachment={openAttachment}
-              />
-            ) : null}
-            {selected.messages.map((message) => (
-              <ChatBubble
-                key={message.id}
-                id={`message-${message.id}`}
-                body={message.body}
-                createdAt={message.createdAt}
-                senderCompanyId={message.senderCompanyId}
-                thread={selected}
-                attachments={message.attachments}
-                onOpenAttachment={openAttachment}
-              />
-            ))}
+          <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
+            <MessageTimeline thread={selected} onOpenAttachment={openAttachment} />
             <div ref={messagesEndRef} aria-hidden="true" />
           </div>
-          <footer className="max-h-[45%] shrink-0 overflow-y-auto border-t theme-border p-4">
+          <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
             <div
               onDragOver={(event) => {
                 event.preventDefault();
@@ -651,21 +653,22 @@ export function MessagesClient({
                 event.preventDefault();
                 addFiles(event.dataTransfer.files);
               }}
-              className="rounded-lg border border-dashed p-3 theme-surface"
+              className="rounded-2xl border border-zinc-200 bg-white px-3 py-2.5 text-zinc-950 shadow-sm transition focus-within:border-[#64AF8B]/60 focus-within:ring-2 focus-within:ring-[#64AF8B]/10"
             >
               <textarea
                 value={reply}
                 onChange={(event) => setReply(event.target.value)}
+                maxLength={MESSAGE_COMPOSER_MAX_LENGTH}
                 rows={3}
                 placeholder={t("messages.replyPlaceholder")}
-                className="w-full resize-none rounded-md border px-3 py-2 theme-input"
+                className="min-h-20 w-full resize-none border-0 bg-transparent px-1 py-1.5 text-sm leading-6 text-zinc-950 outline-none placeholder:text-zinc-400"
               />
               <AttachmentDraftList
                 items={draftAttachments}
                 onRemove={removeDraftAttachment}
                 onRetry={retryDraftAttachment}
               />
-              <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-100 pt-2">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -680,22 +683,40 @@ export function MessagesClient({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium theme-secondary-button"
+                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+                  aria-label={t("messages.attachFiles")}
+                >
+                  <ImageIcon className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+                  aria-label={t("messages.attachFiles")}
                 >
                   <Paperclip className="size-4" />
-                  {t("messages.attachFiles")}
                 </button>
-                <span className="text-xs theme-muted">{t("messages.dropFiles")}</span>
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-300"
+                  aria-label="Emoji"
+                >
+                  <Smile className="size-4" />
+                </button>
+                <span className="ml-auto text-xs tabular-nums text-zinc-400">
+                  {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
+                </span>
                 <button
                   type="button"
                   onClick={() => void submitReply()}
-                  disabled={draftAttachments.some((item) => item.status === "uploading")}
-                  className="ml-auto rounded-md px-4 py-2 text-sm font-medium theme-primary-button disabled:cursor-wait disabled:opacity-60"
+                  disabled={hasPendingUploads || !hasComposerContent}
+                  className="ml-2 inline-flex size-8 items-center justify-center rounded-full bg-zinc-950 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
+                  aria-label={t("messages.saveReply")}
                 >
-                  {t("messages.saveReply")}
+                  <Send className="size-4" />
                 </button>
               </div>
-              <p className="mt-2 text-xs leading-5 theme-muted">{t("messages.attachmentHelp")}</p>
               {composerError ? (
                 <p className="mt-2 text-xs font-medium text-red-700">{composerError}</p>
               ) : null}
@@ -738,6 +759,35 @@ export function MessagesClient({
         />
       ) : null}
     </div>
+  );
+}
+
+function normalizeUnreadCount(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : 0;
+}
+
+function formatUnreadCount(count: number) {
+  return count > 99 ? "99+" : String(count);
+}
+
+function UnreadMessageBadge({
+  count,
+  className,
+}: {
+  count: number;
+  className?: string;
+}) {
+  if (count <= 0) return null;
+
+  return (
+    <span
+      aria-label={`${count} unread messages`}
+      className={`absolute inline-flex items-center justify-center rounded-full bg-[#64AF8B] text-[10px] font-semibold leading-none text-white shadow-sm ${count > 99 ? "size-6 text-[9px]" : "size-5"} ${className ?? ""}`}
+    >
+      {formatUnreadCount(count)}
+    </span>
   );
 }
 
@@ -884,56 +934,126 @@ function ChatRoomContextMenuItem({
   );
 }
 
-function CounterpartyProfileLink({ company }: { company: ThreadCompany }) {
+function ProductInquiryCard({ thread }: { thread: InquiryThread }) {
   const { locale, t } = useI18n();
-  const { context: userContext } = useUserContext();
-  const displayName = getCompanyDisplayName(company, t);
-  const profileHref = getPublicProfileHref(company, locale, userContext?.isAdmin === true);
-  const logo = (
-    <CompanyLogo
-      companyName={displayName}
-      logoUrl={company.logoThumbnailUrl || company.logoUrl || company.logoOriginalUrl || undefined}
-      logoUrls={[
-        company.logoThumbnailUrl || "",
-        company.logoUrl || "",
-        company.logoOriginalUrl || "",
-      ]}
-      useDefaultLogo={company.useDefaultLogo}
-      size="sm"
-      className="size-11"
-    />
-  );
+  const product = thread.product;
+  const sellerName = getCompanyDisplayName(thread.sellerCompany, t);
+  const productHref = product?.id ? withLocale(`/products/${product.id}`, locale) : "";
+  const imageUrl = safeExternalUrl(product?.imageUrl) || "/window.svg";
 
-  if (!profileHref) {
-    return (
-      <div className="mt-3 flex min-w-0 items-center gap-3 rounded-lg border p-3 text-sm theme-surface-muted theme-muted">
-        {logo}
-        <div className="min-w-0">
-          <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium theme-foreground">
-            <span className="truncate">{displayName}</span>
-            {company.isTrade82Team ? <AdminBadge /> : null}
-          </p>
-          <p className="text-xs theme-muted">{t("messages.profileNotListed")}</p>
-        </div>
-      </div>
-    );
-  }
+  if (!product) return null;
 
   return (
-    <Link
-      href={profileHref}
-      aria-label={`${t("messages.openCompanyProfile")}: ${displayName}`}
-      className="mt-3 flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition theme-surface-muted theme-card-hover"
-    >
-      {logo}
-      <div className="min-w-0">
-        <p className="flex min-w-0 flex-wrap items-center gap-1.5 font-medium theme-foreground">
-          <span className="truncate hover:underline">{displayName}</span>
-          {company.isTrade82Team ? <AdminBadge /> : null}
-        </p>
-        <p className="text-xs theme-muted">{t("messages.openCompanyProfile")}</p>
+    <div className="flex min-w-0 items-center gap-3 rounded-xl border p-3 text-sm theme-surface-muted">
+      <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border theme-border theme-surface">
+        <Image
+          src={imageUrl}
+          alt=""
+          fill
+          sizes="56px"
+          unoptimized
+          className="object-cover"
+        />
       </div>
-    </Link>
+      <div className="min-w-0 flex-1">
+        <h2 className="truncate text-sm font-semibold theme-foreground">{product.name}</h2>
+        <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs theme-muted">
+          <span className="truncate">{sellerName}</span>
+          {thread.sellerCompany.isTrade82Team ? <AdminBadge compact /> : null}
+        </p>
+        {product.category ? (
+          <p className="mt-1 truncate text-xs theme-muted">{product.category}</p>
+        ) : null}
+      </div>
+      {productHref ? (
+        <Link
+          href={productHref}
+          className="shrink-0 rounded-md border px-2.5 py-1.5 text-xs font-medium transition theme-secondary-button"
+        >
+          {t("common.viewProduct")}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
+type TimelineMessage = {
+  key: string;
+  id?: string;
+  body: string;
+  createdAt: string;
+  senderCompanyId: string | null;
+  attachments: MessageAttachment[];
+};
+
+function MessageTimeline({
+  thread,
+  onOpenAttachment,
+}: {
+  thread: InquiryThread;
+  onOpenAttachment: (attachment: MessageAttachment) => void;
+}) {
+  const { locale } = useI18n();
+  const messages: TimelineMessage[] = [
+    ...(thread.message.trim()
+      ? [
+          {
+            key: `initial-${thread.id}`,
+            body: thread.message,
+            createdAt: thread.createdAt,
+            senderCompanyId: getInitialMessageSenderCompanyId(thread),
+            attachments: [],
+          },
+        ]
+      : []),
+    ...thread.messages.map((message) => ({
+      key: message.id,
+      id: `message-${message.id}`,
+      body: message.body,
+      createdAt: message.createdAt,
+      senderCompanyId: message.senderCompanyId,
+      attachments: message.attachments,
+    })),
+  ];
+  let previousDateKey = "";
+
+  return (
+    <>
+      {messages.map((message) => {
+        const dateKey = getMessageDateKey(message.createdAt);
+        const showDateSeparator = dateKey !== previousDateKey;
+        previousDateKey = dateKey;
+
+        return (
+          <Fragment key={message.key}>
+            {showDateSeparator ? (
+              <DateSeparator label={formatMessageDate(message.createdAt, locale)} />
+            ) : null}
+            <ChatBubble
+              id={message.id}
+              body={message.body}
+              createdAt={message.createdAt}
+              senderCompanyId={message.senderCompanyId}
+              thread={thread}
+              attachments={message.attachments}
+              onOpenAttachment={onOpenAttachment}
+            />
+          </Fragment>
+        );
+      })}
+    </>
+  );
+}
+
+function DateSeparator({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <span className="h-px flex-1 bg-[var(--border)]" />
+      <span className="rounded-full border px-2.5 py-1 text-[11px] font-medium theme-surface-muted theme-muted">
+        {label}
+      </span>
+      <span className="h-px flex-1 bg-[var(--border)]" />
+    </div>
   );
 }
 
@@ -954,45 +1074,75 @@ function ChatBubble({
   attachments: MessageAttachment[];
   onOpenAttachment: (attachment: MessageAttachment) => void;
 }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
+  const { context: userContext } = useUserContext();
   const viewerCompanyId = getViewerCompanyId(thread);
   const isMine = Boolean(senderCompanyId && senderCompanyId === viewerCompanyId);
-  const senderLabel = isMine
-    ? t("messages.you")
-    : getSenderCompanyName(thread, senderCompanyId, t) ||
-      getCompanyDisplayName(getCounterparty(thread), t);
+  const senderCompany = getSenderCompany(thread, senderCompanyId) ?? getCounterparty(thread);
+  const senderName = getCompanyDisplayName(senderCompany, t);
+  const senderProfileHref = !isMine
+    ? getPublicProfileHref(senderCompany, locale, userContext?.isAdmin === true)
+    : "";
+  const incomingAvatar = (
+    <CompanyLogo
+      companyName={senderName}
+      logoUrl={senderCompany.logoThumbnailUrl || senderCompany.logoUrl || senderCompany.logoOriginalUrl || undefined}
+      logoUrls={[
+        senderCompany.logoThumbnailUrl || "",
+        senderCompany.logoUrl || "",
+        senderCompany.logoOriginalUrl || "",
+      ]}
+      useDefaultLogo={senderCompany.useDefaultLogo}
+      size="sm"
+      shape="circle"
+      className="size-8 text-[10px]"
+    />
+  );
 
   return (
     <div id={id} className={`flex w-full scroll-mt-24 ${isMine ? "justify-end" : "justify-start"}`}>
-      <article className={`max-w-[85%] sm:max-w-[70%] ${isMine ? "text-right" : "text-left"}`}>
-        <p className="mb-1 text-xs font-medium theme-muted">
-          {senderLabel}
-        </p>
-        <div
-          className={
-            isMine
-              ? "rounded-2xl rounded-br-md px-4 py-3 shadow-sm theme-primary-button"
-              : "rounded-2xl rounded-bl-md border px-4 py-3 shadow-sm theme-surface"
-          }
-        >
-          {body ? <p className="whitespace-pre-wrap break-words text-sm leading-6">{body}</p> : null}
-          {attachments.length ? (
-            <div className={`mt-3 grid gap-2 ${body ? "border-t border-white/20 pt-3" : ""}`}>
-              {attachments.map((attachment) => (
-                <AttachmentCard
-                  key={attachment.id}
-                  attachment={attachment}
-                  mine={isMine}
-                  compact
-                  onOpen={() => onOpenAttachment(attachment)}
-                />
-              ))}
-            </div>
-          ) : null}
+      <article className={`flex max-w-[94%] items-end gap-2 ${isMine ? "flex-row-reverse" : ""}`}>
+        {!isMine && senderProfileHref ? (
+          <Link
+            href={senderProfileHref}
+            aria-label={`${t("messages.openCompanyProfile")}: ${senderName}`}
+            className="shrink-0 cursor-pointer rounded-full transition hover:scale-105 hover:ring-2 hover:ring-[#64AF8B]/35 focus:outline-none focus:ring-2 focus:ring-[#64AF8B]/50"
+          >
+            {incomingAvatar}
+          </Link>
+        ) : !isMine ? (
+          incomingAvatar
+        ) : null}
+        <div className={`flex min-w-0 items-end gap-1.5 ${isMine ? "flex-row-reverse" : ""}`}>
+          <div
+            className={
+              isMine
+                ? "max-w-[72vw] rounded-2xl rounded-br-md px-3.5 py-2.5 shadow-sm theme-primary-button sm:max-w-[32rem]"
+                : "max-w-[72vw] rounded-2xl rounded-bl-md border px-3.5 py-2.5 shadow-sm theme-surface sm:max-w-[32rem]"
+            }
+          >
+            {body ? <p className="whitespace-pre-wrap break-words text-sm leading-6">{body}</p> : null}
+            {attachments.length ? (
+              <div className={`mt-2.5 grid gap-2 ${body ? "border-t border-white/20 pt-2.5" : ""}`}>
+                {attachments.map((attachment) => (
+                  <AttachmentCard
+                    key={attachment.id}
+                    attachment={attachment}
+                    mine={isMine}
+                    compact
+                    onOpen={() => onOpenAttachment(attachment)}
+                  />
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <time
+            dateTime={createdAt}
+            className="mb-1 shrink-0 whitespace-nowrap text-[10px] leading-none theme-muted"
+          >
+            {formatMessageTime(createdAt, locale)}
+          </time>
         </div>
-        <p className="mt-1 text-[11px] theme-muted">
-          {formatDate(createdAt)}
-        </p>
       </article>
     </div>
   );
@@ -1399,6 +1549,16 @@ function getCounterparty(thread: InquiryThread) {
   return thread.sellerCompany;
 }
 
+function getSenderCompany(thread: InquiryThread, senderCompanyId: string | null) {
+  if (senderCompanyId === thread.buyerCompany.id) {
+    return thread.buyerCompany;
+  }
+  if (senderCompanyId === thread.sellerCompany.id) {
+    return thread.sellerCompany;
+  }
+  return null;
+}
+
 function getPublicProfileHref(
   company: ThreadCompany,
   locale: "en" | "ko",
@@ -1420,20 +1580,6 @@ function getInitialMessageSenderCompanyId(thread: InquiryThread) {
     return thread.buyerCompany.id;
   }
   return null;
-}
-
-function getSenderCompanyName(
-  thread: InquiryThread,
-  senderCompanyId: string | null,
-  t?: (key: string, fallback?: string) => string,
-) {
-  if (senderCompanyId === thread.buyerCompany.id) {
-    return getCompanyDisplayName(thread.buyerCompany, t);
-  }
-  if (senderCompanyId === thread.sellerCompany.id) {
-    return getCompanyDisplayName(thread.sellerCompany, t);
-  }
-  return "";
 }
 
 function getCompanyDisplayName(
@@ -1458,6 +1604,40 @@ function getInquiryLabel(
     return t("messages.buyerInquiry");
   }
   return t("messages.sellerInquiry");
+}
+
+function localeCode(locale: "en" | "ko") {
+  return locale === "ko" ? "ko-KR" : "en-US";
+}
+
+function safeDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getMessageDateKey(value: string) {
+  const date = safeDate(value);
+  if (!date) return value;
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+function formatMessageDate(value: string, locale: "en" | "ko") {
+  const date = safeDate(value);
+  if (!date) return value;
+  return new Intl.DateTimeFormat(localeCode(locale), {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatMessageTime(value: string, locale: "en" | "ko") {
+  const date = safeDate(value);
+  if (!date) return "";
+  return new Intl.DateTimeFormat(localeCode(locale), {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function dealStatusLabel(

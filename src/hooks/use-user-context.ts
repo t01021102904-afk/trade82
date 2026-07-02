@@ -16,6 +16,7 @@ export type UserContext = {
     legalName: string;
     tradeName: string | null;
   }>;
+  unreadMessageCount?: number;
 };
 
 type UserContextResponse = Omit<UserContext, "clerkUserId">;

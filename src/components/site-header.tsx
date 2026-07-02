@@ -29,6 +29,7 @@ export function SiteHeader() {
   const pathWithoutLocale = stripLocale(pathname);
   const role = context?.role ?? user?.publicMetadata?.role;
   const isAdmin = context?.isAdmin === true;
+  const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =
     role === "buyer" ||
     role === "seller" ||
@@ -66,13 +67,16 @@ export function SiteHeader() {
               key={link.href}
               href={withLocale(link.href, locale)}
               className={cx(
-                "rounded-md px-3 py-2 text-sm font-medium transition",
+                "relative rounded-md px-3 py-2 text-sm font-medium transition",
                 pathWithoutLocale === link.href
                   ? "theme-surface-muted theme-foreground"
                   : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
               )}
             >
               {t(link.labelKey)}
+              {link.href === "/messages" ? (
+                <UnreadMessageBadge count={unreadMessageCount} className="-right-1 -top-1" />
+              ) : null}
             </Link>
           ))}
         </nav>
@@ -153,13 +157,16 @@ export function SiteHeader() {
                 href={withLocale(link.href, locale)}
                 onClick={() => setOpen(false)}
                 className={cx(
-                  "rounded-md px-3 py-3 text-sm font-medium",
+                  "relative rounded-md px-3 py-3 text-sm font-medium",
                   pathWithoutLocale === link.href
                     ? "theme-surface-muted theme-foreground"
                     : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
                 )}
               >
                 {t(link.labelKey)}
+                {link.href === "/messages" ? (
+                  <UnreadMessageBadge count={unreadMessageCount} className="right-2 top-2" />
+                ) : null}
               </Link>
             ))}
             <Link href={withLocale(pathWithoutLocale, "en")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
@@ -195,5 +202,38 @@ export function SiteHeader() {
         </div>
       ) : null}
     </header>
+  );
+}
+
+function normalizeUnreadCount(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : 0;
+}
+
+function formatUnreadCount(count: number) {
+  return count > 99 ? "99+" : String(count);
+}
+
+function UnreadMessageBadge({
+  count,
+  className,
+}: {
+  count: number;
+  className?: string;
+}) {
+  if (count <= 0) return null;
+
+  return (
+    <span
+      aria-label={`${count} unread messages`}
+      className={cx(
+        "absolute inline-flex items-center justify-center rounded-full bg-[#64AF8B] text-[10px] font-semibold leading-none text-white shadow-sm",
+        count > 99 ? "size-6 text-[9px]" : "size-5",
+        className,
+      )}
+    >
+      {formatUnreadCount(count)}
+    </span>
   );
 }

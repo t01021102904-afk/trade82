@@ -582,7 +582,7 @@
     "orderQuantity": "주문 수량",
     "targetDate": "목표일",
     "localReply": "답변",
-    "replyPlaceholder": "답변을 입력하세요...",
+    "replyPlaceholder": "메시지를 입력해주세요.",
     "saveReply": "답변 보내기",
     "attachFiles": "파일 첨부",
     "dropFiles": "PDF 또는 이미지 파일을 여기에 놓으세요",
