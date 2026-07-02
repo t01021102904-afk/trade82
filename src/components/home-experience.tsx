@@ -43,58 +43,39 @@ export function HomeExperience({ locale }: { locale: Locale }) {
     messages.home.flowStepInquiry,
     messages.home.flowStepLead,
   ];
-  const roleCards = [
-    {
-      title: messages.home.roleSupplierTitle,
-      description: messages.home.roleSupplierText,
-      href: withLocale("/onboarding/seller", locale),
-      action: messages.home.roleSupplierCta,
-    },
-    {
-      title: messages.home.roleBuyerTitle,
-      description: messages.home.roleBuyerText,
-      href: withLocale("/onboarding/buyer", locale),
-      action: messages.home.roleBuyerCta,
-    },
-  ];
-
   return (
     <main className="overflow-hidden theme-bg">
       <section className="relative isolate">
         <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-20" aria-hidden="true" />
         <div
-          className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl"
           aria-hidden="true"
         />
-        <div className="relative mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:px-8">
+        <div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:px-8">
           <div className="bm-section-in min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold theme-success-badge">
               <span className="bm-pulse-dot size-2 rounded-full bg-emerald-300" />
               {messages.home.heroBadge}
             </div>
-            <h1 className="mt-5 max-w-4xl text-[2rem] font-semibold leading-tight tracking-normal theme-foreground sm:text-5xl">
+            <h1 className="mt-5 max-w-3xl text-[1.875rem] font-semibold leading-tight tracking-normal theme-foreground sm:text-[2.5rem] lg:text-[2.875rem]">
               {messages.home.headline}
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-7 theme-muted sm:text-base">
+            <p className="mt-5 max-w-2xl text-sm leading-6 theme-muted">
               {messages.home.subheadline}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={withLocale("/onboarding/seller", locale)}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
+                className="inline-flex min-h-10 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
               >
                 {messages.home.startListingProducts}
               </Link>
               <Link
                 href={withLocale("/marketplace", locale)}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 theme-secondary-button"
+                className="inline-flex min-h-10 items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-secondary-button"
               >
                 {messages.home.exploreProducts}
               </Link>
-            </div>
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <MetricPill value="19" label={messages.home.buyerTouchpoints} />
-              <MetricPill value="30" label={messages.home.earlyPartnerShort} />
             </div>
           </div>
 
@@ -102,58 +83,19 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="border-y theme-border theme-surface-muted">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 p-5 sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
-              {messages.home.earlyPartnerEyebrow}
-            </p>
-            <h2 className="mt-4 max-w-xl text-2xl font-semibold theme-foreground">
-              {messages.home.earlyPartnerTitle}
-            </h2>
-            <p className="mt-4 text-sm leading-6 theme-muted">
-              {messages.home.earlyPartnerText}
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {roleCards.map((card) => (
-              <Link
-                key={card.title}
-                href={card.href}
-                className="group rounded-3xl border p-5 transition hover:-translate-y-0.5 theme-surface-elevated theme-card-hover"
-              >
-                <div className="mb-6 flex items-center justify-between">
-                  <span className="rounded-full border px-3 py-1 text-xs font-medium theme-border theme-muted">
-                    Trade82
-                  </span>
-                  <span className="text-xs font-semibold transition theme-success-text group-hover:translate-x-1">
-                    {card.action}
-                  </span>
-                </div>
-                <h3 className="text-lg font-semibold theme-foreground">{card.title}</h3>
-                <p className="mt-3 text-sm leading-6 theme-muted">{card.description}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <SectionEyebrow label={messages.home.featureGridEyebrow} />
-        <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mt-4 max-w-3xl">
           <div>
-            <h2 className="max-w-3xl text-2xl font-semibold theme-foreground sm:text-3xl">
+            <h2 className="text-xl font-semibold theme-foreground sm:text-2xl">
               {messages.home.featureGridTitle}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 theme-muted">
               {messages.home.featureGridText}
             </p>
           </div>
-          <span className="w-fit rounded-full border px-3 py-1 text-xs font-medium theme-surface-muted theme-muted">
-            {messages.home.buyerTouchpointsSecured}
-          </span>
         </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {features.map((feature, index) => (
             <FeatureCard
               key={feature.title}
@@ -166,9 +108,9 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       </section>
 
       <section className="border-y theme-border theme-surface-muted">
-        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <SectionEyebrow label={messages.home.howItWorks} />
-          <h2 className="mt-4 max-w-3xl text-2xl font-semibold theme-foreground sm:text-3xl">
+          <h2 className="mt-4 max-w-3xl text-xl font-semibold theme-foreground sm:text-2xl">
             {messages.home.howTitle}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 theme-muted">
@@ -195,13 +137,13 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border p-6 theme-surface-elevated sm:p-8 lg:flex lg:items-center lg:justify-between">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="rounded-3xl border p-5 theme-surface-elevated sm:p-6 lg:flex lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
               {messages.home.ctaEyebrow}
             </p>
-            <h2 className="mt-4 text-2xl font-semibold theme-foreground">
+            <h2 className="mt-4 text-xl font-semibold theme-foreground sm:text-2xl">
               {messages.home.ctaTitle}
             </h2>
             <p className="mt-3 text-sm leading-6 theme-muted">
@@ -211,13 +153,13 @@ export function HomeExperience({ locale }: { locale: Locale }) {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row lg:mt-0">
             <Link
               href={withLocale("/onboarding/seller", locale)}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
             >
               {messages.home.startListingProducts}
             </Link>
             <Link
               href={withLocale("/marketplace", locale)}
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 theme-secondary-button"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-secondary-button"
             >
               {messages.home.exploreProducts}
             </Link>
@@ -225,15 +167,6 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
       </section>
     </main>
-  );
-}
-
-function MetricPill({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="rounded-2xl border p-4 theme-surface-muted">
-      <p className="text-2xl font-semibold theme-foreground">{value}</p>
-      <p className="mt-1 text-xs leading-5 theme-muted">{label}</p>
-    </div>
   );
 }
 
@@ -256,10 +189,10 @@ function FeatureCard({
 }) {
   return (
     <article
-      className="bm-premium-card bm-section-in rounded-3xl border p-5 theme-surface"
+      className="bm-premium-card bm-section-in rounded-3xl border p-4 theme-surface"
       style={{ animationDelay: `${index * 55}ms` }}
     >
-      <div className="mb-6 rounded-2xl border p-4 theme-surface-elevated">
+      <div className="mb-5 rounded-2xl border p-4 theme-surface-elevated">
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-semibold theme-muted">{feature.visual}</span>
           <span className="rounded-full border px-2 py-1 text-[11px] font-medium theme-success-badge">
@@ -273,14 +206,14 @@ function FeatureCard({
         </div>
       </div>
       <h3 className="text-base font-semibold theme-foreground">{feature.title}</h3>
-      <p className="mt-3 text-sm leading-6 theme-muted">{feature.description}</p>
+      <p className="mt-2 text-[13px] leading-6 theme-muted">{feature.description}</p>
     </article>
   );
 }
 
 function TradeFlowVisual({ messages }: { messages: ReturnType<typeof getDictionary>["home"] }) {
   return (
-    <div className="bm-float relative mx-auto w-full max-w-2xl rounded-[2rem] border p-3 theme-surface shadow-2xl shadow-emerald-950/20">
+    <div className="bm-float relative mx-auto w-full max-w-xl rounded-[2rem] border p-3 theme-surface shadow-xl shadow-emerald-950/10">
       <div className="rounded-[1.5rem] border p-4 theme-surface-elevated">
         <div className="mb-5 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
@@ -322,7 +255,6 @@ function TradeFlowVisual({ messages }: { messages: ReturnType<typeof getDictiona
             <span className="rounded-full px-2 py-1 text-xs font-semibold theme-primary">
               {messages.visualInquiryBadge}
             </span>
-            <span className="text-xs theme-success-text">{messages.buyerTouchpointsSecured}</span>
           </div>
           <p className="mt-3 text-sm leading-6 theme-foreground">
             {messages.visualInquiryText}
