@@ -746,8 +746,16 @@ export function SellerDocumentsSection() {
         </div>
 
         {activeTab === "forms" ? (
-          <div className="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 text-xs leading-5 theme-muted">
-            Forms and templates are provided for workflow support only. Requirements vary by product, importer, shipment, and government agency. Confirm final requirements with your customs broker, freight forwarder, or compliance advisor.
+          <div className="mt-4 rounded-xl border p-4 theme-surface-elevated">
+            <h3 className="text-sm font-semibold theme-foreground">
+              How this library works
+            </h3>
+            <p className="mt-2 text-xs leading-5 theme-muted">
+              Trade82 templates can be previewed, printed, and later auto-filled from deal data. Official U.S. forms and agency references are linked to their official sources and are usually prepared by the importer, customs broker, freight forwarder, carrier, manufacturer, or compliance specialist.
+            </p>
+            <p className="mt-2 text-xs leading-5 theme-muted">
+              Not every form is required for every shipment. Requirements vary by product, importer, shipment method, and government agency.
+            </p>
           </div>
         ) : null}
       </div>
@@ -814,6 +822,7 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
         item.filledBy,
         item.format,
         item.source,
+        ...formLibraryLabels(item),
         ...item.statuses,
       ]
         .join(" ")
@@ -827,15 +836,15 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
     setSelectedItem(item);
 
     if (action === "View details") return;
-    if (action.startsWith("Open official")) {
+    if (action === "Open official source") {
       onAction("Official source link will be available soon.");
       return;
     }
-    if (action.startsWith("Download")) {
-      onAction("Download PDF will be available after final template export is added.");
+    if (action === "Request document later") {
+      onAction("Document request workflow will be available later.");
       return;
     }
-    onAction("Template details are shown below.");
+    onAction("Details are shown below.");
   }
 
   return (
@@ -875,7 +884,7 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
                 {selectedItem.usedFor}
               </p>
             </div>
-            <StatusChips statuses={selectedItem.statuses} />
+            <StatusChips statuses={formLibraryLabels(selectedItem)} />
           </div>
         </div>
       ) : null}
@@ -885,10 +894,10 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
           <span>Form / Template</span>
           <span>Category</span>
           <span>Used for</span>
-          <span>Filled by</span>
+          <span>Usually prepared by</span>
           <span>Format</span>
           <span>Source</span>
-          <span>Status</span>
+          <span>Type / source</span>
           <span>Actions</span>
         </div>
         <div className="divide-y theme-border">
@@ -943,11 +952,11 @@ function FormLibraryRow({
       </div>
       <LibraryCell label="Category" value={item.category} />
       <LibraryCell label="Used for" value={item.usedFor} />
-      <LibraryCell label="Filled by" value={item.filledBy} />
+      <LibraryCell label="Usually prepared by" value={item.filledBy} />
       <LibraryCell label="Format" value={item.format} />
       <LibraryCell label="Source" value={item.source} />
       <div className="mt-2 xl:mt-0">
-        <StatusChips statuses={item.statuses} />
+        <StatusChips statuses={formLibraryLabels(item)} />
       </div>
       <div className="mt-3 flex flex-wrap gap-2 xl:mt-0">
         {actions.map((action) => (
@@ -975,7 +984,8 @@ function FormLibraryAction({
   const templateHref = item.templateSlug ? `/templates/trade82/${item.templateSlug}` : null;
   const isTemplatePrintAction =
     templateHref && (action === "Preview" || action === "Print / Save as PDF");
-  const isDisabledDownload = item.templateSlug && action === "Download PDF";
+  const isDisabledTemplateFile =
+    item.templateSlug && (action === "Download PDF if file exists" || action === "DOCX coming soon");
   const icon = action.startsWith("Open") || action === "Print / Save as PDF" ? (
     <ExternalLink className="size-3.5" aria-hidden="true" />
   ) : action.startsWith("Download") ? (
@@ -1003,8 +1013,8 @@ function FormLibraryAction({
   return (
     <button
       type="button"
-      disabled={Boolean(isDisabledDownload)}
-      title={isDisabledDownload ? "PDF download is not available yet. Use Preview and browser print instead." : undefined}
+      disabled={Boolean(isDisabledTemplateFile)}
+      title={isDisabledTemplateFile ? "File download is not available yet. Use Preview and browser print instead." : undefined}
       onClick={() => onAction(item, action)}
       className={`${className} disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0`}
     >
@@ -1376,9 +1386,34 @@ function StatusChip({ label, tone }: { label: string; tone: string }) {
   );
 }
 
+function formLibraryLabels(item: FormLibraryItem) {
+  if (item.templateSlug) {
+    return ["Trade82 Template", "Printable template", "Can be auto-filled later"];
+  }
+
+  if (item.sourceType === "official") {
+    return ["Official source", "Not auto-filled by Trade82", "Broker / importer usually files"];
+  }
+
+  if (item.filter === "Logistics") {
+    return ["Carrier / forwarder issued", "Reference only", "Not auto-filled by Trade82"];
+  }
+
+  if (item.filter === "Compliance") {
+    return ["Manufacturer / lab issued", "Buyer may request", "Upload to My Documents later"];
+  }
+
+  if (item.sourceType === "template") {
+    return ["Trade82 Template", "Can be auto-filled later"];
+  }
+
+  return ["Reference only", "Not auto-filled by Trade82"];
+}
+
 function formActions(item: FormLibraryItem) {
-  if (item.templateSlug) return ["Preview", "Print / Save as PDF", "Download PDF"];
-  if (item.sourceType === "template") return ["View details"];
-  if (item.sourceType === "official") return ["Open official form", "View details"];
-  return ["View details"];
+  if (item.templateSlug) {
+    return ["Preview", "Print / Save as PDF", "Download PDF if file exists", "DOCX coming soon"];
+  }
+  if (item.sourceType === "official") return ["Open official source", "View details"];
+  return ["View details", "Request document later"];
 }
