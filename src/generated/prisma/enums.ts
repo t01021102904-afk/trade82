@@ -102,6 +102,27 @@ export const MessageAttachmentStatus = {
 export type MessageAttachmentStatus = (typeof MessageAttachmentStatus)[keyof typeof MessageAttachmentStatus]
 
 
+export const DocumentCategory = {
+  company: 'company',
+  product: 'product',
+  compliance: 'compliance',
+  shipping: 'shipping',
+  contracts: 'contracts',
+  shared_with_buyer: 'shared_with_buyer'
+} as const
+
+export type DocumentCategory = (typeof DocumentCategory)[keyof typeof DocumentCategory]
+
+
+export const DocumentVisibilityStatus = {
+  private: 'private',
+  internal_review: 'internal_review',
+  shared_with_buyer: 'shared_with_buyer'
+} as const
+
+export type DocumentVisibilityStatus = (typeof DocumentVisibilityStatus)[keyof typeof DocumentVisibilityStatus]
+
+
 export const DealStatus = {
   proposed: 'proposed',
   in_progress: 'in_progress',

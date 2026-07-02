@@ -343,6 +343,9 @@ export type CompanyWhereInput = {
   sentCompanyMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
   uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
+  documentFolders?: Prisma.DocumentFolderListRelationFilter
+  tradeDocuments?: Prisma.TradeDocumentListRelationFilter
+  sharedTradeDocuments?: Prisma.TradeDocumentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   buyerDeals?: Prisma.DealListRelationFilter
   sellerDeals?: Prisma.DealListRelationFilter
@@ -384,6 +387,9 @@ export type CompanyOrderByWithRelationInput = {
   sentCompanyMessages?: Prisma.MessageOrderByRelationAggregateInput
   receivedMessages?: Prisma.MessageOrderByRelationAggregateInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentOrderByRelationAggregateInput
+  documentFolders?: Prisma.DocumentFolderOrderByRelationAggregateInput
+  tradeDocuments?: Prisma.TradeDocumentOrderByRelationAggregateInput
+  sharedTradeDocuments?: Prisma.TradeDocumentOrderByRelationAggregateInput
   savedItems?: Prisma.SavedItemOrderByRelationAggregateInput
   buyerDeals?: Prisma.DealOrderByRelationAggregateInput
   sellerDeals?: Prisma.DealOrderByRelationAggregateInput
@@ -429,6 +435,9 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   sentCompanyMessages?: Prisma.MessageListRelationFilter
   receivedMessages?: Prisma.MessageListRelationFilter
   uploadedMessageAttachments?: Prisma.MessageAttachmentListRelationFilter
+  documentFolders?: Prisma.DocumentFolderListRelationFilter
+  tradeDocuments?: Prisma.TradeDocumentListRelationFilter
+  sharedTradeDocuments?: Prisma.TradeDocumentListRelationFilter
   savedItems?: Prisma.SavedItemListRelationFilter
   buyerDeals?: Prisma.DealListRelationFilter
   sellerDeals?: Prisma.DealListRelationFilter
@@ -523,6 +532,9 @@ export type CompanyCreateInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -563,6 +575,9 @@ export type CompanyUncheckedCreateInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -603,6 +618,9 @@ export type CompanyUpdateInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -643,6 +661,9 @@ export type CompanyUncheckedUpdateInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1059,6 +1080,50 @@ export type CompanyUpdateOneRequiredWithoutUploadedMessageAttachmentsNestedInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutUploadedMessageAttachmentsInput, Prisma.CompanyUpdateWithoutUploadedMessageAttachmentsInput>, Prisma.CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput>
 }
 
+export type CompanyCreateNestedOneWithoutDocumentFoldersInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedCreateWithoutDocumentFoldersInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentFoldersInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutDocumentFoldersNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedCreateWithoutDocumentFoldersInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentFoldersInput
+  upsert?: Prisma.CompanyUpsertWithoutDocumentFoldersInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutDocumentFoldersInput, Prisma.CompanyUpdateWithoutDocumentFoldersInput>, Prisma.CompanyUncheckedUpdateWithoutDocumentFoldersInput>
+}
+
+export type CompanyCreateNestedOneWithoutTradeDocumentsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutTradeDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTradeDocumentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyCreateNestedOneWithoutSharedTradeDocumentsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutSharedTradeDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutSharedTradeDocumentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutTradeDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutTradeDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTradeDocumentsInput
+  upsert?: Prisma.CompanyUpsertWithoutTradeDocumentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutTradeDocumentsInput, Prisma.CompanyUpdateWithoutTradeDocumentsInput>, Prisma.CompanyUncheckedUpdateWithoutTradeDocumentsInput>
+}
+
+export type CompanyUpdateOneWithoutSharedTradeDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutSharedTradeDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutSharedTradeDocumentsInput
+  upsert?: Prisma.CompanyUpsertWithoutSharedTradeDocumentsInput
+  disconnect?: Prisma.CompanyWhereInput | boolean
+  delete?: Prisma.CompanyWhereInput | boolean
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutSharedTradeDocumentsInput, Prisma.CompanyUpdateWithoutSharedTradeDocumentsInput>, Prisma.CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput>
+}
+
 export type CompanyCreateNestedOneWithoutBuyerDealsInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutBuyerDealsInput, Prisma.CompanyUncheckedCreateWithoutBuyerDealsInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutBuyerDealsInput
@@ -1173,6 +1238,9 @@ export type CompanyCreateWithoutOwnerInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1212,6 +1280,9 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1303,6 +1374,9 @@ export type CompanyCreateWithoutSellerProfileInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1342,6 +1416,9 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1397,6 +1474,9 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1436,6 +1516,9 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1475,6 +1558,9 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1514,6 +1600,9 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1569,6 +1658,9 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1608,6 +1700,9 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1647,6 +1742,9 @@ export type CompanyCreateWithoutProductsInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1686,6 +1784,9 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1741,6 +1842,9 @@ export type CompanyUpdateWithoutProductsInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1780,6 +1884,9 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1819,6 +1926,9 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -1858,6 +1968,9 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -1913,6 +2026,9 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -1952,6 +2068,9 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -1991,6 +2110,9 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2030,6 +2152,9 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2074,6 +2199,9 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2113,6 +2241,9 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2157,6 +2288,9 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2196,6 +2330,9 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2251,6 +2388,9 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2290,6 +2430,9 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2340,6 +2483,9 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2379,6 +2525,9 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2429,6 +2578,9 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2468,6 +2620,9 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2508,6 +2663,9 @@ export type CompanyCreateWithoutSavedItemsInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -2547,6 +2705,9 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -2602,6 +2763,9 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -2641,6 +2805,9 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -2679,6 +2846,9 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2718,6 +2888,9 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2762,6 +2935,9 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -2801,6 +2977,9 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -2856,6 +3035,9 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2895,6 +3077,9 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -2945,6 +3130,9 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -2984,6 +3172,9 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3023,6 +3214,9 @@ export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
   recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3062,6 +3256,9 @@ export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3117,6 +3314,9 @@ export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
   recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3156,6 +3356,561 @@ export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyCreateWithoutDocumentFoldersInput = {
+  id?: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserProfileCreateNestedOneWithoutCompaniesInput
+  sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutDocumentFoldersInput = {
+  id?: string
+  ownerUserId: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutDocumentFoldersInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedCreateWithoutDocumentFoldersInput>
+}
+
+export type CompanyUpsertWithoutDocumentFoldersInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedUpdateWithoutDocumentFoldersInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedCreateWithoutDocumentFoldersInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutDocumentFoldersInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentFoldersInput, Prisma.CompanyUncheckedUpdateWithoutDocumentFoldersInput>
+}
+
+export type CompanyUpdateWithoutDocumentFoldersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserProfileUpdateOneRequiredWithoutCompaniesNestedInput
+  sellerProfile?: Prisma.SellerProfileUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutDocumentFoldersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyCreateWithoutTradeDocumentsInput = {
+  id?: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserProfileCreateNestedOneWithoutCompaniesInput
+  sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutTradeDocumentsInput = {
+  id?: string
+  ownerUserId: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutTradeDocumentsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutTradeDocumentsInput>
+}
+
+export type CompanyCreateWithoutSharedTradeDocumentsInput = {
+  id?: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserProfileCreateNestedOneWithoutCompaniesInput
+  sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutSharedTradeDocumentsInput = {
+  id?: string
+  ownerUserId: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
+  reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutSharedTradeDocumentsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutSharedTradeDocumentsInput>
+}
+
+export type CompanyUpsertWithoutTradeDocumentsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutTradeDocumentsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutTradeDocumentsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutTradeDocumentsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutTradeDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutTradeDocumentsInput>
+}
+
+export type CompanyUpdateWithoutTradeDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserProfileUpdateOneRequiredWithoutCompaniesNestedInput
+  sellerProfile?: Prisma.SellerProfileUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutTradeDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUpsertWithoutSharedTradeDocumentsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedCreateWithoutSharedTradeDocumentsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutSharedTradeDocumentsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutSharedTradeDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput>
+}
+
+export type CompanyUpdateWithoutSharedTradeDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserProfileUpdateOneRequiredWithoutCompaniesNestedInput
+  sellerProfile?: Prisma.SellerProfileUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3196,6 +3951,9 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -3235,6 +3993,9 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -3279,6 +4040,9 @@ export type CompanyCreateWithoutSellerDealsInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -3318,6 +4082,9 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -3373,6 +4140,9 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -3412,6 +4182,9 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -3462,6 +4235,9 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -3501,6 +4277,9 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -3540,6 +4319,9 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3579,6 +4361,9 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3623,6 +4408,9 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3662,6 +4450,9 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3717,6 +4508,9 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3756,6 +4550,9 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3806,6 +4603,9 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -3845,6 +4645,9 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -3884,6 +4687,9 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -3923,6 +4729,9 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -3967,6 +4776,9 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
@@ -4006,6 +4818,9 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
   receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
   savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
   buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
   sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
@@ -4061,6 +4876,9 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -4100,6 +4918,9 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -4150,6 +4971,9 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -4189,6 +5013,9 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -4249,6 +5076,9 @@ export type CompanyUpdateWithoutOwnerInput = {
   sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
@@ -4288,6 +5118,9 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
   receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
   uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
   savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
   buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
   sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
@@ -4333,6 +5166,9 @@ export type CompanyCountOutputType = {
   sentCompanyMessages: number
   receivedMessages: number
   uploadedMessageAttachments: number
+  documentFolders: number
+  tradeDocuments: number
+  sharedTradeDocuments: number
   savedItems: number
   buyerDeals: number
   sellerDeals: number
@@ -4351,6 +5187,9 @@ export type CompanyCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   sentCompanyMessages?: boolean | CompanyCountOutputTypeCountSentCompanyMessagesArgs
   receivedMessages?: boolean | CompanyCountOutputTypeCountReceivedMessagesArgs
   uploadedMessageAttachments?: boolean | CompanyCountOutputTypeCountUploadedMessageAttachmentsArgs
+  documentFolders?: boolean | CompanyCountOutputTypeCountDocumentFoldersArgs
+  tradeDocuments?: boolean | CompanyCountOutputTypeCountTradeDocumentsArgs
+  sharedTradeDocuments?: boolean | CompanyCountOutputTypeCountSharedTradeDocumentsArgs
   savedItems?: boolean | CompanyCountOutputTypeCountSavedItemsArgs
   buyerDeals?: boolean | CompanyCountOutputTypeCountBuyerDealsArgs
   sellerDeals?: boolean | CompanyCountOutputTypeCountSellerDealsArgs
@@ -4424,6 +5263,27 @@ export type CompanyCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends runt
  */
 export type CompanyCountOutputTypeCountUploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MessageAttachmentWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountDocumentFoldersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DocumentFolderWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountTradeDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TradeDocumentWhereInput
+}
+
+/**
+ * CompanyCountOutputType without action
+ */
+export type CompanyCountOutputTypeCountSharedTradeDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TradeDocumentWhereInput
 }
 
 /**
@@ -4508,6 +5368,9 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   sentCompanyMessages?: boolean | Prisma.Company$sentCompanyMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.Company$receivedMessagesArgs<ExtArgs>
   uploadedMessageAttachments?: boolean | Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>
+  documentFolders?: boolean | Prisma.Company$documentFoldersArgs<ExtArgs>
+  tradeDocuments?: boolean | Prisma.Company$tradeDocumentsArgs<ExtArgs>
+  sharedTradeDocuments?: boolean | Prisma.Company$sharedTradeDocumentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.Company$savedItemsArgs<ExtArgs>
   buyerDeals?: boolean | Prisma.Company$buyerDealsArgs<ExtArgs>
   sellerDeals?: boolean | Prisma.Company$sellerDealsArgs<ExtArgs>
@@ -4602,6 +5465,9 @@ export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sentCompanyMessages?: boolean | Prisma.Company$sentCompanyMessagesArgs<ExtArgs>
   receivedMessages?: boolean | Prisma.Company$receivedMessagesArgs<ExtArgs>
   uploadedMessageAttachments?: boolean | Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>
+  documentFolders?: boolean | Prisma.Company$documentFoldersArgs<ExtArgs>
+  tradeDocuments?: boolean | Prisma.Company$tradeDocumentsArgs<ExtArgs>
+  sharedTradeDocuments?: boolean | Prisma.Company$sharedTradeDocumentsArgs<ExtArgs>
   savedItems?: boolean | Prisma.Company$savedItemsArgs<ExtArgs>
   buyerDeals?: boolean | Prisma.Company$buyerDealsArgs<ExtArgs>
   sellerDeals?: boolean | Prisma.Company$sellerDealsArgs<ExtArgs>
@@ -4632,6 +5498,9 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     sentCompanyMessages: Prisma.$MessagePayload<ExtArgs>[]
     receivedMessages: Prisma.$MessagePayload<ExtArgs>[]
     uploadedMessageAttachments: Prisma.$MessageAttachmentPayload<ExtArgs>[]
+    documentFolders: Prisma.$DocumentFolderPayload<ExtArgs>[]
+    tradeDocuments: Prisma.$TradeDocumentPayload<ExtArgs>[]
+    sharedTradeDocuments: Prisma.$TradeDocumentPayload<ExtArgs>[]
     savedItems: Prisma.$SavedItemPayload<ExtArgs>[]
     buyerDeals: Prisma.$DealPayload<ExtArgs>[]
     sellerDeals: Prisma.$DealPayload<ExtArgs>[]
@@ -5066,6 +5935,9 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   sentCompanyMessages<T extends Prisma.Company$sentCompanyMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sentCompanyMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   receivedMessages<T extends Prisma.Company$receivedMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   uploadedMessageAttachments<T extends Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$uploadedMessageAttachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  documentFolders<T extends Prisma.Company$documentFoldersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$documentFoldersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DocumentFolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tradeDocuments<T extends Prisma.Company$tradeDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$tradeDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sharedTradeDocuments<T extends Prisma.Company$sharedTradeDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sharedTradeDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   savedItems<T extends Prisma.Company$savedItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$savedItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SavedItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   buyerDeals<T extends Prisma.Company$buyerDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$buyerDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sellerDeals<T extends Prisma.Company$sellerDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sellerDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5750,6 +6622,78 @@ export type Company$uploadedMessageAttachmentsArgs<ExtArgs extends runtime.Types
   take?: number
   skip?: number
   distinct?: Prisma.MessageAttachmentScalarFieldEnum | Prisma.MessageAttachmentScalarFieldEnum[]
+}
+
+/**
+ * Company.documentFolders
+ */
+export type Company$documentFoldersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DocumentFolder
+   */
+  select?: Prisma.DocumentFolderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DocumentFolder
+   */
+  omit?: Prisma.DocumentFolderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DocumentFolderInclude<ExtArgs> | null
+  where?: Prisma.DocumentFolderWhereInput
+  orderBy?: Prisma.DocumentFolderOrderByWithRelationInput | Prisma.DocumentFolderOrderByWithRelationInput[]
+  cursor?: Prisma.DocumentFolderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DocumentFolderScalarFieldEnum | Prisma.DocumentFolderScalarFieldEnum[]
+}
+
+/**
+ * Company.tradeDocuments
+ */
+export type Company$tradeDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeDocument
+   */
+  select?: Prisma.TradeDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeDocument
+   */
+  omit?: Prisma.TradeDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeDocumentInclude<ExtArgs> | null
+  where?: Prisma.TradeDocumentWhereInput
+  orderBy?: Prisma.TradeDocumentOrderByWithRelationInput | Prisma.TradeDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.TradeDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TradeDocumentScalarFieldEnum | Prisma.TradeDocumentScalarFieldEnum[]
+}
+
+/**
+ * Company.sharedTradeDocuments
+ */
+export type Company$sharedTradeDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeDocument
+   */
+  select?: Prisma.TradeDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeDocument
+   */
+  omit?: Prisma.TradeDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeDocumentInclude<ExtArgs> | null
+  where?: Prisma.TradeDocumentWhereInput
+  orderBy?: Prisma.TradeDocumentOrderByWithRelationInput | Prisma.TradeDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.TradeDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TradeDocumentScalarFieldEnum | Prisma.TradeDocumentScalarFieldEnum[]
 }
 
 /**

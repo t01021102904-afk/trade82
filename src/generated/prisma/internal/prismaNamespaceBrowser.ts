@@ -63,6 +63,8 @@ export const ModelName = {
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
+  DocumentFolder: 'DocumentFolder',
+  TradeDocument: 'TradeDocument',
   Deal: 'Deal',
   Review: 'Review',
   CompanyReview: 'CompanyReview'
@@ -344,6 +346,41 @@ export const MessageAttachmentScalarFieldEnum = {
 } as const
 
 export type MessageAttachmentScalarFieldEnum = (typeof MessageAttachmentScalarFieldEnum)[keyof typeof MessageAttachmentScalarFieldEnum]
+
+
+export const DocumentFolderScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  createdByUserId: 'createdByUserId',
+  name: 'name',
+  category: 'category',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DocumentFolderScalarFieldEnum = (typeof DocumentFolderScalarFieldEnum)[keyof typeof DocumentFolderScalarFieldEnum]
+
+
+export const TradeDocumentScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  uploadedByUserId: 'uploadedByUserId',
+  fileName: 'fileName',
+  fileUrl: 'fileUrl',
+  fileType: 'fileType',
+  fileSize: 'fileSize',
+  storageBucket: 'storageBucket',
+  storagePath: 'storagePath',
+  mimeType: 'mimeType',
+  category: 'category',
+  folderId: 'folderId',
+  visibilityStatus: 'visibilityStatus',
+  sharedBuyerId: 'sharedBuyerId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TradeDocumentScalarFieldEnum = (typeof TradeDocumentScalarFieldEnum)[keyof typeof TradeDocumentScalarFieldEnum]
 
 
 export const DealScalarFieldEnum = {

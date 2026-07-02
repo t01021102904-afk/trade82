@@ -70,6 +70,21 @@ enum MessageAttachmentStatus {
   flagged
 }
 
+enum DocumentCategory {
+  company
+  product
+  compliance
+  shipping
+  contracts
+  shared_with_buyer
+}
+
+enum DocumentVisibilityStatus {
+  private
+  internal_review
+  shared_with_buyer
+}
+
 enum DealStatus {
   proposed
   in_progress
@@ -86,74 +101,79 @@ enum PublicValueDisplay {
 }
 
 model UserProfile {
-  id                     String                @id @default(cuid())
-  clerkUserId            String                @unique
-  email                  String                @unique
-  displayName            String
-  avatarOriginalUrl      String?
-  avatarUrl              String?
-  companyAffiliation     String                @default("")
-  jobTitle               String                @default("")
-  department             String                @default("")
-  bio                    String                @default("")
-  phoneNumber            String                @default("")
-  linkedinUrl            String                @default("")
-  country                String                @default("")
-  city                   String                @default("")
-  role                   AccountRole
-  preferredLanguage      PreferredLanguage     @default(en)
-  companies              Company[]
-  requestedVerifications VerificationRequest[] @relation("RequestedVerification")
-  reviewedVerifications  VerificationRequest[] @relation("ReviewedVerification")
-  sentInquiries          Inquiry[]             @relation("InquirySender")
-  sentMessages           Message[]             @relation("MessageSender")
-  receivedMessages       Message[]             @relation("MessageReceiver")
-  uploadedMessageAttachments MessageAttachment[] @relation("MessageAttachmentUploader")
-  savedItems             SavedItem[]
-  createdDeals           Deal[]                @relation("DealCreator")
-  createdAt              DateTime              @default(now())
-  updatedAt              DateTime              @updatedAt
+  id                         String                @id @default(cuid())
+  clerkUserId                String                @unique
+  email                      String                @unique
+  displayName                String
+  avatarOriginalUrl          String?
+  avatarUrl                  String?
+  companyAffiliation         String                @default("")
+  jobTitle                   String                @default("")
+  department                 String                @default("")
+  bio                        String                @default("")
+  phoneNumber                String                @default("")
+  linkedinUrl                String                @default("")
+  country                    String                @default("")
+  city                       String                @default("")
+  role                       AccountRole
+  preferredLanguage          PreferredLanguage     @default(en)
+  companies                  Company[]
+  requestedVerifications     VerificationRequest[] @relation("RequestedVerification")
+  reviewedVerifications      VerificationRequest[] @relation("ReviewedVerification")
+  sentInquiries              Inquiry[]             @relation("InquirySender")
+  sentMessages               Message[]             @relation("MessageSender")
+  receivedMessages           Message[]             @relation("MessageReceiver")
+  uploadedMessageAttachments MessageAttachment[]   @relation("MessageAttachmentUploader")
+  createdDocumentFolders     DocumentFolder[]      @relation("CreatedDocumentFolders")
+  uploadedTradeDocuments     TradeDocument[]       @relation("UploadedTradeDocuments")
+  savedItems                 SavedItem[]
+  createdDeals               Deal[]                @relation("DealCreator")
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
 }
 
 model Company {
-  id                     String                    @id @default(cuid())
-  ownerUserId            String
-  owner                  UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  companyRole            CompanyRole
-  legalName              String
-  tradeName              String?
-  logoOriginalUrl        String?
-  logoThumbnailUrl       String?
-  logoUrl                String?
-  useDefaultLogo         Boolean                   @default(true)
-  website                String                    @default("")
-  country                String
-  city                   String                    @default("")
-  stateOrProvince        String                    @default("")
-  businessAddress        String
-  description            String                    @default("")
-  categories             String[]                  @default([])
-  viewCount              Int                       @default(0)
-  verificationStatus     CompanyVerificationStatus @default(unverified)
-  sellerProfile          SellerProfile?
-  buyerProfile           BuyerProfile?
-  products               Product[]
-  verificationRequests   VerificationRequest[]
-  buyerInquiries         Inquiry[]                 @relation("BuyerCompanyInquiries")
-  sellerInquiries        Inquiry[]                 @relation("SellerCompanyInquiries")
-  recipientInquiries     Inquiry[]                 @relation("RecipientCompanyInquiries")
-  sentCompanyMessages    Message[]                 @relation("MessageSenderCompany")
-  receivedMessages       Message[]                 @relation("MessageReceiverCompany")
-  uploadedMessageAttachments MessageAttachment[]     @relation("MessageAttachmentCompany")
-  savedItems             SavedItem[]
-  buyerDeals             Deal[]                    @relation("BuyerCompanyDeals")
-  sellerDeals            Deal[]                    @relation("SellerCompanyDeals")
-  reviewsWritten         Review[]                  @relation("ReviewWriter")
-  reviewsReceived        Review[]                  @relation("ReviewRecipient")
-  companyReviewsWritten  CompanyReview[]           @relation("CompanyReviewWriter")
-  companyReviewsReceived CompanyReview[]           @relation("CompanyReviewRecipient")
-  createdAt              DateTime                  @default(now())
-  updatedAt              DateTime                  @updatedAt
+  id                         String                    @id @default(cuid())
+  ownerUserId                String
+  owner                      UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  companyRole                CompanyRole
+  legalName                  String
+  tradeName                  String?
+  logoOriginalUrl            String?
+  logoThumbnailUrl           String?
+  logoUrl                    String?
+  useDefaultLogo             Boolean                   @default(true)
+  website                    String                    @default("")
+  country                    String
+  city                       String                    @default("")
+  stateOrProvince            String                    @default("")
+  businessAddress            String
+  description                String                    @default("")
+  categories                 String[]                  @default([])
+  viewCount                  Int                       @default(0)
+  verificationStatus         CompanyVerificationStatus @default(unverified)
+  sellerProfile              SellerProfile?
+  buyerProfile               BuyerProfile?
+  products                   Product[]
+  verificationRequests       VerificationRequest[]
+  buyerInquiries             Inquiry[]                 @relation("BuyerCompanyInquiries")
+  sellerInquiries            Inquiry[]                 @relation("SellerCompanyInquiries")
+  recipientInquiries         Inquiry[]                 @relation("RecipientCompanyInquiries")
+  sentCompanyMessages        Message[]                 @relation("MessageSenderCompany")
+  receivedMessages           Message[]                 @relation("MessageReceiverCompany")
+  uploadedMessageAttachments MessageAttachment[]       @relation("MessageAttachmentCompany")
+  documentFolders            DocumentFolder[]          @relation("CompanyDocumentFolders")
+  tradeDocuments             TradeDocument[]           @relation("CompanyTradeDocuments")
+  sharedTradeDocuments       TradeDocument[]           @relation("SharedBuyerDocuments")
+  savedItems                 SavedItem[]
+  buyerDeals                 Deal[]                    @relation("BuyerCompanyDeals")
+  sellerDeals                Deal[]                    @relation("SellerCompanyDeals")
+  reviewsWritten             Review[]                  @relation("ReviewWriter")
+  reviewsReceived            Review[]                  @relation("ReviewRecipient")
+  companyReviewsWritten      CompanyReview[]           @relation("CompanyReviewWriter")
+  companyReviewsReceived     CompanyReview[]           @relation("CompanyReviewRecipient")
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
 
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
@@ -177,75 +197,75 @@ model SellerProfile {
 }
 
 model BuyerProfile {
-  id                   String   @id @default(cuid())
-  companyId            String   @unique
-  company              Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  buyerType            String
-  purchasingCategories String[] @default([])
+  id                    String   @id @default(cuid())
+  companyId             String   @unique
+  company               Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  buyerType             String
+  purchasingCategories  String[] @default([])
   preferredSupplierType String   @default("")
-  targetOrderSize      String
-  monthlyImportVolume  String
-  importExperience     String
-  purchaseTimeline     String
-  salesChannels        String[] @default([])
+  targetOrderSize       String
+  monthlyImportVolume   String
+  importExperience      String
+  purchaseTimeline      String
+  salesChannels         String[] @default([])
 }
 
 model Product {
-  id                     String         @id @default(cuid())
-  sellerCompanyId        String
-  sellerCompany          Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
-  name                   String
-  slug                   String         @unique
-  imageUrl               String?
-  category               String
-  tags                   String[]       @default([])
-  shortDescription       String
-  detailedDescription    String
-  priceMin               Decimal?       @db.Decimal(14, 2)
-  priceMax               Decimal?       @db.Decimal(14, 2)
-  currency               String         @default("USD")
-  priceUnit              String         @default("unit")
-  moq                    String
-  moqQuantity            String         @default("")
-  moqUnit                String         @default("Units")
-  leadTime               String
-  leadTimeCode           String         @default("")
-  sampleAvailability     String         @default("")
-  privateLabelAvailability String       @default("")
-  monthlyCapacity        String         @default("")
-  monthlyCapacityUnit    String         @default("Units")
-  origin                 String         @default("South Korea")
-  countryOfOrigin        String         @default("South Korea")
-  shippingOriginCountry  String         @default("South Korea")
-  shippingOriginRegion   String         @default("")
-  incoterms              String[]       @default([])
-  hsCode                 String         @default("")
-  shelfLife              String         @default("")
-  storageRequirements    String         @default("")
-  documentsAvailable     String[]       @default([])
-  complianceClaims       String[]       @default([])
-  buyerNotes             String         @default("")
-  riskNotes              String[]       @default([])
-  certifications         String[]       @default([])
-  ingredientsOrMaterials String
-  packaging              String
-  packageSize            String         @default("")
-  unitsPerCarton         String         @default("")
-  cartonWeight           String         @default("")
-  cartonDimensions       String         @default("")
-  palletQuantity         String         @default("")
-  storageTemperature     String         @default("")
-  suggestedUsChannels    String[]       @default([])
-  fieldVisibility        Json           @default("{}") @map("field_visibility")
-  exportReadiness        Boolean        @default(false)
-  viewCount              Int            @default(0)
-  status                 ProductStatus  @default(draft)
-  images                 ProductImage[]
-  inquiries              Inquiry[]
-  savedItems             SavedItem[]
-  deals                  Deal[]
-  createdAt              DateTime       @default(now())
-  updatedAt              DateTime       @updatedAt
+  id                       String         @id @default(cuid())
+  sellerCompanyId          String
+  sellerCompany            Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  name                     String
+  slug                     String         @unique
+  imageUrl                 String?
+  category                 String
+  tags                     String[]       @default([])
+  shortDescription         String
+  detailedDescription      String
+  priceMin                 Decimal?       @db.Decimal(14, 2)
+  priceMax                 Decimal?       @db.Decimal(14, 2)
+  currency                 String         @default("USD")
+  priceUnit                String         @default("unit")
+  moq                      String
+  moqQuantity              String         @default("")
+  moqUnit                  String         @default("Units")
+  leadTime                 String
+  leadTimeCode             String         @default("")
+  sampleAvailability       String         @default("")
+  privateLabelAvailability String         @default("")
+  monthlyCapacity          String         @default("")
+  monthlyCapacityUnit      String         @default("Units")
+  origin                   String         @default("South Korea")
+  countryOfOrigin          String         @default("South Korea")
+  shippingOriginCountry    String         @default("South Korea")
+  shippingOriginRegion     String         @default("")
+  incoterms                String[]       @default([])
+  hsCode                   String         @default("")
+  shelfLife                String         @default("")
+  storageRequirements      String         @default("")
+  documentsAvailable       String[]       @default([])
+  complianceClaims         String[]       @default([])
+  buyerNotes               String         @default("")
+  riskNotes                String[]       @default([])
+  certifications           String[]       @default([])
+  ingredientsOrMaterials   String
+  packaging                String
+  packageSize              String         @default("")
+  unitsPerCarton           String         @default("")
+  cartonWeight             String         @default("")
+  cartonDimensions         String         @default("")
+  palletQuantity           String         @default("")
+  storageTemperature       String         @default("")
+  suggestedUsChannels      String[]       @default([])
+  fieldVisibility          Json           @default("{}") @map("field_visibility")
+  exportReadiness          Boolean        @default(false)
+  viewCount                Int            @default(0)
+  status                   ProductStatus  @default(draft)
+  images                   ProductImage[]
+  inquiries                Inquiry[]
+  savedItems               SavedItem[]
+  deals                    Deal[]
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   @@index([sellerCompanyId, status])
   @@index([category])
@@ -302,26 +322,26 @@ model VerificationRequest {
 }
 
 model Inquiry {
-  id                 String        @id @default(cuid())
+  id                 String              @id @default(cuid())
   buyerCompanyId     String
-  buyerCompany       Company       @relation("BuyerCompanyInquiries", fields: [buyerCompanyId], references: [id])
+  buyerCompany       Company             @relation("BuyerCompanyInquiries", fields: [buyerCompanyId], references: [id])
   sellerCompanyId    String
-  sellerCompany      Company       @relation("SellerCompanyInquiries", fields: [sellerCompanyId], references: [id])
+  sellerCompany      Company             @relation("SellerCompanyInquiries", fields: [sellerCompanyId], references: [id])
   productId          String?
-  product            Product?      @relation(fields: [productId], references: [id])
+  product            Product?            @relation(fields: [productId], references: [id])
   senderUserId       String
-  sender             UserProfile   @relation("InquirySender", fields: [senderUserId], references: [id])
+  sender             UserProfile         @relation("InquirySender", fields: [senderUserId], references: [id])
   recipientCompanyId String
-  recipientCompany   Company       @relation("RecipientCompanyInquiries", fields: [recipientCompanyId], references: [id])
+  recipientCompany   Company             @relation("RecipientCompanyInquiries", fields: [recipientCompanyId], references: [id])
   message            String
   quantity           String?
   targetDate         DateTime?
-  status             InquiryStatus @default(sent)
+  status             InquiryStatus       @default(sent)
   messages           Message[]
   attachments        MessageAttachment[]
   deals              Deal[]
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   @@index([buyerCompanyId, sellerCompanyId])
   @@index([recipientCompanyId, status])
@@ -348,51 +368,97 @@ model SavedItem {
 }
 
 model Message {
-  id                String       @id @default(cuid())
+  id                String              @id @default(cuid())
   inquiryId         String?
-  inquiry           Inquiry?     @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  inquiry           Inquiry?            @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
   senderUserId      String
-  sender            UserProfile  @relation("MessageSender", fields: [senderUserId], references: [id])
+  sender            UserProfile         @relation("MessageSender", fields: [senderUserId], references: [id])
   receiverUserId    String?
-  receiver          UserProfile? @relation("MessageReceiver", fields: [receiverUserId], references: [id])
+  receiver          UserProfile?        @relation("MessageReceiver", fields: [receiverUserId], references: [id])
   senderCompanyId   String?
-  senderCompany     Company?     @relation("MessageSenderCompany", fields: [senderCompanyId], references: [id])
+  senderCompany     Company?            @relation("MessageSenderCompany", fields: [senderCompanyId], references: [id])
   receiverCompanyId String?
-  receiverCompany   Company?     @relation("MessageReceiverCompany", fields: [receiverCompanyId], references: [id])
+  receiverCompany   Company?            @relation("MessageReceiverCompany", fields: [receiverCompanyId], references: [id])
   body              String
-  contentHash       String       @default("")
+  contentHash       String              @default("")
   attachments       MessageAttachment[]
-  createdAt         DateTime     @default(now())
+  createdAt         DateTime            @default(now())
 
   @@index([inquiryId, createdAt])
 }
 
 model MessageAttachment {
-  id                  String                      @id @default(cuid())
+  id                  String                    @id @default(cuid())
   messageId           String?
-  message             Message?                    @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  message             Message?                  @relation(fields: [messageId], references: [id], onDelete: SetNull)
   inquiryId           String
-  inquiry             Inquiry                     @relation(fields: [inquiryId], references: [id])
+  inquiry             Inquiry                   @relation(fields: [inquiryId], references: [id])
   uploadedByUserId    String
-  uploadedByUser      UserProfile                 @relation("MessageAttachmentUploader", fields: [uploadedByUserId], references: [id])
+  uploadedByUser      UserProfile               @relation("MessageAttachmentUploader", fields: [uploadedByUserId], references: [id])
   uploadedByCompanyId String
-  uploadedByCompany   Company                     @relation("MessageAttachmentCompany", fields: [uploadedByCompanyId], references: [id])
+  uploadedByCompany   Company                   @relation("MessageAttachmentCompany", fields: [uploadedByCompanyId], references: [id])
   originalFilename    String
   storedFilename      String
   storageBucket       String
-  storagePath         String                      @unique
+  storagePath         String                    @unique
   mimeType            String
   fileType            MessageAttachmentFileType
   sizeBytes           Int
   sha256Hash          String
-  status              MessageAttachmentStatus     @default(restricted)
-  createdAt           DateTime                    @default(now())
-  updatedAt           DateTime                    @updatedAt
+  status              MessageAttachmentStatus   @default(restricted)
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
 
   @@index([inquiryId, createdAt])
   @@index([messageId])
   @@index([uploadedByUserId, createdAt])
   @@index([status, createdAt])
+}
+
+model DocumentFolder {
+  id              String           @id @default(cuid())
+  companyId       String           @map("company_id")
+  company         Company          @relation("CompanyDocumentFolders", fields: [companyId], references: [id], onDelete: Cascade)
+  createdByUserId String           @map("created_by_user_id")
+  createdByUser   UserProfile      @relation("CreatedDocumentFolders", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  name            String
+  category        DocumentCategory
+  documents       TradeDocument[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@unique([companyId, category, name])
+  @@index([companyId, category])
+  @@map("document_folders")
+}
+
+model TradeDocument {
+  id               String                   @id @default(cuid())
+  companyId        String                   @map("company_id")
+  company          Company                  @relation("CompanyTradeDocuments", fields: [companyId], references: [id], onDelete: Cascade)
+  uploadedByUserId String                   @map("uploaded_by_user_id")
+  uploadedByUser   UserProfile              @relation("UploadedTradeDocuments", fields: [uploadedByUserId], references: [id], onDelete: Cascade)
+  fileName         String                   @map("file_name")
+  fileUrl          String                   @map("file_url")
+  fileType         String                   @map("file_type")
+  fileSize         Int                      @map("file_size")
+  storageBucket    String                   @map("storage_bucket")
+  storagePath      String                   @unique @map("storage_path")
+  mimeType         String                   @map("mime_type")
+  category         DocumentCategory
+  folderId         String?                  @map("folder_id")
+  folder           DocumentFolder?          @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  visibilityStatus DocumentVisibilityStatus @default(private) @map("visibility_status")
+  sharedBuyerId    String?                  @map("shared_buyer_id")
+  sharedBuyer      Company?                 @relation("SharedBuyerDocuments", fields: [sharedBuyerId], references: [id], onDelete: SetNull)
+  createdAt        DateTime                 @default(now()) @map("created_at")
+  updatedAt        DateTime                 @updatedAt @map("updated_at")
+
+  @@index([companyId, category, createdAt])
+  @@index([uploadedByUserId, createdAt])
+  @@index([folderId])
+  @@index([sharedBuyerId])
+  @@map("trade_documents")
 }
 
 model Deal {
