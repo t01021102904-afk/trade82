@@ -36,45 +36,48 @@ export function OnboardingStepper({
   return (
     <nav
       aria-label={t("onboarding.stepperLabel")}
-      className="grid gap-2 rounded-[20px] border border-white/10 bg-white/[0.035] p-2 sm:grid-cols-4"
+      className="rounded-2xl border px-3 py-3 theme-surface-elevated"
     >
-      {steps.map((step, index) => {
-        const active = step.id === current;
-        const complete = index < currentIndex;
-        const clickable = complete && onSelect;
+      <ol className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        {steps.map((step, index) => {
+          const active = step.id === current;
+          const complete = index < currentIndex;
+          const clickable = complete && onSelect;
 
-        return (
-          <button
-            key={step.id}
-            type="button"
-            disabled={!clickable}
-            onClick={() => onSelect?.(step.id)}
-            className={cx(
-              "group min-w-0 rounded-2xl border px-3 py-3 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300",
-              active
-                ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100 shadow-sm"
-                : complete
-                  ? "border-blue-300/30 bg-blue-300/10 text-blue-100"
-                  : "border-white/10 bg-zinc-950/70 text-zinc-500",
-              clickable ? "hover:-translate-y-0.5 hover:border-emerald-300/40" : "cursor-default",
-            )}
-            aria-current={active ? "step" : undefined}
-          >
-            <span className="block text-xs font-semibold uppercase tracking-wide">
-              {t("onboarding.stepLabel", "Step")} {index + 1}
-            </span>
-            <span className="mt-1 block truncate font-semibold">{step.label}</span>
-            <span className="mt-3 block h-1 overflow-hidden rounded-full bg-white/10">
-              <span
+          return (
+            <li key={step.id} className="flex min-w-0 flex-1 items-center gap-2">
+              <button
+                type="button"
+                disabled={!clickable}
+                onClick={() => onSelect?.(step.id)}
                 className={cx(
-                  "block h-full rounded-full transition-all",
-                  active || complete ? "w-full bg-emerald-300" : "w-1/4 bg-white/15",
+                  "flex min-w-0 items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
+                  active
+                    ? "theme-success-badge"
+                    : complete
+                      ? "theme-info-badge"
+                      : "theme-muted",
+                  clickable ? "hover:bg-[var(--muted)]" : "cursor-default",
                 )}
-              />
-            </span>
-          </button>
-        );
-      })}
+                aria-current={active ? "step" : undefined}
+              >
+                <span
+                  className={cx(
+                    "inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold",
+                    active || complete ? "border-current" : "theme-border",
+                  )}
+                >
+                  {index + 1}
+                </span>
+                <span className="min-w-0 truncate font-medium">{step.label}</span>
+              </button>
+              {index < steps.length - 1 ? (
+                <span className="hidden h-px flex-1 theme-surface-muted sm:block" />
+              ) : null}
+            </li>
+          );
+        })}
+      </ol>
     </nav>
   );
 }

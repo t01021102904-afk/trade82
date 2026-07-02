@@ -13,7 +13,6 @@ import {
   OnboardingStepper,
   type OnboardingStepId,
 } from "@/components/onboarding-stepper";
-import { OnboardingStoryPanel } from "@/components/onboarding-story-panel";
 import {
   emptyRichProductForm,
   productPayloadFromForm,
@@ -783,90 +782,86 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     const buyerErrors = buyerSubmitted ? buyerSignupErrors() : {};
 
     return (
-      <div className="grid gap-6">
-        <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
-          <OnboardingStoryPanel kind={kind} />
-          <div id="onboarding-current-step" className="scroll-mt-28 grid gap-5">
-            {draft ? (
-              <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
-                <p>{t("settings.draftAvailable")}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={restoreDraft}
-                    className="rounded-lg bg-amber-300 px-3 py-2 font-medium text-zinc-950"
-                  >
-                    {t("settings.restoreDraft")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={discardDraft}
-                    className="rounded-lg border border-amber-300/40 px-3 py-2 font-medium text-amber-100"
-                  >
-                    {t("settings.discardDraft")}
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            {error ? (
-              <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-                {error}
-              </p>
-            ) : null}
-            {success ? (
-              <p className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-                {success}
-              </p>
-            ) : null}
-
-            <BuyerQuickSignupForm
-              company={company}
-              personal={personal}
-              sourcing={sourcing}
-              keywords={buyerKeywords}
-              keywordInput={buyerKeywordInput}
-              errors={buyerErrors}
-              saving={saving}
-              onSubmit={saveBuyerSignup}
-              onCompanyChange={updateCompany}
-              onPersonalChange={updatePersonal}
-              onSourcingChange={updateSourcing}
-              onKeywordInputChange={setBuyerKeywordInput}
-              onAddKeyword={addBuyerKeyword}
-              onRemoveKeyword={removeBuyerKeyword}
-            />
+      <div
+        id="onboarding-current-step"
+        className="mx-auto grid w-full max-w-[860px] scroll-mt-28 gap-5"
+      >
+        {draft ? (
+          <div className="rounded-xl border p-4 text-sm theme-warning-badge">
+            <p>{t("settings.draftAvailable")}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={restoreDraft}
+                className="rounded-lg px-3 py-2 font-medium theme-primary"
+              >
+                {t("settings.restoreDraft")}
+              </button>
+              <button
+                type="button"
+                onClick={discardDraft}
+                className="rounded-lg border px-3 py-2 font-medium theme-surface"
+              >
+                {t("settings.discardDraft")}
+              </button>
+            </div>
           </div>
-        </div>
+        ) : null}
+
+        {error ? (
+          <p className="rounded-xl border px-4 py-3 text-sm theme-danger-badge">
+            {error}
+          </p>
+        ) : null}
+        {success ? (
+          <p className="rounded-xl border px-4 py-3 text-sm theme-success-badge">
+            {success}
+          </p>
+        ) : null}
+
+        <BuyerQuickSignupForm
+          company={company}
+          personal={personal}
+          sourcing={sourcing}
+          keywords={buyerKeywords}
+          keywordInput={buyerKeywordInput}
+          errors={buyerErrors}
+          saving={saving}
+          onSubmit={saveBuyerSignup}
+          onCompanyChange={updateCompany}
+          onPersonalChange={updatePersonal}
+          onSourcingChange={updateSourcing}
+          onKeywordInputChange={setBuyerKeywordInput}
+          onAddKeyword={addBuyerKeyword}
+          onRemoveKeyword={removeBuyerKeyword}
+        />
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-[860px] gap-5">
       <OnboardingStepper
         current={stepToId(step)}
         role={kind}
         onSelect={selectStep}
       />
-      <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
-        <OnboardingStoryPanel kind={kind} />
-        <div id="onboarding-current-step" className="scroll-mt-28 grid gap-5">
+      <div id="onboarding-current-step" className="scroll-mt-28 grid gap-5">
           {draft ? (
-            <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <div className="rounded-xl border p-4 text-sm theme-warning-badge">
               <p>{t("settings.draftAvailable")}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={restoreDraft}
-                  className="rounded-md bg-amber-900 px-3 py-2 font-medium text-white"
+                  className="rounded-lg px-3 py-2 font-medium theme-primary"
                 >
                   {t("settings.restoreDraft")}
                 </button>
                 <button
                   type="button"
                   onClick={discardDraft}
-                  className="rounded-md border border-amber-300 bg-white px-3 py-2 font-medium text-amber-900"
+                  className="rounded-lg border px-3 py-2 font-medium theme-surface"
                 >
                   {t("settings.discardDraft")}
                 </button>
@@ -875,12 +870,12 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
           ) : null}
 
           {error ? (
-            <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <p className="rounded-xl border px-4 py-3 text-sm theme-danger-badge">
               {error}
             </p>
           ) : null}
           {success ? (
-            <p className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <p className="rounded-xl border px-4 py-3 text-sm theme-success-badge">
               {success}
             </p>
           ) : null}
@@ -933,7 +928,6 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
               onChange={updateSourcing}
             />
           ) : null}
-        </div>
       </div>
     </div>
   );
@@ -988,17 +982,17 @@ function BuyerQuickSignupForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="grid gap-5 rounded-2xl border border-white/10 bg-zinc-950/80 p-5 shadow-2xl shadow-black/20 backdrop-blur"
+      className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
       noValidate
     >
-      <div className="flex flex-col gap-2 border-b border-white/10 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
+      <div className="flex flex-col gap-2 border-b pb-5 theme-border">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] theme-success-text">
           {t("onboarding.buyerQuickLabel")}
         </p>
-        <h2 className="text-xl font-semibold text-white">
+        <h2 className="text-xl font-semibold theme-foreground">
           {t("onboarding.buyerQuickTitle")}
         </h2>
-        <p className="max-w-2xl text-sm leading-6 text-zinc-400">
+        <p className="max-w-2xl text-sm leading-6 theme-muted">
           {t("onboarding.buyerQuickDescription")}
         </p>
       </div>
@@ -1054,13 +1048,13 @@ function BuyerQuickSignupForm({
             required
           />
           <label className="grid gap-1.5 text-sm">
-            <span className="font-medium text-zinc-200">
+            <span className="font-medium theme-foreground">
               {t("onboarding.signUpPath")} <span className="text-red-300">*</span>
             </span>
             <select
               value={company.companyType}
               onChange={(event) => onCompanyChange("companyType", event.target.value)}
-              className="h-11 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+              className="h-11 rounded-xl border px-3 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
             >
               {buyerTypeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -1089,8 +1083,8 @@ function BuyerQuickSignupForm({
                 onClick={() => toggleCategory(option.value)}
                 className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
                   selected
-                    ? "border-emerald-300/70 bg-emerald-400/15 text-emerald-100 shadow-sm shadow-emerald-950/20"
-                    : "border-white/10 bg-white/[0.04] text-zinc-300 hover:border-white/25 hover:bg-white/[0.07]"
+                    ? "theme-success-badge"
+                    : "theme-surface theme-card-hover"
                 }`}
                 aria-pressed={selected}
               >
@@ -1102,13 +1096,13 @@ function BuyerQuickSignupForm({
         {errors.categories ? (
           <p className="text-xs text-red-300">{errors.categories}</p>
         ) : null}
-        <p className="text-xs leading-5 text-zinc-500">
+        <p className="text-xs leading-5 theme-muted">
           {t("onboarding.productTypesHelp")}
         </p>
 
         <div className="grid gap-2">
           <label className="grid gap-1.5 text-sm">
-            <span className="font-medium text-zinc-200">
+            <span className="font-medium theme-foreground">
               {t("onboarding.interestedKeywords")}{" "}
               <span className="text-red-300">*</span>
             </span>
@@ -1124,12 +1118,12 @@ function BuyerQuickSignupForm({
                     onAddKeyword(keywordInput);
                   }
                 }}
-                className="h-11 min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+                className="h-11 min-w-0 flex-1 rounded-xl border px-3 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
               />
               <button
                 type="button"
                 onClick={() => onAddKeyword(keywordInput)}
-                className="inline-flex h-11 items-center rounded-xl border border-white/10 bg-white/[0.08] px-3 text-sm font-semibold text-white transition hover:bg-white/[0.12]"
+                className="inline-flex h-11 items-center rounded-xl border px-3 text-sm font-semibold transition theme-surface-muted hover:bg-[var(--muted)]"
               >
                 {t("onboarding.addKeyword")}
               </button>
@@ -1142,7 +1136,7 @@ function BuyerQuickSignupForm({
                   key={keyword}
                   type="button"
                   onClick={() => onRemoveKeyword(keyword)}
-                  className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100"
+                  className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium theme-success-badge"
                   aria-label={t("onboarding.removeKeyword")}
                 >
                   {keyword}
@@ -1154,7 +1148,7 @@ function BuyerQuickSignupForm({
           {errors.keywords ? (
             <p className="text-xs text-red-300">{errors.keywords}</p>
           ) : null}
-          <p className="text-xs leading-5 text-zinc-500">
+          <p className="text-xs leading-5 theme-muted">
             {t("onboarding.keywordsHelp")}
           </p>
         </div>
@@ -1164,20 +1158,20 @@ function BuyerQuickSignupForm({
         title={t("onboarding.agreement")}
         description={t("onboarding.agreementHelp")}
       >
-        <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-sm leading-6 text-zinc-300">
+        <label className="flex items-start gap-3 rounded-xl border p-3 text-sm leading-6 theme-surface-muted">
           <input
             type="checkbox"
             checked={personal.acceptedTerms}
             onChange={(event) => onPersonalChange("acceptedTerms", event.target.checked)}
-            className="mt-1 size-4 rounded border-white/20 bg-zinc-950"
+            className="mt-1 size-4 rounded theme-input"
           />
           <span>
             {t("onboarding.acceptLegalPrefix")}{" "}
-            <Link className="font-medium text-emerald-200 hover:text-emerald-100" href={withLocale("/terms", locale)}>
+            <Link className="font-medium theme-success-text hover:underline" href={withLocale("/terms", locale)}>
               {t("footer.legalLinks.0.label")}
             </Link>{" "}
             {t("onboarding.and")}{" "}
-            <Link className="font-medium text-emerald-200 hover:text-emerald-100" href={withLocale("/privacy", locale)}>
+            <Link className="font-medium theme-success-text hover:underline" href={withLocale("/privacy", locale)}>
               {t("footer.legalLinks.2.label")}
             </Link>
             .
@@ -1186,14 +1180,14 @@ function BuyerQuickSignupForm({
         {errors.terms ? <p className="text-xs text-red-300">{errors.terms}</p> : null}
       </BuyerFormSection>
 
-      <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs leading-5 text-zinc-500">
+      <div className="flex flex-col gap-3 border-t pt-5 theme-border sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs leading-5 theme-muted">
           {t("onboarding.authSeparateNotice")}
         </p>
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-300 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition theme-primary hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
         >
           {saving ? t("settings.saving") : t("onboarding.saveBuyer")}
         </button>
@@ -1212,10 +1206,10 @@ function BuyerFormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <section className="grid gap-3 rounded-2xl border p-4 theme-surface">
       <div>
-        <h3 className="text-base font-semibold text-white">{title}</h3>
-        <p className="mt-1 text-sm leading-6 text-zinc-400">{description}</p>
+        <h3 className="text-base font-semibold theme-foreground">{title}</h3>
+        <p className="mt-1 text-sm leading-6 theme-muted">{description}</p>
       </div>
       {children}
     </section>
@@ -1239,7 +1233,7 @@ function BuyerInput({
 }) {
   return (
     <label className="grid gap-1.5 text-sm">
-      <span className="font-medium text-zinc-200">
+      <span className="font-medium theme-foreground">
         {label}
         {required ? <span className="text-red-300"> *</span> : null}
       </span>
@@ -1247,7 +1241,7 @@ function BuyerInput({
         type={type}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+        className="h-11 rounded-xl border px-3 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
       />
       {error ? <span className="text-xs text-red-300">{error}</span> : null}
     </label>
@@ -1297,7 +1291,7 @@ function CompanyStepForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="bm-premium-card grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100"
+      className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
       noValidate
     >
       <StepHeading
@@ -1382,18 +1376,18 @@ function CompanyStepForm({
           />
         ) : null}
         <label className="grid gap-1 text-sm sm:col-span-2">
-          <span className="font-medium text-zinc-700">
+          <span className="font-medium theme-foreground">
             {t("settings.companyDescription")}
           </span>
           <textarea
             rows={5}
             value={company.description}
             onChange={(event) => onChange("description", event.target.value)}
-            className="rounded-md border border-zinc-200 px-3 py-2"
+            className="rounded-xl border px-3 py-2 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
           />
         </label>
         <label className="grid gap-1 text-sm sm:col-span-2">
-          <span className="font-medium text-zinc-700">
+          <span className="font-medium theme-foreground">
             {t("onboarding.privateBusinessDocument")}
           </span>
           <input
@@ -1402,9 +1396,9 @@ function CompanyStepForm({
             onChange={(event) =>
               onPrivateDocument(event.target.files?.[0] ?? null)
             }
-            className="block w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-zinc-700 file:mr-3 file:rounded file:border-0 file:bg-zinc-100 file:px-3 file:py-1 file:text-sm"
+            className="block w-full rounded-xl border px-3 py-2 text-sm theme-input file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--muted)] file:px-3 file:py-1 file:text-sm file:text-[var(--foreground)]"
           />
-          <span className="text-xs leading-5 text-zinc-500">
+          <span className="text-xs leading-5 theme-muted">
             {privateDocument?.name || company.certificateFileName
               ? privateDocument?.name || company.certificateFileName
               : t("onboarding.privateDocumentNotice")}
@@ -1440,7 +1434,7 @@ function PersonalStepForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="bm-premium-card grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100"
+      className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
       noValidate
     >
       <StepHeading
@@ -1541,7 +1535,7 @@ function ProductStepForm({
         }
         onSubmit(event);
       }}
-      className="bm-premium-card grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100"
+      className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
       noValidate
     >
       <StepHeading
@@ -1561,7 +1555,7 @@ function ProductStepForm({
         label={t("onboarding.finishOnboarding")}
       />
       {uploading ? (
-        <p role="status" className="text-sm text-blue-700">
+        <p role="status" className="text-sm theme-info-text">
           {t("listing.imageUploadInProgress")}
         </p>
       ) : null}
@@ -1588,7 +1582,7 @@ function SourcingStepForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="bm-premium-card grid gap-5 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100"
+      className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
       noValidate
     >
       <StepHeading
@@ -1667,8 +1661,8 @@ function StepHeading({
 }) {
   return (
     <div>
-      <h2 className="text-lg font-semibold text-zinc-950">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-600">{description}</p>
+      <h2 className="text-lg font-semibold theme-foreground">{title}</h2>
+      <p className="mt-2 text-sm leading-6 theme-muted">{description}</p>
     </div>
   );
 }
@@ -1688,7 +1682,7 @@ function SubmitButton({
     <button
       type="submit"
       disabled={saving || uploading}
-      className="inline-flex min-h-11 items-center justify-center rounded-md bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-blue-700 disabled:cursor-wait disabled:opacity-75 sm:w-fit"
+      className="inline-flex min-h-11 items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition theme-primary hover:-translate-y-0.5 hover:opacity-90 disabled:cursor-wait disabled:opacity-75 sm:w-fit"
     >
       {uploading ? t("listing.uploading") : saving ? t("settings.saving") : label}
     </button>
@@ -1714,7 +1708,7 @@ function SelectField({
 }) {
   return (
     <label className="grid gap-1 text-sm">
-      <span className="font-medium text-zinc-700">
+      <span className="font-medium theme-foreground">
         {label}
         {required ? <span className="text-red-600"> *</span> : null}
       </span>
@@ -1723,7 +1717,7 @@ function SelectField({
         required={required}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-zinc-200 bg-white px-3 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 disabled:bg-zinc-50 disabled:text-zinc-500"
+        className="h-10 rounded-xl border px-3 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {placeholder ? <option value="">{placeholder}</option> : null}
         {options.map((option) => (
@@ -1763,18 +1757,18 @@ function CheckboxGroup({
 
   return (
     <fieldset className={`grid gap-2 text-sm ${className ?? ""}`}>
-      <legend className="font-medium text-zinc-700">
+      <legend className="font-medium theme-foreground">
         {label}
         {required ? <span className="text-red-600"> *</span> : null}
       </legend>
-      <div className="grid gap-2 rounded-md border border-zinc-200 bg-white p-3 sm:grid-cols-2">
+      <div className="grid gap-2 rounded-xl border p-3 theme-surface sm:grid-cols-2">
         {options.map((option) => (
-          <label key={option.value} className="flex items-center gap-2 text-zinc-700">
+          <label key={option.value} className="flex items-center gap-2 theme-foreground">
             <input
               type="checkbox"
               checked={values.includes(option.value)}
               onChange={() => toggle(option.value)}
-              className="size-4 rounded border-zinc-300"
+              className="size-4 rounded theme-input"
             />
             <span>{option.label}</span>
           </label>
@@ -1801,7 +1795,7 @@ function Field({
 }) {
   return (
     <label className="grid gap-1 text-sm">
-      <span className="font-medium text-zinc-700">
+      <span className="font-medium theme-foreground">
         {label}
         {required ? <span className="text-red-600"> *</span> : null}
       </span>
@@ -1811,7 +1805,7 @@ function Field({
         placeholder={placeholder}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-zinc-200 bg-white px-3 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+        className="h-10 rounded-xl border px-3 text-sm outline-none transition theme-input focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/20"
       />
     </label>
   );

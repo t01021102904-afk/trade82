@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { OnboardingStepper } from "@/components/onboarding-stepper";
-import { OnboardingStoryPanel } from "@/components/onboarding-story-panel";
 import { withLocale } from "@/lib/i18n";
 import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
@@ -35,22 +34,6 @@ const roleCards: Array<{
     descriptionKey: "onboarding.roleBuyerDescription",
     buttonKey: "onboarding.continueAsBuyer",
     eyebrowKey: "onboarding.roleBuyerEyebrow",
-    tone: "blue",
-  },
-  {
-    role: "seller",
-    titleKey: "onboarding.roleListProductsTitle",
-    descriptionKey: "onboarding.roleListProductsDescription",
-    buttonKey: "onboarding.ctaStartListingProducts",
-    eyebrowKey: "onboarding.roleSellerTitle",
-    tone: "emerald",
-  },
-  {
-    role: "buyer",
-    titleKey: "onboarding.roleFindProductsTitle",
-    descriptionKey: "onboarding.roleFindProductsDescription",
-    buttonKey: "onboarding.roleFindProductsCta",
-    eyebrowKey: "onboarding.roleBuyerTitle",
     tone: "blue",
   },
 ];
@@ -161,89 +144,81 @@ export function RoleSelection() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="mx-auto grid w-full max-w-[860px] gap-5">
       <OnboardingStepper current="role" />
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px] xl:items-start">
-        <section id="onboarding-current-step" className="scroll-mt-28 grid gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
-              {t("onboarding.pathPickerLabel")}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold text-white">
-              {t("onboarding.pathPickerTitle")}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
-              {t("onboarding.pathPickerText")}
-            </p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {roleCards.map((card) => {
-              const loading = pendingRole === card.role;
+      <section
+        id="onboarding-current-step"
+        className="scroll-mt-28 grid gap-4 rounded-2xl border p-5 theme-surface-elevated sm:p-6"
+      >
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] theme-success-text">
+            {t("onboarding.pathPickerLabel")}
+          </p>
+          <h2 className="mt-2 text-xl font-semibold theme-foreground">
+            {t("onboarding.pathPickerTitle")}
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
+            {t("onboarding.pathPickerText")}
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {roleCards.map((card) => {
+            const loading = pendingRole === card.role;
 
-              return (
-                <article
-                  key={`${card.role}-${card.titleKey}`}
-                  className={cx(
-                    "group grid min-h-60 gap-5 rounded-2xl border bg-white/[0.045] p-5 shadow-2xl shadow-black/10 transition hover:-translate-y-0.5 hover:bg-white/[0.07]",
-                    loading
-                      ? card.tone === "emerald"
-                        ? "border-emerald-300/60 ring-4 ring-emerald-300/10"
-                        : "border-blue-300/60 ring-4 ring-blue-300/10"
-                      : "border-white/10 hover:border-white/20",
-                  )}
-                >
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between gap-3">
-                      <span
-                        className={cx(
-                          "inline-flex size-10 items-center justify-center rounded-xl text-sm font-semibold",
-                          card.tone === "emerald"
-                            ? "bg-emerald-300 text-zinc-950"
-                            : "bg-blue-300 text-zinc-950",
-                        )}
-                      >
-                        {card.role === "seller" ? "S" : "B"}
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-zinc-950/70 px-2.5 py-1 text-[11px] font-semibold text-zinc-400">
-                        {t(card.eyebrowKey)}
-                      </span>
-                    </div>
-                    <h2 className="mt-5 text-lg font-semibold text-white">
-                      {t(card.titleKey)}
-                    </h2>
-                    <p className="mt-3 text-sm leading-6 text-zinc-400">
-                      {t(card.descriptionKey)}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={pendingRole !== null}
-                    onClick={() => chooseRole(card.role)}
+            return (
+              <button
+                key={card.role}
+                type="button"
+                disabled={pendingRole !== null}
+                onClick={() => chooseRole(card.role)}
+                className={cx(
+                  "group grid min-h-[176px] gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
+                  loading
+                    ? card.tone === "emerald"
+                      ? "border-emerald-400/60 ring-4 ring-emerald-400/10"
+                      : "border-blue-400/60 ring-4 ring-blue-400/10"
+                    : "theme-surface theme-card-hover",
+                  pendingRole !== null ? "cursor-wait opacity-80" : "",
+                )}
+              >
+                <span className="flex items-start justify-between gap-3">
+                  <span
                     className={cx(
-                      "relative z-10 inline-flex min-h-10 items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300",
-                      loading
-                        ? "bg-white text-zinc-950"
-                        : "border border-white/10 bg-white/[0.06] text-zinc-100 hover:bg-white hover:text-zinc-950",
-                      pendingRole !== null ? "cursor-wait opacity-80" : "",
+                      "inline-flex size-9 items-center justify-center rounded-xl border text-sm font-semibold",
+                      card.tone === "emerald"
+                        ? "theme-success-badge"
+                        : "theme-info-badge",
                     )}
                   >
-                    {loading ? t("onboarding.savingRole") : t(card.buttonKey)}
-                  </button>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <OnboardingStoryPanel kind="role" />
-      </div>
+                    {card.role === "seller" ? "S" : "B"}
+                  </span>
+                  <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold theme-surface-muted">
+                    {t(card.eyebrowKey)}
+                  </span>
+                </span>
+                <span>
+                  <span className="block text-base font-semibold theme-foreground">
+                    {t(card.titleKey)}
+                  </span>
+                  <span className="mt-2 block text-sm leading-6 theme-muted">
+                    {t(card.descriptionKey)}
+                  </span>
+                </span>
+                <span className="inline-flex h-9 w-fit items-center justify-center rounded-xl border px-3 text-sm font-semibold theme-surface-muted transition group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)]">
+                  {loading ? t("onboarding.savingRole") : t(card.buttonKey)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
       {status || error ? (
         <div
           className={cx(
             "rounded-2xl border px-4 py-3 text-sm",
             error
-              ? "border-red-300/25 bg-red-300/10 text-red-100"
-              : "border-blue-300/25 bg-blue-300/10 text-blue-100",
+              ? "theme-danger-badge"
+              : "theme-info-badge",
           )}
           role={error ? "alert" : "status"}
         >

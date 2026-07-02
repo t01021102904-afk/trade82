@@ -12,28 +12,26 @@ export function OnboardingPageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#05070a] text-zinc-100">
-      <div className="mx-auto grid max-w-7xl gap-7 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-        <header className="grid gap-3 rounded-[24px] border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 sm:p-6">
+    <div className="min-h-screen theme-bg">
+      <div className="mx-auto grid w-full max-w-[860px] gap-5 px-4 py-6 sm:px-6 sm:py-8">
+        <header className="grid gap-3 rounded-2xl border p-5 theme-surface-elevated sm:p-6">
           {label ? (
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] theme-success-text">
               {label}
             </p>
           ) : null}
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,0.75fr)_minmax(280px,0.25fr)] lg:items-end">
-            <div className="min-w-0">
-              <h1 className="break-words text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                {title}
-              </h1>
-              {description ? (
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
-                  {description}
-                </p>
-              ) : null}
-            </div>
-            <div className="hidden h-2 overflow-hidden rounded-full border border-white/10 bg-zinc-950 lg:block">
-              <span className="bm-onboarding-progress block h-full rounded-full bg-gradient-to-r from-emerald-300 via-blue-300 to-zinc-100" />
-            </div>
+          <div className="min-w-0">
+            <h1 className="break-words text-2xl font-semibold tracking-tight theme-foreground sm:text-[28px]">
+              {title}
+            </h1>
+            {description ? (
+              <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
+                {description}
+              </p>
+            ) : null}
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full border theme-surface-muted">
+            <span className="bm-onboarding-progress block h-full rounded-full bg-gradient-to-r from-emerald-400 via-blue-400 to-cyan-300" />
           </div>
         </header>
         {children}
