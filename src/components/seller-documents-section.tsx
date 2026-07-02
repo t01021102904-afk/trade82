@@ -13,6 +13,7 @@ import {
   Search,
   Upload,
 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const formsLibraryFilters = [
@@ -42,6 +43,7 @@ type FormLibraryItem = {
   format: string;
   source: string;
   statuses: string[];
+  templateSlug?: string;
 };
 
 type MyDocumentItem = {
@@ -72,9 +74,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Initial quote and buyer import planning",
     filledBy: "Seller",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Workflow support"],
+    templateSlug: "proforma-invoice",
   },
   {
     id: "commercial-invoice",
@@ -85,9 +88,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Shipment value, parties, and product line details",
     filledBy: "Seller / exporter",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Shipment document"],
+    templateSlug: "commercial-invoice",
   },
   {
     id: "packing-list",
@@ -98,9 +102,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Carton, pallet, weight, and package details",
     filledBy: "Seller / warehouse",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Logistics"],
+    templateSlug: "packing-list",
   },
   {
     id: "purchase-order",
@@ -111,9 +116,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Buyer order confirmation and requested terms",
     filledBy: "Buyer",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Workflow support"],
+    templateSlug: "purchase-order",
   },
   {
     id: "export-sales-contract",
@@ -124,9 +130,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Commercial terms, delivery terms, and order scope",
     filledBy: "Buyer and seller",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Contract support"],
+    templateSlug: "export-sales-contract",
   },
   {
     id: "certificate-origin-template",
@@ -137,9 +144,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Origin statement support for trade review",
     filledBy: "Seller / chamber where applicable",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Origin"],
+    templateSlug: "certificate-of-origin-template",
   },
   {
     id: "shipper-letter-instruction",
@@ -150,9 +158,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Instructions to freight forwarder or logistics partner",
     filledBy: "Seller / shipper",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Logistics"],
+    templateSlug: "shippers-letter-of-instruction",
   },
   {
     id: "document-checklist",
@@ -163,9 +172,10 @@ const formLibraryItems: FormLibraryItem[] = [
     category: "Trade Templates",
     usedFor: "Shipment and compliance document planning",
     filledBy: "Buyer and seller",
-    format: "PDF / DOCX",
+    format: "Printable HTML",
     source: "Trade82 template",
     statuses: ["Template", "Workflow support"],
+    templateSlug: "document-checklist",
   },
   {
     id: "cbp-3461",
@@ -817,15 +827,15 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
     setSelectedItem(item);
 
     if (action === "View details") return;
-    if (action === "Preview") {
-      onAction("Template preview will be available soon.");
-      return;
-    }
     if (action.startsWith("Open official")) {
       onAction("Official source link will be available soon.");
       return;
     }
-    onAction("Template file will be available soon.");
+    if (action.startsWith("Download")) {
+      onAction("Download PDF will be available after final template export is added.");
+      return;
+    }
+    onAction("Template details are shown below.");
   }
 
   return (
@@ -912,7 +922,7 @@ function FormLibraryRow({
   item: FormLibraryItem;
   onAction: (item: FormLibraryItem, action: string) => void;
 }) {
-  const actions = formActions(item.sourceType);
+  const actions = formActions(item);
 
   return (
     <article className="p-3 transition hover:bg-[var(--muted)] xl:grid xl:grid-cols-[1.1fr_0.7fr_1.1fr_0.75fr_0.65fr_0.85fr_0.85fr_0.95fr] xl:items-center xl:gap-3">
@@ -941,24 +951,66 @@ function FormLibraryRow({
       </div>
       <div className="mt-3 flex flex-wrap gap-2 xl:mt-0">
         {actions.map((action) => (
-          <button
+          <FormLibraryAction
             key={action}
-            type="button"
-            onClick={() => onAction(item, action)}
-            className="inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5"
-          >
-            {action.startsWith("Open") ? (
-              <ExternalLink className="size-3.5" aria-hidden="true" />
-            ) : action.startsWith("Download") ? (
-              <Download className="size-3.5" aria-hidden="true" />
-            ) : (
-              <Eye className="size-3.5" aria-hidden="true" />
-            )}
-            {action}
-          </button>
+            action={action}
+            item={item}
+            onAction={onAction}
+          />
         ))}
       </div>
     </article>
+  );
+}
+
+function FormLibraryAction({
+  action,
+  item,
+  onAction,
+}: {
+  action: string;
+  item: FormLibraryItem;
+  onAction: (item: FormLibraryItem, action: string) => void;
+}) {
+  const templateHref = item.templateSlug ? `/templates/trade82/${item.templateSlug}` : null;
+  const isTemplatePrintAction =
+    templateHref && (action === "Preview" || action === "Print / Save as PDF");
+  const isDisabledDownload = item.templateSlug && action === "Download PDF";
+  const icon = action.startsWith("Open") || action === "Print / Save as PDF" ? (
+    <ExternalLink className="size-3.5" aria-hidden="true" />
+  ) : action.startsWith("Download") ? (
+    <Download className="size-3.5" aria-hidden="true" />
+  ) : (
+    <Eye className="size-3.5" aria-hidden="true" />
+  );
+  const className =
+    "inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5";
+
+  if (isTemplatePrintAction) {
+    return (
+      <Link
+        href={templateHref}
+        target={action === "Print / Save as PDF" ? "_blank" : undefined}
+        rel={action === "Print / Save as PDF" ? "noopener noreferrer" : undefined}
+        className={className}
+      >
+        {icon}
+        {action}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={Boolean(isDisabledDownload)}
+      title={isDisabledDownload ? "PDF download is not available yet. Use Preview and browser print instead." : undefined}
+      onClick={() => onAction(item, action)}
+      className={`${className} disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0`}
+    >
+      {icon}
+      {action}
+    </button>
   );
 }
 
@@ -1324,8 +1376,9 @@ function StatusChip({ label, tone }: { label: string; tone: string }) {
   );
 }
 
-function formActions(sourceType: SourceType) {
-  if (sourceType === "template") return ["Download PDF", "Download DOCX", "Preview"];
-  if (sourceType === "official") return ["Open official form", "View details"];
+function formActions(item: FormLibraryItem) {
+  if (item.templateSlug) return ["Preview", "Print / Save as PDF", "Download PDF"];
+  if (item.sourceType === "template") return ["View details"];
+  if (item.sourceType === "official") return ["Open official form", "View details"];
   return ["View details"];
 }
