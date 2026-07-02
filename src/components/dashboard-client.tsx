@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
@@ -11,6 +12,7 @@ import {
   type EditableProduct,
 } from "@/components/product-management";
 import { withLocale } from "@/lib/i18n";
+import { buyerCategoryLabel } from "@/lib/company-select-options";
 import { safeImageUrl } from "@/lib/url-security";
 
 export type DashboardSection =
@@ -21,6 +23,34 @@ export type DashboardSection =
   | "products";
 
 type Summary = {
+  company?: {
+    id: string;
+    name: string;
+    verificationStatus: string;
+    categories?: string[];
+  } | null;
+  buyerProfile?: {
+    displayName: string;
+    companyName: string;
+    categories: string[];
+    keywords: string[];
+    signUpPath: string;
+    profileCompletion: number;
+  };
+  suggestedCategories?: string[];
+  recommendedProducts?: Array<{
+    id: string;
+    name: string;
+    category: string;
+    imageUrl: string | null;
+    href: string;
+    sellerName: string;
+    priceMin: string | null;
+    priceMax: string | null;
+    currency: string;
+    moq: string;
+    tags: string[];
+  }>;
   metrics: Record<string, number>;
   recentReviews: Array<{
     id: string;
@@ -159,13 +189,24 @@ export function DashboardClient({
   return (
     <div key={`${role}-${activeSection}`} className="bm-section-in grid gap-4">
       {activeSection === "overview" ? (
-        <OverviewSection
-          role={role}
-          metrics={metrics}
-          summary={summary}
-          locale={locale}
-          onSectionChange={onSectionChange}
-        />
+        role === "buyer" ? (
+          <BuyerDiscoveryDashboard
+            summary={summary}
+            metrics={metrics}
+            savedProducts={savedProducts}
+            inquiries={recentInquiries}
+            locale={locale}
+            onSectionChange={onSectionChange}
+          />
+        ) : (
+          <OverviewSection
+            role={role}
+            metrics={metrics}
+            summary={summary}
+            locale={locale}
+            onSectionChange={onSectionChange}
+          />
+        )
       ) : null}
 
       {role === "buyer" && activeSection === "saved-products" ? (
@@ -210,6 +251,398 @@ export function DashboardClient({
       ) : null}
     </div>
   );
+}
+
+function BuyerDiscoveryDashboard({
+  summary,
+  metrics,
+  savedProducts,
+  inquiries,
+  locale,
+  onSectionChange,
+}: {
+  summary: Summary;
+  metrics: Metric[];
+  savedProducts: NonNullable<Summary["recentSavedItems"]>;
+  inquiries: NonNullable<Summary["recentInquiries"]>;
+  locale: "en" | "ko";
+  onSectionChange?: (section: DashboardSection) => void;
+}) {
+  const { t } = useI18n();
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [keyword, setKeyword] = useState("all");
+  const profile = summary.buyerProfile;
+  const recommendedProducts = useMemo(
+    () => summary.recommendedProducts ?? [],
+    [summary.recommendedProducts],
+  );
+  const categories = profile?.categories?.length
+    ? profile.categories
+    : summary.suggestedCategories ?? [];
+  const keywords = profile?.keywords ?? [];
+  const filteredProducts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return recommendedProducts.filter((product) => {
+      const selectedCategoryLabel = buyerCategoryLabel(category, "en").toLowerCase();
+      const productCategory = product.category.toLowerCase();
+      const matchesCategory =
+        category === "all" ||
+        productCategory === category.toLowerCase() ||
+        productCategory === selectedCategoryLabel ||
+        productCategory.includes(selectedCategoryLabel);
+      const text = [
+        product.name,
+        product.category,
+        product.sellerName,
+        product.moq,
+        ...product.tags,
+      ]
+        .join(" ")
+        .toLowerCase();
+      const matchesKeyword = keyword === "all" || text.includes(keyword.toLowerCase());
+      const matchesSearch = !query || text.includes(query);
+      return matchesCategory && matchesKeyword && matchesSearch;
+    });
+  }, [category, keyword, recommendedProducts, search]);
+
+  return (
+    <div className="grid gap-4 text-zinc-100">
+      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/10">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
+                {t("dashboard.buyerWorkspace")}
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">
+                {t("dashboard.buyerWelcome", "Welcome")}
+                {profile?.displayName ? `, ${profile.displayName}` : ""}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
+                {profile?.companyName
+                  ? t("dashboard.buyerCompanyIntro").replace("{company}", profile.companyName)
+                  : t("dashboard.buyerCompanyIntroEmpty")}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-right">
+              <p className="text-xs font-medium text-emerald-100">
+                {t("dashboard.profileCompletion")}
+              </p>
+              <p className="mt-1 text-2xl font-semibold text-white">
+                {profile?.profileCompletion ?? 0}%
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {categories.slice(0, 6).map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-medium text-zinc-300"
+              >
+                {buyerCategoryLabel(item, locale)}
+              </span>
+            ))}
+            {keywords.slice(0, 6).map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100"
+              >
+                #{item}
+              </span>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link
+              href={withLocale("/marketplace", locale)}
+              className="inline-flex h-9 items-center rounded-xl bg-emerald-300 px-3 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200"
+            >
+              {t("dashboard.browseProducts")}
+            </Link>
+            <button
+              type="button"
+              onClick={() => onSectionChange?.("messages")}
+              className="inline-flex h-9 items-center rounded-xl border border-white/10 bg-white/[0.05] px-3 text-sm font-medium text-white transition hover:bg-white/[0.1]"
+            >
+              {t("dashboard.sendInquiry")}
+            </button>
+            <Link
+              href={withLocale("/settings/company", locale)}
+              className="inline-flex h-9 items-center rounded-xl border border-white/10 px-3 text-sm font-medium text-zinc-300 transition hover:border-white/25 hover:text-white"
+            >
+              {t("dashboard.updateProductInterests")}
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <h3 className="text-base font-semibold text-white">
+            {t("dashboard.buyerSnapshot")}
+          </h3>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {metrics.slice(0, 4).map((metric) => (
+              <button
+                key={metric.label}
+                type="button"
+                onClick={() => onSectionChange?.(metric.section)}
+                className="rounded-xl border border-white/10 bg-black/20 p-3 text-left transition hover:border-emerald-300/30 hover:bg-white/[0.06]"
+              >
+                <span className="block text-xs text-zinc-500">{metric.label}</span>
+                <span className="mt-1 block text-xl font-semibold text-white">
+                  {metric.value}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-white">
+              {t("dashboard.productDiscovery")}
+            </h3>
+            <p className="mt-1 text-sm text-zinc-400">
+              {t("dashboard.productDiscoveryHelp")}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder={t("dashboard.searchKoreanProducts")}
+              className="h-10 min-w-0 rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20 sm:w-64"
+            />
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="h-10 rounded-xl border border-white/10 bg-zinc-950 px-3 text-sm text-white outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+            >
+              <option value="all">{t("dashboard.allCategories")}</option>
+              {categories.map((item) => (
+                <option key={item} value={item}>
+                  {buyerCategoryLabel(item, locale)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {keywords.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setKeyword("all")}
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                keyword === "all"
+                  ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100"
+                  : "border-white/10 text-zinc-400 hover:text-white"
+              }`}
+            >
+              {t("dashboard.allKeywords")}
+            </button>
+            {keywords.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setKeyword(item)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium ${
+                  keyword === item
+                    ? "border-emerald-300/50 bg-emerald-300/10 text-emerald-100"
+                    : "border-white/10 text-zinc-400 hover:text-white"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {filteredProducts.map((product) => {
+            const displayImageUrl = safeImageUrl(product.imageUrl, "");
+
+            return (
+              <Link
+                key={product.id}
+                href={withLocale(product.href, locale)}
+                className="group overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/70 transition hover:-translate-y-0.5 hover:border-emerald-300/40"
+              >
+                <div className="aspect-[4/3] bg-zinc-900">
+                  {displayImageUrl ? (
+                    <Image
+                      src={displayImageUrl}
+                      alt=""
+                      width={480}
+                      height={360}
+                      className="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center text-sm text-zinc-600">
+                      {t("dashboard.noProductImage")}
+                    </div>
+                  )}
+                </div>
+                <div className="grid gap-2 p-3">
+                  <div>
+                    <p className="line-clamp-1 text-sm font-semibold text-white">
+                      {product.name}
+                    </p>
+                    <p className="mt-1 line-clamp-1 text-xs text-zinc-500">
+                      {product.sellerName}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 text-xs">
+                    <span className="rounded-full border border-white/10 px-2 py-0.5 text-zinc-400">
+                      {product.category}
+                    </span>
+                    <span className="rounded-full border border-white/10 px-2 py-0.5 text-zinc-400">
+                      {formatBuyerProductPrice(product, t("dashboard.priceOnRequest"))}
+                    </span>
+                    {product.moq ? (
+                      <span className="rounded-full border border-white/10 px-2 py-0.5 text-zinc-400">
+                        {product.moq}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+        {!filteredProducts.length ? (
+          <div className="mt-4 rounded-2xl border border-dashed border-white/10 bg-black/20 p-6 text-center">
+            <p className="text-sm font-semibold text-white">
+              {t("dashboard.noRecommendedProducts")}
+            </p>
+            <p className="mt-2 text-sm text-zinc-500">
+              {t("dashboard.startExploringKoreanProducts")}
+            </p>
+          </div>
+        ) : null}
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <DarkListPanel
+          title={t("dashboard.savedProducts")}
+          actionLabel={t("dashboard.browseProducts")}
+          href={withLocale("/marketplace", locale)}
+          emptyTitle={t("dashboard.noSavedProductsTitle")}
+          emptyText={t("dashboard.startExploringKoreanProducts")}
+        >
+          {savedProducts.map((item) =>
+            item.href ? (
+              <Link
+                key={item.id}
+                href={withLocale(item.href, locale)}
+                className="rounded-xl border border-white/10 bg-black/20 p-3 text-sm font-medium text-zinc-200 hover:border-emerald-300/30"
+              >
+                {item.displayName}
+              </Link>
+            ) : null,
+          )}
+        </DarkListPanel>
+        <DarkListPanel
+          title={t("dashboard.inquiryManagement")}
+          actionLabel={t("dashboard.viewMessages")}
+          href={withLocale("/messages", locale)}
+          emptyTitle={t("dashboard.noInquiriesTitle")}
+          emptyText={t("dashboard.startByExploringProducts")}
+        >
+          {inquiries.map((item, index) => (
+            <Link
+              key={item.id}
+              href={withLocale("/messages", locale)}
+              className="rounded-xl border border-white/10 bg-black/20 p-3 hover:border-emerald-300/30"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-white">
+                    {item.productName || item.companyName}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-zinc-500">
+                    {item.message}
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-full border border-white/10 px-2 py-0.5 text-[11px] font-medium text-zinc-400">
+                  {index === 0
+                    ? t("dashboard.sellerReplied")
+                    : t("dashboard.waitingForResponse")}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </DarkListPanel>
+      </section>
+
+      <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+        <h3 className="text-base font-semibold text-white">
+          {t("dashboard.suggestedCategories")}
+        </h3>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {(summary.suggestedCategories ?? categories).map((item) => (
+            <Link
+              key={item}
+              href={withLocale(`/marketplace?category=${encodeURIComponent(item)}`, locale)}
+              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300 transition hover:border-emerald-300/30 hover:text-white"
+            >
+              {buyerCategoryLabel(item, locale)}
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DarkListPanel({
+  title,
+  actionLabel,
+  href,
+  emptyTitle,
+  emptyText,
+  children,
+}: {
+  title: string;
+  actionLabel: string;
+  href: string;
+  emptyTitle: string;
+  emptyText: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <Link
+          href={href}
+          className="text-xs font-semibold text-emerald-200 hover:text-emerald-100"
+        >
+          {actionLabel}
+        </Link>
+      </div>
+      <div className="mt-3 grid gap-2">
+        {children}
+        {Array.isArray(children) && children.filter(Boolean).length ? null : (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-5">
+            <p className="text-sm font-semibold text-white">{emptyTitle}</p>
+            <p className="mt-1 text-sm leading-6 text-zinc-500">{emptyText}</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function formatBuyerProductPrice(
+  product: NonNullable<Summary["recommendedProducts"]>[number],
+  fallback: string,
+) {
+  if (!product.priceMin && !product.priceMax) return fallback;
+  if (product.priceMin && product.priceMax && product.priceMin !== product.priceMax) {
+    return `${product.currency} ${product.priceMin} - ${product.priceMax}`;
+  }
+  return `${product.currency} ${product.priceMin ?? product.priceMax}`;
 }
 
 function OverviewSection({

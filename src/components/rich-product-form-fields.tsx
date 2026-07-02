@@ -996,14 +996,14 @@ function NumberWithSelect({
   variant?: ProductFormVariant;
 }) {
   return (
-    <fieldset className="grid gap-1 text-sm">
+    <fieldset className="grid min-w-0 gap-1 text-sm">
       <legend className="w-full">
         <FieldLabel label={label} required={required} visibility={visibility} variant={variant} />
       </legend>
-      <div className="grid gap-2 sm:grid-cols-[1fr_132px]">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(96px,128px)] items-center gap-2">
         <div
           className={cx(
-            "flex min-w-0 items-center",
+            "flex h-11 min-w-0 items-center",
             inputShellClass(variant),
           )}
         >
@@ -1025,7 +1025,7 @@ function NumberWithSelect({
             required={required}
             onChange={(event) => onValueChange(event.target.value)}
             className={cx(
-              "h-10 min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 outline-none",
+              "h-full min-w-0 flex-1 rounded-xl border-0 bg-transparent px-3 outline-none",
               variant === "dashboard" ? "text-zinc-100 placeholder:text-zinc-600" : "",
             )}
             aria-invalid={Boolean(error)}
@@ -1034,7 +1034,7 @@ function NumberWithSelect({
         <select
           value={selectValue}
           onChange={(event) => onSelectChange(event.target.value)}
-          className={selectClass(variant)}
+          className={cx(selectClass(variant), "h-11 min-w-0 px-2")}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

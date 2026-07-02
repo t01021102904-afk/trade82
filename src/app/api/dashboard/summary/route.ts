@@ -1,6 +1,32 @@
 import { apiError } from "@/lib/api-response";
 import { getUserCompany, requireAuth } from "@/lib/authz";
+import { buyerCategoryLabel } from "@/lib/company-select-options";
 import { getDb } from "@/lib/db";
+import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
+
+function normalizeText(value: string | null | undefined) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]+/g, " ")
+    .trim();
+}
+
+function parseInterestedKeywords(value: string | null | undefined) {
+  return (value ?? "")
+    .replace(/^interested keywords:\s*/i, "")
+    .split(/[,;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
+function productImageUrl(product: {
+  imageUrl: string | null;
+  images: Array<{ cardUrl: string; mainUrl: string; originalUrl: string }>;
+}) {
+  const firstImage = product.images[0];
+  return firstImage?.cardUrl || firstImage?.mainUrl || product.imageUrl || firstImage?.originalUrl || null;
+}
 
 export async function GET(request: Request) {
   try {
@@ -161,6 +187,7 @@ export async function GET(request: Request) {
       inquiries,
       inquiryCount,
       deals,
+      products,
     ] = await Promise.all([
       getDb().savedItem.findMany({
         where: { userId: user.id },
@@ -184,13 +211,120 @@ export async function GET(request: Request) {
         where: { buyerCompanyId: company.id },
         include: { reviews: { where: { reviewerCompanyId: company.id } } },
       }),
+      getDb().product.findMany({
+        where: {
+          status: "active",
+          sellerCompany: {
+            companyRole: "seller",
+            verificationStatus: "verified",
+            legalName: { not: DELETED_COMPANY_NAME },
+          },
+        },
+        orderBy: { updatedAt: "desc" },
+        take: 32,
+        include: {
+          sellerCompany: {
+            select: {
+              id: true,
+              legalName: true,
+              tradeName: true,
+            },
+          },
+          images: {
+            orderBy: { position: "asc" },
+            take: 1,
+            select: {
+              cardUrl: true,
+              mainUrl: true,
+              originalUrl: true,
+            },
+          },
+        },
+      }),
     ]);
+    const buyerCategories = Array.from(
+      new Set([
+        ...company.categories,
+        ...(company.buyerProfile?.purchasingCategories ?? []),
+      ].filter(Boolean)),
+    );
+    const categoryTerms = buyerCategories.flatMap((category) => [
+      normalizeText(category),
+      normalizeText(buyerCategoryLabel(category, "en")),
+    ]);
+    const interestedKeywords = parseInterestedKeywords(company.description);
+    const normalizedKeywords = interestedKeywords.map(normalizeText);
+    const scoredProducts = products
+      .map((product) => {
+        const haystack = normalizeText(
+          [
+            product.name,
+            product.category,
+            product.shortDescription,
+            product.detailedDescription,
+            ...product.tags,
+          ].join(" "),
+        );
+        const categoryScore = categoryTerms.some((term) => term && haystack.includes(term))
+          ? 4
+          : 0;
+        const keywordScore = normalizedKeywords.reduce(
+          (score, keyword) => score + (keyword && haystack.includes(keyword) ? 2 : 0),
+          0,
+        );
+        return { product, score: categoryScore + keywordScore };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6)
+      .map(({ product }) => ({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        imageUrl: productImageUrl(product),
+        href: `/products/${product.id}`,
+        sellerName: product.sellerCompany.tradeName || product.sellerCompany.legalName,
+        priceMin: product.priceMin?.toString() ?? null,
+        priceMax: product.priceMax?.toString() ?? null,
+        currency: product.currency,
+        moq: product.moq,
+        tags: product.tags.slice(0, 4),
+      }));
     return Response.json({
       company: {
         id: company.id,
         name: company.tradeName || company.legalName,
         verificationStatus: company.verificationStatus,
+        categories: buyerCategories,
+        buyerProfile: company.buyerProfile,
       },
+      buyerProfile: {
+        displayName: user.displayName,
+        companyName: company.tradeName || company.legalName,
+        categories: buyerCategories,
+        keywords: interestedKeywords,
+        signUpPath: company.buyerProfile?.buyerType ?? "",
+        profileCompletion: Math.round(
+          ([
+            user.displayName,
+            user.email,
+            company.tradeName || company.legalName,
+            buyerCategories.length ? "categories" : "",
+            interestedKeywords.length ? "keywords" : "",
+          ].filter(Boolean).length /
+            5) *
+            100,
+        ),
+      },
+      suggestedCategories: buyerCategories.length
+        ? buyerCategories
+        : [
+            "beauty_personal_care",
+            "food_snacks",
+            "health_wellness",
+            "household_goods",
+            "electronics_accessories",
+          ],
+      recommendedProducts: scoredProducts,
       metrics: {
         savedProducts: savedProductCount,
         savedCompanies: savedCompanyCount,

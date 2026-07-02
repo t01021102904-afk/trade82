@@ -1,8 +1,9 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   SingleImageUploader,
@@ -67,6 +68,8 @@ type CompanyStep = {
 };
 
 type PersonalStep = {
+  firstName: string;
+  lastName: string;
   displayName: string;
   email: string;
   avatarOriginalUrl: string;
@@ -75,6 +78,7 @@ type PersonalStep = {
   department: string;
   phoneNumber: string;
   linkedinUrl: string;
+  acceptedTerms: boolean;
 };
 
 type SellerProductStep = RichProductFormValue;
@@ -128,6 +132,8 @@ function initialCompany(kind: "buyer" | "seller"): CompanyStep {
 }
 
 const emptyPersonal: PersonalStep = {
+  firstName: "",
+  lastName: "",
   displayName: "",
   email: "",
   avatarOriginalUrl: "",
@@ -136,6 +142,7 @@ const emptyPersonal: PersonalStep = {
   department: "",
   phoneNumber: "",
   linkedinUrl: "",
+  acceptedTerms: false,
 };
 
 const emptyProduct: SellerProductStep = emptyRichProductForm;
@@ -186,6 +193,8 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const [company, setCompany] = useState<CompanyStep>(() => initialCompany(kind));
   const [personal, setPersonal] = useState<PersonalStep>(() => ({
     ...emptyPersonal,
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
     displayName: user?.fullName ?? "",
     email: user?.primaryEmailAddress?.emailAddress ?? "",
   }));
@@ -198,6 +207,8 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [buyerSubmitted, setBuyerSubmitted] = useState(false);
+  const [buyerKeywordInput, setBuyerKeywordInput] = useState("");
   const lastValidCompanyLogo = useRef({
     logoOriginalUrl: "",
     logoThumbnailUrl: "",
@@ -319,6 +330,30 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   ) {
     setSourcing((current) => ({ ...current, [key]: value }));
     markDirty();
+  }
+
+  const buyerKeywords = useMemo(
+    () => list(sourcing.messagePreference),
+    [sourcing.messagePreference],
+  );
+
+  function addBuyerKeyword(rawValue: string) {
+    const cleaned = rawValue.trim().replace(/,$/, "");
+    if (!cleaned) return;
+    const existing = new Set(buyerKeywords.map((keyword) => keyword.toLowerCase()));
+    if (existing.has(cleaned.toLowerCase())) {
+      setBuyerKeywordInput("");
+      return;
+    }
+    updateSourcing("messagePreference", joined([...buyerKeywords, cleaned]));
+    setBuyerKeywordInput("");
+  }
+
+  function removeBuyerKeyword(keyword: string) {
+    updateSourcing(
+      "messagePreference",
+      joined(buyerKeywords.filter((item) => item !== keyword)),
+    );
   }
 
   function restoreDraft() {
@@ -567,6 +602,120 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     }
   }
 
+  function buyerSignupErrors() {
+    const errors: Record<string, string> = {};
+    const email = personal.email.trim();
+    if (!email) {
+      errors.email = t("onboarding.workEmailRequired");
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = t("onboarding.workEmailInvalid");
+    }
+    if (!personal.firstName.trim()) errors.firstName = t("onboarding.firstNameRequired");
+    if (!personal.lastName.trim()) errors.lastName = t("onboarding.lastNameRequired");
+    if (!company.companyName.trim()) errors.companyName = t("onboarding.companyNameRequired");
+    if (!personal.phoneNumber.trim()) errors.phoneNumber = t("onboarding.companyTelRequired");
+    if (!company.companyType.trim()) errors.companyType = t("onboarding.signUpPathRequired");
+    if (!list(sourcing.interestedCategories).length) {
+      errors.categories = t("onboarding.productTypesRequired");
+    }
+    if (!buyerKeywords.length) errors.keywords = t("onboarding.keywordsRequired");
+    if (!personal.acceptedTerms) errors.terms = t("onboarding.termsRequired");
+    return errors;
+  }
+
+  async function saveBuyerSignup(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (saving || uploading) return;
+    setBuyerSubmitted(true);
+    const nextErrors = buyerSignupErrors();
+    if (Object.keys(nextErrors).length) {
+      setError(t("onboarding.buyerSignupFixErrors"));
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
+    const displayName = `${personal.firstName.trim()} ${personal.lastName.trim()}`.trim();
+    const categories = list(sourcing.interestedCategories);
+    const keywords = buyerKeywords;
+
+    try {
+      const profileResponse = await fetch("/api/account/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName,
+          email: personal.email,
+          companyAffiliation: company.companyName,
+          phoneNumber: personal.phoneNumber,
+          country: UNITED_STATES,
+          city: "",
+          preferredLanguage: locale,
+        }),
+      });
+      if (!profileResponse.ok) {
+        setError(await readJsonError(profileResponse, t("settings.profileSaveError")));
+        return;
+      }
+
+      const companyResponse = await fetch("/api/account/company", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyRole: "buyer",
+          legalName: company.companyName,
+          tradeName: "",
+          logoOriginalUrl: company.logoOriginalUrl,
+          logoThumbnailUrl: company.logoThumbnailUrl,
+          logoUrl: company.logoUrl,
+          useDefaultLogo: !company.logoUrl,
+          website: "",
+          country: UNITED_STATES,
+          city: "",
+          stateOrProvince: "",
+          businessAddress: "",
+          description: keywords.length
+            ? `Interested keywords: ${joined(keywords)}`
+            : "",
+          categories,
+          buyerProfile: {
+            buyerType: company.companyType,
+            purchasingCategories: categories,
+            preferredSupplierType: "",
+            targetOrderSize: "",
+            monthlyImportVolume: "",
+            importExperience: "",
+            salesChannels: [],
+            purchaseTimeline: "",
+          },
+        }),
+      });
+      if (!companyResponse.ok) {
+        setError(await readJsonError(companyResponse, t("settings.companySaveError")));
+        return;
+      }
+
+      const savedCompany = (await companyResponse.json()) as AccountCompanyRecord & {
+        id: string;
+      };
+      setCompanyId(savedCompany.id);
+      if (user?.id) {
+        rememberAccountCompany(user.id, savedCompany);
+      }
+      setPersonal((current) => ({ ...current, displayName }));
+      clearDraft();
+      setDirty(false);
+      setSuccess(t("onboarding.profileSavedText"));
+      await completeOnboarding("/dashboard/buyer");
+    } catch {
+      setError(t("settings.companySaveError"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function companyPayload(includeBuyerPreferences = false) {
     const categories =
       kind === "buyer" && includeBuyerPreferences
@@ -628,6 +777,69 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     clearDraft();
     setDirty(false);
     router.push(withLocale(target, locale));
+  }
+
+  if (kind === "buyer") {
+    const buyerErrors = buyerSubmitted ? buyerSignupErrors() : {};
+
+    return (
+      <div className="grid gap-6">
+        <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
+          <OnboardingStoryPanel kind={kind} />
+          <div id="onboarding-current-step" className="scroll-mt-28 grid gap-5">
+            {draft ? (
+              <div className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+                <p>{t("settings.draftAvailable")}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={restoreDraft}
+                    className="rounded-lg bg-amber-300 px-3 py-2 font-medium text-zinc-950"
+                  >
+                    {t("settings.restoreDraft")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={discardDraft}
+                    className="rounded-lg border border-amber-300/40 px-3 py-2 font-medium text-amber-100"
+                  >
+                    {t("settings.discardDraft")}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {error ? (
+              <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {error}
+              </p>
+            ) : null}
+            {success ? (
+              <p className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                {success}
+              </p>
+            ) : null}
+
+            <BuyerQuickSignupForm
+              company={company}
+              personal={personal}
+              sourcing={sourcing}
+              keywords={buyerKeywords}
+              keywordInput={buyerKeywordInput}
+              errors={buyerErrors}
+              saving={saving}
+              onSubmit={saveBuyerSignup}
+              onCompanyChange={updateCompany}
+              onPersonalChange={updatePersonal}
+              onSourcingChange={updateSourcing}
+              onKeywordInputChange={setBuyerKeywordInput}
+              onAddKeyword={addBuyerKeyword}
+              onRemoveKeyword={removeBuyerKeyword}
+            />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -724,6 +936,321 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
         </div>
       </div>
     </div>
+  );
+}
+
+function BuyerQuickSignupForm({
+  company,
+  personal,
+  sourcing,
+  keywords,
+  keywordInput,
+  errors,
+  saving,
+  onSubmit,
+  onCompanyChange,
+  onPersonalChange,
+  onSourcingChange,
+  onKeywordInputChange,
+  onAddKeyword,
+  onRemoveKeyword,
+}: {
+  company: CompanyStep;
+  personal: PersonalStep;
+  sourcing: BuyerSourcingStep;
+  keywords: string[];
+  keywordInput: string;
+  errors: Record<string, string>;
+  saving: boolean;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onCompanyChange: <K extends keyof CompanyStep>(key: K, value: CompanyStep[K]) => void;
+  onPersonalChange: <K extends keyof PersonalStep>(key: K, value: PersonalStep[K]) => void;
+  onSourcingChange: <K extends keyof BuyerSourcingStep>(
+    key: K,
+    value: BuyerSourcingStep[K],
+  ) => void;
+  onKeywordInputChange: (value: string) => void;
+  onAddKeyword: (value: string) => void;
+  onRemoveKeyword: (value: string) => void;
+}) {
+  const { locale, t } = useI18n();
+  const selectedCategories = list(sourcing.interestedCategories);
+  const categoryOptions = getBuyerCategoryOptions(locale);
+  const buyerTypeOptions = getBuyerTypeOptions(locale);
+
+  function toggleCategory(value: string) {
+    const next = new Set(selectedCategories);
+    if (next.has(value)) next.delete(value);
+    else next.add(value);
+    onSourcingChange("interestedCategories", joined(Array.from(next)));
+  }
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="grid gap-5 rounded-2xl border border-white/10 bg-zinc-950/80 p-5 shadow-2xl shadow-black/20 backdrop-blur"
+      noValidate
+    >
+      <div className="flex flex-col gap-2 border-b border-white/10 pb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
+          {t("onboarding.buyerQuickLabel")}
+        </p>
+        <h2 className="text-2xl font-semibold text-white">
+          {t("onboarding.buyerQuickTitle")}
+        </h2>
+        <p className="max-w-2xl text-sm leading-6 text-zinc-400">
+          {t("onboarding.buyerQuickDescription")}
+        </p>
+      </div>
+
+      <BuyerFormSection
+        title={t("onboarding.accountContact")}
+        description={t("onboarding.accountContactHelp")}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <BuyerInput
+            label={t("onboarding.workEmail")}
+            type="email"
+            value={personal.email}
+            onChange={(value) => onPersonalChange("email", value)}
+            error={errors.email}
+            required
+          />
+          <BuyerInput
+            label={t("settings.phoneNumber")}
+            type="tel"
+            value={personal.phoneNumber}
+            onChange={(value) => onPersonalChange("phoneNumber", value)}
+            error={errors.phoneNumber}
+            required
+          />
+          <BuyerInput
+            label={t("onboarding.firstName")}
+            value={personal.firstName}
+            onChange={(value) => onPersonalChange("firstName", value)}
+            error={errors.firstName}
+            required
+          />
+          <BuyerInput
+            label={t("onboarding.lastName")}
+            value={personal.lastName}
+            onChange={(value) => onPersonalChange("lastName", value)}
+            error={errors.lastName}
+            required
+          />
+        </div>
+      </BuyerFormSection>
+
+      <BuyerFormSection
+        title={t("onboarding.companyInformation")}
+        description={t("onboarding.companyInformationHelp")}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <BuyerInput
+            label={t("onboarding.companyName")}
+            value={company.companyName}
+            onChange={(value) => onCompanyChange("companyName", value)}
+            error={errors.companyName}
+            required
+          />
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-medium text-zinc-200">
+              {t("onboarding.signUpPath")} <span className="text-red-300">*</span>
+            </span>
+            <select
+              value={company.companyType}
+              onChange={(event) => onCompanyChange("companyType", event.target.value)}
+              className="h-11 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+            >
+              {buyerTypeOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {errors.companyType ? (
+              <span className="text-xs text-red-300">{errors.companyType}</span>
+            ) : null}
+          </label>
+        </div>
+      </BuyerFormSection>
+
+      <BuyerFormSection
+        title={t("onboarding.productInterests")}
+        description={t("onboarding.productInterestsHelp")}
+      >
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          {categoryOptions.map((option) => {
+            const selected = selectedCategories.includes(option.value);
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => toggleCategory(option.value)}
+                className={`rounded-xl border px-3 py-2.5 text-left text-sm transition ${
+                  selected
+                    ? "border-emerald-300/70 bg-emerald-400/15 text-emerald-100 shadow-sm shadow-emerald-950/20"
+                    : "border-white/10 bg-white/[0.04] text-zinc-300 hover:border-white/25 hover:bg-white/[0.07]"
+                }`}
+                aria-pressed={selected}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+        {errors.categories ? (
+          <p className="text-xs text-red-300">{errors.categories}</p>
+        ) : null}
+        <p className="text-xs leading-5 text-zinc-500">
+          {t("onboarding.productTypesHelp")}
+        </p>
+
+        <div className="grid gap-2">
+          <label className="grid gap-1.5 text-sm">
+            <span className="font-medium text-zinc-200">
+              {t("onboarding.interestedKeywords")}{" "}
+              <span className="text-red-300">*</span>
+            </span>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={keywordInput}
+                placeholder={t("onboarding.keywordPlaceholder")}
+                onChange={(event) => onKeywordInputChange(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === ",") {
+                    event.preventDefault();
+                    onAddKeyword(keywordInput);
+                  }
+                }}
+                className="h-11 min-w-0 flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+              />
+              <button
+                type="button"
+                onClick={() => onAddKeyword(keywordInput)}
+                className="inline-flex h-11 items-center rounded-xl border border-white/10 bg-white/[0.08] px-3 text-sm font-semibold text-white transition hover:bg-white/[0.12]"
+              >
+                {t("onboarding.addKeyword")}
+              </button>
+            </div>
+          </label>
+          {keywords.length ? (
+            <div className="flex flex-wrap gap-2">
+              {keywords.map((keyword) => (
+                <button
+                  key={keyword}
+                  type="button"
+                  onClick={() => onRemoveKeyword(keyword)}
+                  className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-medium text-emerald-100"
+                  aria-label={t("onboarding.removeKeyword")}
+                >
+                  {keyword}
+                  <span aria-hidden="true">x</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {errors.keywords ? (
+            <p className="text-xs text-red-300">{errors.keywords}</p>
+          ) : null}
+          <p className="text-xs leading-5 text-zinc-500">
+            {t("onboarding.keywordsHelp")}
+          </p>
+        </div>
+      </BuyerFormSection>
+
+      <BuyerFormSection
+        title={t("onboarding.agreement")}
+        description={t("onboarding.agreementHelp")}
+      >
+        <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-sm leading-6 text-zinc-300">
+          <input
+            type="checkbox"
+            checked={personal.acceptedTerms}
+            onChange={(event) => onPersonalChange("acceptedTerms", event.target.checked)}
+            className="mt-1 size-4 rounded border-white/20 bg-zinc-950"
+          />
+          <span>
+            {t("onboarding.acceptLegalPrefix")}{" "}
+            <Link className="font-medium text-emerald-200 hover:text-emerald-100" href={withLocale("/terms", locale)}>
+              {t("footer.legalLinks.0.label")}
+            </Link>{" "}
+            {t("onboarding.and")}{" "}
+            <Link className="font-medium text-emerald-200 hover:text-emerald-100" href={withLocale("/privacy", locale)}>
+              {t("footer.legalLinks.2.label")}
+            </Link>
+            .
+          </span>
+        </label>
+        {errors.terms ? <p className="text-xs text-red-300">{errors.terms}</p> : null}
+      </BuyerFormSection>
+
+      <div className="flex flex-col gap-3 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-xs leading-5 text-zinc-500">
+          {t("onboarding.authSeparateNotice")}
+        </p>
+        <button
+          type="submit"
+          disabled={saving}
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-300 px-5 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-200 disabled:cursor-wait disabled:opacity-70"
+        >
+          {saving ? t("settings.saving") : t("onboarding.saveBuyer")}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function BuyerFormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="grid gap-3 rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+      <div>
+        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <p className="mt-1 text-sm leading-6 text-zinc-400">{description}</p>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function BuyerInput({
+  label,
+  value,
+  onChange,
+  type = "text",
+  error,
+  required = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  type?: "text" | "email" | "tel";
+  error?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-200">
+        {label}
+        {required ? <span className="text-red-300"> *</span> : null}
+      </span>
+      <input
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 rounded-xl border border-white/10 bg-white/[0.06] px-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+      />
+      {error ? <span className="text-xs text-red-300">{error}</span> : null}
+    </label>
   );
 }
 
