@@ -129,43 +129,6 @@ type ChatRoomContextMenuAction =
   | "notifications"
   | "leave";
 
-type DealWorkflowStatus =
-  | "inquiry_started"
-  | "deal_request_sent"
-  | "deal_proposal_sent"
-  | "changes_requested"
-  | "deal_accepted"
-  | "deal_declined"
-  | "deal_created"
-  | "documents_pending"
-  | "payment_pending"
-  | "shipping_pending"
-  | "completed";
-
-type DealWorkflowKind = "request" | "proposal";
-
-type DealWorkflowSide = "buyer" | "seller";
-
-type DealWorkflowState = {
-  status: DealWorkflowStatus;
-  kind?: DealWorkflowKind;
-  senderSide?: DealWorkflowSide;
-  message?: string;
-  updatedAt?: string;
-};
-
-type DealModalState = {
-  threadId: string;
-  kind: DealWorkflowKind;
-} | null;
-
-type DealModalField = {
-  name: string;
-  label: string;
-  type?: string;
-  optional?: boolean;
-};
-
 type SignedUrlPayload = {
   signedUrl: string;
   expiresInSeconds: number;
@@ -179,6 +142,14 @@ async function fetchInquiryThreads() {
   const response = await fetch("/api/inquiries");
   if (!response.ok) return [];
   return (await response.json()) as InquiryThread[];
+}
+
+function isDealSummary(value: DealSummary | { error?: string } | null): value is DealSummary {
+  return Boolean(value && "id" in value && "dealStatus" in value);
+}
+
+function getDealError(value: DealSummary | { error?: string } | null) {
+  return value && "error" in value ? value.error : null;
 }
 
 export function MessagesClient({
@@ -199,8 +170,8 @@ export function MessagesClient({
   const [previewAttachment, setPreviewAttachment] = useState<MessageAttachment | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [dealWorkflowByThread, setDealWorkflowByThread] = useState<Record<string, DealWorkflowState>>({});
-  const [dealModal, setDealModal] = useState<DealModalState>(null);
+  const [dealPending, setDealPending] = useState(false);
+  const [dealError, setDealError] = useState("");
   const [contextMenu, setContextMenu] = useState<ChatRoomContextMenuState | null>(null);
   const [pinnedThreadIds, setPinnedThreadIds] = useState<Set<string>>(() => new Set());
   const [favoriteThreadIds, setFavoriteThreadIds] = useState<Set<string>>(() => new Set());
@@ -259,10 +230,6 @@ export function MessagesClient({
   const contextMenuThread = useMemo(
     () => threads.find((thread) => thread.id === contextMenu?.threadId) ?? null,
     [contextMenu?.threadId, threads],
-  );
-  const dealModalThread = useMemo(
-    () => threads.find((thread) => thread.id === dealModal?.threadId) ?? null,
-    [dealModal?.threadId, threads],
   );
 
   useEffect(() => {
@@ -330,6 +297,7 @@ export function MessagesClient({
       setReply("");
     }
     setSelectedId(id);
+    setDealError("");
   }
 
   function openThreadContextMenu(threadId: string, clientX: number, clientY: number) {
@@ -557,40 +525,64 @@ export function MessagesClient({
     });
   }
 
-  function submitDealWorkflow(
-    thread: InquiryThread,
-    kind: DealWorkflowKind,
-    message: string,
-  ) {
-    const viewerSide = getViewerSide(thread);
-    setDealWorkflowByThread((current) => ({
-      ...current,
-      [thread.id]: {
-        status: kind === "request" ? "deal_request_sent" : "deal_proposal_sent",
-        kind,
-        senderSide: viewerSide,
-        message,
-        updatedAt: new Date().toISOString(),
-      },
-    }));
-    setDealModal(null);
+  function updateThreadDeal(threadId: string, deal: DealSummary) {
+    setThreads((current) =>
+      current.map((thread) =>
+        thread.id === threadId
+          ? {
+              ...thread,
+              deals: [
+                deal,
+                ...(thread.deals ?? []).filter((item) => item.id !== deal.id),
+              ],
+            }
+          : thread,
+      ),
+    );
   }
 
-  function respondToDealWorkflow(
-    thread: InquiryThread,
-    status: "deal_accepted" | "changes_requested" | "deal_declined",
-  ) {
-    setDealWorkflowByThread((current) => {
-      const previous = getDealWorkflowState(thread, current[thread.id]);
-      return {
-        ...current,
-        [thread.id]: {
-          ...previous,
-          status,
-          updatedAt: new Date().toISOString(),
-        },
-      };
+  async function createDeal(thread: InquiryThread) {
+    setDealPending(true);
+    setDealError("");
+    const response = await fetch("/api/deals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inquiryId: thread.id }),
     });
+    const result = (await response.json().catch(() => null)) as
+      | DealSummary
+      | { error?: string }
+      | null;
+    setDealPending(false);
+    if (!response.ok || !isDealSummary(result)) {
+      setDealError(getDealError(result) ?? t("deals.actionFailed"));
+      return;
+    }
+    updateThreadDeal(thread.id, result);
+  }
+
+  async function updateDeal(
+    thread: InquiryThread,
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) {
+    setDealPending(true);
+    setDealError("");
+    const response = await fetch(`/api/deals/${deal.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action }),
+    });
+    const result = (await response.json().catch(() => null)) as
+      | DealSummary
+      | { error?: string }
+      | null;
+    setDealPending(false);
+    if (!response.ok || !isDealSummary(result)) {
+      setDealError(getDealError(result) ?? t("deals.actionFailed"));
+      return;
+    }
+    updateThreadDeal(thread.id, result);
   }
 
   if (!threads.length) {
@@ -642,9 +634,10 @@ export function MessagesClient({
             {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
             <DealControls
               thread={selected}
-              workflow={getDealWorkflowState(selected, dealWorkflowByThread[selected.id])}
-              onOpenModal={(kind) => setDealModal({ threadId: selected.id, kind })}
-              onRespond={(status) => respondToDealWorkflow(selected, status)}
+              pending={dealPending}
+              error={dealError}
+              onCreate={() => void createDeal(selected)}
+              onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
             />
           </header>
           <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
@@ -763,14 +756,6 @@ export function MessagesClient({
           notificationsEnabled={!mutedThreadIds.has(contextMenu.threadId)}
           onClose={() => setContextMenu(null)}
           onAction={handleContextMenuAction}
-        />
-      ) : null}
-      {dealModal && dealModalThread ? (
-        <DealRequestModal
-          kind={dealModal.kind}
-          thread={dealModalThread}
-          onClose={() => setDealModal(null)}
-          onSubmit={(message) => submitDealWorkflow(dealModalThread, dealModal.kind, message)}
         />
       ) : null}
     </div>
@@ -1441,123 +1426,95 @@ function safeParseJson(value: string) {
 
 function DealControls({
   thread,
-  workflow,
-  onOpenModal,
-  onRespond,
+  pending,
+  error,
+  onCreate,
+  onUpdate,
 }: {
   thread: InquiryThread;
-  workflow: DealWorkflowState;
-  onOpenModal: (kind: DealWorkflowKind) => void;
-  onRespond: (status: "deal_accepted" | "changes_requested" | "deal_declined") => void;
+  pending: boolean;
+  error: string;
+  onCreate: () => void;
+  onUpdate: (
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) => void;
 }) {
-  const { t } = useI18n();
-  const [dealRoomOpen, setDealRoomOpen] = useState(false);
-  const viewerSide = getViewerSide(thread);
-  const currentUserKind: DealWorkflowKind = viewerSide === "buyer" ? "request" : "proposal";
-  const currentUserActionLabel =
-    currentUserKind === "request"
-      ? t("deals.sendDealRequest", "Send Deal Request")
-      : t("deals.sendDealProposal", "Send Deal Proposal");
-  const statusLabel = dealWorkflowLabel(workflow.status, t);
-  const isSentState =
-    workflow.status === "deal_request_sent" ||
-    workflow.status === "deal_proposal_sent";
-  const isSender = Boolean(workflow.senderSide && workflow.senderSide === viewerSide);
-  const canRespond = isSentState && Boolean(workflow.senderSide) && !isSender;
-  const showDealRoom =
-    workflow.status === "deal_accepted" ||
-    workflow.status === "deal_created" ||
-    workflow.status === "documents_pending" ||
-    workflow.status === "payment_pending" ||
-    workflow.status === "shipping_pending" ||
-    workflow.status === "completed";
+  const { locale, t } = useI18n();
+  const deal = getActiveDeal(thread);
+  const viewerCompanyId = getViewerCompanyId(thread);
+  const isBuyer = viewerCompanyId === thread.buyerCompany.id;
+  const currentSideConfirmed = deal
+    ? isBuyer
+      ? deal.confirmedByBuyer
+      : deal.confirmedBySeller
+    : false;
+  const hasReviewed = Boolean(
+    deal?.reviews.some((review) => review.reviewerCompanyId === viewerCompanyId),
+  );
+  const statusLabel = deal ? dealStatusLabel(deal.dealStatus, t) : null;
 
   return (
     <div className="mt-4 grid gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full border border-[#64AF8B]/35 bg-[#64AF8B]/10 px-3 py-1 text-xs font-medium text-[#2f7a59]">
-          {statusLabel}
-        </span>
-        {workflow.status === "inquiry_started" || workflow.status === "deal_declined" ? (
-          <ActionButton onClick={() => onOpenModal(currentUserKind)}>
-            {currentUserActionLabel}
+        {statusLabel ? (
+          <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800">
+            {statusLabel}
+          </span>
+        ) : null}
+        {!deal ? (
+          <ActionButton disabled={pending} onClick={onCreate}>
+            {t("deals.markInProgress")}
           </ActionButton>
         ) : null}
-        {workflow.status === "changes_requested" ? (
-          <ActionButton onClick={() => onOpenModal(currentUserKind)}>
-            {currentUserKind === "request"
-              ? t("deals.sendUpdatedDealRequest", "Send Updated Deal Request")
-              : t("deals.sendUpdatedDealProposal", "Send Updated Deal Proposal")}
+        {deal && (deal.dealStatus === "proposed" || deal.dealStatus === "in_progress") ? (
+          <ActionButton disabled={pending} onClick={() => onUpdate(deal, "request_completion")}>
+            {t("deals.requestCompletion")}
           </ActionButton>
         ) : null}
-        {canRespond ? (
-          <>
-            <ActionButton onClick={() => onRespond("deal_accepted")}>
-              {t("deals.accept", "Accept")}
-            </ActionButton>
-            <ActionButton variant="secondary" onClick={() => onRespond("changes_requested")}>
-              {t("deals.proposeChanges", "Propose Changes")}
-            </ActionButton>
-            <ActionButton variant="danger" onClick={() => onRespond("deal_declined")}>
-              {t("deals.decline", "Decline")}
-            </ActionButton>
-          </>
-        ) : null}
-        {showDealRoom ? (
-          <ActionButton onClick={() => setDealRoomOpen((current) => !current)}>
-            {t("deals.openDealRoom", "Open Deal Room")}
+        {deal && deal.dealStatus === "completion_requested" && !currentSideConfirmed ? (
+          <ActionButton disabled={pending} onClick={() => onUpdate(deal, "confirm_completion")}>
+            {t("deals.confirmCompletion")}
           </ActionButton>
+        ) : null}
+        {deal && deal.dealStatus === "completed" && !hasReviewed ? (
+          <Link
+            href={withLocale(`/deals/${deal.id}/review`, locale)}
+            className="rounded-md bg-zinc-950 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
+          >
+            {t("deals.writeReview")}
+          </Link>
+        ) : null}
+        {deal && deal.dealStatus === "completed" && hasReviewed ? (
+          <span className="text-xs font-medium text-emerald-700">{t("deals.alreadyReviewed")}</span>
         ) : null}
       </div>
-      {isSentState && isSender ? (
-        <Banner>
-          {workflow.kind === "request"
-            ? t("deals.dealRequestWaiting", "Deal request sent. Waiting for the seller to respond.")
-            : t("deals.dealProposalWaiting", "Deal proposal sent. Waiting for the buyer to respond.")}
-        </Banner>
+      {deal?.dealStatus === "completion_requested" && !currentSideConfirmed ? (
+        <Banner>{t("deals.otherRequestedCompletion")}</Banner>
       ) : null}
-      {canRespond ? (
-        <Banner>
-          {workflow.kind === "request"
-            ? t("deals.dealRequestReceived", "A buyer sent a deal request. Review it before accepting.")
-            : t("deals.dealProposalReceived", "A seller sent a deal proposal. Review it before accepting.")}
-        </Banner>
+      {deal?.dealStatus === "completed" && !hasReviewed ? (
+        <Banner>{t("deals.completeReviewPrompt")}</Banner>
       ) : null}
-      {workflow.status === "changes_requested" ? (
-        <Banner>{t("deals.changesRequestedHint", "Changes were requested. Send an updated request or proposal when ready.")}</Banner>
-      ) : null}
-      {workflow.status === "deal_declined" ? (
-        <Banner>{t("deals.dealDeclinedHint", "This deal request was declined. You can send a new request or proposal when ready.")}</Banner>
-      ) : null}
-      {showDealRoom && dealRoomOpen ? <DealRoomPreview /> : null}
+      {error ? <p className="text-xs font-medium text-red-700">{error}</p> : null}
     </div>
   );
 }
 
 function ActionButton({
   children,
-  disabled = false,
-  variant = "primary",
+  disabled,
   onClick,
 }: {
   children: React.ReactNode;
-  disabled?: boolean;
-  variant?: "primary" | "secondary" | "danger";
+  disabled: boolean;
   onClick: () => void;
 }) {
-  const variantClass =
-    variant === "primary"
-      ? "border-zinc-950 bg-zinc-950 text-white hover:bg-zinc-800"
-      : variant === "danger"
-        ? "border-red-200 bg-white text-red-700 hover:border-red-300 hover:bg-red-50"
-        : "border-zinc-200 bg-white text-zinc-700 hover:border-[#64AF8B]/40 hover:text-[#2f7a59]";
-
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`rounded-md border px-3 py-2 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${variantClass}`}
+      className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700 disabled:cursor-wait disabled:opacity-60"
     >
       {children}
     </button>
@@ -1572,225 +1529,8 @@ function Banner({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DealRoomPreview() {
-  const { t } = useI18n();
-  const sections = [
-    t("deals.roomChat", "Chat"),
-    t("deals.roomQuote", "Quote"),
-    t("deals.roomDocuments", "Documents"),
-    t("deals.roomPayment", "Payment"),
-    t("deals.roomShipping", "Shipping"),
-    t("deals.roomTimeline", "Timeline"),
-  ];
-
-  return (
-    <div className="rounded-xl border p-3 theme-surface-muted">
-      <div className="flex flex-wrap gap-2">
-        {sections.map((section) => (
-          <span
-            key={section}
-            className="rounded-full border px-2.5 py-1 text-xs font-medium theme-surface theme-border theme-muted"
-          >
-            {section}
-          </span>
-        ))}
-      </div>
-      <p className="mt-2 text-xs theme-muted">
-        {t("deals.roomPreviewHint", "Deal Room workspace is prepared. Payments and full shipment tools are not live yet.")}
-      </p>
-    </div>
-  );
-}
-
-function DealRequestModal({
-  kind,
-  thread,
-  onClose,
-  onSubmit,
-}: {
-  kind: DealWorkflowKind;
-  thread: InquiryThread;
-  onClose: () => void;
-  onSubmit: (message: string) => void;
-}) {
-  const { t } = useI18n();
-  const [message, setMessage] = useState("");
-  const isRequest = kind === "request";
-  const title = isRequest
-    ? t("deals.sendDealRequest", "Send Deal Request")
-    : t("deals.sendDealProposal", "Send Deal Proposal");
-  const submitLabel = isRequest
-    ? t("deals.sendDealRequest", "Send Deal Request")
-    : t("deals.sendDealProposal", "Send Deal Proposal");
-  const fields: DealModalField[] = isRequest
-    ? [
-        { name: "requestedQuantity", label: t("deals.requestedQuantity", "Requested quantity") },
-        { name: "targetUnitPrice", label: t("deals.targetUnitPrice", "Target unit price"), optional: true },
-        { name: "destinationCountry", label: t("deals.destinationCountry", "Destination country") },
-        { name: "shippingAddress", label: t("deals.shippingAddress", "Shipping address"), optional: true },
-        { name: "requestedDeliveryDate", label: t("deals.requestedDeliveryDate", "Requested delivery date"), type: "date", optional: true },
-        { name: "preferredPaymentMethod", label: t("deals.preferredPaymentMethod", "Preferred payment method"), optional: true },
-      ]
-    : [
-        { name: "unitPrice", label: t("deals.unitPrice", "Unit price") },
-        { name: "quantity", label: t("deals.quantity", "Quantity") },
-        { name: "moq", label: t("deals.moq", "MOQ") },
-        { name: "totalAmount", label: t("deals.totalAmount", "Total amount") },
-        { name: "currency", label: t("deals.currency", "Currency") },
-        { name: "incoterms", label: t("deals.incoterms", "Incoterms") },
-        { name: "leadTime", label: t("deals.leadTime", "Lead time") },
-        { name: "shippingOrigin", label: t("deals.shippingOrigin", "Shipping origin") },
-        { name: "paymentTerms", label: t("deals.paymentTerms", "Payment terms") },
-        { name: "quoteExpirationDate", label: t("deals.quoteExpirationDate", "Quote expiration date"), type: "date" },
-      ];
-
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose]);
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSubmit(message.trim());
-        }}
-        className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-2xl border theme-border theme-surface-elevated p-5 shadow-2xl"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-[#64AF8B]">
-              {t("messages.productInquiry", "Product inquiry")}
-            </p>
-            <h3 className="mt-1 text-lg font-semibold theme-foreground">{title}</h3>
-            <p className="mt-1 text-sm theme-muted">
-              {thread.product?.name || getInquiryLabel(thread, t)}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md p-1 theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
-            aria-label={t("common.cancel", "Cancel")}
-          >
-            <X className="size-5" />
-          </button>
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          {fields.map((field) => (
-            <ModalField
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type}
-              optional={field.optional}
-            />
-          ))}
-        </div>
-        <ModalTextarea
-          label={
-            isRequest
-              ? t("deals.messageToSeller", "Message to seller")
-              : t("deals.messageToBuyer", "Message to buyer")
-          }
-          value={message}
-          onChange={setMessage}
-        />
-        <div className="mt-5 flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border px-3 py-2 text-sm font-medium theme-secondary-button"
-          >
-            {t("common.cancel", "Cancel")}
-          </button>
-          <button
-            type="submit"
-            className="rounded-md border border-zinc-950 bg-zinc-950 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            {submitLabel}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function ModalField({
-  name,
-  label,
-  type = "text",
-  optional = false,
-}: {
-  name: string;
-  label: string;
-  type?: string;
-  optional?: boolean;
-}) {
-  const { t } = useI18n();
-
-  return (
-    <label className="grid gap-1.5 text-sm font-medium theme-foreground">
-      <span>
-        {label}
-        {optional ? (
-          <span className="ml-1 text-xs font-normal theme-muted">
-            {t("common.optional", "Optional")}
-          </span>
-        ) : null}
-      </span>
-      <input
-        name={name}
-        type={type}
-        className="h-10 rounded-md border bg-transparent px-3 text-sm outline-none theme-border focus:border-[#64AF8B] focus:ring-2 focus:ring-[#64AF8B]/15"
-      />
-    </label>
-  );
-}
-
-function ModalTextarea({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <label className="mt-3 grid gap-1.5 text-sm font-medium theme-foreground">
-      <span>{label}</span>
-      <textarea
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        rows={4}
-        className="rounded-md border bg-transparent px-3 py-2 text-sm outline-none theme-border focus:border-[#64AF8B] focus:ring-2 focus:ring-[#64AF8B]/15"
-      />
-    </label>
-  );
-}
-
 function getActiveDeal(thread: InquiryThread) {
   return (thread.deals ?? []).find((deal) => deal.dealStatus !== "cancelled") ?? null;
-}
-
-function getDealWorkflowState(
-  thread: InquiryThread,
-  localWorkflow?: DealWorkflowState,
-): DealWorkflowState {
-  if (localWorkflow) return localWorkflow;
-
-  const deal = getActiveDeal(thread);
-  if (!deal) return { status: "inquiry_started" };
-  if (deal.dealStatus === "completed") return { status: "completed" };
-  if (deal.dealStatus === "disputed") return { status: "changes_requested" };
-  if (deal.dealStatus === "completion_requested") return { status: "shipping_pending" };
-  return { status: "deal_created" };
 }
 
 function getViewerCompanyId(thread: InquiryThread) {
@@ -1799,10 +1539,6 @@ function getViewerCompanyId(thread: InquiryThread) {
     viewerCompanyIds.find((id) => id === thread.buyerCompany.id || id === thread.sellerCompany.id) ??
     ""
   );
-}
-
-function getViewerSide(thread: InquiryThread): DealWorkflowSide {
-  return getViewerCompanyId(thread) === thread.buyerCompany.id ? "buyer" : "seller";
 }
 
 function getCounterparty(thread: InquiryThread) {
@@ -1904,19 +1640,11 @@ function formatMessageTime(value: string, locale: "en" | "ko") {
   }).format(date);
 }
 
-function dealWorkflowLabel(
-  status: DealWorkflowStatus,
+function dealStatusLabel(
+  status: DealSummary["dealStatus"],
   t: (key: string, fallback?: string) => string,
 ) {
-  if (status === "deal_request_sent") return t("deals.dealRequestSent", "Deal Request Sent");
-  if (status === "deal_proposal_sent") return t("deals.dealProposalSent", "Deal Proposal Sent");
-  if (status === "changes_requested") return t("deals.changesRequested", "Changes Requested");
-  if (status === "deal_accepted") return t("deals.dealAccepted", "Deal Accepted");
-  if (status === "deal_declined") return t("deals.dealDeclined", "Deal Declined");
-  if (status === "deal_created") return t("deals.dealRoom", "Deal Room");
-  if (status === "documents_pending") return t("deals.documentsPending", "Documents Pending");
-  if (status === "payment_pending") return t("deals.paymentPending", "Payment Pending");
-  if (status === "shipping_pending") return t("deals.shippingPending", "Shipping Pending");
-  if (status === "completed") return t("deals.completedDeal", "Completed deal");
-  return t("deals.inquiryStarted", "Inquiry Started");
+  if (status === "completion_requested") return t("deals.completionRequested");
+  if (status === "completed") return t("deals.completedDeal");
+  return t("deals.dealInProgress");
 }
