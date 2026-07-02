@@ -3,11 +3,15 @@
 import {
   Building2,
   ClipboardCheck,
+  Download,
+  ExternalLink,
   Eye,
+  FileText,
   Handshake,
   MessageCircle,
   ShoppingBag,
   Star,
+  Search,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -31,7 +35,8 @@ export type DashboardSection =
   | "saved-products"
   | "following"
   | "messages"
-  | "products";
+  | "products"
+  | "documents";
 
 type Summary = {
   company?: {
@@ -111,6 +116,577 @@ const metricIcons: Record<MetricIconKey, LucideIcon> = {
   rating: Star,
 };
 
+const formsLibraryFilters = [
+  "All",
+  "Trade Templates",
+  "CBP",
+  "FDA",
+  "USDA",
+  "Logistics",
+  "Compliance",
+] as const;
+
+type FormsLibraryFilter = (typeof formsLibraryFilters)[number];
+
+type FormLibraryItem = {
+  id: string;
+  section: string;
+  filter: Exclude<FormsLibraryFilter, "All">;
+  name: string;
+  category: string;
+  usedFor: string;
+  filledBy: string;
+  format: string;
+  source: string;
+  statuses: string[];
+  actions: string[];
+};
+
+const formsLibrarySections = [
+  "Core Trade Templates",
+  "U.S. Customs / CBP Forms",
+  "FDA / Food & Cosmetics",
+  "USDA / Agriculture",
+  "Logistics & Shipping",
+  "Product Compliance",
+];
+
+const formsLibraryItems: FormLibraryItem[] = [
+  {
+    id: "proforma-invoice",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Proforma Invoice",
+    category: "Trade Templates",
+    usedFor: "Initial quote and buyer import planning",
+    filledBy: "Seller",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Workflow support"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "commercial-invoice",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Commercial Invoice",
+    category: "Trade Templates",
+    usedFor: "Shipment value, parties, and product line details",
+    filledBy: "Seller / exporter",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Shipment document"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "packing-list",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Packing List",
+    category: "Trade Templates",
+    usedFor: "Carton, pallet, weight, and package details",
+    filledBy: "Seller / warehouse",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Logistics"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "purchase-order",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Purchase Order",
+    category: "Trade Templates",
+    usedFor: "Buyer order confirmation and requested terms",
+    filledBy: "Buyer",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Workflow support"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "export-sales-contract",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Export Sales Contract",
+    category: "Trade Templates",
+    usedFor: "Commercial terms, delivery terms, and order scope",
+    filledBy: "Buyer and seller",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Contract support"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "certificate-origin-template",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Certificate of Origin Template",
+    category: "Trade Templates",
+    usedFor: "Origin statement support for trade review",
+    filledBy: "Seller / chamber where applicable",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Origin"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "shipper-letter-instruction",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Shipper’s Letter of Instruction",
+    category: "Trade Templates",
+    usedFor: "Instructions to freight forwarder or logistics partner",
+    filledBy: "Seller / shipper",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Logistics"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "document-checklist",
+    section: "Core Trade Templates",
+    filter: "Trade Templates",
+    name: "Document Checklist",
+    category: "Trade Templates",
+    usedFor: "Shipment and compliance document planning",
+    filledBy: "Buyer and seller",
+    format: "PDF / DOCX",
+    source: "Trade82 template",
+    statuses: ["Template", "Workflow support"],
+    actions: ["Download PDF", "Download DOCX", "Preview"],
+  },
+  {
+    id: "cbp-3461",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 3461 - Entry / Immediate Delivery",
+    category: "CBP",
+    usedFor: "Entry or immediate delivery process",
+    filledBy: "Customs broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Broker usually files"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "cbp-7501",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 7501 - Entry Summary",
+    category: "CBP",
+    usedFor: "Entry summary and duty/tax reporting",
+    filledBy: "Customs broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Broker usually files"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "cbp-5106",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 5106 - Importer Identity Form",
+    category: "CBP",
+    usedFor: "Importer identity setup with CBP",
+    filledBy: "Importer / broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Importer required"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "cbp-301",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 301 - Customs Bond",
+    category: "CBP",
+    usedFor: "Customs bond documentation",
+    filledBy: "Importer / surety / broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Importer required"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "cbp-3311",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 3311 - Declaration for Free Entry of Returned American Products",
+    category: "CBP",
+    usedFor: "Returned American products entry support",
+    filledBy: "Importer / broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Category-specific"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "cbp-3299",
+    section: "U.S. Customs / CBP Forms",
+    filter: "CBP",
+    name: "CBP Form 3299 - Declaration for Free Entry of Unaccompanied Articles",
+    category: "CBP",
+    usedFor: "Unaccompanied articles entry support",
+    filledBy: "Importer / broker",
+    format: "Official form",
+    source: "U.S. Customs and Border Protection",
+    statuses: ["Official U.S. Form", "Category-specific"],
+    actions: ["Open official form", "View details"],
+  },
+  {
+    id: "fda-prior-notice-guide",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "FDA Prior Notice Guide",
+    category: "FDA",
+    usedFor: "Food shipment prior notice planning",
+    filledBy: "Importer / broker / filer",
+    format: "Official guide",
+    source: "U.S. Food and Drug Administration",
+    statuses: ["Official source", "Food / cosmetics"],
+    actions: ["Open official guide", "View details"],
+  },
+  {
+    id: "fda-facility-registration",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "FDA Facility Registration Reference",
+    category: "FDA",
+    usedFor: "Facility registration planning",
+    filledBy: "Facility owner / importer",
+    format: "Official reference",
+    source: "U.S. Food and Drug Administration",
+    statuses: ["Official source", "Category-specific"],
+    actions: ["Open official guide", "View details"],
+  },
+  {
+    id: "ingredient-declaration-template",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "Ingredient Declaration Template",
+    category: "FDA",
+    usedFor: "Ingredient statement collection and review",
+    filledBy: "Seller / manufacturer",
+    format: "Checklist",
+    source: "Trade82 template",
+    statuses: ["Category-specific", "Food / cosmetics"],
+    actions: ["Download checklist", "View details"],
+  },
+  {
+    id: "nutrition-allergen-checklist",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "Nutrition / Allergen Checklist",
+    category: "FDA",
+    usedFor: "Nutrition and allergen disclosure planning",
+    filledBy: "Seller / importer",
+    format: "Checklist",
+    source: "Trade82 template",
+    statuses: ["Category-specific", "Food / cosmetics"],
+    actions: ["Download checklist", "View details"],
+  },
+  {
+    id: "cosmetic-labeling-checklist",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "Cosmetic Labeling Checklist",
+    category: "FDA",
+    usedFor: "Cosmetic label review preparation",
+    filledBy: "Seller / brand owner",
+    format: "Checklist",
+    source: "Trade82 template",
+    statuses: ["Category-specific", "Food / cosmetics"],
+    actions: ["Download checklist", "View details"],
+  },
+  {
+    id: "mocra-reference",
+    section: "FDA / Food & Cosmetics",
+    filter: "FDA",
+    name: "MoCRA Reference",
+    category: "FDA",
+    usedFor: "Cosmetics regulatory reference planning",
+    filledBy: "Brand owner / responsible person",
+    format: "Official reference",
+    source: "U.S. Food and Drug Administration",
+    statuses: ["Official source", "Category-specific"],
+    actions: ["Open official guide", "View details"],
+  },
+  {
+    id: "aphis-import-permit",
+    section: "USDA / Agriculture",
+    filter: "USDA",
+    name: "APHIS Import Permit Reference",
+    category: "USDA",
+    usedFor: "Agricultural product import permit review",
+    filledBy: "Importer / broker",
+    format: "Official reference",
+    source: "USDA APHIS",
+    statuses: ["Category-specific", "Permit may be required"],
+    actions: ["Open official source", "View details"],
+  },
+  {
+    id: "plant-product-import-guide",
+    section: "USDA / Agriculture",
+    filter: "USDA",
+    name: "Plant Product Import Guide",
+    category: "USDA",
+    usedFor: "Plant product import requirement planning",
+    filledBy: "Importer / broker",
+    format: "Official guide",
+    source: "USDA APHIS",
+    statuses: ["Category-specific", "Permit may be required"],
+    actions: ["Open official source", "View details"],
+  },
+  {
+    id: "animal-product-import-guide",
+    section: "USDA / Agriculture",
+    filter: "USDA",
+    name: "Animal Product Import Guide",
+    category: "USDA",
+    usedFor: "Animal product import requirement planning",
+    filledBy: "Importer / broker",
+    format: "Official guide",
+    source: "USDA APHIS",
+    statuses: ["Category-specific", "Permit may be required"],
+    actions: ["Open official source", "View details"],
+  },
+  {
+    id: "vs-16-3-reference",
+    section: "USDA / Agriculture",
+    filter: "USDA",
+    name: "VS Form 16-3 Reference",
+    category: "USDA",
+    usedFor: "Animal product import permit reference",
+    filledBy: "Importer / broker",
+    format: "Official reference",
+    source: "USDA APHIS",
+    statuses: ["Category-specific", "Permit may be required"],
+    actions: ["Open official source", "View details"],
+  },
+  {
+    id: "ppq-permit-reference",
+    section: "USDA / Agriculture",
+    filter: "USDA",
+    name: "PPQ Permit Reference",
+    category: "USDA",
+    usedFor: "Plant protection and quarantine permit reference",
+    filledBy: "Importer / broker",
+    format: "Official reference",
+    source: "USDA APHIS",
+    statuses: ["Category-specific", "Permit may be required"],
+    actions: ["Open official source", "View details"],
+  },
+  {
+    id: "bill-of-lading",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Bill of Lading Reference",
+    category: "Logistics",
+    usedFor: "Ocean shipment carrier document reference",
+    filledBy: "Forwarder / carrier",
+    format: "Reference",
+    source: "Forwarder / carrier issued",
+    statuses: ["Logistics", "Forwarder / carrier issued", "Reference only"],
+    actions: ["View details"],
+  },
+  {
+    id: "air-waybill",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Air Waybill Reference",
+    category: "Logistics",
+    usedFor: "Air shipment carrier document reference",
+    filledBy: "Forwarder / carrier",
+    format: "Reference",
+    source: "Forwarder / carrier issued",
+    statuses: ["Logistics", "Forwarder / carrier issued", "Reference only"],
+    actions: ["View details"],
+  },
+  {
+    id: "delivery-order",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Delivery Order",
+    category: "Logistics",
+    usedFor: "Cargo release or delivery coordination",
+    filledBy: "Forwarder / carrier",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Logistics", "Reference only"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "arrival-notice",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Arrival Notice",
+    category: "Logistics",
+    usedFor: "Shipment arrival and charges notification",
+    filledBy: "Forwarder / carrier",
+    format: "Reference",
+    source: "Forwarder / carrier issued",
+    statuses: ["Logistics", "Forwarder / carrier issued", "Reference only"],
+    actions: ["View details"],
+  },
+  {
+    id: "insurance-certificate",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Insurance Certificate",
+    category: "Logistics",
+    usedFor: "Cargo insurance documentation",
+    filledBy: "Insurer / forwarder",
+    format: "Reference",
+    source: "Insurer / forwarder issued",
+    statuses: ["Logistics", "Reference only"],
+    actions: ["View details"],
+  },
+  {
+    id: "dangerous-goods-declaration",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Dangerous Goods Declaration",
+    category: "Logistics",
+    usedFor: "Hazardous shipment declaration planning",
+    filledBy: "Shipper / specialist",
+    format: "Reference",
+    source: "Carrier / regulator specific",
+    statuses: ["Logistics", "Category-specific", "Reference only"],
+    actions: ["View details"],
+  },
+  {
+    id: "carton-marking-template",
+    section: "Logistics & Shipping",
+    filter: "Logistics",
+    name: "Carton Marking Template",
+    category: "Logistics",
+    usedFor: "Carton label and warehouse marking planning",
+    filledBy: "Seller / warehouse",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Logistics", "Template"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "coa",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "COA",
+    category: "Compliance",
+    usedFor: "Certificate of analysis request and review",
+    filledBy: "Manufacturer / lab",
+    format: "Reference",
+    source: "Manufacturer / lab issued",
+    statuses: ["Product-specific", "Compliance", "Buyer may request"],
+    actions: ["View details"],
+  },
+  {
+    id: "msds-sds",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "MSDS / SDS",
+    category: "Compliance",
+    usedFor: "Safety data sheet review",
+    filledBy: "Manufacturer",
+    format: "Reference",
+    source: "Manufacturer issued",
+    statuses: ["Product-specific", "Compliance", "Buyer may request"],
+    actions: ["View details"],
+  },
+  {
+    id: "test-report",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "Test Report",
+    category: "Compliance",
+    usedFor: "Product testing evidence review",
+    filledBy: "Lab / manufacturer",
+    format: "Reference",
+    source: "Lab / manufacturer issued",
+    statuses: ["Product-specific", "Compliance", "Buyer may request"],
+    actions: ["View details"],
+  },
+  {
+    id: "fcc-declaration",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "FCC Declaration",
+    category: "Compliance",
+    usedFor: "Electronics compliance declaration planning",
+    filledBy: "Manufacturer / importer",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Product-specific", "Compliance"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "cpsc-cpsia-certificate",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "CPSC / CPSIA Certificate",
+    category: "Compliance",
+    usedFor: "Consumer product certificate planning",
+    filledBy: "Importer / manufacturer",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Product-specific", "Compliance"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "label-compliance-file",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "Label Compliance File",
+    category: "Compliance",
+    usedFor: "Label review packet organization",
+    filledBy: "Seller / importer",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Product-specific", "Compliance"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "certificate-free-sale",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "Certificate of Free Sale",
+    category: "Compliance",
+    usedFor: "Marketability or regulatory support where requested",
+    filledBy: "Manufacturer / authority",
+    format: "Reference",
+    source: "Issuer specific",
+    statuses: ["Product-specific", "Buyer may request"],
+    actions: ["View details"],
+  },
+  {
+    id: "brand-authorization-letter",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "Brand Authorization Letter",
+    category: "Compliance",
+    usedFor: "Brand authorization support",
+    filledBy: "Brand owner",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Product-specific", "Buyer may request"],
+    actions: ["Download template", "View details"],
+  },
+  {
+    id: "product-spec-sheet",
+    section: "Product Compliance",
+    filter: "Compliance",
+    name: "Product Specification Sheet",
+    category: "Compliance",
+    usedFor: "Product attribute and technical detail summary",
+    filledBy: "Seller / manufacturer",
+    format: "Template",
+    source: "Trade82 template",
+    statuses: ["Product-specific", "Buyer may request"],
+    actions: ["Download template", "View details"],
+  },
+];
+
 export function DashboardClient({
   role,
   activeSection = "overview",
@@ -145,7 +721,7 @@ export function DashboardClient({
           {
             label: t("dashboard.followers"),
             value: summary.metrics.followers ?? 0,
-            section: "following",
+            section: "overview",
             icon: "users",
           },
           {
@@ -163,7 +739,7 @@ export function DashboardClient({
           {
             label: t("dashboard.receivedInquiries"),
             value: summary.metrics.receivedInquiries ?? summary.metrics.inquiryCount ?? 0,
-            section: "messages",
+            section: "overview",
             icon: "messages",
           },
           {
@@ -293,6 +869,313 @@ export function DashboardClient({
           emptyText={t("dashboard.noListedProducts")}
         />
       ) : null}
+
+      {role === "seller" && activeSection === "documents" ? (
+        <TradeFormsLibraryPanel />
+      ) : null}
+    </div>
+  );
+}
+
+function TradeFormsLibraryPanel() {
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<FormsLibraryFilter>("All");
+  const [selectedItem, setSelectedItem] = useState<FormLibraryItem | null>(null);
+  const [notice, setNotice] = useState("");
+
+  const filteredItems = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return formsLibraryItems.filter((item) => {
+      const matchesFilter = filter === "All" || item.filter === filter;
+      const searchableText = [
+        item.name,
+        item.section,
+        item.category,
+        item.usedFor,
+        item.filledBy,
+        item.format,
+        item.source,
+        ...item.statuses,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return matchesFilter && (!query || searchableText.includes(query));
+    });
+  }, [filter, search]);
+
+  const groupedItems = formsLibrarySections
+    .map((section) => ({
+      section,
+      items: filteredItems.filter((item) => item.section === section),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  function handleAction(item: FormLibraryItem, action: string) {
+    setSelectedItem(item);
+
+    if (action === "View details") {
+      setNotice("");
+      return;
+    }
+
+    if (action === "Open official form" || action === "Open official guide" || action === "Open official source") {
+      setNotice("Official source link will be available soon.");
+      return;
+    }
+
+    if (action === "Preview") {
+      setNotice("Template preview will be available soon.");
+      return;
+    }
+
+    setNotice("Template file will be available soon.");
+  }
+
+  return (
+    <section className="grid gap-4">
+      <div className="rounded-2xl border p-4 theme-surface-elevated">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] theme-success-text">
+              U.S. Import & Trade Forms Library
+            </p>
+            <h2 className="mt-3 text-xl font-semibold theme-foreground">
+              Documents
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 theme-muted">
+              Access common U.S. import, export, logistics, and compliance forms used in B2B trade.
+            </p>
+          </div>
+          <div
+            className="inline-flex w-fit rounded-xl border p-1 theme-surface-muted"
+            role="tablist"
+            aria-label="Documents tabs"
+          >
+            <button
+              type="button"
+              role="tab"
+              className="h-8 rounded-lg px-3 text-xs font-semibold theme-primary-button"
+              aria-selected="true"
+            >
+              Forms Library
+            </button>
+            <button
+              type="button"
+              role="tab"
+              disabled
+              className="h-8 cursor-not-allowed rounded-lg px-3 text-xs font-medium opacity-55 theme-muted"
+              title="Coming soon"
+              aria-selected="false"
+            >
+              My Documents · Coming soon
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/10 p-3 text-xs leading-5 theme-muted">
+          Forms and templates are provided for workflow support only. Requirements vary by product, importer, shipment, and government agency. Confirm final requirements with your customs broker, freight forwarder, or compliance advisor.
+        </div>
+      </div>
+
+      <div className="rounded-2xl border p-4 theme-surface">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <label className="relative min-w-0 flex-1">
+            <span className="sr-only">Search forms, templates, or agencies</span>
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 theme-muted" aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search forms, templates, or agencies"
+              className="h-10 w-full rounded-xl border pl-9 pr-3 text-sm outline-none theme-input focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {formsLibraryFilters.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => setFilter(item)}
+                className={`h-8 rounded-full border px-3 text-xs font-medium transition ${
+                  filter === item
+                    ? "theme-success-badge"
+                    : "theme-border theme-muted hover:text-[var(--foreground)]"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {notice ? (
+          <p
+            role="status"
+            className="mt-3 rounded-xl border border-emerald-300/20 bg-emerald-300/10 p-3 text-sm font-medium theme-success-text"
+          >
+            {notice}
+          </p>
+        ) : null}
+
+        {selectedItem ? (
+          <div className="mt-3 rounded-xl border p-3 theme-surface-elevated">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] theme-muted">
+                  Details
+                </p>
+                <h3 className="mt-1 text-sm font-semibold theme-foreground">
+                  {selectedItem.name}
+                </h3>
+                <p className="mt-1 text-sm leading-6 theme-muted">
+                  {selectedItem.usedFor}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedItem.statuses.map((status) => (
+                  <span
+                    key={status}
+                    className="rounded-full border px-2 py-1 text-[11px] font-medium theme-border theme-muted"
+                  >
+                    {status}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="grid gap-4">
+        {groupedItems.map((group) => (
+          <section key={group.section} className="rounded-2xl border p-4 theme-surface">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-semibold theme-foreground">
+                  {group.section}
+                </h3>
+                <p className="mt-1 text-xs theme-muted">
+                  {group.items.length} item{group.items.length === 1 ? "" : "s"}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 hidden rounded-xl border px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] theme-surface-muted theme-muted xl:grid xl:grid-cols-[1.25fr_0.75fr_1.1fr_0.85fr_0.7fr_0.9fr_1.05fr] xl:gap-3">
+              <span>Form / Template</span>
+              <span>Category</span>
+              <span>Used for</span>
+              <span>Filled by</span>
+              <span>Format</span>
+              <span>Source</span>
+              <span>Action</span>
+            </div>
+            <div className="mt-2 grid gap-2">
+              {group.items.map((item) => (
+                <FormLibraryRow
+                  key={item.id}
+                  item={item}
+                  onAction={handleAction}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
+        {!groupedItems.length ? (
+          <div className="rounded-2xl border border-dashed p-8 text-center theme-surface-muted">
+            <p className="text-sm font-semibold theme-foreground">
+              No forms found.
+            </p>
+            <p className="mt-2 text-sm theme-muted">
+              Try a different keyword or category filter.
+            </p>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function FormLibraryRow({
+  item,
+  onAction,
+}: {
+  item: FormLibraryItem;
+  onAction: (item: FormLibraryItem, action: string) => void;
+}) {
+  return (
+    <article className="rounded-xl border p-3 theme-surface-elevated">
+      <div className="grid gap-3 xl:grid-cols-[1.25fr_0.75fr_1.1fr_0.85fr_0.7fr_0.9fr_1.05fr] xl:items-center">
+        <div className="min-w-0">
+          <div className="flex min-w-0 items-start gap-2">
+            <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg border theme-border theme-surface-muted">
+              <FileText className="size-3.5 text-[var(--accent-foreground)]" aria-hidden="true" />
+            </span>
+            <div className="min-w-0">
+              <h4 className="text-sm font-semibold theme-foreground">
+                {item.name}
+              </h4>
+              <div className="mt-1 flex flex-wrap gap-1.5 xl:hidden">
+                {item.statuses.map((status) => (
+                  <span
+                    key={status}
+                    className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted"
+                  >
+                    {status}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+        <LibraryCell label="Category" value={item.category} />
+        <LibraryCell label="Used for" value={item.usedFor} />
+        <LibraryCell label="Filled by" value={item.filledBy} />
+        <LibraryCell label="Format" value={item.format} />
+        <LibraryCell label="Source" value={item.source} />
+        <div className="flex flex-wrap gap-2">
+          {item.actions.map((action) => (
+            <button
+              key={action}
+              type="button"
+              onClick={() => onAction(item, action)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5"
+            >
+              {action.startsWith("Open") ? (
+                <ExternalLink className="size-3.5" aria-hidden="true" />
+              ) : action.startsWith("Download") ? (
+                <Download className="size-3.5" aria-hidden="true" />
+              ) : (
+                <Eye className="size-3.5" aria-hidden="true" />
+              )}
+              {action}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="mt-2 hidden flex-wrap gap-1.5 xl:flex">
+        {item.statuses.map((status) => (
+          <span
+            key={status}
+            className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted"
+          >
+            {status}
+          </span>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function LibraryCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] theme-muted xl:hidden">
+        {label}
+      </p>
+      <p className="mt-1 break-words text-xs leading-5 theme-muted xl:mt-0">
+        {value}
+      </p>
     </div>
   );
 }

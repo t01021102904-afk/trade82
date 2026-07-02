@@ -115,16 +115,20 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           },
         ]
       : []),
-    {
-      id: "following",
-      label:
-        role === "seller"
-          ? t("dashboard.dashboardNavFollowers")
-          : t("dashboard.dashboardNavFollowing"),
-    },
-    { id: "messages", label: t("dashboard.dashboardNavMessages") },
+    ...(role === "buyer"
+      ? [
+          {
+            id: "following" as const,
+            label: t("dashboard.dashboardNavFollowing"),
+          },
+          { id: "messages" as const, label: t("dashboard.dashboardNavMessages") },
+        ]
+      : []),
     ...(role === "seller"
-      ? [{ id: "products" as const, label: t("dashboard.dashboardNavProducts") }]
+      ? [
+          { id: "products" as const, label: t("dashboard.dashboardNavProducts") },
+          { id: "documents" as const, label: "Documents" },
+        ]
       : []),
   ];
   const safeActiveSection = navItems.some((item) => item.id === activeSection)
@@ -250,6 +254,7 @@ function parseDashboardSection(
     return value;
   }
   if (role === "seller" && value === "products") return value;
+  if (role === "seller" && value === "documents") return value;
   if (role === "buyer" && value === "saved-products") return value;
   return null;
 }
