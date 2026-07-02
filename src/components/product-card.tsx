@@ -38,14 +38,14 @@ export function ProductCard({ product }: { product: Product }) {
 
       <div className="relative z-10 grid min-w-0 gap-1.5 pt-3">
         <Link href={href} className="min-w-0">
-          <h3 className="line-clamp-2 text-base font-semibold leading-6 theme-foreground transition-colors group-hover:text-[var(--accent-foreground)]">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-5 theme-foreground transition-colors group-hover:text-[var(--accent-foreground)]">
             {product.name}
           </h3>
         </Link>
-        <p className="truncate text-lg font-bold theme-foreground">{product.wholesalePrice}</p>
+        <p className="truncate text-base font-semibold theme-foreground">{product.wholesalePrice}</p>
         <Link
           href={withLocale(`/stores/${product.sellerId}`, locale)}
-          className="flex min-w-0 items-center gap-1.5 text-sm theme-muted hover:text-[var(--accent-foreground)]"
+          className="flex min-w-0 items-center gap-1.5 text-xs theme-muted hover:text-[var(--accent-foreground)]"
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}

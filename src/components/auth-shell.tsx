@@ -27,10 +27,10 @@ export function AuthShell({
           <p className="text-sm font-medium text-blue-700">
             {isLogin ? messages.auth.login : messages.auth.signup}
           </p>
-          <h1 className="mt-3 text-4xl font-semibold text-zinc-950">
+          <h1 className="mt-3 text-3xl font-semibold text-zinc-950">
             {isLogin ? messages.auth.loginTitle : messages.auth.signupTitle}
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-zinc-600">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-zinc-600">
             {isLogin ? messages.auth.loginText : messages.auth.signupText}
           </p>
         </section>

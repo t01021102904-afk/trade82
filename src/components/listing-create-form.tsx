@@ -148,7 +148,7 @@ export function ListingCreateForm() {
             {t("listing.pageLabel")}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-semibold tracking-tight theme-foreground">
+            <h1 className="text-2xl font-semibold tracking-tight theme-foreground">
               {t("listing.createProduct")}
             </h1>
             <StatusPill label={statusMeta.label} tone={statusMeta.tone} />

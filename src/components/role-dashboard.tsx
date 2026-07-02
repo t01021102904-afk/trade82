@@ -168,7 +168,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               <div className="min-w-0">
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <h1
-                    className="truncate text-xl font-semibold theme-foreground"
+                    className="truncate text-lg font-semibold theme-foreground"
                   >
                     {company.tradeName || company.legalName}
                   </h1>
@@ -220,7 +220,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
             <p className="text-sm theme-muted">
               {t("settings.profileCompleteness")}
             </p>
-            <p className="mt-1 text-2xl font-semibold theme-foreground">
+            <p className="mt-1 text-xl font-semibold theme-foreground">
               {completeness}%
             </p>
           </div>

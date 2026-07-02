@@ -315,7 +315,7 @@ function BuyerDiscoveryDashboard({
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
                 {t("dashboard.buyerWorkspace")}
               </p>
-              <h2 className="mt-3 text-2xl font-semibold theme-foreground">
+              <h2 className="mt-3 text-xl font-semibold theme-foreground">
                 {t("dashboard.buyerWelcome", "Welcome")}
                 {profile?.displayName ? `, ${profile.displayName}` : ""}
               </h2>
@@ -329,7 +329,7 @@ function BuyerDiscoveryDashboard({
               <p className="text-xs font-medium text-emerald-100">
                 {t("dashboard.profileCompletion")}
               </p>
-              <p className="mt-1 text-2xl font-semibold theme-foreground">
+              <p className="mt-1 text-xl font-semibold theme-foreground">
                 {profile?.profileCompletion ?? 0}%
               </p>
             </div>
@@ -388,7 +388,7 @@ function BuyerDiscoveryDashboard({
                 className="rounded-xl border p-3 text-left transition theme-surface-muted theme-card-hover"
               >
                 <span className="block text-xs theme-muted">{metric.label}</span>
-                <span className="mt-1 block text-xl font-semibold theme-foreground">
+                <span className="mt-1 block text-lg font-semibold theme-foreground">
                   {metric.value}
                 </span>
               </button>
@@ -400,7 +400,7 @@ function BuyerDiscoveryDashboard({
       <section className="rounded-2xl border p-4 theme-surface">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-lg font-semibold theme-foreground">
+            <h3 className="text-base font-semibold theme-foreground">
               {t("dashboard.productDiscovery")}
             </h3>
             <p className="mt-1 text-sm theme-muted">
@@ -735,7 +735,7 @@ function MetricGrid({
           <span className="block truncate text-xs font-medium uppercase tracking-wide theme-muted">
             {metric.label}
           </span>
-          <span className="mt-2 block truncate text-2xl font-semibold theme-foreground">
+          <span className="mt-2 block truncate text-xl font-semibold theme-foreground">
             {metric.value}
           </span>
           <span className="mt-2 block text-xs font-medium text-blue-700">
@@ -1055,7 +1055,7 @@ function SellerProductsPanel({
           <dt className="truncate text-xs font-medium uppercase tracking-wide theme-muted">
             {t("dashboard.publicProducts")}
           </dt>
-          <dd className="mt-1 text-2xl font-semibold theme-foreground">
+          <dd className="mt-1 text-xl font-semibold theme-foreground">
             {listedCount}
           </dd>
         </div>
@@ -1063,7 +1063,7 @@ function SellerProductsPanel({
           <dt className="truncate text-xs font-medium uppercase tracking-wide theme-muted">
             {t("dashboard.productViews")}
           </dt>
-          <dd className="mt-1 text-2xl font-semibold theme-foreground">
+          <dd className="mt-1 text-xl font-semibold theme-foreground">
             {productViews}
           </dd>
         </div>
@@ -1270,7 +1270,7 @@ function StatPanel({
   return (
     <section className="bm-premium-card min-w-0 rounded-md border p-4 theme-surface">
       <h2 className="truncate text-base font-semibold theme-foreground">{title}</h2>
-      <p className="mt-2 text-2xl font-semibold theme-foreground">{value}</p>
+      <p className="mt-2 text-xl font-semibold theme-foreground">{value}</p>
       {value === 0 ? <div className="mt-3"><Empty text={emptyText} /></div> : null}
     </section>
   );

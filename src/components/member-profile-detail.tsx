@@ -47,11 +47,11 @@ export function MemberSellerDetail({ id }: { id: string }) {
         />
         <div className="grid gap-2">
           <VerificationBadge status="verified" subject="seller" />
-          <h1 className="text-4xl font-semibold text-zinc-950">{seller.name}</h1>
+          <h1 className="text-2xl font-semibold text-zinc-950 sm:text-3xl">{seller.name}</h1>
         </div>
       </div>
       <p className="text-sm text-zinc-500">{seller.location}</p>
-      <p className="max-w-3xl text-base leading-7 text-zinc-600">
+      <p className="max-w-3xl text-sm leading-6 text-zinc-600">
         {seller.description}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -103,11 +103,11 @@ export function MemberBuyerDetail({ id }: { id: string }) {
         />
         <div className="grid gap-2">
           <VerificationBadge status="verified" subject="buyer" />
-          <h1 className="text-4xl font-semibold text-zinc-950">{buyer.name}</h1>
+          <h1 className="text-2xl font-semibold text-zinc-950 sm:text-3xl">{buyer.name}</h1>
         </div>
       </div>
       <p className="text-sm text-zinc-500">{buyer.location}</p>
-      <p className="max-w-3xl text-base leading-7 text-zinc-600">
+      <p className="max-w-3xl text-sm leading-6 text-zinc-600">
         {buyer.marketStrategy}
       </p>
       <div className="flex flex-wrap gap-2">

@@ -17,9 +17,9 @@ export function SectionHeader({
         {label ? (
           <p className="mb-2 text-sm font-medium text-blue-700">{label}</p>
         ) : null}
-        <h2 className="break-words text-2xl font-semibold theme-foreground sm:text-3xl">{title}</h2>
+        <h2 className="break-words text-xl font-semibold theme-foreground sm:text-2xl">{title}</h2>
         {description ? (
-          <p className="mt-3 text-base leading-7 theme-muted">{description}</p>
+          <p className="mt-2 text-sm leading-6 theme-muted">{description}</p>
         ) : null}
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}

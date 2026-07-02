@@ -357,7 +357,7 @@ export function ProductEditor({
             {t("listing.pageLabel")}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h2 className="text-2xl font-semibold tracking-tight text-white">
+            <h2 className="text-xl font-semibold tracking-tight text-white">
               {t("listing.editProduct")}
             </h2>
             <EditorStatusPill label={status.label} tone={status.tone} />

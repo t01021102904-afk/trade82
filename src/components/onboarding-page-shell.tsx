@@ -22,11 +22,11 @@ export function OnboardingPageShell({
           ) : null}
           <div className="grid gap-3 lg:grid-cols-[minmax(0,0.75fr)_minmax(280px,0.25fr)] lg:items-end">
             <div className="min-w-0">
-              <h1 className="break-words text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              <h1 className="break-words text-2xl font-semibold tracking-tight text-white sm:text-3xl">
                 {title}
               </h1>
               {description ? (
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400 sm:text-base sm:leading-7">
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-400">
                   {description}
                 </p>
               ) : null}

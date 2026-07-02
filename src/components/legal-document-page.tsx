@@ -29,7 +29,7 @@ export function LegalDocumentPage({
 
   return (
     <div className="bg-zinc-50">
-      <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-5xl gap-7 px-4 py-8 sm:px-6 lg:px-8">
         <nav
           aria-label={locale === "ko" ? "약관 문서" : "Legal documents"}
           className="flex flex-wrap gap-2 text-sm"
@@ -56,13 +56,13 @@ export function LegalDocumentPage({
           })}
         </nav>
 
-        <article className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm shadow-zinc-100 sm:p-8">
-          <div className="border-b border-zinc-200 pb-6">
+        <article className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm shadow-zinc-100 sm:p-7">
+          <div className="border-b border-zinc-200 pb-5">
             <p className="text-sm font-semibold text-blue-700">Trade82</p>
-            <h1 className="mt-3 break-words text-3xl font-semibold tracking-normal text-zinc-950 sm:text-4xl">
+            <h1 className="mt-3 break-words text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl">
               {document.title}
             </h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-zinc-600">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">
               {document.description}
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
@@ -80,10 +80,10 @@ export function LegalDocumentPage({
             </div>
           </div>
 
-          <div className="mt-8 grid gap-8">
+          <div className="mt-7 grid gap-7">
             {document.sections.map((section) => (
               <section key={section.title} className="grid gap-3">
-                <h2 className="break-words text-xl font-semibold text-zinc-950">
+                <h2 className="break-words text-lg font-semibold text-zinc-950">
                   {section.title}
                 </h2>
                 {section.paragraphs?.map((paragraph) => (

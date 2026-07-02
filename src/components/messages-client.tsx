@@ -449,7 +449,7 @@ export function MessagesClient({
   }
 
   if (!threads.length) {
-    return <div className="rounded-lg border border-dashed p-10 text-center theme-surface"><h2 className="text-xl font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div>;
+    return <div className="rounded-lg border border-dashed p-8 text-center theme-surface"><h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div>;
   }
 
   return (
@@ -463,8 +463,8 @@ export function MessagesClient({
       </aside>
       {selected ? (
         <section className="flex min-h-0 flex-col">
-          <header className="shrink-0 border-b theme-border p-5">
-            <h2 className="text-xl font-semibold theme-foreground">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
+          <header className="shrink-0 border-b theme-border p-4">
+            <h2 className="text-lg font-semibold theme-foreground">{selected.product?.name || getInquiryLabel(selected, t)}</h2>
             <CounterpartyProfileLink company={getCounterparty(selected)} />
             {selected.product ? <p className="mt-2 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
             <DealControls

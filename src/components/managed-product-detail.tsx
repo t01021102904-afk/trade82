@@ -32,7 +32,7 @@ export function ManagedProductDetail({ id }: { id: string }) {
 
   return (
     <div className="bg-zinc-50">
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div
           className="min-h-[420px] rounded-lg bg-zinc-100 bg-cover bg-center"
           style={{ backgroundImage: `url(${product.imagePlaceholder})` }}
@@ -45,8 +45,8 @@ export function ManagedProductDetail({ id }: { id: string }) {
             {managedProduct?.exportReady ? <Badge tone="blue">Export Ready</Badge> : null}
           </div>
           <p className="mt-5 text-sm font-medium text-blue-700">{product.category}</p>
-          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">{product.name}</h1>
-          <p className="mt-4 leading-7 text-zinc-600">{product.longDescription}</p>
+          <h1 className="mt-2 text-2xl font-semibold text-zinc-950 sm:text-3xl">{product.name}</h1>
+          <p className="mt-3 text-sm leading-6 text-zinc-600">{product.longDescription}</p>
           <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
             <Detail label="Price" value={product.wholesalePrice} />
             <Detail label="MOQ" value={product.moq} />

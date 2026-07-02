@@ -12,7 +12,7 @@ export default async function KoBuyerDashboardPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
             {messages.dashboard.label}
           </p>
-          <h1 className="mt-3 text-3xl font-semibold theme-foreground">
+          <h1 className="mt-3 text-2xl font-semibold theme-foreground">
             {messages.settings.buyerDashboard}
           </h1>
           <p className="mt-3 text-sm leading-6 theme-muted">

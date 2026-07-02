@@ -150,8 +150,8 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
   return (
     <div className="bg-zinc-50">
       <ViewTracker id={company.id} type="company" />
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6">
-        <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-6 sm:flex-row">
+      <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6">
+        <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 sm:flex-row">
           <CompanyLogo
             companyName={company.tradeName || company.legalName}
             logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? company.logoOriginalUrl ?? undefined}
@@ -167,7 +167,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
           <div className="min-w-0">
             <VerificationBadge status={company.verificationStatus} subject={company.companyRole} />
             <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-              <h1 className="break-words text-4xl font-semibold text-zinc-950">{company.tradeName || company.legalName}</h1>
+              <h1 className="break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{company.tradeName || company.legalName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
             </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
@@ -180,14 +180,14 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
           <SellerProfileDetail company={company} />
         )}
         <section>
-          <h2 className="text-xl font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
+          <h2 className="text-lg font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
           <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length}</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             {company.reviewsReceived.map((review) => <ReviewCard key={review.id} review={review} />)}
           </div>
         </section>
         <CompanyReviewsSection companyId={company.id} companyRole={company.companyRole} />
-        {companyProducts.length ? <section className="min-w-0"><h2 className="mb-4 text-xl font-semibold text-zinc-950">Products</h2><div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">{companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div></section> : null}
+        {companyProducts.length ? <section className="min-w-0"><h2 className="mb-4 text-lg font-semibold text-zinc-950">Products</h2><div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">{companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div></section> : null}
       </div>
     </div>
   );
@@ -224,13 +224,13 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
       <div className="grid gap-6">
         {rows.length ? (
           <div>
-            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("buyer.requirements")}</h2>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("buyer.requirements")}</h2>
             <DetailTable rows={rows} />
           </div>
         ) : null}
         {company.description.trim() ? (
           <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <h2 className="text-xl font-semibold text-zinc-950">{t("buyer.marketStrategy")}</h2>
+            <h2 className="text-lg font-semibold text-zinc-950">{t("buyer.marketStrategy")}</h2>
             <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
           </div>
         ) : null}
@@ -278,19 +278,19 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
       <div className="grid gap-6">
         {companyRows.length ? (
           <div>
-            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("company.profile")}</h2>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("company.profile")}</h2>
             <DetailTable rows={companyRows} />
           </div>
         ) : null}
         {company.description.trim() ? (
           <div className="rounded-lg border border-zinc-200 bg-white p-5">
-            <h2 className="text-xl font-semibold text-zinc-950">{t("company.about")}</h2>
+            <h2 className="text-lg font-semibold text-zinc-950">{t("company.about")}</h2>
             <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
           </div>
         ) : null}
         {capabilityRows.length ? (
           <div>
-            <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("company.capabilities")}</h2>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("company.capabilities")}</h2>
             <DetailTable rows={capabilityRows} />
           </div>
         ) : null}
@@ -322,7 +322,7 @@ function BadgeList({
 }) {
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-5">
-      <h2 className="text-xl font-semibold text-zinc-950">{title}</h2>
+      <h2 className="text-lg font-semibold text-zinc-950">{title}</h2>
       <div className="mt-4 flex flex-wrap gap-2">
         {values.map((value) => (
           <Badge key={value} tone={tone}>
@@ -468,7 +468,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   return (
     <div className="bg-zinc-50">
       <ViewTracker id={id} type="product" />
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:px-8">
         <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[0.9fr_1.1fr]">
           <ProductImageGallery
             images={product.imageUrls ?? [product.imagePlaceholder]}
@@ -478,7 +478,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             <div className="min-w-0">
               <VerificationBadge status={product.verificationStatus ?? "verified"} subject="seller" />
               <p className="mt-5 break-words text-sm font-medium text-blue-700">{product.category}</p>
-              <h1 className="mt-2 break-words text-4xl font-semibold text-zinc-950">{product.name}</h1>
+              <h1 className="mt-2 break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{product.name}</h1>
               <p className="mt-4 max-w-2xl break-words text-base leading-7 text-zinc-600">
                 {product.shortDescription || product.longDescription}
               </p>
@@ -566,7 +566,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg border border-zinc-200 bg-white p-5">
               <p className="text-sm text-zinc-500">{label}</p>
-              <p className="mt-2 break-words text-xl font-semibold text-zinc-950">{value}</p>
+              <p className="mt-2 break-words text-lg font-semibold text-zinc-950">{value}</p>
             </div>
           ))}
         </section>
@@ -585,7 +585,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
         <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="grid gap-6">
             <div className="rounded-lg border border-zinc-200 bg-white p-5">
-              <h2 className="text-xl font-semibold text-zinc-950">{t("productDetail.overview")}</h2>
+              <h2 className="text-lg font-semibold text-zinc-950">{t("productDetail.overview")}</h2>
               <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
                 {product.longDescription || notProvided}
               </p>
@@ -597,7 +597,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
 
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("productDetail.tradeDetails")}</h2>
+              <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("productDetail.tradeDetails")}</h2>
               <DetailTable
                 rows={compactRows([
                   { label: t("productDetail.wholesalePrice"), value: price },
@@ -625,7 +625,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
 
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-zinc-950">
+              <h2 className="mb-3 text-lg font-semibold text-zinc-950">
                 {t("productDetail.complianceDocuments")}
               </h2>
               <DetailTable
@@ -641,7 +641,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
 
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-zinc-950">
+              <h2 className="mb-3 text-lg font-semibold text-zinc-950">
                 {t("productDetail.packagingLogistics")}
               </h2>
               <DetailTable
@@ -660,7 +660,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
 
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-zinc-950">{t("productDetail.buyerReviews")}</h2>
+              <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("productDetail.buyerReviews")}</h2>
               {reviews.length ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
@@ -682,7 +682,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   useDefaultLogo={product.sellerUseDefaultLogo ?? true}
                   size="sm"
                 />
-                <h2 className="text-xl font-semibold text-zinc-950">{t("productDetail.sellerInformation")}</h2>
+                <h2 className="text-lg font-semibold text-zinc-950">{t("productDetail.sellerInformation")}</h2>
               </div>
               <p className="mt-3 text-sm leading-6 text-zinc-600">
                 {String(sellerCompanyRef?.description ?? sellerCompany?.description ?? "") || product.sellerName}
@@ -722,7 +722,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
 
         {relatedProducts.length ? (
           <section className="grid gap-5">
-            <h2 className="text-xl font-semibold text-zinc-950">
+            <h2 className="text-lg font-semibold text-zinc-950">
               {t("productDetail.moreFromSeller")}
             </h2>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">

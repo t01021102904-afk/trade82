@@ -995,7 +995,7 @@ function BuyerQuickSignupForm({
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">
           {t("onboarding.buyerQuickLabel")}
         </p>
-        <h2 className="text-2xl font-semibold text-white">
+        <h2 className="text-xl font-semibold text-white">
           {t("onboarding.buyerQuickTitle")}
         </h2>
         <p className="max-w-2xl text-sm leading-6 text-zinc-400">
@@ -1667,7 +1667,7 @@ function StepHeading({
 }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-zinc-950">{title}</h2>
+      <h2 className="text-lg font-semibold text-zinc-950">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-zinc-600">{description}</p>
     </div>
   );

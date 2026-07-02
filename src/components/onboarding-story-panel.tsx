@@ -49,7 +49,7 @@ export function OnboardingStoryPanel({
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
               Trade82
             </p>
-            <h2 className="mt-2 text-xl font-semibold text-white">
+            <h2 className="mt-2 text-lg font-semibold text-white">
               {t("onboarding.processTitle")}
             </h2>
           </div>

@@ -16,7 +16,7 @@ export function BuyerCard({ buyer }: { buyer: Buyer }) {
   const notProvided = t("common.notProvided");
 
   return (
-    <article className="bm-premium-card flex h-full min-w-0 flex-col rounded-lg border p-5 theme-surface">
+    <article className="bm-premium-card flex h-full min-w-0 flex-col rounded-lg border p-4 theme-surface">
       <div className="relative z-10 flex min-w-0 items-start gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <CompanyLogo
@@ -28,7 +28,7 @@ export function BuyerCard({ buyer }: { buyer: Buyer }) {
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-1.5">
               <Link href={withLocale(`/buyers/${buyer.id}`, locale)} className="min-w-0">
-              <h3 className="truncate text-lg font-semibold theme-foreground transition hover:text-[var(--accent-foreground)]">
+              <h3 className="truncate text-base font-semibold theme-foreground transition hover:text-[var(--accent-foreground)]">
                 {buyer.name}
               </h3>
             </Link>
@@ -41,7 +41,7 @@ export function BuyerCard({ buyer }: { buyer: Buyer }) {
         </div>
       </div>
 
-      <dl className="relative z-10 mt-5 grid min-w-0 grid-cols-2 gap-3 text-sm">
+      <dl className="relative z-10 mt-4 grid min-w-0 grid-cols-2 gap-3 text-sm">
         <div className="min-w-0">
           <dt className="truncate theme-muted">{t("buyers.buyerType")}</dt>
           <dd className="line-clamp-2 break-words font-medium theme-foreground">{buyer.buyerType || notProvided}</dd>
@@ -79,7 +79,7 @@ export function BuyerCard({ buyer }: { buyer: Buyer }) {
           : notProvided}
       </p>
 
-      <div className="relative z-10 mt-auto grid gap-2 pt-5 sm:grid-cols-2">
+      <div className="relative z-10 mt-auto grid gap-2 pt-4 sm:grid-cols-2">
         <Link
           href={withLocale(`/buyers/${buyer.id}`, locale)}
           className="inline-flex items-center justify-center rounded-md border px-3.5 py-2 text-sm font-medium transition theme-secondary-button"

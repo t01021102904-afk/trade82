@@ -66,16 +66,16 @@ export function HomeExperience({ locale }: { locale: Locale }) {
           className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-emerald-400/10 blur-3xl"
           aria-hidden="true"
         />
-        <div className="relative mx-auto grid min-h-[720px] max-w-7xl items-center gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:px-8">
+        <div className="relative mx-auto grid min-h-[680px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:px-8">
           <div className="bm-section-in min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
               <span className="bm-pulse-dot size-2 rounded-full bg-emerald-300" />
               {messages.home.heroBadge}
             </div>
-            <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-tight tracking-normal theme-foreground sm:text-6xl">
+            <h1 className="mt-5 max-w-4xl text-[2rem] font-semibold leading-tight tracking-normal theme-foreground sm:text-5xl">
               {messages.home.headline}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-8 theme-muted sm:text-lg">
+            <p className="mt-5 max-w-2xl text-sm leading-7 theme-muted sm:text-base">
               {messages.home.subheadline}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -103,12 +103,12 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       </section>
 
       <section className="border-y theme-border theme-surface-muted">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-14 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-          <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 p-6">
+        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-12 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+          <div className="rounded-3xl border border-emerald-300/20 bg-emerald-300/10 p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
               {messages.home.earlyPartnerEyebrow}
             </p>
-            <h2 className="mt-4 max-w-xl text-3xl font-semibold theme-foreground">
+            <h2 className="mt-4 max-w-xl text-2xl font-semibold theme-foreground">
               {messages.home.earlyPartnerTitle}
             </h2>
             <p className="mt-4 text-sm leading-6 text-emerald-50/80">
@@ -122,7 +122,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
                 href={card.href}
                 className="group rounded-3xl border p-5 transition hover:-translate-y-0.5 theme-surface-elevated theme-card-hover"
               >
-                <div className="mb-8 flex items-center justify-between">
+                <div className="mb-6 flex items-center justify-between">
                   <span className="rounded-full border px-3 py-1 text-xs font-medium theme-border theme-muted">
                     Trade82
                   </span>
@@ -130,7 +130,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
                     {card.action}
                   </span>
                 </div>
-                <h3 className="text-xl font-semibold theme-foreground">{card.title}</h3>
+                <h3 className="text-lg font-semibold theme-foreground">{card.title}</h3>
                 <p className="mt-3 text-sm leading-6 theme-muted">{card.description}</p>
               </Link>
             ))}
@@ -138,11 +138,11 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <SectionEyebrow label={messages.home.featureGridEyebrow} />
         <div className="mt-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="max-w-3xl text-3xl font-semibold theme-foreground sm:text-4xl">
+            <h2 className="max-w-3xl text-2xl font-semibold theme-foreground sm:text-3xl">
               {messages.home.featureGridTitle}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 theme-muted">
@@ -166,9 +166,9 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       </section>
 
       <section className="border-y theme-border theme-surface-muted">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
           <SectionEyebrow label={messages.home.howItWorks} />
-          <h2 className="mt-4 max-w-3xl text-3xl font-semibold theme-foreground sm:text-4xl">
+          <h2 className="mt-4 max-w-3xl text-2xl font-semibold theme-foreground sm:text-3xl">
             {messages.home.howTitle}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 theme-muted">
@@ -195,13 +195,13 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="rounded-3xl border p-6 theme-surface-elevated sm:p-8 lg:flex lg:items-center lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
               {messages.home.ctaEyebrow}
             </p>
-            <h2 className="mt-4 text-3xl font-semibold theme-foreground">
+            <h2 className="mt-4 text-2xl font-semibold theme-foreground">
               {messages.home.ctaTitle}
             </h2>
             <p className="mt-3 text-sm leading-6 theme-muted">
@@ -231,7 +231,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
 function MetricPill({ value, label }: { value: string; label: string }) {
   return (
     <div className="rounded-2xl border p-4 theme-surface-muted">
-      <p className="text-3xl font-semibold theme-foreground">{value}</p>
+      <p className="text-2xl font-semibold theme-foreground">{value}</p>
       <p className="mt-1 text-xs leading-5 theme-muted">{label}</p>
     </div>
   );
@@ -272,7 +272,7 @@ function FeatureCard({
           <span className="h-2 w-2/3 rounded-full bg-[var(--muted)]" />
         </div>
       </div>
-      <h3 className="text-lg font-semibold theme-foreground">{feature.title}</h3>
+      <h3 className="text-base font-semibold theme-foreground">{feature.title}</h3>
       <p className="mt-3 text-sm leading-6 theme-muted">{feature.description}</p>
     </article>
   );

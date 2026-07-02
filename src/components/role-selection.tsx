@@ -169,7 +169,7 @@ export function RoleSelection() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">
               {t("onboarding.pathPickerLabel")}
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-xl font-semibold text-white">
               {t("onboarding.pathPickerTitle")}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
@@ -208,7 +208,7 @@ export function RoleSelection() {
                         {t(card.eyebrowKey)}
                       </span>
                     </div>
-                    <h2 className="mt-5 text-xl font-semibold text-white">
+                    <h2 className="mt-5 text-lg font-semibold text-white">
                       {t(card.titleKey)}
                     </h2>
                     <p className="mt-3 text-sm leading-6 text-zinc-400">
