@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  Building2,
+  ClipboardCheck,
+  Eye,
+  Handshake,
+  MessageCircle,
+  ShoppingBag,
+  Star,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
@@ -76,6 +87,28 @@ type Metric = {
   label: string;
   value: string | number;
   section: DashboardSection;
+  icon: MetricIconKey;
+};
+
+type MetricIconKey =
+  | "users"
+  | "productViews"
+  | "companyViews"
+  | "messages"
+  | "deals"
+  | "reviews"
+  | "products"
+  | "rating";
+
+const metricIcons: Record<MetricIconKey, LucideIcon> = {
+  users: Users,
+  productViews: Eye,
+  companyViews: Building2,
+  messages: MessageCircle,
+  deals: Handshake,
+  reviews: ClipboardCheck,
+  products: ShoppingBag,
+  rating: Star,
 };
 
 export function DashboardClient({
@@ -104,6 +137,8 @@ export function DashboardClient({
   const recentSavedItems = summary.recentSavedItems ?? [];
   const savedProducts = recentSavedItems.filter((item) => item.type === "product");
   const followingCompanies = recentSavedItems.filter((item) => item.type === "company");
+  const reviewCount = summary.metrics.reviewCount ?? 0;
+  const averageRating = Number(summary.metrics.averageRating ?? 0).toFixed(1);
   const metrics: Metric[] =
     role === "seller"
       ? [
@@ -111,46 +146,49 @@ export function DashboardClient({
             label: t("dashboard.followers"),
             value: summary.metrics.followers ?? 0,
             section: "following",
+            icon: "users",
           },
           {
             label: t("dashboard.productViews"),
             value: summary.metrics.productViews ?? 0,
             section: "products",
+            icon: "productViews",
           },
           {
             label: t("dashboard.companyViews"),
             value: summary.metrics.companyViews ?? 0,
             section: "overview",
+            icon: "companyViews",
           },
           {
             label: t("dashboard.receivedInquiries"),
             value: summary.metrics.receivedInquiries ?? summary.metrics.inquiryCount ?? 0,
             section: "messages",
+            icon: "messages",
           },
           {
             label: t("dashboard.completedDeals"),
             value: summary.metrics.completedDeals ?? 0,
             section: "overview",
+            icon: "deals",
           },
           {
             label: t("dashboard.reviewRequests"),
             value: summary.metrics.reviewRequests ?? 0,
             section: "overview",
+            icon: "reviews",
           },
           {
             label: t("dashboard.publicProducts"),
             value: summary.metrics.listedProductCount ?? 0,
             section: "products",
-          },
-          {
-            label: t("dashboard.reviewCount"),
-            value: summary.metrics.reviewCount ?? 0,
-            section: "overview",
+            icon: "products",
           },
           {
             label: t("dashboard.averageRating"),
-            value: Number(summary.metrics.averageRating ?? 0).toFixed(1),
+            value: `${averageRating} (${reviewCount})`,
             section: "overview",
+            icon: "rating",
           },
         ]
       : [
@@ -158,31 +196,37 @@ export function DashboardClient({
             label: t("dashboard.savedProducts"),
             value: summary.metrics.savedProducts ?? 0,
             section: "saved-products",
+            icon: "products",
           },
           {
             label: t("dashboard.savedCompanies"),
             value: summary.metrics.savedCompanies ?? 0,
             section: "following",
+            icon: "companyViews",
           },
           {
             label: t("dashboard.sentInquiries"),
             value: summary.metrics.sentInquiries ?? summary.metrics.inquiryCount ?? 0,
             section: "messages",
+            icon: "messages",
           },
           {
             label: t("dashboard.completedDeals"),
             value: summary.metrics.completedDeals ?? 0,
             section: "overview",
+            icon: "deals",
           },
           {
             label: t("dashboard.reviewRequests"),
             value: summary.metrics.reviewRequests ?? 0,
             section: "overview",
+            icon: "reviews",
           },
           {
             label: t("dashboard.recentMessages"),
             value: recentInquiries.length,
             section: "messages",
+            icon: "messages",
           },
         ];
 
@@ -387,7 +431,10 @@ function BuyerDiscoveryDashboard({
                 onClick={() => onSectionChange?.(metric.section)}
                 className="rounded-xl border p-3 text-left transition theme-surface-muted theme-card-hover"
               >
-                <span className="block text-xs theme-muted">{metric.label}</span>
+                <span className="flex min-w-0 items-center gap-2 text-xs theme-muted">
+                  <MetricIcon icon={metric.icon} />
+                  <span className="truncate">{metric.label}</span>
+                </span>
                 <span className="mt-1 block text-lg font-semibold theme-foreground">
                   {metric.value}
                 </span>
@@ -732,8 +779,9 @@ function MetricGrid({
           onClick={() => onSectionChange?.(metric.section)}
           className="bm-premium-card min-w-0 rounded-md border p-3 text-left transition theme-surface theme-card-hover"
         >
-          <span className="block truncate text-xs font-medium uppercase tracking-wide theme-muted">
-            {metric.label}
+          <span className="flex min-w-0 items-center gap-2 text-xs font-medium uppercase tracking-wide theme-muted">
+            <MetricIcon icon={metric.icon} />
+            <span className="truncate">{metric.label}</span>
           </span>
           <span className="mt-2 block truncate text-xl font-semibold theme-foreground">
             {metric.value}
@@ -744,6 +792,16 @@ function MetricGrid({
         </button>
       ))}
     </section>
+  );
+}
+
+function MetricIcon({ icon }: { icon: MetricIconKey }) {
+  const Icon = metricIcons[icon];
+
+  return (
+    <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border theme-border theme-surface-muted">
+      <Icon className="size-4 text-[var(--accent-foreground)]" aria-hidden="true" />
+    </span>
   );
 }
 
