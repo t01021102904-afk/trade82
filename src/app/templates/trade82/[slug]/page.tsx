@@ -41,17 +41,58 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
   if (!template) notFound();
 
   return (
-    <main className="trade82-template-screen min-h-screen bg-[#f4f6f3] px-4 py-6 text-[#111827] sm:px-6 lg:px-8">
+    <main className="trade82-template-screen min-h-screen bg-white px-4 py-6 text-[#111827] sm:px-6 lg:px-8">
       <style>{`
+        html:has(.trade82-template-screen),
+        body:has(.trade82-template-screen) {
+          background: #ffffff !important;
+          color: #111827 !important;
+          color-scheme: light !important;
+        }
+
+        .trade82-template-screen,
+        .trade82-template-screen * {
+          color-scheme: light !important;
+        }
+
+        .trade82-template-screen {
+          background: #ffffff !important;
+          color: #111827 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .trade82-template-page {
+          background: #ffffff !important;
+          color: #111827 !important;
+        }
+
         @media print {
+          html,
+          body,
+          body:has(.trade82-template-screen) {
+            background: #ffffff !important;
+            color: #111827 !important;
+            color-scheme: light !important;
+          }
+
           body > header,
           body > footer {
             display: none !important;
           }
 
-          body,
-          .trade82-template-screen {
+          .trade82-template-screen,
+          .trade82-template-page,
+          .trade82-template-section,
+          .trade82-template-section label,
+          .trade82-template-section span,
+          .trade82-template-section p,
+          .trade82-template-section h2,
+          .trade82-template-page table,
+          .trade82-template-page th,
+          .trade82-template-page td {
             background: #ffffff !important;
+            color: #111827 !important;
           }
 
           .trade82-template-screen {
@@ -72,6 +113,20 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
 
           .trade82-template-section {
             break-inside: avoid;
+          }
+
+          .trade82-template-field,
+          .trade82-template-notes,
+          .trade82-template-table,
+          .trade82-template-box {
+            background: #ffffff !important;
+            border-color: #d1d5db !important;
+          }
+
+          .trade82-template-table thead,
+          .trade82-template-table th {
+            background: #eef3ef !important;
+            color: #111827 !important;
           }
 
           @page {
@@ -116,7 +171,7 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
               {template.description}
             </p>
           </div>
-          <div className="rounded-xl border border-[#d1d5db] p-4 text-right">
+          <div className="trade82-template-box rounded-xl border border-[#d1d5db] bg-white p-4 text-right">
             <p className="text-2xl font-semibold tracking-tight text-[#111827]">
               Trade82
             </p>
@@ -151,7 +206,7 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
         ))}
 
         {template.declaration ? (
-          <section className="trade82-template-section mt-6 rounded-xl border border-[#d1d5db] p-4">
+          <section className="trade82-template-section trade82-template-box mt-6 rounded-xl border border-[#d1d5db] bg-white p-4">
             <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#111827]">
               Declaration
             </h2>
@@ -162,11 +217,11 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
         ) : null}
 
         {template.notesLabel ? (
-          <section className="trade82-template-section mt-6 rounded-xl border border-[#d1d5db] p-4">
+          <section className="trade82-template-section trade82-template-box mt-6 rounded-xl border border-[#d1d5db] bg-white p-4">
             <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#111827]">
               {template.notesLabel}
             </h2>
-            <div className="mt-3 h-24 rounded-lg border border-dashed border-[#cbd5e1]" />
+            <div className="trade82-template-notes mt-3 h-24 rounded-lg border border-dashed border-[#cbd5e1] bg-white" />
           </section>
         ) : null}
 
@@ -194,7 +249,7 @@ export default async function Trade82TemplateRoute({ params }: TemplateRouteProp
 
 function FieldSection({ section }: { section: TemplateSection }) {
   return (
-    <section className="trade82-template-section rounded-xl border border-[#d1d5db] p-4">
+    <section className="trade82-template-section trade82-template-box rounded-xl border border-[#d1d5db] bg-white p-4">
       <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#111827]">
         {section.title}
       </h2>
@@ -213,7 +268,7 @@ function FieldBox({ label }: { label: string }) {
       <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6b7280]">
         {label}
       </span>
-      <span className="mt-1 block h-9 rounded-lg border border-[#d1d5db] bg-[#fbfcfb]" />
+      <span className="trade82-template-field mt-1 block h-9 rounded-lg border border-[#d1d5db] bg-white" />
     </label>
   );
 }
@@ -224,7 +279,7 @@ function TemplateTableBlock({ table }: { table: TemplateTable }) {
       <h2 className="text-sm font-semibold uppercase tracking-[0.08em] text-[#111827]">
         {table.title}
       </h2>
-      <div className="mt-3 overflow-hidden rounded-xl border border-[#d1d5db]">
+      <div className="trade82-template-table mt-3 overflow-hidden rounded-xl border border-[#d1d5db] bg-white">
         <table className="w-full border-collapse text-left text-xs text-[#111827]">
           <thead className="bg-[#eef3ef]">
             <tr>
