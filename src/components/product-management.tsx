@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
 import { Badge } from "@/components/badge";
+import type { ListingImageUploadState } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import { ProductImage } from "@/components/product-image";
 import {
@@ -252,11 +253,16 @@ export function ProductEditor({
   const [product, setProduct] = useState<RichProductFormValue>(() =>
     formFromProductRecord(initialProduct),
   );
-  const [uploading, setUploading] = useState(false);
+  const [imageUploadState, setImageUploadState] =
+    useState<ListingImageUploadState>({
+      uploading: false,
+      failed: false,
+    });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<ProductEditorErrors>({});
   const [dirty, setDirty] = useState(false);
   const leaveMessage = t("settings.unsavedChangesWarning");
+  const uploading = imageUploadState.uploading;
   const confirmLeave = useUnsavedChangesWarning(
     dirty && !saving && !uploading,
     leaveMessage,
@@ -288,15 +294,31 @@ export function ProductEditor({
     discardDraft();
   }
 
-  function validate() {
-    const nextErrors: ProductEditorErrors = validateRichProductForm(product, t);
+  function imageUploadFailedMessage() {
+    return locale === "ko"
+      ? "실패한 이미지 업로드를 삭제하거나 다시 시도한 뒤 공개해 주세요."
+      : "Remove failed image uploads or retry them before publishing.";
+  }
+
+  function validate(status?: "active" | "draft") {
+    const nextStatus = status ?? product.status;
+    const publishing = nextStatus === "active";
+    const nextErrors: ProductEditorErrors = validateRichProductForm(product, t, {
+      requireImages: publishing,
+    });
+    if (publishing && imageUploadState.uploading) {
+      nextErrors.images = t("listing.imageUploadInProgress");
+    }
+    if (publishing && imageUploadState.failed) {
+      nextErrors.images = imageUploadFailedMessage();
+    }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
   async function saveProduct(status?: "active" | "draft") {
     if (saving) return;
-    if (!validate()) return;
+    if (!validate(status)) return;
 
     setSaving(true);
     setErrors({});
@@ -384,13 +406,17 @@ export function ProductEditor({
           </Link>
           <button
             type="button"
-            disabled={saving}
+            disabled={saving || uploading}
             onClick={() => void saveProduct("active")}
             className={editorSecondaryActionClass}
           >
             {saving ? t("settings.saving") : t("listing.publishProduct")}
           </button>
-          <button type="submit" disabled={saving} className={editorPrimaryActionClass}>
+          <button
+            type="submit"
+            disabled={saving || (product.status === "active" && uploading)}
+            className={editorPrimaryActionClass}
+          >
             {saving ? t("settings.saving") : t("listing.updateProduct")}
           </button>
         </div>
@@ -431,7 +457,13 @@ export function ProductEditor({
         value={product}
         errors={errors}
         onChange={update}
-        onUploadingChange={setUploading}
+        onUploadingChange={(nextUploading) =>
+          setImageUploadState((current) => ({
+            ...current,
+            uploading: nextUploading,
+          }))
+        }
+        onImageUploadStateChange={setImageUploadState}
         variant="dashboard"
       />
       <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">

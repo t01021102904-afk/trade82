@@ -1,6 +1,9 @@
 "use client";
 
-import { ListingImageUploader } from "@/components/image-uploader";
+import {
+  ListingImageUploader,
+  type ListingImageUploadState,
+} from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
   formatMoqValue,
@@ -429,6 +432,7 @@ export function RichProductFormFields({
   errors = {},
   onChange,
   onUploadingChange,
+  onImageUploadStateChange,
   variant = "default",
 }: {
   value: RichProductFormValue;
@@ -438,6 +442,7 @@ export function RichProductFormFields({
     nextValue: RichProductFormValue[K],
   ) => void;
   onUploadingChange: (uploading: boolean) => void;
+  onImageUploadStateChange?: (state: ListingImageUploadState) => void;
   variant?: ProductFormVariant;
 }) {
   const { locale, t } = useI18n();
@@ -475,6 +480,7 @@ export function RichProductFormFields({
             value={value.images}
             onChange={(images) => onChange("images", images)}
             onUploadingChange={onUploadingChange}
+            onUploadStateChange={onImageUploadStateChange}
             variant={variant}
           />
           {errors.images ? <ErrorText>{errors.images}</ErrorText> : null}
