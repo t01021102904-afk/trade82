@@ -16,15 +16,7 @@ import {
   useDraftBackup,
   useUnsavedChangesWarning,
 } from "@/hooks/use-form-reliability";
-import {
-  getLeadTimeOptions,
-  getSalesChannelOptions,
-} from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
-import {
-  normalizeProductFieldVisibility,
-  type ProductFieldVisibilityKey,
-} from "@/lib/product-field-visibility";
 import { cx } from "@/lib/utils";
 
 type ListingErrors = RichProductFormErrors & { form?: string };
@@ -139,7 +131,7 @@ export function ListingCreateForm() {
   return (
     <form
       onSubmit={submit}
-      className="mx-auto grid w-full max-w-7xl gap-5 rounded-[24px] border p-4 theme-surface-elevated sm:p-5 lg:p-6"
+      className="mx-auto grid w-full max-w-[1500px] gap-5 rounded-[24px] border p-4 theme-surface-elevated sm:p-5 lg:p-6"
       noValidate
     >
       <div className="flex flex-col gap-4 border-b theme-border pb-5 lg:flex-row lg:items-start lg:justify-between">
@@ -166,9 +158,6 @@ export function ListingCreateForm() {
           >
             {submitting ? t("listing.statusSaving") : t("listing.saveDraft")}
           </button>
-          <a href="#buyer-preview" className={ghostActionClass}>
-            {t("listing.preview")}
-          </a>
           <button
             type="submit"
             disabled={submitting}
@@ -201,7 +190,7 @@ export function ListingCreateForm() {
         </div>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:items-start">
+      <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start xl:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="hidden rounded-2xl border p-3 theme-surface lg:sticky lg:top-24 lg:block">
           <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.16em] theme-muted">
             {t("listing.sections")}
@@ -228,8 +217,6 @@ export function ListingCreateForm() {
             variant="dashboard"
           />
         </div>
-
-        <BuyerPreviewPanel product={product} />
       </div>
 
       {errors.form ? (
@@ -273,8 +260,6 @@ const primaryActionClass =
   "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-primary-button disabled:cursor-not-allowed disabled:opacity-50";
 const secondaryActionClass =
   "inline-flex h-10 items-center justify-center rounded-xl border px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-secondary-button disabled:cursor-not-allowed disabled:opacity-50";
-const ghostActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus theme-ghost-button";
 
 function productBuilderStatus({
   submitting,
@@ -316,128 +301,4 @@ function StatusPill({
       {label}
     </span>
   );
-}
-
-function BuyerPreviewPanel({ product }: { product: RichProductFormValue }) {
-  const { locale, t } = useI18n();
-  const image =
-    product.images[0]?.mainUrl ||
-    product.images[0]?.cardUrl ||
-    product.images[0]?.originalUrl ||
-    "";
-  const leadTimeLabel =
-    getLeadTimeOptions(locale).find((option) => option.value === product.leadTime)
-      ?.label ?? product.leadTime;
-  const channelOptions = getSalesChannelOptions(locale);
-  const channelLabels = product.suggestedUsChannels
-    .map(
-      (channel) =>
-        channelOptions.find((option) => option.value === channel)?.label ?? channel,
-    )
-    .slice(0, 3);
-
-  return (
-    <aside
-      id="buyer-preview"
-      className="rounded-2xl border p-4 theme-surface lg:sticky lg:top-24"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] theme-muted">
-            {t("listing.buyerPreview")}
-          </p>
-          <h2 className="mt-1 text-base font-semibold theme-foreground">
-            {product.name || t("listing.previewUntitled")}
-          </h2>
-        </div>
-        <StatusPill label={t("listing.statusDraft")} tone="zinc" />
-      </div>
-
-      <div className="mt-4 overflow-hidden rounded-2xl border theme-surface-elevated">
-        {image ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={image} alt="" className="aspect-[4/3] w-full object-cover" />
-        ) : (
-          <div className="flex aspect-[4/3] items-center justify-center text-sm theme-muted">
-            {t("listing.previewImagePlaceholder")}
-          </div>
-        )}
-      </div>
-
-      <dl className="mt-4 grid gap-3 text-sm">
-        <PreviewRow label={t("listing.category")} value={product.category || t("productDetail.notProvided")} />
-        <PreviewRow
-          label={t("settings.priceMin")}
-          value={fieldPreviewValue(
-            product,
-            "minimumUnitPrice",
-            product.priceMin
-              ? `${product.currency} ${product.priceMin}${product.priceMax ? `-${product.priceMax}` : ""} / ${product.priceUnit}`
-              : "",
-            t,
-          )}
-        />
-        <PreviewRow
-          label={t("marketplace.moq")}
-          value={fieldPreviewValue(
-            product,
-            "moq",
-            product.moqQuantity
-              ? `${product.moqQuantity} ${product.moqUnit}`
-              : "",
-            t,
-          )}
-        />
-        <PreviewRow
-          label={t("settings.leadTime")}
-          value={fieldPreviewValue(product, "leadTime", leadTimeLabel, t)}
-        />
-        <PreviewRow
-          label={t("productForm.countryOfOrigin")}
-          value={product.shippingOriginRegion || product.countryOfOrigin}
-        />
-      </dl>
-
-      <div className="mt-4 border-t theme-border pt-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] theme-muted">
-          {t("productForm.suggestedUsChannels")}
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {channelLabels.length ? (
-            channelLabels.map((channel) => (
-              <span
-                key={channel}
-                className="rounded-full border px-2.5 py-1 text-xs font-medium theme-surface-muted theme-muted"
-              >
-                {channel}
-              </span>
-            ))
-          ) : (
-            <span className="text-sm theme-muted">{t("productDetail.notProvided")}</span>
-          )}
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-function PreviewRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="grid gap-1 rounded-xl border p-3 theme-surface-muted">
-      <dt className="text-xs font-medium theme-muted">{label}</dt>
-      <dd className="break-words text-sm font-medium theme-foreground">{value}</dd>
-    </div>
-  );
-}
-
-function fieldPreviewValue(
-  product: RichProductFormValue,
-  key: ProductFieldVisibilityKey,
-  value: string,
-  t: (key: string) => string,
-) {
-  const visibility = normalizeProductFieldVisibility(product.fieldVisibility)[key];
-  if (visibility === "private") return t("listing.previewContactSeller");
-  if (visibility === "inquiry_required") return t("listing.previewInquiryRequired");
-  return value || t("productDetail.notProvided");
 }

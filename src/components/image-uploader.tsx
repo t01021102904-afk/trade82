@@ -371,7 +371,8 @@ export function ListingImageUploader({
       <div
         className={cx(
           "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
-          variant === "dashboard" && "lg:grid-cols-3 xl:grid-cols-4",
+          variant === "dashboard" &&
+            "lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6",
         )}
       >
         {items.map((item, index) => (
