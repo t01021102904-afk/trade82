@@ -6,6 +6,7 @@ import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
 import { ProductImage } from "@/components/product-image";
 import { SaveButton } from "@/components/save-button";
+import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
@@ -46,6 +47,7 @@ export function ProductCard({ product }: { product: Product }) {
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
+          {product.sellerIsVerifiedSeller ? <VerifiedSellerBadge compact /> : null}
         </Link>
         <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs theme-muted">
           <span className="truncate">

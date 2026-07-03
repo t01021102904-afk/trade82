@@ -63,6 +63,8 @@ export async function GET() {
               country: true,
               categories: true,
               description: true,
+              subscriptionStatus: true,
+              subscriptionPlan: true,
               sellerProfile: true,
               ownerUserId: true,
               owner: {

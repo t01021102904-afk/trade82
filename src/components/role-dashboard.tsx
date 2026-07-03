@@ -12,8 +12,10 @@ import {
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { VerificationBadge } from "@/components/verification-badge";
+import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
+import { isVerifiedSellerSubscription } from "@/lib/billing";
 import { withLocale } from "@/lib/i18n";
 import type { VerificationStatus } from "@/lib/types";
 
@@ -34,6 +36,8 @@ type DashboardCompany = {
   sellerProfile: Record<string, unknown> | null;
   buyerProfile: Record<string, unknown> | null;
   verificationRequests: Array<{ adminNote: string | null }>;
+  subscriptionStatus?: string | null;
+  subscriptionPlan?: string | null;
 };
 
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
@@ -105,6 +109,10 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   );
   const status = company.verificationStatus;
   const rejectionReason = company.verificationRequests[0]?.adminNote;
+  const verifiedSeller = role === "seller" && isVerifiedSellerSubscription(
+    company.subscriptionStatus,
+    company.subscriptionPlan,
+  );
   const navItems: Array<{ id: DashboardSection; label: string }> = [
     { id: "overview", label: t("dashboard.dashboardNavOverview") },
     ...(role === "buyer"
@@ -156,6 +164,14 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               {item.label}
             </button>
           ))}
+          {role === "seller" ? (
+            <Link
+              href={withLocale("/dashboard/settings", locale)}
+              className="relative z-10 h-8 min-w-max rounded-md px-2.5 py-2 text-left text-xs font-medium leading-4 transition theme-ghost-button hover:-translate-y-0.5"
+            >
+              {t("dashboard.dashboardNavSettings")}
+            </Link>
+          ) : null}
         </nav>
       </aside>
 
@@ -177,6 +193,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                     {company.tradeName || company.legalName}
                   </h1>
                   {context?.isAdmin ? <AdminBadge /> : null}
+                  {verifiedSeller ? <VerifiedSellerBadge /> : null}
                 </div>
                 <p className="mt-1 text-sm theme-muted">
                   {role === "seller"

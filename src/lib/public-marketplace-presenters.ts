@@ -1,4 +1,5 @@
 import type { Product, Seller } from "@/lib/types";
+import { isVerifiedSellerSubscription } from "@/lib/billing";
 import { normalizeProductFieldVisibility } from "@/lib/product-field-visibility";
 
 export function databaseProductToCard(value: Record<string, unknown>): Product {
@@ -41,6 +42,10 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
             : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
     sellerIsTrade82Team: company.isTrade82Team === true,
+    sellerIsVerifiedSeller: isVerifiedSellerSubscription(
+      typeof company.subscriptionStatus === "string" ? company.subscriptionStatus : null,
+      typeof company.subscriptionPlan === "string" ? company.subscriptionPlan : null,
+    ),
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: price,
@@ -134,6 +139,14 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
     verified: true,
     verificationStatus: "verified",
     isTrade82Team: company.isTrade82Team === true,
+    isVerifiedSeller: isVerifiedSellerSubscription(
+      typeof company.subscriptionStatus === "string"
+        ? company.subscriptionStatus
+        : null,
+      typeof company.subscriptionPlan === "string"
+        ? company.subscriptionPlan
+        : null,
+    ),
     description: String(company.description ?? ""),
   };
 }

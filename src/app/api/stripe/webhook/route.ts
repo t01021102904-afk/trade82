@@ -1,0 +1,149 @@
+import Stripe from "stripe";
+
+import { VERIFIED_SELLER_PLAN, isVerifiedSellerSubscription } from "@/lib/billing";
+import { getDb } from "@/lib/db";
+import { getStripe } from "@/lib/stripe";
+
+export const runtime = "nodejs";
+
+function idOf(value: string | { id?: string } | null | undefined) {
+  if (typeof value === "string") return value;
+  return typeof value?.id === "string" ? value.id : null;
+}
+
+function dateFromUnix(value: number | null | undefined) {
+  return typeof value === "number" ? new Date(value * 1000) : null;
+}
+
+function subscriptionPeriodEnd(subscription: Stripe.Subscription) {
+  return dateFromUnix(subscription.items.data[0]?.current_period_end);
+}
+
+function nestedSubscriptionId(value: unknown): string | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+
+  if (typeof record.subscription === "string") return record.subscription;
+  if (record.subscription && typeof record.subscription === "object") {
+    const id = (record.subscription as { id?: unknown }).id;
+    if (typeof id === "string") return id;
+  }
+
+  return nestedSubscriptionId(record.subscription_details);
+}
+
+async function updateCompanyFromSubscription(subscription: Stripe.Subscription) {
+  const customerId = idOf(subscription.customer);
+  const companyId = subscription.metadata.companyId;
+  const priceId = subscription.items.data[0]?.price.id;
+  const configuredPriceId = process.env.STRIPE_VERIFIED_SELLER_PRICE_ID;
+  const subscriptionPlan =
+    subscription.metadata.plan === VERIFIED_SELLER_PLAN ||
+    (configuredPriceId && priceId === configuredPriceId)
+      ? VERIFIED_SELLER_PLAN
+      : null;
+
+  const company = await getDb().company.findFirst({
+    where: {
+      companyRole: "seller",
+      OR: [
+        ...(companyId ? [{ id: companyId }] : []),
+        { stripeSubscriptionId: subscription.id },
+        ...(customerId ? [{ stripeCustomerId: customerId }] : []),
+      ],
+    },
+    select: { id: true, verifiedSellerSince: true },
+  });
+
+  if (!company) {
+    console.warn("Stripe subscription webhook did not match a seller company.", {
+      eventSubscriptionId: subscription.id,
+      hasCustomerId: Boolean(customerId),
+      hasCompanyId: Boolean(companyId),
+    });
+    return;
+  }
+
+  const isActiveVerifiedSeller = isVerifiedSellerSubscription(
+    subscription.status,
+    subscriptionPlan,
+  );
+
+  await getDb().company.update({
+    where: { id: company.id },
+    data: {
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscription.id,
+      subscriptionStatus: subscription.status,
+      subscriptionPlan,
+      subscriptionCurrentPeriodEnd: subscriptionPeriodEnd(subscription),
+      verifiedSellerSince:
+        isActiveVerifiedSeller && !company.verifiedSellerSince
+          ? new Date()
+          : company.verifiedSellerSince,
+    },
+  });
+}
+
+async function updateFromSubscriptionId(subscriptionId: string | null) {
+  if (!subscriptionId) return;
+  const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
+  await updateCompanyFromSubscription(subscription);
+}
+
+export async function POST(request: Request) {
+  const stripe = getStripe();
+  const signature = request.headers.get("stripe-signature");
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    return Response.json(
+      { error: "Stripe webhook secret is not configured." },
+      { status: 500 },
+    );
+  }
+  if (!signature) {
+    return Response.json({ error: "Missing Stripe signature." }, { status: 400 });
+  }
+
+  let event: Stripe.Event;
+  const rawBody = await request.text();
+
+  try {
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  } catch {
+    return Response.json({ error: "Invalid Stripe webhook signature." }, { status: 400 });
+  }
+
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        await updateFromSubscriptionId(idOf(session.subscription));
+        break;
+      }
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted": {
+        await updateCompanyFromSubscription(event.data.object as Stripe.Subscription);
+        break;
+      }
+      case "invoice.payment_succeeded":
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await updateFromSubscriptionId(nestedSubscriptionId(invoice.parent));
+        break;
+      }
+      default:
+        break;
+    }
+  } catch (error) {
+    console.error("Stripe webhook processing failed.", {
+      eventType: event.type,
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
+    return Response.json({ error: "Webhook processing failed." }, { status: 500 });
+  }
+
+  return Response.json({ received: true });
+}

@@ -8,6 +8,7 @@ import { ContactModal } from "@/components/contact-modal";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { SaveButton } from "@/components/save-button";
+import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { withLocale } from "@/lib/i18n";
 import type { Seller } from "@/lib/types";
 
@@ -33,6 +34,7 @@ export function SellerCard({ seller }: { seller: Seller }) {
             </h3>
           </Link>
             {seller.isTrade82Team ? <AdminBadge /> : null}
+            {seller.isVerifiedSeller ? <VerifiedSellerBadge /> : null}
           </div>
           <p className="mt-1 truncate text-sm theme-muted">{seller.location}</p>
         </div>

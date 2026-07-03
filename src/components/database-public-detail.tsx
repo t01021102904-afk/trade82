@@ -15,6 +15,7 @@ import { ProductCard } from "@/components/product-card";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { ProductShareButton } from "@/components/product-share-button";
 import { VerificationBadge } from "@/components/verification-badge";
+import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
 import { useUserContext } from "@/hooks/use-user-context";
@@ -43,6 +44,7 @@ import {
   SOUTH_KOREA,
   UNITED_STATES,
 } from "@/lib/company-select-options";
+import { isVerifiedSellerSubscription } from "@/lib/billing";
 import { withLocale } from "@/lib/i18n";
 import {
   normalizeProductFieldVisibility,
@@ -107,6 +109,8 @@ type PublicCompany = {
     reviewerCompany: { legalName: string; tradeName: string | null };
   }>;
   isTrade82Team?: boolean;
+  subscriptionStatus?: string | null;
+  subscriptionPlan?: string | null;
 };
 
 type PublicPayload = {
@@ -147,6 +151,9 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
 
   if (!loaded) return <PublicLoading />;
   if (!company) return <PublicUnavailable />;
+  const verifiedSeller =
+    company.companyRole === "seller" &&
+    isVerifiedSellerSubscription(company.subscriptionStatus, company.subscriptionPlan);
 
   return (
     <div className="bg-zinc-50">
@@ -170,6 +177,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
             <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
               <h1 className="break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{company.tradeName || company.legalName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
+              {verifiedSeller ? <VerifiedSellerBadge /> : null}
             </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
             <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{company.description}</p>
@@ -496,6 +504,9 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   <p className="flex min-w-0 flex-wrap items-center gap-1.5 break-words font-semibold text-zinc-950">
                     <span>{product.sellerName}</span>
                     {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
+                    {product.sellerIsVerifiedSeller ? (
+                      <VerifiedSellerBadge compact />
+                    ) : null}
                   </p>
                   <p className="break-words">{product.sellerLocation}</p>
                 </div>
@@ -936,6 +947,14 @@ function publicProductToCard(value: Record<string, unknown>): Product {
             : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
     sellerIsTrade82Team: company.isTrade82Team === true,
+    sellerIsVerifiedSeller: isVerifiedSellerSubscription(
+      typeof company.subscriptionStatus === "string"
+        ? company.subscriptionStatus
+        : null,
+      typeof company.subscriptionPlan === "string"
+        ? company.subscriptionPlan
+        : null,
+    ),
     shortDescription: String(value.shortDescription ?? ""),
     longDescription: String(value.detailedDescription ?? ""),
     wholesalePrice: priceMin

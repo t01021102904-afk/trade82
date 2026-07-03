@@ -133,50 +133,57 @@ model UserProfile {
 }
 
 model Company {
-  id                         String                    @id @default(cuid())
-  ownerUserId                String
-  owner                      UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  companyRole                CompanyRole
-  legalName                  String
-  tradeName                  String?
-  logoOriginalUrl            String?
-  logoThumbnailUrl           String?
-  logoUrl                    String?
-  useDefaultLogo             Boolean                   @default(true)
-  website                    String                    @default("")
-  country                    String
-  city                       String                    @default("")
-  stateOrProvince            String                    @default("")
-  businessAddress            String
-  description                String                    @default("")
-  categories                 String[]                  @default([])
-  viewCount                  Int                       @default(0)
-  verificationStatus         CompanyVerificationStatus @default(unverified)
-  sellerProfile              SellerProfile?
-  buyerProfile               BuyerProfile?
-  products                   Product[]
-  verificationRequests       VerificationRequest[]
-  buyerInquiries             Inquiry[]                 @relation("BuyerCompanyInquiries")
-  sellerInquiries            Inquiry[]                 @relation("SellerCompanyInquiries")
-  recipientInquiries         Inquiry[]                 @relation("RecipientCompanyInquiries")
-  sentCompanyMessages        Message[]                 @relation("MessageSenderCompany")
-  receivedMessages           Message[]                 @relation("MessageReceiverCompany")
-  uploadedMessageAttachments MessageAttachment[]       @relation("MessageAttachmentCompany")
-  documentFolders            DocumentFolder[]          @relation("CompanyDocumentFolders")
-  tradeDocuments             TradeDocument[]           @relation("CompanyTradeDocuments")
-  sharedTradeDocuments       TradeDocument[]           @relation("SharedBuyerDocuments")
-  savedItems                 SavedItem[]
-  buyerDeals                 Deal[]                    @relation("BuyerCompanyDeals")
-  sellerDeals                Deal[]                    @relation("SellerCompanyDeals")
-  reviewsWritten             Review[]                  @relation("ReviewWriter")
-  reviewsReceived            Review[]                  @relation("ReviewRecipient")
-  companyReviewsWritten      CompanyReview[]           @relation("CompanyReviewWriter")
-  companyReviewsReceived     CompanyReview[]           @relation("CompanyReviewRecipient")
-  createdAt                  DateTime                  @default(now())
-  updatedAt                  DateTime                  @updatedAt
+  id                           String                    @id @default(cuid())
+  ownerUserId                  String
+  owner                        UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  companyRole                  CompanyRole
+  legalName                    String
+  tradeName                    String?
+  logoOriginalUrl              String?
+  logoThumbnailUrl             String?
+  logoUrl                      String?
+  useDefaultLogo               Boolean                   @default(true)
+  website                      String                    @default("")
+  country                      String
+  city                         String                    @default("")
+  stateOrProvince              String                    @default("")
+  businessAddress              String
+  description                  String                    @default("")
+  categories                   String[]                  @default([])
+  viewCount                    Int                       @default(0)
+  verificationStatus           CompanyVerificationStatus @default(unverified)
+  stripeCustomerId             String?                   @unique
+  stripeSubscriptionId         String?                   @unique
+  subscriptionStatus           String?
+  subscriptionPlan             String?
+  subscriptionCurrentPeriodEnd DateTime?
+  verifiedSellerSince          DateTime?
+  sellerProfile                SellerProfile?
+  buyerProfile                 BuyerProfile?
+  products                     Product[]
+  verificationRequests         VerificationRequest[]
+  buyerInquiries               Inquiry[]                 @relation("BuyerCompanyInquiries")
+  sellerInquiries              Inquiry[]                 @relation("SellerCompanyInquiries")
+  recipientInquiries           Inquiry[]                 @relation("RecipientCompanyInquiries")
+  sentCompanyMessages          Message[]                 @relation("MessageSenderCompany")
+  receivedMessages             Message[]                 @relation("MessageReceiverCompany")
+  uploadedMessageAttachments   MessageAttachment[]       @relation("MessageAttachmentCompany")
+  documentFolders              DocumentFolder[]          @relation("CompanyDocumentFolders")
+  tradeDocuments               TradeDocument[]           @relation("CompanyTradeDocuments")
+  sharedTradeDocuments         TradeDocument[]           @relation("SharedBuyerDocuments")
+  savedItems                   SavedItem[]
+  buyerDeals                   Deal[]                    @relation("BuyerCompanyDeals")
+  sellerDeals                  Deal[]                    @relation("SellerCompanyDeals")
+  reviewsWritten               Review[]                  @relation("ReviewWriter")
+  reviewsReceived              Review[]                  @relation("ReviewRecipient")
+  companyReviewsWritten        CompanyReview[]           @relation("CompanyReviewWriter")
+  companyReviewsReceived       CompanyReview[]           @relation("CompanyReviewRecipient")
+  createdAt                    DateTime                  @default(now())
+  updatedAt                    DateTime                  @updatedAt
 
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
+  @@index([subscriptionStatus, subscriptionPlan])
 }
 
 model SellerProfile {
