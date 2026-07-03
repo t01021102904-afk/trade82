@@ -3,6 +3,10 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { rateLimitOrResponse } from "@/lib/api-security";
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import {
+  getOnboardingCompanyState,
+  isOnboardingCompleteForRole,
+} from "@/lib/onboarding-status";
 
 const validRoles = new Set(["buyer", "seller"]);
 
@@ -31,6 +35,31 @@ export async function POST(request: Request) {
     return Response.json({ error: "Admin role is managed by ADMIN_EMAILS." }, { status: 403 });
   }
 
+  const profile = await getCurrentUserProfile();
+  if (profile && profile.role !== "user") {
+    const companyState = await getOnboardingCompanyState(profile.id);
+    const onboardingComplete = isOnboardingCompleteForRole(
+      profile.role,
+      companyState,
+      false,
+    );
+    const client = await clerkClient();
+
+    await client.users.updateUserMetadata(userId, {
+      publicMetadata: {
+        role: profile.role,
+        onboardingComplete,
+      },
+    });
+
+    return Response.json({
+      ok: true,
+      role: profile.role,
+      onboardingComplete,
+      alreadyConfigured: true,
+    });
+  }
+
   const client = await clerkClient();
 
   await client.users.updateUserMetadata(userId, {
@@ -39,7 +68,6 @@ export async function POST(request: Request) {
       onboardingComplete: false,
     },
   });
-  const profile = await getCurrentUserProfile();
   if (profile) {
     await getDb().userProfile.update({
       where: { id: profile.id },

@@ -11,6 +11,10 @@ import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
 type Role = "buyer" | "seller";
+type RoleResponse = {
+  role?: unknown;
+  onboardingComplete?: unknown;
+};
 
 const roleCards: Array<{
   role: Role;
@@ -81,10 +85,11 @@ export function RoleSelection() {
         status: response.status,
       });
 
+      const payload = (await response.json().catch(() => null)) as
+        | (RoleResponse & { error?: string })
+        | null;
+
       if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as
-          | { error?: string }
-          | null;
         setError(
           `${t("onboarding.roleError")} (${response.status}${payload?.error ? `: ${payload.error}` : ""})`,
         );
@@ -94,7 +99,14 @@ export function RoleSelection() {
       }
 
       await user?.reload();
-      const nextRoute = withLocale(`/onboarding/${role}`, locale);
+      const savedRole =
+        payload?.role === "buyer" || payload?.role === "seller"
+          ? payload.role
+          : role;
+      const nextRoute =
+        payload?.onboardingComplete === true
+          ? withLocale("/dashboard", locale)
+          : withLocale(`/onboarding/${savedRole}`, locale);
       debugRoleSelection("pushing route", { role, nextRoute });
       setStatus(statusText(locale, "navigating", nextRoute));
       router.push(nextRoute);
