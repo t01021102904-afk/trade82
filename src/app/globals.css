@@ -501,40 +501,12 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
   transition: opacity 180ms ease;
 }
 
-.home-image-stage {
-  background:
-    radial-gradient(
-      circle at 50% 16%,
-      color-mix(in srgb, var(--accent-foreground) 14%, transparent),
-      transparent 44%
-    ),
-    linear-gradient(180deg, color-mix(in srgb, var(--card) 92%, transparent), var(--card));
-}
-
-.home-image-stage::before {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  content: "";
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 28px 28px;
-  opacity: 0.12;
-}
-
-.home-isometric-image,
 .home-hero-asset {
   filter: drop-shadow(0 22px 34px rgb(0 0 0 / 24%));
   transition:
     transform 220ms ease,
     filter 220ms ease,
     opacity 220ms ease;
-}
-
-.home-image-stage:hover .home-isometric-image {
-  filter: drop-shadow(0 28px 42px rgb(0 0 0 / 28%));
-  transform: translateY(-4px) rotate(1deg) scale(1.015);
 }
 
 .home-hero-asset-main {
