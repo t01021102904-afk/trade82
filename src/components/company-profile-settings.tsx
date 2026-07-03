@@ -94,13 +94,7 @@ function rememberCompanyFormSnapshot(key: string, draft: CompanyDraft) {
 
 type CompanyFormErrors = Partial<
   Record<
-    | "logo"
-    | "legalName"
-    | "country"
-    | "city"
-    | "stateOrProvince"
-    | "businessAddress"
-    | "website",
+    "legalName" | "country" | "city" | "stateOrProvince" | "businessAddress" | "website",
     string
   >
 >;
@@ -350,15 +344,6 @@ function CompanyProfileForm({
 
   function validate() {
     const nextErrors: CompanyFormErrors = {};
-    const hasLogo = Boolean(
-      company.logoOriginalUrl || company.logoThumbnailUrl || company.logoUrl,
-    );
-    if (role === "seller" && (company.useDefaultLogo || !hasLogo)) {
-      nextErrors.logo =
-        locale === "ko"
-          ? "한국 셀러 회사 프로필에는 회사 로고가 필요합니다."
-          : "Company logo is required for Korean seller profiles.";
-    }
     if (!company.legalName.trim()) {
       nextErrors.legalName = t("settings.requiredField");
     }
@@ -517,7 +502,6 @@ function CompanyProfileForm({
     });
     setCompany(nextCompany);
     setClearCompanyLogo(false);
-    setFieldErrors((current) => ({ ...current, logo: undefined }));
     markDirty();
   }
 
@@ -578,9 +562,6 @@ function CompanyProfileForm({
           }}
           onUploadingChange={handleUploadingChange}
         />
-        {fieldErrors.logo ? (
-          <p className="text-sm font-medium text-red-700">{fieldErrors.logo}</p>
-        ) : null}
         {companyLogoPreviewUrl && !company.useDefaultLogo ? (
           <button
             type="button"

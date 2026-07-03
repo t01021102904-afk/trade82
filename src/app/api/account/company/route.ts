@@ -188,21 +188,6 @@ function logoFieldsForWrite(
   };
 }
 
-function hasCompanyLogo(fields: {
-  logoOriginalUrl: string | null;
-  logoThumbnailUrl: string | null;
-  logoUrl: string | null;
-}) {
-  return Boolean(fields.logoOriginalUrl || fields.logoThumbnailUrl || fields.logoUrl);
-}
-
-function sellerLogoRequiredResponse() {
-  return Response.json(
-    { error: "Company logo is required for Korean seller profiles." },
-    { status: 400 },
-  );
-}
-
 export async function GET(request: Request) {
   try {
     const user = await requireCurrentAppUser();
@@ -309,9 +294,6 @@ export async function PUT(request: Request) {
           ? "needs_reverification"
           : existing?.verificationStatus ?? "pending_review";
     const logoWriteFields = logoFieldsForWrite(body, existing);
-    if (companyRole === "seller" && !hasCompanyLogo(logoWriteFields)) {
-      return sellerLogoRequiredResponse();
-    }
 
     debugCompanyLogo("saving company logo fields", {
       companyRole,
