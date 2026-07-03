@@ -217,7 +217,7 @@
     "emptyTitle": "No products found",
     "emptyText": "Try a broader category, certification, or shipping term.",
     "noProductsListed": "No products listed yet.",
-    "noProductsListedText": "Real company product listings will appear here after they are added."
+    "noProductsListedText": "Products are being added. Browse listed Korean sellers or join Trade82 as a supplier."
   },
   "product": {
     "seller": "Seller",
@@ -262,7 +262,7 @@
     "emptyTitle": "No sellers found",
     "emptyText": "Try another category, state, or export filter.",
     "noCompaniesListed": "No companies listed yet.",
-    "noCompaniesListedText": "Real Korean seller company profiles will appear here after they are listed.",
+    "noCompaniesListedText": "Seller profiles are being added. Browse the marketplace or join Trade82 as a supplier.",
     "businessType": "Business type",
     "years": "Years",
     "response": "Response",

@@ -218,7 +218,7 @@
     "emptyTitle": "상품을 찾을 수 없습니다",
     "emptyText": "카테고리, 보유 규격, 선적 조건을 더 넓게 설정해 보세요.",
     "noProductsListed": "아직 등록된 상품이 없습니다.",
-    "noProductsListedText": "실제 회사 상품이 등록되면 여기에 표시됩니다."
+    "noProductsListedText": "상품이 추가되고 있습니다. 공개된 한국 셀러를 둘러보거나 Trade82 셀러로 가입해 보세요."
   },
   "product": {
     "seller": "셀러",
@@ -263,7 +263,7 @@
     "emptyTitle": "셀러를 찾을 수 없습니다",
     "emptyText": "다른 카테고리, 주, 수출 필터를 선택해 보세요.",
     "noCompaniesListed": "아직 등록된 회사가 없습니다.",
-    "noCompaniesListedText": "실제 한국 셀러 회사가 공개되면 여기에 표시됩니다.",
+    "noCompaniesListedText": "셀러 프로필이 추가되고 있습니다. 마켓플레이스를 둘러보거나 Trade82 셀러로 가입해 보세요.",
     "businessType": "비즈니스 유형",
     "years": "업력",
     "response": "응답",

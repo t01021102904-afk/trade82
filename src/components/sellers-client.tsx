@@ -193,13 +193,13 @@ export function SellersClient() {
           ))}
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-10 text-center shadow-sm shadow-zinc-100">
-          <h2 className="text-lg font-semibold text-zinc-950">
+        <div className="rounded-lg border border-dashed p-5 text-center theme-surface">
+          <h2 className="text-base font-semibold theme-foreground">
             {visibleSellers.length
               ? t("sellers.emptyTitle")
               : t("sellers.noCompaniesListed")}
           </h2>
-          <p className="mt-2 text-sm text-zinc-600">
+          <p className="mt-2 text-sm theme-muted">
             {visibleSellers.length
               ? t("sellers.emptyText")
               : t("sellers.noCompaniesListedText")}
