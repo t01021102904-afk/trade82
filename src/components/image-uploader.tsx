@@ -18,6 +18,11 @@ type PendingImage = {
   file?: File;
 };
 
+export type ListingImageUploadState = {
+  uploading: boolean;
+  failed: boolean;
+};
+
 const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
 const acceptedTypes = new Set([
   "image/jpeg",
@@ -197,11 +202,13 @@ export function ListingImageUploader({
   value,
   onChange,
   onUploadingChange,
+  onUploadStateChange,
   variant = "default",
 }: {
   value: UploadedListingImage[];
   onChange: (images: UploadedListingImage[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
+  onUploadStateChange?: (state: ListingImageUploadState) => void;
   variant?: "default" | "dashboard";
 }) {
   const { locale } = useI18n();
@@ -221,8 +228,13 @@ export function ListingImageUploader({
   const previewUrls = useRef(new Set<string>());
 
   useEffect(() => {
-    onUploadingChange?.(items.some((item) => item.status === "uploading"));
-  }, [items, onUploadingChange]);
+    const uploadState = {
+      uploading: items.some((item) => item.status === "uploading"),
+      failed: items.some((item) => item.status === "error"),
+    };
+    onUploadingChange?.(uploadState.uploading);
+    onUploadStateChange?.(uploadState);
+  }, [items, onUploadingChange, onUploadStateChange]);
 
   useEffect(() => {
     const urls = previewUrls.current;

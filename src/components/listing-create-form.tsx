@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import type { ListingImageUploadState } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
   emptyRichProductForm,
@@ -33,11 +34,16 @@ export function ListingCreateForm() {
   const router = useRouter();
   const { locale, t } = useI18n();
   const [product, setProduct] = useState<RichProductFormValue>(emptyRichProductForm);
-  const [uploading, setUploading] = useState(false);
+  const [imageUploadState, setImageUploadState] =
+    useState<ListingImageUploadState>({
+      uploading: false,
+      failed: false,
+    });
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [errors, setErrors] = useState<ListingErrors>({});
   const [notice, setNotice] = useState("");
+  const uploading = imageUploadState.uploading;
   const leaveMessage = t("settings.unsavedChangesWarning");
   useUnsavedChangesWarning(dirty && !submitting && !uploading, leaveMessage);
   const { draft, clearDraft, discardDraft } = useDraftBackup<RichProductFormValue>(
@@ -68,15 +74,30 @@ export function ListingCreateForm() {
     discardDraft();
   }
 
-  function validate() {
-    const nextErrors: ListingErrors = validateRichProductForm(product, t);
+  function imageUploadFailedMessage() {
+    return locale === "ko"
+      ? "실패한 이미지 업로드를 삭제하거나 다시 시도한 뒤 공개해 주세요."
+      : "Remove failed image uploads or retry them before publishing.";
+  }
+
+  function validate(status: "active" | "draft") {
+    const publishing = status === "active";
+    const nextErrors: ListingErrors = validateRichProductForm(product, t, {
+      requireImages: publishing,
+    });
+    if (publishing && imageUploadState.uploading) {
+      nextErrors.images = t("listing.imageUploadInProgress");
+    }
+    if (publishing && imageUploadState.failed) {
+      nextErrors.images = imageUploadFailedMessage();
+    }
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
   async function saveProduct(status: "active" | "draft") {
     if (submitting) return;
-    if (!validate()) return;
+    if (!validate(status)) return;
 
     setSubmitting(true);
     setNotice("");
@@ -171,7 +192,7 @@ export function ListingCreateForm() {
           </a>
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || uploading}
             className={primaryActionClass}
           >
             {submitting ? t("listing.statusSaving") : t("listing.publishProduct")}
@@ -224,7 +245,13 @@ export function ListingCreateForm() {
             value={product}
             errors={errors}
             onChange={update}
-            onUploadingChange={setUploading}
+            onUploadingChange={(nextUploading) =>
+              setImageUploadState((current) => ({
+                ...current,
+                uploading: nextUploading,
+              }))
+            }
+            onImageUploadStateChange={setImageUploadState}
             variant="dashboard"
           />
         </div>
@@ -259,7 +286,7 @@ export function ListingCreateForm() {
         </button>
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || uploading}
           className={primaryActionClass}
         >
           {submitting ? t("listing.statusSaving") : t("listing.publishProduct")}
