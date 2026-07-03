@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import {
+  type DragEvent,
   useCallback,
   useEffect,
   useMemo,
@@ -86,6 +87,11 @@ type DocumentVisibilityValue =
   | "private"
   | "internal_review"
   | "shared_with_buyer";
+
+type DocumentUploadTarget = {
+  category: DocumentCategoryValue;
+  folderId?: string | null;
+};
 
 type DocumentsApiPayload = {
   folders: Array<{
@@ -703,6 +709,21 @@ const documentVisibilityLabels: Record<DocumentVisibilityValue, string> = {
   shared_with_buyer: "Shared with buyer",
 };
 
+const DOCUMENT_CLIENT_UPLOAD_MAX_BYTES = 20 * 1024 * 1024;
+const DOCUMENT_CLIENT_ALLOWED_EXTENSIONS = new Set([
+  "jpeg",
+  "jpg",
+  "pdf",
+  "png",
+  "webp",
+]);
+const DOCUMENT_CLIENT_ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
 function formatDocumentDate(value: string) {
   return new Intl.DateTimeFormat("en", {
     month: "short",
@@ -717,13 +738,54 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function fileExtension(filename: string) {
+  return filename
+    .toLowerCase()
+    .split(".")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .at(-1) ?? "";
+}
+
+function validateClientDocumentFiles(files: File[]) {
+  for (const file of files) {
+    const extension = fileExtension(file.name);
+    const mimeType = file.type.toLowerCase();
+
+    if (
+      !DOCUMENT_CLIENT_ALLOWED_EXTENSIONS.has(extension) ||
+      !DOCUMENT_CLIENT_ALLOWED_MIME_TYPES.has(mimeType)
+    ) {
+      return "Only PDF, JPG, PNG, and WebP files are supported.";
+    }
+
+    if (file.size <= 0) {
+      return "Empty files cannot be uploaded.";
+    }
+
+    if (file.size > DOCUMENT_CLIENT_UPLOAD_MAX_BYTES) {
+      return "This file is too large. Maximum size is 20MB.";
+    }
+  }
+
+  return "";
+}
+
+function dragEventHasFiles(event: DragEvent<HTMLElement>) {
+  return Array.from(event.dataTransfer.types).includes("Files");
+}
+
+function filesFromDragEvent(event: DragEvent<HTMLElement>) {
+  return Array.from(event.dataTransfer.files ?? []);
+}
+
 export function SellerDocumentsSection() {
   const [activeTab, setActiveTab] = useState<DocumentsTab>("forms");
   const [notice, setNotice] = useState("");
 
-  function showNotice(message: string) {
+  const showNotice = useCallback((message: string) => {
     setNotice(message);
-  }
+  }, []);
 
   return (
     <section className="grid gap-4">
@@ -1074,9 +1136,13 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
   const [selectedFolderId, setSelectedFolderId] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [deletingId, setDeletingId] = useState("");
+  const [draggingDocuments, setDraggingDocuments] = useState(false);
+  const [draggingFolderId, setDraggingFolderId] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragDepthRef = useRef(0);
 
   const applyPayload = useCallback((payload: DocumentsApiPayload) => {
     setFolders(
@@ -1161,33 +1227,136 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
     });
   }, [documents, filter, search]);
 
-  async function uploadDocument(file: File) {
+  async function uploadDocuments(
+    files: File[],
+    target: DocumentUploadTarget = {
+      category: selectedCategory,
+      folderId: selectedFolderId || null,
+    },
+  ) {
+    if (!files.length) return;
+    if (uploading) {
+      onAction("Upload is already in progress.");
+      return;
+    }
+
+    const validationError = validateClientDocumentFiles(files);
+    if (validationError) {
+      onAction(validationError);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("category", selectedCategory);
-      formData.append("visibilityStatus", "private");
-      if (selectedFolderId) formData.append("folderId", selectedFolderId);
+      for (const [index, file] of files.entries()) {
+        setUploadStatus(
+          files.length > 1
+            ? `Uploading ${index + 1} of ${files.length}...`
+            : "Uploading...",
+        );
 
-      const response = await fetch("/api/account/documents", {
-        method: "POST",
-        body: formData,
-      });
-      const payload = (await response.json().catch(() => null)) as
-        | (DocumentsApiPayload & { error?: string })
-        | null;
-      if (!response.ok || !payload) {
-        throw new Error(payload?.error || "Document upload failed.");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("category", target.category);
+        formData.append("visibilityStatus", "private");
+        if (target.folderId) formData.append("folderId", target.folderId);
+
+        const response = await fetch("/api/account/documents", {
+          method: "POST",
+          body: formData,
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | (DocumentsApiPayload & { error?: string })
+          | null;
+        if (!response.ok || !payload) {
+          throw new Error(payload?.error || "Document upload failed.");
+        }
+        applyPayload(payload);
       }
-      applyPayload(payload);
-      onAction("Document uploaded.");
+
+      setSelectedCategory(target.category);
+      setSelectedFolderId(target.folderId ?? "");
+      setFilter(documentCategoryLabels[target.category]);
+      onAction(files.length === 1 ? "Document uploaded." : `${files.length} documents uploaded.`);
     } catch (error) {
       onAction(error instanceof Error ? error.message : "Document upload failed.");
     } finally {
       setUploading(false);
+      setUploadStatus("");
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
+  }
+
+  function resetDragState() {
+    dragDepthRef.current = 0;
+    setDraggingDocuments(false);
+    setDraggingFolderId("");
+  }
+
+  function handleDocumentDragEnter(event: DragEvent<HTMLElement>) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    dragDepthRef.current += 1;
+    setDraggingDocuments(true);
+  }
+
+  function handleDocumentDragOver(event: DragEvent<HTMLElement>) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = uploading ? "none" : "copy";
+    setDraggingDocuments(true);
+  }
+
+  function handleDocumentDragLeave(event: DragEvent<HTMLElement>) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setDraggingDocuments(false);
+      setDraggingFolderId("");
+    }
+  }
+
+  function handleDocumentDrop(event: DragEvent<HTMLElement>) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    const files = filesFromDragEvent(event);
+    resetDragState();
+    void uploadDocuments(files);
+  }
+
+  function handleFolderDragEnter(event: DragEvent<HTMLElement>, folderId: string) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    setDraggingFolderId(folderId);
+  }
+
+  function handleFolderDragOver(event: DragEvent<HTMLElement>) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = uploading ? "none" : "copy";
+  }
+
+  function handleFolderDragLeave(event: DragEvent<HTMLElement>, folderId: string) {
+    if (!dragEventHasFiles(event)) return;
+    const relatedTarget = event.relatedTarget;
+    if (relatedTarget instanceof Node && event.currentTarget.contains(relatedTarget)) {
+      return;
+    }
+    if (draggingFolderId === folderId) setDraggingFolderId("");
+  }
+
+  function handleFolderDrop(event: DragEvent<HTMLElement>, folder: FolderItem) {
+    if (!dragEventHasFiles(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const files = filesFromDragEvent(event);
+    resetDragState();
+    void uploadDocuments(files, {
+      category: folder.category,
+      folderId: folder.id,
+    });
   }
 
   async function createFolder() {
@@ -1270,7 +1439,27 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
   }
 
   return (
-    <div className="grid gap-4">
+    <div
+      className="relative grid gap-4"
+      onDragEnter={handleDocumentDragEnter}
+      onDragOver={handleDocumentDragOver}
+      onDragLeave={handleDocumentDragLeave}
+      onDrop={handleDocumentDrop}
+    >
+      {draggingDocuments ? (
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-2xl border border-emerald-300/40 bg-[var(--background)]/75 p-4 shadow-2xl shadow-emerald-950/20 backdrop-blur-md">
+          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/10 px-6 py-5 text-center">
+            <Upload className="mx-auto size-6 text-[var(--accent-foreground)]" aria-hidden="true" />
+            <p className="mt-3 text-sm font-semibold theme-foreground">
+              Drop files to upload
+            </p>
+            <p className="mt-1 text-xs theme-muted">
+              PDF, JPG, PNG, or WebP · Max 20MB
+            </p>
+          </div>
+        </div>
+      ) : null}
+
       <section className="rounded-2xl border p-4 theme-surface-elevated">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0">
@@ -1319,11 +1508,12 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
             <input
               ref={fileInputRef}
               type="file"
+              multiple
               className="hidden"
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,image/jpeg,image/png,image/webp"
+              accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
               onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) void uploadDocument(file);
+                const files = Array.from(event.target.files ?? []);
+                if (files.length) void uploadDocuments(files);
               }}
             />
             <button
@@ -1360,6 +1550,16 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
             </div>
           </div>
         </div>
+        <div className="mt-4 rounded-xl border border-dashed px-4 py-3 theme-surface-muted">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs font-medium theme-muted">
+              Drag files anywhere in My Documents, or drop files directly onto a folder.
+            </p>
+            <p className="text-xs font-semibold theme-muted">
+              {uploading ? uploadStatus || "Uploading..." : "PDF, JPG, PNG, WebP · Max 20MB"}
+            </p>
+          </div>
+        </div>
       </section>
 
       <section className="rounded-2xl border p-4 theme-surface">
@@ -1388,12 +1588,20 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
           <button
             key={folder.id}
             type="button"
+            onDragEnter={(event) => handleFolderDragEnter(event, folder.id)}
+            onDragOver={handleFolderDragOver}
+            onDragLeave={(event) => handleFolderDragLeave(event, folder.id)}
+            onDrop={(event) => handleFolderDrop(event, folder)}
             onClick={() => {
               setSelectedCategory(folder.category);
               setSelectedFolderId(folder.id);
               setFilter(documentCategoryLabels[folder.category]);
             }}
-            className="rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover"
+            className={`rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover ${
+              draggingFolderId === folder.id
+                ? "border-emerald-300/70 bg-emerald-300/10 ring-2 ring-emerald-400/20"
+                : ""
+            }`}
           >
             <div className="flex items-start justify-between gap-2">
               <span className="inline-flex size-9 items-center justify-center rounded-xl border theme-border theme-surface-muted">
@@ -1407,7 +1615,9 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
               {folder.name}
             </h4>
             <p className="mt-1 text-xs theme-muted">
-              {folder.files} files · Updated {folder.updated}
+              {draggingFolderId === folder.id
+                ? "Drop files into this folder"
+                : `${folder.files} files · Updated ${folder.updated}`}
             </p>
           </button>
         ))}
