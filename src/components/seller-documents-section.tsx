@@ -14,7 +14,13 @@ import {
   Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 const formsLibraryFilters = [
   "All",
@@ -49,20 +55,60 @@ type FormLibraryItem = {
 
 type MyDocumentItem = {
   id: string;
-  name: string;
-  category: "Company" | "Product" | "Compliance" | "Shipping" | "Contracts";
-  fileType: "PDF" | "DOCX" | "XLSX";
-  status: "Approved" | "Uploaded" | "Needs review" | "Draft" | "Signed";
-  visibility: "Private" | "Shared with buyer" | "Internal review";
+  fileName: string;
+  category: DocumentCategoryValue;
+  fileType: string;
+  fileSize: number;
+  mimeType: string;
+  folderId: string | null;
+  folderName: string | null;
+  visibilityStatus: DocumentVisibilityValue;
   lastModified: string;
 };
 
 type FolderItem = {
+  id: string;
   name: string;
-  category: Exclude<MyDocumentFilter, "All" | "Shared with buyer">;
+  category: DocumentCategoryValue;
   files: number;
   updated: string;
-  badge?: string;
+};
+
+type DocumentCategoryValue =
+  | "company"
+  | "product"
+  | "compliance"
+  | "shipping"
+  | "contracts"
+  | "shared_with_buyer";
+
+type DocumentVisibilityValue =
+  | "private"
+  | "internal_review"
+  | "shared_with_buyer";
+
+type DocumentsApiPayload = {
+  folders: Array<{
+    id: string;
+    name: string;
+    category: DocumentCategoryValue;
+    files: number;
+    updatedAt: string;
+  }>;
+  documents: Array<{
+    id: string;
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+    mimeType: string;
+    category: DocumentCategoryValue;
+    folderId: string | null;
+    folderName: string | null;
+    visibilityStatus: DocumentVisibilityValue;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  companyRequired?: boolean;
 };
 
 const formLibraryItems: FormLibraryItem[] = [
@@ -635,95 +681,47 @@ const myDocumentFilters = [
 
 type MyDocumentFilter = (typeof myDocumentFilters)[number];
 
-const folders: FolderItem[] = [
-  {
-    name: "Company Documents",
-    category: "Company",
-    files: 8,
-    updated: "Jul 2, 2026",
-    badge: "Private",
-  },
-  {
-    name: "Product Documents",
-    category: "Product",
-    files: 14,
-    updated: "Jul 2, 2026",
-  },
-  {
-    name: "Compliance Documents",
-    category: "Compliance",
-    files: 11,
-    updated: "Jul 1, 2026",
-    badge: "Needs review",
-  },
-  {
-    name: "Shipping Documents",
-    category: "Shipping",
-    files: 6,
-    updated: "Jun 30, 2026",
-  },
-  {
-    name: "Contracts",
-    category: "Contracts",
-    files: 4,
-    updated: "Jun 29, 2026",
-    badge: "Shared with buyer",
-  },
+const documentCategoryOptions: Array<{
+  label: Exclude<MyDocumentFilter, "All">;
+  value: DocumentCategoryValue;
+}> = [
+  { label: "Company", value: "company" },
+  { label: "Product", value: "product" },
+  { label: "Compliance", value: "compliance" },
+  { label: "Shipping", value: "shipping" },
+  { label: "Contracts", value: "contracts" },
+  { label: "Shared with buyer", value: "shared_with_buyer" },
 ];
 
-const myDocuments: MyDocumentItem[] = [
-  {
-    id: "business-registration-certificate",
-    name: "Business Registration Certificate.pdf",
-    category: "Company",
-    fileType: "PDF",
-    status: "Approved",
-    visibility: "Private",
-    lastModified: "Jul 2, 2026",
-  },
-  {
-    id: "product-specification-sheet",
-    name: "Product Specification Sheet.docx",
-    category: "Product",
-    fileType: "DOCX",
-    status: "Uploaded",
-    visibility: "Shared with buyer",
-    lastModified: "Jul 2, 2026",
-  },
-  {
-    id: "certificate-of-origin",
-    name: "Certificate of Origin.pdf",
-    category: "Compliance",
-    fileType: "PDF",
-    status: "Needs review",
-    visibility: "Internal review",
-    lastModified: "Jul 1, 2026",
-  },
-  {
-    id: "commercial-invoice-draft",
-    name: "Commercial Invoice Draft.xlsx",
-    category: "Shipping",
-    fileType: "XLSX",
-    status: "Draft",
-    visibility: "Private",
-    lastModified: "Jun 30, 2026",
-  },
-  {
-    id: "export-sales-contract",
-    name: "Export Sales Contract.pdf",
-    category: "Contracts",
-    fileType: "PDF",
-    status: "Signed",
-    visibility: "Shared with buyer",
-    lastModified: "Jun 29, 2026",
-  },
-];
+const documentCategoryLabels = Object.fromEntries(
+  documentCategoryOptions.map((item) => [item.value, item.label]),
+) as Record<DocumentCategoryValue, Exclude<MyDocumentFilter, "All">>;
+
+const documentVisibilityLabels: Record<DocumentVisibilityValue, string> = {
+  internal_review: "Internal review",
+  private: "Private",
+  shared_with_buyer: "Shared with buyer",
+};
+
+function formatDocumentDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export function SellerDocumentsSection() {
   const [activeTab, setActiveTab] = useState<DocumentsTab>("forms");
   const [notice, setNotice] = useState("");
 
-  function showStorageNotice(message = "Document storage will be available when file storage is connected.") {
+  function showNotice(message: string) {
     setNotice(message);
   }
 
@@ -785,9 +783,9 @@ export function SellerDocumentsSection() {
       ) : null}
 
       {activeTab === "forms" ? (
-        <FormsLibraryView onAction={showStorageNotice} />
+        <FormsLibraryView onAction={showNotice} />
       ) : (
-        <MyDocumentsView onAction={showStorageNotice} />
+        <MyDocumentsView onAction={showNotice} />
       )}
     </section>
   );
@@ -819,7 +817,7 @@ function TabButton({
   );
 }
 
-function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }) {
+function FormsLibraryView({ onAction }: { onAction: (message: string) => void }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FormsLibraryFilter>("All");
   const [selectedItem, setSelectedItem] = useState<FormLibraryItem | null>(null);
@@ -1065,32 +1063,211 @@ function FormLibraryAction({
   );
 }
 
-function MyDocumentsView({ onAction }: { onAction: (message?: string) => void }) {
+function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<MyDocumentFilter>("All");
   const [viewMode, setViewMode] = useState<DocumentViewMode>("grid");
+  const [documents, setDocuments] = useState<MyDocumentItem[]>([]);
+  const [folders, setFolders] = useState<FolderItem[]>([]);
+  const [selectedCategory, setSelectedCategory] =
+    useState<DocumentCategoryValue>("company");
+  const [selectedFolderId, setSelectedFolderId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [creatingFolder, setCreatingFolder] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const applyPayload = useCallback((payload: DocumentsApiPayload) => {
+    setFolders(
+      payload.folders.map((folder) => ({
+        id: folder.id,
+        name: folder.name,
+        category: folder.category,
+        files: folder.files,
+        updated: formatDocumentDate(folder.updatedAt),
+      })),
+    );
+    setDocuments(
+      payload.documents.map((document) => ({
+        id: document.id,
+        fileName: document.fileName,
+        fileType: document.fileType,
+        fileSize: document.fileSize,
+        mimeType: document.mimeType,
+        category: document.category,
+        folderId: document.folderId,
+        folderName: document.folderName,
+        visibilityStatus: document.visibilityStatus,
+        lastModified: formatDocumentDate(document.updatedAt),
+      })),
+    );
+  }, []);
+
+  const loadDocuments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/account/documents", {
+        cache: "no-store",
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | (DocumentsApiPayload & { error?: string })
+        | null;
+      if (!response.ok || !payload) {
+        throw new Error(payload?.error || "Could not load documents.");
+      }
+      applyPayload(payload);
+      if (payload.companyRequired) {
+        onAction("Create a company profile before using document storage.");
+      }
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Could not load documents.");
+    } finally {
+      setLoading(false);
+    }
+  }, [applyPayload, onAction]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadDocuments();
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadDocuments]);
+
+  const foldersForCategory = useMemo(
+    () => folders.filter((folder) => folder.category === selectedCategory),
+    [folders, selectedCategory],
+  );
 
   const filteredDocuments = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return myDocuments.filter((document) => {
+    return documents.filter((document) => {
       const matchesFilter =
         filter === "All" ||
-        document.category === filter ||
-        document.visibility === filter;
+        documentCategoryLabels[document.category] === filter ||
+        documentVisibilityLabels[document.visibilityStatus] === filter;
       const searchableText = [
-        document.name,
-        document.category,
+        document.fileName,
+        documentCategoryLabels[document.category],
         document.fileType,
-        document.status,
-        document.visibility,
+        document.folderName ?? "",
+        documentVisibilityLabels[document.visibilityStatus],
       ]
         .join(" ")
         .toLowerCase();
 
       return matchesFilter && (!query || searchableText.includes(query));
     });
-  }, [filter, search]);
+  }, [documents, filter, search]);
+
+  async function uploadDocument(file: File) {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("category", selectedCategory);
+      formData.append("visibilityStatus", "private");
+      if (selectedFolderId) formData.append("folderId", selectedFolderId);
+
+      const response = await fetch("/api/account/documents", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | (DocumentsApiPayload & { error?: string })
+        | null;
+      if (!response.ok || !payload) {
+        throw new Error(payload?.error || "Document upload failed.");
+      }
+      applyPayload(payload);
+      onAction("Document uploaded.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Document upload failed.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function createFolder() {
+    const name = window.prompt("Folder name");
+    if (!name?.trim()) return;
+
+    setCreatingFolder(true);
+    try {
+      const response = await fetch("/api/account/document-folders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          category: selectedCategory,
+        }),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { folder?: { id: string }; error?: string }
+        | null;
+      if (!response.ok || !payload?.folder) {
+        throw new Error(payload?.error || "Folder could not be created.");
+      }
+      await loadDocuments();
+      setSelectedFolderId(payload.folder.id);
+      onAction("Folder created.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Folder could not be created.");
+    } finally {
+      setCreatingFolder(false);
+    }
+  }
+
+  async function openDocument(document: MyDocumentItem) {
+    try {
+      const response = await fetch(`/api/account/documents/${document.id}/signed-url`, {
+        cache: "no-store",
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { url?: string; error?: string }
+        | null;
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error || "Document could not be opened.");
+      }
+      window.open(payload.url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Document could not be opened.");
+    }
+  }
+
+  async function deleteDocument(document: MyDocumentItem) {
+    if (!window.confirm(`Delete ${document.fileName}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingId(document.id);
+    try {
+      const response = await fetch(`/api/account/documents/${document.id}`, {
+        method: "DELETE",
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      if (!response.ok) {
+        throw new Error(payload?.error || "Document could not be deleted.");
+      }
+      setDocuments((current) => current.filter((item) => item.id !== document.id));
+      setFolders((current) =>
+        current.map((folder) =>
+          folder.id === document.folderId
+            ? { ...folder, files: Math.max(0, folder.files - 1) }
+            : folder,
+        ),
+      );
+      onAction("Document deleted.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Document could not be deleted.");
+    } finally {
+      setDeletingId("");
+    }
+  }
 
   return (
     <div className="grid gap-4">
@@ -1101,17 +1278,72 @@ function MyDocumentsView({ onAction }: { onAction: (message?: string) => void })
               <h3 className="text-lg font-semibold theme-foreground">
                 My Documents
               </h3>
-              <span className="rounded-full border px-2 py-1 text-[11px] font-medium theme-warning-badge">
-                Storage coming later
-              </span>
             </div>
             <p className="mt-2 max-w-3xl text-sm leading-6 theme-muted">
               Store and organize company, product, compliance, shipping, and contract documents for Trade82 workflows.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <PlaceholderButton icon={Upload} label="Upload document" onClick={onAction} primary />
-            <PlaceholderButton icon={FolderPlus} label="New folder" onClick={onAction} />
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="grid gap-1">
+              <span className="sr-only">Document category</span>
+              <select
+                value={selectedCategory}
+                onChange={(event) => {
+                  setSelectedCategory(event.target.value as DocumentCategoryValue);
+                  setSelectedFolderId("");
+                }}
+                className="h-8 rounded-md border px-2 text-xs font-medium theme-input"
+              >
+                {documentCategoryOptions.map((category) => (
+                  <option key={category.value} value={category.value}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1">
+              <span className="sr-only">Document folder</span>
+              <select
+                value={selectedFolderId}
+                onChange={(event) => setSelectedFolderId(event.target.value)}
+                className="h-8 max-w-44 rounded-md border px-2 text-xs font-medium theme-input"
+              >
+                <option value="">No folder</option>
+                {foldersForCategory.map((folder) => (
+                  <option key={folder.id} value={folder.id}>
+                    {folder.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,text/plain,image/jpeg,image/png,image/webp"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void uploadDocument(file);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 text-xs font-semibold transition theme-primary-button hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+              <Upload className="size-3.5" aria-hidden="true" />
+              {uploading ? "Uploading..." : "Upload document"}
+            </button>
+            <button
+              type="button"
+              onClick={() => void createFolder()}
+              disabled={creatingFolder}
+              className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-md border px-2.5 text-xs font-semibold transition theme-secondary-button hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+              <FolderPlus className="size-3.5" aria-hidden="true" />
+              {creatingFolder ? "Creating..." : "New folder"}
+            </button>
             <div className="inline-flex h-8 rounded-md border p-0.5 theme-surface-muted">
               <ViewToggleButton
                 active={viewMode === "grid"}
@@ -1154,20 +1386,22 @@ function MyDocumentsView({ onAction }: { onAction: (message?: string) => void })
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {folders.map((folder) => (
           <button
-            key={folder.name}
+            key={folder.id}
             type="button"
-            onClick={() => onAction()}
+            onClick={() => {
+              setSelectedCategory(folder.category);
+              setSelectedFolderId(folder.id);
+              setFilter(documentCategoryLabels[folder.category]);
+            }}
             className="rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover"
           >
             <div className="flex items-start justify-between gap-2">
               <span className="inline-flex size-9 items-center justify-center rounded-xl border theme-border theme-surface-muted">
                 <Folder className="size-4 text-[var(--accent-foreground)]" aria-hidden="true" />
               </span>
-              {folder.badge ? (
-                <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted">
-                  {folder.badge}
-                </span>
-              ) : null}
+              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted">
+                {documentCategoryLabels[folder.category]}
+              </span>
             </div>
             <h4 className="mt-3 text-sm font-semibold theme-foreground">
               {folder.name}
@@ -1179,10 +1413,24 @@ function MyDocumentsView({ onAction }: { onAction: (message?: string) => void })
         ))}
       </section>
 
+      {loading ? (
+        <div className="rounded-2xl border p-8 text-center theme-surface-muted">
+          <p className="text-sm font-semibold theme-foreground">
+            Loading documents...
+          </p>
+        </div>
+      ) : null}
+
       {viewMode === "grid" ? (
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {filteredDocuments.map((document) => (
-            <DocumentCard key={document.id} document={document} onAction={onAction} />
+            <DocumentCard
+              key={document.id}
+              document={document}
+              deleting={deletingId === document.id}
+              onDelete={deleteDocument}
+              onOpen={openDocument}
+            />
           ))}
         </section>
       ) : (
@@ -1198,13 +1446,19 @@ function MyDocumentsView({ onAction }: { onAction: (message?: string) => void })
           </div>
           <div className="divide-y theme-border">
             {filteredDocuments.map((document) => (
-              <DocumentRow key={document.id} document={document} onAction={onAction} />
+              <DocumentRow
+                key={document.id}
+                document={document}
+                deleting={deletingId === document.id}
+                onDelete={deleteDocument}
+                onOpen={openDocument}
+              />
             ))}
           </div>
         </section>
       )}
 
-      {!filteredDocuments.length ? (
+      {!loading && !filteredDocuments.length ? (
         <div className="rounded-2xl border border-dashed p-8 text-center theme-surface-muted">
           <p className="text-sm font-semibold theme-foreground">
             No documents found.
@@ -1220,10 +1474,14 @@ function MyDocumentsView({ onAction }: { onAction: (message?: string) => void })
 
 function DocumentCard({
   document,
-  onAction,
+  deleting,
+  onDelete,
+  onOpen,
 }: {
   document: MyDocumentItem;
-  onAction: (message?: string) => void;
+  deleting: boolean;
+  onDelete: (document: MyDocumentItem) => void;
+  onOpen: (document: MyDocumentItem) => void;
 }) {
   return (
     <article className="rounded-2xl border p-3 theme-surface-elevated">
@@ -1234,18 +1492,29 @@ function DocumentCard({
           </span>
           <div className="min-w-0">
             <h4 className="line-clamp-2 text-sm font-semibold leading-5 theme-foreground">
-              {document.name}
+              {document.fileName}
             </h4>
             <p className="mt-1 text-xs theme-muted">
-              {document.category} · {document.fileType}
+              {documentCategoryLabels[document.category]} · {document.fileType} · {formatFileSize(document.fileSize)}
             </p>
+            {document.folderName ? (
+              <p className="mt-1 text-xs theme-muted">{document.folderName}</p>
+            ) : null}
           </div>
         </div>
-        <DocumentActions onAction={onAction} />
+        <DocumentActions
+          deleting={deleting}
+          document={document}
+          onDelete={onDelete}
+          onOpen={onOpen}
+        />
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
-        <StatusChip label={document.status} tone={document.status} />
-        <StatusChip label={document.visibility} tone={document.visibility} />
+        <StatusChip label="Uploaded" tone="Uploaded" />
+        <StatusChip
+          label={documentVisibilityLabels[document.visibilityStatus]}
+          tone={documentVisibilityLabels[document.visibilityStatus]}
+        />
       </div>
       <p className="mt-3 text-xs theme-muted">
         Last modified {document.lastModified}
@@ -1256,10 +1525,14 @@ function DocumentCard({
 
 function DocumentRow({
   document,
-  onAction,
+  deleting,
+  onDelete,
+  onOpen,
 }: {
   document: MyDocumentItem;
-  onAction: (message?: string) => void;
+  deleting: boolean;
+  onDelete: (document: MyDocumentItem) => void;
+  onOpen: (document: MyDocumentItem) => void;
 }) {
   return (
     <article className="grid gap-3 p-3 transition hover:bg-[var(--muted)] lg:grid-cols-[1.3fr_0.65fr_0.55fr_0.75fr_0.85fr_0.75fr_0.8fr] lg:items-center">
@@ -1268,26 +1541,42 @@ function DocumentRow({
           <FileText className="size-4 text-[var(--accent-foreground)]" aria-hidden="true" />
         </span>
         <span className="truncate text-sm font-semibold theme-foreground">
-          {document.name}
+          {document.fileName}
         </span>
       </div>
-      <LibraryCell label="Category" value={document.category} />
+      <LibraryCell label="Category" value={documentCategoryLabels[document.category]} />
       <LibraryCell label="Type" value={document.fileType} />
       <div>
-        <StatusChip label={document.status} tone={document.status} />
+        <StatusChip label="Uploaded" tone="Uploaded" />
       </div>
       <div>
-        <StatusChip label={document.visibility} tone={document.visibility} />
+        <StatusChip
+          label={documentVisibilityLabels[document.visibilityStatus]}
+          tone={documentVisibilityLabels[document.visibilityStatus]}
+        />
       </div>
       <LibraryCell label="Modified" value={document.lastModified} />
-      <DocumentActions onAction={onAction} />
+      <DocumentActions
+        deleting={deleting}
+        document={document}
+        onDelete={onDelete}
+        onOpen={onOpen}
+      />
     </article>
   );
 }
 
-function DocumentActions({ onAction }: { onAction: (message?: string) => void }) {
-  const actions = ["Preview", "Download", "Rename", "Move", "Share", "Delete"];
-
+function DocumentActions({
+  deleting,
+  document,
+  onDelete,
+  onOpen,
+}: {
+  deleting: boolean;
+  document: MyDocumentItem;
+  onDelete: (document: MyDocumentItem) => void;
+  onOpen: (document: MyDocumentItem) => void;
+}) {
   return (
     <details className="relative">
       <summary className="inline-flex h-8 cursor-pointer list-none items-center gap-1 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5">
@@ -1295,43 +1584,23 @@ function DocumentActions({ onAction }: { onAction: (message?: string) => void })
         Actions
       </summary>
       <div className="absolute right-0 z-20 mt-2 grid min-w-36 gap-1 rounded-xl border p-1 theme-surface-elevated">
-        {actions.map((action) => (
-          <button
-            key={action}
-            type="button"
-            onClick={() => onAction()}
-            className="rounded-lg px-2 py-1.5 text-left text-xs font-medium theme-ghost-button"
-          >
-            {action}
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={() => onOpen(document)}
+          className="rounded-lg px-2 py-1.5 text-left text-xs font-medium theme-ghost-button"
+        >
+          Open
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(document)}
+          disabled={deleting}
+          className="rounded-lg px-2 py-1.5 text-left text-xs font-medium text-red-500 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {deleting ? "Deleting..." : "Delete"}
+        </button>
       </div>
     </details>
-  );
-}
-
-function PlaceholderButton({
-  icon: Icon,
-  label,
-  onClick,
-  primary = false,
-}: {
-  icon: typeof Upload;
-  label: string;
-  onClick: (message?: string) => void;
-  primary?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={() => onClick()}
-      className={`inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold transition hover:-translate-y-0.5 ${
-        primary ? "theme-primary-button" : "border theme-secondary-button"
-      }`}
-    >
-      <Icon className="size-3.5" aria-hidden="true" />
-      {label}
-    </button>
   );
 }
 
