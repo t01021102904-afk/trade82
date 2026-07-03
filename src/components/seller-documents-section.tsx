@@ -1351,7 +1351,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
     }
 
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = rect.right - 220;
+    const x = rect.left;
     const y = rect.bottom + 8;
     return clampMenuCoordinates(x, y);
   }
@@ -1672,7 +1672,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
         | { folder?: FolderApiItem; error?: string }
         | null;
       if (!response.ok || !payload?.folder) {
-        throw new Error(payload?.error || "Folder could not be renamed.");
+        throw new Error(payload?.error || `Folder rename request failed (${response.status}).`);
       }
       const renamed = mapApiFolder(payload.folder);
       setFolders((current) =>
@@ -1689,7 +1689,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
       setRenameTarget(null);
       onAction("Folder renamed.");
     } catch (error) {
-      onAction(error instanceof Error ? error.message : "Folder could not be renamed.", "error");
+      onAction(error instanceof Error ? error.message : "Folder rename request failed.", "error");
     } finally {
       setRenaming(false);
     }
@@ -1752,14 +1752,14 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
         | { error?: string }
         | null;
       if (!response.ok) {
-        throw new Error(payload?.error || "Folder could not be deleted.");
+        throw new Error(payload?.error || `Folder delete request failed (${response.status}).`);
       }
       setFolders((current) => current.filter((item) => item.id !== folder.id));
       setOpenedFolder((current) => (current?.id === folder.id ? null : current));
       if (selectedFolderId === folder.id) setSelectedFolderId("");
       onAction("Folder deleted.");
     } catch (error) {
-      onAction(error instanceof Error ? error.message : "Folder could not be deleted.", "error");
+      onAction(error instanceof Error ? error.message : "Folder delete request failed.", "error");
     } finally {
       setDeletingFolderId("");
     }
@@ -2143,9 +2143,13 @@ function FolderWindow({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-zinc-950/45 p-3 backdrop-blur-sm sm:p-6">
+    <div
+      className="fixed inset-0 z-40 flex items-center justify-center bg-zinc-950/45 p-3 backdrop-blur-sm sm:p-6"
+      onClick={onClose}
+    >
       <section
-        className="relative flex h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white text-zinc-950 shadow-2xl shadow-zinc-950/25"
+        className="relative flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[880px] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white text-zinc-950 shadow-2xl shadow-zinc-950/25 sm:max-h-[76vh]"
+        onClick={(event) => event.stopPropagation()}
         onDragEnter={onDragEnter}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
@@ -2165,14 +2169,14 @@ function FolderWindow({
           </div>
         ) : null}
 
-        <header className="border-b border-zinc-200 bg-zinc-50/80 p-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex min-w-0 items-start gap-3">
-              <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white">
-                <FolderOpen className="size-5 text-emerald-600" aria-hidden="true" />
+        <header className="border-b border-zinc-200 bg-zinc-50/80 p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-start gap-2.5">
+              <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white">
+                <FolderOpen className="size-4 text-emerald-600" aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <h3 className="truncate text-base font-semibold text-zinc-950">
+                <h3 className="truncate text-sm font-semibold text-zinc-950">
                   {folder.name}
                 </h3>
                 <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -2189,13 +2193,13 @@ function FolderWindow({
               type="button"
               onClick={onClose}
               aria-label="Close folder"
-              className="inline-flex size-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+              className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="mt-4 flex flex-col gap-2 lg:flex-row lg:items-center">
+          <div className="mt-3 flex flex-col gap-2 lg:flex-row lg:items-center">
             <input
               ref={fileInputRef}
               type="file"
@@ -2212,7 +2216,7 @@ function FolderWindow({
               type="button"
               disabled={uploading}
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-zinc-950 px-3 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-zinc-950 px-3 text-xs font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Upload className="size-3.5" aria-hidden="true" />
               {uploading ? uploadStatus || "Uploading..." : "Upload to this folder"}
@@ -2225,15 +2229,15 @@ function FolderWindow({
                 value={search}
                 onChange={(event) => onSearchChange(event.target.value)}
                 placeholder="Search inside folder"
-                className="h-9 w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-sm text-zinc-950 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+                className="h-8 w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-xs text-zinc-950 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
               />
             </label>
-            <div className="inline-flex h-9 rounded-lg border border-zinc-200 bg-white p-0.5">
+            <div className="inline-flex h-8 rounded-lg border border-zinc-200 bg-white p-0.5">
               <button
                 type="button"
                 aria-label="Folder grid view"
                 onClick={() => onViewModeChange("grid")}
-                className={`inline-flex size-8 items-center justify-center rounded-md transition ${
+                className={`inline-flex size-7 items-center justify-center rounded-md transition ${
                   viewMode === "grid"
                     ? "bg-zinc-950 text-white"
                     : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
@@ -2245,7 +2249,7 @@ function FolderWindow({
                 type="button"
                 aria-label="Folder list view"
                 onClick={() => onViewModeChange("list")}
-                className={`inline-flex size-8 items-center justify-center rounded-md transition ${
+                className={`inline-flex size-7 items-center justify-center rounded-md transition ${
                   viewMode === "list"
                     ? "bg-zinc-950 text-white"
                     : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
@@ -2257,9 +2261,9 @@ function FolderWindow({
           </div>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto bg-white p-4">
+        <div className="min-h-0 overflow-y-auto bg-white p-3">
           {!documents.length ? (
-            <div className="flex min-h-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 p-8 text-center">
+            <div className="mx-auto flex min-h-[280px] max-w-sm items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-6 py-8 text-center">
               <div>
                 <FolderOpen className="mx-auto size-8 text-zinc-400" aria-hidden="true" />
                 <p className="mt-3 text-sm font-semibold text-zinc-950">
