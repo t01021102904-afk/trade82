@@ -6,10 +6,36 @@ import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
+const defaultTitle = "Trade82 | Korean-U.S. B2B Marketplace";
+const defaultDescription =
+  "Connect Korean sellers with U.S. buyers and manage export workflows in one workspace.";
+const defaultOgImage = "https://trade82.com/og/linkpicture-v2.png";
+
 export const metadata: Metadata = {
-  title: "Trade82 | Korean-U.S. B2B Marketplace",
-  description:
-    "Trade82 connects Korean sellers with trusted American buyers and trade-ready product information.",
+  metadataBase: new URL("https://trade82.com"),
+  title: defaultTitle,
+  description: defaultDescription,
+  openGraph: {
+    title: defaultTitle,
+    description: defaultDescription,
+    url: "https://trade82.com",
+    siteName: "Trade82",
+    type: "website",
+    images: [
+      {
+        url: defaultOgImage,
+        width: 1200,
+        height: 630,
+        alt: "Trade82 Korean-U.S. B2B Marketplace",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+    images: [defaultOgImage],
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

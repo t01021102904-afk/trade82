@@ -15,6 +15,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { cx } from "@/lib/utils";
 
+const DEFAULT_SHARE_IMAGE_URL = "https://trade82.com/og/linkpicture-v2.png";
+
 type ProductShareButtonProps = {
   title: string;
   description: string;
@@ -75,7 +77,7 @@ export function ProductShareButton({
   }, [copied]);
 
   const resolvedImageUrl = useMemo(() => {
-    const candidate = imageUrl?.trim() || "/og/trade82-share.png";
+    const candidate = imageUrl?.trim() || DEFAULT_SHARE_IMAGE_URL;
     try {
       return new URL(candidate).toString();
     } catch {

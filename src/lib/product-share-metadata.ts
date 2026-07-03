@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 
-const DEFAULT_OG_IMAGE_PATH = "/og/trade82-share.png";
+const DEFAULT_OG_IMAGE_URL = "https://trade82.com/og/linkpicture-v2.png";
 const DEFAULT_DESCRIPTION =
   "Discover trade-ready Korean products and connect with U.S. buyers and suppliers on Trade82.";
 
@@ -51,7 +51,7 @@ function publicProductImageUrl(
       }
     | null,
 ) {
-  if (!product) return absoluteUrl(DEFAULT_OG_IMAGE_PATH);
+  if (!product) return DEFAULT_OG_IMAGE_URL;
 
   const image = product.images[0];
   const candidate =
@@ -64,7 +64,7 @@ function publicProductImageUrl(
 
   return candidate.trim()
     ? absoluteUrl(candidate)
-    : absoluteUrl(DEFAULT_OG_IMAGE_PATH);
+    : DEFAULT_OG_IMAGE_URL;
 }
 
 export async function getProductShareMetadata(
@@ -144,7 +144,7 @@ export async function getProductShareMetadata(
 }
 
 function fallbackProductMetadata(url: string): Metadata {
-  const imageUrl = absoluteUrl(DEFAULT_OG_IMAGE_PATH);
+  const imageUrl = DEFAULT_OG_IMAGE_URL;
 
   return {
     title: "Trade82 product | Trade82",
