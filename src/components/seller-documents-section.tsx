@@ -905,7 +905,7 @@ function FormsLibraryView({ onAction }: { onAction: (message?: string) => void }
       ) : null}
 
       <div className="overflow-hidden rounded-2xl border theme-surface">
-        <div className="hidden border-b px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] theme-border theme-surface-muted theme-muted xl:grid xl:grid-cols-[1.1fr_0.7fr_1.1fr_0.75fr_0.65fr_0.85fr_0.85fr_0.95fr] xl:gap-3">
+        <div className="hidden border-b px-4 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] theme-border theme-surface-muted theme-muted xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.75fr)_minmax(0,0.45fr)_minmax(0,0.65fr)_minmax(0,0.8fr)_minmax(200px,1.25fr)] xl:gap-4">
           <span>Form / Template</span>
           <span>Category</span>
           <span>Used for</span>
@@ -949,7 +949,7 @@ function FormLibraryRow({
   const actions = formActions(item);
 
   return (
-    <article className="p-3 transition hover:bg-[var(--muted)] xl:grid xl:grid-cols-[1.1fr_0.7fr_1.1fr_0.75fr_0.65fr_0.85fr_0.85fr_0.95fr] xl:items-center xl:gap-3">
+    <article className="p-4 transition hover:bg-[var(--muted)] xl:grid xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.6fr)_minmax(0,1fr)_minmax(0,0.75fr)_minmax(0,0.45fr)_minmax(0,0.65fr)_minmax(0,0.8fr)_minmax(200px,1.25fr)] xl:items-center xl:gap-4">
       <div className="min-w-0">
         <div className="flex min-w-0 items-start gap-2">
           <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg border theme-border theme-surface-muted">
@@ -973,7 +973,7 @@ function FormLibraryRow({
       <div className="mt-2 xl:mt-0">
         <StatusChips statuses={formLibraryLabels(item)} />
       </div>
-      <div className="mt-3 flex flex-wrap gap-2 xl:mt-0">
+      <div className="mt-4 grid gap-2 sm:flex sm:flex-wrap xl:mt-0 xl:flex xl:flex-col xl:flex-nowrap xl:items-stretch">
         {actions.map((action) => (
           <FormLibraryAction
             key={action}
@@ -1002,7 +1002,6 @@ function FormLibraryAction({
     templateHref && (action === "Preview" || action === "Print / Save as PDF");
   const isTemplatePdfDownload = templatePdfHref && action === "Download PDF";
   const isOfficialSourceAction = item.officialUrl && action === "Open official source";
-  const isDisabledTemplateFile = item.templateSlug && action === "DOCX coming soon";
   const icon = action.startsWith("Open") || action === "Print / Save as PDF" ? (
     <ExternalLink className="size-3.5" aria-hidden="true" />
   ) : action.startsWith("Download") ? (
@@ -1011,7 +1010,7 @@ function FormLibraryAction({
     <Eye className="size-3.5" aria-hidden="true" />
   );
   const className =
-    "inline-flex h-7 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5";
+    "inline-flex h-8 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-2.5 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5 sm:w-auto xl:w-full";
 
   if (isTemplatePrintAction) {
     return (
@@ -1057,10 +1056,8 @@ function FormLibraryAction({
   return (
     <button
       type="button"
-      disabled={Boolean(isDisabledTemplateFile)}
-      title={isDisabledTemplateFile ? "File download is not available yet. Use Preview and browser print instead." : undefined}
       onClick={() => onAction(item, action)}
-      className={`${className} disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0`}
+      className={className}
     >
       {icon}
       {action}
@@ -1395,7 +1392,7 @@ function FilterChips<T extends string>({
 function LibraryCell({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] theme-muted lg:hidden">
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] theme-muted xl:hidden">
         {label}
       </p>
       <p className="mt-1 break-words text-xs leading-5 theme-muted lg:mt-0">
@@ -1456,7 +1453,7 @@ function formLibraryLabels(item: FormLibraryItem) {
 
 function formActions(item: FormLibraryItem) {
   if (item.templateSlug) {
-    return ["Preview", "Print / Save as PDF", "Download PDF", "DOCX coming soon"];
+    return ["Preview", "Print / Save as PDF", "Download PDF"];
   }
   if (item.sourceType === "official") return ["Open official source", "View details"];
   return ["View details", "Request document later"];
