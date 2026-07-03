@@ -132,12 +132,6 @@ type FileManagerContextMenuState =
       item: MyDocumentItem;
       x: number;
       y: number;
-    }
-  | {
-      kind: "folder";
-      item: FolderItem;
-      x: number;
-      y: number;
     };
 
 type RenameTarget =
@@ -761,7 +755,6 @@ const DOCUMENT_CLIENT_ALLOWED_MIME_TYPES = new Set([
 ]);
 const FILE_MANAGER_MENU_WIDTH = 224;
 const DOCUMENT_MENU_HEIGHT = 188;
-const FOLDER_MENU_HEIGHT = 156;
 const MENU_GAP = 8;
 const MENU_VIEWPORT_MARGIN = 12;
 
@@ -1211,12 +1204,13 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   const [draggingFolderWindow, setDraggingFolderWindow] = useState(false);
   const [contextMenu, setContextMenu] =
     useState<FileManagerContextMenuState | null>(null);
+  const [activeFolderMenuId, setActiveFolderMenuId] = useState("");
   const [draggingDocuments, setDraggingDocuments] = useState(false);
   const [draggingFolderId, setDraggingFolderId] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragDepthRef = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
-  const folderActionButtonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const folderMenuRef = useRef<HTMLDivElement>(null);
 
   const applyPayload = useCallback((payload: DocumentsApiPayload) => {
     const mappedFolders = payload.folders.map(mapApiFolder);
@@ -1285,6 +1279,33 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [contextMenu]);
+
+  useEffect(() => {
+    if (!activeFolderMenuId) return undefined;
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (target instanceof Node && folderMenuRef.current?.contains(target)) return;
+      setActiveFolderMenuId("");
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setActiveFolderMenuId("");
+    }
+
+    function handleScroll() {
+      setActiveFolderMenuId("");
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [activeFolderMenuId]);
 
   useEffect(() => {
     if (!openedFolder) return undefined;
@@ -1370,17 +1391,6 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
     return clampMenuCoordinates(x, y);
   }
 
-  function folderMenuCoordinates(folderId: string, event: MouseEvent<HTMLElement>) {
-    const anchor = folderActionButtonRefs.current.get(folderId) ?? event.currentTarget;
-    const rect = anchor.getBoundingClientRect();
-    const x = rect.right - FILE_MANAGER_MENU_WIDTH;
-    const belowY = rect.bottom + MENU_GAP;
-    const canOpenBelow =
-      belowY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
-    const y = canOpenBelow ? belowY : rect.top - MENU_GAP - FOLDER_MENU_HEIGHT;
-    return clampMenuCoordinates(x, y, FOLDER_MENU_HEIGHT);
-  }
-
   function openDocumentMenu(
     documentItem: MyDocumentItem,
     event: MouseEvent<HTMLElement>,
@@ -1393,22 +1403,8 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   function openFolderMenu(folder: FolderItem, event: MouseEvent<HTMLElement>) {
     event.preventDefault();
     event.stopPropagation();
-    setContextMenu({
-      kind: "folder",
-      item: folder,
-      ...folderMenuCoordinates(folder.id, event),
-    });
-  }
-
-  function setFolderActionButtonRef(
-    folderId: string,
-    element: HTMLButtonElement | null,
-  ) {
-    if (element) {
-      folderActionButtonRefs.current.set(folderId, element);
-      return;
-    }
-    folderActionButtonRefs.current.delete(folderId);
+    setContextMenu(null);
+    setActiveFolderMenuId((current) => (current === folder.id ? "" : folder.id));
   }
 
   function selectFolder(folder: FolderItem) {
@@ -1416,12 +1412,14 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
     setSelectedFolderId(folder.id);
     setFilter(documentCategoryLabels[folder.category]);
     setContextMenu(null);
+    setActiveFolderMenuId("");
   }
 
   function openFolderWindow(folder: FolderItem) {
     setOpenedFolder(folder);
     setFolderWindowSearch("");
     setContextMenu(null);
+    setActiveFolderMenuId("");
     selectFolder(folder);
   }
 
@@ -1774,7 +1772,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   }
 
   async function deleteFolder(folder: FolderItem) {
-    setContextMenu(null);
+    setActiveFolderMenuId("");
     if (folder.files > 0) {
       onAction("Move or delete documents before deleting this folder.", "error");
       return;
@@ -1960,7 +1958,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+      <section className="grid overflow-visible gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {folders.map((folder) => (
           <article
             key={folder.id}
@@ -1979,7 +1977,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
             }}
             role="button"
             tabIndex={0}
-            className={`rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover ${
+            className={`relative overflow-visible rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover ${
               draggingFolderId === folder.id
                 ? "border-emerald-300/70 bg-emerald-300/10 ring-2 ring-emerald-400/20"
                 : ""
@@ -1994,7 +1992,6 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
                   {documentCategoryLabels[folder.category]}
                 </span>
                 <button
-                  ref={(element) => setFolderActionButtonRef(folder.id, element)}
                   type="button"
                   aria-label={`Open actions for ${folder.name}`}
                   onClick={(event) => openFolderMenu(folder, event)}
@@ -2002,6 +1999,20 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
                 >
                   <MoreHorizontal className="size-3.5" aria-hidden="true" />
                 </button>
+                {activeFolderMenuId === folder.id ? (
+                  <FolderCardMenu
+                    ref={folderMenuRef}
+                    deleting={deletingFolderId === folder.id}
+                    folder={folder}
+                    onClose={() => setActiveFolderMenuId("")}
+                    onDeleteFolder={deleteFolder}
+                    onOpenFolder={openFolderWindow}
+                    onRenameFolder={(item) => {
+                      setActiveFolderMenuId("");
+                      setRenameTarget({ kind: "folder", item });
+                    }}
+                  />
+                ) : null}
               </div>
             </div>
             <h4 className="mt-3 text-sm font-semibold theme-foreground">
@@ -2077,20 +2088,13 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
           ref={menuRef}
           menu={contextMenu}
           deletingDocumentId={deletingId}
-          deletingFolderId={deletingFolderId}
           onClose={() => setContextMenu(null)}
           onDeleteDocument={deleteDocument}
-          onDeleteFolder={deleteFolder}
           onDownloadDocument={downloadDocument}
           onOpenDocument={openDocument}
-          onOpenFolder={openFolderWindow}
           onRenameDocument={(item) => {
             setContextMenu(null);
             setRenameTarget({ kind: "document", item });
-          }}
-          onRenameFolder={(item) => {
-            setContextMenu(null);
-            setRenameTarget({ kind: "folder", item });
           }}
         />
       ) : null}
@@ -2484,94 +2488,119 @@ const FileManagerContextMenu = forwardRef<
   {
     menu: FileManagerContextMenuState;
     deletingDocumentId: string;
-    deletingFolderId: string;
     onClose: () => void;
     onDeleteDocument: (document: MyDocumentItem) => void;
-    onDeleteFolder: (folder: FolderItem) => void;
     onDownloadDocument: (document: MyDocumentItem) => void;
     onOpenDocument: (document: MyDocumentItem) => void;
-    onOpenFolder: (folder: FolderItem) => void;
     onRenameDocument: (document: MyDocumentItem) => void;
-    onRenameFolder: (folder: FolderItem) => void;
   }
 >(function FileManagerContextMenu(
   {
     menu,
     deletingDocumentId,
-    deletingFolderId,
     onClose,
     onDeleteDocument,
-    onDeleteFolder,
     onDownloadDocument,
     onOpenDocument,
-    onOpenFolder,
     onRenameDocument,
-    onRenameFolder,
   },
   ref,
 ) {
-  const isDocument = menu.kind === "document";
-  const deleting =
-    menu.kind === "document"
-      ? deletingDocumentId === menu.item.id
-      : deletingFolderId === menu.item.id;
+  const deleting = deletingDocumentId === menu.item.id;
 
   return (
     <div
       ref={ref}
       role="menu"
-      aria-label={isDocument ? "Document actions" : "Folder actions"}
+      aria-label="Document actions"
       className="fixed z-50 w-56 rounded-xl border border-zinc-200 bg-white p-1.5 text-zinc-900 shadow-xl shadow-zinc-950/15"
       style={{ left: menu.x, top: menu.y }}
     >
-      {menu.kind === "document" ? (
-        <>
-          <ContextMenuButton
-            icon={Eye}
-            label="Open / Preview"
-            onClick={() => onOpenDocument(menu.item)}
-          />
-          <ContextMenuButton
-            icon={Download}
-            label="Download"
-            onClick={() => onDownloadDocument(menu.item)}
-          />
-          <MenuDivider />
-          <ContextMenuButton
-            icon={Pencil}
-            label="Rename"
-            onClick={() => onRenameDocument(menu.item)}
-          />
-          <ContextMenuButton
-            danger
-            disabled={deleting}
-            icon={Trash2}
-            label={deleting ? "Deleting..." : "Delete"}
-            onClick={() => onDeleteDocument(menu.item)}
-          />
-        </>
-      ) : (
-        <>
-          <ContextMenuButton
-            icon={FolderOpen}
-            label="Open folder"
-            onClick={() => onOpenFolder(menu.item)}
-          />
-          <MenuDivider />
-          <ContextMenuButton
-            icon={Pencil}
-            label="Rename folder"
-            onClick={() => onRenameFolder(menu.item)}
-          />
-          <ContextMenuButton
-            danger
-            disabled={deleting}
-            icon={Trash2}
-            label={deleting ? "Deleting..." : "Delete folder"}
-            onClick={() => onDeleteFolder(menu.item)}
-          />
-        </>
-      )}
+      <ContextMenuButton
+        icon={Eye}
+        label="Open / Preview"
+        onClick={() => onOpenDocument(menu.item)}
+      />
+      <ContextMenuButton
+        icon={Download}
+        label="Download"
+        onClick={() => onDownloadDocument(menu.item)}
+      />
+      <MenuDivider />
+      <ContextMenuButton
+        icon={Pencil}
+        label="Rename"
+        onClick={() => onRenameDocument(menu.item)}
+      />
+      <ContextMenuButton
+        danger
+        disabled={deleting}
+        icon={Trash2}
+        label={deleting ? "Deleting..." : "Delete"}
+        onClick={() => onDeleteDocument(menu.item)}
+      />
+      <button
+        type="button"
+        onClick={onClose}
+        className="mt-1 w-full rounded-lg px-2 py-1.5 text-left text-xs font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+      >
+        Close
+      </button>
+    </div>
+  );
+});
+
+const FolderCardMenu = forwardRef<
+  HTMLDivElement,
+  {
+    deleting: boolean;
+    folder: FolderItem;
+    onClose: () => void;
+    onDeleteFolder: (folder: FolderItem) => void;
+    onOpenFolder: (folder: FolderItem) => void;
+    onRenameFolder: (folder: FolderItem) => void;
+  }
+>(function FolderCardMenu(
+  {
+    deleting,
+    folder,
+    onClose,
+    onDeleteFolder,
+    onOpenFolder,
+    onRenameFolder,
+  },
+  ref,
+) {
+  return (
+    <div
+      ref={ref}
+      role="menu"
+      aria-label="Folder actions"
+      className="absolute right-0 top-9 z-50 w-56 rounded-xl border border-zinc-200 bg-white p-1.5 text-zinc-900 shadow-xl shadow-zinc-950/15"
+      onClick={(event) => event.stopPropagation()}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
+      <ContextMenuButton
+        icon={FolderOpen}
+        label="Open folder"
+        onClick={() => onOpenFolder(folder)}
+      />
+      <MenuDivider />
+      <ContextMenuButton
+        icon={Pencil}
+        label="Rename folder"
+        onClick={() => onRenameFolder(folder)}
+      />
+      <ContextMenuButton
+        danger
+        disabled={deleting}
+        icon={Trash2}
+        label={deleting ? "Deleting..." : "Delete folder"}
+        onClick={() => onDeleteFolder(folder)}
+      />
       <button
         type="button"
         onClick={onClose}
