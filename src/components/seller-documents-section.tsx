@@ -6,16 +6,21 @@ import {
   Eye,
   FileText,
   Folder,
+  FolderOpen,
   FolderPlus,
   Grid2X2,
   List,
   MoreHorizontal,
+  Pencil,
   Search,
+  Trash2,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
 import {
   type DragEvent,
+  type MouseEvent,
+  forwardRef,
   useCallback,
   useEffect,
   useMemo,
@@ -116,6 +121,27 @@ type DocumentsApiPayload = {
   }>;
   companyRequired?: boolean;
 };
+
+type FolderApiItem = DocumentsApiPayload["folders"][number];
+type DocumentApiItem = DocumentsApiPayload["documents"][number];
+
+type FileManagerContextMenuState =
+  | {
+      kind: "document";
+      item: MyDocumentItem;
+      x: number;
+      y: number;
+    }
+  | {
+      kind: "folder";
+      item: FolderItem;
+      x: number;
+      y: number;
+    };
+
+type RenameTarget =
+  | { kind: "document"; item: MyDocumentItem }
+  | { kind: "folder"; item: FolderItem };
 
 const formLibraryItems: FormLibraryItem[] = [
   {
@@ -738,6 +764,31 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function mapApiFolder(folder: FolderApiItem): FolderItem {
+  return {
+    id: folder.id,
+    name: folder.name,
+    category: folder.category,
+    files: folder.files,
+    updated: formatDocumentDate(folder.updatedAt),
+  };
+}
+
+function mapApiDocument(document: DocumentApiItem): MyDocumentItem {
+  return {
+    id: document.id,
+    fileName: document.fileName,
+    fileType: document.fileType,
+    fileSize: document.fileSize,
+    mimeType: document.mimeType,
+    category: document.category,
+    folderId: document.folderId,
+    folderName: document.folderName,
+    visibilityStatus: document.visibilityStatus,
+    lastModified: formatDocumentDate(document.updatedAt),
+  };
+}
+
 function fileExtension(filename: string) {
   return filename
     .toLowerCase()
@@ -911,14 +962,6 @@ function FormsLibraryView({ onAction }: { onAction: (message: string) => void })
     setSelectedItem(item);
 
     if (action === "View details") return;
-    if (action === "Open official source") {
-      onAction("Official source link will be available soon.");
-      return;
-    }
-    if (action === "Request document later") {
-      onAction("Document request workflow will be available later.");
-      return;
-    }
     onAction("Details are shown below.");
   }
 
@@ -1139,35 +1182,20 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
   const [uploadStatus, setUploadStatus] = useState("");
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [deletingId, setDeletingId] = useState("");
+  const [deletingFolderId, setDeletingFolderId] = useState("");
+  const [renaming, setRenaming] = useState(false);
+  const [renameTarget, setRenameTarget] = useState<RenameTarget | null>(null);
+  const [contextMenu, setContextMenu] =
+    useState<FileManagerContextMenuState | null>(null);
   const [draggingDocuments, setDraggingDocuments] = useState(false);
   const [draggingFolderId, setDraggingFolderId] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragDepthRef = useRef(0);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const applyPayload = useCallback((payload: DocumentsApiPayload) => {
-    setFolders(
-      payload.folders.map((folder) => ({
-        id: folder.id,
-        name: folder.name,
-        category: folder.category,
-        files: folder.files,
-        updated: formatDocumentDate(folder.updatedAt),
-      })),
-    );
-    setDocuments(
-      payload.documents.map((document) => ({
-        id: document.id,
-        fileName: document.fileName,
-        fileType: document.fileType,
-        fileSize: document.fileSize,
-        mimeType: document.mimeType,
-        category: document.category,
-        folderId: document.folderId,
-        folderName: document.folderName,
-        visibilityStatus: document.visibilityStatus,
-        lastModified: formatDocumentDate(document.updatedAt),
-      })),
-    );
+    setFolders(payload.folders.map(mapApiFolder));
+    setDocuments(payload.documents.map(mapApiDocument));
   }, []);
 
   const loadDocuments = useCallback(async () => {
@@ -1200,6 +1228,33 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
     return () => window.clearTimeout(timer);
   }, [loadDocuments]);
 
+  useEffect(() => {
+    if (!contextMenu) return undefined;
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (target instanceof Node && menuRef.current?.contains(target)) return;
+      setContextMenu(null);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setContextMenu(null);
+    }
+
+    function handleScroll() {
+      setContextMenu(null);
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleScroll, true);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
+  }, [contextMenu]);
+
   const foldersForCategory = useMemo(
     () => folders.filter((folder) => folder.category === selectedCategory),
     [folders, selectedCategory],
@@ -1226,6 +1281,45 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
       return matchesFilter && (!query || searchableText.includes(query));
     });
   }, [documents, filter, search]);
+
+  function menuCoordinates(event: MouseEvent<HTMLElement>) {
+    const menuWidth = 220;
+    const menuHeight = 220;
+    const x = Math.min(
+      event.clientX,
+      Math.max(12, window.innerWidth - menuWidth - 12),
+    );
+    const y = Math.min(
+      event.clientY,
+      Math.max(12, window.innerHeight - menuHeight - 12),
+    );
+    return {
+      x: Math.max(12, x),
+      y: Math.max(12, y),
+    };
+  }
+
+  function openDocumentMenu(
+    documentItem: MyDocumentItem,
+    event: MouseEvent<HTMLElement>,
+  ) {
+    event.preventDefault();
+    event.stopPropagation();
+    setContextMenu({ kind: "document", item: documentItem, ...menuCoordinates(event) });
+  }
+
+  function openFolderMenu(folder: FolderItem, event: MouseEvent<HTMLElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setContextMenu({ kind: "folder", item: folder, ...menuCoordinates(event) });
+  }
+
+  function openFolder(folder: FolderItem) {
+    setSelectedCategory(folder.category);
+    setSelectedFolderId(folder.id);
+    setFilter(documentCategoryLabels[folder.category]);
+    setContextMenu(null);
+  }
 
   async function uploadDocuments(
     files: File[],
@@ -1391,6 +1485,7 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
 
   async function openDocument(document: MyDocumentItem) {
     try {
+      setContextMenu(null);
       const response = await fetch(`/api/account/documents/${document.id}/signed-url`, {
         cache: "no-store",
       });
@@ -1406,6 +1501,97 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
     }
   }
 
+  async function downloadDocument(documentItem: MyDocumentItem) {
+    try {
+      setContextMenu(null);
+      const response = await fetch(`/api/account/documents/${documentItem.id}/signed-url`, {
+        cache: "no-store",
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { url?: string; error?: string }
+        | null;
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error || "Document could not be downloaded.");
+      }
+
+      const fileResponse = await fetch(payload.url);
+      if (!fileResponse.ok) {
+        throw new Error("Document could not be downloaded.");
+      }
+      const blob = await fileResponse.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = globalThis.document.createElement("a");
+      anchor.href = objectUrl;
+      anchor.download = documentItem.fileName;
+      globalThis.document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      onAction("Download started.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Document could not be downloaded.");
+    }
+  }
+
+  async function renameDocument(documentItem: MyDocumentItem, fileName: string) {
+    setRenaming(true);
+    try {
+      const response = await fetch(`/api/account/documents/${documentItem.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fileName }),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { document?: DocumentApiItem; error?: string }
+        | null;
+      if (!response.ok || !payload?.document) {
+        throw new Error(payload?.error || "Document could not be renamed.");
+      }
+      const renamed = mapApiDocument(payload.document);
+      setDocuments((current) =>
+        current.map((item) => (item.id === renamed.id ? renamed : item)),
+      );
+      setRenameTarget(null);
+      onAction("Document renamed.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Document could not be renamed.");
+    } finally {
+      setRenaming(false);
+    }
+  }
+
+  async function renameFolder(folder: FolderItem, name: string) {
+    setRenaming(true);
+    try {
+      const response = await fetch(`/api/account/document-folders/${folder.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { folder?: FolderApiItem; error?: string }
+        | null;
+      if (!response.ok || !payload?.folder) {
+        throw new Error(payload?.error || "Folder could not be renamed.");
+      }
+      const renamed = mapApiFolder(payload.folder);
+      setFolders((current) =>
+        current.map((item) => (item.id === renamed.id ? renamed : item)),
+      );
+      setDocuments((current) =>
+        current.map((item) =>
+          item.folderId === renamed.id ? { ...item, folderName: renamed.name } : item,
+        ),
+      );
+      setRenameTarget(null);
+      onAction("Folder renamed.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Folder could not be renamed.");
+    } finally {
+      setRenaming(false);
+    }
+  }
+
   async function deleteDocument(document: MyDocumentItem) {
     if (!window.confirm(`Delete ${document.fileName}? This cannot be undone.`)) {
       return;
@@ -1413,6 +1599,7 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
 
     setDeletingId(document.id);
     try {
+      setContextMenu(null);
       const response = await fetch(`/api/account/documents/${document.id}`, {
         method: "DELETE",
       });
@@ -1436,6 +1623,45 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
     } finally {
       setDeletingId("");
     }
+  }
+
+  async function deleteFolder(folder: FolderItem) {
+    setContextMenu(null);
+    if (folder.files > 0) {
+      onAction("Move or delete documents before deleting this folder.");
+      return;
+    }
+    if (!window.confirm(`Delete folder ${folder.name}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingFolderId(folder.id);
+    try {
+      const response = await fetch(`/api/account/document-folders/${folder.id}`, {
+        method: "DELETE",
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      if (!response.ok) {
+        throw new Error(payload?.error || "Folder could not be deleted.");
+      }
+      setFolders((current) => current.filter((item) => item.id !== folder.id));
+      if (selectedFolderId === folder.id) setSelectedFolderId("");
+      onAction("Folder deleted.");
+    } catch (error) {
+      onAction(error instanceof Error ? error.message : "Folder could not be deleted.");
+    } finally {
+      setDeletingFolderId("");
+    }
+  }
+
+  function submitRename(target: RenameTarget, value: string) {
+    if (target.kind === "document") {
+      void renameDocument(target.item, value);
+      return;
+    }
+    void renameFolder(target.item, value);
   }
 
   return (
@@ -1585,18 +1811,22 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
 
       <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {folders.map((folder) => (
-          <button
+          <article
             key={folder.id}
-            type="button"
             onDragEnter={(event) => handleFolderDragEnter(event, folder.id)}
             onDragOver={handleFolderDragOver}
             onDragLeave={(event) => handleFolderDragLeave(event, folder.id)}
             onDrop={(event) => handleFolderDrop(event, folder)}
-            onClick={() => {
-              setSelectedCategory(folder.category);
-              setSelectedFolderId(folder.id);
-              setFilter(documentCategoryLabels[folder.category]);
+            onClick={() => openFolder(folder)}
+            onContextMenu={(event) => openFolderMenu(folder, event)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openFolder(folder);
+              }
             }}
+            role="button"
+            tabIndex={0}
             className={`rounded-2xl border p-3 text-left transition theme-surface-elevated theme-card-hover ${
               draggingFolderId === folder.id
                 ? "border-emerald-300/70 bg-emerald-300/10 ring-2 ring-emerald-400/20"
@@ -1607,9 +1837,19 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
               <span className="inline-flex size-9 items-center justify-center rounded-xl border theme-border theme-surface-muted">
                 <Folder className="size-4 text-[var(--accent-foreground)]" aria-hidden="true" />
               </span>
-              <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted">
-                {documentCategoryLabels[folder.category]}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted">
+                  {documentCategoryLabels[folder.category]}
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Open actions for ${folder.name}`}
+                  onClick={(event) => openFolderMenu(folder, event)}
+                  className="inline-flex size-7 items-center justify-center rounded-md border theme-secondary-button"
+                >
+                  <MoreHorizontal className="size-3.5" aria-hidden="true" />
+                </button>
+              </div>
             </div>
             <h4 className="mt-3 text-sm font-semibold theme-foreground">
               {folder.name}
@@ -1619,7 +1859,7 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
                 ? "Drop files into this folder"
                 : `${folder.files} files · Updated ${folder.updated}`}
             </p>
-          </button>
+          </article>
         ))}
       </section>
 
@@ -1638,8 +1878,8 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
               key={document.id}
               document={document}
               deleting={deletingId === document.id}
-              onDelete={deleteDocument}
-              onOpen={openDocument}
+              onContextMenu={openDocumentMenu}
+              onMenu={openDocumentMenu}
             />
           ))}
         </section>
@@ -1660,8 +1900,8 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
                 key={document.id}
                 document={document}
                 deleting={deletingId === document.id}
-                onDelete={deleteDocument}
-                onOpen={openDocument}
+                onContextMenu={openDocumentMenu}
+                onMenu={openDocumentMenu}
               />
             ))}
           </div>
@@ -1678,6 +1918,47 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
           </p>
         </div>
       ) : null}
+
+      {contextMenu ? (
+        <FileManagerContextMenu
+          ref={menuRef}
+          menu={contextMenu}
+          deletingDocumentId={deletingId}
+          deletingFolderId={deletingFolderId}
+          onClose={() => setContextMenu(null)}
+          onDeleteDocument={deleteDocument}
+          onDeleteFolder={deleteFolder}
+          onDownloadDocument={downloadDocument}
+          onOpenDocument={openDocument}
+          onOpenFolder={openFolder}
+          onRenameDocument={(item) => {
+            setContextMenu(null);
+            setRenameTarget({ kind: "document", item });
+          }}
+          onRenameFolder={(item) => {
+            setContextMenu(null);
+            setRenameTarget({ kind: "folder", item });
+          }}
+        />
+      ) : null}
+
+      {renameTarget ? (
+        <RenameDialog
+          key={`${renameTarget.kind}-${renameTarget.item.id}`}
+          busy={renaming}
+          initialValue={
+            renameTarget.kind === "document"
+              ? renameTarget.item.fileName
+              : renameTarget.item.name
+          }
+          title={renameTarget.kind === "document" ? "Rename document" : "Rename folder"}
+          confirmLabel={renaming ? "Saving..." : "Rename"}
+          onCancel={() => {
+            if (!renaming) setRenameTarget(null);
+          }}
+          onSubmit={(value) => submitRename(renameTarget, value)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -1685,16 +1966,19 @@ function MyDocumentsView({ onAction }: { onAction: (message: string) => void }) 
 function DocumentCard({
   document,
   deleting,
-  onDelete,
-  onOpen,
+  onContextMenu,
+  onMenu,
 }: {
   document: MyDocumentItem;
   deleting: boolean;
-  onDelete: (document: MyDocumentItem) => void;
-  onOpen: (document: MyDocumentItem) => void;
+  onContextMenu: (document: MyDocumentItem, event: MouseEvent<HTMLElement>) => void;
+  onMenu: (document: MyDocumentItem, event: MouseEvent<HTMLElement>) => void;
 }) {
   return (
-    <article className="rounded-2xl border p-3 theme-surface-elevated">
+    <article
+      onContextMenu={(event) => onContextMenu(document, event)}
+      className="rounded-2xl border p-3 theme-surface-elevated"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-2">
           <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xl border theme-border theme-surface-muted">
@@ -1715,8 +1999,7 @@ function DocumentCard({
         <DocumentActions
           deleting={deleting}
           document={document}
-          onDelete={onDelete}
-          onOpen={onOpen}
+          onMenu={onMenu}
         />
       </div>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -1736,16 +2019,19 @@ function DocumentCard({
 function DocumentRow({
   document,
   deleting,
-  onDelete,
-  onOpen,
+  onContextMenu,
+  onMenu,
 }: {
   document: MyDocumentItem;
   deleting: boolean;
-  onDelete: (document: MyDocumentItem) => void;
-  onOpen: (document: MyDocumentItem) => void;
+  onContextMenu: (document: MyDocumentItem, event: MouseEvent<HTMLElement>) => void;
+  onMenu: (document: MyDocumentItem, event: MouseEvent<HTMLElement>) => void;
 }) {
   return (
-    <article className="grid gap-3 p-3 transition hover:bg-[var(--muted)] lg:grid-cols-[1.3fr_0.65fr_0.55fr_0.75fr_0.85fr_0.75fr_0.8fr] lg:items-center">
+    <article
+      onContextMenu={(event) => onContextMenu(document, event)}
+      className="grid gap-3 p-3 transition hover:bg-[var(--muted)] lg:grid-cols-[1.3fr_0.65fr_0.55fr_0.75fr_0.85fr_0.75fr_0.8fr] lg:items-center"
+    >
       <div className="flex min-w-0 items-center gap-2">
         <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border theme-border theme-surface-muted">
           <FileText className="size-4 text-[var(--accent-foreground)]" aria-hidden="true" />
@@ -1769,8 +2055,7 @@ function DocumentRow({
       <DocumentActions
         deleting={deleting}
         document={document}
-        onDelete={onDelete}
-        onOpen={onOpen}
+        onMenu={onMenu}
       />
     </article>
   );
@@ -1779,38 +2064,223 @@ function DocumentRow({
 function DocumentActions({
   deleting,
   document,
-  onDelete,
-  onOpen,
+  onMenu,
 }: {
   deleting: boolean;
   document: MyDocumentItem;
-  onDelete: (document: MyDocumentItem) => void;
-  onOpen: (document: MyDocumentItem) => void;
+  onMenu: (document: MyDocumentItem, event: MouseEvent<HTMLElement>) => void;
 }) {
   return (
-    <details className="relative">
-      <summary className="inline-flex h-8 cursor-pointer list-none items-center gap-1 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5">
-        <MoreHorizontal className="size-3.5" aria-hidden="true" />
-        Actions
-      </summary>
-      <div className="absolute right-0 z-20 mt-2 grid min-w-36 gap-1 rounded-xl border p-1 theme-surface-elevated">
-        <button
-          type="button"
-          onClick={() => onOpen(document)}
-          className="rounded-lg px-2 py-1.5 text-left text-xs font-medium theme-ghost-button"
-        >
-          Open
-        </button>
-        <button
-          type="button"
-          onClick={() => onDelete(document)}
-          disabled={deleting}
-          className="rounded-lg px-2 py-1.5 text-left text-xs font-medium text-red-500 transition hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {deleting ? "Deleting..." : "Delete"}
-        </button>
-      </div>
-    </details>
+    <button
+      type="button"
+      onClick={(event) => onMenu(document, event)}
+      disabled={deleting}
+      className="inline-flex h-8 items-center gap-1 rounded-md border px-2 text-xs font-medium transition theme-secondary-button hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+    >
+      <MoreHorizontal className="size-3.5" aria-hidden="true" />
+      Actions
+    </button>
+  );
+}
+
+const FileManagerContextMenu = forwardRef<
+  HTMLDivElement,
+  {
+    menu: FileManagerContextMenuState;
+    deletingDocumentId: string;
+    deletingFolderId: string;
+    onClose: () => void;
+    onDeleteDocument: (document: MyDocumentItem) => void;
+    onDeleteFolder: (folder: FolderItem) => void;
+    onDownloadDocument: (document: MyDocumentItem) => void;
+    onOpenDocument: (document: MyDocumentItem) => void;
+    onOpenFolder: (folder: FolderItem) => void;
+    onRenameDocument: (document: MyDocumentItem) => void;
+    onRenameFolder: (folder: FolderItem) => void;
+  }
+>(function FileManagerContextMenu(
+  {
+    menu,
+    deletingDocumentId,
+    deletingFolderId,
+    onClose,
+    onDeleteDocument,
+    onDeleteFolder,
+    onDownloadDocument,
+    onOpenDocument,
+    onOpenFolder,
+    onRenameDocument,
+    onRenameFolder,
+  },
+  ref,
+) {
+  const isDocument = menu.kind === "document";
+  const deleting =
+    menu.kind === "document"
+      ? deletingDocumentId === menu.item.id
+      : deletingFolderId === menu.item.id;
+
+  return (
+    <div
+      ref={ref}
+      role="menu"
+      aria-label={isDocument ? "Document actions" : "Folder actions"}
+      className="fixed z-50 w-56 rounded-xl border border-zinc-200 bg-white p-1.5 text-zinc-900 shadow-xl shadow-zinc-950/15"
+      style={{ left: menu.x, top: menu.y }}
+    >
+      {menu.kind === "document" ? (
+        <>
+          <ContextMenuButton
+            icon={Eye}
+            label="Open / Preview"
+            onClick={() => onOpenDocument(menu.item)}
+          />
+          <ContextMenuButton
+            icon={Download}
+            label="Download"
+            onClick={() => onDownloadDocument(menu.item)}
+          />
+          <MenuDivider />
+          <ContextMenuButton
+            icon={Pencil}
+            label="Rename"
+            onClick={() => onRenameDocument(menu.item)}
+          />
+          <ContextMenuButton
+            danger
+            disabled={deleting}
+            icon={Trash2}
+            label={deleting ? "Deleting..." : "Delete"}
+            onClick={() => onDeleteDocument(menu.item)}
+          />
+        </>
+      ) : (
+        <>
+          <ContextMenuButton
+            icon={FolderOpen}
+            label="Open folder"
+            onClick={() => onOpenFolder(menu.item)}
+          />
+          <MenuDivider />
+          <ContextMenuButton
+            icon={Pencil}
+            label="Rename folder"
+            onClick={() => onRenameFolder(menu.item)}
+          />
+          <ContextMenuButton
+            danger
+            disabled={deleting}
+            icon={Trash2}
+            label={deleting ? "Deleting..." : "Delete folder"}
+            onClick={() => onDeleteFolder(menu.item)}
+          />
+        </>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        className="mt-1 w-full rounded-lg px-2 py-1.5 text-left text-xs font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+      >
+        Close
+      </button>
+    </div>
+  );
+});
+
+function ContextMenuButton({
+  danger = false,
+  disabled = false,
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  danger?: boolean;
+  disabled?: boolean;
+  icon: typeof Eye;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+        danger
+          ? "text-red-600 hover:bg-red-50"
+          : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950"
+      }`}
+    >
+      <Icon className="size-3.5" aria-hidden="true" />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+    </button>
+  );
+}
+
+function MenuDivider() {
+  return <div className="my-1 h-px bg-zinc-200" role="separator" />;
+}
+
+function RenameDialog({
+  busy,
+  confirmLabel,
+  initialValue,
+  onCancel,
+  onSubmit,
+  title,
+}: {
+  busy: boolean;
+  confirmLabel: string;
+  initialValue: string;
+  onCancel: () => void;
+  onSubmit: (value: string) => void;
+  title: string;
+}) {
+  const [value, setValue] = useState(initialValue);
+
+  const trimmed = value.trim();
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/45 p-4 backdrop-blur-sm">
+      <form
+        className="w-full max-w-sm rounded-2xl border p-4 theme-surface-elevated"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!trimmed || busy) return;
+          onSubmit(trimmed);
+        }}
+      >
+        <h3 className="text-sm font-semibold theme-foreground">{title}</h3>
+        <label className="mt-4 grid gap-1.5">
+          <span className="text-xs font-medium theme-muted">Name</span>
+          <input
+            autoFocus
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            className="h-10 rounded-xl border px-3 text-sm outline-none theme-input focus:border-emerald-300 focus:ring-2 focus:ring-emerald-400/20"
+            maxLength={255}
+          />
+        </label>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            className="h-8 rounded-md border px-3 text-xs font-semibold theme-secondary-button disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={busy || !trimmed}
+            className="h-8 rounded-md px-3 text-xs font-semibold theme-primary-button disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
@@ -1934,6 +2404,8 @@ function formActions(item: FormLibraryItem) {
   if (item.templateSlug) {
     return ["Preview", "Print / Save as PDF", "Download PDF"];
   }
-  if (item.sourceType === "official") return ["Open official source", "View details"];
-  return ["View details", "Request document later"];
+  if (item.sourceType === "official") {
+    return item.officialUrl ? ["Open official source", "View details"] : ["View details"];
+  }
+  return ["View details"];
 }
