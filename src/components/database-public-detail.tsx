@@ -13,6 +13,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { ProductCard } from "@/components/product-card";
 import { ProductImageGallery } from "@/components/product-image-gallery";
+import { ProductShareButton } from "@/components/product-share-button";
 import { VerificationBadge } from "@/components/verification-badge";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
@@ -414,6 +415,8 @@ export function DatabaseProductDetail({ id }: { id: string }) {
     (key) => !canViewSensitiveFields && fieldVisibility[key] === "inquiry_required",
   );
   const checkingOwner = Boolean(isSignedIn && !userContext);
+  const shareImageUrl = product.imageUrls?.[0] || product.imagePlaceholder;
+  const shareDescription = product.shortDescription || product.longDescription || product.name;
 
   async function setProductPreparing() {
     setOwnerActionPending(true);
@@ -523,6 +526,12 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   >
                     {ownerActionPending ? t("settings.saving") : t("settings.deleteProduct")}
                   </button>
+                  <ProductShareButton
+                    title={product.name}
+                    description={shareDescription}
+                    imageUrl={shareImageUrl}
+                    className="h-8 px-2.5 text-xs"
+                  />
                 </div>
                 {ownerNotice ? (
                   <p role="status" className="text-sm font-medium text-emerald-700">
@@ -541,6 +550,11 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               </div>
             ) : (
               <div className="flex flex-col gap-3 sm:flex-row">
+                <ProductShareButton
+                  title={product.name}
+                  description={shareDescription}
+                  imageUrl={shareImageUrl}
+                />
                 <SaveButton id={product.id} kind="product" />
                 <ContactModal context={{ type: "product", product }} buttonLabel={t("productDetail.contactSeller")} />
               </div>
