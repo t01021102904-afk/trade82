@@ -482,6 +482,87 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
   animation: bm-flow-inquiry 7s ease-in-out infinite;
 }
 
+.home-magnetic-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-magnetic-panel::before {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  content: "";
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 44%),
+    color-mix(in srgb, var(--accent-foreground) 18%, transparent),
+    transparent 32%
+  );
+  opacity: 0.72;
+  transition: opacity 180ms ease;
+}
+
+.home-flow-card {
+  position: relative;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.home-flow-card:hover {
+  border-color: color-mix(in srgb, var(--accent-foreground) 36%, var(--border));
+  transform: translateY(-2px);
+}
+
+.home-moving-dot {
+  animation: home-moving-dot 3.6s ease-in-out infinite;
+}
+
+.home-live-dot {
+  animation: bm-pulse-dot 2.4s ease-in-out infinite;
+}
+
+.home-inquiry-card {
+  animation: bm-flow-inquiry 7s ease-in-out infinite;
+}
+
+.home-progress-line {
+  animation: bm-flow-progress 7s ease-in-out infinite;
+}
+
+.home-system-map {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-system-map::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.18;
+}
+
+.home-system-map > * {
+  position: relative;
+}
+
+@keyframes home-moving-dot {
+  0%,
+  100% {
+    transform: translateX(-6px);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateX(6px);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
