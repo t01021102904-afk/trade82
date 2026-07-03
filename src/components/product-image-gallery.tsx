@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
+import { ProductImage } from "@/components/product-image";
 import { safeImageUrl } from "@/lib/url-security";
 
 export function ProductImageGallery({
@@ -12,24 +12,21 @@ export function ProductImageGallery({
   images: string[];
   productName: string;
 }) {
-  const safeImages = (images.length ? images : ["/window.svg"]).map((image) =>
-    safeImageUrl(image),
-  );
+  const safeImages = images
+    .map((image) => safeImageUrl(image, ""))
+    .filter((image) => image && image !== "/window.svg");
   const [selected, setSelected] = useState(0);
   const active = safeImages[selected] ?? safeImages[0];
 
   return (
     <div className="grid gap-3">
-      <div className="relative aspect-square overflow-hidden rounded-md bg-zinc-100">
-        <Image
-          src={active}
-          alt={`${productName} 이미지 ${selected + 1}`}
-          fill
-          sizes="(max-width: 1023px) 100vw, 50vw"
-          unoptimized
-          className="object-cover"
-        />
-      </div>
+      <ProductImage
+        urls={[active]}
+        alt={`${productName} 이미지 ${selected + 1}`}
+        sizes="(max-width: 1023px) 100vw, 50vw"
+        className="aspect-square rounded-md"
+        imageClassName="object-contain p-4"
+      />
       {safeImages.length > 1 ? (
         <div className="grid grid-cols-5 gap-2 sm:grid-cols-6">
           {safeImages.map((image, index) => (
@@ -45,13 +42,13 @@ export function ProductImageGallery({
               aria-label={`${productName} 이미지 ${index + 1} 보기`}
               aria-pressed={selected === index}
             >
-              <Image
-                src={image}
+              <ProductImage
+                urls={[image]}
                 alt=""
-                fill
                 sizes="120px"
-                unoptimized
-                className="object-cover"
+                className="size-full rounded-none"
+                placeholderClassName="p-1"
+                showLabel={false}
               />
             </button>
           ))}

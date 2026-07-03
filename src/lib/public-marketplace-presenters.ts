@@ -6,6 +6,11 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
   const images = Array.isArray(value.images)
     ? (value.images as Array<Record<string, unknown>>)
     : [];
+  const imageUrls = images.map(productImageUrl).filter((url) => url !== null);
+  const fallbackImageUrl =
+    typeof value.imageUrl === "string" && value.imageUrl.trim()
+      ? value.imageUrl.trim()
+      : "";
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
   const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
   const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
@@ -68,12 +73,17 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
       ? (value.suggestedUsChannels as string[])
       : [],
     riskNotes: Array.isArray(value.riskNotes) ? (value.riskNotes as string[]) : [],
-    imagePlaceholder: String(images[0]?.cardUrl ?? value.imageUrl ?? "/window.svg"),
-    imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)),
+    imagePlaceholder: imageUrls[0] ?? fallbackImageUrl,
+    imageUrls,
     tags: Array.isArray(value.tags) ? (value.tags as string[]) : [],
     createdAt: String(value.createdAt ?? ""),
     verificationStatus: "verified",
   };
+}
+
+function productImageUrl(image: Record<string, unknown>) {
+  const value = image.detailUrl ?? image.mainUrl ?? image.cardUrl;
+  return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
 function companyLogoUrl(company: Record<string, unknown>) {

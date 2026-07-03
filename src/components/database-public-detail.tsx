@@ -471,7 +471,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
       <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:px-8">
         <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[0.9fr_1.1fr]">
           <ProductImageGallery
-            images={product.imageUrls ?? [product.imagePlaceholder]}
+            images={product.imageUrls?.length ? product.imageUrls : [product.imagePlaceholder]}
             productName={product.name}
           />
           <div className="flex min-w-0 flex-col justify-between gap-8">
@@ -893,6 +893,11 @@ function publicProductToCard(value: Record<string, unknown>): Product {
   const images = Array.isArray(value.images)
     ? (value.images as Array<Record<string, unknown>>)
     : [];
+  const imageUrls = images.map(productImageUrl).filter((url) => url !== null);
+  const fallbackImageUrl =
+    typeof value.imageUrl === "string" && value.imageUrl.trim()
+      ? value.imageUrl.trim()
+      : "";
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
   const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
   const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
@@ -952,12 +957,17 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     koreanMarketFit: String(value.buyerNotes ?? value.ingredientsOrMaterials ?? ""),
     suggestedSalesChannels: arrayOfStrings(value.suggestedUsChannels),
     riskNotes: arrayOfStrings(value.riskNotes),
-    imagePlaceholder: String(images[0]?.cardUrl ?? value.imageUrl ?? "/window.svg"),
-    imageUrls: images.map((image) => String(image.detailUrl ?? image.mainUrl ?? image.cardUrl)),
+    imagePlaceholder: imageUrls[0] ?? fallbackImageUrl,
+    imageUrls,
     tags: arrayOfStrings(value.tags),
     createdAt: String(value.createdAt ?? new Date().toISOString()),
     verificationStatus: String(company.verificationStatus ?? "verified") as VerificationStatus,
   };
+}
+
+function productImageUrl(image: Record<string, unknown>) {
+  const value = image.detailUrl ?? image.mainUrl ?? image.cardUrl;
+  return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
 function PublicLoading() { return <div className="mx-auto max-w-5xl px-4 py-12 text-sm text-zinc-600">Loading...</div>; }

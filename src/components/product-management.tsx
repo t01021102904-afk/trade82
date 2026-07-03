@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
+import { ProductImage } from "@/components/product-image";
 import {
   formFromProductRecord,
   productPayloadFromForm,
@@ -20,7 +21,6 @@ import {
 } from "@/hooks/use-form-reliability";
 import { withLocale } from "@/lib/i18n";
 import type { UploadedListingImage } from "@/lib/marketplace";
-import { safeImageUrl } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
 export type DbProduct = {
@@ -163,12 +163,13 @@ export function ProductManagement() {
               key={product.id}
               className="grid gap-3 rounded-md border border-zinc-200 p-3 sm:grid-cols-[72px_1fr] xl:grid-cols-[72px_minmax(0,1fr)_auto] xl:items-center"
             >
-              <div
-                className="aspect-square rounded-md bg-zinc-100 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url("${safeImageUrl(product.images[0]?.cardUrl || product.imageUrl)}")`,
-                }}
-                aria-label={product.name}
+              <ProductImage
+                urls={[product.images[0]?.cardUrl, product.imageUrl]}
+                alt={product.name}
+                sizes="72px"
+                className="aspect-square rounded-md sm:size-[72px]"
+                placeholderClassName="p-1"
+                showLabel={false}
               />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">

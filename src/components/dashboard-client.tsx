@@ -11,7 +11,6 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -23,9 +22,9 @@ import {
   type DbProduct,
   type EditableProduct,
 } from "@/components/product-management";
+import { ProductImage } from "@/components/product-image";
 import { withLocale } from "@/lib/i18n";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
-import { safeImageUrl } from "@/lib/url-security";
 
 export type DashboardSection =
   | "overview"
@@ -512,56 +511,45 @@ function BuyerDiscoveryDashboard({
           </div>
         ) : null}
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {filteredProducts.map((product) => {
-            const displayImageUrl = safeImageUrl(product.imageUrl, "");
-
-            return (
-              <Link
-                key={product.id}
-                href={withLocale(product.href, locale)}
-                className="group overflow-hidden rounded-2xl border transition hover:-translate-y-0.5 theme-surface-elevated theme-card-hover"
-              >
-                <div className="aspect-[4/3] bg-zinc-900">
-                  {displayImageUrl ? (
-                    <Image
-                      src={displayImageUrl}
-                      alt=""
-                      width={480}
-                      height={360}
-                      className="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div className="flex size-full items-center justify-center text-sm text-zinc-600">
-                      {t("dashboard.noProductImage")}
-                    </div>
-                  )}
+          {filteredProducts.map((product) => (
+            <Link
+              key={product.id}
+              href={withLocale(product.href, locale)}
+              className="group overflow-hidden rounded-2xl border transition hover:-translate-y-0.5 theme-surface-elevated theme-card-hover"
+            >
+              <ProductImage
+                urls={[product.imageUrl]}
+                alt=""
+                sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                className="aspect-[4/3]"
+                imageClassName="transition duration-300 group-hover:scale-[1.03]"
+                placeholderLabel={t("dashboard.noProductImage")}
+              />
+              <div className="grid gap-2 p-3">
+                <div>
+                  <p className="line-clamp-1 text-sm font-semibold theme-foreground">
+                    {product.name}
+                  </p>
+                  <p className="mt-1 line-clamp-1 text-xs theme-muted">
+                    {product.sellerName}
+                  </p>
                 </div>
-                <div className="grid gap-2 p-3">
-                  <div>
-                    <p className="line-clamp-1 text-sm font-semibold theme-foreground">
-                      {product.name}
-                    </p>
-                    <p className="mt-1 line-clamp-1 text-xs theme-muted">
-                      {product.sellerName}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 text-xs">
+                <div className="flex flex-wrap gap-1.5 text-xs">
+                  <span className="rounded-full border px-2 py-0.5 theme-border theme-muted">
+                    {product.category}
+                  </span>
+                  <span className="rounded-full border px-2 py-0.5 theme-border theme-muted">
+                    {formatBuyerProductPrice(product, t("dashboard.priceOnRequest"))}
+                  </span>
+                  {product.moq ? (
                     <span className="rounded-full border px-2 py-0.5 theme-border theme-muted">
-                      {product.category}
+                      {product.moq}
                     </span>
-                    <span className="rounded-full border px-2 py-0.5 theme-border theme-muted">
-                      {formatBuyerProductPrice(product, t("dashboard.priceOnRequest"))}
-                    </span>
-                    {product.moq ? (
-                      <span className="rounded-full border px-2 py-0.5 theme-border theme-muted">
-                        {product.moq}
-                      </span>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
-              </Link>
-            );
-          })}
+              </div>
+            </Link>
+          ))}
         </div>
         {!filteredProducts.length ? (
           <div className="mt-4 rounded-2xl border border-dashed p-6 text-center theme-surface-muted">
@@ -1207,26 +1195,19 @@ function SellerProductCard({
   onDelete: () => void;
 }) {
   const { t } = useI18n();
-  const imageUrl = safeImageUrl(product.images[0]?.cardUrl || product.imageUrl, "");
   const status = productStatusMeta(product, t);
   const price = formatDashboardProductPrice(product, t("dashboard.priceOnRequest"));
 
   return (
     <article className="grid min-w-0 gap-3 rounded-md border p-3 theme-surface-muted sm:grid-cols-[72px_minmax(0,1fr)] xl:grid-cols-[72px_minmax(0,1fr)_auto] xl:items-center">
-      <div className="relative aspect-square overflow-hidden rounded-md bg-zinc-100 sm:size-[72px]">
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageUrl}
-            alt={product.name}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm font-semibold theme-muted">
-            {product.name.charAt(0)}
-          </div>
-        )}
-      </div>
+      <ProductImage
+        urls={[product.images[0]?.cardUrl, product.imageUrl]}
+        alt={product.name}
+        sizes="72px"
+        className="aspect-square rounded-md sm:size-[72px]"
+        placeholderClassName="p-1"
+        showLabel={false}
+      />
 
       <div className="min-w-0">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">

@@ -1,31 +1,28 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
+import { ProductImage } from "@/components/product-image";
 import { SaveButton } from "@/components/save-button";
 import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
-import { safeImageUrl } from "@/lib/url-security";
 
 export function ProductCard({ product }: { product: Product }) {
   const { locale } = useI18n();
   const href = withLocale(`/products/${product.id}`, locale);
-  const imageUrl = safeImageUrl(product.imagePlaceholder);
 
   return (
     <article className="bm-premium-card group min-w-0 rounded-lg border p-3 theme-surface">
-      <div className="relative aspect-square overflow-hidden rounded-md theme-surface-muted">
+      <div className="relative aspect-square overflow-hidden rounded-md">
         <Link href={href} className="relative block size-full">
-          <Image
-            src={imageUrl}
+          <ProductImage
+            urls={[product.imagePlaceholder, ...(product.imageUrls ?? [])]}
             alt={product.name}
-            fill
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
-            unoptimized
-            className="object-cover transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.02]"
+            className="size-full rounded-md"
+            imageClassName="transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.02]"
           />
         </Link>
         <SaveButton
