@@ -2146,7 +2146,7 @@ function FolderWindow({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-zinc-950/45 p-3 backdrop-blur-sm sm:p-6"
+      className="fixed inset-0 z-40 flex items-center justify-center p-3 sm:p-6"
       onClick={onClose}
     >
       <section
@@ -2158,7 +2158,7 @@ function FolderWindow({
         onDrop={onDrop}
       >
         {dragging ? (
-          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-emerald-50/85 p-6 backdrop-blur-sm">
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-emerald-50/85 p-6">
             <div className="rounded-2xl border border-emerald-300 bg-white px-6 py-5 text-center shadow-xl shadow-emerald-950/10">
               <Folder className="mx-auto size-7 text-emerald-600" aria-hidden="true" />
               <p className="mt-3 text-sm font-semibold text-zinc-950">
