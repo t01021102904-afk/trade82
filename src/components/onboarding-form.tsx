@@ -7,7 +7,6 @@ import { FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from 
 
 import {
   SingleImageUploader,
-  type ListingImageUploadState,
 } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
@@ -202,11 +201,6 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   const [sourcing, setSourcing] = useState<BuyerSourcingStep>(emptySourcing);
   const [companyId, setCompanyId] = useState("");
   const [privateDocument, setPrivateDocument] = useState<File | null>(null);
-  const [productImageUploadState, setProductImageUploadState] =
-    useState<ListingImageUploadState>({
-      uploading: false,
-      failed: false,
-    });
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -361,24 +355,6 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     );
   }
 
-  function hasCompanyLogo() {
-    return Boolean(
-      company.logoOriginalUrl || company.logoThumbnailUrl || company.logoUrl,
-    );
-  }
-
-  function sellerLogoRequiredMessage() {
-    return locale === "ko"
-      ? "한국 셀러 회사 프로필에는 회사 로고가 필요합니다."
-      : "Company logo is required for Korean seller profiles.";
-  }
-
-  function productImageUploadFailedMessage() {
-    return locale === "ko"
-      ? "실패한 이미지 업로드를 삭제하거나 다시 시도한 뒤 공개해 주세요."
-      : "Remove failed image uploads or retry them before publishing.";
-  }
-
   function restoreDraft() {
     if (!draft) return;
     debugOnboardingLogo("restoring onboarding draft", {
@@ -448,10 +424,6 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
     }
     if (!company.companyType.trim()) {
       setError(t("onboarding.companyTypeRequired"));
-      return;
-    }
-    if (kind === "seller" && !hasCompanyLogo()) {
-      setError(sellerLogoRequiredMessage());
       return;
     }
 
@@ -561,15 +533,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
   async function saveProductStep(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
-    const nextErrors = validateRichProductForm(product, t, {
-      requireImages: true,
-    });
-    if (productImageUploadState.uploading) {
-      nextErrors.images = t("listing.imageUploadInProgress");
-    }
-    if (productImageUploadState.failed) {
-      nextErrors.images = productImageUploadFailedMessage();
-    }
+    const nextErrors = validateRichProductForm(product, t);
     const firstError = Object.values(nextErrors)[0];
     if (firstError) {
       setError(firstError);
@@ -953,8 +917,6 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
               onSubmit={saveProductStep}
               onChange={updateProduct}
               onUploadingChange={setUploading}
-              onImageUploadStateChange={setProductImageUploadState}
-              imageUploadState={productImageUploadState}
             />
           ) : null}
 
@@ -1538,32 +1500,22 @@ function ProductStepForm({
   product,
   saving,
   uploading,
-  imageUploadState,
   onSubmit,
   onChange,
   onUploadingChange,
-  onImageUploadStateChange,
 }: {
   product: SellerProductStep;
   saving: boolean;
   uploading: boolean;
-  imageUploadState: ListingImageUploadState;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onChange: <K extends keyof SellerProductStep>(
     key: K,
     value: SellerProductStep[K],
   ) => void;
   onUploadingChange: (uploading: boolean) => void;
-  onImageUploadStateChange: (state: ListingImageUploadState) => void;
 }) {
-  const { locale, t } = useI18n();
+  const { t } = useI18n();
   const [fieldErrors, setFieldErrors] = useState<RichProductFormErrors>({});
-
-  function productImageUploadFailedMessage() {
-    return locale === "ko"
-      ? "실패한 이미지 업로드를 삭제하거나 다시 시도한 뒤 공개해 주세요."
-      : "Remove failed image uploads or retry them before publishing.";
-  }
 
   function update<K extends keyof SellerProductStep>(key: K, value: SellerProductStep[K]) {
     setFieldErrors((current) =>
@@ -1575,15 +1527,7 @@ function ProductStepForm({
   return (
     <form
       onSubmit={(event) => {
-        const nextErrors = validateRichProductForm(product, t, {
-          requireImages: true,
-        });
-        if (imageUploadState.uploading) {
-          nextErrors.images = t("listing.imageUploadInProgress");
-        }
-        if (imageUploadState.failed) {
-          nextErrors.images = productImageUploadFailedMessage();
-        }
+        const nextErrors = validateRichProductForm(product, t);
         setFieldErrors(nextErrors);
         if (Object.keys(nextErrors).length) {
           event.preventDefault();
@@ -1603,12 +1547,11 @@ function ProductStepForm({
         errors={fieldErrors}
         onChange={update}
         onUploadingChange={onUploadingChange}
-        onImageUploadStateChange={onImageUploadStateChange}
         variant="dashboard"
       />
       <SubmitButton
         saving={saving}
-        uploading={uploading}
+        uploading={false}
         label={t("onboarding.finishOnboarding")}
       />
       {uploading ? (

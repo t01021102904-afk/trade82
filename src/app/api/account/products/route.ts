@@ -67,13 +67,6 @@ function publicFieldRequiredResponse() {
   );
 }
 
-function productImageRequiredResponse() {
-  return Response.json(
-    { error: "Product image is required before publishing." },
-    { status: 400 },
-  );
-}
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -150,10 +143,6 @@ export async function POST(request: Request) {
       ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
       : "";
     const images = parseUploadedImages(body.images);
-    const status: "active" | "inactive" | "draft" =
-      body.status === "inactive" || body.status === "draft"
-        ? body.status
-        : "active";
 
     if (!name) {
       return Response.json({ error: "상품명을 입력해 주시기 바랍니다." }, { status: 400 });
@@ -175,9 +164,6 @@ export async function POST(request: Request) {
     }
     if (!detailedDescription) {
       return Response.json({ error: "상품 설명을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (status === "active" && !images.length) {
-      return productImageRequiredResponse();
     }
     if (
       productFieldRequiresValue(fieldVisibility, "sampleAvailability") &&
@@ -390,7 +376,10 @@ export async function POST(request: Request) {
         ),
         fieldVisibility,
         exportReadiness: body.exportReadiness === true,
-        status,
+        status:
+          body.status === "inactive" || body.status === "draft"
+            ? body.status
+            : "active",
         images: images.length
           ? {
               create: images.map((image) => ({
