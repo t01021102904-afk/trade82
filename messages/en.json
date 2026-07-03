@@ -84,6 +84,13 @@
       "Each seller and buyer is responsible for product information, pricing, lead times, export/import requirements, submitted documents, payment terms, shipping terms, and transaction outcomes. Users should conduct their own due diligence, contract review, legal review, and payment-safety checks before entering into any transaction.",
       "Unless separately stated, Trade82 does not provide payment protection, escrow services, import approval, product compliance review, customs clearance support, or any promise that a transaction will be completed."
     ],
+    "importantLinksTitle": "Important links",
+    "importantLinks": {
+      "login": "Login",
+      "signup": "Sign up",
+      "marketplace": "Marketplace",
+      "sellers": "Sellers"
+    },
     "legalLinksTitle": "Legal documents",
     "legalLinks": [
       {

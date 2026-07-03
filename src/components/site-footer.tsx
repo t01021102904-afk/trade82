@@ -7,6 +7,12 @@ import { useI18n } from "@/components/i18n-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 const legalRoutes = ["/terms", "/sourcing-terms", "/privacy", "/business"] as const;
+const importantRoutes = {
+  login: "/login",
+  signup: "/signup",
+  marketplace: "/marketplace",
+  sellers: "/sellers",
+} as const;
 
 function legalPrefix(pathname: string) {
   if (pathname === "/ko" || pathname.startsWith("/ko/")) return "/ko";
@@ -29,6 +35,22 @@ export function SiteFooter() {
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
+        <nav className="relative z-10 mt-5" aria-label={footer.legalLinksTitle}>
+          <p className="text-xs font-semibold theme-foreground">
+            {footer.importantLinksTitle}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs theme-muted">
+            {Object.entries(importantRoutes).map(([key, href]) => (
+              <Link
+                key={href}
+                href={`${prefix}${href}`}
+                className="relative z-10 inline-flex min-h-8 items-center rounded-md underline-offset-4 transition hover:text-[var(--foreground)] hover:underline"
+              >
+                {footer.importantLinks[key as keyof typeof importantRoutes]}
+              </Link>
+            ))}
+          </div>
+        </nav>
         <nav className="relative z-10 mt-5" aria-label={footer.legalLinksTitle}>
           <p className="text-xs font-semibold theme-foreground">
             {footer.legalLinksTitle}

@@ -1,6 +1,19 @@
+import type { Metadata } from "next";
+
 import { MarketplaceClient } from "@/components/marketplace-client";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
+import { publicPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = publicPageMetadata({
+  title: "Marketplace | Trade82",
+  description: "Discover Korean products from verified sellers for U.S. B2B sourcing.",
+  path: "/marketplace",
+  languages: {
+    en: "/marketplace",
+    ko: "/ko/marketplace",
+  },
+});
 
 export default function MarketplacePage() {
   const messages = getDictionary("en");
