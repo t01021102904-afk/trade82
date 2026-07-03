@@ -1216,6 +1216,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragDepthRef = useRef(0);
   const menuRef = useRef<HTMLDivElement>(null);
+  const folderActionButtonRefs = useRef(new Map<string, HTMLButtonElement>());
 
   const applyPayload = useCallback((payload: DocumentsApiPayload) => {
     const mappedFolders = payload.folders.map(mapApiFolder);
@@ -1369,31 +1370,14 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
     return clampMenuCoordinates(x, y);
   }
 
-  function folderMenuCoordinates(event: MouseEvent<HTMLElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const canOpenRight =
-      rect.right + MENU_GAP + FILE_MANAGER_MENU_WIDTH <=
-      window.innerWidth - MENU_VIEWPORT_MARGIN;
-    const canOpenLeft =
-      rect.left - MENU_GAP - FILE_MANAGER_MENU_WIDTH >= MENU_VIEWPORT_MARGIN;
-    const x = canOpenRight
-      ? rect.right + MENU_GAP
-      : canOpenLeft
-        ? rect.left - MENU_GAP - FILE_MANAGER_MENU_WIDTH
-        : rect.left;
-
-    if (event.type !== "contextmenu") {
-      const belowY = rect.bottom + MENU_GAP;
-      const canOpenBelow =
-        belowY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
-      const y = canOpenBelow ? belowY : rect.top - MENU_GAP - FOLDER_MENU_HEIGHT;
-      return clampMenuCoordinates(x, y, FOLDER_MENU_HEIGHT);
-    }
-
-    const cursorY = Math.max(rect.top, Math.min(event.clientY, rect.bottom));
+  function folderMenuCoordinates(folderId: string, event: MouseEvent<HTMLElement>) {
+    const anchor = folderActionButtonRefs.current.get(folderId) ?? event.currentTarget;
+    const rect = anchor.getBoundingClientRect();
+    const x = rect.right - FILE_MANAGER_MENU_WIDTH;
+    const belowY = rect.bottom + MENU_GAP;
     const canOpenBelow =
-      cursorY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
-    const y = canOpenBelow ? cursorY : cursorY - FOLDER_MENU_HEIGHT;
+      belowY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
+    const y = canOpenBelow ? belowY : rect.top - MENU_GAP - FOLDER_MENU_HEIGHT;
     return clampMenuCoordinates(x, y, FOLDER_MENU_HEIGHT);
   }
 
@@ -1409,7 +1393,22 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   function openFolderMenu(folder: FolderItem, event: MouseEvent<HTMLElement>) {
     event.preventDefault();
     event.stopPropagation();
-    setContextMenu({ kind: "folder", item: folder, ...folderMenuCoordinates(event) });
+    setContextMenu({
+      kind: "folder",
+      item: folder,
+      ...folderMenuCoordinates(folder.id, event),
+    });
+  }
+
+  function setFolderActionButtonRef(
+    folderId: string,
+    element: HTMLButtonElement | null,
+  ) {
+    if (element) {
+      folderActionButtonRefs.current.set(folderId, element);
+      return;
+    }
+    folderActionButtonRefs.current.delete(folderId);
   }
 
   function selectFolder(folder: FolderItem) {
@@ -1995,6 +1994,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
                   {documentCategoryLabels[folder.category]}
                 </span>
                 <button
+                  ref={(element) => setFolderActionButtonRef(folder.id, element)}
                   type="button"
                   aria-label={`Open actions for ${folder.name}`}
                   onClick={(event) => openFolderMenu(folder, event)}
