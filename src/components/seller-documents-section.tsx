@@ -840,6 +840,12 @@ function filesFromDragEvent(event: DragEvent<HTMLElement>) {
   return Array.from(event.dataTransfer.files ?? []);
 }
 
+function debugFolderAction(action: string, details: Record<string, unknown>) {
+  if (process.env.NODE_ENV !== "production") {
+    console.info(`[Trade82 documents] folder ${action}`, details);
+  }
+}
+
 export function SellerDocumentsSection() {
   const [activeTab, setActiveTab] = useState<DocumentsTab>("forms");
   const [notice, setNotice] = useState<NoticeState | null>(null);
@@ -1663,7 +1669,9 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   async function renameFolder(folder: FolderItem, name: string) {
     setRenaming(true);
     try {
-      const response = await fetch(`/api/account/document-folders/${folder.id}`, {
+      const url = `/api/account/document-folders/${folder.id}`;
+      debugFolderAction("rename request", { folderId: folder.id, url });
+      const response = await fetch(url, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
@@ -1671,8 +1679,18 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
       const payload = (await response.json().catch(() => null)) as
         | { folder?: FolderApiItem; error?: string }
         | null;
+      debugFolderAction("rename response", {
+        folderId: folder.id,
+        status: response.status,
+        payload,
+      });
       if (!response.ok || !payload?.folder) {
-        throw new Error(payload?.error || `Folder rename request failed (${response.status}).`);
+        throw new Error(
+          payload?.error ||
+            (response.status === 404
+              ? "Folder API route not found. Check document-folders/[id] route."
+              : `Folder rename request failed (${response.status}).`),
+        );
       }
       const renamed = mapApiFolder(payload.folder);
       setFolders((current) =>
@@ -1745,14 +1763,26 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
 
     setDeletingFolderId(folder.id);
     try {
-      const response = await fetch(`/api/account/document-folders/${folder.id}`, {
+      const url = `/api/account/document-folders/${folder.id}`;
+      debugFolderAction("delete request", { folderId: folder.id, url });
+      const response = await fetch(url, {
         method: "DELETE",
       });
       const payload = (await response.json().catch(() => null)) as
         | { error?: string }
         | null;
+      debugFolderAction("delete response", {
+        folderId: folder.id,
+        status: response.status,
+        payload,
+      });
       if (!response.ok) {
-        throw new Error(payload?.error || `Folder delete request failed (${response.status}).`);
+        throw new Error(
+          payload?.error ||
+            (response.status === 404
+              ? "Folder API route not found. Check document-folders/[id] route."
+              : `Folder delete request failed (${response.status}).`),
+        );
       }
       setFolders((current) => current.filter((item) => item.id !== folder.id));
       setOpenedFolder((current) => (current?.id === folder.id ? null : current));
