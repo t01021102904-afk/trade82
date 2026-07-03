@@ -759,6 +759,11 @@ const DOCUMENT_CLIENT_ALLOWED_MIME_TYPES = new Set([
   "image/png",
   "image/webp",
 ]);
+const FILE_MANAGER_MENU_WIDTH = 224;
+const DOCUMENT_MENU_HEIGHT = 188;
+const FOLDER_MENU_HEIGHT = 156;
+const MENU_GAP = 8;
+const MENU_VIEWPORT_MARGIN = 12;
 
 function formatDocumentDate(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -1336,12 +1341,20 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
     });
   }, [documents, folderWindowSearch, openedFolder]);
 
-  function clampMenuCoordinates(x: number, y: number) {
-    const menuWidth = 220;
-    const menuHeight = 220;
+  function clampMenuCoordinates(
+    x: number,
+    y: number,
+    menuHeight = DOCUMENT_MENU_HEIGHT,
+  ) {
     return {
-      x: Math.max(12, Math.min(x, window.innerWidth - menuWidth - 12)),
-      y: Math.max(12, Math.min(y, window.innerHeight - menuHeight - 12)),
+      x: Math.max(
+        MENU_VIEWPORT_MARGIN,
+        Math.min(x, window.innerWidth - FILE_MANAGER_MENU_WIDTH - MENU_VIEWPORT_MARGIN),
+      ),
+      y: Math.max(
+        MENU_VIEWPORT_MARGIN,
+        Math.min(y, window.innerHeight - menuHeight - MENU_VIEWPORT_MARGIN),
+      ),
     };
   }
 
@@ -1352,8 +1365,36 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
 
     const rect = event.currentTarget.getBoundingClientRect();
     const x = rect.left;
-    const y = rect.bottom + 8;
+    const y = rect.bottom + MENU_GAP;
     return clampMenuCoordinates(x, y);
+  }
+
+  function folderMenuCoordinates(event: MouseEvent<HTMLElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const canOpenRight =
+      rect.right + MENU_GAP + FILE_MANAGER_MENU_WIDTH <=
+      window.innerWidth - MENU_VIEWPORT_MARGIN;
+    const canOpenLeft =
+      rect.left - MENU_GAP - FILE_MANAGER_MENU_WIDTH >= MENU_VIEWPORT_MARGIN;
+    const x = canOpenRight
+      ? rect.right + MENU_GAP
+      : canOpenLeft
+        ? rect.left - MENU_GAP - FILE_MANAGER_MENU_WIDTH
+        : rect.left;
+
+    if (event.type !== "contextmenu") {
+      const belowY = rect.bottom + MENU_GAP;
+      const canOpenBelow =
+        belowY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
+      const y = canOpenBelow ? belowY : rect.top - MENU_GAP - FOLDER_MENU_HEIGHT;
+      return clampMenuCoordinates(x, y, FOLDER_MENU_HEIGHT);
+    }
+
+    const cursorY = Math.max(rect.top, Math.min(event.clientY, rect.bottom));
+    const canOpenBelow =
+      cursorY + FOLDER_MENU_HEIGHT <= window.innerHeight - MENU_VIEWPORT_MARGIN;
+    const y = canOpenBelow ? cursorY : cursorY - FOLDER_MENU_HEIGHT;
+    return clampMenuCoordinates(x, y, FOLDER_MENU_HEIGHT);
   }
 
   function openDocumentMenu(
@@ -1368,7 +1409,7 @@ function MyDocumentsView({ onAction }: { onAction: NoticeHandler }) {
   function openFolderMenu(folder: FolderItem, event: MouseEvent<HTMLElement>) {
     event.preventDefault();
     event.stopPropagation();
-    setContextMenu({ kind: "folder", item: folder, ...menuCoordinates(event) });
+    setContextMenu({ kind: "folder", item: folder, ...folderMenuCoordinates(event) });
   }
 
   function selectFolder(folder: FolderItem) {
