@@ -3,7 +3,7 @@ import "server-only";
 import { getDb } from "@/lib/db";
 import type { AccountRole } from "@/lib/types";
 
-type CompanyRoleState = {
+export type CompanyRoleState = {
   hasBuyerCompany: boolean;
   hasSellerCompany: boolean;
 };
@@ -31,6 +31,10 @@ export function inferRoleFromCompanyState(
   if (companyState.hasBuyerCompany) return "buyer";
   if (companyState.hasSellerCompany) return "seller";
   return null;
+}
+
+export function hasAnyOnboardingCompany(companyState: CompanyRoleState) {
+  return companyState.hasBuyerCompany || companyState.hasSellerCompany;
 }
 
 export function isOnboardingCompleteForRole(

@@ -5,6 +5,7 @@ import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
   getOnboardingCompanyState,
+  hasAnyOnboardingCompany,
   inferRoleFromCompanyState,
   isOnboardingCompleteForRole,
   onboardingRoleSegment,
@@ -78,6 +79,7 @@ async function resolveOnboardingState(
 
   return {
     role,
+    canChangeRole: role !== "admin" && !hasAnyOnboardingCompany(companyState),
     onboardingComplete: isOnboardingCompleteForRole(role, companyState),
   };
 }
@@ -140,7 +142,7 @@ export async function redirectSignedInUserFromSignup(
     getCurrentUserProfile(),
   ]);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -152,7 +154,7 @@ export async function redirectSignedInUserFromSignup(
     onboardingComplete,
   );
 
-  if (role === "user") {
+  if (role === "user" || canChangeRole) {
     redirect(`${basePath}/onboarding/role`);
   }
 
@@ -215,7 +217,7 @@ export async function requireOnboardingEntry(redirectUrl: string) {
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -227,7 +229,7 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     onboardingComplete,
   );
 
-  if (role === "user") return { role };
+  if (role === "user" || canChangeRole) return { role, canChangeRole };
   if (role === "admin") redirect(`${prefix}/admin`);
 
   if (onboardingComplete) {
@@ -249,7 +251,7 @@ export async function requireOnboardingRole(
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -277,7 +279,7 @@ export async function requireOnboardingRole(
     redirect(`${prefix}/dashboard`);
   }
 
-  return { role };
+  return { role, canChangeRole };
 }
 
 export async function requireDashboardRole(

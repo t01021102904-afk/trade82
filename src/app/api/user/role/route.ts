@@ -5,6 +5,7 @@ import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
   getOnboardingCompanyState,
+  hasAnyOnboardingCompany,
   isOnboardingCompleteForRole,
   ROLE_SELECTION_SOURCE,
 } from "@/lib/onboarding-status";
@@ -37,27 +38,50 @@ export async function POST(request: Request) {
   }
 
   const profile = await getCurrentUserProfile();
-  if (profile && profile.role !== "user") {
+  if (profile) {
+    const companyState = await getOnboardingCompanyState(profile.id);
+    if (hasAnyOnboardingCompany(companyState)) {
+      const onboardingComplete = isOnboardingCompleteForRole(
+        profile.role,
+        companyState,
+      );
+      const client = await clerkClient();
+
+      await client.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          role: profile.role,
+          onboardingComplete,
+        },
+      });
+
+      return Response.json(
+        {
+          error: "Role cannot be changed after a company profile is created.",
+          role: profile.role,
+          onboardingComplete,
+        },
+        { status: 409 },
+      );
+    }
+  }
+
+  if (profile && profile.role !== "user" && profile.role !== role) {
     const companyState = await getOnboardingCompanyState(profile.id);
     const onboardingComplete = isOnboardingCompleteForRole(
       profile.role,
       companyState,
     );
-    const client = await clerkClient();
 
-    await client.users.updateUserMetadata(userId, {
-      publicMetadata: {
-        role: profile.role,
-        onboardingComplete,
-      },
-    });
-
-    return Response.json({
-      ok: true,
-      role: profile.role,
-      onboardingComplete,
-      alreadyConfigured: true,
-    });
+    if (onboardingComplete) {
+      return Response.json(
+        {
+          error: "Role cannot be changed after onboarding is complete.",
+          role: profile.role,
+          onboardingComplete,
+        },
+        { status: 409 },
+      );
+    }
   }
 
   const client = await clerkClient();
