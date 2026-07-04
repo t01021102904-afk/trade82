@@ -86,15 +86,15 @@ type HomeCopy = {
 };
 
 const builtWithLogos = [
-  "ChatGPT",
-  "Codex",
-  "Vercel",
-  "Supabase",
-  "Stripe",
-  "Clerk",
-  "Resend",
-  "GitHub",
-  "Claude",
+  { name: "ChatGPT", src: "/logo/chatgpt.webp" },
+  { name: "Codex", src: "/logo/codex.png" },
+  { name: "Vercel", src: "/logo/vercel.svg" },
+  { name: "Supabase", src: "/logo/supabase.webp" },
+  { name: "Stripe", src: "/logo/stripe.png" },
+  { name: "Clerk", src: "/logo/clerk.png" },
+  { name: "Resend", src: "/logo/resend.svg" },
+  { name: "GitHub", src: "/logo/github.png" },
+  { name: "Claude", src: "/logo/claude.png" },
 ];
 
 const homeCopy: Record<Locale, HomeCopy> = {
@@ -534,12 +534,20 @@ function BuiltWithMarquee({ label }: { label: string }) {
         </p>
         <div className="home-marquee-mask min-w-0 flex-1 overflow-hidden">
           <div className="home-marquee-track flex w-max items-center gap-3">
-            {loop.map((name, index) => (
+            {loop.map((logo, index) => (
               <span
-                key={`${name}-${index}`}
-                className="inline-flex h-9 items-center rounded-full border px-4 font-mono text-[11px] font-semibold tracking-[0.04em] theme-surface-muted"
+                key={`${logo.name}-${index}`}
+                className="inline-flex h-11 w-[112px] items-center justify-center rounded-full border border-black/10 bg-[rgba(255,255,255,0.96)] px-4 shadow-sm shadow-black/5"
               >
-                {name}
+                <Image
+                  src={logo.src}
+                  alt={`${logo.name} logo`}
+                  width={96}
+                  height={32}
+                  className="max-h-6 w-auto max-w-[82px] object-contain"
+                  unoptimized
+                  draggable={false}
+                />
               </span>
             ))}
           </div>
