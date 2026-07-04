@@ -1,14 +1,34 @@
-import { CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 
-export function VerifiedSellerBadge({ compact = false }: { compact?: boolean }) {
+import { cx } from "@/lib/utils";
+
+export function VerifiedSellerBadge({
+  compact = false,
+  className,
+}: {
+  compact?: boolean;
+  className?: string;
+}) {
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold theme-success-badge"
+      role="img"
+      className={cx(
+        "inline-flex shrink-0 items-center align-middle",
+        compact ? "size-4" : "size-5",
+        className,
+      )}
       title="Verified Seller subscription active"
       aria-label="Verified Seller subscription active"
     >
-      <CheckCircle2 className={compact ? "size-3" : "size-3.5"} aria-hidden="true" />
-      {compact ? "Verified" : "Verified Seller"}
+      <Image
+        src="/Trade82/trade82_verified_sticker.png"
+        alt=""
+        width={compact ? 16 : 20}
+        height={compact ? 16 : 20}
+        className="size-full object-contain"
+        loading="lazy"
+        aria-hidden="true"
+      />
     </span>
   );
 }

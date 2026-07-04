@@ -34,7 +34,7 @@ export function SellerCard({ seller }: { seller: Seller }) {
             </h3>
           </Link>
             {seller.isTrade82Team ? <AdminBadge /> : null}
-            {seller.isVerifiedSeller ? <VerifiedSellerBadge /> : null}
+            {seller.isVerifiedSeller ? <VerifiedSellerBadge compact /> : null}
           </div>
           <p className="mt-1 truncate text-sm theme-muted">{seller.location}</p>
         </div>
