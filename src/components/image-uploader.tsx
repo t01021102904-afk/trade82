@@ -109,12 +109,9 @@ function uploadCopy(locale: "en" | "ko") {
           "네트워크 문제로 업로드하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.",
         tooMany:
           "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해 주세요.",
-        productHelp:
-          "JPG, PNG, WebP, AVIF 파일을 업로드할 수 있습니다. 상품 이미지는 파일당 최대 50MB까지 가능합니다.",
         profileHelp:
           "JPG, PNG, WebP, AVIF 파일을 업로드할 수 있습니다. 프로필 사진과 회사 로고는 최대 25MB까지 가능합니다.",
         tooManyImages: "이미지는 최대 12장까지 등록할 수 있습니다.",
-        productImages: "상품 이미지",
         primary: "대표",
         remove: "삭제",
         uploading: "업로드 중",
@@ -122,8 +119,6 @@ function uploadCopy(locale: "en" | "ko") {
         changePhoto: "사진 변경",
         retryUpload: "다시 시도",
         dragHelp: "이미지를 끌어오거나 파일을 선택하세요",
-        reorderHelp:
-          "첫 번째 사진이 대표 이미지로 사용됩니다. 드래그하거나 화살표로 순서를 변경할 수 있습니다.",
       }
     : {
         empty: "Empty files cannot be uploaded.",
@@ -139,12 +134,9 @@ function uploadCopy(locale: "en" | "ko") {
         network:
           "Network error while uploading. Check your connection and try again.",
         tooMany: "Too many upload attempts. Please try again shortly.",
-        productHelp:
-          "Upload JPG, PNG, WebP, or AVIF. Product images can be up to 50MB each.",
         profileHelp:
           "Upload JPG, PNG, WebP, or AVIF. Profile photos and company logos can be up to 25MB.",
         tooManyImages: "You can add up to 12 images.",
-        productImages: "Product images",
         primary: "Primary",
         remove: "Remove",
         uploading: "Uploading",
@@ -152,8 +144,6 @@ function uploadCopy(locale: "en" | "ko") {
         changePhoto: "Change photo",
         retryUpload: "Retry",
         dragHelp: "Drag images here or choose files",
-        reorderHelp:
-          "The first photo is used as the primary image. Drag or use the arrows to reorder.",
       };
 }
 
@@ -356,18 +346,6 @@ export function ListingImageUploader({
 
   return (
     <div className="grid gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <span
-          className={cx(
-            "text-sm font-semibold",
-            variant === "dashboard" ? "text-zinc-100" : "text-zinc-900",
-          )}
-        >
-          {copy.productImages}
-        </span>
-        <span className="text-sm text-zinc-500">{items.length}/12</span>
-      </div>
-      <p className="text-xs leading-5 text-zinc-500">{copy.productHelp}</p>
       <div
         className={cx(
           "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
@@ -502,7 +480,6 @@ export function ListingImageUploader({
           {error}
         </p>
       ) : null}
-      <p className="text-xs text-zinc-500">{copy.reorderHelp}</p>
     </div>
   );
 }

@@ -288,15 +288,18 @@ export function ProductEditor({
     discardDraft();
   }
 
-  function validate() {
-    const nextErrors: ProductEditorErrors = validateRichProductForm(product, t);
+  function validate(status?: "active" | "draft") {
+    const targetStatus = status ?? product.status;
+    const nextErrors: ProductEditorErrors = validateRichProductForm(product, t, {
+      requireImages: targetStatus === "active",
+    });
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
   async function saveProduct(status?: "active" | "draft") {
     if (saving) return;
-    if (!validate()) return;
+    if (!validate(status)) return;
 
     setSaving(true);
     setErrors({});
@@ -363,9 +366,6 @@ export function ProductEditor({
             </h2>
             <EditorStatusPill label={status.label} tone={status.tone} />
           </div>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-400">
-            {t("listing.builderHelp")}
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

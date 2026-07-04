@@ -469,7 +469,12 @@ export function RichProductFormFields({
 
   return (
     <div className={cx("grid gap-5", variant === "dashboard" && "gap-6")}>
-      <Section id="product-images" title={t("productForm.productImages")} variant={variant}>
+      <Section
+        id="product-images"
+        title={t("productForm.productImages")}
+        required
+        variant={variant}
+      >
         <div className="sm:col-span-2">
           <ListingImageUploader
             value={value.images}
@@ -782,16 +787,6 @@ export function RichProductFormFields({
           variant={variant}
         />
       </Section>
-      <p
-        className={cx(
-          "rounded-md border p-3 text-xs leading-5",
-          variant === "dashboard"
-            ? "theme-surface-muted theme-muted"
-            : "border-zinc-200 bg-zinc-50 text-zinc-600",
-        )}
-      >
-        {t("productForm.visibilityHelper")} {t("productForm.imagesPublicNote")}
-      </p>
     </div>
   );
 }
@@ -812,11 +807,13 @@ function Section({
   title,
   children,
   variant = "default",
+  required = false,
 }: {
   id?: string;
   title: string;
   children: React.ReactNode;
   variant?: ProductFormVariant;
+  required?: boolean;
 }) {
   return (
     <section
@@ -835,6 +832,12 @@ function Section({
         )}
       >
         {title}
+        {required ? (
+          <span className={variant === "dashboard" ? "text-red-300" : "text-red-600"}>
+            {" "}
+            *
+          </span>
+        ) : null}
       </h3>
       {children}
     </section>

@@ -60,15 +60,17 @@ export function ListingCreateForm() {
     discardDraft();
   }
 
-  function validate() {
-    const nextErrors: ListingErrors = validateRichProductForm(product, t);
+  function validate(status: "active" | "draft") {
+    const nextErrors: ListingErrors = validateRichProductForm(product, t, {
+      requireImages: status === "active",
+    });
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
 
   async function saveProduct(status: "active" | "draft") {
     if (submitting) return;
-    if (!validate()) return;
+    if (!validate(status)) return;
 
     setSubmitting(true);
     setNotice("");
@@ -145,9 +147,6 @@ export function ListingCreateForm() {
             </h1>
             <StatusPill label={statusMeta.label} tone={statusMeta.tone} />
           </div>
-          <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
-            {t("listing.builderHelp")}
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
