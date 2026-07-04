@@ -1,4 +1,4 @@
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 import { rateLimitOrResponse } from "@/lib/api-security";
 import { getCurrentUserProfile } from "@/lib/authz";
@@ -18,15 +18,8 @@ export async function POST(request: Request) {
   });
   if (rateLimited) return rateLimited;
 
-  const user = await currentUser();
   const profile = await getCurrentUserProfile();
-  const metadataRole = user?.publicMetadata?.role;
-  const role =
-    profile?.role === "buyer" ||
-    profile?.role === "seller" ||
-    profile?.role === "both"
-      ? profile.role
-      : metadataRole;
+  const role = profile?.role;
 
   if (role !== "buyer" && role !== "seller" && role !== "both") {
     return Response.json({ error: "Missing role" }, { status: 400 });

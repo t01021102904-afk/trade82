@@ -11,6 +11,10 @@ import type {
 } from "@/generated/prisma/client";
 import { Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
+import {
+  getOnboardingCompanyState,
+  inferRoleFromCompanyState,
+} from "@/lib/onboarding-status";
 
 type CompanyWithOwner = Company & {
   owner?: Pick<UserProfile, "id">;
@@ -33,10 +37,11 @@ function roleForExistingProfile(
   existingRole: AccountRole,
   metadataRole: AccountRole,
   admin: boolean,
+  inferredRole: AccountRole | null,
 ) {
   if (admin) return "admin";
   if (existingRole === "admin") return metadataRole === "admin" ? "admin" : "user";
-  if (existingRole === "user" && metadataRole !== "admin") return metadataRole;
+  if (existingRole === "user") return inferredRole ?? "user";
   return existingRole;
 }
 
@@ -75,7 +80,7 @@ export async function getCurrentUserProfile() {
 
   const admin = isAdminEmail(primaryEmail);
   const metadataRole = roleFromMetadata(clerkUser.publicMetadata.role);
-  const createRole: AccountRole = admin ? "admin" : metadataRole;
+  const createRole: AccountRole = admin ? "admin" : "user";
   const preferredLanguage =
     clerkUser.publicMetadata.preferredLanguage === "ko" ? "ko" : "en";
   const email = primaryEmail.toLowerCase();
@@ -83,17 +88,28 @@ export async function getCurrentUserProfile() {
     clerkUser.fullName || primaryEmail.split("@")[0] || "Trade82 User";
   const db = getDb();
 
-  const updateExistingProfile = (profile: UserProfile) =>
-    db.userProfile.update({
+  const updateExistingProfile = async (profile: UserProfile) => {
+    const inferredRole =
+      profile.role === "user"
+        ? inferRoleFromCompanyState(await getOnboardingCompanyState(profile.id))
+        : null;
+
+    return db.userProfile.update({
       where: { id: profile.id },
       data: {
         clerkUserId: userId,
         email,
         displayName: profile.displayName || displayName,
-        role: roleForExistingProfile(profile.role, metadataRole, admin),
+        role: roleForExistingProfile(
+          profile.role,
+          metadataRole,
+          admin,
+          inferredRole,
+        ),
         preferredLanguage,
       },
     });
+  };
 
   try {
     const existingByClerkId = await db.userProfile.findUnique({
