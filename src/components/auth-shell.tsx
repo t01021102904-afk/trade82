@@ -47,6 +47,8 @@ export async function AuthShell({
               signUpUrl={`${basePath}/signup`}
               forceRedirectUrl={loginRedirectPath}
               fallbackRedirectUrl={dashboardPath}
+              signUpForceRedirectUrl={rolePath}
+              signUpFallbackRedirectUrl={rolePath}
             />
           ) : (
             <SignUp

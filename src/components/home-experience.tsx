@@ -203,7 +203,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href={withLocale("/onboarding/seller", locale)}
+                href={withLocale("/signup", locale)}
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
               >
                 {copy.primaryCta}
@@ -253,7 +253,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
           </div>
           <div className="relative mt-7 flex flex-col gap-3 sm:flex-row lg:mt-0">
             <Link
-              href={withLocale("/onboarding/seller", locale)}
+              href={withLocale("/signup", locale)}
               className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
             >
               {copy.finalPrimary}
