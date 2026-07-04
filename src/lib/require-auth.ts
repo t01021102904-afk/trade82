@@ -41,9 +41,7 @@ export function getUserRole(metadata: PublicMetadata): AccountRole | null {
 
 async function resolveOnboardingState(
   profile: Awaited<ReturnType<typeof getCurrentUserProfile>>,
-  metadata: PublicMetadata,
 ) {
-  const metadataComplete = metadata.onboardingComplete === true;
   const companyState = profile
     ? await getOnboardingCompanyState(profile.id)
     : { hasBuyerCompany: false, hasSellerCompany: false };
@@ -60,11 +58,7 @@ async function resolveOnboardingState(
 
   return {
     role,
-    onboardingComplete: isOnboardingCompleteForRole(
-      role,
-      companyState,
-      metadataComplete,
-    ),
+    onboardingComplete: isOnboardingCompleteForRole(role, companyState),
   };
 }
 
@@ -107,6 +101,44 @@ export async function requireAuth(redirectUrl: string) {
   }
 }
 
+export async function redirectSignedInUserFromSignup(
+  basePath: "" | "/en" | "/ko",
+) {
+  const { userId } = await auth();
+  if (!userId) return;
+
+  const [clerkUser, profile] = await Promise.all([
+    currentUser(),
+    getCurrentUserProfile(),
+  ]);
+  const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
+  const { role, onboardingComplete } = await resolveOnboardingState(profile);
+
+  if (role === "user") {
+    redirect(`${basePath}/onboarding/role`);
+  }
+
+  if (role === "admin") {
+    redirect(`${basePath}/admin`);
+  }
+
+  await syncClerkOnboardingMetadata(
+    clerkUser?.id,
+    metadata,
+    role,
+    onboardingComplete,
+  );
+
+  if (
+    (role === "seller" || role === "buyer" || role === "both") &&
+    !onboardingComplete
+  ) {
+    redirect(`${basePath}/onboarding/${onboardingRoleSegment(role)}`);
+  }
+
+  redirect(`${basePath}/dashboard`);
+}
+
 export async function requireAppProfile(redirectUrl: string) {
   await requireAuth(redirectUrl);
 
@@ -116,10 +148,7 @@ export async function requireAppProfile(redirectUrl: string) {
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
-    profile,
-    metadata,
-  );
+  const { role, onboardingComplete } = await resolveOnboardingState(profile);
 
   if (role === "user") {
     redirect(`${prefix}/onboarding/role`);
@@ -152,10 +181,7 @@ export async function requireOnboardingEntry(redirectUrl: string) {
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
-    profile,
-    metadata,
-  );
+  const { role, onboardingComplete } = await resolveOnboardingState(profile);
 
   if (role === "user") return { role };
   if (role === "admin") redirect(`${prefix}/admin`);
@@ -186,10 +212,7 @@ export async function requireOnboardingRole(
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
-    profile,
-    metadata,
-  );
+  const { role, onboardingComplete } = await resolveOnboardingState(profile);
 
   if (role === "user") {
     redirect(`${prefix}/onboarding/role`);

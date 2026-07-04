@@ -1,9 +1,10 @@
 import { SignIn, SignUp } from "@clerk/nextjs";
 
 import { getDictionary, type Locale } from "@/lib/i18n";
+import { redirectSignedInUserFromSignup } from "@/lib/require-auth";
 import { safeInternalPath } from "@/lib/url-security";
 
-export function AuthShell({
+export async function AuthShell({
   locale,
   mode,
   basePath,
@@ -19,6 +20,10 @@ export function AuthShell({
   const rolePath = `${basePath}/onboarding/role`;
   const dashboardPath = `${basePath}/dashboard`;
   const loginRedirectPath = safeInternalPath(redirectUrl, dashboardPath);
+
+  if (!isLogin) {
+    await redirectSignedInUserFromSignup(basePath);
+  }
 
   return (
     <div className="bg-zinc-50">

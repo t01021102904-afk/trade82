@@ -34,10 +34,8 @@ export function inferRoleFromCompanyState(
 export function isOnboardingCompleteForRole(
   role: AccountRole,
   companyState: CompanyRoleState,
-  metadataComplete: boolean,
 ) {
   if (role === "admin") return true;
-  if (metadataComplete) return true;
   if (role === "buyer") return companyState.hasBuyerCompany;
   if (role === "seller") return companyState.hasSellerCompany;
   if (role === "both") {

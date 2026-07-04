@@ -41,7 +41,6 @@ export async function POST(request: Request) {
     const onboardingComplete = isOnboardingCompleteForRole(
       profile.role,
       companyState,
-      false,
     );
     const client = await clerkClient();
 
