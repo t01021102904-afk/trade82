@@ -1,7 +1,17 @@
 "use client";
 
+import {
+  FileText,
+  LayoutDashboard,
+  MessageCircle,
+  Package,
+  Settings as SettingsIcon,
+  ShoppingBag,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
@@ -16,8 +26,9 @@ import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
 import { isVerifiedSellerSubscription } from "@/lib/billing";
-import { withLocale } from "@/lib/i18n";
+import { stripLocale, withLocale } from "@/lib/i18n";
 import type { VerificationStatus } from "@/lib/types";
+import { cx } from "@/lib/utils";
 
 type DashboardCompany = {
   id: string;
@@ -44,6 +55,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const userId = user?.id ?? "";
   const [company, setCompany] = useState<DashboardCompany | null | undefined>(
     undefined,
@@ -113,13 +125,22 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     company.subscriptionStatus,
     company.subscriptionPlan,
   );
-  const navItems: Array<{ id: DashboardSection; label: string }> = [
-    { id: "overview", label: t("dashboard.dashboardNavOverview") },
+  const navItems: Array<{
+    id: DashboardSection;
+    label: string;
+    icon: LucideIcon;
+  }> = [
+    {
+      id: "overview",
+      label: t("dashboard.dashboardNavOverview"),
+      icon: LayoutDashboard,
+    },
     ...(role === "buyer"
       ? [
           {
             id: "saved-products" as const,
             label: t("dashboard.dashboardNavSavedProducts"),
+            icon: ShoppingBag,
           },
         ]
       : []),
@@ -128,48 +149,66 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           {
             id: "following" as const,
             label: t("dashboard.dashboardNavFollowing"),
+            icon: Users,
           },
-          { id: "messages" as const, label: t("dashboard.dashboardNavMessages") },
+          {
+            id: "messages" as const,
+            label: t("dashboard.dashboardNavMessages"),
+            icon: MessageCircle,
+          },
         ]
       : []),
     ...(role === "seller"
       ? [
-          { id: "products" as const, label: t("dashboard.dashboardNavProducts") },
-          { id: "documents" as const, label: "Documents" },
+          {
+            id: "products" as const,
+            label: t("dashboard.dashboardNavProducts"),
+            icon: Package,
+          },
+          {
+            id: "documents" as const,
+            label: t("common.documents"),
+            icon: FileText,
+          },
         ]
       : []),
   ];
   const safeActiveSection = navItems.some((item) => item.id === activeSection)
     ? activeSection
     : "overview";
+  const settingsSelected = stripLocale(pathname) === "/dashboard/settings";
   return (
-    <div className="grid gap-4 lg:grid-cols-[208px_1fr]">
+    <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
       <aside className="h-fit min-w-0 rounded-2xl border p-2 theme-surface-elevated">
         <nav
           className="-mx-1 flex gap-2 overflow-x-auto px-1 lg:mx-0 lg:grid lg:gap-1 lg:overflow-visible lg:px-0"
           aria-label={t("dashboard.label")}
         >
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setActiveSection(item.id)}
-              className={`relative z-10 h-8 min-w-max rounded-md px-2.5 text-left text-xs font-medium transition ${
-                safeActiveSection === item.id
-                  ? "theme-primary-button shadow-sm"
-                  : "theme-ghost-button hover:-translate-y-0.5"
-              }`}
-              aria-current={safeActiveSection === item.id ? "page" : undefined}
-            >
-              {item.label}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const selected = safeActiveSection === item.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActiveSection(item.id)}
+                className={dashboardNavItemClass(selected)}
+                aria-current={selected ? "page" : undefined}
+              >
+                <Icon className="size-4 shrink-0" aria-hidden="true" />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
           {role === "seller" ? (
             <Link
               href={withLocale("/dashboard/settings", locale)}
-              className="relative z-10 h-8 min-w-max rounded-md px-2.5 py-2 text-left text-xs font-medium leading-4 transition theme-ghost-button hover:-translate-y-0.5"
+              className={dashboardNavItemClass(settingsSelected)}
+              aria-current={settingsSelected ? "page" : undefined}
             >
-              {t("dashboard.dashboardNavSettings")}
+              <SettingsIcon className="size-4 shrink-0" aria-hidden="true" />
+              <span className="truncate">{t("dashboard.dashboardNavSettings")}</span>
             </Link>
           ) : null}
         </nav>
@@ -260,6 +299,15 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
         />
       </div>
     </div>
+  );
+}
+
+function dashboardNavItemClass(selected: boolean) {
+  return cx(
+    "relative z-10 inline-flex h-10 min-w-max items-center gap-2 rounded-lg px-3 text-left text-sm font-medium transition lg:w-full lg:min-w-0",
+    selected
+      ? "theme-primary-button shadow-sm"
+      : "theme-ghost-button hover:-translate-y-0.5",
   );
 }
 
