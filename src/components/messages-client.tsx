@@ -25,7 +25,6 @@ import {
 } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
-import { BackButton } from "@/components/back-button";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { useUserContext } from "@/hooks/use-user-context";
@@ -627,7 +626,6 @@ export function MessagesClient({
       {selected ? (
         <section className="flex min-h-0 flex-col">
           <header className="shrink-0 border-b theme-border p-4">
-            <BackButton fallbackHref="/dashboard" className="mb-3" />
             {selected.product ? (
               <ProductInquiryCard thread={selected} />
             ) : (

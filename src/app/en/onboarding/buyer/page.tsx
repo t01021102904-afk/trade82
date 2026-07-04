@@ -9,6 +9,7 @@ export default async function EnBuyerOnboardingPage() {
 
   return (
     <OnboardingPageShell
+      backFallbackHref="/onboarding/role"
       label={messages.onboarding.buyerLabel}
       title={messages.onboarding.buyerTitle}
       description={messages.onboarding.buyerDescription}

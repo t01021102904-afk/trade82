@@ -7,6 +7,7 @@ export function RolePageContent({ locale }: { locale: Locale }) {
 
   return (
     <OnboardingPageShell
+      backFallbackHref="/"
       label={messages.onboarding.roleLabel}
       title={messages.onboarding.roleTitle}
       description={messages.onboarding.roleDescription}

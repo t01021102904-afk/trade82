@@ -8,6 +8,7 @@ export default async function SellerOnboardingPage() {
   const messages = getDictionary("en");
   return (
     <OnboardingPageShell
+      backFallbackHref="/onboarding/role"
       label={messages.onboarding.sellerLabel}
       title={messages.onboarding.sellerTitle}
       description={messages.onboarding.sellerDescription}

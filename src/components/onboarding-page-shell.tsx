@@ -1,11 +1,15 @@
 import type { ReactNode } from "react";
 
+import { BackButton } from "@/components/back-button";
+
 export function OnboardingPageShell({
+  backFallbackHref = "/",
   label,
   title,
   description,
   children,
 }: {
+  backFallbackHref?: string;
   label?: string;
   title: string;
   description?: string;
@@ -14,6 +18,7 @@ export function OnboardingPageShell({
   return (
     <div className="min-h-screen theme-bg">
       <div className="mx-auto grid w-full max-w-[860px] gap-5 px-4 py-6 sm:px-6 sm:py-8">
+        <BackButton fallbackHref={backFallbackHref} />
         <header className="grid gap-3 rounded-2xl border p-5 theme-surface-elevated sm:p-6">
           {label ? (
             <p className="text-xs font-semibold uppercase tracking-[0.16em] theme-success-text">

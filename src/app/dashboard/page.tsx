@@ -1,4 +1,5 @@
 import { DashboardOverview } from "@/components/dashboard-overview";
+import { BackButton } from "@/components/back-button";
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary } from "@/lib/i18n";
 import { requireAppProfile } from "@/lib/require-auth";
@@ -14,6 +15,7 @@ export default async function DashboardPage() {
   return (
     <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <BackButton fallbackHref="/" />
         <SectionHeader
           label={messages.dashboard.label}
           title={messages.dashboard.title}

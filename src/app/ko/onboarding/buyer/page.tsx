@@ -8,6 +8,7 @@ export default async function KoBuyerOnboardingPage() {
   const messages = getDictionary("ko");
   return (
     <OnboardingPageShell
+      backFallbackHref="/onboarding/role"
       label={messages.onboarding.buyerLabel}
       title={messages.onboarding.buyerTitle}
       description={messages.onboarding.buyerDescription}
