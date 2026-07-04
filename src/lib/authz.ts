@@ -38,9 +38,11 @@ function roleForExistingProfile(
   metadataRole: AccountRole,
   admin: boolean,
   inferredRole: AccountRole | null,
+  relinkingDifferentClerkUser: boolean,
 ) {
   if (admin) return "admin";
   if (existingRole === "admin") return metadataRole === "admin" ? "admin" : "user";
+  if (relinkingDifferentClerkUser && !inferredRole) return "user";
   if (existingRole === "user") return inferredRole ?? "user";
   return existingRole;
 }
@@ -89,10 +91,9 @@ export async function getCurrentUserProfile() {
   const db = getDb();
 
   const updateExistingProfile = async (profile: UserProfile) => {
-    const inferredRole =
-      profile.role === "user"
-        ? inferRoleFromCompanyState(await getOnboardingCompanyState(profile.id))
-        : null;
+    const companyState = await getOnboardingCompanyState(profile.id);
+    const inferredRole = inferRoleFromCompanyState(companyState);
+    const relinkingDifferentClerkUser = profile.clerkUserId !== userId;
 
     return db.userProfile.update({
       where: { id: profile.id },
@@ -105,6 +106,7 @@ export async function getCurrentUserProfile() {
           metadataRole,
           admin,
           inferredRole,
+          relinkingDifferentClerkUser,
         ),
         preferredLanguage,
       },

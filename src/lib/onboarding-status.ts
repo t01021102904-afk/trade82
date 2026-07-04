@@ -8,6 +8,8 @@ type CompanyRoleState = {
   hasSellerCompany: boolean;
 };
 
+export const ROLE_SELECTION_SOURCE = "trade82-role-picker";
+
 export async function getOnboardingCompanyState(
   userProfileId: string,
 ): Promise<CompanyRoleState> {

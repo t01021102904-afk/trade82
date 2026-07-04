@@ -43,13 +43,13 @@ export function DashboardOverview({ role }: { role: AccountRole }) {
       {effectiveRole === "user" ? (
         <section className="grid gap-5 md:grid-cols-2">
           <OnboardingCard
-            href="/onboarding/seller"
+            href="/onboarding/role"
             title={t("onboarding.roleSellerTitle")}
             description={t("onboarding.roleSellerDescription")}
             locale={locale}
           />
           <OnboardingCard
-            href="/onboarding/buyer"
+            href="/onboarding/role"
             title={t("onboarding.roleBuyerTitle")}
             description={t("onboarding.roleBuyerDescription")}
             locale={locale}

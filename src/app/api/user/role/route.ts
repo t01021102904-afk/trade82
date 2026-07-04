@@ -6,6 +6,7 @@ import { getDb } from "@/lib/db";
 import {
   getOnboardingCompanyState,
   isOnboardingCompleteForRole,
+  ROLE_SELECTION_SOURCE,
 } from "@/lib/onboarding-status";
 
 const validRoles = new Set(["buyer", "seller"]);
@@ -65,6 +66,7 @@ export async function POST(request: Request) {
     publicMetadata: {
       role,
       onboardingComplete: false,
+      roleSelectionSource: ROLE_SELECTION_SOURCE,
     },
   });
   if (profile) {

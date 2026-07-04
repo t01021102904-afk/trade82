@@ -8,6 +8,7 @@ import {
   inferRoleFromCompanyState,
   isOnboardingCompleteForRole,
   onboardingRoleSegment,
+  ROLE_SELECTION_SOURCE,
 } from "@/lib/onboarding-status";
 import type { AccountRole } from "@/lib/types";
 import { safeInternalPath } from "@/lib/url-security";
@@ -15,6 +16,7 @@ import { safeInternalPath } from "@/lib/url-security";
 type PublicMetadata = {
   role?: unknown;
   onboardingComplete?: unknown;
+  roleSelectionSource?: unknown;
 };
 
 function localePrefix(pathname: string) {
@@ -41,6 +43,7 @@ export function getUserRole(metadata: PublicMetadata): AccountRole | null {
 
 async function resolveOnboardingState(
   profile: Awaited<ReturnType<typeof getCurrentUserProfile>>,
+  metadata: PublicMetadata = {},
 ) {
   const companyState = profile
     ? await getOnboardingCompanyState(profile.id)
@@ -50,6 +53,23 @@ async function resolveOnboardingState(
 
   if (profile && role === "user" && inferredRole) {
     role = inferredRole;
+    await getDb().userProfile.update({
+      where: { id: profile.id },
+      data: { role },
+    });
+  }
+
+  if (
+    profile &&
+    role !== "user" &&
+    role !== "admin" &&
+    !inferredRole &&
+    !(
+      metadata.role === role &&
+      metadata.roleSelectionSource === ROLE_SELECTION_SOURCE
+    )
+  ) {
+    role = "user";
     await getDb().userProfile.update({
       where: { id: profile.id },
       data: { role },
@@ -68,22 +88,30 @@ async function syncClerkOnboardingMetadata(
   role: AccountRole,
   onboardingComplete: boolean,
 ) {
-  if (!clerkUserId || role === "user") return;
+  if (!clerkUserId) return;
+  const hasStaleRoleSelectionSource =
+    role === "user" && metadata.roleSelectionSource !== undefined;
   if (
     metadata.role === role &&
-    metadata.onboardingComplete === onboardingComplete
+    metadata.onboardingComplete === onboardingComplete &&
+    !hasStaleRoleSelectionSource
   ) {
     return;
   }
 
   try {
     const client = await clerkClient();
+    const nextMetadata: Record<string, unknown> = {
+      ...(metadata as Record<string, unknown>),
+      role,
+      onboardingComplete,
+    };
+    if (role === "user") {
+      delete nextMetadata.roleSelectionSource;
+    }
+
     await client.users.updateUserMetadata(clerkUserId, {
-      publicMetadata: {
-        ...(metadata as Record<string, unknown>),
-        role,
-        onboardingComplete,
-      },
+      publicMetadata: nextMetadata,
     });
   } catch {
     console.warn("Unable to sync Clerk onboarding metadata from app profile.");
@@ -112,7 +140,17 @@ export async function redirectSignedInUserFromSignup(
     getCurrentUserProfile(),
   ]);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(profile);
+  const { role, onboardingComplete } = await resolveOnboardingState(
+    profile,
+    metadata,
+  );
+
+  await syncClerkOnboardingMetadata(
+    clerkUser?.id,
+    metadata,
+    role,
+    onboardingComplete,
+  );
 
   if (role === "user") {
     redirect(`${basePath}/onboarding/role`);
@@ -121,13 +159,6 @@ export async function redirectSignedInUserFromSignup(
   if (role === "admin") {
     redirect(`${basePath}/admin`);
   }
-
-  await syncClerkOnboardingMetadata(
-    clerkUser?.id,
-    metadata,
-    role,
-    onboardingComplete,
-  );
 
   if (
     (role === "seller" || role === "buyer" || role === "both") &&
@@ -148,7 +179,17 @@ export async function requireAppProfile(redirectUrl: string) {
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(profile);
+  const { role, onboardingComplete } = await resolveOnboardingState(
+    profile,
+    metadata,
+  );
+
+  await syncClerkOnboardingMetadata(
+    clerkUser?.id,
+    metadata,
+    role,
+    onboardingComplete,
+  );
 
   if (role === "user") {
     redirect(`${prefix}/onboarding/role`);
@@ -162,13 +203,6 @@ export async function requireAppProfile(redirectUrl: string) {
     redirect(`${prefix}/onboarding/${onboardingRole}`);
   }
 
-  await syncClerkOnboardingMetadata(
-    clerkUser?.id,
-    metadata,
-    role,
-    onboardingComplete,
-  );
-
   return { role };
 }
 
@@ -181,10 +215,10 @@ export async function requireOnboardingEntry(redirectUrl: string) {
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(profile);
-
-  if (role === "user") return { role };
-  if (role === "admin") redirect(`${prefix}/admin`);
+  const { role, onboardingComplete } = await resolveOnboardingState(
+    profile,
+    metadata,
+  );
 
   await syncClerkOnboardingMetadata(
     clerkUser?.id,
@@ -192,6 +226,9 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     role,
     onboardingComplete,
   );
+
+  if (role === "user") return { role };
+  if (role === "admin") redirect(`${prefix}/admin`);
 
   if (onboardingComplete) {
     redirect(`${prefix}/dashboard`);
@@ -212,7 +249,17 @@ export async function requireOnboardingRole(
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(profile);
+  const { role, onboardingComplete } = await resolveOnboardingState(
+    profile,
+    metadata,
+  );
+
+  await syncClerkOnboardingMetadata(
+    clerkUser?.id,
+    metadata,
+    role,
+    onboardingComplete,
+  );
 
   if (role === "user") {
     redirect(`${prefix}/onboarding/role`);
@@ -225,13 +272,6 @@ export async function requireOnboardingRole(
   if (role !== expectedRole && role !== "both") {
     redirect(`${prefix}/onboarding/${role}`);
   }
-
-  await syncClerkOnboardingMetadata(
-    clerkUser?.id,
-    metadata,
-    role,
-    onboardingComplete,
-  );
 
   if (onboardingComplete) {
     redirect(`${prefix}/dashboard`);
