@@ -11,6 +11,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
+import { BackButton } from "@/components/back-button";
 import { DeleteAccountDangerZone } from "@/components/delete-account-danger-zone";
 import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import {
@@ -61,6 +62,7 @@ export function DashboardSettingsClient({
     <div className="theme-bg">
       <div className="mx-auto grid max-w-6xl gap-5 px-4 py-8 sm:px-6 lg:px-8">
         <div>
+          <BackButton fallbackHref="/dashboard" className="mb-4" />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] theme-success-text">
             Seller dashboard
           </p>

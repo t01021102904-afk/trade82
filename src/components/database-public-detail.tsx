@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
+import { BackButton } from "@/components/back-button";
 import { Badge } from "@/components/badge";
 import { CompanyReviewsSection } from "@/components/company-reviews";
 import { ContactModal } from "@/components/contact-modal";
@@ -159,6 +160,9 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
     <div className="bg-zinc-50">
       <ViewTracker id={company.id} type="company" />
       <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6">
+        <BackButton
+          fallbackHref={company.companyRole === "buyer" ? "/buyers" : "/sellers"}
+        />
         <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 sm:flex-row">
           <CompanyLogo
             companyName={company.tradeName || company.legalName}
@@ -480,6 +484,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
     <div className="bg-zinc-50">
       <ViewTracker id={id} type="product" />
       <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:px-8">
+        <BackButton fallbackHref="/marketplace" />
         <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[0.9fr_1.1fr]">
           <ProductImageGallery
             images={product.imageUrls?.length ? product.imageUrls : [product.imagePlaceholder]}
