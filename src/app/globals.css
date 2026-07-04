@@ -409,6 +409,15 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
   }
 }
 
+@keyframes home-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .bm-grid-surface {
   background-image:
     linear-gradient(var(--grid-line) 1px, transparent 1px),
@@ -480,6 +489,18 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
 
 .bm-flow-inquiry {
   animation: bm-flow-inquiry 7s ease-in-out infinite;
+}
+
+.home-marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.home-marquee-track {
+  animation: home-marquee 34s linear infinite;
+}
+
+.home-marquee-mask:hover .home-marquee-track {
+  animation-play-state: paused;
 }
 
 .home-magnetic-panel {
