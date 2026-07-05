@@ -227,9 +227,13 @@ export function MessagesClient({
         return matchesFilter && matchesSearch;
       });
   }, [libraryFilter, librarySearch, selected]);
+  const visibleThreads = useMemo(
+    () => getCanonicalInquiryThreads(threads),
+    [threads],
+  );
   const contextMenuThread = useMemo(
-    () => threads.find((thread) => thread.id === contextMenu?.threadId) ?? null,
-    [contextMenu?.threadId, threads],
+    () => visibleThreads.find((thread) => thread.id === contextMenu?.threadId) ?? null,
+    [contextMenu?.threadId, visibleThreads],
   );
 
   useEffect(() => {
@@ -585,17 +589,20 @@ export function MessagesClient({
     updateThreadDeal(thread.id, result);
   }
 
-  if (!threads.length) {
+  if (!visibleThreads.length) {
     return <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed p-8 text-center theme-surface"><div><h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div></div>;
   }
 
   return (
     <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,13rem)] overflow-hidden rounded-lg border theme-surface-elevated xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
       <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
-        {threads.map((thread) => {
+        {visibleThreads.map((thread) => {
           const company = getCounterparty(thread);
           const companyName = getCompanyDisplayName(company, t);
           const unreadCount = normalizeUnreadCount(thread.unreadCount);
+          const isSelected =
+            selected?.id === thread.id ||
+            (selected ? getThreadParticipantKey(selected) === getThreadParticipantKey(thread) : false);
           return (
             <button
               key={thread.id}
@@ -607,7 +614,7 @@ export function MessagesClient({
               onPointerUp={handleThreadPressEnd}
               onPointerCancel={handleThreadPressEnd}
               onPointerLeave={handleThreadPressEnd}
-              className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${selected?.id === thread.id ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
+              className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${isSelected ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
             >
               <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
               <div className="min-w-0">
@@ -1531,6 +1538,29 @@ function Banner({ children }: { children: React.ReactNode }) {
 
 function getActiveDeal(thread: InquiryThread) {
   return (thread.deals ?? []).find((deal) => deal.dealStatus !== "cancelled") ?? null;
+}
+
+function getThreadParticipantKey(thread: InquiryThread) {
+  return [thread.buyerCompany.id, thread.sellerCompany.id].sort().join(":");
+}
+
+function getCanonicalInquiryThreads(threads: InquiryThread[]) {
+  const canonicalThreads = new Map<string, InquiryThread>();
+
+  threads.forEach((thread) => {
+    const key = getThreadParticipantKey(thread);
+    const existing = canonicalThreads.get(key);
+    if (
+      !existing ||
+      new Date(thread.updatedAt).getTime() > new Date(existing.updatedAt).getTime()
+    ) {
+      canonicalThreads.set(key, thread);
+    }
+  });
+
+  return Array.from(canonicalThreads.values()).sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
 }
 
 function getViewerCompanyId(thread: InquiryThread) {
