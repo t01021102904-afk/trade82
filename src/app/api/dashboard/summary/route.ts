@@ -136,6 +136,11 @@ export async function GET(request: Request) {
           id: company.id,
           name: company.tradeName || company.legalName,
           verificationStatus: company.verificationStatus,
+          sellerSupportPlan: company.sellerSupportPlan,
+          sellerSupportStatus: company.sellerSupportStatus,
+          sellerSupportCurrentPeriodEnd: company.sellerSupportCurrentPeriodEnd,
+          sellerSupportMonthlyLimit: company.sellerSupportMonthlyLimit,
+          sellerSupportMonthlyUsed: company.sellerSupportMonthlyUsed,
         },
         metrics: {
           productViews: products.reduce((sum, item) => sum + item.viewCount, 0),

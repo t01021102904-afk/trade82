@@ -3,6 +3,7 @@
 import {
   FileText,
   LayoutDashboard,
+  LifeBuoy,
   MessageCircle,
   Package,
   Settings as SettingsIcon,
@@ -11,7 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
@@ -27,6 +28,7 @@ import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
 import { isVerifiedSellerSubscription } from "@/lib/billing";
 import { stripLocale, withLocale } from "@/lib/i18n";
+import { isActiveSellerSupportSubscription } from "@/lib/seller-support";
 import type { VerificationStatus } from "@/lib/types";
 import { cx } from "@/lib/utils";
 
@@ -49,11 +51,14 @@ type DashboardCompany = {
   verificationRequests: Array<{ adminNote: string | null }>;
   subscriptionStatus?: string | null;
   subscriptionPlan?: string | null;
+  sellerSupportPlan?: string | null;
+  sellerSupportStatus?: string | null;
 };
 
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const userId = user?.id ?? "";
@@ -64,6 +69,8 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     useState<DashboardSection>(() =>
       parseDashboardSection(searchParams.get("section"), role) ?? "overview",
     );
+  const [supportOpening, setSupportOpening] = useState(false);
+  const [supportError, setSupportError] = useState("");
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
@@ -125,10 +132,51 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     company.subscriptionStatus,
     company.subscriptionPlan,
   );
+  const supportActive =
+    role === "seller" &&
+    isActiveSellerSupportSubscription(
+      company.sellerSupportStatus,
+      company.sellerSupportPlan,
+    );
+  const openSupportTeam = async () => {
+    setSupportError("");
+    if (!supportActive) {
+      router.push(withLocale("/pricing", locale));
+      return;
+    }
+
+    setSupportOpening(true);
+    try {
+      const response = await fetch("/api/support/conversation", {
+        method: "POST",
+      });
+      const body = (await response.json().catch(() => null)) as
+        | { messageRoute?: string; error?: string; pricingPath?: string }
+        | null;
+      if (!response.ok) {
+        if (response.status === 402 && body?.pricingPath) {
+          router.push(withLocale(body.pricingPath, locale));
+          return;
+        }
+        throw new Error(body?.error || "Support Team could not be opened.");
+      }
+      router.push(withLocale(body?.messageRoute || "/messages", locale));
+    } catch (error) {
+      setSupportError(
+        error instanceof Error ? error.message : "Support Team could not be opened.",
+      );
+      setActiveSection("support-team");
+    } finally {
+      setSupportOpening(false);
+    }
+  };
   const navItems: Array<{
     id: DashboardSection;
     label: string;
     icon: LucideIcon;
+    badge?: string;
+    onClick?: () => void;
+    loading?: boolean;
   }> = [
     {
       id: "overview",
@@ -170,6 +218,14 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
             label: t("dashboard.dashboardNavDocuments"),
             icon: FileText,
           },
+          {
+            id: "support-team" as const,
+            label: t("dashboard.dashboardNavSupportTeam"),
+            icon: LifeBuoy,
+            badge: t("dashboard.proBadge"),
+            onClick: openSupportTeam,
+            loading: supportOpening,
+          },
         ]
       : []),
   ];
@@ -192,12 +248,24 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               <button
                 key={item.id}
                 type="button"
-                onClick={() => setActiveSection(item.id)}
+                onClick={() => {
+                  if (item.onClick) {
+                    item.onClick();
+                    return;
+                  }
+                  setActiveSection(item.id);
+                }}
                 className={dashboardNavItemClass(selected)}
                 aria-current={selected ? "page" : undefined}
+                disabled={item.loading}
               >
                 <Icon className="size-4 shrink-0" aria-hidden="true" />
                 <span className="truncate">{item.label}</span>
+                {item.badge ? (
+                  <span className="ml-auto rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none theme-success-badge">
+                    {item.badge}
+                  </span>
+                ) : null}
               </button>
             );
           })}
@@ -296,6 +364,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           role={role}
           activeSection={safeActiveSection}
           onSectionChange={setActiveSection}
+          supportError={supportError}
         />
       </div>
     </div>
@@ -320,6 +389,7 @@ function parseDashboardSection(
   }
   if (role === "seller" && value === "products") return value;
   if (role === "seller" && value === "documents") return value;
+  if (role === "seller" && value === "support-team") return value;
   if (role === "buyer" && value === "saved-products") return value;
   return null;
 }

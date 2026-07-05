@@ -158,6 +158,13 @@ model Company {
   subscriptionPlan             String?
   subscriptionCurrentPeriodEnd DateTime?
   verifiedSellerSince          DateTime?
+  sellerSupportPlan                 String?
+  sellerSupportStatus               String?
+  sellerSupportStripeCustomerId     String?                   @unique
+  sellerSupportStripeSubscriptionId String?                   @unique
+  sellerSupportCurrentPeriodEnd     DateTime?
+  sellerSupportMonthlyLimit         Int                       @default(0)
+  sellerSupportMonthlyUsed          Int                       @default(0)
   sellerProfile                SellerProfile?
   buyerProfile                 BuyerProfile?
   products                     Product[]
@@ -184,6 +191,7 @@ model Company {
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
   @@index([subscriptionStatus, subscriptionPlan])
+  @@index([sellerSupportStatus, sellerSupportPlan])
 }
 
 model SellerProfile {

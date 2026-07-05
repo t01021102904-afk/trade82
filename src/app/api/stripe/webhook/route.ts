@@ -2,7 +2,13 @@ import Stripe from "stripe";
 
 import { VERIFIED_SELLER_PLAN, isVerifiedSellerSubscription } from "@/lib/billing";
 import { getDb } from "@/lib/db";
-import { getStripe } from "@/lib/stripe";
+import {
+  SELLER_SUPPORT_PRODUCT_TYPE,
+  isActiveSellerSupportSubscription,
+  isSellerSupportPlanId,
+  sellerSupportMonthlyLimit,
+} from "@/lib/seller-support";
+import { getSellerSupportPlanForPriceId, getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
@@ -36,6 +42,56 @@ async function updateCompanyFromSubscription(subscription: Stripe.Subscription) 
   const customerId = idOf(subscription.customer);
   const companyId = subscription.metadata.companyId;
   const priceId = subscription.items.data[0]?.price.id;
+  const supportPlan =
+    subscription.metadata.productType === SELLER_SUPPORT_PRODUCT_TYPE &&
+    isSellerSupportPlanId(subscription.metadata.supportPlan)
+      ? subscription.metadata.supportPlan
+      : getSellerSupportPlanForPriceId(priceId);
+
+  if (supportPlan) {
+    const company = await getDb().company.findFirst({
+      where: {
+        companyRole: "seller",
+        OR: [
+          ...(companyId ? [{ id: companyId }] : []),
+          { sellerSupportStripeSubscriptionId: subscription.id },
+          ...(customerId ? [{ sellerSupportStripeCustomerId: customerId }] : []),
+        ],
+      },
+      select: { id: true },
+    });
+
+    if (!company) {
+      console.warn("Stripe support subscription webhook did not match a seller company.", {
+        eventSubscriptionId: subscription.id,
+        hasCustomerId: Boolean(customerId),
+        hasCompanyId: Boolean(companyId),
+      });
+      return;
+    }
+
+    const supportActive = isActiveSellerSupportSubscription(
+      subscription.status,
+      supportPlan,
+    );
+
+    await getDb().company.update({
+      where: { id: company.id },
+      data: {
+        sellerSupportStripeCustomerId: customerId,
+        sellerSupportStripeSubscriptionId: subscription.id,
+        sellerSupportStatus: subscription.status,
+        sellerSupportPlan: supportPlan,
+        sellerSupportCurrentPeriodEnd: subscriptionPeriodEnd(subscription),
+        sellerSupportMonthlyLimit: supportActive
+          ? sellerSupportMonthlyLimit(supportPlan)
+          : 0,
+        ...(supportActive ? {} : { sellerSupportMonthlyUsed: 0 }),
+      },
+    });
+    return;
+  }
+
   const configuredPriceId = process.env.STRIPE_VERIFIED_SELLER_PRICE_ID;
   const subscriptionPlan =
     subscription.metadata.plan === VERIFIED_SELLER_PLAN ||
