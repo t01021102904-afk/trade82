@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
             className="size-full rounded-md"
-            imageClassName="transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.02]"
+            imageClassName="bg-white object-contain p-2 transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.02]"
           />
         </Link>
         <SaveButton

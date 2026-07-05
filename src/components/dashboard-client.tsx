@@ -528,7 +528,7 @@ function BuyerDiscoveryDashboard({
                 alt=""
                 sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
                 className="aspect-[4/3]"
-                imageClassName="transition duration-300 group-hover:scale-[1.03]"
+                imageClassName="bg-white object-contain p-3 transition duration-300 group-hover:scale-[1.03]"
                 placeholderLabel={t("dashboard.noProductImage")}
               />
               <div className="grid gap-2 p-3">
@@ -1220,6 +1220,7 @@ function SellerProductCard({
         alt={product.name}
         sizes="72px"
         className="aspect-square rounded-md sm:size-[72px]"
+        imageClassName="bg-white object-contain p-1"
         placeholderClassName="p-1"
         showLabel={false}
       />

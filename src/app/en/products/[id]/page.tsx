@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
 
-import ProductDetailPage, {
-  generateProductPageMetadata,
-  type ProductDetailPageProps,
-} from "../../../products/[id]/page";
+import { DatabaseProductDetail } from "@/components/database-public-detail";
+import { getProductShareMetadata } from "@/lib/product-share-metadata";
 
 export const dynamic = "force-dynamic";
 
+type ProductDetailPageProps = {
+  params: Promise<{ id: string }>;
+};
+
 export async function generateMetadata(
-  props: ProductDetailPageProps,
+  { params }: ProductDetailPageProps,
 ): Promise<Metadata> {
-  return generateProductPageMetadata(props, "/en");
+  const { id } = await params;
+  return getProductShareMetadata(id, "/en");
 }
 
-export default ProductDetailPage;
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
+  const { id } = await params;
+
+  return <DatabaseProductDetail id={id} />;
+}

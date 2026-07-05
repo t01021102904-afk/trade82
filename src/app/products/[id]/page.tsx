@@ -9,18 +9,11 @@ export type ProductDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function generateProductPageMetadata(
+export async function generateMetadata(
   { params }: ProductDetailPageProps,
-  localePrefix = "",
 ): Promise<Metadata> {
   const { id } = await params;
-  return getProductShareMetadata(id, localePrefix);
-}
-
-export async function generateMetadata(
-  props: ProductDetailPageProps,
-): Promise<Metadata> {
-  return generateProductPageMetadata(props);
+  return getProductShareMetadata(id);
 }
 
 export default async function ProductDetailPage({

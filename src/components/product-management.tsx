@@ -168,6 +168,7 @@ export function ProductManagement() {
                 alt={product.name}
                 sizes="72px"
                 className="aspect-square rounded-md sm:size-[72px]"
+                imageClassName="bg-white object-contain p-1"
                 placeholderClassName="p-1"
                 showLabel={false}
               />

@@ -1,5 +1,6 @@
 "use client";
 
+import type { PointerEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -16,6 +17,22 @@ type PendingImage = {
   status: "uploading" | "ready" | "error";
   error: string;
   file?: File;
+};
+
+type ProductEditorMode = "fit" | "fill";
+
+type ProductImageEditorState = {
+  offsetX: number;
+  offsetY: number;
+  zoom: number;
+  rotation: number;
+  mode: ProductEditorMode;
+};
+
+type ProductImageEditorFile = {
+  id: string;
+  file: File;
+  previewUrl: string;
 };
 
 const acceptedExtensions = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
@@ -43,6 +60,16 @@ const suspiciousExtensions = new Set([
 const MB = 1024 * 1024;
 const maxProductSize = 50 * MB;
 const maxProfileSize = 25 * MB;
+const productEditorOutputSize = 1600;
+const productEditorPreviewSize = 900;
+const productEditorQuality = 0.9;
+const defaultEditorState: ProductImageEditorState = {
+  offsetX: 0,
+  offsetY: 0,
+  zoom: 1,
+  rotation: 0,
+  mode: "fit",
+};
 
 function extensionOf(file: File) {
   return file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -119,6 +146,15 @@ function uploadCopy(locale: "en" | "ko") {
         changePhoto: "사진 변경",
         retryUpload: "다시 시도",
         dragHelp: "이미지를 끌어오거나 파일을 선택하세요",
+        adjustImage: "이미지 조정",
+        zoom: "확대/축소",
+        rotateLeft: "왼쪽 회전",
+        rotateRight: "오른쪽 회전",
+        fitFullImage: "전체 맞춤",
+        fillFrame: "프레임 채우기",
+        reset: "초기화",
+        cancel: "취소",
+        apply: "적용",
       }
     : {
         empty: "Empty files cannot be uploaded.",
@@ -144,6 +180,15 @@ function uploadCopy(locale: "en" | "ko") {
         changePhoto: "Change photo",
         retryUpload: "Retry",
         dragHelp: "Drag images here or choose files",
+        adjustImage: "Adjust image",
+        zoom: "Zoom",
+        rotateLeft: "Rotate left",
+        rotateRight: "Rotate right",
+        fitFullImage: "Fit full image",
+        fillFrame: "Fill frame",
+        reset: "Reset",
+        cancel: "Cancel",
+        apply: "Apply",
       };
 }
 
@@ -183,6 +228,87 @@ function updateUploadedProductPreview(
   };
 }
 
+function normalizedRotation(rotation: number) {
+  return ((rotation % 360) + 360) % 360;
+}
+
+function rotatedImageBounds(image: HTMLImageElement, rotation: number) {
+  const normalized = normalizedRotation(rotation);
+  const sideways = normalized === 90 || normalized === 270;
+  return {
+    width: sideways ? image.naturalHeight : image.naturalWidth,
+    height: sideways ? image.naturalWidth : image.naturalHeight,
+  };
+}
+
+function imageScaleForFrame(
+  image: HTMLImageElement,
+  state: ProductImageEditorState,
+  targetSize: number,
+) {
+  const bounds = rotatedImageBounds(image, state.rotation);
+  const fitScale = targetSize / Math.max(bounds.width, bounds.height);
+  const fillScale = targetSize / Math.min(bounds.width, bounds.height);
+  return (state.mode === "fill" ? fillScale : fitScale) * state.zoom;
+}
+
+function drawProductEditorCanvas(
+  canvas: HTMLCanvasElement,
+  image: HTMLImageElement,
+  state: ProductImageEditorState,
+  targetSize: number,
+) {
+  canvas.width = targetSize;
+  canvas.height = targetSize;
+
+  const context = canvas.getContext("2d");
+  if (!context) return;
+
+  const scaleRatio = targetSize / productEditorOutputSize;
+  const imageScale = imageScaleForFrame(image, state, targetSize);
+
+  context.clearRect(0, 0, targetSize, targetSize);
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, targetSize, targetSize);
+  context.save();
+  context.translate(
+    targetSize / 2 + state.offsetX * scaleRatio,
+    targetSize / 2 + state.offsetY * scaleRatio,
+  );
+  context.rotate((normalizedRotation(state.rotation) * Math.PI) / 180);
+  context.scale(imageScale, imageScale);
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(image, -image.naturalWidth / 2, -image.naturalHeight / 2);
+  context.restore();
+}
+
+function editedImageFileName(fileName: string) {
+  const baseName = fileName.replace(/\.[^.]+$/, "").trim() || "product-image";
+  return `${baseName}-edited.jpg`;
+}
+
+function canvasToJpegFile(canvas: HTMLCanvasElement, fileName: string) {
+  return new Promise<File>((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("Unable to generate edited image."));
+          return;
+        }
+        resolve(
+          new File([blob], editedImageFileName(fileName), {
+            type: "image/jpeg",
+            lastModified: Date.now(),
+          }),
+        );
+      },
+      "image/jpeg",
+      productEditorQuality,
+    );
+  });
+}
+
 export function ListingImageUploader({
   value,
   onChange,
@@ -208,6 +334,8 @@ export function ListingImageUploader({
   );
   const [error, setError] = useState("");
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [editorFile, setEditorFile] = useState<ProductImageEditorFile | null>(null);
+  const [editorQueue, setEditorQueue] = useState<File[]>([]);
   const previewUrls = useRef(new Set<string>());
 
   useEffect(() => {
@@ -221,9 +349,35 @@ export function ListingImageUploader({
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (editorFile?.previewUrl) URL.revokeObjectURL(editorFile.previewUrl);
+    };
+  }, [editorFile]);
+
+  function openEditor(file: File) {
+    setEditorFile({
+      id: crypto.randomUUID(),
+      file,
+      previewUrl: URL.createObjectURL(file),
+    });
+  }
+
+  function closeEditorAndOpenNext() {
+    setEditorFile(null);
+    setEditorQueue((current) => {
+      const [nextFile, ...remaining] = current;
+      if (nextFile) {
+        queueMicrotask(() => openEditor(nextFile));
+      }
+      return remaining;
+    });
+  }
+
   async function addFiles(files: File[]) {
     setError("");
-    if (items.length + files.length > 12) {
+    const pendingEditorCount = editorQueue.length + (editorFile ? 1 : 0);
+    if (items.length + pendingEditorCount + files.length > 12) {
       setError(copy.tooManyImages);
       return;
     }
@@ -236,46 +390,44 @@ export function ListingImageUploader({
       return;
     }
 
-    const additions = files.map((file) => {
-      const previewUrl = URL.createObjectURL(file);
-      previewUrls.current.add(previewUrl);
-      return {
-        id: crypto.randomUUID(),
-        previewUrl,
-        fileName: file.name,
-        uploaded: null,
-        status: "uploading" as const,
-        error: "",
-        file,
-      };
-    });
+    const [firstFile, ...remainingFiles] = files;
+    if (!firstFile) return;
+    if (editorFile) {
+      setEditorQueue((current) => [...current, ...files]);
+      return;
+    }
+    openEditor(firstFile);
+    if (remainingFiles.length) {
+      setEditorQueue((current) => [...current, ...remainingFiles]);
+    }
+  }
 
+  async function uploadEditedProductImage(file: File) {
+    const previewUrl = URL.createObjectURL(file);
+    previewUrls.current.add(previewUrl);
+    const addition: PendingImage = {
+      id: crypto.randomUUID(),
+      previewUrl,
+      fileName: file.name,
+      uploaded: null,
+      status: "uploading",
+      error: "",
+      file,
+    };
     setItems((current) => [
       ...current,
-      ...additions.map((item) => ({
-        id: item.id,
-        previewUrl: item.previewUrl,
-        fileName: item.fileName,
-        uploaded: item.uploaded,
-        status: item.status,
-        error: item.error,
-        file: item.file,
-      })),
+      addition,
     ]);
 
-    await Promise.all(
-      additions.map(async ({ file, ...pending }) => {
-        const result = await uploadImage(file, "product_image", copy, {
-          locale,
-        });
-        setItems((current) =>
-          current.map((item) =>
-            item.id === pending.id
-              ? updateUploadedProductPreview(item, result, previewUrls.current)
-              : item,
-          ),
-        );
-      }),
+    const result = await uploadImage(file, "product_image", copy, {
+      locale,
+    });
+    setItems((current) =>
+      current.map((item) =>
+        item.id === addition.id
+          ? updateUploadedProductPreview(item, result, previewUrls.current)
+          : item,
+      ),
     );
   }
 
@@ -346,6 +498,18 @@ export function ListingImageUploader({
 
   return (
     <div className="grid gap-3">
+      {editorFile ? (
+        <ProductImageEditorModal
+          key={editorFile.id}
+          editorFile={editorFile}
+          copy={copy}
+          onCancel={closeEditorAndOpenNext}
+          onApply={(file) => {
+            void uploadEditedProductImage(file);
+            closeEditorAndOpenNext();
+          }}
+        />
+      ) : null}
       <div
         className={cx(
           "grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4",
@@ -375,7 +539,7 @@ export function ListingImageUploader({
             <img
               src={item.previewUrl}
               alt={`${item.fileName} 미리보기`}
-              className="absolute inset-0 size-full object-cover"
+              className="absolute inset-0 size-full bg-white object-contain"
             />
             {index === 0 ? (
               <span
@@ -483,6 +647,259 @@ export function ListingImageUploader({
     </div>
   );
 }
+
+function ProductImageEditorModal({
+  editorFile,
+  copy,
+  onCancel,
+  onApply,
+}: {
+  editorFile: ProductImageEditorFile;
+  copy: ReturnType<typeof uploadCopy>;
+  onCancel: () => void;
+  onApply: (file: File) => void;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dragRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startOffsetX: number;
+    startOffsetY: number;
+  } | null>(null);
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [state, setState] = useState<ProductImageEditorState>(defaultEditorState);
+  const [applying, setApplying] = useState(false);
+
+  useEffect(() => {
+    const nextImage = new Image();
+    nextImage.decoding = "async";
+    nextImage.onload = () => setImage(nextImage);
+    nextImage.src = editorFile.previewUrl;
+
+    return () => {
+      nextImage.onload = null;
+      nextImage.onerror = null;
+    };
+  }, [editorFile.previewUrl]);
+
+  useEffect(() => {
+    if (!image || !canvasRef.current) return;
+    drawProductEditorCanvas(
+      canvasRef.current,
+      image,
+      state,
+      productEditorPreviewSize,
+    );
+  }, [image, state]);
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onCancel();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onCancel]);
+
+  function setMode(mode: ProductEditorMode) {
+    setState({
+      ...defaultEditorState,
+      mode,
+    });
+  }
+
+  function rotate(delta: number) {
+    setState((current) => ({
+      ...current,
+      offsetX: 0,
+      offsetY: 0,
+      rotation: normalizedRotation(current.rotation + delta),
+    }));
+  }
+
+  function reset() {
+    setState(defaultEditorState);
+  }
+
+  async function applyEdit() {
+    if (!image || applying) return;
+    setApplying(true);
+    try {
+      const outputCanvas = document.createElement("canvas");
+      drawProductEditorCanvas(
+        outputCanvas,
+        image,
+        state,
+        productEditorOutputSize,
+      );
+      const editedFile = await canvasToJpegFile(outputCanvas, editorFile.file.name);
+      onApply(editedFile);
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  function dragScale(event: PointerEvent<HTMLCanvasElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return productEditorOutputSize / Math.max(rect.width, 1);
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/25 p-3 sm:p-5"
+      role="dialog"
+      aria-modal="true"
+      aria-label={copy.adjustImage}
+    >
+      <div className="grid max-h-[92vh] w-full max-w-3xl gap-4 overflow-y-auto rounded-2xl border bg-white p-4 shadow-2xl shadow-zinc-950/20 sm:p-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-zinc-950">
+              {copy.adjustImage}
+            </h2>
+            <p className="mt-1 truncate text-sm text-zinc-500">
+              {editorFile.file.name}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setMode("fit")}
+              className={cx(
+                editorModeButtonClass,
+                state.mode === "fit"
+                  ? "border-zinc-950 bg-zinc-950 text-white"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
+              )}
+            >
+              {copy.fitFullImage}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("fill")}
+              className={cx(
+                editorModeButtonClass,
+                state.mode === "fill"
+                  ? "border-zinc-950 bg-zinc-950 text-white"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
+              )}
+            >
+              {copy.fillFrame}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
+          <div className="rounded-2xl border bg-zinc-50 p-3">
+            <canvas
+              ref={canvasRef}
+              className="aspect-square w-full touch-none rounded-xl border border-zinc-200 bg-white shadow-sm"
+              onPointerDown={(event) => {
+                if (!image) return;
+                event.currentTarget.setPointerCapture(event.pointerId);
+                dragRef.current = {
+                  pointerId: event.pointerId,
+                  startX: event.clientX,
+                  startY: event.clientY,
+                  startOffsetX: state.offsetX,
+                  startOffsetY: state.offsetY,
+                };
+              }}
+              onPointerMove={(event) => {
+                const drag = dragRef.current;
+                if (!drag || drag.pointerId !== event.pointerId) return;
+                const scale = dragScale(event);
+                const nextOffsetX =
+                  drag.startOffsetX + (event.clientX - drag.startX) * scale;
+                const nextOffsetY =
+                  drag.startOffsetY + (event.clientY - drag.startY) * scale;
+                setState((current) => ({
+                  ...current,
+                  offsetX: nextOffsetX,
+                  offsetY: nextOffsetY,
+                }));
+              }}
+              onPointerUp={(event) => {
+                if (dragRef.current?.pointerId === event.pointerId) {
+                  dragRef.current = null;
+                }
+              }}
+              onPointerCancel={() => {
+                dragRef.current = null;
+              }}
+            />
+          </div>
+
+          <div className="grid content-start gap-3">
+            <label className="grid gap-2 text-sm font-medium text-zinc-700">
+              <span>{copy.zoom}</span>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value={state.zoom}
+                onChange={(event) =>
+                  setState((current) => ({
+                    ...current,
+                    zoom: Number(event.target.value),
+                  }))
+                }
+                className="accent-zinc-950"
+              />
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => rotate(-90)}
+                className={editorControlButtonClass}
+              >
+                {copy.rotateLeft}
+              </button>
+              <button
+                type="button"
+                onClick={() => rotate(90)}
+                className={editorControlButtonClass}
+              >
+                {copy.rotateRight}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={reset}
+              className={editorControlButtonClass}
+            >
+              {copy.reset}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col-reverse gap-2 border-t border-zinc-200 pt-4 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          >
+            {copy.cancel}
+          </button>
+          <button
+            type="button"
+            onClick={() => void applyEdit()}
+            disabled={!image || applying}
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-zinc-950 px-4 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-wait disabled:opacity-60"
+          >
+            {applying ? copy.uploading : copy.apply}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const editorModeButtonClass =
+  "inline-flex h-9 items-center justify-center rounded-lg border px-3 text-xs font-semibold transition";
+const editorControlButtonClass =
+  "inline-flex min-h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50";
 
 export function SingleImageUploader({
   kind,
