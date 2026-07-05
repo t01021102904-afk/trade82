@@ -503,6 +503,21 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
   animation-play-state: paused;
 }
 
+.home-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.home-reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .home-magnetic-panel {
   position: relative;
   overflow: hidden;
@@ -557,6 +572,11 @@ html[data-theme="dark"] .shadow-zinc-950\/5 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   *,
   *::before,
   *::after {

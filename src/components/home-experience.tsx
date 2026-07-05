@@ -12,7 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-import { HomeAutoVideo, HomeFaqAccordion } from "@/components/home-landing-interactions";
+import { HomeAutoVideo, HomeFaqAccordion, HomeReveal } from "@/components/home-landing-interactions";
 import { HomeWorkflowVisual } from "@/components/home-workflow-visual";
 import { withLocale, type Locale } from "@/lib/i18n";
 
@@ -430,7 +430,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.14]" aria-hidden="true" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/40 to-transparent" aria-hidden="true" />
         <div className="relative mx-auto grid min-h-[680px] max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
-          <div className="bm-section-in max-w-2xl">
+          <HomeReveal className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] theme-success-badge">
               <span className="bm-pulse-dot size-2 rounded-full bg-emerald-300" />
               {copy.hero.eyebrow}
@@ -456,18 +456,22 @@ export function HomeExperience({ locale }: { locale: Locale }) {
                 {copy.hero.buyerCta}
               </Link>
             </div>
-          </div>
-          <HomeWorkflowVisual locale={locale} />
+          </HomeReveal>
+          <HomeReveal delay={120}>
+            <HomeWorkflowVisual locale={locale} />
+          </HomeReveal>
         </div>
         <BuiltWithMarquee label={copy.hero.builtWith} />
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-        <SectionHeader
-          eyebrow={copy.capabilities.eyebrow}
-          title={copy.capabilities.title}
-          text={copy.capabilities.text}
-        />
+        <HomeReveal>
+          <SectionHeader
+            eyebrow={copy.capabilities.eyebrow}
+            title={copy.capabilities.title}
+            text={copy.capabilities.text}
+          />
+        </HomeReveal>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {copy.capabilities.items.map((item, index) => (
             <CapabilityCard key={item.title} item={item} index={index} />
@@ -503,19 +507,21 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       <ValueSectionBlock section={copy.sellers} />
 
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-        <div className="relative overflow-hidden rounded-[1.75rem] border p-5 theme-surface-elevated sm:p-8 lg:p-10">
-          <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.1]" aria-hidden="true" />
-          <div className="relative grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-            <div>
-              <SectionEyebrow label={copy.faq.eyebrow} />
-              <h2 className="mt-4 text-2xl font-semibold tracking-[-0.01em] theme-foreground sm:text-[1.9rem]">
-                {copy.faq.title}
-              </h2>
-              <p className="mt-3 text-sm leading-6 theme-muted">{copy.faq.text}</p>
+        <HomeReveal>
+          <div className="relative overflow-hidden rounded-[1.75rem] border p-5 theme-surface-elevated sm:p-8 lg:p-10">
+            <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.1]" aria-hidden="true" />
+            <div className="relative grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
+              <div>
+                <SectionEyebrow label={copy.faq.eyebrow} />
+                <h2 className="mt-4 text-2xl font-semibold tracking-[-0.01em] theme-foreground sm:text-[1.9rem]">
+                  {copy.faq.title}
+                </h2>
+                <p className="mt-3 text-sm leading-6 theme-muted">{copy.faq.text}</p>
+              </div>
+              <HomeFaqAccordion items={copy.faq.items} />
             </div>
-            <HomeFaqAccordion items={copy.faq.items} />
           </div>
-        </div>
+        </HomeReveal>
       </section>
 
       <FinalCta copy={copy.cta} locale={locale} />
@@ -589,18 +595,17 @@ function CapabilityCard({ item, index }: { item: CapabilityItem; index: number }
   const Icon = item.icon;
 
   return (
-    <article
-      className="bm-premium-card bm-section-in min-h-[190px] rounded-[1.35rem] border p-5 theme-surface"
-      style={{ animationDelay: `${index * 45}ms` }}
-    >
-      <div className="relative">
-        <span className="inline-flex size-10 items-center justify-center rounded-xl border theme-border theme-surface-muted">
-          <Icon className="size-[18px] text-[var(--accent-foreground)]" aria-hidden="true" />
-        </span>
-        <h3 className="mt-5 text-base font-semibold theme-foreground">{item.title}</h3>
-        <p className="mt-3 text-[13px] leading-6 theme-muted">{item.description}</p>
-      </div>
-    </article>
+    <HomeReveal delay={index * 65}>
+      <article className="bm-premium-card min-h-[190px] rounded-[1.35rem] border p-5 theme-surface">
+        <div className="relative">
+          <span className="inline-flex size-10 items-center justify-center rounded-xl border theme-border theme-surface-muted">
+            <Icon className="size-[18px] text-[var(--accent-foreground)]" aria-hidden="true" />
+          </span>
+          <h3 className="mt-5 text-base font-semibold theme-foreground">{item.title}</h3>
+          <p className="mt-3 text-[13px] leading-6 theme-muted">{item.description}</p>
+        </div>
+      </article>
+    </HomeReveal>
   );
 }
 
@@ -641,8 +646,16 @@ function VideoFeatureSection({
   return (
     <section className="border-y theme-border">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
-        {mediaSide === "left" ? media : text}
-        {mediaSide === "left" ? text : media}
+        {mediaSide === "left" ? (
+          <HomeReveal>{media}</HomeReveal>
+        ) : (
+          <HomeReveal>{text}</HomeReveal>
+        )}
+        {mediaSide === "left" ? (
+          <HomeReveal delay={120}>{text}</HomeReveal>
+        ) : (
+          <HomeReveal delay={120}>{media}</HomeReveal>
+        )}
       </div>
     </section>
   );
@@ -708,8 +721,16 @@ function ValueSectionBlock({ section }: { section: ValueSection }) {
 
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
-      {section.imageSide === "left" ? image : text}
-      {section.imageSide === "left" ? text : image}
+      {section.imageSide === "left" ? (
+        <HomeReveal>{image}</HomeReveal>
+      ) : (
+        <HomeReveal>{text}</HomeReveal>
+      )}
+      {section.imageSide === "left" ? (
+        <HomeReveal delay={120}>{text}</HomeReveal>
+      ) : (
+        <HomeReveal delay={120}>{image}</HomeReveal>
+      )}
     </section>
   );
 }
@@ -717,41 +738,43 @@ function ValueSectionBlock({ section }: { section: ValueSection }) {
 function FinalCta({ copy, locale }: { copy: HomeCopy["cta"]; locale: Locale }) {
   return (
     <section className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6 sm:pb-24 lg:px-8">
-      <div className="relative overflow-hidden rounded-[1.75rem] border p-6 theme-surface-elevated sm:p-8 lg:p-10">
-        <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.1]" aria-hidden="true" />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <SectionEyebrow label={copy.eyebrow} />
-          <h2 className="mt-4 text-2xl font-semibold tracking-[-0.01em] theme-foreground sm:text-[2rem]">
-            {copy.title}
-          </h2>
-          <p className="mt-3 text-sm leading-6 theme-muted">{copy.text}</p>
+      <HomeReveal>
+        <div className="relative overflow-hidden rounded-[1.75rem] border p-6 theme-surface-elevated sm:p-8 lg:p-10">
+          <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.1]" aria-hidden="true" />
+          <div className="relative mx-auto max-w-3xl text-center">
+            <SectionEyebrow label={copy.eyebrow} />
+            <h2 className="mt-4 text-2xl font-semibold tracking-[-0.01em] theme-foreground sm:text-[2rem]">
+              {copy.title}
+            </h2>
+            <p className="mt-3 text-sm leading-6 theme-muted">{copy.text}</p>
+          </div>
+          <div className="relative mt-9 grid gap-4 md:grid-cols-2">
+            <CtaCard
+              icon={Building2}
+              title={copy.sellerTitle}
+              text={copy.sellerText}
+              href={withLocale("/signup", locale)}
+              label={copy.sellerCta}
+            />
+            <CtaCard
+              icon={Search}
+              title={copy.buyerTitle}
+              text={copy.buyerText}
+              href={withLocale("/signup", locale)}
+              label={copy.buyerCta}
+            />
+          </div>
+          <div className="relative mt-6 text-center">
+            <Link
+              href={withLocale("/marketplace", locale)}
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
+            >
+              {copy.browseCta}
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
-        <div className="relative mt-9 grid gap-4 md:grid-cols-2">
-          <CtaCard
-            icon={Building2}
-            title={copy.sellerTitle}
-            text={copy.sellerText}
-            href={withLocale("/signup", locale)}
-            label={copy.sellerCta}
-          />
-          <CtaCard
-            icon={Search}
-            title={copy.buyerTitle}
-            text={copy.buyerText}
-            href={withLocale("/signup", locale)}
-            label={copy.buyerCta}
-          />
-        </div>
-        <div className="relative mt-6 text-center">
-          <Link
-            href={withLocale("/marketplace", locale)}
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
-          >
-            {copy.browseCta}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
+      </HomeReveal>
     </section>
   );
 }

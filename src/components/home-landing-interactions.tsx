@@ -1,7 +1,60 @@
 "use client";
 
 import { Minus, Play, Plus } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
+
+type RevealStyle = CSSProperties & {
+  "--reveal-delay": string;
+};
+
+export function HomeReveal({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
+      },
+      {
+        rootMargin: "0px 0px -12% 0px",
+        threshold: 0.16,
+      },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const style: RevealStyle = { "--reveal-delay": `${delay}ms` };
+
+  return (
+    <div
+      ref={ref}
+      style={style}
+      className={`home-reveal ${isVisible ? "home-reveal-visible" : ""} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
 
 type AutoVideoProps = {
   src: string;
@@ -24,6 +77,11 @@ export function HomeAutoVideo({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+      return;
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -105,11 +163,15 @@ export function HomeFaqAccordion({ items }: { items: FaqItem[] }) {
                 )}
               </span>
             </button>
-            {isOpen ? (
-              <p className="max-w-4xl px-1 pb-5 text-sm leading-6 theme-muted">
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <p className="max-w-4xl overflow-hidden px-1 pb-5 text-sm leading-6 theme-muted">
                 {item.answer}
               </p>
-            ) : null}
+            </div>
           </div>
         );
       })}
