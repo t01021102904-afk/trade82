@@ -54,16 +54,16 @@ export function HomeWorkflowVisual({ locale }: { locale: Locale }) {
 
   return (
     <div
-      className="home-magnetic-panel bm-section-in rounded-[1.75rem] border p-3 theme-surface"
+      className="home-magnetic-panel bm-section-in w-full max-w-full rounded-[1.25rem] border p-2 theme-surface sm:rounded-[1.75rem] sm:p-3"
       onPointerMove={handlePointerMove}
       onPointerLeave={handlePointerLeave}
       style={style}
     >
-      <div className="relative overflow-hidden rounded-[1.35rem] border p-4 theme-surface-elevated sm:p-5">
+      <div className="relative overflow-hidden rounded-[1rem] border p-2 theme-surface-elevated sm:rounded-[1.35rem] sm:p-5">
         <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.18]" aria-hidden="true" />
-        <div className="relative min-h-[420px] overflow-hidden rounded-2xl border theme-border theme-surface-muted sm:min-h-[500px]">
-          <div className="absolute inset-x-6 top-6 h-24 rounded-full bg-emerald-300/10 blur-3xl" aria-hidden="true" />
-          <div className="absolute left-1/2 top-4 z-20 w-[78%] max-w-[520px] -translate-x-1/2">
+        <div className="relative min-h-[292px] overflow-hidden rounded-xl border pb-12 theme-border theme-surface-muted sm:min-h-[500px] sm:rounded-2xl sm:pb-0">
+          <div className="absolute inset-x-6 top-4 h-20 rounded-full bg-emerald-300/10 blur-3xl sm:top-6 sm:h-24" aria-hidden="true" />
+          <div className="absolute left-1/2 top-2 z-20 w-[82%] max-w-[520px] -translate-x-1/2 sm:top-4 sm:w-[78%]">
             <Image
               src="/landing/export-documents.png"
               alt={copy.mainAlt}
@@ -74,7 +74,7 @@ export function HomeWorkflowVisual({ locale }: { locale: Locale }) {
               className="home-hero-asset home-hero-asset-main h-auto w-full object-contain"
             />
           </div>
-          <div className="absolute -left-2 bottom-8 z-10 w-[47%] max-w-[300px]">
+          <div className="absolute -left-2 bottom-12 z-10 w-[45%] max-w-[300px] sm:bottom-8 sm:w-[47%]">
             <Image
               src="/landing/beauty-products-chat.png"
               alt={copy.chatAlt}
@@ -84,7 +84,7 @@ export function HomeWorkflowVisual({ locale }: { locale: Locale }) {
               className="home-hero-asset home-hero-asset-left h-auto w-full object-contain"
             />
           </div>
-          <div className="absolute -right-3 bottom-7 z-10 w-[50%] max-w-[330px]">
+          <div className="absolute -right-3 bottom-12 z-10 w-[47%] max-w-[330px] sm:bottom-7 sm:w-[50%]">
             <Image
               src="/landing/logistics-shipping.png"
               alt={copy.logisticsAlt}
@@ -94,11 +94,11 @@ export function HomeWorkflowVisual({ locale }: { locale: Locale }) {
               className="home-hero-asset home-hero-asset-right h-auto w-full object-contain"
             />
           </div>
-          <div className="absolute inset-x-4 bottom-4 z-30 grid gap-2 sm:grid-cols-3">
+          <div className="absolute inset-x-2 bottom-2 z-30 grid grid-cols-3 gap-1 sm:inset-x-4 sm:bottom-4 sm:gap-2">
             {[copy.documents, copy.chat, copy.logistics].map((label) => (
               <span
                 key={label}
-                className="rounded-full border px-3 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-[0.12em] backdrop-blur theme-success-badge"
+                className="rounded-full border px-1.5 py-1 text-center font-mono text-[8px] font-semibold uppercase leading-tight tracking-[0.06em] backdrop-blur theme-success-badge sm:px-3 sm:py-2 sm:text-[10px] sm:tracking-[0.12em]"
               >
                 {label}
               </span>

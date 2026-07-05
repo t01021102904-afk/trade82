@@ -1,42 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  --background: #05070a;
-  --foreground: #f8fafc;
-  --card: rgba(255, 255, 255, 0.045);
-  --card-foreground: #f8fafc;
-  --card-elevated: rgba(9, 12, 18, 0.92);
-  --border: rgba(255, 255, 255, 0.1);
-  --muted: rgba(255, 255, 255, 0.055);
-  --muted-foreground: #a1a1aa;
-  --primary: #d9f99d;
-  --primary-foreground: #111827;
-  --secondary: rgba(255, 255, 255, 0.075);
-  --secondary-foreground: #f4f4f5;
-  --accent: rgba(16, 185, 129, 0.14);
-  --accent-foreground: #a7f3d0;
-  --destructive: #f87171;
-  --destructive-foreground: #fff1f2;
-  --success-soft: rgba(16, 185, 129, 0.14);
-  --success-border: rgba(110, 231, 183, 0.3);
-  --success-foreground: #a7f3d0;
-  --info-soft: rgba(59, 130, 246, 0.14);
-  --info-border: rgba(147, 197, 253, 0.3);
-  --info-foreground: #bfdbfe;
-  --warning-soft: rgba(245, 158, 11, 0.14);
-  --warning-border: rgba(252, 211, 77, 0.34);
-  --warning-foreground: #fde68a;
-  --danger-soft: rgba(248, 113, 113, 0.14);
-  --danger-border: rgba(252, 165, 165, 0.34);
-  --danger-foreground: #fecaca;
-  --input: rgba(9, 12, 18, 0.88);
-  --ring: rgba(16, 185, 129, 0.34);
-  --shadow-soft: 0 22px 70px -44px rgba(0, 0, 0, 0.75);
-  --grid-line: rgba(255, 255, 255, 0.055);
-  color-scheme: dark;
-}
-
-html[data-theme="light"] {
   --background: #f7f8fb;
   --foreground: #111827;
   --card: rgba(255, 255, 255, 0.92);
@@ -70,10 +34,6 @@ html[data-theme="light"] {
   --shadow-soft: 0 22px 70px -52px rgba(15, 23, 42, 0.35);
   --grid-line: rgba(15, 23, 42, 0.055);
   color-scheme: light;
-}
-
-html[data-theme="dark"] {
-  color-scheme: dark;
 }
 
 @theme inline {
@@ -245,70 +205,6 @@ textarea {
 .theme-ghost-button:hover {
   background: var(--muted);
   color: var(--foreground);
-}
-
-html[data-theme="dark"] .bg-zinc-50,
-html[data-theme="dark"] .bg-zinc-100,
-html[data-theme="dark"] .bg-zinc-200 {
-  background-color: var(--muted) !important;
-}
-
-html[data-theme="dark"] .bg-white {
-  background-color: var(--card-elevated) !important;
-}
-
-html[data-theme="dark"] [class*="bg-white/"] {
-  background-color: var(--card) !important;
-}
-
-html[data-theme="dark"] .border-zinc-100,
-html[data-theme="dark"] .border-zinc-200,
-html[data-theme="dark"] .border-zinc-300,
-html[data-theme="dark"] [class*="border-white/"] {
-  border-color: var(--border) !important;
-}
-
-html[data-theme="dark"] .bg-white .text-zinc-950,
-html[data-theme="dark"] .bg-white .text-zinc-900,
-html[data-theme="dark"] .bg-white .text-zinc-800,
-html[data-theme="dark"] .bg-white .text-zinc-700,
-html[data-theme="dark"] .bg-white.text-zinc-950,
-html[data-theme="dark"] .bg-white.text-zinc-900,
-html[data-theme="dark"] .bg-white.text-zinc-800,
-html[data-theme="dark"] .bg-white.text-zinc-700,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-950,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-900,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-800,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-700,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-950,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-900,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-800,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-700 {
-  color: var(--foreground) !important;
-}
-
-html[data-theme="dark"] .bg-white .text-zinc-600,
-html[data-theme="dark"] .bg-white .text-zinc-500,
-html[data-theme="dark"] .bg-white .text-zinc-400,
-html[data-theme="dark"] .bg-white .text-zinc-300,
-html[data-theme="dark"] .bg-white.text-zinc-600,
-html[data-theme="dark"] .bg-white.text-zinc-500,
-html[data-theme="dark"] .bg-white.text-zinc-400,
-html[data-theme="dark"] .bg-white.text-zinc-300,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-600,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-500,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-400,
-html[data-theme="dark"] .bg-zinc-50 .text-zinc-300,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-600,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-500,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-400,
-html[data-theme="dark"] .bg-zinc-50.text-zinc-300 {
-  color: var(--muted-foreground) !important;
-}
-
-html[data-theme="dark"] .shadow-zinc-100,
-html[data-theme="dark"] .shadow-zinc-950\/5 {
-  box-shadow: var(--shadow-soft) !important;
 }
 
 @keyframes bm-float {

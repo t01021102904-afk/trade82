@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useI18n } from "@/components/i18n-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const legalRoutes = ["/terms", "/sourcing-terms", "/privacy", "/business"] as const;
 const importantRoutes = {
@@ -69,9 +68,6 @@ export function SiteFooter() {
         </nav>
         <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <p className="text-xs theme-muted">{footer.copyright}</p>
-          <div className="sm:ml-auto">
-            <ThemeToggle />
-          </div>
         </div>
       </div>
     </footer>

@@ -429,7 +429,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       <section className="relative isolate border-b theme-border">
         <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.14]" aria-hidden="true" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/40 to-transparent" aria-hidden="true" />
-        <div className="relative mx-auto grid min-h-[680px] max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:px-8">
+        <div className="relative mx-auto grid min-h-0 max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-20 lg:min-h-[680px] lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-10 lg:px-8">
           <HomeReveal className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] theme-success-badge">
               <span className="bm-pulse-dot size-2 rounded-full bg-emerald-300" />
@@ -444,14 +444,14 @@ export function HomeExperience({ locale }: { locale: Locale }) {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href={withLocale("/signup", locale)}
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-primary-button"
+                className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg px-4 py-2 text-[13px] font-semibold transition hover:-translate-y-0.5 theme-primary-button sm:min-h-10 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 {copy.hero.sellerCta}
                 <ArrowRight className="size-4" aria-hidden="true" />
               </Link>
               <Link
                 href={withLocale("/signup", locale)}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border px-5 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 theme-secondary-button"
+                className="inline-flex min-h-9 items-center justify-center rounded-lg border px-4 py-2 text-[13px] font-semibold transition hover:-translate-y-0.5 theme-secondary-button sm:min-h-10 sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
               >
                 {copy.hero.buyerCta}
               </Link>
@@ -464,7 +464,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         <BuiltWithMarquee label={copy.hero.builtWith} />
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
         <HomeReveal>
           <SectionHeader
             eyebrow={copy.capabilities.eyebrow}
@@ -506,7 +506,7 @@ export function HomeExperience({ locale }: { locale: Locale }) {
       <ValueSectionBlock section={copy.buyers} />
       <ValueSectionBlock section={copy.sellers} />
 
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
         <HomeReveal>
           <div className="relative overflow-hidden rounded-[1.75rem] border p-5 theme-surface-elevated sm:p-8 lg:p-10">
             <div className="bm-grid-surface pointer-events-none absolute inset-0 opacity-[0.1]" aria-hidden="true" />
@@ -645,7 +645,7 @@ function VideoFeatureSection({
 
   return (
     <section className="border-y theme-border">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
         {mediaSide === "left" ? (
           <HomeReveal>{media}</HomeReveal>
         ) : (
@@ -720,7 +720,7 @@ function ValueSectionBlock({ section }: { section: ValueSection }) {
   );
 
   return (
-    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
+    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:px-8">
       {section.imageSide === "left" ? (
         <HomeReveal>{image}</HomeReveal>
       ) : (

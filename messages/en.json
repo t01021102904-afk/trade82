@@ -3,12 +3,6 @@
     "english": "English",
     "korean": "한국어"
   },
-  "theme": {
-    "label": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
-  },
   "common": {
     "bridgeMarket": "Trade82",
     "tagline": "Connecting Korean sellers with trusted American buyers.",

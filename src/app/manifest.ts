@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Trade82 connects Korean sellers with trusted American buyers and trade-ready product information.",
     start_url: "/",
     display: "standalone",
-    background_color: "#05070a",
-    theme_color: "#05070a",
+    background_color: "#f8faf9",
+    theme_color: "#f8faf9",
     icons: [
       {
         src: "/icon.png",

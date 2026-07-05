@@ -48,17 +48,17 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href={withLocale("/", locale)} className="flex items-center gap-2 theme-foreground">
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+        <Link href={withLocale("/", locale)} className="flex min-w-0 items-center gap-2 theme-foreground">
           <Image
             src="/trade82-logo.png"
             alt="Trade82"
             width={40}
             height={40}
             priority
-            className="h-9 w-9 object-contain"
+            className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9"
           />
-          <span className="text-sm font-semibold tracking-tight">Trade82</span>
+          <span className="truncate text-sm font-semibold tracking-tight">Trade82</span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -140,7 +140,7 @@ export function SiteHeader() {
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border text-sm font-semibold theme-border theme-muted lg:hidden"
+          className="inline-flex h-9 min-w-[4.25rem] shrink-0 items-center justify-center rounded-md border px-3 text-xs font-semibold theme-border theme-muted lg:hidden"
           aria-label="Toggle navigation"
           aria-expanded={open}
         >
