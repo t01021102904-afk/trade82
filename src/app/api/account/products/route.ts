@@ -3,6 +3,7 @@ import { rateLimitOrResponse } from "@/lib/api-security";
 import { requireSeller } from "@/lib/authz";
 import {
   getComplianceClaimOptions,
+  getCountryOptions,
   getIncotermOptions,
   getKoreanRegionOptions,
   getLeadTimeOptions,
@@ -150,6 +151,20 @@ export async function POST(request: Request) {
       ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
       : "";
     const images = parseUploadedImages(body.images);
+    const countryOfOrigin = allowedOption(
+      body.countryOfOrigin,
+      getCountryOptions("en"),
+      SOUTH_KOREA,
+    );
+    const shippingOriginCountry = allowedOption(
+      body.shippingOriginCountry,
+      getCountryOptions("en"),
+      SOUTH_KOREA,
+    );
+    const shippingOriginRegion =
+      shippingOriginCountry === SOUTH_KOREA
+        ? allowedOption(body.shippingOriginRegion, getKoreanRegionOptions("en"))
+        : cleanPlainText(body.shippingOriginRegion, 120);
     const status =
       body.status === "inactive" || body.status === "draft"
         ? body.status
@@ -324,13 +339,10 @@ export async function POST(request: Request) {
           getPriceUnitOptions("en"),
           "unit",
         ),
-        origin: SOUTH_KOREA,
-        countryOfOrigin: SOUTH_KOREA,
-        shippingOriginCountry: SOUTH_KOREA,
-        shippingOriginRegion: allowedOption(
-          body.shippingOriginRegion,
-          getKoreanRegionOptions("en"),
-        ),
+        origin: countryOfOrigin,
+        countryOfOrigin,
+        shippingOriginCountry,
+        shippingOriginRegion,
         incoterms: productFieldRequiresValue(fieldVisibility, "incoterms")
           ? allowedList(body.incoterms, getIncotermOptions("en"))
           : [],

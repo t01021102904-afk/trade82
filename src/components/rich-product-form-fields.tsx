@@ -5,6 +5,7 @@ import { useI18n } from "@/components/i18n-provider";
 import {
   formatMoqValue,
   getComplianceClaimOptions,
+  getCountryOptions,
   getIncotermOptions,
   getKoreanRegionOptions,
   getLeadTimeOptions,
@@ -166,9 +167,9 @@ export function productPayloadFromForm(product: RichProductFormValue) {
     tags,
     moq,
     leadTimeCode: visibleProduct.leadTime,
-    countryOfOrigin: SOUTH_KOREA,
-    shippingOriginCountry: SOUTH_KOREA,
-    origin: SOUTH_KOREA,
+    countryOfOrigin: visibleProduct.countryOfOrigin || SOUTH_KOREA,
+    shippingOriginCountry: visibleProduct.shippingOriginCountry || SOUTH_KOREA,
+    origin: visibleProduct.countryOfOrigin || SOUTH_KOREA,
     certifications: visibleProduct.complianceClaims,
     packaging: visibleProduct.packaging || visibleProduct.packageSize,
     fieldVisibility: normalized,
@@ -445,6 +446,11 @@ export function RichProductFormFields({
     getSellerProductCategoryOptions(locale),
     value.category,
   );
+  const countryOptions = withCurrentOption(getCountryOptions(locale), value.countryOfOrigin);
+  const shippingCountryOptions = withCurrentOption(
+    getCountryOptions(locale),
+    value.shippingOriginCountry,
+  );
   const leadTimeOptions = withCurrentOption(getLeadTimeOptions(locale), value.leadTime);
   const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
   const updateVisibility = (
@@ -616,28 +622,35 @@ export function RichProductFormFields({
       <Section id="origin-shipping" title={t("productForm.originShipping")} variant={variant}>
         <SelectField
           label={t("productForm.countryOfOrigin")}
-          value={SOUTH_KOREA}
-          onChange={() => onChange("countryOfOrigin", SOUTH_KOREA)}
-          options={[{ value: SOUTH_KOREA, label: locale === "ko" ? "대한민국" : SOUTH_KOREA }]}
-          disabled
+          value={value.countryOfOrigin}
+          onChange={(nextValue) => onChange("countryOfOrigin", nextValue)}
+          options={countryOptions}
           variant={variant}
         />
         <SelectField
           label={t("productForm.shippingOriginCountry")}
-          value={SOUTH_KOREA}
-          onChange={() => onChange("shippingOriginCountry", SOUTH_KOREA)}
-          options={[{ value: SOUTH_KOREA, label: locale === "ko" ? "대한민국" : SOUTH_KOREA }]}
-          disabled
+          value={value.shippingOriginCountry}
+          onChange={(nextValue) => onChange("shippingOriginCountry", nextValue)}
+          options={shippingCountryOptions}
           variant={variant}
         />
-        <SelectField
-          label={t("productForm.shippingOriginRegion")}
-          value={value.shippingOriginRegion}
-          onChange={(nextValue) => onChange("shippingOriginRegion", nextValue)}
-          options={getKoreanRegionOptions(locale)}
-          placeholder={t("settings.selectCityRegion")}
-          variant={variant}
-        />
+        {value.shippingOriginCountry === SOUTH_KOREA ? (
+          <SelectField
+            label={t("productForm.shippingOriginRegion")}
+            value={value.shippingOriginRegion}
+            onChange={(nextValue) => onChange("shippingOriginRegion", nextValue)}
+            options={withCurrentOption(getKoreanRegionOptions(locale), value.shippingOriginRegion)}
+            placeholder={t("settings.selectCityRegion")}
+            variant={variant}
+          />
+        ) : (
+          <TextField
+            label={t("productForm.shippingOriginRegion")}
+            value={value.shippingOriginRegion}
+            onChange={(nextValue) => onChange("shippingOriginRegion", nextValue)}
+            variant={variant}
+          />
+        )}
         <CheckboxGroup
           label={t("productForm.incoterms")}
           values={value.incoterms}

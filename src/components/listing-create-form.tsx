@@ -168,20 +168,20 @@ export function ListingCreateForm() {
       </div>
 
       {draft ? (
-        <div className="rounded-2xl border p-4 text-sm theme-warning-badge">
-          <p>{t("settings.draftAvailable")}</p>
+        <div className="rounded-xl border p-3 text-sm theme-surface">
+          <p className="theme-muted">{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={restoreDraft}
-              className="h-8 rounded-lg bg-amber-300 px-3 text-xs font-semibold text-zinc-950"
+              className="inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button"
             >
               {t("settings.restoreDraft")}
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="h-8 rounded-lg border px-3 text-xs font-semibold theme-warning-badge"
+              className="inline-flex h-8 items-center rounded-md px-2.5 text-xs font-medium theme-ghost-button"
             >
               {t("settings.discardDraft")}
             </button>

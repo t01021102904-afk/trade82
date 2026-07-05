@@ -16,6 +16,7 @@ import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react
 
 import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
+import { CompanyLogo } from "@/components/profile-identity";
 import { SellerDocumentsSection } from "@/components/seller-documents-section";
 import {
   ProductEditor,
@@ -25,6 +26,7 @@ import {
 import { ProductImage } from "@/components/product-image";
 import { withLocale } from "@/lib/i18n";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
+import { cx } from "@/lib/utils";
 
 export type DashboardSection =
   | "overview"
@@ -75,6 +77,10 @@ type Summary = {
     message: string;
     companyName: string;
     productName: string | null;
+    companyLogoThumbnailUrl?: string | null;
+    companyLogoUrl?: string | null;
+    senderAvatarUrl?: string | null;
+    useDefaultLogo?: boolean;
   }>;
   recentSavedItems?: Array<{
     id: string;
@@ -762,8 +768,6 @@ function MetricGrid({
   metrics: Metric[];
   onSectionChange?: (section: DashboardSection) => void;
 }) {
-  const { t } = useI18n();
-
   return (
     <section className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
@@ -779,9 +783,6 @@ function MetricGrid({
           </span>
           <span className="mt-2 block truncate text-xl font-semibold theme-foreground">
             {metric.value}
-          </span>
-          <span className="mt-2 block text-xs font-medium text-blue-700">
-            {t("dashboard.sectionView")}
           </span>
         </button>
       ))}
@@ -828,14 +829,28 @@ function MessagesPanel({
           <Link
             key={item.id}
             href={withLocale("/messages", locale)}
-            className="min-w-0 rounded-md border p-3 transition theme-surface-muted theme-card-hover"
+            className="flex min-w-0 items-start gap-3 rounded-md border p-3 transition theme-surface-muted theme-card-hover"
           >
-            <p className="truncate font-medium theme-foreground">
-              {item.productName || item.companyName}
-            </p>
-            <p className="mt-1 line-clamp-2 break-words text-sm theme-muted">
-              {item.message}
-            </p>
+            <CompanyLogo
+              companyName={item.companyName}
+              logoUrls={[
+                item.companyLogoThumbnailUrl ?? "",
+                item.companyLogoUrl ?? "",
+                item.senderAvatarUrl ?? "",
+              ]}
+              useDefaultLogo={(item.useDefaultLogo ?? false) && !item.senderAvatarUrl}
+              size="sm"
+              shape="circle"
+              className="size-9 text-[11px]"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-medium theme-foreground">
+                {item.productName || item.companyName}
+              </span>
+              <span className="mt-1 line-clamp-2 break-words text-sm theme-muted">
+                {item.message}
+              </span>
+            </span>
           </Link>
         ))}
         {!inquiries.length ? <Empty text={emptyText} /> : null}
@@ -1240,7 +1255,7 @@ function SellerProductCard({
         <button
           type="button"
           onClick={onEdit}
-          className="h-8 rounded-md px-2.5 text-xs font-medium theme-primary-button"
+          className={productEditButtonClass}
         >
           {t("settings.editProduct")}
         </button>
@@ -1249,7 +1264,7 @@ function SellerProductCard({
             type="button"
             disabled={pending}
             onClick={onSetPreparing}
-            className="h-8 rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-800 disabled:cursor-wait disabled:opacity-60"
+            className={productPreparingButtonClass}
           >
             {pending ? t("settings.saving") : t("dashboard.setPreparing")}
           </button>
@@ -1258,7 +1273,7 @@ function SellerProductCard({
             type="button"
             disabled={pending}
             onClick={onPublish}
-            className="h-8 rounded-md border border-blue-200 px-2.5 text-xs font-medium text-blue-700 disabled:cursor-wait disabled:opacity-60"
+            className={productPublishButtonClass}
           >
             {pending ? t("settings.saving") : t("listing.publishProduct")}
           </button>
@@ -1267,7 +1282,7 @@ function SellerProductCard({
           type="button"
           disabled={pending}
           onClick={onDelete}
-          className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700 disabled:cursor-wait disabled:opacity-60"
+          className={productDeleteButtonClass}
         >
           {pending ? t("settings.saving") : t("settings.deleteProduct")}
         </button>
@@ -1275,6 +1290,25 @@ function SellerProductCard({
     </article>
   );
 }
+
+const productActionBase =
+  "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition disabled:cursor-wait disabled:opacity-60";
+const productEditButtonClass = cx(
+  productActionBase,
+  "border-zinc-300 bg-white text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50",
+);
+const productPreparingButtonClass = cx(
+  productActionBase,
+  "border-amber-200 bg-amber-50/60 text-amber-800 hover:bg-amber-50",
+);
+const productPublishButtonClass = cx(
+  productActionBase,
+  "border-emerald-200 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-50",
+);
+const productDeleteButtonClass = cx(
+  productActionBase,
+  "border-red-200 bg-white text-red-700 hover:bg-red-50",
+);
 
 function productStatusMeta(
   product: DbProduct,

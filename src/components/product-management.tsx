@@ -189,7 +189,7 @@ export function ProductManagement() {
                 <button
                   type="button"
                   onClick={() => setEditing({ ...product })}
-                  className="h-8 rounded-md border border-zinc-200 px-2.5 text-xs font-medium text-zinc-700"
+                  className={productEditButtonClass}
                 >
                   {t("settings.editProduct")}
                 </button>
@@ -197,7 +197,7 @@ export function ProductManagement() {
                   <button
                     type="button"
                     onClick={() => void markInactive(product)}
-                    className="h-8 rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-800"
+                    className={productPreparingButtonClass}
                   >
                     {t("settings.markInactive")}
                   </button>
@@ -205,7 +205,7 @@ export function ProductManagement() {
                   <button
                     type="button"
                     onClick={() => void publish(product)}
-                    className="h-8 rounded-md border border-blue-200 px-2.5 text-xs font-medium text-blue-700"
+                    className={productPublishButtonClass}
                   >
                     {t("listing.publishProduct")}
                   </button>
@@ -213,7 +213,7 @@ export function ProductManagement() {
                 <button
                   type="button"
                   onClick={() => void remove(product.id)}
-                  className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700"
+                  className={productDeleteButtonClass}
                 >
                   {t("settings.deleteProduct")}
                 </button>
@@ -238,6 +238,25 @@ function formatPrice(product: Pick<DbProduct, "priceMin" | "priceMax" | "currenc
   }
   return `${product.currency} ${product.priceMin}-${product.priceMax}`;
 }
+
+const productActionBase =
+  "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition disabled:cursor-wait disabled:opacity-60";
+const productEditButtonClass = cx(
+  productActionBase,
+  "border-zinc-300 bg-white text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50",
+);
+const productPreparingButtonClass = cx(
+  productActionBase,
+  "border-amber-200 bg-amber-50/60 text-amber-800 hover:bg-amber-50",
+);
+const productPublishButtonClass = cx(
+  productActionBase,
+  "border-emerald-200 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-50",
+);
+const productDeleteButtonClass = cx(
+  productActionBase,
+  "border-red-200 bg-white text-red-700 hover:bg-red-50",
+);
 
 export function ProductEditor({
   initialProduct,
@@ -397,20 +416,20 @@ export function ProductEditor({
       </div>
 
       {draft ? (
-        <div className="rounded-2xl border p-3 text-sm theme-warning-badge">
-          <p>{t("settings.draftAvailable")}</p>
+        <div className="rounded-xl border p-3 text-sm theme-surface">
+          <p className="theme-muted">{t("settings.draftAvailable")}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
               onClick={restoreDraft}
-              className="h-8 rounded-lg bg-amber-300 px-2.5 text-xs font-semibold text-zinc-950"
+              className="inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button"
             >
               {t("settings.restoreDraft")}
             </button>
             <button
               type="button"
               onClick={discardDraft}
-              className="h-8 rounded-lg border px-2.5 text-xs font-semibold theme-warning-badge"
+              className="inline-flex h-8 items-center rounded-md px-2.5 text-xs font-medium theme-ghost-button"
             >
               {t("settings.discardDraft")}
             </button>

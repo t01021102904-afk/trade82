@@ -167,7 +167,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           },
           {
             id: "documents" as const,
-            label: t("common.documents"),
+            label: t("dashboard.dashboardNavDocuments"),
             icon: FileText,
           },
         ]

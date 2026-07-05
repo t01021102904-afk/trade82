@@ -63,7 +63,11 @@ export async function GET(request: Request) {
           where: { sellerCompanyId: company.id },
           orderBy: { updatedAt: "desc" },
           take: 8,
-          include: { buyerCompany: true, product: true },
+          include: {
+            buyerCompany: true,
+            product: true,
+            sender: { select: { avatarUrl: true } },
+          },
         }),
         getDb().inquiry.count({ where: { sellerCompanyId: company.id } }),
         getDb().companyReview.findMany({
@@ -175,6 +179,10 @@ export async function GET(request: Request) {
           updatedAt: item.updatedAt,
           companyName:
             item.buyerCompany.tradeName || item.buyerCompany.legalName,
+          companyLogoThumbnailUrl: item.buyerCompany.logoThumbnailUrl,
+          companyLogoUrl: item.buyerCompany.logoUrl,
+          useDefaultLogo: item.buyerCompany.useDefaultLogo,
+          senderAvatarUrl: item.sender.avatarUrl,
           productName: item.product?.name || null,
         })),
       });
@@ -204,7 +212,11 @@ export async function GET(request: Request) {
         where: { buyerCompanyId: company.id },
         orderBy: { updatedAt: "desc" },
         take: 8,
-        include: { sellerCompany: true, product: true },
+        include: {
+          sellerCompany: true,
+          product: true,
+          sender: { select: { avatarUrl: true } },
+        },
       }),
       getDb().inquiry.count({ where: { buyerCompanyId: company.id } }),
       getDb().deal.findMany({
@@ -345,6 +357,10 @@ export async function GET(request: Request) {
         updatedAt: item.updatedAt,
         companyName:
           item.sellerCompany.tradeName || item.sellerCompany.legalName,
+        companyLogoThumbnailUrl: item.sellerCompany.logoThumbnailUrl,
+        companyLogoUrl: item.sellerCompany.logoUrl,
+        useDefaultLogo: item.sellerCompany.useDefaultLogo,
+        senderAvatarUrl: item.sender.avatarUrl,
         productName: item.product?.name || null,
       })),
       recentReviews: [],
