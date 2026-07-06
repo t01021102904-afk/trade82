@@ -411,6 +411,7 @@ export async function PUT(request: Request) {
             seller,
             "exportExperience",
             existing?.sellerProfile?.exportExperience ?? "",
+            10_000,
           ),
           exportCountries: listField(
             seller,
