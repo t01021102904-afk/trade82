@@ -8,6 +8,7 @@ import { FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from 
 import {
   SingleImageUploader,
 } from "@/components/image-uploader";
+import { CountryMultiSelect } from "@/components/country-multi-select";
 import { useI18n } from "@/components/i18n-provider";
 import {
   OnboardingStepper,
@@ -60,6 +61,7 @@ type CompanyStep = {
   stateOrProvince: string;
   companyType: string;
   categories: string;
+  exportCountries: string;
   description: string;
   logoOriginalUrl: string;
   logoThumbnailUrl: string;
@@ -123,6 +125,7 @@ function initialCompany(kind: "buyer" | "seller"): CompanyStep {
     stateOrProvince: "",
     companyType: kind === "seller" ? "manufacturer" : "importer",
     categories: "",
+    exportCountries: "",
     description: "",
     logoOriginalUrl: "",
     logoThumbnailUrl: "",
@@ -737,7 +740,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
               koreanBusinessRegistrationNumber: "",
               representativeName: personal.displayName,
               exportExperience: company.description,
-              exportCountries: [],
+              exportCountries: list(company.exportCountries),
               productCategories: categories,
               minimumOrderQuantity: productPayloadFromForm(product).moq,
               leadTime: product.leadTime,
@@ -1383,13 +1386,28 @@ function CompanyStepForm({
           required
         />
         {kind === "seller" ? (
-          <CheckboxGroup
-            label={t("settings.categories")}
-            values={list(company.categories)}
-            onChange={(values) => onChange("categories", joined(values))}
-            options={getSellerProductCategoryOptions(locale)}
-            className="sm:col-span-2"
-          />
+          <>
+            <CheckboxGroup
+              label={t("settings.categories")}
+              values={list(company.categories)}
+              onChange={(values) => onChange("categories", joined(values))}
+              options={getSellerProductCategoryOptions(locale)}
+              className="sm:col-span-2"
+            />
+            <CountryMultiSelect
+              label={t("settings.exportCountries")}
+              helperText={t("settings.exportCountriesHelp")}
+              values={list(company.exportCountries)}
+              onChange={(values) => onChange("exportCountries", joined(values))}
+              options={countryOptions}
+              placeholder={t("settings.searchCountries")}
+              noResultsText={t("settings.noCountriesFound")}
+              allSelectedText={t("settings.allCountriesSelected")}
+              removeLabel={(country) => `${t("settings.removeCountry")}: ${country}`}
+              className="sm:col-span-2"
+              variant="theme"
+            />
+          </>
         ) : null}
         <label className="grid gap-1 text-sm sm:col-span-2">
           <span className="font-medium theme-foreground">

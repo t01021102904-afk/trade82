@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
+import { CountryMultiSelect } from "@/components/country-multi-select";
 import { SingleImageUploader } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
@@ -1163,6 +1164,7 @@ function SellerFields({
   onDirty: () => void;
 }) {
   const { locale, t } = useI18n();
+  const countryOptions = getCountryOptions(locale);
   const update = <K extends keyof SellerCompanyProfile>(key: K, value: SellerCompanyProfile[K]) => {
     setSeller((current) => ({ ...current, [key]: value }));
     onDirty();
@@ -1176,7 +1178,18 @@ function SellerFields({
       <Field label={t("settings.registrationNumber")} value={seller.businessRegistrationNumber} onChange={(value) => update("businessRegistrationNumber", value)} />
       <Field label={t("settings.representativeName")} value={seller.representativeName} onChange={(value) => update("representativeName", value)} />
       <Field label={t("settings.exportExperience")} value={seller.exportExperience} onChange={(value) => update("exportExperience", value)} className="sm:col-span-2" />
-      <Field label={t("settings.exportCountries")} value={joined(seller.exportCountries)} onChange={(value) => update("exportCountries", list(value))} />
+      <CountryMultiSelect
+        label={t("settings.exportCountries")}
+        helperText={t("settings.exportCountriesHelp")}
+        values={seller.exportCountries}
+        onChange={(values) => update("exportCountries", values)}
+        options={countryOptions}
+        placeholder={t("settings.searchCountries")}
+        noResultsText={t("settings.noCountriesFound")}
+        allSelectedText={t("settings.allCountriesSelected")}
+        removeLabel={(country) => `${t("settings.removeCountry")}: ${country}`}
+        className="sm:col-span-2"
+      />
       <CheckboxGroup
         label={t("settings.productCategories")}
         values={seller.productCategories}

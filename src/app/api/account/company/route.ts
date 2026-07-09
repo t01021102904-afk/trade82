@@ -60,15 +60,43 @@ function listField(
   source: Record<string, unknown>,
   key: string,
   fallback: string[] = [],
+  options: { maxItems?: number; maxLength?: number } = {},
 ) {
   if (!(key in source)) return fallback;
+  const maxItems = options.maxItems ?? 30;
+  const maxLength = options.maxLength ?? 120;
   const items = strings(source[key]);
-  if (items.length > 30) throw validationError(`${key} has too many items.`);
+  if (items.length > maxItems) throw validationError(`${key} has too many items.`);
   return items.map((item) => {
     const value = item.trim();
-    if (value.length > 120) throw validationError(`${key} item is too long.`);
+    if (value.length > maxLength) throw validationError(`${key} item is too long.`);
     return value;
   }).filter(Boolean);
+}
+
+function exportCountriesField(
+  source: Record<string, unknown>,
+  fallback: string[] = [],
+) {
+  if (!("exportCountries" in source)) return fallback;
+  const value = source.exportCountries;
+  if (!Array.isArray(value)) {
+    throw validationError("exportCountries must be a list.");
+  }
+  if (value.length > 50) {
+    throw validationError("exportCountries has too many items.");
+  }
+  const countries = value.map((item) => {
+    if (typeof item !== "string") {
+      throw validationError("exportCountries contains invalid text.");
+    }
+    const country = item.trim();
+    if (country.length > 120) {
+      throw validationError("exportCountries item is too long.");
+    }
+    return country;
+  });
+  return Array.from(new Set(countries.filter(Boolean)));
 }
 
 function booleanField(
@@ -383,7 +411,7 @@ export async function PUT(request: Request) {
           ),
           representativeName: textField(seller, "representativeName"),
           exportExperience: textField(seller, "exportExperience"),
-          exportCountries: listField(seller, "exportCountries"),
+          exportCountries: exportCountriesField(seller),
           productCategories: listField(seller, "productCategories"),
           minimumOrderQuantity: textField(seller, "minimumOrderQuantity"),
           leadTime: textField(seller, "leadTime"),
@@ -413,9 +441,8 @@ export async function PUT(request: Request) {
             existing?.sellerProfile?.exportExperience ?? "",
             10_000,
           ),
-          exportCountries: listField(
+          exportCountries: exportCountriesField(
             seller,
-            "exportCountries",
             existing?.sellerProfile?.exportCountries ?? [],
           ),
           productCategories: listField(
