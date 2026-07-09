@@ -18,7 +18,7 @@ export const metadata: Metadata = publicPageMetadata({
 export default function KoMarketplacePage() {
   return (
     <div className="bm-grid-surface theme-bg">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:px-8">
         <BackButton fallbackHref="/" />
         <MarketplaceSeoContent locale="ko" />
         <MarketplaceClient />
