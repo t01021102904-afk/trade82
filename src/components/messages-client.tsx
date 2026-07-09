@@ -1,13 +1,18 @@
 "use client";
 
 import {
+  ChevronLeft,
   Download,
   FileText,
+  FolderOpen,
   Image as ImageIcon,
+  MoreVertical,
   Paperclip,
+  Plus,
   Search,
   Send,
   Smile,
+  Upload,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -21,6 +26,7 @@ import {
   type Dispatch,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type RefObject,
   type SetStateAction,
 } from "react";
 
@@ -35,7 +41,7 @@ import {
   MESSAGE_ATTACHMENT_LIMITS,
 } from "@/lib/message-attachment-rules";
 import { safeExternalUrl } from "@/lib/url-security";
-import { formatDate } from "@/lib/utils";
+import { cx, formatDate } from "@/lib/utils";
 
 type DealSummary = {
   id: string;
@@ -129,6 +135,13 @@ type ChatRoomContextMenuAction =
   | "notifications"
   | "leave";
 
+type MobileThreadFilter =
+  | "all"
+  | "waiting"
+  | "in_progress"
+  | "completed"
+  | "archived";
+
 type SignedUrlPayload = {
   signedUrl: string;
   expiresInSeconds: number;
@@ -176,11 +189,18 @@ export function MessagesClient({
   const [pinnedThreadIds, setPinnedThreadIds] = useState<Set<string>>(() => new Set());
   const [favoriteThreadIds, setFavoriteThreadIds] = useState<Set<string>>(() => new Set());
   const [mutedThreadIds, setMutedThreadIds] = useState<Set<string>>(() => new Set());
+  const [mobileChatOpen, setMobileChatOpen] = useState(Boolean(initialInquiryId));
+  const [mobileAttachmentSheetOpen, setMobileAttachmentSheetOpen] = useState(false);
+  const [mobileDealSheetOpen, setMobileDealSheetOpen] = useState(false);
+  const [mobileFilter, setMobileFilter] = useState<MobileThreadFilter>("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draftAttachmentsRef = useRef<DraftAttachment[]>([]);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const mobileMessagesEndRef = useRef<HTMLDivElement>(null);
+  const mobileChatOpenRef = useRef(mobileChatOpen);
+  const pushedMobileHistoryRef = useRef(false);
 
   async function load() {
     setThreads(await fetchInquiryThreads());
@@ -231,6 +251,15 @@ export function MessagesClient({
     () => getCanonicalInquiryThreads(threads),
     [threads],
   );
+  const mobileVisibleThreads = useMemo(
+    () =>
+      mobileFilter === "all"
+        ? visibleThreads
+        : visibleThreads.filter(
+            (thread) => getMobileThreadStatus(thread) === mobileFilter,
+          ),
+    [mobileFilter, visibleThreads],
+  );
   const contextMenuThread = useMemo(
     () => visibleThreads.find((thread) => thread.id === contextMenu?.threadId) ?? null,
     [contextMenu?.threadId, visibleThreads],
@@ -250,7 +279,27 @@ export function MessagesClient({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ block: "end" });
+    mobileMessagesEndRef.current?.scrollIntoView({ block: "end" });
   }, [lastMessageId, selected?.id]);
+
+  useEffect(() => {
+    mobileChatOpenRef.current = mobileChatOpen;
+  }, [mobileChatOpen]);
+
+  useEffect(() => {
+    function handlePopState() {
+      if (!mobileChatOpenRef.current || !pushedMobileHistoryRef.current) return;
+      pushedMobileHistoryRef.current = false;
+      setMobileChatOpen(false);
+      setMobileAttachmentSheetOpen(false);
+      setMobileDealSheetOpen(false);
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
 
   async function submitReply() {
     if (!selected) return;
@@ -360,6 +409,36 @@ export function MessagesClient({
     selectThread(threadId);
   }
 
+  function openMobileThread(threadId: string) {
+    setContextMenu(null);
+    selectThread(threadId);
+    setMobileAttachmentSheetOpen(false);
+    setMobileDealSheetOpen(false);
+    setMobileChatOpen(true);
+    if (
+      typeof window !== "undefined" &&
+      window.innerWidth < 768 &&
+      !pushedMobileHistoryRef.current
+    ) {
+      window.history.pushState(
+        { trade82MobileMessages: true, threadId },
+        "",
+        window.location.href,
+      );
+      pushedMobileHistoryRef.current = true;
+    }
+  }
+
+  function closeMobileThread() {
+    setMobileChatOpen(false);
+    setMobileAttachmentSheetOpen(false);
+    setMobileDealSheetOpen(false);
+    if (pushedMobileHistoryRef.current && typeof window !== "undefined") {
+      pushedMobileHistoryRef.current = false;
+      window.history.back();
+    }
+  }
+
   function toggleThreadSet(
     setter: Dispatch<SetStateAction<Set<string>>>,
     threadId: string,
@@ -392,6 +471,7 @@ export function MessagesClient({
 
   function addFiles(files: FileList | File[]) {
     if (!selected) return;
+    setMobileAttachmentSheetOpen(false);
     setComposerError("");
     const incoming = Array.from(files);
     const openSlots = MESSAGE_ATTACHMENT_LIMITS.maxFilesPerMessage - draftAttachments.length;
@@ -590,158 +670,229 @@ export function MessagesClient({
   }
 
   if (!visibleThreads.length) {
-    return <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed p-8 text-center theme-surface"><div><h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2><p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p><Link href={withLocale("/marketplace", locale)} className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button">{t("common.browseProducts")}</Link></div></div>;
+    return (
+      <>
+        <div className="min-h-0 flex-1 md:hidden">
+          <MobileConversationList
+            threads={mobileVisibleThreads}
+            activeFilter={mobileFilter}
+            onFilter={setMobileFilter}
+            onOpenThread={openMobileThread}
+          />
+        </div>
+        <div className="hidden flex-1 items-center justify-center rounded-lg border border-dashed p-8 text-center theme-surface md:flex">
+          <div>
+            <h2 className="text-lg font-semibold theme-foreground">{t("messages.emptyTitle")}</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 theme-muted">{t("messages.emptyText")}</p>
+            <Link
+              href={withLocale("/marketplace", locale)}
+              className="mt-5 inline-flex rounded-md px-4 py-2 text-sm font-medium theme-primary-button"
+            >
+              {t("common.browseProducts")}
+            </Link>
+          </div>
+        </div>
+      </>
+    );
   }
 
   return (
-    <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,13rem)] overflow-hidden rounded-lg border theme-surface-elevated xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
-      <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
-        {visibleThreads.map((thread) => {
-          const company = getCounterparty(thread);
-          const companyName = getCompanyDisplayName(company, t);
-          const unreadCount = normalizeUnreadCount(thread.unreadCount);
-          const isSelected =
-            selected?.id === thread.id ||
-            (selected ? getThreadParticipantKey(selected) === getThreadParticipantKey(thread) : false);
-          return (
-            <button
-              key={thread.id}
-              type="button"
-              aria-haspopup="menu"
-              onClick={() => handleThreadClick(thread.id)}
-              onContextMenu={(event) => handleThreadContextMenu(event, thread.id)}
-              onPointerDown={(event) => handleThreadPointerDown(event, thread.id)}
-              onPointerUp={handleThreadPressEnd}
-              onPointerCancel={handleThreadPressEnd}
-              onPointerLeave={handleThreadPressEnd}
-              className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${isSelected ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
-            >
-              <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
-              <div className="min-w-0">
-                <p className="flex min-w-0 items-center gap-1.5 font-medium theme-foreground">
-                  <span className="truncate">{companyName}</span>
-                  {company.isTrade82Team ? <AdminBadge compact /> : null}
-                </p>
-                <p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p>
-                <p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p>
-              </div>
-              <UnreadMessageBadge count={unreadCount} className="right-3 top-3" />
-            </button>
-          );
-        })}
-      </aside>
-      {selected ? (
-        <section className="flex min-h-0 flex-col">
-          <header className="shrink-0 border-b theme-border p-4">
-            {selected.product ? (
-              <ProductInquiryCard thread={selected} />
-            ) : (
-              <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
-            )}
-            {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
-            <DealControls
-              thread={selected}
-              pending={dealPending}
-              error={dealError}
-              onCreate={() => void createDeal(selected)}
-              onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
-            />
-          </header>
-          <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
-            <MessageTimeline thread={selected} onOpenAttachment={openAttachment} />
-            <div ref={messagesEndRef} aria-hidden="true" />
-          </div>
-          <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
-            <div
-              onDragOver={(event) => {
-                event.preventDefault();
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                addFiles(event.dataTransfer.files);
-              }}
-              className="rounded-2xl border border-zinc-200 bg-white px-3 py-2.5 text-zinc-950 shadow-sm transition focus-within:border-[#64AF8B]/60 focus-within:ring-2 focus-within:ring-[#64AF8B]/10"
-            >
-              <textarea
-                value={reply}
-                onChange={(event) => setReply(event.target.value)}
-                maxLength={MESSAGE_COMPOSER_MAX_LENGTH}
-                rows={3}
-                placeholder={t("messages.replyPlaceholder")}
-                className="min-h-20 w-full resize-none border-0 bg-transparent px-1 py-1.5 text-sm leading-6 text-zinc-950 outline-none placeholder:text-zinc-400"
+    <>
+      <div className="min-h-0 flex-1 md:hidden">
+        {!mobileChatOpen ? (
+          <MobileConversationList
+            threads={mobileVisibleThreads}
+            activeFilter={mobileFilter}
+            onFilter={setMobileFilter}
+            onOpenThread={openMobileThread}
+          />
+        ) : selected ? (
+          <MobileChatDetail
+            thread={selected}
+            reply={reply}
+            draftAttachments={draftAttachments}
+            composerError={composerError}
+            hasPendingUploads={hasPendingUploads}
+            hasComposerContent={hasComposerContent}
+            libraryAttachments={libraryAttachments}
+            libraryFilter={libraryFilter}
+            librarySearch={librarySearch}
+            attachmentSheetOpen={mobileAttachmentSheetOpen}
+            dealSheetOpen={mobileDealSheetOpen}
+            messagesEndRef={mobileMessagesEndRef}
+            fileInputRef={fileInputRef}
+            onBack={closeMobileThread}
+            onReplyChange={setReply}
+            onSubmitReply={() => void submitReply()}
+            onAddFiles={addFiles}
+            onRemoveDraftAttachment={removeDraftAttachment}
+            onRetryDraftAttachment={retryDraftAttachment}
+            onOpenAttachment={openAttachment}
+            onJumpToMessage={jumpToMessage}
+            onFilterFiles={setLibraryFilter}
+            onSearchFiles={setLibrarySearch}
+            onOpenAttachmentSheet={() => setMobileAttachmentSheetOpen(true)}
+            onCloseAttachmentSheet={() => setMobileAttachmentSheetOpen(false)}
+            onOpenDealSheet={() => setMobileDealSheetOpen(true)}
+            onCloseDealSheet={() => setMobileDealSheetOpen(false)}
+            dealPending={dealPending}
+            dealError={dealError}
+            onCreateDeal={() => void createDeal(selected)}
+            onUpdateDeal={(deal, action) => void updateDeal(selected, deal, action)}
+          />
+        ) : null}
+      </div>
+
+      <div className="hidden min-h-0 flex-1 grid-rows-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,13rem)] overflow-hidden rounded-lg border theme-surface-elevated md:grid xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
+        <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
+          {visibleThreads.map((thread) => {
+            const company = getCounterparty(thread);
+            const companyName = getCompanyDisplayName(company, t);
+            const unreadCount = normalizeUnreadCount(thread.unreadCount);
+            const isSelected =
+              selected?.id === thread.id ||
+              (selected ? getThreadParticipantKey(selected) === getThreadParticipantKey(thread) : false);
+            return (
+              <button
+                key={thread.id}
+                type="button"
+                aria-haspopup="menu"
+                onClick={() => handleThreadClick(thread.id)}
+                onContextMenu={(event) => handleThreadContextMenu(event, thread.id)}
+                onPointerDown={(event) => handleThreadPointerDown(event, thread.id)}
+                onPointerUp={handleThreadPressEnd}
+                onPointerCancel={handleThreadPressEnd}
+                onPointerLeave={handleThreadPressEnd}
+                className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${isSelected ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
+              >
+                <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
+                <div className="min-w-0">
+                  <p className="flex min-w-0 items-center gap-1.5 font-medium theme-foreground">
+                    <span className="truncate">{companyName}</span>
+                    {company.isTrade82Team ? <AdminBadge compact /> : null}
+                  </p>
+                  <p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p>
+                  <p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p>
+                </div>
+                <UnreadMessageBadge count={unreadCount} className="right-3 top-3" />
+              </button>
+            );
+          })}
+        </aside>
+        {selected ? (
+          <section className="flex min-h-0 flex-col">
+            <header className="shrink-0 border-b theme-border p-4">
+              {selected.product ? (
+                <ProductInquiryCard thread={selected} />
+              ) : (
+                <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
+              )}
+              {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
+              <DealControls
+                thread={selected}
+                pending={dealPending}
+                error={dealError}
+                onCreate={() => void createDeal(selected)}
+                onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
               />
-              <AttachmentDraftList
-                items={draftAttachments}
-                onRemove={removeDraftAttachment}
-                onRetry={retryDraftAttachment}
-              />
-              <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-100 pt-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.jpg,.jpeg,.png,.webp"
-                  className="hidden"
-                  onChange={(event) => {
-                    if (event.target.files) addFiles(event.target.files);
-                    event.target.value = "";
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
-                  aria-label={t("messages.attachFiles")}
-                >
-                  <ImageIcon className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
-                  aria-label={t("messages.attachFiles")}
-                >
-                  <Paperclip className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex size-8 items-center justify-center rounded-full text-zinc-300"
-                  aria-label="Emoji"
-                >
-                  <Smile className="size-4" />
-                </button>
-                <span className="ml-auto text-xs tabular-nums text-zinc-400">
-                  {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => void submitReply()}
-                  disabled={hasPendingUploads || !hasComposerContent}
-                  className="ml-2 inline-flex size-8 items-center justify-center rounded-full bg-zinc-950 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
-                  aria-label={t("messages.saveReply")}
-                >
-                  <Send className="size-4" />
-                </button>
-              </div>
-              {composerError ? (
-                <p className="mt-2 text-xs font-medium text-red-700">{composerError}</p>
-              ) : null}
+            </header>
+            <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
+              <MessageTimeline thread={selected} onOpenAttachment={openAttachment} />
+              <div ref={messagesEndRef} aria-hidden="true" />
             </div>
-          </footer>
-        </section>
-      ) : null}
-      {selected ? (
-        <AttachmentLibrary
-          attachments={libraryAttachments}
-          filter={libraryFilter}
-          search={librarySearch}
-          onFilter={setLibraryFilter}
-          onSearch={setLibrarySearch}
-          onOpen={openAttachment}
-          onJump={jumpToMessage}
-        />
-      ) : null}
+            <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
+              <div
+                onDragOver={(event) => {
+                  event.preventDefault();
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  addFiles(event.dataTransfer.files);
+                }}
+                className="rounded-2xl border border-zinc-200 bg-white px-3 py-2.5 text-zinc-950 shadow-sm transition focus-within:border-[#64AF8B]/60 focus-within:ring-2 focus-within:ring-[#64AF8B]/10"
+              >
+                <textarea
+                  value={reply}
+                  onChange={(event) => setReply(event.target.value)}
+                  maxLength={MESSAGE_COMPOSER_MAX_LENGTH}
+                  rows={3}
+                  placeholder={t("messages.replyPlaceholder")}
+                  className="min-h-20 w-full resize-none border-0 bg-transparent px-1 py-1.5 text-sm leading-6 text-zinc-950 outline-none placeholder:text-zinc-400"
+                />
+                <AttachmentDraftList
+                  items={draftAttachments}
+                  onRemove={removeDraftAttachment}
+                  onRetry={retryDraftAttachment}
+                />
+                <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-100 pt-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".pdf,.jpg,.jpeg,.png,.webp"
+                    className="hidden"
+                    onChange={(event) => {
+                      if (event.target.files) addFiles(event.target.files);
+                      event.target.value = "";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+                    aria-label={t("messages.attachFiles")}
+                  >
+                    <ImageIcon className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex size-8 items-center justify-center rounded-full text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+                    aria-label={t("messages.attachFiles")}
+                  >
+                    <Paperclip className="size-4" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    className="inline-flex size-8 items-center justify-center rounded-full text-zinc-300"
+                    aria-label="Emoji"
+                  >
+                    <Smile className="size-4" />
+                  </button>
+                  <span className="ml-auto text-xs tabular-nums text-zinc-400">
+                    {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => void submitReply()}
+                    disabled={hasPendingUploads || !hasComposerContent}
+                    className="ml-2 inline-flex size-8 items-center justify-center rounded-full bg-zinc-950 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
+                    aria-label={t("messages.saveReply")}
+                  >
+                    <Send className="size-4" />
+                  </button>
+                </div>
+                {composerError ? (
+                  <p className="mt-2 text-xs font-medium text-red-700">{composerError}</p>
+                ) : null}
+              </div>
+            </footer>
+          </section>
+        ) : null}
+        {selected ? (
+          <AttachmentLibrary
+            attachments={libraryAttachments}
+            filter={libraryFilter}
+            search={librarySearch}
+            onFilter={setLibraryFilter}
+            onSearch={setLibrarySearch}
+            onOpen={openAttachment}
+            onJump={jumpToMessage}
+          />
+        ) : null}
+      </div>
+
       {previewAttachment && previewUrl ? (
         <ImagePreviewModal
           attachment={previewAttachment}
@@ -765,7 +916,7 @@ export function MessagesClient({
           onAction={handleContextMenuAction}
         />
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -795,6 +946,468 @@ function UnreadMessageBadge({
     >
       {formatUnreadCount(count)}
     </span>
+  );
+}
+
+function MobileConversationList({
+  threads,
+  activeFilter,
+  onFilter,
+  onOpenThread,
+}: {
+  threads: InquiryThread[];
+  activeFilter: MobileThreadFilter;
+  onFilter: (filter: MobileThreadFilter) => void;
+  onOpenThread: (threadId: string) => void;
+}) {
+  const { locale, t } = useI18n();
+  const filters: Array<{ value: MobileThreadFilter; label: string }> = [
+    { value: "all", label: t("messages.filterAll") },
+    { value: "waiting", label: t("messages.filterWaiting") },
+    { value: "in_progress", label: t("messages.filterInProgress") },
+    { value: "completed", label: t("messages.filterCompleted") },
+    { value: "archived", label: t("messages.filterArchived") },
+  ];
+
+  return (
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
+      <header className="shrink-0 border-b border-zinc-100 px-4 pb-3 pt-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold tracking-tight text-zinc-950">
+            {t("messages.mobileAllConversations")}
+          </h2>
+          <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600">
+            {threads.length}
+          </span>
+        </div>
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {filters.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => onFilter(filter.value)}
+              className={cx(
+                "shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                activeFilter === filter.value
+                  ? "border-zinc-950 bg-zinc-950 text-white"
+                  : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:bg-zinc-50",
+              )}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </header>
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {threads.length ? (
+          threads.map((thread) => {
+            const company = getCounterparty(thread);
+            const companyName = getCompanyDisplayName(company, t);
+            const unreadCount = normalizeUnreadCount(thread.unreadCount);
+            const latestPreview = getLatestThreadPreview(thread, t);
+            return (
+              <button
+                key={thread.id}
+                type="button"
+                onClick={() => onOpenThread(thread.id)}
+                className="relative flex w-full gap-3 border-b border-zinc-100 px-4 py-3.5 text-left transition active:bg-zinc-50"
+              >
+                <CompanyLogo
+                  companyName={companyName}
+                  logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined}
+                  useDefaultLogo={company.useDefaultLogo}
+                  size="md"
+                  shape="circle"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-zinc-950">
+                      <span className="truncate">{companyName}</span>
+                      {company.isTrade82Team ? <AdminBadge compact /> : null}
+                    </p>
+                    <time className="shrink-0 text-[11px] text-zinc-400">
+                      {formatThreadListTime(thread.updatedAt, locale)}
+                    </time>
+                  </div>
+                  <p className="mt-0.5 truncate text-xs font-medium text-zinc-500">
+                    {thread.product?.name || getInquiryLabel(thread, t)}
+                  </p>
+                  <p className="mt-1 line-clamp-1 text-sm text-zinc-500">
+                    {latestPreview}
+                  </p>
+                </div>
+                <UnreadMessageBadge count={unreadCount} className="right-4 top-9" />
+              </button>
+            );
+          })
+        ) : (
+          <div className="flex h-full items-center justify-center px-6 text-center">
+            <p className="text-sm text-zinc-500">{t("messages.noConversationsForFilter")}</p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function MobileChatDetail({
+  thread,
+  reply,
+  draftAttachments,
+  composerError,
+  hasPendingUploads,
+  hasComposerContent,
+  libraryAttachments,
+  libraryFilter,
+  librarySearch,
+  attachmentSheetOpen,
+  dealSheetOpen,
+  messagesEndRef,
+  fileInputRef,
+  onBack,
+  onReplyChange,
+  onSubmitReply,
+  onAddFiles,
+  onRemoveDraftAttachment,
+  onRetryDraftAttachment,
+  onOpenAttachment,
+  onJumpToMessage,
+  onFilterFiles,
+  onSearchFiles,
+  onOpenAttachmentSheet,
+  onCloseAttachmentSheet,
+  onOpenDealSheet,
+  onCloseDealSheet,
+  dealPending,
+  dealError,
+  onCreateDeal,
+  onUpdateDeal,
+}: {
+  thread: InquiryThread;
+  reply: string;
+  draftAttachments: DraftAttachment[];
+  composerError: string;
+  hasPendingUploads: boolean;
+  hasComposerContent: boolean;
+  libraryAttachments: MessageAttachment[];
+  libraryFilter: "all" | "image" | "pdf";
+  librarySearch: string;
+  attachmentSheetOpen: boolean;
+  dealSheetOpen: boolean;
+  messagesEndRef: RefObject<HTMLDivElement | null>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  onBack: () => void;
+  onReplyChange: (value: string) => void;
+  onSubmitReply: () => void;
+  onAddFiles: (files: FileList | File[]) => void;
+  onRemoveDraftAttachment: (id: string) => void;
+  onRetryDraftAttachment: (id: string) => void;
+  onOpenAttachment: (attachment: MessageAttachment) => void;
+  onJumpToMessage: (messageId: string | null) => void;
+  onFilterFiles: (value: "all" | "image" | "pdf") => void;
+  onSearchFiles: (value: string) => void;
+  onOpenAttachmentSheet: () => void;
+  onCloseAttachmentSheet: () => void;
+  onOpenDealSheet: () => void;
+  onCloseDealSheet: () => void;
+  dealPending: boolean;
+  dealError: string;
+  onCreateDeal: () => void;
+  onUpdateDeal: (
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) => void;
+}) {
+  const { t } = useI18n();
+  const company = getCounterparty(thread);
+  const companyName = getCompanyDisplayName(company, t);
+  const subtitle = thread.product?.name || getInquiryLabel(thread, t);
+  const status = getMobileThreadStatus(thread);
+
+  return (
+    <section className="fixed inset-0 z-40 flex h-[100dvh] flex-col overflow-hidden bg-white text-zinc-950 md:hidden">
+      <header className="shrink-0 border-b border-zinc-100 bg-white px-3 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label={t("common.back", "Back")}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-700 active:bg-zinc-100"
+          >
+            <ChevronLeft className="size-5" />
+          </button>
+          <CompanyLogo
+            companyName={companyName}
+            logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined}
+            useDefaultLogo={company.useDefaultLogo}
+            size="sm"
+            shape="circle"
+          />
+          <div className="min-w-0 flex-1">
+            <p className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
+              <span className="truncate">{companyName}</span>
+              {company.isTrade82Team ? <AdminBadge compact /> : null}
+            </p>
+            <p className="truncate text-xs text-zinc-500">{subtitle}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenDealSheet}
+            aria-label={t("messages.mobileDealActions")}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-600 active:bg-zinc-100"
+          >
+            <MoreVertical className="size-5" />
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenDealSheet}
+          className="ml-12 mt-2 inline-flex max-w-[calc(100%-3rem)] items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-600"
+        >
+          <span>{getInquiryLabel(thread, t)}</span>
+          <span aria-hidden="true">·</span>
+          <span>{mobileThreadStatusLabel(status, t)}</span>
+        </button>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto bg-zinc-50 px-3 py-3">
+        <MessageTimeline thread={thread} onOpenAttachment={onOpenAttachment} />
+        <div ref={messagesEndRef} aria-hidden="true" />
+      </div>
+
+      <footer className="shrink-0 border-t border-zinc-100 bg-white px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2">
+        <AttachmentDraftList
+          items={draftAttachments}
+          onRemove={onRemoveDraftAttachment}
+          onRetry={onRetryDraftAttachment}
+        />
+        {composerError ? (
+          <p className="mb-2 text-xs font-medium text-red-700">{composerError}</p>
+        ) : null}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept=".pdf,.jpg,.jpeg,.png,.webp"
+          className="hidden"
+          onChange={(event) => {
+            if (event.target.files) onAddFiles(event.target.files);
+            event.target.value = "";
+          }}
+        />
+        <div className="flex items-end gap-2 rounded-[1.4rem] border border-zinc-200 bg-zinc-50 px-2 py-2">
+          <button
+            type="button"
+            onClick={onOpenAttachmentSheet}
+            aria-label={t("messages.mobileAttach")}
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-zinc-600 shadow-sm active:bg-zinc-100"
+          >
+            <Plus className="size-5" />
+          </button>
+          <textarea
+            value={reply}
+            onChange={(event) => onReplyChange(event.target.value)}
+            maxLength={MESSAGE_COMPOSER_MAX_LENGTH}
+            rows={1}
+            placeholder={t("messages.mobileReplyPlaceholder")}
+            className="max-h-28 min-h-9 flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm leading-5 text-zinc-950 outline-none placeholder:text-zinc-400"
+          />
+          <button
+            type="button"
+            onClick={onSubmitReply}
+            disabled={hasPendingUploads || !hasComposerContent}
+            aria-label={t("messages.saveReply")}
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-white disabled:bg-zinc-200 disabled:text-zinc-400"
+          >
+            <Send className="size-4" />
+          </button>
+        </div>
+      </footer>
+
+      {attachmentSheetOpen ? (
+        <MobileAttachmentSheet
+          attachments={libraryAttachments}
+          filter={libraryFilter}
+          search={librarySearch}
+          fileInputRef={fileInputRef}
+          onClose={onCloseAttachmentSheet}
+          onFilter={onFilterFiles}
+          onSearch={onSearchFiles}
+          onOpen={onOpenAttachment}
+          onJump={onJumpToMessage}
+        />
+      ) : null}
+
+      {dealSheetOpen ? (
+        <MobileDealSheet
+          thread={thread}
+          pending={dealPending}
+          error={dealError}
+          onClose={onCloseDealSheet}
+          onCreate={onCreateDeal}
+          onUpdate={onUpdateDeal}
+        />
+      ) : null}
+    </section>
+  );
+}
+
+function MobileAttachmentSheet({
+  attachments,
+  filter,
+  search,
+  fileInputRef,
+  onClose,
+  onFilter,
+  onSearch,
+  onOpen,
+  onJump,
+}: {
+  attachments: MessageAttachment[];
+  filter: "all" | "image" | "pdf";
+  search: string;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  onClose: () => void;
+  onFilter: (value: "all" | "image" | "pdf") => void;
+  onSearch: (value: string) => void;
+  onOpen: (attachment: MessageAttachment) => void;
+  onJump: (messageId: string | null) => void;
+}) {
+  const { t } = useI18n();
+  const fileListRef = useRef<HTMLDivElement>(null);
+  const filters = [
+    ["all", t("messages.allFiles")],
+    ["image", t("messages.images")],
+    ["pdf", t("messages.documents")],
+  ] as const;
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[82dvh] overflow-hidden rounded-t-3xl border border-zinc-200 bg-white shadow-2xl md:hidden">
+      <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200" />
+      <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-3">
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileFilesTitle")}</h3>
+          <p className="text-xs text-zinc-500">{t("messages.mobileFilesSubtitle")}</p>
+        </div>
+        <button type="button" onClick={onClose} className="rounded-full p-2 text-zinc-500 active:bg-zinc-100">
+          <X className="size-5" />
+        </button>
+      </div>
+      <div className="grid gap-3 overflow-y-auto px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-950 px-3 text-sm font-semibold text-white"
+          >
+            <Upload className="size-4" />
+            {t("messages.mobileUploadFile")}
+          </button>
+          <button
+            type="button"
+            onClick={() => fileListRef.current?.scrollIntoView({ block: "start" })}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-700"
+          >
+            <FolderOpen className="size-4" />
+            {t("messages.mobileViewFiles")}
+          </button>
+        </div>
+        <label className="flex items-center gap-2 rounded-xl border border-zinc-200 px-3 py-2 text-sm">
+          <Search className="size-4 text-zinc-400" />
+          <input
+            value={search}
+            onChange={(event) => onSearch(event.target.value)}
+            placeholder={t("messages.searchFiles")}
+            className="min-w-0 flex-1 outline-none"
+          />
+        </label>
+        <div className="flex gap-2 overflow-x-auto">
+          {filters.map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onFilter(value)}
+              className={cx(
+                "shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium",
+                filter === value
+                  ? "border-zinc-950 bg-zinc-950 text-white"
+                  : "border-zinc-200 text-zinc-600",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div ref={fileListRef} className="grid max-h-72 gap-2 overflow-y-auto scroll-mt-3">
+          {attachments.length ? (
+            attachments.map((attachment) => (
+              <article key={attachment.id} className="rounded-xl border border-zinc-200 p-2">
+                <AttachmentCard attachment={attachment} onOpen={() => onOpen(attachment)} compact />
+                <button
+                  type="button"
+                  onClick={() => {
+                    onJump(attachment.messageId);
+                    onClose();
+                  }}
+                  className="mt-2 text-xs font-medium text-blue-700"
+                >
+                  {t("messages.jumpToOriginal")}
+                </button>
+              </article>
+            ))
+          ) : (
+            <p className="rounded-xl border border-dashed border-zinc-200 p-4 text-sm text-zinc-500">
+              {t("messages.noAttachments")}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileDealSheet({
+  thread,
+  pending,
+  error,
+  onClose,
+  onCreate,
+  onUpdate,
+}: {
+  thread: InquiryThread;
+  pending: boolean;
+  error: string;
+  onClose: () => void;
+  onCreate: () => void;
+  onUpdate: (
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) => void;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 overflow-hidden rounded-t-3xl border border-zinc-200 bg-white shadow-2xl md:hidden">
+      <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200" />
+      <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-3">
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileDealActions")}</h3>
+          <p className="text-xs text-zinc-500">{mobileThreadStatusLabel(getMobileThreadStatus(thread), t)}</p>
+        </div>
+        <button type="button" onClick={onClose} className="rounded-full p-2 text-zinc-500 active:bg-zinc-100">
+          <X className="size-5" />
+        </button>
+      </div>
+      <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
+        <DealControls
+          thread={thread}
+          pending={pending}
+          error={error}
+          onCreate={onCreate}
+          onUpdate={onUpdate}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -1540,6 +2153,40 @@ function getActiveDeal(thread: InquiryThread) {
   return (thread.deals ?? []).find((deal) => deal.dealStatus !== "cancelled") ?? null;
 }
 
+function getMobileThreadStatus(thread: InquiryThread): MobileThreadFilter {
+  const rawStatus = thread.status.toLowerCase();
+  const deal = getActiveDeal(thread);
+
+  if (rawStatus.includes("archived")) return "archived";
+  if (deal?.dealStatus === "completed" || rawStatus.includes("closed") || rawStatus.includes("completed")) {
+    return "completed";
+  }
+  if (deal && deal.dealStatus !== "cancelled") return "in_progress";
+  return "waiting";
+}
+
+function mobileThreadStatusLabel(
+  status: MobileThreadFilter,
+  t: (key: string, fallback?: string) => string,
+) {
+  if (status === "in_progress") return t("messages.filterInProgress", "In Progress");
+  if (status === "completed") return t("messages.filterCompleted", "Completed");
+  if (status === "archived") return t("messages.filterArchived", "Archived");
+  if (status === "waiting") return t("messages.filterWaiting", "Waiting");
+  return t("messages.filterAll", "All");
+}
+
+function getLatestThreadPreview(
+  thread: InquiryThread,
+  t: (key: string, fallback?: string) => string,
+) {
+  const latest = thread.messages.at(-1);
+  if (latest?.body.trim()) return latest.body.trim();
+  if (latest?.attachments.length) return t("messages.mobileAttachmentPreview", "Attachment shared");
+  if (thread.message.trim()) return thread.message.trim();
+  return thread.product?.name || getInquiryLabel(thread, t);
+}
+
 function getThreadParticipantKey(thread: InquiryThread) {
   return [thread.buyerCompany.id, thread.sellerCompany.id].sort().join(":");
 }
@@ -1667,6 +2314,21 @@ function formatMessageTime(value: string, locale: "en" | "ko") {
   return new Intl.DateTimeFormat(localeCode(locale), {
     hour: "numeric",
     minute: "2-digit",
+  }).format(date);
+}
+
+function formatThreadListTime(value: string, locale: "en" | "ko") {
+  const date = safeDate(value);
+  if (!date) return "";
+  const now = new Date();
+  const sameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  if (sameDay) return formatMessageTime(value, locale);
+  return new Intl.DateTimeFormat(localeCode(locale), {
+    month: "short",
+    day: "numeric",
   }).format(date);
 }
 

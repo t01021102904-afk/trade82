@@ -13,8 +13,8 @@ export default async function MessagesPage({
   const messages = getDictionary("en");
   return (
     <div className="theme-bg">
-      <div className="flex h-[calc(100dvh-4rem)] min-h-[560px] w-full flex-col gap-2 px-2 py-2 sm:px-3 lg:px-4">
-        <BackButton fallbackHref="/dashboard" />
+      <div className="flex h-[calc(100dvh-4rem)] w-full flex-col gap-2 px-2 py-2 sm:px-3 md:min-h-[560px] lg:px-4">
+        <BackButton fallbackHref="/dashboard" className="hidden md:inline-flex" />
         <h1 className="sr-only">{messages.messages.label}</h1>
         <MessagesClient initialInquiryId={inquiryId ?? null} />
       </div>
