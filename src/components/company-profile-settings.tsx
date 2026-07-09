@@ -248,6 +248,93 @@ async function readJsonError(response: Response, fallback: string) {
   return result?.error ?? fallback;
 }
 
+const avatarAcceptedExtensions = new Set(["jpg", "jpeg", "png", "webp", "avif"]);
+const avatarAcceptedTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+const avatarMaxBytes = 25 * 1024 * 1024;
+
+function fileExtension(file: File) {
+  return file.name.split(".").pop()?.toLowerCase() ?? "";
+}
+
+function avatarValidationError(file: File, locale: "en" | "ko") {
+  if (file.size <= 0) {
+    return locale === "ko"
+      ? "빈 파일은 업로드할 수 없습니다."
+      : "Empty files cannot be uploaded.";
+  }
+  if (
+    !avatarAcceptedTypes.has(file.type.toLowerCase()) ||
+    !avatarAcceptedExtensions.has(fileExtension(file))
+  ) {
+    return locale === "ko"
+      ? "JPG, PNG, WebP 또는 AVIF 이미지만 업로드할 수 있습니다."
+      : "Only JPG, PNG, WebP, or AVIF images can be uploaded.";
+  }
+  if (file.size > avatarMaxBytes) {
+    return locale === "ko"
+      ? "프로필 사진은 최대 25MB까지 업로드할 수 있습니다."
+      : "Profile photos can be up to 25MB.";
+  }
+  return "";
+}
+
+function avatarUploadError(locale: "en" | "ko") {
+  return locale === "ko"
+    ? "프로필 사진 업로드에 실패했습니다. 다시 시도해 주세요."
+    : "Profile photo upload failed. Please try again.";
+}
+
+async function uploadAvatarFile(file: File, locale: "en" | "ko") {
+  const formData = new FormData();
+  formData.set("uploadType", "profile_avatar");
+  formData.set("file", file);
+
+  try {
+    const response = await fetch("/api/uploads", {
+      method: "POST",
+      headers: { "x-trade82-locale": locale },
+      body: formData,
+    });
+    const result = (await response.json().catch(() => null)) as
+      | (Partial<UploadedListingImage> & { error?: string })
+      | null;
+
+    if (
+      response.ok &&
+      result?.originalUrl &&
+      result.cardUrl &&
+      result.mainUrl &&
+      result.detailUrl &&
+      result.storagePath
+    ) {
+      return {
+        ok: true as const,
+        image: {
+          originalUrl: result.originalUrl,
+          cardUrl: result.cardUrl,
+          mainUrl: result.mainUrl,
+          detailUrl: result.detailUrl,
+          storagePath: result.storagePath,
+          width: result.width ?? null,
+          height: result.height ?? null,
+        },
+      };
+    }
+
+    return {
+      ok: false as const,
+      error: result?.error ?? avatarUploadError(locale),
+    };
+  } catch {
+    return { ok: false as const, error: avatarUploadError(locale) };
+  }
+}
+
 export function CompanyProfileSettings() {
   const { isLoaded, user } = useUser();
   const { locale, t } = useI18n();
@@ -400,6 +487,7 @@ function CompanyProfileForm({
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CompanyFormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
+  const buyerAvatarInputRef = useRef<HTMLInputElement>(null);
   const saveQueuedAfterUploadRef = useRef(false);
   const leaveMessage = t("settings.unsavedChangesWarning");
   useUnsavedChangesWarning(dirty && !isSaving && !isUploading, leaveMessage);
@@ -567,6 +655,8 @@ function CompanyProfileForm({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             displayName: accountProfile.displayName,
+            avatarOriginalUrl: accountProfile.avatarOriginalUrl,
+            avatarUrl: accountProfile.avatarUrl,
             phoneNumber: accountProfile.phoneNumber,
             country: company.country || accountProfile.country || "",
             city: company.city,
@@ -695,6 +785,62 @@ function CompanyProfileForm({
     markDirty();
   }
 
+  function updateBuyerAvatar(image: UploadedListingImage) {
+    setAccountProfile((current) => {
+      const nextProfile = {
+        ...current,
+        avatarOriginalUrl: image.originalUrl,
+        avatarUrl: image.mainUrl || image.cardUrl || image.originalUrl,
+      };
+      rememberCompanyFormSnapshot(formSnapshotKey, {
+        company,
+        seller,
+        buyer,
+        accountProfile: nextProfile,
+      });
+      return nextProfile;
+    });
+    markDirty();
+  }
+
+  function removeBuyerAvatar() {
+    setAccountProfile((current) => {
+      const nextProfile = {
+        ...current,
+        avatarOriginalUrl: "",
+        avatarUrl: "",
+      };
+      rememberCompanyFormSnapshot(formSnapshotKey, {
+        company,
+        seller,
+        buyer,
+        accountProfile: nextProfile,
+      });
+      return nextProfile;
+    });
+    markDirty();
+  }
+
+  async function handleBuyerAvatarFile(file: File) {
+    const validationError = avatarValidationError(file, locale);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError("");
+    handleUploadingChange(true);
+    const result = await uploadAvatarFile(file, locale);
+    if (result.ok) {
+      updateBuyerAvatar(result.image);
+    } else {
+      saveQueuedAfterUploadRef.current = false;
+      setSaveQueuedAfterUpload(false);
+      setError(result.error);
+    }
+    handleUploadingChange(false);
+  }
+
   function handleUploadingChange(uploading: boolean) {
     setIsUploading(uploading);
     if (uploading || !saveQueuedAfterUploadRef.current) return;
@@ -720,6 +866,7 @@ function CompanyProfileForm({
     (isPersonalBuyerCompanyName(company.legalName)
       ? ""
       : company.legalName.trim());
+  const buyerAvatarUrl = accountProfile.avatarUrl || accountProfile.avatarOriginalUrl;
   const countryOptions = getCountryOptions(locale);
 
   return (
@@ -841,9 +988,21 @@ function CompanyProfileForm({
           <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5">
             <div className="flex flex-wrap items-center gap-4">
               <ProfileAvatar
-                imageUrl={accountProfile.avatarUrl || accountProfile.avatarOriginalUrl}
+                imageUrl={buyerAvatarUrl}
                 name={buyerDisplayName}
                 email={accountProfile.email}
+              />
+              <input
+                ref={buyerAvatarInputRef}
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif"
+                className="sr-only"
+                disabled={isUploading || isSaving}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) void handleBuyerAvatarFile(file);
+                  event.target.value = "";
+                }}
               />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
@@ -855,6 +1014,30 @@ function CompanyProfileForm({
                 <p className="truncate text-sm text-zinc-500">
                   {accountProfile.email}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => buyerAvatarInputRef.current?.click()}
+                    disabled={isUploading || isSaving}
+                    className="inline-flex h-8 items-center rounded-md border border-zinc-200 bg-white px-3 text-xs font-medium text-zinc-700 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isUploading
+                      ? t("settings.uploadingPhoto")
+                      : buyerAvatarUrl
+                        ? t("settings.changePhoto")
+                        : t("settings.uploadPhoto")}
+                  </button>
+                  {buyerAvatarUrl ? (
+                    <button
+                      type="button"
+                      onClick={removeBuyerAvatar}
+                      disabled={isUploading || isSaving}
+                      className="inline-flex h-8 items-center rounded-md border border-red-200 bg-white px-3 text-xs font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {t("settings.removePhoto")}
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -958,8 +1141,12 @@ function CompanyProfileForm({
       {isUploading ? (
         <p className="text-sm text-amber-700" aria-live="polite">
           {saveQueuedAfterUpload
-            ? t("settings.logoUploadSaveQueued")
-            : t("settings.logoUploadInProgress")}
+            ? role === "buyer"
+              ? t("settings.profilePhotoUploadSaveQueued")
+              : t("settings.logoUploadSaveQueued")
+            : role === "buyer"
+              ? t("settings.profilePhotoUploadInProgress")
+              : t("settings.logoUploadInProgress")}
         </p>
       ) : null}
     </form>
@@ -1034,7 +1221,7 @@ function ProfileAvatar({
   name: string;
   email: string;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedUrl, setFailedUrl] = useState("");
   const initials =
     name
       .split(/\s+/)
@@ -1045,14 +1232,14 @@ function ProfileAvatar({
     email.slice(0, 2).toUpperCase() ||
     "B";
 
-  if (imageUrl && !failed) {
+  if (imageUrl && failedUrl !== imageUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageUrl}
         alt=""
         className="size-14 rounded-full border border-zinc-200 object-cover"
-        onError={() => setFailed(true)}
+        onError={() => setFailedUrl(imageUrl)}
       />
     );
   }
