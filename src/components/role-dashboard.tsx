@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ClipboardList,
   FileText,
   LayoutDashboard,
   LifeBuoy,
@@ -287,6 +288,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     ? activeSection
     : "overview";
   const settingsSelected = stripLocale(pathname) === "/dashboard/settings";
+  const rfqsSelected = stripLocale(pathname).startsWith("/dashboard/rfqs");
   return (
     <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
       <aside className="h-fit min-w-0 rounded-2xl border p-2 theme-surface-elevated">
@@ -333,6 +335,16 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               <span className="truncate">{t("dashboard.dashboardNavSettings")}</span>
             </Link>
           ) : null}
+          {role === "buyer" ? (
+            <Link
+              href={withLocale("/dashboard/rfqs", locale)}
+              className={dashboardNavItemClass(rfqsSelected)}
+              aria-current={rfqsSelected ? "page" : undefined}
+            >
+              <ClipboardList className="size-4 shrink-0" aria-hidden="true" />
+              <span className="truncate">{t("dashboard.dashboardNavRfqs")}</span>
+            </Link>
+          ) : null}
         </nav>
       </aside>
 
@@ -375,6 +387,13 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
+              {role === "buyer" ? (
+                <Action
+                  href="/dashboard/rfqs/new"
+                  label={t("rfq.createRfq")}
+                  locale={locale}
+                />
+              ) : null}
               <Action
                 href="/settings/company"
                 label={t("dashboard.editProfile")}

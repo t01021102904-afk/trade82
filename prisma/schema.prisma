@@ -100,6 +100,23 @@ enum PublicValueDisplay {
   range
 }
 
+enum RfqStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  MATCHING_READY
+  CLOSED
+  CANCELLED
+}
+
+enum RfqAdminStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
 model UserProfile {
   id                         String                @id @default(cuid())
   clerkUserId                String                @unique
@@ -128,6 +145,8 @@ model UserProfile {
   uploadedTradeDocuments     TradeDocument[]       @relation("UploadedTradeDocuments")
   savedItems                 SavedItem[]
   createdDeals               Deal[]                @relation("DealCreator")
+  buyerRfqRequests           RfqRequest[]          @relation("BuyerRfqRequests")
+  reviewedRfqRequests        RfqRequest[]          @relation("ReviewedRfqRequests")
   createdAt                  DateTime              @default(now())
   updatedAt                  DateTime              @updatedAt
 }
@@ -181,6 +200,7 @@ model Company {
   savedItems                   SavedItem[]
   buyerDeals                   Deal[]                    @relation("BuyerCompanyDeals")
   sellerDeals                  Deal[]                    @relation("SellerCompanyDeals")
+  buyerRfqRequests             RfqRequest[]              @relation("BuyerCompanyRfqs")
   reviewsWritten               Review[]                  @relation("ReviewWriter")
   reviewsReceived              Review[]                  @relation("ReviewRecipient")
   companyReviewsWritten        CompanyReview[]           @relation("CompanyReviewWriter")
@@ -360,6 +380,43 @@ model Inquiry {
 
   @@index([buyerCompanyId, sellerCompanyId])
   @@index([recipientCompanyId, status])
+}
+
+model RfqRequest {
+  id                             String         @id @default(cuid())
+  buyerUserId                    String
+  buyerUser                      UserProfile    @relation("BuyerRfqRequests", fields: [buyerUserId], references: [id], onDelete: Cascade)
+  buyerCompanyId                 String?
+  buyerCompany                   Company?       @relation("BuyerCompanyRfqs", fields: [buyerCompanyId], references: [id], onDelete: SetNull)
+  productName                    String
+  category                       String
+  sourcingType                   String
+  sourcingPurpose                String?
+  quantity                       String
+  tradeTerms                     String
+  destinationCountry             String?
+  preferredUnitPriceAmount       Decimal?       @db.Decimal(14, 2)
+  preferredUnitPriceCurrency     String?
+  shape                          String?
+  capacity                       String?
+  material                       String?
+  certification                  String?
+  feature                        String?
+  targetDeliveryDate             DateTime?
+  details                        String
+  status                         RfqStatus      @default(SUBMITTED)
+  adminStatus                    RfqAdminStatus @default(PENDING_REVIEW)
+  adminNote                      String?
+  reviewedByUserId               String?
+  reviewedByUser                 UserProfile?   @relation("ReviewedRfqRequests", fields: [reviewedByUserId], references: [id])
+  reviewedAt                     DateTime?
+  createdAt                      DateTime       @default(now())
+  updatedAt                      DateTime       @updatedAt
+
+  @@index([buyerUserId, createdAt])
+  @@index([buyerCompanyId, createdAt])
+  @@index([status, createdAt])
+  @@index([adminStatus, createdAt])
 }
 
 model SavedItem {
