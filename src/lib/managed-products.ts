@@ -50,7 +50,7 @@ export function managedProductToPublic(
     koreanMarketFit: product.ingredientsOrMaterials,
     suggestedSalesChannels: [],
     riskNotes: [
-      "U.S. buyers should independently verify import and product compliance requirements.",
+      "Buyers should independently verify import and product compliance requirements for their market.",
     ],
     imagePlaceholder: product.imageUrl || defaultProductImage,
     verificationStatus: "verified",

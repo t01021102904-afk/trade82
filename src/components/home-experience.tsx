@@ -101,9 +101,9 @@ const homeCopy: Record<Locale, HomeCopy> = {
   en: {
     hero: {
       eyebrow: "Trade82",
-      headline: "Korean Sellers. U.S. Buyers. One B2B Workspace.",
+      headline: "Korean Sellers. Global Buyers. One B2B Workspace.",
       subheadline:
-        "Trade82 helps Korean suppliers and American buyers connect, manage product sourcing, share trade documents, and move inquiries into real business.",
+        "Trade82 helps Korean suppliers and global buyers connect, manage product sourcing, share trade documents, and move inquiries into real business.",
       sellerCta: "Join as seller",
       buyerCta: "Join as buyer",
       builtWith: "Built with",
@@ -116,7 +116,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       items: [
         {
           title: "Browse Korean products",
-          description: "Discover product listings prepared for U.S. sourcing conversations.",
+          description: "Discover product listings prepared for international sourcing conversations.",
           icon: PackageSearch,
         },
         {
@@ -175,10 +175,10 @@ const homeCopy: Record<Locale, HomeCopy> = {
       fallbackText: "Add /public/Trade82/message.mp4 to show the auto-playing inquiry demo here.",
     },
     buyers: {
-      eyebrow: "For U.S. buyers",
+      eyebrow: "For global buyers",
       title: "Why Trade82 works for buyers",
       description:
-        "Trade82 helps U.S. buyers discover Korean suppliers faster and evaluate products with more confidence. Instead of sourcing through scattered emails and spreadsheets, buyers can compare products, review seller profiles, and manage conversations in one place.",
+        "Trade82 helps global buyers discover Korean suppliers faster and evaluate products with more confidence. Instead of sourcing through scattered emails and spreadsheets, buyers can compare products, review seller profiles, and manage conversations in one place.",
       bullets: [
         "Discover Korean products and suppliers faster",
         "Compare sellers before starting a conversation",
@@ -197,7 +197,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       description:
         "Trade82 gives Korean sellers a cleaner way to present products, respond to buyer inquiries, and support export conversations with the right information and documents.",
       bullets: [
-        "Get discovered by U.S. buyers",
+        "Get discovered by global buyers",
         "Present your company and products professionally",
         "Share export documents more efficiently",
         "Manage buyer inquiries in one place",
@@ -217,7 +217,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
         {
           question: "What is Trade82?",
           answer:
-            "Trade82 is a B2B platform that helps Korean sellers and U.S. buyers connect, share product information, manage trade documents, and start sourcing conversations more efficiently.",
+            "Trade82 is a B2B platform that helps Korean sellers and global buyers connect, share product information, manage trade documents, and start sourcing conversations more efficiently.",
         },
         {
           question: "Can buyers contact sellers directly?",
@@ -241,7 +241,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
         {
           question: "Who is Trade82 for?",
           answer:
-            "Trade82 is designed for Korean sellers who want to reach U.S. buyers and for U.S. buyers looking for Korean products and suppliers.",
+            "Trade82 is designed for Korean sellers who want to reach buyers worldwide and for global buyers looking for Korean products and suppliers.",
         },
       ],
     },
@@ -249,9 +249,9 @@ const homeCopy: Record<Locale, HomeCopy> = {
       eyebrow: "Start with Trade82",
       title: "Start sourcing or selling with Trade82",
       text:
-        "Whether you are a Korean seller looking for U.S. buyers or a buyer searching for Korean products, Trade82 gives you one place to start.",
+        "Whether you are a Korean seller looking for global buyers or a buyer searching for Korean products, Trade82 gives you one place to start.",
       sellerTitle: "For sellers",
-      sellerText: "List your company and products for U.S. buyer discovery.",
+      sellerText: "List your company and products for global buyer discovery.",
       buyerTitle: "For buyers",
       buyerText: "Discover Korean suppliers and start organized product inquiries.",
       sellerCta: "Join as seller",
@@ -262,9 +262,9 @@ const homeCopy: Record<Locale, HomeCopy> = {
   ko: {
     hero: {
       eyebrow: "Trade82",
-      headline: "한국 셀러와 미국 바이어를 연결하는 B2B 워크스페이스.",
+      headline: "한국 셀러와 글로벌 바이어를 연결하는 B2B 워크스페이스.",
       subheadline:
-        "Trade82는 한국 공급사와 미국 바이어가 만나고, 상품 소싱을 관리하고, 무역 서류를 공유하고, 문의를 실제 비즈니스 대화로 이어가도록 돕습니다.",
+        "Trade82는 한국 공급사와 전 세계 바이어가 만나고, 상품 소싱을 관리하고, 무역 서류를 공유하고, 문의를 실제 비즈니스 대화로 이어가도록 돕습니다.",
       sellerCta: "셀러로 시작하기",
       buyerCta: "바이어로 시작하기",
       builtWith: "Built with",
@@ -277,7 +277,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       items: [
         {
           title: "한국 상품 둘러보기",
-          description: "미국 소싱 대화에 맞게 정리된 상품 리스트를 확인합니다.",
+          description: "글로벌 소싱 대화에 맞게 정리된 상품 리스트를 확인합니다.",
           icon: PackageSearch,
         },
         {
@@ -336,10 +336,10 @@ const homeCopy: Record<Locale, HomeCopy> = {
       fallbackText: "/public/Trade82/message.mp4 파일을 추가하면 문의 데모 영상이 자동 재생됩니다.",
     },
     buyers: {
-      eyebrow: "미국 바이어를 위해",
+      eyebrow: "글로벌 바이어를 위해",
       title: "바이어가 Trade82를 쓰는 이유",
       description:
-        "Trade82는 미국 바이어가 한국 공급사를 더 빠르게 발견하고 더 자신 있게 상품을 검토할 수 있게 합니다. 흩어진 이메일과 스프레드시트 대신 상품 비교, 셀러 프로필 검토, 대화 관리를 한곳에서 진행합니다.",
+        "Trade82는 전 세계 바이어가 한국 공급사를 더 빠르게 발견하고 더 자신 있게 상품을 검토할 수 있게 합니다. 흩어진 이메일과 스프레드시트 대신 상품 비교, 셀러 프로필 검토, 대화 관리를 한곳에서 진행합니다.",
       bullets: [
         "한국 상품과 공급사를 더 빠르게 발견",
         "대화 시작 전 셀러 비교",
@@ -358,7 +358,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       description:
         "Trade82는 한국 셀러가 상품을 더 깔끔하게 보여주고, 바이어 문의에 답하고, 필요한 정보와 문서로 수출 대화를 지원할 수 있게 합니다.",
       bullets: [
-        "미국 바이어에게 발견될 기회 확대",
+        "글로벌 바이어에게 발견될 기회 확대",
         "회사와 상품을 전문적으로 제시",
         "수출 문서를 더 효율적으로 공유",
         "바이어 문의를 한곳에서 관리",
@@ -377,7 +377,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
         {
           question: "Trade82는 무엇인가요?",
           answer:
-            "Trade82는 한국 셀러와 미국 바이어가 연결되고, 상품 정보를 공유하고, 무역 서류를 관리하고, 소싱 대화를 더 효율적으로 시작하도록 돕는 B2B 플랫폼입니다.",
+            "Trade82는 한국 셀러와 글로벌 바이어가 연결되고, 상품 정보를 공유하고, 무역 서류를 관리하고, 소싱 대화를 더 효율적으로 시작하도록 돕는 B2B 플랫폼입니다.",
         },
         {
           question: "바이어가 셀러에게 직접 연락할 수 있나요?",
@@ -401,7 +401,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
         {
           question: "Trade82는 누구를 위한 서비스인가요?",
           answer:
-            "Trade82는 미국 바이어에게 도달하고 싶은 한국 셀러와 한국 상품 및 공급사를 찾는 미국 바이어를 위해 설계되었습니다.",
+            "Trade82는 전 세계 바이어에게 도달하고 싶은 한국 셀러와 한국 상품 및 공급사를 찾는 글로벌 바이어를 위해 설계되었습니다.",
         },
       ],
     },
@@ -409,9 +409,9 @@ const homeCopy: Record<Locale, HomeCopy> = {
       eyebrow: "Trade82 시작하기",
       title: "Trade82에서 소싱하거나 판매를 시작하세요",
       text:
-        "미국 바이어를 찾는 한국 셀러든, 한국 상품을 찾는 바이어든 Trade82는 시작할 수 있는 하나의 워크스페이스를 제공합니다.",
+        "글로벌 바이어를 찾는 한국 셀러든, 한국 상품을 찾는 바이어든 Trade82는 시작할 수 있는 하나의 워크스페이스를 제공합니다.",
       sellerTitle: "셀러용",
-      sellerText: "회사와 상품을 등록해 미국 바이어에게 발견될 수 있게 하세요.",
+      sellerText: "회사와 상품을 등록해 글로벌 바이어에게 발견될 수 있게 하세요.",
       buyerTitle: "바이어용",
       buyerText: "한국 공급사와 상품을 찾고 체계적인 문의를 시작하세요.",
       sellerCta: "셀러로 시작하기",

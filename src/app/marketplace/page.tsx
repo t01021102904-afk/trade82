@@ -7,7 +7,7 @@ import { publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
   title: "Marketplace | Trade82",
-  description: "Discover Korean products from verified sellers for U.S. B2B sourcing.",
+  description: "Discover Korean products from verified sellers for global B2B sourcing.",
   path: "/marketplace",
   languages: {
     en: "/marketplace",

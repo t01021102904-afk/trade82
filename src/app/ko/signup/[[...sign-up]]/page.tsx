@@ -6,7 +6,7 @@ import { publicPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = publicPageMetadata({
   title: "Sign up | Trade82",
   description:
-    "Create a Trade82 account to connect Korean sellers with U.S. buyers.",
+    "Create a Trade82 account to connect Korean sellers with buyers worldwide.",
   path: "/ko/signup",
   languages: {
     en: "/signup",

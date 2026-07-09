@@ -32,6 +32,7 @@ import {
 import {
   getBuyerCategoryOptions,
   getBuyerTypeOptions,
+  getCountryOptions,
   getImportExperienceOptions,
   getImportVolumeOptions,
   getKoreanRegionOptions,
@@ -117,7 +118,7 @@ function initialCompany(kind: "buyer" | "seller"): CompanyStep {
   return {
     companyName: "",
     website: "",
-    country: kind === "seller" ? SOUTH_KOREA : UNITED_STATES,
+    country: kind === "seller" ? SOUTH_KOREA : "",
     city: "",
     stateOrProvince: "",
     companyType: kind === "seller" ? "manufacturer" : "importer",
@@ -294,7 +295,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
           logoUrl: nextCompany.logoUrl,
           useDefaultLogo: false,
           website: nextCompany.website,
-          country: kind === "seller" ? SOUTH_KOREA : UNITED_STATES,
+          country: kind === "seller" ? SOUTH_KOREA : nextCompany.country,
           city: nextCompany.city,
           stateOrProvince: nextCompany.stateOrProvince,
           description: nextCompany.description,
@@ -413,12 +414,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
       setError(t("onboarding.companyNameRequired"));
       return;
     }
-    const expectedCountry = kind === "seller" ? SOUTH_KOREA : UNITED_STATES;
-    if (!expectedCountry || !company.city.trim()) {
-      setError(t("onboarding.locationRequired"));
-      return;
-    }
-    if (kind === "buyer" && !company.stateOrProvince.trim()) {
+    if (kind === "seller" && !company.city.trim()) {
       setError(t("onboarding.locationRequired"));
       return;
     }
@@ -508,10 +504,10 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
           department: personal.department,
           phoneNumber: personal.phoneNumber,
           linkedinUrl: personal.linkedinUrl,
-          country: kind === "seller" ? SOUTH_KOREA : UNITED_STATES,
-      city: company.city,
-      stateOrProvince: company.stateOrProvince,
-      preferredLanguage: locale,
+          country: kind === "seller" ? SOUTH_KOREA : company.country,
+          city: company.city,
+          stateOrProvince: company.stateOrProvince,
+          preferredLanguage: locale,
         }),
       });
       if (!response.ok) {
@@ -649,7 +645,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
           email: personal.email,
           companyAffiliation: company.companyName,
           phoneNumber: personal.phoneNumber,
-          country: UNITED_STATES,
+          country: company.country,
           city: "",
           preferredLanguage: locale,
         }),
@@ -671,7 +667,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
           logoUrl: company.logoUrl,
           useDefaultLogo: !company.logoUrl,
           website: "",
-          country: UNITED_STATES,
+          country: company.country,
           city: "",
           stateOrProvince: "",
           businessAddress: "",
@@ -729,7 +725,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
       logoUrl: company.logoUrl,
       useDefaultLogo: !company.logoUrl,
       website: company.website,
-      country: kind === "seller" ? SOUTH_KOREA : UNITED_STATES,
+      country: kind === "seller" ? SOUTH_KOREA : company.country,
       city: company.city,
       stateOrProvince: kind === "buyer" ? company.stateOrProvince : "",
       businessAddress: "",
@@ -741,7 +737,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
               koreanBusinessRegistrationNumber: "",
               representativeName: personal.displayName,
               exportExperience: company.description,
-              exportCountries: ["United States"],
+              exportCountries: [],
               productCategories: categories,
               minimumOrderQuantity: productPayloadFromForm(product).moq,
               leadTime: product.leadTime,
@@ -971,6 +967,7 @@ function BuyerQuickSignupForm({
   const selectedCategories = list(sourcing.interestedCategories);
   const categoryOptions = getBuyerCategoryOptions(locale);
   const buyerTypeOptions = getBuyerTypeOptions(locale);
+  const countryOptions = getCountryOptions(locale);
 
   function toggleCategory(value: string) {
     const next = new Set(selectedCategories);
@@ -1066,6 +1063,13 @@ function BuyerQuickSignupForm({
               <span className="text-xs text-red-300">{errors.companyType}</span>
             ) : null}
           </label>
+          <SelectField
+            label={t("settings.country")}
+            value={company.country}
+            onChange={(value) => onCompanyChange("country", value)}
+            options={countryOptions}
+            placeholder={t("onboarding.select")}
+          />
         </div>
       </BuyerFormSection>
 
@@ -1276,7 +1280,8 @@ function CompanyStepForm({
     kind === "seller"
       ? getSellerCompanyTypeOptions(locale)
       : getBuyerTypeOptions(locale);
-  const countryValue = kind === "seller" ? SOUTH_KOREA : UNITED_STATES;
+  const countryOptions = getCountryOptions(locale);
+  const countryValue = kind === "seller" ? SOUTH_KOREA : company.country;
   const companyLogoImageUrls = useMemo(
     () =>
       [
@@ -1327,10 +1332,15 @@ function CompanyStepForm({
         <SelectField
           label={t("settings.country")}
           value={countryValue}
-          onChange={() => onChange("country", countryValue)}
-          options={[{ value: countryValue, label: countryValue }]}
-          required
-          disabled
+          onChange={(value) => onChange("country", value)}
+          options={
+            kind === "seller"
+              ? [{ value: SOUTH_KOREA, label: SOUTH_KOREA }]
+              : countryOptions
+          }
+          placeholder={kind === "buyer" ? t("onboarding.select") : undefined}
+          required={kind === "seller"}
+          disabled={kind === "seller"}
         />
         {kind === "buyer" ? (
           <>
@@ -1338,16 +1348,22 @@ function CompanyStepForm({
               label={t("settings.city")}
               value={company.city}
               onChange={(value) => onChange("city", value)}
-              required
             />
-            <SelectField
-              label={t("settings.state")}
-              value={company.stateOrProvince}
-              onChange={(value) => onChange("stateOrProvince", value)}
-              options={getUsStateOptions(locale)}
-              placeholder={t("settings.selectState")}
-              required
-            />
+            {countryValue === UNITED_STATES ? (
+              <SelectField
+                label={t("settings.state")}
+                value={company.stateOrProvince}
+                onChange={(value) => onChange("stateOrProvince", value)}
+                options={getUsStateOptions(locale)}
+                placeholder={t("settings.selectState")}
+              />
+            ) : (
+              <Field
+                label={t("settings.stateProvince")}
+                value={company.stateOrProvince}
+                onChange={(value) => onChange("stateOrProvince", value)}
+              />
+            )}
           </>
         ) : (
           <SelectField

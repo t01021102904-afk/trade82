@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Trade82",
     short_name: "Trade82",
     description:
-      "Trade82 connects Korean sellers with trusted American buyers and trade-ready product information.",
+      "Trade82 connects Korean sellers with trusted global buyers and trade-ready product information.",
     start_url: "/",
     display: "standalone",
     background_color: "#f8faf9",

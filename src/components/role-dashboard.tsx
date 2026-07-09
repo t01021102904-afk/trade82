@@ -26,7 +26,10 @@ import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
 import { isVerifiedSellerSubscription } from "@/lib/billing";
-import { getBuyerTypeOptions } from "@/lib/company-select-options";
+import {
+  getBuyerTypeOptions,
+  getCountryOptions,
+} from "@/lib/company-select-options";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import { isActiveSellerSupportSubscription } from "@/lib/seller-support";
 import type { VerificationStatus } from "@/lib/types";
@@ -152,12 +155,21 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     fallbackName: user?.fullName,
     email: buyerEmail,
     company,
-    fallbackLabel: t("dashboard.americanBuyer"),
+    fallbackLabel: t("dashboard.globalBuyer"),
   });
   const buyerType = getStringField(roleProfile, "buyerType");
   const buyerTypeLabel =
     getBuyerTypeOptions(locale).find((option) => option.value === buyerType)
-      ?.label || t("dashboard.americanBuyer");
+      ?.label || "";
+  const buyerCountryLabel = getBuyerCountryLabel({
+    country: company.country,
+    locale,
+    fallback: t("dashboard.globalBuyer"),
+    suffix: t("dashboard.buyerLabelSuffix"),
+  });
+  const buyerDescriptor = buyerTypeLabel
+    ? `${buyerCountryLabel} · ${buyerTypeLabel}`
+    : buyerCountryLabel;
   const values =
     role === "seller"
       ? [
@@ -370,7 +382,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                 <p className="mt-1 text-sm theme-muted">
                   {role === "seller"
                     ? t("onboarding.roleSellerTitle")
-                    : buyerTypeLabel}
+                    : buyerDescriptor}
                 </p>
                 {role === "seller" ? (
                   <div className="mt-2">
@@ -513,6 +525,25 @@ function getBuyerDashboardDisplayName({
   return isPersonalBuyerCompanyName(companyName)
     ? fallbackLabel
     : companyName;
+}
+
+function getBuyerCountryLabel({
+  country,
+  locale,
+  fallback,
+  suffix,
+}: {
+  country: string | null | undefined;
+  locale: "en" | "ko";
+  fallback: string;
+  suffix: string;
+}) {
+  const countryValue = String(country ?? "").trim();
+  if (!countryValue) return fallback;
+  const countryLabel =
+    getCountryOptions(locale).find((option) => option.value === countryValue)
+      ?.label || countryValue;
+  return `${countryLabel} ${suffix}`;
 }
 
 function getStringField(

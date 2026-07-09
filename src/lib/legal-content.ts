@@ -35,7 +35,7 @@ export const legalDocuments: Record<Locale, Record<LegalDocumentKey, LegalDocume
         {
           title: "1. Service overview",
           paragraphs: [
-            "Trade82 provides a B2B marketplace platform that helps Korean sellers and American buyers discover company profiles, product information, inquiries, messages, and transaction-related communications.",
+            "Trade82 provides a B2B marketplace platform that helps Korean sellers and global buyers discover company profiles, product information, inquiries, messages, and transaction-related communications.",
             "Trade82 is not a party to transactions between sellers and buyers. The parties are responsible for deciding whether to proceed with any inquiry, negotiation, contract, payment, shipment, import, export, or after-sales matter.",
           ],
         },
@@ -227,7 +227,7 @@ export const legalDocuments: Record<Locale, Record<LegalDocumentKey, LegalDocume
         {
           title: "Trade82 service information",
           paragraphs: [
-            "Trade82 is a B2B marketplace platform that connects Korean sellers with American buyers. Trade82 provides company information, product information, inquiries, messaging, and transaction communication features within the platform, but Trade82 is not a party to transactions between individual sellers and buyers.",
+            "Trade82 is a B2B marketplace platform that connects Korean sellers with global buyers. Trade82 provides company information, product information, inquiries, messaging, and transaction communication features within the platform, but Trade82 is not a party to transactions between individual sellers and buyers.",
             "Each seller and buyer is responsible for product information, pricing, lead times, export/import requirements, submitted documents, payment terms, shipping terms, and transaction outcomes. Users should conduct their own due diligence, contract review, legal review, and payment-safety checks before entering into any transaction.",
             "Unless separately stated, Trade82 does not provide payment protection, escrow services, import approval, customs clearance, product compliance review, or any guarantee that a transaction will be completed.",
           ],
@@ -251,7 +251,7 @@ export const legalDocuments: Record<Locale, Record<LegalDocumentKey, LegalDocume
         {
           title: "1. 서비스 개요",
           paragraphs: [
-            "Trade82는 한국 셀러와 미국 바이어가 회사 프로필, 상품 정보, 문의, 메시지, 거래 관련 커뮤니케이션을 확인하고 관리할 수 있도록 돕는 B2B 마켓플레이스 플랫폼입니다.",
+            "Trade82는 한국 셀러와 글로벌 바이어가 회사 프로필, 상품 정보, 문의, 메시지, 거래 관련 커뮤니케이션을 확인하고 관리할 수 있도록 돕는 B2B 마켓플레이스 플랫폼입니다.",
             "Trade82는 셀러와 바이어 간 개별 거래의 당사자가 아닙니다. 문의, 협의, 계약, 결제, 배송, 수출입, 사후 대응 여부와 조건은 각 거래 당사자가 직접 판단하고 책임집니다.",
           ],
         },
@@ -440,7 +440,7 @@ export const legalDocuments: Record<Locale, Record<LegalDocumentKey, LegalDocume
         {
           title: "Trade82 서비스 안내",
           paragraphs: [
-            "Trade82는 한국 셀러와 미국 바이어를 연결하는 B2B 마켓플레이스 플랫폼입니다. Trade82는 플랫폼 내 회사 정보, 상품 정보, 문의 및 거래 커뮤니케이션 기능을 제공하지만, 개별 셀러와 바이어 간 거래의 당사자가 아닙니다.",
+            "Trade82는 한국 셀러와 글로벌 바이어를 연결하는 B2B 마켓플레이스 플랫폼입니다. Trade82는 플랫폼 내 회사 정보, 상품 정보, 문의 및 거래 커뮤니케이션 기능을 제공하지만, 개별 셀러와 바이어 간 거래의 당사자가 아닙니다.",
             "상품 정보, 가격, 납기, 수출입 요건, 제출 서류, 결제 조건, 배송 조건 및 거래 결과에 대한 책임은 각 거래 당사자에게 있습니다. 사용자는 거래 전 필요한 실사, 계약 검토, 법규 확인, 결제 안전성 확인을 직접 진행해야 합니다.",
             "Trade82는 별도로 명시하지 않는 한 결제 보호, 에스크로 서비스, 수입 허가, 통관, 제품 관련 법규 검토 또는 거래 성사를 제공하거나 보증하지 않습니다.",
           ],

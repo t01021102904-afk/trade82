@@ -449,7 +449,7 @@ function BuyerDiscoveryDashboard({
     ? profile.categories
     : summary.suggestedCategories ?? [];
   const keywords = profile?.keywords ?? [];
-  const buyerName = cleanBuyerDisplayName(profile?.displayName) || t("dashboard.americanBuyer");
+  const buyerName = cleanBuyerDisplayName(profile?.displayName) || t("dashboard.globalBuyer");
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
     return recommendedProducts.filter((product) => {

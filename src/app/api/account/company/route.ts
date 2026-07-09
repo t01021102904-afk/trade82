@@ -325,7 +325,7 @@ export async function PUT(request: Request) {
         country: textField(
           body,
           "country",
-          companyRole === "seller" ? "South Korea" : "United States",
+          companyRole === "seller" ? "South Korea" : "",
           100,
         ),
         city: textField(body, "city", "", 100),

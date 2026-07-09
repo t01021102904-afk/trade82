@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import { DEFAULT_OG_IMAGE_URL, SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
-const defaultTitle = "Trade82 | Korean-U.S. B2B Marketplace";
+const defaultTitle = "Trade82 | Korean-Global B2B Marketplace";
 const defaultDescription =
-  "Connect Korean sellers with U.S. buyers and manage export workflows in one workspace.";
+  "Connect Korean sellers with buyers worldwide and manage export workflows in one workspace.";
 const structuredData = [
   {
     "@context": "https://schema.org",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
         url: DEFAULT_OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Trade82 Korean-U.S. B2B Marketplace",
+        alt: "Trade82 Korean-Global B2B Marketplace",
       },
     ],
   },

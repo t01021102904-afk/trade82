@@ -9,7 +9,7 @@ export function RoleBadge({ role }: { role: AccountRole }) {
   const labels: Record<AccountRole, string> = {
     user: t("roles.generalUser"),
     seller: t("roles.koreanSeller"),
-    buyer: t("roles.americanBuyer"),
+    buyer: t("roles.globalBuyer"),
     both: t("roles.both"),
     admin: t("roles.admin"),
   };

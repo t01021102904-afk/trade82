@@ -1,6 +1,6 @@
 # Trade82
 
-Trade82 is a Next.js B2B marketplace MVP that connects Korean sellers with American buyers. It includes Clerk authentication, Google Sign-In support, English/Korean URL routing, Supabase Postgres marketplace data, and Supabase Storage file uploads.
+Trade82 is a Next.js B2B marketplace MVP that connects Korean sellers with global buyers. It includes Clerk authentication, Google Sign-In support, English/Korean URL routing, Supabase Postgres marketplace data, and Supabase Storage file uploads.
 
 ## Tech Stack
 

@@ -7,7 +7,7 @@ import { getDb } from "@/lib/db";
 
 const DEFAULT_OG_IMAGE_URL = "https://trade82.com/og/linkpicture-v2.png";
 const DEFAULT_DESCRIPTION =
-  "Discover trade-ready Korean products and connect with U.S. buyers and suppliers on Trade82.";
+  "Discover trade-ready Korean products and connect with global buyers and Korean suppliers on Trade82.";
 
 function getSiteOrigin() {
   const configured =

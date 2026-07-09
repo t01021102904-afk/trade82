@@ -8,7 +8,7 @@ const defaultImage = {
   url: DEFAULT_OG_IMAGE_URL,
   width: 1200,
   height: 630,
-  alt: "Trade82 Korean-U.S. B2B Marketplace",
+  alt: "Trade82 Korean-Global B2B Marketplace",
 };
 
 export function absoluteSiteUrl(path = "/") {

@@ -6,7 +6,7 @@ import { publicPageMetadata } from "@/lib/seo";
 export const metadata: Metadata = publicPageMetadata({
   title: "Seller Support Pricing | Trade82",
   description:
-    "Choose a Trade82 Seller Support plan for U.S. buyer-facing copy, inquiry replies, and product page improvements.",
+    "Choose a Trade82 Seller Support plan for global buyer-facing copy, inquiry replies, and product page improvements.",
   path: "/pricing",
   languages: {
     en: "/pricing",

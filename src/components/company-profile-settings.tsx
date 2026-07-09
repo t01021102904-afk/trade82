@@ -195,7 +195,7 @@ function buildCompanyProfile(
       useDefaultLogo: stored?.useDefaultLogo !== false,
       website: String(stored?.website ?? ""),
       country: String(
-        stored?.country ?? (role === "seller" ? SOUTH_KOREA : UNITED_STATES),
+        stored?.country ?? (role === "seller" ? SOUTH_KOREA : ""),
       ),
       city: String(stored?.city ?? ""),
       stateOrProvince: String(stored?.stateOrProvince ?? ""),
@@ -217,9 +217,7 @@ function buildCompanyProfile(
       ),
       representativeName: String(sellerProfile.representativeName ?? ""),
       exportExperience: String(sellerProfile.exportExperience ?? ""),
-      exportCountries: (sellerProfile.exportCountries as string[]) ?? [
-        "United States",
-      ],
+      exportCountries: (sellerProfile.exportCountries as string[]) ?? [],
       productCategories: (sellerProfile.productCategories as string[]) ?? [],
       minimumOrderQuantity: String(sellerProfile.minimumOrderQuantity ?? ""),
       leadTime: String(sellerProfile.leadTime ?? ""),
@@ -545,7 +543,7 @@ function CompanyProfileForm({
           body: JSON.stringify({
             displayName: accountProfile.displayName,
             phoneNumber: accountProfile.phoneNumber,
-            country: company.country || accountProfile.country || UNITED_STATES,
+            country: company.country || accountProfile.country || "",
             city: company.city,
             preferredLanguage: locale,
           }),
@@ -567,7 +565,7 @@ function CompanyProfileForm({
         country:
           role === "seller"
             ? SOUTH_KOREA
-            : company.country || accountProfile.country || UNITED_STATES,
+            : company.country || accountProfile.country || "",
         stateOrProvince: role === "buyer" ? company.stateOrProvince : "",
       };
       debugCompanyLogo("submitting company profile", {
@@ -882,7 +880,7 @@ function CompanyProfileForm({
             ) : null}
             <SelectField
               label={t("settings.country")}
-              value={company.country || accountProfile.country || UNITED_STATES}
+              value={company.country || accountProfile.country || ""}
               onChange={(value) => updateCompany("country", value)}
               options={countryOptions}
               placeholder={t("onboarding.select")}

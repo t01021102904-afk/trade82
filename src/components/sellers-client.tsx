@@ -91,7 +91,7 @@ export function SellersClient() {
         (verified === "reviewing" && !seller.verified);
       const matchesExport =
         exportExperience === "all" ||
-        (exportExperience === "korea" && seller.exportCountries.includes("United States")) ||
+        (exportExperience === "korea" && seller.exportCountries.length > 0) ||
         (exportExperience === "multi" && seller.exportCountries.length >= 3) ||
         (exportExperience === "fast" && seller.responseTime.toLowerCase().includes("under"));
 

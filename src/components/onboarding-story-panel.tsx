@@ -55,7 +55,7 @@ export function OnboardingStoryPanel({
           </div>
           <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-100">
             {kind === "buyer"
-              ? t("roles.americanBuyer")
+              ? t("roles.globalBuyer")
               : kind === "seller"
                 ? t("roles.koreanSeller")
                 : t("onboarding.pathPickerLabel")}

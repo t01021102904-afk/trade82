@@ -7,7 +7,7 @@ const marketplaceCopy = {
     eyebrow: "Trade82 Marketplace",
     title: "Korean Products Marketplace",
     description:
-      "Discover Korean products prepared for U.S. B2B sourcing. Trade82 helps buyers compare seller profiles, product details, pricing visibility, logistics terms, and submitted documents before starting an inquiry.",
+      "Discover Korean products prepared for global B2B sourcing. Trade82 helps buyers compare seller profiles, product details, pricing visibility, logistics terms, and submitted documents before starting an inquiry.",
     primaryCta: "Browse Korean sellers",
     secondaryCta: "Join Trade82",
     categoriesTitle: "Explore Korean product categories",
@@ -46,7 +46,7 @@ const marketplaceCopy = {
     eyebrow: "Trade82 마켓플레이스",
     title: "한국 상품 마켓플레이스",
     description:
-      "미국 B2B 소싱 검토에 필요한 한국 상품 정보를 확인하세요. Trade82는 바이어가 셀러 프로필, 상품 정보, 가격 공개 범위, 물류 조건, 제출 서류를 비교한 뒤 문의를 시작할 수 있도록 돕습니다.",
+      "글로벌 B2B 소싱 검토에 필요한 한국 상품 정보를 확인하세요. Trade82는 바이어가 셀러 프로필, 상품 정보, 가격 공개 범위, 물류 조건, 제출 서류를 비교한 뒤 문의를 시작할 수 있도록 돕습니다.",
     primaryCta: "한국 셀러 보기",
     secondaryCta: "Trade82 가입",
     categoriesTitle: "한국 상품 카테고리 탐색",
@@ -88,7 +88,7 @@ const sellersCopy = {
     eyebrow: "Seller Directory",
     title: "Korean Seller Companies",
     description:
-      "Browse Korean manufacturers, distributors, wholesalers, and brand owners preparing products for U.S. sourcing conversations. Seller profiles help buyers understand company focus before sending an inquiry.",
+      "Browse Korean manufacturers, distributors, wholesalers, and brand owners preparing products for global sourcing conversations. Seller profiles help buyers understand company focus before sending an inquiry.",
     primaryCta: "Explore marketplace",
     secondaryCta: "Join as supplier",
     profileTitle: "What seller profiles can show",
@@ -127,7 +127,7 @@ const sellersCopy = {
     eyebrow: "셀러 디렉터리",
     title: "한국 셀러 회사",
     description:
-      "미국 소싱 상담을 준비하는 한국 제조사, 유통사, 도매사, 브랜드 오너를 확인하세요. 셀러 프로필은 바이어가 문의 전 회사의 주요 카테고리와 상품 맥락을 이해하는 데 도움을 줍니다.",
+      "글로벌 소싱 상담을 준비하는 한국 제조사, 유통사, 도매사, 브랜드 오너를 확인하세요. 셀러 프로필은 바이어가 문의 전 회사의 주요 카테고리와 상품 맥락을 이해하는 데 도움을 줍니다.",
     primaryCta: "마켓플레이스 보기",
     secondaryCta: "셀러로 가입",
     profileTitle: "셀러 프로필에서 확인할 수 있는 정보",

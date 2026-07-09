@@ -51,7 +51,7 @@ export function submissionToSeller(
     yearsInBusiness: 1,
     categories: categoriesFromText(submission.productCategory),
     certifications: ["Trade82 Reviewed"],
-    exportCountries: ["United States"],
+    exportCountries: ["Global markets"],
     exportExperience:
       submission.exportExperience || "Export experience provided during company onboarding.",
     monthlyCapacity: "Contact seller",
@@ -69,7 +69,7 @@ export function submissionToSeller(
     verificationStatus: "verified",
     description:
       submission.exportExperience ||
-      "Reviewed Korean seller company exporting products to American buyers.",
+      "Reviewed Korean seller company exporting products to global buyers.",
   };
 }
 
@@ -100,20 +100,20 @@ export function submissionToBuyer(
     name: submission.companyName,
     logoUrl: company?.logoUrl,
     useDefaultLogo: company?.useDefaultLogo ?? true,
-    location: submission.businessAddress || "United States",
+    location: submission.businessAddress || "International",
     buyerType,
     interestedCategories: categoriesFromText(submission.purchasingCategories),
     targetOrderSize:
       submission.estimatedMonthlyOrderVolume || "Contact buyer",
     annualImportVolume:
       submission.estimatedMonthlyOrderVolume || "Not disclosed",
-    salesChannels: ["U.S. retail and distribution"],
+    salesChannels: ["International retail and distribution"],
     importExperience: "Company information reviewed by Trade82 admin.",
     requiredDocuments: ["Commercial invoice", "Packing list", "Certificate of origin"],
     preferredPaymentTerms: ["Discuss with buyer"],
     timeline: "Contact buyer",
     marketStrategy:
-      "Reviewed American buyer sourcing export-ready Korean products.",
+      "Reviewed global buyer sourcing export-ready Korean products.",
     contactPerson: "Purchasing team",
     contactEmail: submission.userEmail,
     verified: true,

@@ -11,11 +11,11 @@ import { withLocale } from "@/lib/i18n";
 import { cx } from "@/lib/utils";
 
 const supportItems = [
-  "U.S. buyer-facing English product/company copy",
+  "Global buyer-facing English product/company copy",
   "Trade82 product/company page improvement",
   "Buyer inquiry reply copy",
   "MOQ, sample, and supply condition wording",
-  "U.S. buyer outreach copy",
+  "Global buyer outreach copy",
   "Product name/product description optimization",
   "Company introduction improvement",
   "Sample request reply copy",
@@ -30,7 +30,7 @@ const copy = {
     label: "Seller Support",
     title: "Trade82 Support Team",
     description:
-      "Monthly support for Korean sellers preparing U.S. buyer-facing materials, inquiry replies, and product page improvements.",
+      "Monthly support for Korean sellers preparing global buyer-facing materials, inquiry replies, and product page improvements.",
     requestPlan: "Request Plan",
     perMonth: "/ month",
     requestsPerMonth: "support requests / month",
@@ -41,17 +41,17 @@ const copy = {
     loading: "Starting checkout...",
     plans: {
       starter:
-        "For sellers who want light product/page improvement for U.S. buyers.",
+        "For sellers who want light product/page improvement for global buyers.",
       growth:
         "For sellers who want ongoing support for buyer replies, product copy, and outreach preparation.",
-      full: "For sellers who want full monthly support for U.S. buyer-facing materials, inquiry replies, outreach copy, and product page improvement.",
+      full: "For sellers who want full monthly support for global buyer-facing materials, inquiry replies, outreach copy, and product page improvement.",
     },
   },
   ko: {
     label: "셀러 지원",
     title: "Trade82 지원팀",
     description:
-      "미국 바이어 대상 상품/회사 소개, 문의 답변, 상품 페이지 개선을 위한 월간 셀러 지원 플랜입니다.",
+      "글로벌 바이어 대상 상품/회사 소개, 문의 답변, 상품 페이지 개선을 위한 월간 셀러 지원 플랜입니다.",
     requestPlan: "플랜 요청",
     perMonth: "/ 월",
     requestsPerMonth: "지원 요청 / 월",
@@ -61,9 +61,9 @@ const copy = {
     error: "결제를 시작할 수 없습니다.",
     loading: "결제 페이지 준비 중...",
     plans: {
-      starter: "미국 바이어용 상품/페이지 개선을 가볍게 시작하려는 셀러에게 적합합니다.",
+      starter: "글로벌 바이어용 상품/페이지 개선을 가볍게 시작하려는 셀러에게 적합합니다.",
       growth: "바이어 답변, 상품 카피, 아웃리치 준비를 지속적으로 지원받고 싶은 셀러에게 적합합니다.",
-      full: "미국 바이어용 자료, 문의 답변, 아웃리치 카피, 상품 페이지 개선을 월간으로 폭넓게 지원받고 싶은 셀러에게 적합합니다.",
+      full: "글로벌 바이어용 자료, 문의 답변, 아웃리치 카피, 상품 페이지 개선을 월간으로 폭넓게 지원받고 싶은 셀러에게 적합합니다.",
     },
   },
 };

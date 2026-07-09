@@ -160,7 +160,7 @@ export function ProfilePreviewPanel({
                 : "bg-blue-400/15 text-blue-100",
             )}
           >
-            {badgeLabel ?? (kind === "seller" ? "Korean Seller" : "U.S. Buyer")}
+            {badgeLabel ?? (kind === "seller" ? "Korean Seller" : "Global Buyer")}
           </span>
         </div>
         <p className="mt-2 text-xs leading-5 text-zinc-300">{subtitle}</p>
