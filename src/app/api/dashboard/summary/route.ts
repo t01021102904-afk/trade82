@@ -41,8 +41,6 @@ export async function GET(request: Request) {
     if (role === "seller") {
       const [
         products,
-        companySavedCount,
-        productSavedCount,
         inquiries,
         inquiryCount,
         companyReviews,
@@ -54,10 +52,6 @@ export async function GET(request: Request) {
         getDb().product.findMany({
           where: { sellerCompanyId: company.id },
           select: { id: true, viewCount: true, status: true },
-        }),
-        getDb().savedItem.count({ where: { companyId: company.id } }),
-        getDb().savedItem.count({
-          where: { product: { sellerCompanyId: company.id } },
         }),
         getDb().inquiry.findMany({
           where: { sellerCompanyId: company.id },
@@ -145,8 +139,6 @@ export async function GET(request: Request) {
         metrics: {
           productViews: products.reduce((sum, item) => sum + item.viewCount, 0),
           companyViews: company.viewCount,
-          followers: companySavedCount,
-          savedCount: companySavedCount + productSavedCount,
           inquiryCount,
           receivedInquiries: inquiryCount,
           completedDeals: completedDeals.length,
@@ -196,22 +188,18 @@ export async function GET(request: Request) {
     const [
       savedItems,
       savedProductCount,
-      savedCompanyCount,
       inquiries,
       inquiryCount,
       deals,
       products,
     ] = await Promise.all([
       getDb().savedItem.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, type: "product" },
         orderBy: { createdAt: "desc" },
         take: 8,
       }),
       getDb().savedItem.count({
         where: { userId: user.id, type: "product" },
-      }),
-      getDb().savedItem.count({
-        where: { userId: user.id, type: "company" },
       }),
       getDb().inquiry.findMany({
         where: { buyerCompanyId: company.id },
@@ -344,7 +332,6 @@ export async function GET(request: Request) {
       recommendedProducts: scoredProducts,
       metrics: {
         savedProducts: savedProductCount,
-        savedCompanies: savedCompanyCount,
         inquiryCount,
         sentInquiries: inquiryCount,
         completedDeals: deals.filter((deal) => deal.dealStatus === "completed")

@@ -7,7 +7,6 @@ import { Badge } from "@/components/badge";
 import { ContactModal } from "@/components/contact-modal";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
-import { SaveButton } from "@/components/save-button";
 import { withLocale } from "@/lib/i18n";
 import type { Buyer } from "@/lib/types";
 
@@ -87,7 +86,6 @@ export function BuyerCard({ buyer }: { buyer: Buyer }) {
           {t("common.viewBuyer")}
         </Link>
         <ContactModal context={{ type: "buyer", buyer }} buttonLabel={t("common.contactBuyer")} />
-        <SaveButton id={buyer.id} kind="company" className="sm:col-span-2" />
       </div>
     </article>
   );

@@ -7,7 +7,6 @@ import {
   getCompanyProfiles,
   getMessageThreads,
   getManagedProducts,
-  getSavedCompanies,
   getSavedProducts,
   getSellerProfiles,
   getUserProfiles,
@@ -51,7 +50,6 @@ function createCachedSnapshot<T>(read: () => T, serverValue: T) {
 }
 
 const savedProductsSnapshot = createCachedSnapshot(getSavedProducts, emptyStrings);
-const savedCompaniesSnapshot = createCachedSnapshot(getSavedCompanies, emptyStrings);
 const messageThreadsSnapshot = createCachedSnapshot(getMessageThreads, emptyThreads);
 const verificationSubmissionsSnapshot = createCachedSnapshot(
   getVerificationSubmissions,
@@ -79,14 +77,6 @@ export function useSavedProductIds() {
   return useSyncExternalStore(
     subscribeToBridgeStorage,
     savedProductsSnapshot,
-    () => emptyStrings,
-  );
-}
-
-export function useSavedCompanyIds() {
-  return useSyncExternalStore(
-    subscribeToBridgeStorage,
-    savedCompaniesSnapshot,
     () => emptyStrings,
   );
 }

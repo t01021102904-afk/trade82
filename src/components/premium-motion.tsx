@@ -27,12 +27,12 @@ export function FloatingMarketplacePreview({
     buyer: string;
     inquiry: string;
     sample: string;
-    follow: string;
+    status: string;
   };
 }) {
   const steps = [
     labels.seller,
-    labels.follow,
+    labels.status,
     labels.inquiry,
     labels.sample,
     labels.buyer,
@@ -56,7 +56,7 @@ export function FloatingMarketplacePreview({
             <div className="flex items-center justify-between gap-3">
               <span className="text-sm font-semibold">{labels.seller}</span>
               <span className="rounded-full bg-emerald-400/15 px-2 py-1 text-xs text-emerald-200">
-                {labels.follow}
+                {labels.status}
               </span>
             </div>
             <div className="mt-3 grid gap-2">

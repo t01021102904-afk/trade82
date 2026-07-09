@@ -9,7 +9,6 @@ import {
   MessageCircle,
   ShoppingBag,
   Star,
-  Users,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -38,7 +37,6 @@ import {
 export type DashboardSection =
   | "overview"
   | "saved-products"
-  | "following"
   | "messages"
   | "products"
   | "documents"
@@ -111,7 +109,6 @@ type Metric = {
 };
 
 type MetricIconKey =
-  | "users"
   | "productViews"
   | "companyViews"
   | "messages"
@@ -121,7 +118,6 @@ type MetricIconKey =
   | "rating";
 
 const metricIcons: Record<MetricIconKey, LucideIcon> = {
-  users: Users,
   productViews: Eye,
   companyViews: Building2,
   messages: MessageCircle,
@@ -158,18 +154,11 @@ export function DashboardClient({
   const recentInquiries = summary.recentInquiries ?? [];
   const recentSavedItems = summary.recentSavedItems ?? [];
   const savedProducts = recentSavedItems.filter((item) => item.type === "product");
-  const followingCompanies = recentSavedItems.filter((item) => item.type === "company");
   const reviewCount = summary.metrics.reviewCount ?? 0;
   const averageRating = Number(summary.metrics.averageRating ?? 0).toFixed(1);
   const metrics: Metric[] =
     role === "seller"
       ? [
-          {
-            label: t("dashboard.followers"),
-            value: summary.metrics.followers ?? 0,
-            section: "overview",
-            icon: "users",
-          },
           {
             label: t("dashboard.productViews"),
             value: summary.metrics.productViews ?? 0,
@@ -219,12 +208,6 @@ export function DashboardClient({
             value: summary.metrics.savedProducts ?? 0,
             section: "saved-products",
             icon: "products",
-          },
-          {
-            label: t("dashboard.savedCompanies"),
-            value: summary.metrics.savedCompanies ?? 0,
-            section: "following",
-            icon: "companyViews",
           },
           {
             label: t("dashboard.sentInquiries"),
@@ -281,22 +264,6 @@ export function DashboardClient({
           items={savedProducts}
           emptyText={t("dashboard.noSavedProducts")}
         />
-      ) : null}
-
-      {activeSection === "following" ? (
-        role === "buyer" ? (
-          <SavedItemsPanel
-            title={t("dashboard.savedCompanies")}
-            items={followingCompanies}
-            emptyText={t("dashboard.noSavedCompanies")}
-          />
-        ) : (
-          <StatPanel
-            title={t("dashboard.followers")}
-            value={summary.metrics.followers ?? 0}
-            emptyText={t("dashboard.noFollowers")}
-          />
-        )
       ) : null}
 
       {activeSection === "messages" ? (
@@ -894,11 +861,6 @@ function OverviewSection({
               <h2 className="mt-2 text-lg font-semibold theme-foreground">
                 {t("dashboard.recommendedSellers")}
               </h2>
-              {(summary.metrics.savedCompanies ?? 0) === 0 ? (
-                <p className="mt-1 break-words text-sm leading-6 theme-muted">
-                  {t("dashboard.noSavedCompanies")}
-                </p>
-              ) : null}
             </div>
             <Link
               href={withLocale("/sellers", locale)}
@@ -1027,11 +989,7 @@ function SavedItemsPanel({
       <h2 className="truncate text-base font-semibold theme-foreground">{title}</h2>
       <div className="mt-3 grid gap-2">
         {items.map((item) => {
-          const label =
-            item.displayName ||
-            (item.type === "company"
-              ? t("common.followingCompany")
-              : t("common.saved"));
+          const label = item.displayName || t("common.saved");
 
           return item.href ? (
             <Link
@@ -1488,24 +1446,6 @@ function formatDashboardProductPrice(
     return `${product.currency} ${product.priceMin}`;
   }
   return `${product.currency} ${product.priceMin}-${product.priceMax}`;
-}
-
-function StatPanel({
-  title,
-  value,
-  emptyText,
-}: {
-  title: string;
-  value: number;
-  emptyText: string;
-}) {
-  return (
-    <section className="bm-premium-card min-w-0 rounded-md border p-4 theme-surface">
-      <h2 className="truncate text-base font-semibold theme-foreground">{title}</h2>
-      <p className="mt-2 text-xl font-semibold theme-foreground">{value}</p>
-      {value === 0 ? <div className="mt-3"><Empty text={emptyText} /></div> : null}
-    </section>
-  );
 }
 
 function Empty({ text }: { text: string }) {

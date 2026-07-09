@@ -8,7 +8,6 @@ import {
   Package,
   Settings as SettingsIcon,
   ShoppingBag,
-  Users,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -195,11 +194,6 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     ...(role === "buyer"
       ? [
           {
-            id: "following" as const,
-            label: t("dashboard.dashboardNavFollowing"),
-            icon: Users,
-          },
-          {
             id: "messages" as const,
             label: t("dashboard.dashboardNavMessages"),
             icon: MessageCircle,
@@ -384,7 +378,7 @@ function parseDashboardSection(
   value: string | null,
   role: "seller" | "buyer",
 ): DashboardSection | null {
-  if (value === "overview" || value === "following" || value === "messages") {
+  if (value === "overview" || value === "messages") {
     return value;
   }
   if (role === "seller" && value === "products") return value;

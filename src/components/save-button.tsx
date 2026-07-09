@@ -21,9 +21,14 @@ function loadSavedItems(userId: string) {
   const request = fetch("/api/saved-items")
     .then(async (response) => {
       if (!response.ok) return new Set<string>();
-      const items = (await response.json()) as Array<{ targetId?: string }>;
+      const items = (await response.json()) as Array<{
+        targetId?: string;
+        type?: string;
+      }>;
       const result = new Set(
-        items.flatMap((item) => (item.targetId ? [item.targetId] : [])),
+        items.flatMap((item) =>
+          item.type === "product" && item.targetId ? [item.targetId] : [],
+        ),
       );
       savedItemsByUser.set(userId, result);
       return result;
@@ -40,7 +45,7 @@ export function SaveButton({
   iconOnly = false,
 }: {
   id: string;
-  kind: "product" | "company";
+  kind: "product";
   className?: string;
   iconOnly?: boolean;
 }) {
@@ -64,10 +69,8 @@ export function SaveButton({
   const userId = isSignedIn && canUseSavedItems ? user?.id : "";
   const savedItemsKey = userId ? `${userId}:${id}` : "";
   const savedItemsReady = !userId || loadedSavedKey === savedItemsKey;
-  const savedFeedback =
-    kind === "company" ? t("common.followingCompany") : t("common.saved");
-  const removedFeedback =
-    kind === "company" ? t("common.unfollowedCompany") : t("common.removed");
+  const savedFeedback = t("common.saved");
+  const removedFeedback = t("common.removed");
 
   useEffect(() => {
     interacted.current = false;
@@ -185,14 +188,7 @@ export function SaveButton({
   }
 
   const visibleSaved = isSignedIn && canUseSavedItems ? saved : false;
-  const label =
-    kind === "company"
-      ? visibleSaved
-        ? t("common.unfollowCompany")
-        : t("common.saveCompany")
-      : visibleSaved
-        ? t("common.saved")
-        : t("common.saveProduct");
+  const label = visibleSaved ? t("common.saved") : t("common.saveProduct");
   if (
     isSignedIn &&
     !canUseSavedItems

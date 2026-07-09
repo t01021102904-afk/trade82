@@ -14,7 +14,6 @@ import type {
 
 const messageKey = "bridgemarket:message-threads";
 const savedProductsKey = "bridgemarket:saved-products";
-const savedCompaniesKey = "bridgemarket:saved-companies";
 const buyerOnboardingKey = "bridgemarket:onboarding-buyer";
 const sellerOnboardingKey = "bridgemarket:onboarding-seller";
 const verificationSubmissionsKey = "bridgemarket:verification-submissions";
@@ -97,10 +96,6 @@ export function getSavedProducts() {
   return readJson<string[]>(savedProductsKey, []);
 }
 
-export function getSavedCompanies() {
-  return readJson<string[]>(savedCompaniesKey, []);
-}
-
 function toggleId(key: string, id: string) {
   const current = readJson<string[]>(key, []);
   const next = current.includes(id)
@@ -112,10 +107,6 @@ function toggleId(key: string, id: string) {
 
 export function toggleSavedProduct(id: string) {
   return toggleId(savedProductsKey, id);
-}
-
-export function toggleSavedCompany(id: string) {
-  return toggleId(savedCompaniesKey, id);
 }
 
 export function saveOnboarding(kind: "buyer" | "seller", payload: Record<string, string>) {
