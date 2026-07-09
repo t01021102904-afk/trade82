@@ -1099,6 +1099,8 @@
   },
   "productDetail": {
     "wholesalePrice": "Wholesale price",
+    "seeWholesalePrice": "See wholesale price",
+    "signupToViewWholesalePrice": "Sign up to view wholesale pricing",
     "monthlyCapacity": "Monthly capacity",
     "sampleAvailability": "Sample availability",
     "shippingOrigin": "Shipping origin",

@@ -7,6 +7,7 @@ import { useI18n } from "@/components/i18n-provider";
 import { ProductImage } from "@/components/product-image";
 import { SaveButton } from "@/components/save-button";
 import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
+import { WholesalePriceGate } from "@/components/wholesale-price-gate";
 import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
@@ -40,7 +41,12 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
-        <p className="truncate text-base font-semibold theme-foreground">{product.wholesalePrice}</p>
+        <WholesalePriceGate
+          value={product.wholesalePrice}
+          className="max-w-full"
+          valueClassName="truncate text-base font-semibold theme-foreground"
+          gateClassName="text-sm"
+        />
         <Link
           href={withLocale(`/stores/${product.sellerId}`, locale)}
           className="flex min-w-0 items-center gap-1.5 text-xs theme-muted hover:text-[var(--accent-foreground)]"

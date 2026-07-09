@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
 import { BackButton } from "@/components/back-button";
@@ -19,6 +19,7 @@ import { VerificationBadge } from "@/components/verification-badge";
 import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
+import { WholesalePriceGate } from "@/components/wholesale-price-gate";
 import { useUserContext } from "@/hooks/use-user-context";
 import {
   buyerCategoryLabel,
@@ -403,6 +404,13 @@ export function DatabaseProductDetail({ id }: { id: string }) {
     formatProductPrice(richRows, locale, notProvided),
     "price",
   );
+  const priceDisplay = (
+    <WholesalePriceGate
+      value={price}
+      valueClassName="break-words"
+      gateClassName="text-sm"
+    />
+  );
   const moq = displayField(
     "moq",
     formatProductMoq(richRows, locale, product.moq || notProvided),
@@ -580,20 +588,20 @@ export function DatabaseProductDetail({ id }: { id: string }) {
 
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {[
-            [t("productDetail.wholesalePrice"), price],
-            [t("marketplace.moq"), moq],
-            [t("settings.leadTime"), leadTime],
-            [t("productDetail.monthlyCapacity"), monthlyCapacity],
-            [
-              t("productDetail.sampleAvailability"),
-              displayField(
+            { label: t("productDetail.wholesalePrice"), value: priceDisplay },
+            { label: t("marketplace.moq"), value: moq },
+            { label: t("settings.leadTime"), value: leadTime },
+            { label: t("productDetail.monthlyCapacity"), value: monthlyCapacity },
+            {
+              label: t("productDetail.sampleAvailability"),
+              value: displayField(
                 "sampleAvailability",
                 sampleAvailabilityLabel(String(richRows.sampleAvailability ?? ""), locale) ||
                   notProvided,
               ),
-            ],
-            [t("productDetail.shippingOrigin"), shippingOrigin],
-          ].map(([label, value]) => (
+            },
+            { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
+          ].map(({ label, value }) => (
             <div key={label} className="rounded-lg border border-zinc-200 bg-white p-5">
               <p className="text-sm text-zinc-500">{label}</p>
               <p className="mt-2 break-words text-lg font-semibold text-zinc-950">{value}</p>
@@ -630,7 +638,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("productDetail.tradeDetails")}</h2>
               <DetailTable
                 rows={compactRows([
-                  { label: t("productDetail.wholesalePrice"), value: price },
+                  { label: t("productDetail.wholesalePrice"), value: priceDisplay },
                   { label: t("marketplace.moq"), value: moq },
                   { label: t("settings.leadTime"), value: leadTime },
                   { label: t("productDetail.monthlyCapacity"), value: monthlyCapacity },
@@ -772,7 +780,7 @@ function ReviewCard({ review }: { review: PublicCompany["reviewsReceived"][numbe
 }
 
 function compactRows(
-  rows: Array<{ label: string; value: string | number | null | undefined }>,
+  rows: Array<{ label: string; value: ReactNode }>,
 ) {
   return rows
     .map((row) => ({
@@ -780,8 +788,9 @@ function compactRows(
       value: typeof row.value === "string" ? row.value.trim() : row.value,
     }))
     .filter((row) => {
-      return Boolean(String(row.value ?? "").trim());
-    }) as Array<{ label: string; value: string | number }>;
+      if (row.value === null || row.value === undefined) return false;
+      return typeof row.value === "string" ? Boolean(row.value.trim()) : true;
+    });
 }
 
 function joinList(values: string[] | undefined) {
