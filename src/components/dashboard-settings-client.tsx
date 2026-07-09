@@ -18,7 +18,7 @@ import {
   hasBillingPaymentIssue,
   isVerifiedSellerSubscription,
 } from "@/lib/billing";
-import { withLocale, type Locale } from "@/lib/i18n";
+import { getDictionary, withLocale, type Locale } from "@/lib/i18n";
 import { cx } from "@/lib/utils";
 
 type SettingsTab = "account" | "company" | "billing" | "security";
@@ -34,16 +34,11 @@ type SellerBillingCompany = {
   verifiedSellerSince: string | null;
 };
 
-const tabs: Array<{
+type SettingsTabConfig = {
   id: SettingsTab;
   label: string;
   icon: typeof UserRound;
-}> = [
-  { id: "account", label: "Account", icon: UserRound },
-  { id: "company", label: "Company Profile", icon: Building2 },
-  { id: "billing", label: "Billing", icon: CreditCard },
-  { id: "security", label: "Security", icon: LockKeyhole },
-];
+};
 
 export function DashboardSettingsClient({
   activeTab,
@@ -57,6 +52,18 @@ export function DashboardSettingsClient({
   locale: Locale;
 }) {
   const basePath = withLocale("/dashboard/settings", locale);
+  const messages = getDictionary(locale);
+  const buyerOnly = role === "buyer";
+  const tabs: SettingsTabConfig[] = [
+    { id: "account", label: "Account", icon: UserRound },
+    {
+      id: "company",
+      label: buyerOnly ? messages.settings.editBuyerProfile : "Company Profile",
+      icon: Building2,
+    },
+    { id: "billing", label: "Billing", icon: CreditCard },
+    { id: "security", label: "Security", icon: LockKeyhole },
+  ];
 
   return (
     <div className="theme-bg">
@@ -122,15 +129,25 @@ export function DashboardSettingsClient({
 
             {activeTab === "company" ? (
               <SettingsCard
-                title="Company Profile"
-                description="Manage company details, marketplace profile fields, and seller profile information."
+                title={
+                  buyerOnly
+                    ? messages.settings.editBuyerProfile
+                    : "Company Profile"
+                }
+                description={
+                  buyerOnly
+                    ? messages.settings.buyerProfileDescription
+                    : "Manage company details, marketplace profile fields, and seller profile information."
+                }
               >
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={withLocale("/settings/company", locale)}
                     className="inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold theme-primary-button"
                   >
-                    Edit company profile
+                    {buyerOnly
+                      ? messages.settings.editBuyerProfile
+                      : "Edit company profile"}
                   </Link>
                 </div>
               </SettingsCard>

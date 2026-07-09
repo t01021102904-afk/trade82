@@ -18,6 +18,7 @@ import {
 import {
   getBuyerCategoryOptions,
   getBuyerTypeOptions,
+  getCountryOptions,
   getImportExperienceOptions,
   getImportVolumeOptions,
   getKoreanRegionOptions,
@@ -66,16 +67,87 @@ type LoadedCompanyProfile = {
   company: CompanyProfile;
   seller: SellerCompanyProfile;
   buyer: BuyerCompanyProfile;
+  accountProfile: AccountProfileForSettings;
 };
 
 type CompanyDraft = LoadedCompanyProfile;
 
 type CompanyRecord = AccountCompanyRecord;
 
+type AccountProfileForSettings = {
+  displayName: string;
+  email: string;
+  avatarOriginalUrl: string;
+  avatarUrl: string;
+  phoneNumber: string;
+  country: string;
+  city: string;
+  role: "user" | "seller" | "buyer" | "both" | "admin" | null;
+};
+
 const companyFormSnapshots = new Map<string, CompanyDraft>();
 
 function companySnapshotKey(ownerUserId: string, role: "seller" | "buyer") {
   return `${ownerUserId}:${role}`;
+}
+
+function normalizeAccountRole(value: unknown): AccountProfileForSettings["role"] {
+  return value === "user" ||
+    value === "seller" ||
+    value === "buyer" ||
+    value === "both" ||
+    value === "admin"
+    ? value
+    : null;
+}
+
+function companyRoleFromAccountRole(
+  role: AccountProfileForSettings["role"],
+): "seller" | "buyer" | null {
+  if (role === "seller" || role === "both") return "seller";
+  if (role === "buyer") return "buyer";
+  return null;
+}
+
+function inferCompanyRoleFromCompanies(companies: CompanyRecord[]) {
+  if (companies.some((company) => company.companyRole === "seller")) {
+    return "seller" as const;
+  }
+  if (companies.some((company) => company.companyRole === "buyer")) {
+    return "buyer" as const;
+  }
+  return null;
+}
+
+function isPersonalBuyerCompanyName(value: string | null | undefined) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return !normalized || normalized === "personal";
+}
+
+function buildAccountProfile(
+  stored: Record<string, unknown> | null,
+  fallback: {
+    displayName: string;
+    email: string;
+    avatarUrl: string;
+  },
+): AccountProfileForSettings {
+  return {
+    displayName: String(stored?.displayName ?? fallback.displayName),
+    email: String(stored?.email ?? fallback.email),
+    avatarOriginalUrl: String(stored?.avatarOriginalUrl ?? ""),
+    avatarUrl: String(stored?.avatarUrl ?? fallback.avatarUrl),
+    phoneNumber: String(stored?.phoneNumber ?? ""),
+    country: String(stored?.country ?? ""),
+    city: String(stored?.city ?? ""),
+    role: normalizeAccountRole(stored?.role),
+  };
+}
+
+async function loadAccountProfile() {
+  const response = await fetch("/api/account/profile", { cache: "no-store" });
+  if (!response.ok) return null;
+  return (await response.json()) as Record<string, unknown>;
 }
 
 function rememberCompanyFormSnapshot(key: string, draft: CompanyDraft) {
@@ -103,6 +175,7 @@ function buildCompanyProfile(
   stored: CompanyRecord | undefined,
   role: "seller" | "buyer",
   userId: string,
+  accountProfile: AccountProfileForSettings,
 ): LoadedCompanyProfile {
   const now = new Date().toISOString();
   const companyId = String(stored?.id ?? `new-${role}`);
@@ -121,7 +194,9 @@ function buildCompanyProfile(
       logoUrl: String(stored?.logoUrl ?? ""),
       useDefaultLogo: stored?.useDefaultLogo !== false,
       website: String(stored?.website ?? ""),
-      country: role === "seller" ? SOUTH_KOREA : UNITED_STATES,
+      country: String(
+        stored?.country ?? (role === "seller" ? SOUTH_KOREA : UNITED_STATES),
+      ),
       city: String(stored?.city ?? ""),
       stateOrProvince: String(stored?.stateOrProvince ?? ""),
       businessAddress: String(stored?.businessAddress ?? ""),
@@ -170,6 +245,7 @@ function buildCompanyProfile(
       salesChannels: (buyerProfile.salesChannels as string[]) ?? [],
       purchaseTimeline: String(buyerProfile.purchaseTimeline ?? ""),
     },
+    accountProfile,
   };
 }
 
@@ -183,47 +259,78 @@ async function readJsonError(response: Response, fallback: string) {
 export function CompanyProfileSettings() {
   const { isLoaded, user } = useUser();
   const { locale, t } = useI18n();
-  const metadataRole = user?.publicMetadata.role;
-  const role =
-    metadataRole === "seller" || metadataRole === "both"
-      ? "seller"
-      : metadataRole === "buyer"
-        ? "buyer"
-        : null;
+  const metadataRole = normalizeAccountRole(user?.publicMetadata.role);
   const userId = user?.id ?? "";
   const [loadedProfile, setLoadedProfile] =
     useState<LoadedCompanyProfile | null>(null);
-  const effectiveRole = role ?? loadedProfile?.company.companyRole ?? null;
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded || !userId || !role) return;
+    if (!isLoaded || !userId) return;
 
     let cancelled = false;
-    void loadAccountCompanies(userId, { force: true })
-      .then((companies: CompanyRecord[]) => {
+    const fallbackProfile = {
+      displayName:
+        user?.fullName ||
+        user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+        "Trade82 User",
+      email: user?.primaryEmailAddress?.emailAddress ?? "",
+      avatarUrl: user?.imageUrl ?? "",
+    };
+
+    void Promise.all([
+      loadAccountCompanies(userId, { force: true }),
+      loadAccountProfile(),
+    ])
+      .then(([companies, accountRecord]: [CompanyRecord[], Record<string, unknown> | null]) => {
         if (cancelled) return;
-        const stored = companies.find((item) => item.companyRole === role);
+        const accountProfile = buildAccountProfile(accountRecord, fallbackProfile);
+        const dbCompanyRole = companyRoleFromAccountRole(accountProfile.role);
+        const metadataCompanyRole = companyRoleFromAccountRole(metadataRole);
+        const targetRole =
+          dbCompanyRole ?? metadataCompanyRole ?? inferCompanyRoleFromCompanies(companies);
+        if (!targetRole) {
+          setLoadedProfile(null);
+          setLoadingComplete(true);
+          return;
+        }
+        const stored = companies.find((item) => item.companyRole === targetRole);
         debugCompanyLogo("loaded company profile", {
-          role,
+          role: targetRole,
+          dbRole: accountProfile.role,
+          metadataRole,
           companyId: stored?.id ?? null,
           logoOriginalUrl: stored?.logoOriginalUrl ?? null,
           logoThumbnailUrl: stored?.logoThumbnailUrl ?? null,
           logoUrl: stored?.logoUrl ?? null,
           useDefaultLogo: stored?.useDefaultLogo ?? null,
         });
-        setLoadedProfile(buildCompanyProfile(stored, role, userId));
+        setLoadedProfile(
+          buildCompanyProfile(stored, targetRole, userId, accountProfile),
+        );
+        setLoadingComplete(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoadedProfile(null);
+        setLoadingComplete(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [isLoaded, role, userId]);
+  }, [
+    isLoaded,
+    metadataRole,
+    user?.fullName,
+    user?.imageUrl,
+    user?.primaryEmailAddress?.emailAddress,
+    userId,
+  ]);
 
   if (
-    isLoaded &&
+    loadingComplete &&
     user &&
-    user.publicMetadata.role !== "seller" &&
-    user.publicMetadata.role !== "buyer" &&
-    user.publicMetadata.role !== "both"
+    !loadedProfile
   ) {
     return (
       <div className="rounded-lg border border-zinc-200 p-6">
@@ -242,12 +349,10 @@ export function CompanyProfileSettings() {
 
   if (
     !loadedProfile ||
-    !effectiveRole ||
     (isLoaded && !user) ||
     (isLoaded &&
       user &&
-      (loadedProfile.company.ownerClerkUserId !== user.id ||
-        loadedProfile.company.companyRole !== effectiveRole))
+      loadedProfile.company.ownerClerkUserId !== user.id)
   ) {
     return <div className="text-sm text-zinc-600">{t("common.loading")}</div>;
   }
@@ -258,6 +363,7 @@ export function CompanyProfileSettings() {
       initialCompany={loadedProfile.company}
       initialSeller={loadedProfile.seller}
       initialBuyer={loadedProfile.buyer}
+      initialAccountProfile={loadedProfile.accountProfile}
     />
   );
 }
@@ -267,11 +373,13 @@ function CompanyProfileForm({
   initialCompany,
   initialSeller,
   initialBuyer,
+  initialAccountProfile,
 }: {
   role: "seller" | "buyer";
   initialCompany: CompanyProfile;
   initialSeller: SellerCompanyProfile;
   initialBuyer: BuyerCompanyProfile;
+  initialAccountProfile: AccountProfileForSettings;
 }) {
   const { locale, t } = useI18n();
   const formSnapshotKey = companySnapshotKey(
@@ -288,6 +396,9 @@ function CompanyProfileForm({
   const [buyer, setBuyer] = useState(
     () => initialSnapshot?.buyer ?? initialBuyer,
   );
+  const [accountProfile, setAccountProfile] = useState(
+    () => initialSnapshot?.accountProfile ?? initialAccountProfile,
+  );
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -302,13 +413,18 @@ function CompanyProfileForm({
   useUnsavedChangesWarning(dirty && !isSaving && !isUploading, leaveMessage);
   const { draft, clearDraft, discardDraft } = useDraftBackup<CompanyDraft>(
     `bridgemarket:company-draft:${initialCompany.ownerClerkUserId}:${role}`,
-    { company, seller, buyer },
+    { company, seller, buyer, accountProfile },
     dirty && !isSaving,
   );
 
   useEffect(() => {
-    rememberCompanyFormSnapshot(formSnapshotKey, { company, seller, buyer });
-  }, [buyer, company, formSnapshotKey, seller]);
+    rememberCompanyFormSnapshot(formSnapshotKey, {
+      company,
+      seller,
+      buyer,
+      accountProfile,
+    });
+  }, [accountProfile, buyer, company, formSnapshotKey, seller]);
 
   function markDirty() {
     setDirty(true);
@@ -326,6 +442,7 @@ function CompanyProfileForm({
         company: nextCompany,
         seller,
         buyer,
+        accountProfile,
       });
       return nextCompany;
     });
@@ -342,22 +459,40 @@ function CompanyProfileForm({
     markDirty();
   }
 
+  function updateAccountProfile<K extends keyof AccountProfileForSettings>(
+    key: K,
+    value: AccountProfileForSettings[K],
+  ) {
+    setAccountProfile((current) => {
+      const nextProfile = { ...current, [key]: value };
+      rememberCompanyFormSnapshot(formSnapshotKey, {
+        company,
+        seller,
+        buyer,
+        accountProfile: nextProfile,
+      });
+      return nextProfile;
+    });
+    markDirty();
+  }
+
   function validate() {
     const nextErrors: CompanyFormErrors = {};
-    if (!company.legalName.trim()) {
+    const individualBuyer =
+      role === "buyer" && isPersonalBuyerCompanyName(company.legalName);
+    if (role === "seller" && !company.legalName.trim()) {
       nextErrors.legalName = t("settings.requiredField");
     }
-    const expectedCountry = role === "seller" ? SOUTH_KOREA : UNITED_STATES;
-    if (!expectedCountry) {
+    if (role === "buyer" && !individualBuyer && !company.legalName.trim()) {
+      nextErrors.legalName = t("settings.requiredField");
+    }
+    if (role === "seller" && !company.country.trim()) {
       nextErrors.country = t("settings.requiredField");
     }
-    if (!company.city.trim()) {
+    if (role === "seller" && !company.city.trim()) {
       nextErrors.city = t("settings.requiredField");
     }
-    if (role === "buyer" && !company.stateOrProvince.trim()) {
-      nextErrors.stateOrProvince = t("settings.requiredField");
-    }
-    if (!company.businessAddress.trim()) {
+    if (role === "seller" && !company.businessAddress.trim()) {
       nextErrors.businessAddress = t("settings.requiredField");
     }
     if (company.website.trim()) {
@@ -377,6 +512,7 @@ function CompanyProfileForm({
     setCompany(draft.company);
     setSeller(draft.seller);
     setBuyer(draft.buyer);
+    setAccountProfile(draft.accountProfile ?? initialAccountProfile);
     setDirty(true);
     setSaved(false);
     setError("");
@@ -401,9 +537,37 @@ function CompanyProfileForm({
     setError("");
 
     try {
+      let savedAccountProfile = accountProfile;
+      if (role === "buyer") {
+        const profileResponse = await fetch("/api/account/profile", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            displayName: accountProfile.displayName,
+            phoneNumber: accountProfile.phoneNumber,
+            country: company.country || accountProfile.country || UNITED_STATES,
+            city: company.city,
+            preferredLanguage: locale,
+          }),
+        });
+        if (!profileResponse.ok) {
+          setError(
+            await readJsonError(profileResponse, t("settings.profileSaveError")),
+          );
+          return;
+        }
+        savedAccountProfile = buildAccountProfile(
+          (await profileResponse.json()) as Record<string, unknown>,
+          accountProfile,
+        );
+      }
+
       const companyForSave = {
         ...company,
-        country: role === "seller" ? SOUTH_KOREA : UNITED_STATES,
+        country:
+          role === "seller"
+            ? SOUTH_KOREA
+            : company.country || accountProfile.country || UNITED_STATES,
         stateOrProvince: role === "buyer" ? company.stateOrProvince : "",
       };
       debugCompanyLogo("submitting company profile", {
@@ -461,11 +625,13 @@ function CompanyProfileForm({
         savedRecord,
         role,
         initialCompany.ownerClerkUserId,
+        savedAccountProfile,
       );
       rememberCompanyFormSnapshot(formSnapshotKey, savedProfile);
       setCompany(savedProfile.company);
       setSeller(savedProfile.seller);
       setBuyer(savedProfile.buyer);
+      setAccountProfile(savedProfile.accountProfile);
       setDirty(false);
       setSaved(true);
       clearDraft();
@@ -499,6 +665,7 @@ function CompanyProfileForm({
       company: nextCompany,
       seller,
       buyer,
+      accountProfile,
     });
     setCompany(nextCompany);
     setClearCompanyLogo(false);
@@ -523,6 +690,14 @@ function CompanyProfileForm({
     [company.logoOriginalUrl, company.logoThumbnailUrl, company.logoUrl],
   );
   const companyLogoPreviewUrl = companyLogoImageUrls[0] ?? "";
+  const individualBuyer =
+    role === "buyer" && isPersonalBuyerCompanyName(company.legalName);
+  const buyerDisplayName =
+    accountProfile.displayName.trim() ||
+    accountProfile.email.trim() ||
+    company.tradeName?.trim() ||
+    company.legalName.trim();
+  const countryOptions = getCountryOptions(locale);
 
   return (
     <form ref={formRef} onSubmit={submit} className="grid gap-6" autoComplete="off">
@@ -547,113 +722,210 @@ function CompanyProfileForm({
           </div>
         </div>
       ) : null}
-      <section className="flex flex-wrap items-center gap-4 rounded-lg border border-zinc-200 bg-white p-5">
-        <SingleImageUploader
-          kind="company_logo"
-          imageUrl={companyLogoPreviewUrl}
-          imageUrls={companyLogoImageUrls}
-          label={t("settings.companyLogoUpload")}
-          companyId={company.id.startsWith("new-") ? undefined : company.id}
-          onUploaded={updateLogo}
-          onUploadError={(message) => {
-            saveQueuedAfterUploadRef.current = false;
-            setSaveQueuedAfterUpload(false);
-            setError(message);
-          }}
-          onUploadingChange={handleUploadingChange}
-        />
-        {companyLogoPreviewUrl && !company.useDefaultLogo ? (
-          <button
-            type="button"
-            onClick={() => {
-              setCompany((current) => {
-                const nextCompany = {
-                  ...current,
-                  logoOriginalUrl: "",
-                  logoThumbnailUrl: "",
-                  logoUrl: "",
-                  useDefaultLogo: true,
-                };
-                rememberCompanyFormSnapshot(formSnapshotKey, {
-                  company: nextCompany,
-                  seller,
-                  buyer,
-                });
-                return nextCompany;
-              });
-              setClearCompanyLogo(true);
-              markDirty();
-            }}
-            className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700"
-          >
-            {t("settings.removeCompanyLogo")}
-          </button>
-        ) : null}
-      </section>
+      {role === "seller" ? (
+        <>
+          <section className="flex flex-wrap items-center gap-4 rounded-lg border border-zinc-200 bg-white p-5">
+            <SingleImageUploader
+              kind="company_logo"
+              imageUrl={companyLogoPreviewUrl}
+              imageUrls={companyLogoImageUrls}
+              label={t("settings.companyLogoUpload")}
+              companyId={company.id.startsWith("new-") ? undefined : company.id}
+              onUploaded={updateLogo}
+              onUploadError={(message) => {
+                saveQueuedAfterUploadRef.current = false;
+                setSaveQueuedAfterUpload(false);
+                setError(message);
+              }}
+              onUploadingChange={handleUploadingChange}
+            />
+            {companyLogoPreviewUrl && !company.useDefaultLogo ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setCompany((current) => {
+                    const nextCompany = {
+                      ...current,
+                      logoOriginalUrl: "",
+                      logoThumbnailUrl: "",
+                      logoUrl: "",
+                      useDefaultLogo: true,
+                    };
+                    rememberCompanyFormSnapshot(formSnapshotKey, {
+                      company: nextCompany,
+                      seller,
+                      buyer,
+                      accountProfile,
+                    });
+                    return nextCompany;
+                  });
+                  setClearCompanyLogo(true);
+                  markDirty();
+                }}
+                className="rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700"
+              >
+                {t("settings.removeCompanyLogo")}
+              </button>
+            ) : null}
+          </section>
 
-      <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
-        <Field label={t("settings.legalName")} value={company.legalName} onChange={(value) => updateCompany("legalName", value)} error={fieldErrors.legalName} required />
-        <Field label={t("settings.tradeName")} value={company.tradeName ?? ""} onChange={(value) => updateCompany("tradeName", value)} />
-        <Field label={t("settings.website")} type="url" value={company.website} onChange={(value) => updateCompany("website", value)} error={fieldErrors.website} />
-        <SelectField
-          label={t("settings.country")}
-          value={role === "seller" ? SOUTH_KOREA : UNITED_STATES}
-          onChange={(value) => updateCompany("country", value)}
-          options={[{ value: role === "seller" ? SOUTH_KOREA : UNITED_STATES, label: role === "seller" ? SOUTH_KOREA : UNITED_STATES }]}
-          error={fieldErrors.country}
-          required
-          disabled
-        />
-        {role === "buyer" ? (
-          <>
-            <Field label={t("settings.city")} value={company.city} onChange={(value) => updateCompany("city", value)} error={fieldErrors.city} required />
+          <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
+            <Field label={t("settings.legalName")} value={company.legalName} onChange={(value) => updateCompany("legalName", value)} error={fieldErrors.legalName} required />
+            <Field label={t("settings.tradeName")} value={company.tradeName ?? ""} onChange={(value) => updateCompany("tradeName", value)} />
+            <Field label={t("settings.website")} type="url" value={company.website} onChange={(value) => updateCompany("website", value)} error={fieldErrors.website} />
             <SelectField
-              label={t("settings.state")}
-              value={company.stateOrProvince}
-              onChange={(value) => updateCompany("stateOrProvince", value)}
-              options={getUsStateOptions(locale)}
-              placeholder={t("settings.selectState")}
-              error={fieldErrors.stateOrProvince}
+              label={t("settings.country")}
+              value={SOUTH_KOREA}
+              onChange={(value) => updateCompany("country", value)}
+              options={[{ value: SOUTH_KOREA, label: SOUTH_KOREA }]}
+              error={fieldErrors.country}
+              required
+              disabled
+            />
+            <SelectField
+              label={t("settings.cityRegion")}
+              value={company.city}
+              onChange={(value) => updateCompany("city", value)}
+              options={getKoreanRegionOptions(locale)}
+              placeholder={t("settings.selectCityRegion")}
+              error={fieldErrors.city}
               required
             />
-          </>
-        ) : (
-          <SelectField
-            label={t("settings.cityRegion")}
-            value={company.city}
-            onChange={(value) => updateCompany("city", value)}
-            options={getKoreanRegionOptions(locale)}
-            placeholder={t("settings.selectCityRegion")}
-            error={fieldErrors.city}
-            required
-          />
-        )}
-        <Field label={t("settings.businessAddress")} value={company.businessAddress} onChange={(value) => updateCompany("businessAddress", value)} error={fieldErrors.businessAddress} className="sm:col-span-2" required />
-        {role === "seller" ? (
-          <CheckboxGroup
-            label={t("settings.categories")}
-            values={company.categories}
-            onChange={(values) => updateCompany("categories", values)}
-            options={getSellerProductCategoryOptions(locale)}
-            className="sm:col-span-2"
-          />
-        ) : null}
-        <label className="grid gap-1 text-sm sm:col-span-2">
-          <span className="font-medium text-zinc-700">
-            {role === "buyer" ? t("settings.marketStrategy") : t("settings.companyDescription")}
-          </span>
-          <textarea value={company.description} onChange={(event) => updateCompany("description", event.target.value)} rows={4} className="rounded-md border border-zinc-200 px-3 py-2" />
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={company.useDefaultLogo} onChange={(event) => updateCompany("useDefaultLogo", event.target.checked)} />
-          {t("settings.useDefaultLogo")}
-        </label>
-      </section>
+            <Field label={t("settings.businessAddress")} value={company.businessAddress} onChange={(value) => updateCompany("businessAddress", value)} error={fieldErrors.businessAddress} className="sm:col-span-2" required />
+            <CheckboxGroup
+              label={t("settings.categories")}
+              values={company.categories}
+              onChange={(values) => updateCompany("categories", values)}
+              options={getSellerProductCategoryOptions(locale)}
+              className="sm:col-span-2"
+            />
+            <label className="grid gap-1 text-sm sm:col-span-2">
+              <span className="font-medium text-zinc-700">
+                {t("settings.companyDescription")}
+              </span>
+              <textarea value={company.description} onChange={(event) => updateCompany("description", event.target.value)} rows={4} className="rounded-md border border-zinc-200 px-3 py-2" />
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={company.useDefaultLogo} onChange={(event) => updateCompany("useDefaultLogo", event.target.checked)} />
+              {t("settings.useDefaultLogo")}
+            </label>
+          </section>
 
-      {role === "seller" ? (
-        <SellerFields seller={seller} setSeller={setSeller} onDirty={markDirty} />
+          <SellerFields seller={seller} setSeller={setSeller} onDirty={markDirty} />
+        </>
       ) : (
-        <BuyerFields buyer={buyer} setBuyer={setBuyer} onDirty={markDirty} />
+        <>
+          <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5">
+            <div className="flex flex-wrap items-center gap-4">
+              <ProfileAvatar
+                imageUrl={accountProfile.avatarUrl || accountProfile.avatarOriginalUrl}
+                name={buyerDisplayName}
+                email={accountProfile.email}
+              />
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate text-base font-semibold text-zinc-950">
+                  {buyerDisplayName || t("settings.buyerProfileSection")}
+                </h3>
+                <p className="truncate text-sm text-zinc-500">
+                  {accountProfile.email}
+                </p>
+              </div>
+              <Link
+                href={withLocale("/settings/profile", locale)}
+                className="inline-flex h-9 items-center rounded-md border border-zinc-200 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              >
+                {t("settings.manageProfile")}
+              </Link>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                label={t("settings.displayName")}
+                value={accountProfile.displayName}
+                onChange={(value) => updateAccountProfile("displayName", value)}
+              />
+              <Field
+                label={t("onboarding.workEmail")}
+                type="email"
+                value={accountProfile.email}
+                onChange={() => undefined}
+                disabled
+              />
+              <Field
+                label={t("settings.phoneNumber")}
+                type="tel"
+                value={accountProfile.phoneNumber}
+                onChange={(value) => updateAccountProfile("phoneNumber", value)}
+              />
+            </div>
+          </section>
+
+          <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <h3 className="text-base font-semibold text-zinc-950">
+                {t("settings.buyerProfileSection")}
+              </h3>
+              <p className="mt-1 text-sm text-zinc-500">
+                {t("settings.buyerProfileSectionDescription")}
+              </p>
+            </div>
+            {!individualBuyer ? (
+              <>
+                <Field
+                  label={t("onboarding.companyName")}
+                  value={company.legalName}
+                  onChange={(value) => updateCompany("legalName", value)}
+                  error={fieldErrors.legalName}
+                  required
+                />
+                <Field label={t("settings.tradeName")} value={company.tradeName ?? ""} onChange={(value) => updateCompany("tradeName", value)} />
+                <Field label={t("settings.website")} type="url" value={company.website} onChange={(value) => updateCompany("website", value)} error={fieldErrors.website} />
+              </>
+            ) : null}
+            <SelectField
+              label={t("settings.country")}
+              value={company.country || accountProfile.country || UNITED_STATES}
+              onChange={(value) => updateCompany("country", value)}
+              options={countryOptions}
+              placeholder={t("onboarding.select")}
+              error={fieldErrors.country}
+              className={!individualBuyer ? "" : "sm:col-span-1"}
+            />
+            <Field label={t("settings.city")} value={company.city} onChange={(value) => updateCompany("city", value)} error={fieldErrors.city} />
+            {(company.country || accountProfile.country) === UNITED_STATES ? (
+              <SelectField
+                label={t("settings.state")}
+                value={company.stateOrProvince}
+                onChange={(value) => updateCompany("stateOrProvince", value)}
+                options={getUsStateOptions(locale)}
+                placeholder={t("settings.selectState")}
+                error={fieldErrors.stateOrProvince}
+              />
+            ) : (
+              <Field
+                label={t("settings.stateProvince")}
+                value={company.stateOrProvince}
+                onChange={(value) => updateCompany("stateOrProvince", value)}
+              />
+            )}
+            {!individualBuyer ? (
+              <Field
+                label={t("settings.businessAddress")}
+                value={company.businessAddress}
+                onChange={(value) => updateCompany("businessAddress", value)}
+                error={fieldErrors.businessAddress}
+                className="sm:col-span-2"
+              />
+            ) : null}
+            <label className="grid gap-1 text-sm sm:col-span-2">
+              <span className="font-medium text-zinc-700">
+                {t("settings.marketStrategy")}
+              </span>
+              <textarea value={company.description} onChange={(event) => updateCompany("description", event.target.value)} rows={4} className="rounded-md border border-zinc-200 px-3 py-2" />
+            </label>
+          </section>
+
+          <BuyerFields buyer={buyer} setBuyer={setBuyer} onDirty={markDirty} />
+        </>
       )}
 
       {error ? (
@@ -667,7 +939,9 @@ function CompanyProfileForm({
             ? t("settings.saving")
             : isUploading
               ? t("settings.saveAfterUpload")
-              : t("settings.saveCompany")}
+              : role === "buyer"
+                ? t("settings.saveBuyerProfile")
+                : t("settings.saveCompany")}
         </button>
         {saved ? <span className="text-sm text-emerald-700">{t("settings.saved")}</span> : null}
       </div>
@@ -816,11 +1090,46 @@ function BuyerFields({
         options={getSalesChannelOptions(locale)}
         className="sm:col-span-2"
       />
-      <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 sm:col-span-2">
-        <p className="font-medium text-zinc-800">{t("settings.contactPersonSection")}</p>
-        <p className="mt-1 leading-6">{t("settings.contactPersonManaged")}</p>
-      </div>
     </section>
+  );
+}
+
+function ProfileAvatar({
+  imageUrl,
+  name,
+  email,
+}: {
+  imageUrl: string;
+  name: string;
+  email: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const initials =
+    name
+      .split(/\s+/)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() ||
+    email.slice(0, 2).toUpperCase() ||
+    "B";
+
+  if (imageUrl && !failed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={imageUrl}
+        alt=""
+        className="size-14 rounded-full border border-zinc-200 object-cover"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  return (
+    <div className="flex size-14 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-sm font-semibold text-zinc-600">
+      {initials}
+    </div>
   );
 }
 
@@ -970,16 +1279,18 @@ function Field({
   preventAutofill = false,
   error,
   required = false,
+  disabled = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  type?: "text" | "url";
+  type?: "text" | "url" | "email" | "tel";
   className?: string;
   fieldName?: string;
   preventAutofill?: boolean;
   error?: string;
   required?: boolean;
+  disabled?: boolean;
 }) {
   const inputName =
     fieldName ?? label.trim().toLowerCase().replace(/\s+/g, "-");
@@ -995,13 +1306,14 @@ function Field({
         name={inputName}
         placeholder={label}
         required={required}
+        disabled={disabled}
         autoComplete={preventAutofill ? "new-password" : "off"}
         data-1p-ignore={preventAutofill ? "true" : undefined}
         data-lpignore={preventAutofill ? "true" : undefined}
         value={value}
         aria-invalid={Boolean(error)}
         onChange={(event) => onChange(event.target.value)}
-        className="h-10 rounded-md border border-zinc-200 px-3 aria-invalid:border-red-300"
+        className="h-10 rounded-md border border-zinc-200 px-3 aria-invalid:border-red-300 disabled:bg-zinc-50 disabled:text-zinc-500"
       />
       {error ? <span className="text-sm text-red-700">{error}</span> : null}
     </label>
