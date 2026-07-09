@@ -19,17 +19,11 @@ import {
   getBuyerCategoryOptions,
   getBuyerTypeOptions,
   getCountryOptions,
-  getImportExperienceOptions,
-  getImportVolumeOptions,
   getKoreanRegionOptions,
   getLeadTimeOptions,
   getMoqUnitOptions,
-  getOrderSizeOptions,
-  getSalesChannelOptions,
   getSellerProductCategoryOptions,
   getSellerSupplierTypeOptions,
-  getSourcingTimelineOptions,
-  getSupplierTypeOptions,
   getUsStateOptions,
   formatMoqValue,
   normalizeSellerSupplierType,
@@ -474,6 +468,37 @@ function CompanyProfileForm({
     markDirty();
   }
 
+  function updateBuyer<K extends keyof BuyerCompanyProfile>(
+    key: K,
+    value: BuyerCompanyProfile[K],
+  ) {
+    setBuyer((current) => {
+      const nextBuyer = { ...current, [key]: value };
+      rememberCompanyFormSnapshot(formSnapshotKey, {
+        company,
+        seller,
+        buyer: nextBuyer,
+        accountProfile,
+      });
+      return nextBuyer;
+    });
+    markDirty();
+  }
+
+  function updateBuyerCategories(values: string[]) {
+    const nextCompany = { ...company, categories: values };
+    const nextBuyer = { ...buyer, purchasingCategories: values };
+    rememberCompanyFormSnapshot(formSnapshotKey, {
+      company: nextCompany,
+      seller,
+      buyer: nextBuyer,
+      accountProfile,
+    });
+    setCompany(nextCompany);
+    setBuyer(nextBuyer);
+    markDirty();
+  }
+
   function validate() {
     const nextErrors: CompanyFormErrors = {};
     const individualBuyer =
@@ -688,8 +713,6 @@ function CompanyProfileForm({
     [company.logoOriginalUrl, company.logoThumbnailUrl, company.logoUrl],
   );
   const companyLogoPreviewUrl = companyLogoImageUrls[0] ?? "";
-  const individualBuyer =
-    role === "buyer" && isPersonalBuyerCompanyName(company.legalName);
   const buyerDisplayName =
     accountProfile.displayName.trim() ||
     accountProfile.email.trim() ||
@@ -859,25 +882,12 @@ function CompanyProfileForm({
           <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
               <h3 className="text-base font-semibold text-zinc-950">
-                {t("settings.buyerProfileSection")}
+                {t("settings.buyerDetailsSection")}
               </h3>
               <p className="mt-1 text-sm text-zinc-500">
                 {t("settings.buyerProfileSectionDescription")}
               </p>
             </div>
-            {!individualBuyer ? (
-              <>
-                <Field
-                  label={t("onboarding.companyName")}
-                  value={company.legalName}
-                  onChange={(value) => updateCompany("legalName", value)}
-                  error={fieldErrors.legalName}
-                  required
-                />
-                <Field label={t("settings.tradeName")} value={company.tradeName ?? ""} onChange={(value) => updateCompany("tradeName", value)} />
-                <Field label={t("settings.website")} type="url" value={company.website} onChange={(value) => updateCompany("website", value)} error={fieldErrors.website} />
-              </>
-            ) : null}
             <SelectField
               label={t("settings.country")}
               value={company.country || accountProfile.country || ""}
@@ -885,7 +895,6 @@ function CompanyProfileForm({
               options={countryOptions}
               placeholder={t("onboarding.select")}
               error={fieldErrors.country}
-              className={!individualBuyer ? "" : "sm:col-span-1"}
             />
             <Field label={t("settings.city")} value={company.city} onChange={(value) => updateCompany("city", value)} error={fieldErrors.city} />
             {(company.country || accountProfile.country) === UNITED_STATES ? (
@@ -904,15 +913,21 @@ function CompanyProfileForm({
                 onChange={(value) => updateCompany("stateOrProvince", value)}
               />
             )}
-            {!individualBuyer ? (
-              <Field
-                label={t("settings.businessAddress")}
-                value={company.businessAddress}
-                onChange={(value) => updateCompany("businessAddress", value)}
-                error={fieldErrors.businessAddress}
-                className="sm:col-span-2"
-              />
-            ) : null}
+            <SelectField
+              label={t("settings.buyerType")}
+              value={buyer.buyerType}
+              onChange={(value) =>
+                updateBuyer("buyerType", value as BuyerCompanyProfile["buyerType"])
+              }
+              options={getBuyerTypeOptions(locale)}
+            />
+            <CheckboxGroup
+              label={t("settings.purchasingCategories")}
+              values={buyer.purchasingCategories}
+              onChange={updateBuyerCategories}
+              options={getBuyerCategoryOptions(locale)}
+              className="sm:col-span-2"
+            />
             <label className="grid gap-1 text-sm sm:col-span-2">
               <span className="font-medium text-zinc-700">
                 {t("settings.marketStrategy")}
@@ -920,8 +935,6 @@ function CompanyProfileForm({
               <textarea value={company.description} onChange={(event) => updateCompany("description", event.target.value)} rows={4} className="rounded-md border border-zinc-200 px-3 py-2" />
             </label>
           </section>
-
-          <BuyerFields buyer={buyer} setBuyer={setBuyer} onDirty={markDirty} />
         </>
       )}
 
@@ -937,7 +950,7 @@ function CompanyProfileForm({
             : isUploading
               ? t("settings.saveAfterUpload")
               : role === "buyer"
-                ? t("settings.saveBuyerProfile")
+                ? t("common.save")
                 : t("settings.saveCompany")}
         </button>
         {saved ? <span className="text-sm text-emerald-700">{t("settings.saved")}</span> : null}
@@ -1008,85 +1021,6 @@ function SellerFields({
           ))}
         </select>
       </label>
-    </section>
-  );
-}
-
-function BuyerFields({
-  buyer,
-  setBuyer,
-  onDirty,
-}: {
-  buyer: BuyerCompanyProfile;
-  setBuyer: React.Dispatch<React.SetStateAction<BuyerCompanyProfile>>;
-  onDirty: () => void;
-}) {
-  const { locale, t } = useI18n();
-  const update = <K extends keyof BuyerCompanyProfile>(key: K, value: BuyerCompanyProfile[K]) => {
-    setBuyer((current) => ({ ...current, [key]: value }));
-    onDirty();
-  };
-
-  return (
-    <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
-      <div className="sm:col-span-2">
-        <h3 className="text-base font-semibold text-zinc-950">{t("settings.sourcingPreferencesSection")}</h3>
-      </div>
-      <SelectField
-        label={t("settings.buyerType")}
-        value={buyer.buyerType}
-        onChange={(value) => update("buyerType", value as BuyerCompanyProfile["buyerType"])}
-        options={getBuyerTypeOptions(locale)}
-      />
-      <CheckboxGroup
-        label={t("settings.purchasingCategories")}
-        values={buyer.purchasingCategories}
-        onChange={(values) => update("purchasingCategories", values)}
-        options={getBuyerCategoryOptions(locale)}
-        className="sm:col-span-2"
-      />
-      <SelectField
-        label={t("onboarding.preferredSupplierType")}
-        value={buyer.preferredSupplierType}
-        onChange={(value) => update("preferredSupplierType", value)}
-        options={getSupplierTypeOptions(locale)}
-        placeholder={t("onboarding.select")}
-      />
-      <SelectField
-        label={t("settings.targetOrderSize")}
-        value={buyer.targetOrderSize}
-        onChange={(value) => update("targetOrderSize", value)}
-        options={getOrderSizeOptions(locale)}
-        placeholder={t("onboarding.select")}
-      />
-      <SelectField
-        label={t("settings.monthlyImportVolume")}
-        value={buyer.monthlyImportVolume}
-        onChange={(value) => update("monthlyImportVolume", value)}
-        options={getImportVolumeOptions(locale)}
-        placeholder={t("onboarding.select")}
-      />
-      <SelectField
-        label={t("settings.importExperience")}
-        value={buyer.importExperience}
-        onChange={(value) => update("importExperience", value)}
-        options={getImportExperienceOptions(locale)}
-        placeholder={t("onboarding.select")}
-      />
-      <SelectField
-        label={t("settings.purchaseTimeline")}
-        value={buyer.purchaseTimeline}
-        onChange={(value) => update("purchaseTimeline", value)}
-        options={getSourcingTimelineOptions(locale)}
-        placeholder={t("onboarding.select")}
-      />
-      <CheckboxGroup
-        label={t("settings.salesChannels")}
-        values={buyer.salesChannels}
-        onChange={(values) => update("salesChannels", values)}
-        options={getSalesChannelOptions(locale)}
-        className="sm:col-span-2"
-      />
     </section>
   );
 }

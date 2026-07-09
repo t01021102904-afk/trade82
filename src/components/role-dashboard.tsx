@@ -181,26 +181,9 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           company.categories.length ? "categories" : "",
           roleProfile ? "role-profile" : "",
         ]
-      : [
-          buyerDisplayName,
-          buyerEmail,
-          company.country,
-          company.city,
-          getArrayField(roleProfile, "purchasingCategories").length
-            ? "categories"
-            : "",
-          getStringField(roleProfile, "buyerType"),
-          getStringField(roleProfile, "preferredSupplierType"),
-          getStringField(roleProfile, "targetOrderSize"),
-          getStringField(roleProfile, "monthlyImportVolume"),
-          getStringField(roleProfile, "importExperience"),
-          getStringField(roleProfile, "purchaseTimeline"),
-          getArrayField(roleProfile, "salesChannels").length
-            ? "sales-channels"
-            : "",
-        ];
+      : [];
   const completeness = Math.round(
-    (values.filter(Boolean).length / values.length) * 100,
+    values.length ? (values.filter(Boolean).length / values.length) * 100 : 0,
   );
   const status = company.verificationStatus;
   const rejectionReason = company.verificationRequests[0]?.adminNote;
@@ -433,26 +416,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
               </p>
             </div>
           </section>
-        ) : (
-          <section className="grid gap-3 md:grid-cols-[1fr_auto]">
-            <div className="rounded-2xl border p-4 theme-surface">
-              <p className="text-sm font-medium theme-foreground">
-                {t("dashboard.buyerProfile")}
-              </p>
-              <p className="mt-2 text-sm leading-6 theme-muted">
-                {t("settings.buyerDashboardDescription")}
-              </p>
-            </div>
-            <div className="rounded-2xl border p-4 theme-surface md:min-w-40">
-              <p className="text-sm theme-muted">
-                {t("dashboard.profileCompletion")}
-              </p>
-              <p className="mt-1 text-xl font-semibold theme-foreground">
-                {completeness}%
-              </p>
-            </div>
-          </section>
-        )}
+        ) : null}
 
         {role === "seller" && (status === "rejected" || status === "needs_reverification") ? (
           <div className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
@@ -552,14 +516,6 @@ function getStringField(
 ) {
   const field = value?.[key];
   return typeof field === "string" ? field.trim() : "";
-}
-
-function getArrayField(
-  value: Record<string, unknown> | null,
-  key: string,
-) {
-  const field = value?.[key];
-  return Array.isArray(field) ? field.filter(Boolean) : [];
 }
 
 function Action({

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
@@ -239,8 +239,6 @@ export function DashboardClient({
           <BuyerDiscoveryDashboard
             summary={summary}
             metrics={metrics}
-            savedProducts={savedProducts}
-            inquiries={recentInquiries}
             locale={locale}
             onSectionChange={onSectionChange}
           />
@@ -427,15 +425,11 @@ function SellerSupportPanel({
 function BuyerDiscoveryDashboard({
   summary,
   metrics,
-  savedProducts,
-  inquiries,
   locale,
   onSectionChange,
 }: {
   summary: Summary;
   metrics: Metric[];
-  savedProducts: NonNullable<Summary["recentSavedItems"]>;
-  inquiries: NonNullable<Summary["recentInquiries"]>;
   locale: "en" | "ko";
   onSectionChange?: (section: DashboardSection) => void;
 }) {
@@ -452,7 +446,6 @@ function BuyerDiscoveryDashboard({
     ? profile.categories
     : summary.suggestedCategories ?? [];
   const keywords = profile?.keywords ?? [];
-  const buyerName = cleanBuyerDisplayName(profile?.displayName) || t("dashboard.globalBuyer");
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
     return recommendedProducts.filter((product) => {
@@ -480,93 +473,24 @@ function BuyerDiscoveryDashboard({
 
   return (
     <div className="grid gap-4 theme-foreground">
-      <section className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-2xl border p-5 theme-surface-elevated">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
-                {t("settings.buyerDashboard")}
-              </p>
-              <h2 className="mt-3 text-xl font-semibold theme-foreground">
-                {t("dashboard.buyerWelcome", "Welcome")}
-                {buyerName ? `, ${buyerName}` : ""}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
-                {t("settings.buyerDashboardDescription")}
-              </p>
-            </div>
-            <div className="rounded-2xl border px-4 py-3 text-right theme-success-badge">
-              <p className="text-xs font-medium">
-                {t("dashboard.profileCompletion")}
-              </p>
-              <p className="mt-1 text-xl font-semibold theme-foreground">
-                {profile?.profileCompletion ?? 0}%
-              </p>
-            </div>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {categories.slice(0, 6).map((item) => (
-              <span
-                key={item}
-                className="rounded-full border px-3 py-1 text-xs font-medium theme-surface-muted theme-muted"
-              >
-                {buyerCategoryLabel(item, locale)}
-              </span>
-            ))}
-            {keywords.slice(0, 6).map((item) => (
-              <span
-                key={item}
-                className="rounded-full border px-3 py-1 text-xs font-medium theme-success-badge"
-              >
-                #{item}
-              </span>
-            ))}
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Link
-              href={withLocale("/marketplace", locale)}
-              className="inline-flex h-9 items-center rounded-xl px-3 text-sm font-semibold transition theme-primary-button"
-            >
-              {t("dashboard.browseProducts")}
-            </Link>
+      <section className="rounded-2xl border p-4 theme-surface">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {metrics.slice(0, 4).map((metric) => (
             <button
+              key={metric.label}
               type="button"
-              onClick={() => onSectionChange?.("messages")}
-              className="inline-flex h-9 items-center rounded-xl border px-3 text-sm font-medium transition theme-secondary-button"
+              onClick={() => onSectionChange?.(metric.section)}
+              className="rounded-xl border p-3 text-left transition theme-surface-muted theme-card-hover"
             >
-              {t("dashboard.sendInquiry")}
+              <span className="flex min-w-0 items-center gap-2 text-xs theme-muted">
+                <MetricIcon icon={metric.icon} />
+                <span className="truncate">{metric.label}</span>
+              </span>
+              <span className="mt-1 block text-lg font-semibold theme-foreground">
+                {metric.value}
+              </span>
             </button>
-            <Link
-              href={withLocale("/settings/company", locale)}
-              className="inline-flex h-9 items-center rounded-xl border px-3 text-sm font-medium transition theme-secondary-button"
-            >
-              {t("dashboard.updateProductInterests")}
-            </Link>
-          </div>
-        </div>
-
-        <div className="grid gap-3 rounded-2xl border p-4 theme-surface">
-          <h3 className="text-base font-semibold theme-foreground">
-            {t("dashboard.buyerSnapshot")}
-          </h3>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {metrics.slice(0, 4).map((metric) => (
-              <button
-                key={metric.label}
-                type="button"
-                onClick={() => onSectionChange?.(metric.section)}
-                className="rounded-xl border p-3 text-left transition theme-surface-muted theme-card-hover"
-              >
-                <span className="flex min-w-0 items-center gap-2 text-xs theme-muted">
-                  <MetricIcon icon={metric.icon} />
-                  <span className="truncate">{metric.label}</span>
-                </span>
-                <span className="mt-1 block text-lg font-semibold theme-foreground">
-                  {metric.value}
-                </span>
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
 
@@ -684,115 +608,7 @@ function BuyerDiscoveryDashboard({
         ) : null}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <DarkListPanel
-          title={t("dashboard.savedProducts")}
-          actionLabel={t("dashboard.browseProducts")}
-          href={withLocale("/marketplace", locale)}
-          emptyTitle={t("dashboard.noSavedProductsTitle")}
-          emptyText={t("dashboard.startExploringKoreanProducts")}
-        >
-          {savedProducts.map((item) =>
-            item.href ? (
-              <Link
-                key={item.id}
-                href={withLocale(item.href, locale)}
-                className="rounded-xl border p-3 text-sm font-medium theme-surface-muted theme-card-hover"
-              >
-                {item.displayName}
-              </Link>
-            ) : null,
-          )}
-        </DarkListPanel>
-        <DarkListPanel
-          title={t("dashboard.inquiryManagement")}
-          actionLabel={t("dashboard.viewMessages")}
-          href={withLocale("/messages", locale)}
-          emptyTitle={t("dashboard.noInquiriesTitle")}
-          emptyText={t("dashboard.startByExploringProducts")}
-        >
-          {inquiries.map((item, index) => (
-            <Link
-              key={item.id}
-              href={withLocale("/messages", locale)}
-              className="rounded-xl border p-3 theme-surface-muted theme-card-hover"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium theme-foreground">
-                    {item.productName || item.companyName}
-                  </p>
-                  <p className="mt-1 line-clamp-2 text-xs leading-5 theme-muted">
-                    {item.message}
-                  </p>
-                </div>
-                <span className="shrink-0 rounded-full border px-2 py-0.5 text-[11px] font-medium theme-border theme-muted">
-                  {index === 0
-                    ? t("dashboard.sellerReplied")
-                    : t("dashboard.waitingForResponse")}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </DarkListPanel>
-      </section>
-
-      <section className="rounded-2xl border p-4 theme-surface">
-        <h3 className="text-base font-semibold theme-foreground">
-          {t("dashboard.suggestedCategories")}
-        </h3>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {(summary.suggestedCategories ?? categories).map((item) => (
-            <Link
-              key={item}
-              href={withLocale(`/marketplace?category=${encodeURIComponent(item)}`, locale)}
-              className="rounded-full border px-3 py-1 text-xs font-medium transition theme-surface-muted theme-muted hover:text-[var(--foreground)]"
-            >
-              {buyerCategoryLabel(item, locale)}
-            </Link>
-          ))}
-        </div>
-      </section>
     </div>
-  );
-}
-
-function DarkListPanel({
-  title,
-  actionLabel,
-  href,
-  emptyTitle,
-  emptyText,
-  children,
-}: {
-  title: string;
-  actionLabel: string;
-  href: string;
-  emptyTitle: string;
-  emptyText: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="rounded-2xl border p-4 theme-surface">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold theme-foreground">{title}</h3>
-        <Link
-          href={href}
-          className="text-xs font-semibold theme-success-text hover:underline"
-        >
-          {actionLabel}
-        </Link>
-      </div>
-      <div className="mt-3 grid gap-2">
-        {children}
-        {Array.isArray(children) && children.filter(Boolean).length ? null : (
-          <div className="rounded-2xl border border-dashed p-5 theme-surface-muted">
-            <p className="text-sm font-semibold theme-foreground">{emptyTitle}</p>
-            <p className="mt-1 text-sm leading-6 theme-muted">{emptyText}</p>
-          </div>
-        )}
-      </div>
-    </section>
   );
 }
 
@@ -805,10 +621,6 @@ function formatBuyerProductPrice(
     return `${product.currency} ${product.priceMin} - ${product.priceMax}`;
   }
   return `${product.currency} ${product.priceMin ?? product.priceMax}`;
-}
-
-function cleanBuyerDisplayName(value: string | null | undefined) {
-  return String(value ?? "").trim();
 }
 
 function OverviewSection({
