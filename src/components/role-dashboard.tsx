@@ -26,6 +26,7 @@ import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
 import { isVerifiedSellerSubscription } from "@/lib/billing";
+import { getBuyerTypeOptions } from "@/lib/company-select-options";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import { isActiveSellerSupportSubscription } from "@/lib/seller-support";
 import type { VerificationStatus } from "@/lib/types";
@@ -41,6 +42,7 @@ type DashboardCompany = {
   useDefaultLogo: boolean;
   website: string;
   country: string;
+  city: string;
   businessAddress: string;
   description: string;
   categories: string[];
@@ -54,6 +56,11 @@ type DashboardCompany = {
   sellerSupportStatus?: string | null;
 };
 
+type DashboardAccountProfile = {
+  displayName?: string;
+  email?: string;
+};
+
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
@@ -64,6 +71,8 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const [company, setCompany] = useState<DashboardCompany | null | undefined>(
     undefined,
   );
+  const [accountProfile, setAccountProfile] =
+    useState<DashboardAccountProfile | null>(null);
   const [activeSection, setActiveSection] =
     useState<DashboardSection>(() =>
       parseDashboardSection(searchParams.get("section"), role) ?? "overview",
@@ -88,6 +97,23 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     };
   }, [isLoaded, role, userId]);
 
+  useEffect(() => {
+    if (!isLoaded || !userId || role !== "buyer") return;
+
+    let active = true;
+    void fetch("/api/account/profile", { cache: "no-store" })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((profile: DashboardAccountProfile | null) => {
+        if (active) setAccountProfile(profile);
+      })
+      .catch(() => {
+        if (active) setAccountProfile(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, [isLoaded, role, userId]);
+
   if (company === undefined) {
     return <p className="text-sm text-zinc-600">{t("common.loading")}</p>;
   }
@@ -96,10 +122,14 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     return (
       <section className="rounded-md border border-amber-200 bg-amber-50 p-4">
         <h2 className="font-semibold text-amber-950">
-          {t("settings.companyProfileMissing")}
+          {role === "buyer"
+            ? t("settings.buyerProfileMissing")
+            : t("settings.companyProfileMissing")}
         </h2>
         <p className="mt-2 text-sm text-amber-800">
-          {t("settings.companyProfileMissingText")}
+          {role === "buyer"
+            ? t("settings.buyerProfileMissingText")
+            : t("settings.companyProfileMissingText")}
         </p>
         <Link
           href={withLocale(`/onboarding/${role}`, locale)}
@@ -113,15 +143,50 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
 
   const roleProfile =
     role === "seller" ? company.sellerProfile : company.buyerProfile;
-  const values = [
-    company.legalName,
-    company.website,
-    company.country,
-    company.businessAddress,
-    company.description,
-    company.categories.length ? "categories" : "",
-    roleProfile ? "role-profile" : "",
-  ];
+  const buyerEmail =
+    accountProfile?.email?.trim() ||
+    user?.primaryEmailAddress?.emailAddress ||
+    "";
+  const buyerDisplayName = getBuyerDashboardDisplayName({
+    displayName: accountProfile?.displayName,
+    fallbackName: user?.fullName,
+    email: buyerEmail,
+    company,
+    fallbackLabel: t("dashboard.americanBuyer"),
+  });
+  const buyerType = getStringField(roleProfile, "buyerType");
+  const buyerTypeLabel =
+    getBuyerTypeOptions(locale).find((option) => option.value === buyerType)
+      ?.label || t("dashboard.americanBuyer");
+  const values =
+    role === "seller"
+      ? [
+          company.legalName,
+          company.website,
+          company.country,
+          company.businessAddress,
+          company.description,
+          company.categories.length ? "categories" : "",
+          roleProfile ? "role-profile" : "",
+        ]
+      : [
+          buyerDisplayName,
+          buyerEmail,
+          company.country,
+          company.city,
+          getArrayField(roleProfile, "purchasingCategories").length
+            ? "categories"
+            : "",
+          getStringField(roleProfile, "buyerType"),
+          getStringField(roleProfile, "preferredSupplierType"),
+          getStringField(roleProfile, "targetOrderSize"),
+          getStringField(roleProfile, "monthlyImportVolume"),
+          getStringField(roleProfile, "importExperience"),
+          getStringField(roleProfile, "purchaseTimeline"),
+          getArrayField(roleProfile, "salesChannels").length
+            ? "sales-channels"
+            : "",
+        ];
   const completeness = Math.round(
     (values.filter(Boolean).length / values.length) * 100,
   );
@@ -281,7 +346,11 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <CompanyLogo
-                companyName={company.tradeName || company.legalName}
+                companyName={
+                  role === "buyer"
+                    ? buyerDisplayName
+                    : company.tradeName || company.legalName
+                }
                 logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? undefined}
                 useDefaultLogo={company.useDefaultLogo}
                 size="lg"
@@ -291,7 +360,9 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                   <h1
                     className="truncate text-lg font-semibold theme-foreground"
                   >
-                    {company.tradeName || company.legalName}
+                    {role === "buyer"
+                      ? buyerDisplayName
+                      : company.tradeName || company.legalName}
                   </h1>
                   {context?.isAdmin ? <AdminBadge /> : null}
                   {verifiedSeller ? <VerifiedSellerBadge /> : null}
@@ -299,11 +370,13 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                 <p className="mt-1 text-sm theme-muted">
                   {role === "seller"
                     ? t("onboarding.roleSellerTitle")
-                    : t("onboarding.roleBuyerTitle")}
+                    : buyerTypeLabel}
                 </p>
-                <div className="mt-2">
-                  <VerificationBadge status={status} subject={role} />
-                </div>
+                {role === "seller" ? (
+                  <div className="mt-2">
+                    <VerificationBadge status={status} subject={role} />
+                  </div>
+                ) : null}
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -317,38 +390,59 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           </div>
         </section>
 
-        <section className="grid gap-3 md:grid-cols-[1fr_auto]">
-          <div className="rounded-2xl border p-4 theme-surface">
-            <p className="text-sm theme-muted">
-              {t("settings.verificationStatus")}
-            </p>
-            <div className="mt-2">
-              <VerificationBadge status={status} subject={role} />
+        {role === "seller" ? (
+          <section className="grid gap-3 md:grid-cols-[1fr_auto]">
+            <div className="rounded-2xl border p-4 theme-surface">
+              <p className="text-sm theme-muted">
+                {t("settings.verificationStatus")}
+              </p>
+              <div className="mt-2">
+                <VerificationBadge status={status} subject={role} />
+              </div>
+              <p className="mt-2 text-sm theme-muted">
+                {status === "verified"
+                  ? t("settings.verifiedCompanyText")
+                  : status === "rejected"
+                    ? rejectionReason || t("settings.rejectedCompanyText")
+                    : t("settings.pendingCompanyText")}
+              </p>
+              <p className="mt-2 text-sm font-medium theme-foreground">
+                {status === "verified"
+                  ? t("dashboard.publicListingLive")
+                  : t("dashboard.publicListingHidden")}
+              </p>
             </div>
-            <p className="mt-2 text-sm theme-muted">
-              {status === "verified"
-                ? t("settings.verifiedCompanyText")
-                : status === "rejected"
-                  ? rejectionReason || t("settings.rejectedCompanyText")
-                  : t("settings.pendingCompanyText")}
-            </p>
-            <p className="mt-2 text-sm font-medium theme-foreground">
-              {status === "verified"
-                ? t("dashboard.publicListingLive")
-                : t("dashboard.publicListingHidden")}
-            </p>
-          </div>
-          <div className="rounded-2xl border p-4 theme-surface md:min-w-40">
-            <p className="text-sm theme-muted">
-              {t("settings.profileCompleteness")}
-            </p>
-            <p className="mt-1 text-xl font-semibold theme-foreground">
-              {completeness}%
-            </p>
-          </div>
-        </section>
+            <div className="rounded-2xl border p-4 theme-surface md:min-w-40">
+              <p className="text-sm theme-muted">
+                {t("settings.profileCompleteness")}
+              </p>
+              <p className="mt-1 text-xl font-semibold theme-foreground">
+                {completeness}%
+              </p>
+            </div>
+          </section>
+        ) : (
+          <section className="grid gap-3 md:grid-cols-[1fr_auto]">
+            <div className="rounded-2xl border p-4 theme-surface">
+              <p className="text-sm font-medium theme-foreground">
+                {t("dashboard.buyerProfile")}
+              </p>
+              <p className="mt-2 text-sm leading-6 theme-muted">
+                {t("settings.buyerDashboardDescription")}
+              </p>
+            </div>
+            <div className="rounded-2xl border p-4 theme-surface md:min-w-40">
+              <p className="text-sm theme-muted">
+                {t("dashboard.profileCompletion")}
+              </p>
+              <p className="mt-1 text-xl font-semibold theme-foreground">
+                {completeness}%
+              </p>
+            </div>
+          </section>
+        )}
 
-        {status === "rejected" || status === "needs_reverification" ? (
+        {role === "seller" && (status === "rejected" || status === "needs_reverification") ? (
           <div className="w-fit rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
             {t("settings.resubmitVerification")}
           </div>
@@ -386,6 +480,55 @@ function parseDashboardSection(
   if (role === "seller" && value === "support-team") return value;
   if (role === "buyer" && value === "saved-products") return value;
   return null;
+}
+
+function isPersonalBuyerCompanyName(value: string | null | undefined) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return !normalized || normalized === "personal";
+}
+
+function getBuyerDashboardDisplayName({
+  displayName,
+  fallbackName,
+  email,
+  company,
+  fallbackLabel,
+}: {
+  displayName?: string;
+  fallbackName?: string | null;
+  email: string;
+  company: DashboardCompany;
+  fallbackLabel: string;
+}) {
+  const accountName = String(displayName ?? "").trim();
+  if (accountName) {
+    return accountName;
+  }
+  const clerkName = String(fallbackName ?? "").trim();
+  if (clerkName) {
+    return clerkName;
+  }
+  if (email.trim()) return email.trim();
+  const companyName = company.tradeName || company.legalName;
+  return isPersonalBuyerCompanyName(companyName)
+    ? fallbackLabel
+    : companyName;
+}
+
+function getStringField(
+  value: Record<string, unknown> | null,
+  key: string,
+) {
+  const field = value?.[key];
+  return typeof field === "string" ? field.trim() : "";
+}
+
+function getArrayField(
+  value: Record<string, unknown> | null,
+  key: string,
+) {
+  const field = value?.[key];
+  return Array.isArray(field) ? field.filter(Boolean) : [];
 }
 
 function Action({

@@ -222,12 +222,6 @@ export function DashboardClient({
             icon: "deals",
           },
           {
-            label: t("dashboard.reviewRequests"),
-            value: summary.metrics.reviewRequests ?? 0,
-            section: "overview",
-            icon: "reviews",
-          },
-          {
             label: t("dashboard.recentMessages"),
             value: recentInquiries.length,
             section: "messages",
@@ -455,6 +449,7 @@ function BuyerDiscoveryDashboard({
     ? profile.categories
     : summary.suggestedCategories ?? [];
   const keywords = profile?.keywords ?? [];
+  const buyerName = cleanBuyerDisplayName(profile?.displayName) || t("dashboard.americanBuyer");
   const filteredProducts = useMemo(() => {
     const query = search.trim().toLowerCase();
     return recommendedProducts.filter((product) => {
@@ -487,16 +482,14 @@ function BuyerDiscoveryDashboard({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] theme-success-text">
-                {t("dashboard.buyerWorkspace")}
+                {t("settings.buyerDashboard")}
               </p>
               <h2 className="mt-3 text-xl font-semibold theme-foreground">
                 {t("dashboard.buyerWelcome", "Welcome")}
-                {profile?.displayName ? `, ${profile.displayName}` : ""}
+                {buyerName ? `, ${buyerName}` : ""}
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
-                {profile?.companyName
-                  ? t("dashboard.buyerCompanyIntro").replace("{company}", profile.companyName)
-                  : t("dashboard.buyerCompanyIntroEmpty")}
+                {t("settings.buyerDashboardDescription")}
               </p>
             </div>
             <div className="rounded-2xl border px-4 py-3 text-right theme-success-badge">
@@ -809,6 +802,10 @@ function formatBuyerProductPrice(
     return `${product.currency} ${product.priceMin} - ${product.priceMax}`;
   }
   return `${product.currency} ${product.priceMin ?? product.priceMax}`;
+}
+
+function cleanBuyerDisplayName(value: string | null | undefined) {
+  return String(value ?? "").trim();
 }
 
 function OverviewSection({

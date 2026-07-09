@@ -71,13 +71,17 @@ export function DashboardSettingsClient({
         <div>
           <BackButton fallbackHref="/dashboard" className="mb-4" />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] theme-success-text">
-            Seller dashboard
+            {buyerOnly
+              ? messages.settings.buyerDashboard
+              : messages.settings.sellerDashboard}
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight theme-foreground">
             Settings
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 theme-muted">
-            Manage account, company profile, billing, and security settings for Trade82.
+            {buyerOnly
+              ? messages.settings.buyerProfileDescription
+              : "Manage account, company profile, billing, and security settings for Trade82."}
           </p>
         </div>
 

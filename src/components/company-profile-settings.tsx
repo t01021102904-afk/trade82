@@ -696,7 +696,9 @@ function CompanyProfileForm({
     accountProfile.displayName.trim() ||
     accountProfile.email.trim() ||
     company.tradeName?.trim() ||
-    company.legalName.trim();
+    (isPersonalBuyerCompanyName(company.legalName)
+      ? ""
+      : company.legalName.trim());
   const countryOptions = getCountryOptions(locale);
 
   return (
@@ -823,23 +825,20 @@ function CompanyProfileForm({
                 email={accountProfile.email}
               />
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-base font-semibold text-zinc-950">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                  {t("settings.profileContactSection")}
+                </p>
+                <h3 className="mt-1 truncate text-base font-semibold text-zinc-950">
                   {buyerDisplayName || t("settings.buyerProfileSection")}
                 </h3>
                 <p className="truncate text-sm text-zinc-500">
                   {accountProfile.email}
                 </p>
               </div>
-              <Link
-                href={withLocale("/settings/profile", locale)}
-                className="inline-flex h-9 items-center rounded-md border border-zinc-200 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-              >
-                {t("settings.manageProfile")}
-              </Link>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
-                label={t("settings.displayName")}
+                label={t("settings.buyerDisplayName")}
                 value={accountProfile.displayName}
                 onChange={(value) => updateAccountProfile("displayName", value)}
               />
@@ -1033,7 +1032,7 @@ function BuyerFields({
   return (
     <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
       <div className="sm:col-span-2">
-        <h3 className="text-base font-semibold text-zinc-950">{t("settings.buyerRequirementsSection")}</h3>
+        <h3 className="text-base font-semibold text-zinc-950">{t("settings.sourcingPreferencesSection")}</h3>
       </div>
       <SelectField
         label={t("settings.buyerType")}
