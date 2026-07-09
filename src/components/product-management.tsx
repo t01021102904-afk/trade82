@@ -4,7 +4,6 @@ import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 
-import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { ProductImage } from "@/components/product-image";
 import {
@@ -155,9 +154,6 @@ export function ProductManagement() {
 
       <div className="grid gap-2">
         {products.map((product) => {
-          const isPublic =
-            product.status === "active" &&
-            product.sellerCompany.verificationStatus === "verified";
           return (
             <article
               key={product.id}
@@ -175,18 +171,13 @@ export function ProductManagement() {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-sm font-semibold text-zinc-950">{product.name}</h3>
-                  <Badge tone={product.status === "active" ? "green" : "amber"}>
-                    {product.status === "active" ? t("settings.active") : t("settings.inactive")}
-                  </Badge>
-                  <Badge tone={isPublic ? "blue" : "amber"}>
-                    {isPublic ? t("settings.public") : t("settings.notPublic")}
-                  </Badge>
                 </div>
                 <p className="mt-1 text-xs text-zinc-500">
                   {product.category} · {formatPrice(product)} · MOQ {product.moq}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
+              <div className="flex flex-wrap items-center gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
+                <ProductListStatusIndicator product={product} />
                 <button
                   type="button"
                   onClick={() => setEditing({ ...product })}
@@ -200,7 +191,7 @@ export function ProductManagement() {
                     onClick={() => void markInactive(product)}
                     className={productPreparingButtonClass}
                   >
-                    {t("settings.markInactive")}
+                    {t("dashboard.setPreparing")}
                   </button>
                 ) : (
                   <button
@@ -240,21 +231,68 @@ function formatPrice(product: Pick<DbProduct, "priceMin" | "priceMax" | "currenc
   return `${product.currency} ${product.priceMin}-${product.priceMax}`;
 }
 
-const productActionBase =
-  "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition disabled:cursor-wait disabled:opacity-60";
-const productEditButtonClass = cx(
+export function ProductListStatusIndicator({
+  product,
+  className,
+}: {
+  product: Pick<DbProduct, "status" | "sellerCompany">;
+  className?: string;
+}) {
+  const { t } = useI18n();
+  const isPublic =
+    product.status === "active" &&
+    product.sellerCompany.verificationStatus === "verified";
+
+  if (isPublic) {
+    const label = t("dashboard.statusPublic");
+    return (
+      <span
+        className={cx(
+          "inline-flex h-7 items-center justify-center px-1.5",
+          className,
+        )}
+        aria-label={label}
+        title={label}
+      >
+        <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.14)]" />
+      </span>
+    );
+  }
+
+  const label =
+    product.status === "active"
+      ? t("dashboard.statusActive")
+      : product.status === "draft"
+        ? t("dashboard.statusDraft")
+        : t("dashboard.statusPreparing");
+
+  return (
+    <span
+      className={cx(
+        "inline-flex h-7 items-center rounded-full border border-amber-200 bg-amber-50/70 px-2 text-[11px] font-medium text-amber-800",
+        className,
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+export const productActionBase =
+  "inline-flex h-7 items-center justify-center rounded-md border px-2 text-[11px] font-medium leading-none transition disabled:cursor-wait disabled:opacity-60";
+export const productEditButtonClass = cx(
   productActionBase,
   "border-zinc-300 bg-white text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50",
 );
-const productPreparingButtonClass = cx(
+export const productPreparingButtonClass = cx(
   productActionBase,
-  "border-amber-200 bg-amber-50/60 text-amber-800 hover:bg-amber-50",
+  "border-amber-300 bg-amber-50/70 text-amber-800 hover:bg-amber-100",
 );
-const productPublishButtonClass = cx(
+export const productPublishButtonClass = cx(
   productActionBase,
-  "border-emerald-200 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-50",
+  "border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50",
 );
-const productDeleteButtonClass = cx(
+export const productDeleteButtonClass = cx(
   productActionBase,
   "border-red-200 bg-white text-red-700 hover:bg-red-50",
 );

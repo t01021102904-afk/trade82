@@ -15,19 +15,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
-import { Badge } from "@/components/badge";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { SellerDocumentsSection } from "@/components/seller-documents-section";
 import {
   ProductEditor,
+  ProductListStatusIndicator,
+  productDeleteButtonClass,
+  productEditButtonClass,
+  productPreparingButtonClass,
+  productPublishButtonClass,
   type DbProduct,
   type EditableProduct,
 } from "@/components/product-management";
 import { ProductImage } from "@/components/product-image";
 import { withLocale } from "@/lib/i18n";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
-import { cx } from "@/lib/utils";
 import {
   isActiveSellerSupportSubscription,
   sellerSupportMonthlyLimit,
@@ -1317,7 +1320,6 @@ function SellerProductCard({
   onDelete: () => void;
 }) {
   const { t } = useI18n();
-  const status = productStatusMeta(product, t);
   const price = formatDashboardProductPrice(product, t("dashboard.priceOnRequest"));
 
   return (
@@ -1337,7 +1339,6 @@ function SellerProductCard({
           <h3 className="min-w-0 flex-1 break-words text-sm font-semibold theme-foreground">
             {product.name}
           </h3>
-          <Badge tone={status.tone}>{status.label}</Badge>
         </div>
         <p className="mt-0.5 truncate text-xs theme-muted">{product.category}</p>
 
@@ -1359,7 +1360,8 @@ function SellerProductCard({
         </dl>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
+      <div className="flex flex-wrap items-center gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
+        <ProductListStatusIndicator product={product} />
         <button
           type="button"
           onClick={onEdit}
@@ -1397,41 +1399,6 @@ function SellerProductCard({
       </div>
     </article>
   );
-}
-
-const productActionBase =
-  "inline-flex h-8 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition disabled:cursor-wait disabled:opacity-60";
-const productEditButtonClass = cx(
-  productActionBase,
-  "border-zinc-300 bg-white text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50",
-);
-const productPreparingButtonClass = cx(
-  productActionBase,
-  "border-amber-200 bg-amber-50/60 text-amber-800 hover:bg-amber-50",
-);
-const productPublishButtonClass = cx(
-  productActionBase,
-  "border-emerald-200 bg-emerald-50/70 text-emerald-800 hover:bg-emerald-50",
-);
-const productDeleteButtonClass = cx(
-  productActionBase,
-  "border-red-200 bg-white text-red-700 hover:bg-red-50",
-);
-
-function productStatusMeta(
-  product: DbProduct,
-  t: ReturnType<typeof useI18n>["t"],
-) {
-  if (product.status === "active" && product.sellerCompany.verificationStatus === "verified") {
-    return { label: t("dashboard.statusPublic"), tone: "green" as const };
-  }
-  if (product.status === "active") {
-    return { label: t("dashboard.statusActive"), tone: "blue" as const };
-  }
-  if (product.status === "draft") {
-    return { label: t("dashboard.statusDraft"), tone: "amber" as const };
-  }
-  return { label: t("dashboard.statusPreparing"), tone: "gray" as const };
 }
 
 function formatDashboardProductPrice(

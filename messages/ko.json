@@ -351,7 +351,7 @@
     "productDeleteFailed": "상품을 삭제하지 못했습니다. 다시 시도해 주세요.",
     "productSetPreparing": "상품을 준비 중으로 전환했으며 공개 마켓플레이스에서는 숨겨집니다.",
     "deleteProductConfirm": "이 상품을 삭제할까요? 이 작업은 되돌릴 수 없습니다.",
-    "setPreparing": "준비 중으로 전환",
+    "setPreparing": "준비중으로 변경",
     "statusPublic": "공개",
     "statusActive": "활성",
     "statusDraft": "초안",
