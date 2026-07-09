@@ -834,7 +834,7 @@ function Section({
       className={cx(
         "scroll-mt-28 grid gap-4 rounded-lg border p-4 sm:grid-cols-2 sm:p-5",
         variant === "dashboard"
-          ? "rounded-2xl theme-surface shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
+          ? "rounded-2xl theme-surface shadow-sm"
           : "border-zinc-200 bg-white",
       )}
     >
@@ -846,7 +846,7 @@ function Section({
       >
         {title}
         {required ? (
-          <span className={variant === "dashboard" ? "text-red-300" : "text-red-600"}>
+          <span className="text-red-600">
             {" "}
             *
           </span>
@@ -895,7 +895,7 @@ function TextField({
         className={inputClass(variant)}
         aria-invalid={Boolean(error)}
       />
-      {error ? <ErrorText variant={variant}>{error}</ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
     </label>
   );
 }
@@ -933,7 +933,7 @@ function TextareaField({
         className={cx(inputClass(variant), "h-auto min-h-24 py-2 leading-6")}
         aria-invalid={Boolean(error)}
       />
-      {error ? <ErrorText variant={variant}>{error}</ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
     </label>
   );
 }
@@ -979,7 +979,7 @@ function SelectField({
           </option>
         ))}
       </select>
-      {error ? <ErrorText variant={variant}>{error}</ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
     </label>
   );
 }
@@ -1069,7 +1069,7 @@ function NumberWithSelect({
           {helper}
         </span>
       ) : null}
-      {error ? <ErrorText variant={variant}>{error}</ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
     </fieldset>
   );
 }
@@ -1134,7 +1134,7 @@ function CheckboxGroup({
           </label>
         ))}
       </div>
-      {error ? <ErrorText variant={variant}>{error}</ErrorText> : null}
+      {error ? <ErrorText>{error}</ErrorText> : null}
     </fieldset>
   );
 }
@@ -1264,15 +1264,9 @@ function inputShellClass(variant: ProductFormVariant) {
   );
 }
 
-function ErrorText({
-  children,
-  variant = "default",
-}: {
-  children: React.ReactNode;
-  variant?: ProductFormVariant;
-}) {
+function ErrorText({ children }: { children: React.ReactNode }) {
   return (
-    <span className={cx("text-sm", variant === "dashboard" ? "text-red-300" : "text-red-700")}>
+    <span className="text-sm text-red-700">
       {children}
     </span>
   );

@@ -2,6 +2,7 @@
 
 import type { PointerEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, GripVertical, X } from "lucide-react";
 
 import { useI18n } from "@/components/i18n-provider";
 import type { UploadedListingImage } from "@/lib/marketplace";
@@ -140,7 +141,10 @@ function uploadCopy(locale: "en" | "ko") {
           "JPG, PNG, WebP, AVIF 파일을 업로드할 수 있습니다. 프로필 사진과 회사 로고는 최대 25MB까지 가능합니다.",
         tooManyImages: "이미지는 최대 12장까지 등록할 수 있습니다.",
         primary: "대표",
-        remove: "삭제",
+        removeImage: "이미지 삭제",
+        moveLeft: "이미지를 앞으로 이동",
+        moveRight: "이미지를 뒤로 이동",
+        dragToReorder: "이미지를 끌어서 순서를 변경하세요",
         uploading: "업로드 중",
         addPhoto: "사진 추가",
         changePhoto: "사진 변경",
@@ -174,7 +178,10 @@ function uploadCopy(locale: "en" | "ko") {
           "Upload JPG, PNG, WebP, or AVIF. Profile photos and company logos can be up to 25MB.",
         tooManyImages: "You can add up to 12 images.",
         primary: "Primary",
-        remove: "Remove",
+        removeImage: "Remove image",
+        moveLeft: "Move image left",
+        moveRight: "Move image right",
+        dragToReorder: "Drag to reorder image",
         uploading: "Uploading",
         addPhoto: "Add photo",
         changePhoto: "Change photo",
@@ -529,11 +536,14 @@ export function ListingImageUploader({
               setDraggedId(null);
             }}
             className={cx(
-              "relative aspect-square overflow-hidden rounded-md border bg-zinc-100",
+              "group relative aspect-square cursor-grab overflow-hidden rounded-md border bg-zinc-100 active:cursor-grabbing",
               variant === "dashboard"
-                ? "rounded-2xl border-white/10 bg-zinc-950"
+                ? "rounded-2xl border-zinc-200 bg-white shadow-sm"
                 : "border-zinc-200",
+              draggedId === item.id && "opacity-70 ring-2 ring-emerald-300",
             )}
+            aria-label={`${copy.dragToReorder} ${index + 1}`}
+            title={copy.dragToReorder}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -544,40 +554,48 @@ export function ListingImageUploader({
             {index === 0 ? (
               <span
                 className={cx(
-                  "absolute left-2 top-2 rounded px-2 py-1 text-xs font-medium",
+                  "absolute left-2 top-2 rounded-full border px-2 py-0.5 text-[11px] font-semibold shadow-sm",
                   variant === "dashboard"
-                    ? "bg-emerald-400 text-zinc-950"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                     : "bg-zinc-950 text-white",
                 )}
               >
                 {copy.primary}
               </span>
             ) : null}
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-1 bg-black/65 p-1.5">
+            <button
+              type="button"
+              onClick={() => remove(item.id)}
+              className="absolute right-2 top-2 inline-flex size-7 items-center justify-center rounded-full border border-red-200 bg-white/95 text-red-600 shadow-sm transition hover:bg-red-50 hover:text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+              aria-label={copy.removeImage}
+            >
+              <X className="size-3.5" aria-hidden="true" />
+            </button>
+            <div className="absolute left-2 bottom-2 inline-flex items-center rounded-full border border-zinc-200 bg-white/95 px-1 py-1 text-zinc-500 shadow-sm opacity-90 transition group-hover:opacity-100">
+              <span
+                className="inline-flex size-6 items-center justify-center"
+                aria-hidden="true"
+                title={copy.dragToReorder}
+              >
+                <GripVertical className="size-3.5" />
+              </span>
               <button
                 type="button"
                 onClick={() => move(item.id, -1)}
                 disabled={index === 0}
-                className="size-8 rounded-lg bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
-                aria-label="이미지를 앞으로 이동"
+                className="inline-flex size-6 items-center justify-center rounded-full text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
+                aria-label={copy.moveLeft}
               >
-                ←
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(item.id)}
-                className="h-8 rounded-lg bg-white/90 px-2 text-xs font-medium text-red-700"
-              >
-                {copy.remove}
+                <ArrowLeft className="size-3.5" aria-hidden="true" />
               </button>
               <button
                 type="button"
                 onClick={() => move(item.id, 1)}
                 disabled={index === items.length - 1}
-                className="size-8 rounded-lg bg-white/90 text-sm text-zinc-900 disabled:opacity-40"
-                aria-label="이미지를 뒤로 이동"
+                className="inline-flex size-6 items-center justify-center rounded-full text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:text-zinc-300 disabled:hover:bg-transparent"
+                aria-label={copy.moveRight}
               >
-                →
+                <ArrowRight className="size-3.5" aria-hidden="true" />
               </button>
             </div>
             {item.status === "uploading" ? (
@@ -585,7 +603,7 @@ export function ListingImageUploader({
                 className={cx(
                   "absolute inset-0 flex flex-col items-center justify-center gap-2 text-sm font-medium",
                   variant === "dashboard"
-                    ? "bg-zinc-950/75 text-zinc-100"
+                    ? "bg-white/85 text-zinc-700"
                     : "bg-white/75 text-zinc-700",
                 )}
               >
@@ -614,7 +632,7 @@ export function ListingImageUploader({
             className={cx(
               "flex aspect-square min-h-28 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed text-sm font-medium transition",
               variant === "dashboard"
-                ? "rounded-2xl border-white/15 bg-zinc-950/70 text-zinc-400 hover:border-emerald-400/60 hover:bg-emerald-400/10 hover:text-emerald-200"
+                ? "rounded-2xl border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-emerald-300 hover:bg-emerald-50/60 hover:text-emerald-700"
                 : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700",
             )}
           >
@@ -640,9 +658,7 @@ export function ListingImageUploader({
         ) : null}
       </div>
       {error ? (
-        <p className={cx("text-sm", variant === "dashboard" ? "text-red-300" : "text-red-700")}>
-          {error}
-        </p>
+        <p className="text-sm text-red-700">{error}</p>
       ) : null}
     </div>
   );

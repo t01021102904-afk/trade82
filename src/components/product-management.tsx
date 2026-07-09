@@ -371,17 +371,17 @@ export function ProductEditor({
   return (
     <form
       onSubmit={submit}
-      className="grid gap-5 rounded-[22px] border border-white/10 bg-[#07090d] p-4 text-zinc-100 shadow-2xl shadow-black/20 sm:p-5"
+      className="grid gap-5 rounded-[22px] border p-4 shadow-sm theme-surface-elevated sm:p-5"
       autoComplete="off"
       noValidate
     >
-      <div className="flex flex-col gap-4 border-b border-white/10 pb-4 xl:flex-row xl:items-start xl:justify-between">
+      <div className="flex flex-col gap-4 border-b pb-4 theme-border xl:flex-row xl:items-start xl:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] theme-success-text">
             {t("listing.pageLabel")}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
-            <h2 className="text-xl font-semibold tracking-tight text-white">
+            <h2 className="text-xl font-semibold tracking-tight theme-foreground">
               {t("listing.editProduct")}
             </h2>
             <EditorStatusPill label={status.label} tone={status.tone} />
@@ -454,7 +454,7 @@ export function ProductEditor({
         onUploadingChange={setUploading}
         variant="dashboard"
       />
-      <div className="flex flex-wrap justify-end gap-2 border-t border-white/10 pt-4">
+      <div className="flex flex-wrap justify-end gap-2 border-t pt-4 theme-border">
         <button
           type="button"
           onClick={() => {
@@ -470,11 +470,11 @@ export function ProductEditor({
 }
 
 const editorPrimaryActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl bg-white px-4 text-sm font-semibold text-zinc-950 transition hover:bg-emerald-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition theme-primary-button focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus disabled:cursor-not-allowed disabled:opacity-50";
 const editorSecondaryActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-4 text-sm font-semibold text-zinc-100 transition hover:bg-white/[0.1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex h-10 items-center justify-center rounded-xl border px-4 text-sm font-semibold transition theme-secondary-button focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus disabled:cursor-not-allowed disabled:opacity-50";
 const editorGhostActionClass =
-  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold text-zinc-400 transition hover:bg-white/[0.06] hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300";
+  "inline-flex h-10 items-center justify-center rounded-xl px-4 text-sm font-semibold transition theme-ghost-button focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 theme-focus";
 
 function editorStatusMeta({
   saving,
