@@ -112,10 +112,8 @@ export function siteNavigationJsonLd() {
     itemListElement: [
       navigationElement(1, "Marketplace", "/marketplace"),
       navigationElement(2, "Sellers", "/sellers"),
-      navigationElement(3, "Buyers", "/buyers"),
-      navigationElement(4, "Pricing", "/pricing"),
-      navigationElement(5, "Login", "/login"),
-      navigationElement(6, "Sign up", "/signup"),
+      navigationElement(3, "Login", "/login"),
+      navigationElement(4, "Sign up", "/signup"),
     ],
   };
 }

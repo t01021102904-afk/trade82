@@ -11,8 +11,6 @@ const importantRoutes = {
   signup: "/signup",
   marketplace: "/marketplace",
   sellers: "/sellers",
-  buyers: "/buyers",
-  pricing: "/pricing",
 } as const;
 
 function legalPrefix(pathname: string) {
