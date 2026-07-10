@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useI18n } from "@/components/i18n-provider";
+import { PaginationControls } from "@/components/pagination-controls";
 import { SellerCard } from "@/components/seller-card";
 import { marketplaceCategories } from "@/lib/marketplace";
 import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
@@ -37,73 +39,122 @@ function SelectField({
   );
 }
 
+type PaginationState = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+const DEFAULT_PAGINATION: PaginationState = {
+  page: 1,
+  pageSize: 24,
+  total: 0,
+  totalPages: 1,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
+
 export function SellersClient() {
   const { locale, t } = useI18n();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const gridTopRef = useRef<HTMLDivElement>(null);
   const [databaseSellers, setDatabaseSellers] = useState<Seller[]>([]);
+  const [pagination, setPagination] =
+    useState<PaginationState>(DEFAULT_PAGINATION);
+  const [filterOptions, setFilterOptions] = useState<{ states: string[] }>({
+    states: [],
+  });
   const [databaseLoading, setDatabaseLoading] = useState(true);
+  const search = searchParams.get("q") ?? "";
+  const category = searchParams.get("category") ?? "all";
+  const state = searchParams.get("state") ?? "all";
+  const verified = searchParams.get("verified") ?? "all";
+  const exportExperience = searchParams.get("exportExperience") ?? "all";
+  const page = parsePositiveInteger(searchParams.get("page"));
+
   useEffect(() => {
-    void fetch("/api/public/marketplace")
-      .then((response) => (response.ok ? response.json() : { companies: [] }))
-      .then((result: { companies?: Array<Record<string, unknown>> }) => {
+    const requestParams = new URLSearchParams({
+      resource: "companies",
+      page: String(page),
+      pageSize: "24",
+    });
+    setQueryParam(requestParams, "q", search);
+    setQueryParam(requestParams, "category", category);
+    setQueryParam(requestParams, "state", state);
+    setQueryParam(requestParams, "verified", verified);
+    setQueryParam(requestParams, "exportExperience", exportExperience);
+
+    let active = true;
+    void fetch(`/api/public/marketplace?${requestParams.toString()}`)
+      .then((response) =>
+        response.ok
+          ? response.json()
+          : { companies: [], pagination: DEFAULT_PAGINATION },
+      )
+      .then(
+        (result: {
+          companies?: Array<Record<string, unknown>>;
+          pagination?: PaginationState;
+          filterOptions?: { states?: string[] };
+        }) => {
+          if (!active) return;
         setDatabaseSellers(
           (result.companies ?? [])
-            .filter((company) => company.companyRole === "seller")
             .map((company) => databaseCompanyToSeller(company, locale)),
         );
+          setPagination(result.pagination ?? DEFAULT_PAGINATION);
+          setFilterOptions({ states: result.filterOptions?.states ?? [] });
         setDatabaseLoading(false);
-      })
+        },
+      )
       .catch(() => {
+        if (!active) return;
         setDatabaseSellers([]);
+        setPagination(DEFAULT_PAGINATION);
         setDatabaseLoading(false);
       });
-  }, [locale]);
-  const visibleSellers = databaseSellers;
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [state, setState] = useState("all");
-  const [verified, setVerified] = useState("all");
-  const [exportExperience, setExportExperience] = useState("all");
+
+    return () => {
+      active = false;
+    };
+  }, [locale, page, search, category, state, verified, exportExperience]);
 
   const states = useMemo(
-    () => Array.from(new Set(visibleSellers.map((seller) => seller.state))).sort(),
-    [visibleSellers],
+    () => filterOptions.states,
+    [filterOptions.states],
   );
 
-  const filtered = useMemo(() => {
-    return visibleSellers.filter((seller) => {
-      const haystack = [
-        seller.name,
-        seller.location,
-        seller.businessType,
-        seller.description,
-        seller.certifications.join(" "),
-        seller.categories.join(" "),
-      ]
-        .join(" ")
-        .toLowerCase();
-      const matchesSearch = haystack.includes(search.toLowerCase());
-      const matchesCategory =
-        category === "all" || seller.categories.includes(category as never);
-      const matchesState = state === "all" || seller.state === state;
-      const matchesVerified =
-        verified === "all" ||
-        (verified === "verified" && seller.verified) ||
-        (verified === "reviewing" && !seller.verified);
-      const matchesExport =
-        exportExperience === "all" ||
-        (exportExperience === "korea" && seller.exportCountries.length > 0) ||
-        (exportExperience === "multi" && seller.exportCountries.length >= 3) ||
-        (exportExperience === "fast" && seller.responseTime.toLowerCase().includes("under"));
-
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesState &&
-        matchesVerified &&
-        matchesExport
-      );
+  const updateFilters = (
+    updates: Record<string, string>,
+    options: { scroll?: boolean; replace?: boolean } = { replace: true },
+  ) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    Object.entries(updates).forEach(([key, value]) => {
+      if (!value || value === "all" || (key === "q" && !value.trim())) {
+        nextParams.delete(key);
+      } else {
+        nextParams.set(key, value);
+      }
     });
-  }, [visibleSellers, search, category, state, verified, exportExperience]);
+    if (!("page" in updates)) nextParams.delete("page");
+    const query = nextParams.toString();
+    const nextUrl = query ? `${pathname}?${query}` : pathname;
+    if (options.replace === false) {
+      router.push(nextUrl, { scroll: false });
+    } else {
+      router.replace(nextUrl, { scroll: false });
+    }
+    if (options.scroll) {
+      requestAnimationFrame(() => {
+        gridTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  };
 
   return (
     <div className="grid gap-8">
@@ -113,7 +164,7 @@ export function SellersClient() {
             <span className="font-medium text-zinc-700">{t("sellers.search")}</span>
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => updateFilters({ q: event.target.value })}
               placeholder={t("sellers.searchPlaceholder")}
               className="h-10 rounded-md border border-zinc-200 px-3 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
             />
@@ -121,7 +172,7 @@ export function SellersClient() {
           <SelectField
             label={t("marketplace.category")}
             value={category}
-            onChange={setCategory}
+            onChange={(value) => updateFilters({ category: value })}
             options={[
               { label: t("marketplace.allCategories"), value: "all" },
               ...marketplaceCategories.map((item) => ({ label: item, value: item })),
@@ -130,7 +181,7 @@ export function SellersClient() {
           <SelectField
             label={t("sellers.state")}
             value={state}
-            onChange={setState}
+            onChange={(value) => updateFilters({ state: value })}
             options={[
               { label: t("sellers.allStates"), value: "all" },
               ...states.map((item) => ({ label: item, value: item })),
@@ -139,7 +190,7 @@ export function SellersClient() {
           <SelectField
             label={t("sellers.verified")}
             value={verified}
-            onChange={setVerified}
+            onChange={(value) => updateFilters({ verified: value })}
             options={[
               { label: t("sellers.anyStatus"), value: "all" },
               { label: t("sellers.verifiedOnly"), value: "verified" },
@@ -149,7 +200,7 @@ export function SellersClient() {
           <SelectField
             label={t("sellers.exportExperience")}
             value={exportExperience}
-            onChange={setExportExperience}
+            onChange={(value) => updateFilters({ exportExperience: value })}
             options={[
               { label: t("sellers.anyExperience"), value: "all" },
               { label: t("sellers.exportsToKorea"), value: "korea" },
@@ -159,15 +210,17 @@ export function SellersClient() {
           />
         </div>
         <div className="relative z-10 mt-4 flex items-center justify-between border-t border-zinc-100 pt-4 text-sm text-zinc-600">
-          <span>{filtered.length} {t("sellers.sellerFound")}</span>
+          <span>{pagination.total} {t("sellers.sellerFound")}</span>
           <button
             type="button"
             onClick={() => {
-              setSearch("");
-              setCategory("all");
-              setState("all");
-              setVerified("all");
-              setExportExperience("all");
+              updateFilters({
+                q: "",
+                category: "all",
+                state: "all",
+                verified: "all",
+                exportExperience: "all",
+              });
             }}
             className="font-medium text-blue-700 hover:text-blue-800"
           >
@@ -176,7 +229,8 @@ export function SellersClient() {
         </div>
       </div>
 
-      {databaseLoading && !visibleSellers.length ? (
+      <div ref={gridTopRef} className="scroll-mt-24" />
+      {databaseLoading && !databaseSellers.length ? (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div
@@ -186,26 +240,45 @@ export function SellersClient() {
             />
           ))}
         </div>
-      ) : filtered.length ? (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((seller) => (
-            <SellerCard key={seller.id} seller={seller} />
-          ))}
-        </div>
+      ) : databaseSellers.length ? (
+        <>
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {databaseSellers.map((seller) => (
+              <SellerCard key={seller.id} seller={seller} />
+            ))}
+          </div>
+          <PaginationControls
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            locale={locale}
+            onPageChange={(nextPage) =>
+              updateFilters(
+                { page: nextPage === 1 ? "" : String(nextPage) },
+                { replace: false, scroll: true },
+              )
+            }
+          />
+        </>
       ) : (
         <div className="rounded-lg border border-dashed p-5 text-center theme-surface">
           <h2 className="text-base font-semibold theme-foreground">
-            {visibleSellers.length
-              ? t("sellers.emptyTitle")
-              : t("sellers.noCompaniesListed")}
+            {t("sellers.emptyTitle")}
           </h2>
           <p className="mt-2 text-sm theme-muted">
-            {visibleSellers.length
-              ? t("sellers.emptyText")
-              : t("sellers.noCompaniesListedText")}
+            {t("sellers.emptyText")}
           </p>
         </div>
       )}
     </div>
   );
+}
+
+function parsePositiveInteger(value: string | null) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
+}
+
+function setQueryParam(params: URLSearchParams, key: string, value: string) {
+  if (!value || value === "all" || (key === "q" && !value.trim())) return;
+  params.set(key, value);
 }
