@@ -16,7 +16,9 @@ import {
   isRfqRecord,
   rfqApiErrorMessage,
   rfqMatchReasonLabel,
+  rfqSellerQuoteStatusLabel,
   type RfqRecord,
+  type RfqSellerQuote,
   type RfqSuggestedMatch,
 } from "@/lib/rfq";
 
@@ -27,6 +29,8 @@ export function BuyerRfqDetail({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionPending, setActionPending] = useState(false);
+  const [selectingSellerId, setSelectingSellerId] = useState<string | null>(null);
+  const [openingChatQuoteId, setOpeningChatQuoteId] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -81,6 +85,61 @@ export function BuyerRfqDetail({ id }: { id: string }) {
       setError(t("rfq.actionFailed"));
     } finally {
       setActionPending(false);
+    }
+  }
+
+  async function selectSeller(match: RfqSuggestedMatch) {
+    const sellerCompanyId = match.product.sellerId;
+    setSelectingSellerId(sellerCompanyId);
+    setError("");
+    try {
+      const response = await fetch(`/api/rfqs/${id}/quotes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: match.productId,
+          sellerCompanyId,
+        }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | RfqRecord
+        | { error?: string }
+        | null;
+      if (!response.ok || !isRfqRecord(data)) {
+        setError(rfqApiErrorMessage(data, t("rfq.selectSellerFailed")));
+        return;
+      }
+      setRfq(data);
+      router.refresh();
+    } catch {
+      setError(t("rfq.selectSellerFailed"));
+    } finally {
+      setSelectingSellerId(null);
+    }
+  }
+
+  async function openQuoteChat(quote: RfqSellerQuote) {
+    setOpeningChatQuoteId(quote.id);
+    setError("");
+    try {
+      const response = await fetch(`/api/rfqs/${id}/quotes/${quote.id}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | { rfq?: RfqRecord; messageRoute?: string; error?: string }
+        | null;
+      if (!response.ok || !data?.rfq || !isRfqRecord(data.rfq)) {
+        setError(rfqApiErrorMessage(data, t("rfq.chatFailed")));
+        return;
+      }
+      setRfq(data.rfq);
+      router.push(withLocale(data.messageRoute ?? "/messages", locale));
+    } catch {
+      setError(t("rfq.chatFailed"));
+    } finally {
+      setOpeningChatQuoteId(null);
     }
   }
 
@@ -155,7 +214,19 @@ export function BuyerRfqDetail({ id }: { id: string }) {
       )}
 
       {rfq.status === "MATCHING_READY" || rfq.status === "APPROVED" ? (
-        <SuggestedMatches matches={rfq.suggestedMatches ?? []} />
+        <>
+          <SuggestedMatches
+            matches={rfq.suggestedMatches ?? []}
+            quotes={rfq.sellerQuotes ?? []}
+            selectingSellerId={selectingSellerId}
+            onSelectSeller={(match) => void selectSeller(match)}
+          />
+          <QuoteComparison
+            quotes={rfq.sellerQuotes ?? []}
+            openingChatQuoteId={openingChatQuoteId}
+            onOpenChat={(quote) => void openQuoteChat(quote)}
+          />
+        </>
       ) : null}
     </div>
   );
@@ -213,8 +284,19 @@ function ReadOnlyRfq({ rfq }: { rfq: RfqRecord }) {
   );
 }
 
-function SuggestedMatches({ matches }: { matches: RfqSuggestedMatch[] }) {
+function SuggestedMatches({
+  matches,
+  quotes,
+  selectingSellerId,
+  onSelectSeller,
+}: {
+  matches: RfqSuggestedMatch[];
+  quotes: RfqSellerQuote[];
+  selectingSellerId: string | null;
+  onSelectSeller: (match: RfqSuggestedMatch) => void;
+}) {
   const { locale, t } = useI18n();
+  const selectedSellerIds = new Set(quotes.map((quote) => quote.sellerCompanyId));
 
   return (
     <section className="grid gap-4 rounded-2xl border p-5 theme-surface-elevated">
@@ -229,6 +311,8 @@ function SuggestedMatches({ matches }: { matches: RfqSuggestedMatch[] }) {
         <div className="grid gap-3">
           {matches.map((match) => {
             const product = match.product;
+            const selected = selectedSellerIds.has(product.sellerId);
+            const selecting = selectingSellerId === product.sellerId;
             return (
               <article
                 key={match.id}
@@ -287,12 +371,18 @@ function SuggestedMatches({ matches }: { matches: RfqSuggestedMatch[] }) {
                     >
                       {t("rfq.viewProduct")}
                     </Link>
-                    <Link
-                      href={withLocale(`/stores/${product.sellerId}`, locale)}
-                      className="inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button"
+                    <button
+                      type="button"
+                      onClick={() => onSelectSeller(match)}
+                      disabled={selected || selecting}
+                      className="inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button disabled:cursor-default disabled:opacity-70"
                     >
-                      {t("rfq.selectSeller")}
-                    </Link>
+                      {selected
+                        ? t("rfq.selected")
+                        : selecting
+                          ? t("rfq.selecting")
+                          : t("rfq.selectSeller")}
+                    </button>
                   </div>
                 </div>
               </article>
@@ -306,4 +396,135 @@ function SuggestedMatches({ matches }: { matches: RfqSuggestedMatch[] }) {
       )}
     </section>
   );
+}
+
+function QuoteComparison({
+  quotes,
+  openingChatQuoteId,
+  onOpenChat,
+}: {
+  quotes: RfqSellerQuote[];
+  openingChatQuoteId: string | null;
+  onOpenChat: (quote: RfqSellerQuote) => void;
+}) {
+  const { locale, t } = useI18n();
+
+  return (
+    <section className="grid gap-4 rounded-2xl border p-5 theme-surface-elevated">
+      <div>
+        <h2 className="text-base font-semibold theme-foreground">
+          {t("rfq.quoteComparison")}
+        </h2>
+        <p className="mt-1 text-sm theme-muted">{t("rfq.quoteComparisonSubtitle")}</p>
+      </div>
+
+      {quotes.length ? (
+        <div className="overflow-x-auto rounded-xl border theme-surface">
+          <table className="min-w-[1040px] w-full border-collapse text-left text-sm">
+            <thead className="border-b theme-surface-muted">
+              <tr className="text-xs font-semibold uppercase tracking-wide theme-muted">
+                <th className="px-4 py-3">{t("rfq.seller")}</th>
+                <th className="px-4 py-3">{t("rfq.product")}</th>
+                <th className="px-4 py-3">{t("rfq.unitPrice")}</th>
+                <th className="px-4 py-3">{t("rfq.moq")}</th>
+                <th className="px-4 py-3">{t("rfq.leadTime")}</th>
+                <th className="px-4 py-3">{t("rfq.incoterms")}</th>
+                <th className="px-4 py-3">{t("rfq.sample")}</th>
+                <th className="px-4 py-3">{t("rfq.privateLabel")}</th>
+                <th className="px-4 py-3">{t("rfq.quoteStatus")}</th>
+                <th className="px-4 py-3">{t("rfq.chat")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quotes.map((quote) => (
+                <tr key={quote.id} className="border-b last:border-b-0">
+                  <td className="px-4 py-3 align-middle">
+                    <div className="max-w-[180px]">
+                      <p className="truncate font-medium theme-foreground">
+                        {quote.sellerName}
+                      </p>
+                      {quote.status === "REQUESTED" ? (
+                        <p className="mt-1 text-xs theme-muted">
+                          {t("rfq.waitingForSellerQuote")}
+                        </p>
+                      ) : null}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 align-middle">
+                    {quote.product ? (
+                      <Link
+                        href={withLocale(`/products/${quote.product.id}`, locale)}
+                        className="line-clamp-2 max-w-[220px] font-medium theme-foreground hover:text-[var(--accent-foreground)]"
+                      >
+                        {quote.product.name}
+                      </Link>
+                    ) : (
+                      <span className="theme-muted">{t("rfq.waiting")}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {quotePrice(quote, t("rfq.waiting"))}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {displayValue(quote.moq, t("rfq.waiting"))}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {displayValue(quote.leadTime, t("rfq.waiting"))}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {displayValue(quote.incoterms, t("rfq.waiting"))}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {booleanValue(quote.sampleAvailable, t)}
+                  </td>
+                  <td className="px-4 py-3 align-middle theme-foreground">
+                    {booleanValue(quote.privateLabelAvailable, t)}
+                  </td>
+                  <td className="px-4 py-3 align-middle">
+                    <span className="inline-flex rounded-full border px-2 py-0.5 text-xs font-medium theme-surface-muted theme-foreground">
+                      {rfqSellerQuoteStatusLabel(quote.status, locale)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 align-middle">
+                    <button
+                      type="button"
+                      onClick={() => onOpenChat(quote)}
+                      disabled={openingChatQuoteId === quote.id}
+                      className="inline-flex h-8 items-center whitespace-nowrap rounded-md px-2.5 text-xs font-semibold theme-primary-button disabled:opacity-60"
+                    >
+                      {openingChatQuoteId === quote.id
+                        ? t("common.loading")
+                        : t("rfq.chatNow")}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="rounded-xl border p-5 text-sm theme-surface">
+          <p className="theme-muted">{t("rfq.quoteEmptyState")}</p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function displayValue(value: string | null, fallback: string) {
+  return value?.trim() || fallback;
+}
+
+function quotePrice(quote: RfqSellerQuote, fallback: string) {
+  if (!quote.unitPriceAmount) return fallback;
+  return `${quote.unitPriceCurrency ?? ""} ${quote.unitPriceAmount}`.trim();
+}
+
+function booleanValue(
+  value: boolean | null,
+  t: ReturnType<typeof useI18n>["t"],
+) {
+  if (value === true) return t("rfq.yes");
+  if (value === false) return t("rfq.no");
+  return t("rfq.waiting");
 }

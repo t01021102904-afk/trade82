@@ -117,6 +117,15 @@ enum RfqAdminStatus {
   REJECTED
 }
 
+enum RfqSellerQuoteStatus {
+  REQUESTED
+  SUBMITTED
+  DECLINED
+  NEGOTIATING
+  ACCEPTED
+  CLOSED
+}
+
 model UserProfile {
   id                         String                @id @default(cuid())
   clerkUserId                String                @unique
@@ -191,6 +200,7 @@ model Company {
   buyerInquiries               Inquiry[]                 @relation("BuyerCompanyInquiries")
   sellerInquiries              Inquiry[]                 @relation("SellerCompanyInquiries")
   recipientInquiries           Inquiry[]                 @relation("RecipientCompanyInquiries")
+  rfqSellerQuotes              RfqSellerQuote[]          @relation("SellerCompanyRfqQuotes")
   sentCompanyMessages          Message[]                 @relation("MessageSenderCompany")
   receivedMessages             Message[]                 @relation("MessageReceiverCompany")
   uploadedMessageAttachments   MessageAttachment[]       @relation("MessageAttachmentCompany")
@@ -300,6 +310,7 @@ model Product {
   savedItems               SavedItem[]
   deals                    Deal[]
   rfqMatches               RfqMatchedProduct[]
+  rfqSellerQuotes          RfqSellerQuote[]
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
 
@@ -376,6 +387,7 @@ model Inquiry {
   messages           Message[]
   attachments        MessageAttachment[]
   deals              Deal[]
+  rfqSellerQuotes    RfqSellerQuote[]     @relation("RfqQuoteConversation")
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
@@ -412,6 +424,7 @@ model RfqRequest {
   reviewedByUser                 UserProfile?   @relation("ReviewedRfqRequests", fields: [reviewedByUserId], references: [id])
   reviewedAt                     DateTime?
   matchedProducts                RfqMatchedProduct[]
+  sellerQuotes                   RfqSellerQuote[]
   createdAt                      DateTime       @default(now())
   updatedAt                      DateTime       @updatedAt
 
@@ -434,6 +447,36 @@ model RfqMatchedProduct {
   @@unique([rfqRequestId, productId])
   @@index([rfqRequestId, rank])
   @@index([productId])
+}
+
+model RfqSellerQuote {
+  id                    String               @id @default(cuid())
+  rfqRequestId          String
+  rfqRequest            RfqRequest           @relation(fields: [rfqRequestId], references: [id], onDelete: Cascade)
+  sellerCompanyId       String
+  sellerCompany         Company              @relation("SellerCompanyRfqQuotes", fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  productId             String?
+  product               Product?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+  conversationId        String?
+  conversation          Inquiry?             @relation("RfqQuoteConversation", fields: [conversationId], references: [id], onDelete: SetNull)
+  status                RfqSellerQuoteStatus @default(REQUESTED)
+  unitPriceAmount       Decimal?             @db.Decimal(14, 2)
+  unitPriceCurrency     String?
+  moq                   String?
+  leadTime              String?
+  incoterms             String?
+  sampleAvailable       Boolean?
+  privateLabelAvailable Boolean?
+  notes                 String?
+  submittedAt           DateTime?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@unique([rfqRequestId, sellerCompanyId])
+  @@index([rfqRequestId, status])
+  @@index([sellerCompanyId, createdAt])
+  @@index([productId])
+  @@index([conversationId])
 }
 
 model SavedItem {

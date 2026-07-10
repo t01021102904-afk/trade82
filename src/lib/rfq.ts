@@ -16,6 +16,17 @@ export type RfqStatus = (typeof rfqStatuses)[number];
 
 export type RfqAdminStatus = "PENDING_REVIEW" | "APPROVED" | "REJECTED";
 
+export const rfqSellerQuoteStatuses = [
+  "REQUESTED",
+  "SUBMITTED",
+  "DECLINED",
+  "NEGOTIATING",
+  "ACCEPTED",
+  "CLOSED",
+] as const;
+
+export type RfqSellerQuoteStatus = (typeof rfqSellerQuoteStatuses)[number];
+
 export const rfqMatchReasonCodes = [
   "same_category",
   "similar_keywords",
@@ -34,6 +45,30 @@ export type RfqSuggestedMatch = {
   rank: number;
   reasons: RfqMatchReasonCode[];
   product: Product;
+};
+
+export type RfqSellerQuote = {
+  id: string;
+  rfqRequestId: string;
+  sellerCompanyId: string;
+  sellerName: string;
+  sellerLogoUrl?: string;
+  sellerUseDefaultLogo?: boolean;
+  productId: string | null;
+  product: Product | null;
+  conversationId: string | null;
+  status: RfqSellerQuoteStatus;
+  unitPriceAmount: string | null;
+  unitPriceCurrency: string | null;
+  moq: string | null;
+  leadTime: string | null;
+  incoterms: string | null;
+  sampleAvailable: boolean | null;
+  privateLabelAvailable: boolean | null;
+  notes: string | null;
+  submittedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type RfqRecord = {
@@ -65,6 +100,7 @@ export type RfqRecord = {
   reviewedByUserId: string | null;
   reviewedAt: string | null;
   suggestedMatches?: RfqSuggestedMatch[];
+  sellerQuotes?: RfqSellerQuote[];
   createdAt: string;
   updatedAt: string;
 };
@@ -251,6 +287,29 @@ export function rfqMatchReasonLabel(reason: RfqMatchReasonCode, locale: Locale) 
     },
   };
   return labels[reason][locale];
+}
+
+export function normalizeRfqSellerQuoteStatus(
+  value: string,
+): RfqSellerQuoteStatus {
+  return rfqSellerQuoteStatuses.includes(value as RfqSellerQuoteStatus)
+    ? (value as RfqSellerQuoteStatus)
+    : "REQUESTED";
+}
+
+export function rfqSellerQuoteStatusLabel(
+  status: RfqSellerQuoteStatus,
+  locale: Locale,
+) {
+  const labels: Record<RfqSellerQuoteStatus, { en: string; ko: string }> = {
+    REQUESTED: { en: "Requested", ko: "요청됨" },
+    SUBMITTED: { en: "Submitted", ko: "제출됨" },
+    DECLINED: { en: "Declined", ko: "거절됨" },
+    NEGOTIATING: { en: "Negotiating", ko: "협상중" },
+    ACCEPTED: { en: "Accepted", ko: "수락됨" },
+    CLOSED: { en: "Closed", ko: "종료됨" },
+  };
+  return labels[status]?.[locale] ?? status;
 }
 
 export function canEditRfq(status: RfqStatus) {

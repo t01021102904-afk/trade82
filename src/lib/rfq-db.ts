@@ -6,15 +6,19 @@ import { Prisma } from "@/generated/prisma/client";
 import { validationError } from "@/lib/api-security";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { sha256Hex } from "@/lib/message-attachments";
+import { sendNewMessageNotification } from "@/lib/message-email-notifications";
 import { databaseProductToCard } from "@/lib/public-marketplace-presenters";
 import {
   canCancelRfq,
   canEditRfq,
   normalizeRfqMatchReason,
+  normalizeRfqSellerQuoteStatus,
   type RfqMatchReasonCode,
   type RfqAdminStatus,
   type RfqFormValue,
   type RfqRecord,
+  type RfqSellerQuote,
   type RfqSuggestedMatch,
   type RfqStatus,
 } from "@/lib/rfq";
@@ -55,6 +59,32 @@ type RfqMatchedProductRow = {
   reasons: string[];
 };
 
+type RfqSellerQuoteRow = {
+  id: string;
+  rfqRequestId: string;
+  sellerCompanyId: string;
+  sellerLegalName: string;
+  sellerTradeName: string | null;
+  sellerLogoOriginalUrl: string | null;
+  sellerLogoUrl: string | null;
+  sellerLogoThumbnailUrl: string | null;
+  sellerUseDefaultLogo: boolean;
+  productId: string | null;
+  conversationId: string | null;
+  status: string;
+  unitPriceAmount: string | null;
+  unitPriceCurrency: string | null;
+  moq: string | null;
+  leadTime: string | null;
+  incoterms: string | null;
+  sampleAvailable: boolean | null;
+  privateLabelAvailable: boolean | null;
+  notes: string | null;
+  submittedAt: Date | string | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+};
+
 function toIso(value: Date | string | null) {
   if (!value) return null;
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
@@ -74,6 +104,7 @@ async function serializeRfqWithMatches(row: RfqRow): Promise<RfqRecord> {
   return {
     ...serializeRfq(row),
     suggestedMatches: await listSuggestedMatches(row.id),
+    sellerQuotes: await listSellerQuotes(row.id),
   };
 }
 
@@ -141,6 +172,13 @@ function targetDeliveryDateField(source: Record<string, unknown>) {
     throw validationError("targetDeliveryDate is invalid.");
   }
   return date.toISOString();
+}
+
+function isSerializableTransactionError(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2034"
+  );
 }
 
 export function validateRfqInput(source: Record<string, unknown>): RfqInput {
@@ -427,6 +465,425 @@ async function listSuggestedMatches(rfqRequestId: string): Promise<RfqSuggestedM
       product: databaseProductToCard(product as unknown as Record<string, unknown>),
     };
   });
+}
+
+async function listSellerQuotes(rfqRequestId: string): Promise<RfqSellerQuote[]> {
+  const rows = await getDb().$queryRaw<RfqSellerQuoteRow[]>`
+    SELECT q."id", q."rfqRequestId", q."sellerCompanyId",
+      seller."legalName" AS "sellerLegalName",
+      seller."tradeName" AS "sellerTradeName",
+      seller."logoOriginalUrl" AS "sellerLogoOriginalUrl",
+      seller."logoUrl" AS "sellerLogoUrl",
+      seller."logoThumbnailUrl" AS "sellerLogoThumbnailUrl",
+      seller."useDefaultLogo" AS "sellerUseDefaultLogo",
+      q."productId", q."conversationId", q."status"::TEXT AS "status",
+      q."unitPriceAmount"::TEXT AS "unitPriceAmount",
+      q."unitPriceCurrency", q."moq", q."leadTime", q."incoterms",
+      q."sampleAvailable", q."privateLabelAvailable", q."notes",
+      q."submittedAt", q."createdAt", q."updatedAt"
+    FROM "RfqSellerQuote" q
+    JOIN "Company" seller ON seller."id" = q."sellerCompanyId"
+    WHERE q."rfqRequestId" = ${rfqRequestId}
+    ORDER BY q."createdAt" ASC
+  `;
+  if (!rows.length) return [];
+
+  const productIds = rows.flatMap((row) => row.productId ?? []);
+  const products = productIds.length
+    ? await getDb().product.findMany({
+        where: {
+          id: { in: productIds },
+          status: "active",
+          sellerCompany: {
+            verificationStatus: "verified",
+            legalName: { not: DELETED_COMPANY_NAME },
+          },
+        },
+        include: {
+          images: { orderBy: { position: "asc" } },
+          sellerCompany: {
+            select: {
+              id: true,
+              legalName: true,
+              tradeName: true,
+              logoOriginalUrl: true,
+              logoUrl: true,
+              logoThumbnailUrl: true,
+              useDefaultLogo: true,
+              city: true,
+              country: true,
+              categories: true,
+              description: true,
+              subscriptionStatus: true,
+              subscriptionPlan: true,
+              sellerProfile: true,
+            },
+          },
+        },
+      })
+    : [];
+  const productById = new Map(
+    products.map((product) => [
+      product.id,
+      databaseProductToCard(product as unknown as Record<string, unknown>),
+    ]),
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    rfqRequestId: row.rfqRequestId,
+    sellerCompanyId: row.sellerCompanyId,
+    sellerName: row.sellerTradeName || row.sellerLegalName,
+    sellerLogoUrl:
+      row.sellerLogoThumbnailUrl ?? row.sellerLogoUrl ?? row.sellerLogoOriginalUrl ?? undefined,
+    sellerUseDefaultLogo: row.sellerUseDefaultLogo,
+    productId: row.productId,
+    product: row.productId ? productById.get(row.productId) ?? null : null,
+    conversationId: row.conversationId,
+    status: normalizeRfqSellerQuoteStatus(row.status),
+    unitPriceAmount: row.unitPriceAmount,
+    unitPriceCurrency: row.unitPriceCurrency,
+    moq: row.moq,
+    leadTime: row.leadTime,
+    incoterms: row.incoterms,
+    sampleAvailable: row.sampleAvailable,
+    privateLabelAvailable: row.privateLabelAvailable,
+    notes: row.notes,
+    submittedAt: toIso(row.submittedAt),
+    createdAt: toIso(row.createdAt) ?? "",
+    updatedAt: toIso(row.updatedAt) ?? "",
+  }));
+}
+
+type SelectableRfqMatchRow = {
+  productId: string;
+  sellerCompanyId: string;
+};
+
+export async function createOrReuseRfqSellerQuote({
+  buyerUserId,
+  rfqId,
+  productId,
+  sellerCompanyId,
+}: {
+  buyerUserId: string;
+  rfqId: string;
+  productId: string;
+  sellerCompanyId: string;
+}) {
+  const rfq = await getBuyerRfq(buyerUserId, rfqId);
+  if (!rfq) throw new Response("RFQ not found.", { status: 404 });
+  if (rfq.status !== "MATCHING_READY" && rfq.status !== "APPROVED") {
+    throw new Response("Only approved RFQs can add selected sellers.", {
+      status: 403,
+    });
+  }
+
+  const matches = await getDb().$queryRaw<SelectableRfqMatchRow[]>`
+    SELECT p."id" AS "productId", p."sellerCompanyId" AS "sellerCompanyId"
+    FROM "RfqMatchedProduct" m
+    JOIN "Product" p ON p."id" = m."productId"
+    JOIN "Company" seller ON seller."id" = p."sellerCompanyId"
+    WHERE m."rfqRequestId" = ${rfqId}
+      AND m."productId" = ${productId}
+      AND p."sellerCompanyId" = ${sellerCompanyId}
+      AND p."status" = CAST(${"active"} AS "ProductStatus")
+      AND seller."companyRole" = CAST(${"seller"} AS "CompanyRole")
+      AND seller."verificationStatus" = CAST(${"verified"} AS "CompanyVerificationStatus")
+      AND seller."legalName" <> ${DELETED_COMPANY_NAME}
+      AND seller."ownerUserId" <> ${buyerUserId}
+    LIMIT 1
+  `;
+
+  if (!matches[0]) {
+    throw new Response("This seller is not available for this RFQ match.", {
+      status: 404,
+    });
+  }
+
+  await getDb().$executeRaw`
+    INSERT INTO "RfqSellerQuote" (
+      "id", "rfqRequestId", "sellerCompanyId", "productId", "status", "updatedAt"
+    ) VALUES (
+      ${randomUUID()}, ${rfqId}, ${sellerCompanyId}, ${productId},
+      CAST(${"REQUESTED"} AS "RfqSellerQuoteStatus"), CURRENT_TIMESTAMP
+    )
+    ON CONFLICT ("rfqRequestId", "sellerCompanyId")
+    DO UPDATE SET
+      "productId" = COALESCE("RfqSellerQuote"."productId", EXCLUDED."productId"),
+      "updatedAt" = CURRENT_TIMESTAMP
+  `;
+
+  const updated = await getBuyerRfq(buyerUserId, rfqId);
+  if (!updated) throw new Response("RFQ not found.", { status: 404 });
+  return updated;
+}
+
+export async function createOrReuseRfqQuoteConversation({
+  buyerUserId,
+  rfqId,
+  quoteId,
+  locale,
+}: {
+  buyerUserId: string;
+  rfqId: string;
+  quoteId: string;
+  locale: "en" | "ko";
+}) {
+  const rfq = await getBuyerRfq(buyerUserId, rfqId);
+  if (!rfq) throw new Response("RFQ not found.", { status: 404 });
+  if (!rfq.buyerCompanyId) {
+    throw new Response("Complete your buyer profile before contacting sellers.", {
+      status: 409,
+    });
+  }
+
+  const quote = rfq.sellerQuotes?.find((item) => item.id === quoteId);
+  if (!quote) throw new Response("Selected seller quote not found.", { status: 404 });
+
+  const buyerCompany = await getDb().company.findFirst({
+    where: {
+      id: rfq.buyerCompanyId,
+      ownerUserId: buyerUserId,
+      companyRole: "buyer",
+    },
+  });
+  if (!buyerCompany) {
+    throw new Response("Complete your buyer profile before contacting sellers.", {
+      status: 409,
+    });
+  }
+
+  const sellerCompany = await getDb().company.findFirst({
+    where: {
+      id: quote.sellerCompanyId,
+      companyRole: "seller",
+      verificationStatus: "verified",
+      legalName: { not: DELETED_COMPANY_NAME },
+    },
+  });
+  if (!sellerCompany) {
+    throw new Response("Selected seller is not available.", { status: 404 });
+  }
+
+  const product = quote.productId
+    ? await getDb().product.findFirst({
+        where: {
+          id: quote.productId,
+          sellerCompanyId: sellerCompany.id,
+          status: "active",
+        },
+        select: { id: true, name: true },
+      })
+    : null;
+  const introBody = buildRfqIntroMessage(rfq, locale);
+  const contentHash = sha256Hex(introBody);
+
+  const existingStoredConversation = quote.conversationId
+    ? await getDb().inquiry.findFirst({
+        where: {
+          id: quote.conversationId,
+          buyerCompanyId: buyerCompany.id,
+          sellerCompanyId: sellerCompany.id,
+        },
+        select: { id: true },
+      })
+    : null;
+
+  if (existingStoredConversation) {
+    return {
+      rfq,
+      messageRoute: `/messages?inquiryId=${existingStoredConversation.id}`,
+    };
+  }
+
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const result = await getDb().$transaction(
+        async (tx) => {
+          const existingInquiry = await tx.inquiry.findFirst({
+            where: {
+              buyerCompanyId: buyerCompany.id,
+              sellerCompanyId: sellerCompany.id,
+            },
+            orderBy: { updatedAt: "desc" },
+            select: { id: true, productId: true },
+          });
+
+          if (existingInquiry) {
+            const existingIntro = await tx.message.findFirst({
+              where: {
+                inquiryId: existingInquiry.id,
+                senderUserId: buyerUserId,
+                senderCompanyId: buyerCompany.id,
+                receiverCompanyId: sellerCompany.id,
+                contentHash,
+              },
+              select: { id: true },
+            });
+
+            const message = existingIntro
+              ? null
+              : await tx.message.create({
+                  data: {
+                    inquiryId: existingInquiry.id,
+                    senderUserId: buyerUserId,
+                    senderCompanyId: buyerCompany.id,
+                    receiverCompanyId: sellerCompany.id,
+                    body: introBody,
+                    contentHash,
+                  },
+                });
+
+            const updateData: Prisma.InquiryUpdateInput = {};
+            if (product && existingInquiry.productId !== product.id) {
+              updateData.product = { connect: { id: product.id } };
+            }
+            if (message) updateData.updatedAt = new Date();
+            if (Object.keys(updateData).length) {
+              await tx.inquiry.update({
+                where: { id: existingInquiry.id },
+                data: updateData,
+              });
+            }
+
+            await tx.$executeRaw`
+              UPDATE "RfqSellerQuote"
+              SET "conversationId" = ${existingInquiry.id}, "updatedAt" = CURRENT_TIMESTAMP
+              WHERE "id" = ${quoteId}
+                AND "rfqRequestId" = ${rfqId}
+                AND "sellerCompanyId" = ${sellerCompany.id}
+            `;
+
+            return {
+              inquiryId: existingInquiry.id,
+              notification: message
+                ? {
+                    messageId: message.id,
+                    receiverCompanyId: sellerCompany.id,
+                    body: introBody,
+                  }
+                : null,
+            };
+          }
+
+          const inquiry = await tx.inquiry.create({
+            data: {
+              buyerCompanyId: buyerCompany.id,
+              sellerCompanyId: sellerCompany.id,
+              productId: product?.id ?? null,
+              senderUserId: buyerUserId,
+              recipientCompanyId: sellerCompany.id,
+              message: introBody,
+              quantity: rfq.quantity,
+              targetDate: rfq.targetDeliveryDate
+                ? new Date(rfq.targetDeliveryDate)
+                : null,
+            },
+            select: { id: true, recipientCompanyId: true, message: true },
+          });
+
+          await tx.$executeRaw`
+            UPDATE "RfqSellerQuote"
+            SET "conversationId" = ${inquiry.id}, "updatedAt" = CURRENT_TIMESTAMP
+            WHERE "id" = ${quoteId}
+              AND "rfqRequestId" = ${rfqId}
+              AND "sellerCompanyId" = ${sellerCompany.id}
+          `;
+
+          return {
+            inquiryId: inquiry.id,
+            notification: {
+              messageId: `inquiry-${inquiry.id}`,
+              receiverCompanyId: inquiry.recipientCompanyId,
+              body: inquiry.message,
+            },
+          };
+        },
+        {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        },
+      );
+
+      if (result.notification) {
+        await sendNewMessageNotification({
+          messageId: result.notification.messageId,
+          inquiryId: result.inquiryId,
+          senderUserId: buyerUserId,
+          senderCompanyName: buyerCompany.tradeName || buyerCompany.legalName,
+          receiverCompanyId: result.notification.receiverCompanyId,
+          body: result.notification.body,
+          attachmentCount: 0,
+        }).catch((error) => {
+          console.error("RFQ message notification email failed.", {
+            name: error instanceof Error ? error.name : typeof error,
+          });
+        });
+      }
+
+      const updated = await getBuyerRfq(buyerUserId, rfqId);
+      if (!updated) throw new Response("RFQ not found.", { status: 404 });
+      return {
+        rfq: updated,
+        messageRoute: `/messages?inquiryId=${result.inquiryId}`,
+      };
+    } catch (error) {
+      if (!isSerializableTransactionError(error)) throw error;
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
+function buildRfqIntroMessage(rfq: RfqRecord, locale: "en" | "ko") {
+  const empty = locale === "ko" ? "미입력" : "Not provided";
+  const amount = rfq.preferredUnitPriceAmount
+    ? `${rfq.preferredUnitPriceAmount} ${rfq.preferredUnitPriceCurrency ?? ""}`.trim()
+    : empty;
+  if (locale === "ko") {
+    return [
+      "새 RFQ 견적 요청",
+      "",
+      `상품명: ${rfq.productName}`,
+      `카테고리: ${rfq.category}`,
+      `수량: ${rfq.quantity}`,
+      `거래 조건: ${rfq.tradeTerms}`,
+      `희망 단가: ${amount}`,
+      `납품 국가: ${rfq.destinationCountry || empty}`,
+      "",
+      "스펙:",
+      `형태: ${rfq.shape || empty}`,
+      `용량: ${rfq.capacity || empty}`,
+      `소재: ${rfq.material || empty}`,
+      `인증: ${rfq.certification || empty}`,
+      `특징: ${rfq.feature || empty}`,
+      "",
+      "상세 요청사항:",
+      rfq.details,
+    ].join("\n");
+  }
+  return [
+    "New RFQ request",
+    "",
+    `Product: ${rfq.productName}`,
+    `Category: ${rfq.category}`,
+    `Quantity: ${rfq.quantity}`,
+    `Trade terms: ${rfq.tradeTerms}`,
+    `Preferred unit price: ${amount}`,
+    `Destination country: ${rfq.destinationCountry || empty}`,
+    "",
+    "Specifications:",
+    `Shape: ${rfq.shape || empty}`,
+    `Capacity: ${rfq.capacity || empty}`,
+    `Material: ${rfq.material || empty}`,
+    `Certification: ${rfq.certification || empty}`,
+    `Feature: ${rfq.feature || empty}`,
+    "",
+    "Details:",
+    rfq.details,
+  ].join("\n");
 }
 
 type MatchCandidate = {

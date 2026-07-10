@@ -59,7 +59,7 @@ export function BuyerRfqDetailPageContent({
   const messages = getDictionary(locale);
   return (
     <div className="min-h-screen theme-bg">
-      <div className="mx-auto grid max-w-4xl gap-6 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:px-8">
         <BackButton fallbackHref="/dashboard/rfqs" />
         <SectionHeader
           label={messages.rfq.rfq}
