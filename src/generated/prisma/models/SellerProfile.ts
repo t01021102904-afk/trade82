@@ -30,6 +30,7 @@ export type SellerProfileMinAggregateOutputType = {
   koreanBusinessRegistrationNumber: string | null
   representativeName: string | null
   exportExperience: string | null
+  exportExperienceEn: string | null
   minimumOrderQuantity: string | null
   leadTime: string | null
   factoryOrDistributorStatus: string | null
@@ -41,6 +42,7 @@ export type SellerProfileMaxAggregateOutputType = {
   koreanBusinessRegistrationNumber: string | null
   representativeName: string | null
   exportExperience: string | null
+  exportExperienceEn: string | null
   minimumOrderQuantity: string | null
   leadTime: string | null
   factoryOrDistributorStatus: string | null
@@ -52,6 +54,7 @@ export type SellerProfileCountAggregateOutputType = {
   koreanBusinessRegistrationNumber: number
   representativeName: number
   exportExperience: number
+  exportExperienceEn: number
   exportCountries: number
   productCategories: number
   minimumOrderQuantity: number
@@ -70,6 +73,7 @@ export type SellerProfileMinAggregateInputType = {
   koreanBusinessRegistrationNumber?: true
   representativeName?: true
   exportExperience?: true
+  exportExperienceEn?: true
   minimumOrderQuantity?: true
   leadTime?: true
   factoryOrDistributorStatus?: true
@@ -81,6 +85,7 @@ export type SellerProfileMaxAggregateInputType = {
   koreanBusinessRegistrationNumber?: true
   representativeName?: true
   exportExperience?: true
+  exportExperienceEn?: true
   minimumOrderQuantity?: true
   leadTime?: true
   factoryOrDistributorStatus?: true
@@ -92,6 +97,7 @@ export type SellerProfileCountAggregateInputType = {
   koreanBusinessRegistrationNumber?: true
   representativeName?: true
   exportExperience?: true
+  exportExperienceEn?: true
   exportCountries?: true
   productCategories?: true
   minimumOrderQuantity?: true
@@ -181,6 +187,7 @@ export type SellerProfileGroupByOutputType = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn: string
   exportCountries: string[]
   productCategories: string[]
   minimumOrderQuantity: string
@@ -218,6 +225,7 @@ export type SellerProfileWhereInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFilter<"SellerProfile"> | string
   representativeName?: Prisma.StringFilter<"SellerProfile"> | string
   exportExperience?: Prisma.StringFilter<"SellerProfile"> | string
+  exportExperienceEn?: Prisma.StringFilter<"SellerProfile"> | string
   exportCountries?: Prisma.StringNullableListFilter<"SellerProfile">
   productCategories?: Prisma.StringNullableListFilter<"SellerProfile">
   minimumOrderQuantity?: Prisma.StringFilter<"SellerProfile"> | string
@@ -235,6 +243,7 @@ export type SellerProfileOrderByWithRelationInput = {
   koreanBusinessRegistrationNumber?: Prisma.SortOrder
   representativeName?: Prisma.SortOrder
   exportExperience?: Prisma.SortOrder
+  exportExperienceEn?: Prisma.SortOrder
   exportCountries?: Prisma.SortOrder
   productCategories?: Prisma.SortOrder
   minimumOrderQuantity?: Prisma.SortOrder
@@ -255,6 +264,7 @@ export type SellerProfileWhereUniqueInput = Prisma.AtLeast<{
   koreanBusinessRegistrationNumber?: Prisma.StringFilter<"SellerProfile"> | string
   representativeName?: Prisma.StringFilter<"SellerProfile"> | string
   exportExperience?: Prisma.StringFilter<"SellerProfile"> | string
+  exportExperienceEn?: Prisma.StringFilter<"SellerProfile"> | string
   exportCountries?: Prisma.StringNullableListFilter<"SellerProfile">
   productCategories?: Prisma.StringNullableListFilter<"SellerProfile">
   minimumOrderQuantity?: Prisma.StringFilter<"SellerProfile"> | string
@@ -272,6 +282,7 @@ export type SellerProfileOrderByWithAggregationInput = {
   koreanBusinessRegistrationNumber?: Prisma.SortOrder
   representativeName?: Prisma.SortOrder
   exportExperience?: Prisma.SortOrder
+  exportExperienceEn?: Prisma.SortOrder
   exportCountries?: Prisma.SortOrder
   productCategories?: Prisma.SortOrder
   minimumOrderQuantity?: Prisma.SortOrder
@@ -294,6 +305,7 @@ export type SellerProfileScalarWhereWithAggregatesInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
   representativeName?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
   exportExperience?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
+  exportExperienceEn?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
   exportCountries?: Prisma.StringNullableListFilter<"SellerProfile">
   productCategories?: Prisma.StringNullableListFilter<"SellerProfile">
   minimumOrderQuantity?: Prisma.StringWithAggregatesFilter<"SellerProfile"> | string
@@ -309,6 +321,7 @@ export type SellerProfileCreateInput = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn?: string
   exportCountries?: Prisma.SellerProfileCreateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileCreateproductCategoriesInput | string[]
   minimumOrderQuantity: string
@@ -326,6 +339,7 @@ export type SellerProfileUncheckedCreateInput = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn?: string
   exportCountries?: Prisma.SellerProfileCreateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileCreateproductCategoriesInput | string[]
   minimumOrderQuantity: string
@@ -341,6 +355,7 @@ export type SellerProfileUpdateInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -358,6 +373,7 @@ export type SellerProfileUncheckedUpdateInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -374,6 +390,7 @@ export type SellerProfileCreateManyInput = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn?: string
   exportCountries?: Prisma.SellerProfileCreateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileCreateproductCategoriesInput | string[]
   minimumOrderQuantity: string
@@ -389,6 +406,7 @@ export type SellerProfileUpdateManyMutationInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -405,6 +423,7 @@ export type SellerProfileUncheckedUpdateManyInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -426,6 +445,7 @@ export type SellerProfileCountOrderByAggregateInput = {
   koreanBusinessRegistrationNumber?: Prisma.SortOrder
   representativeName?: Prisma.SortOrder
   exportExperience?: Prisma.SortOrder
+  exportExperienceEn?: Prisma.SortOrder
   exportCountries?: Prisma.SortOrder
   productCategories?: Prisma.SortOrder
   minimumOrderQuantity?: Prisma.SortOrder
@@ -442,6 +462,7 @@ export type SellerProfileMaxOrderByAggregateInput = {
   koreanBusinessRegistrationNumber?: Prisma.SortOrder
   representativeName?: Prisma.SortOrder
   exportExperience?: Prisma.SortOrder
+  exportExperienceEn?: Prisma.SortOrder
   minimumOrderQuantity?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
   factoryOrDistributorStatus?: Prisma.SortOrder
@@ -453,6 +474,7 @@ export type SellerProfileMinOrderByAggregateInput = {
   koreanBusinessRegistrationNumber?: Prisma.SortOrder
   representativeName?: Prisma.SortOrder
   exportExperience?: Prisma.SortOrder
+  exportExperienceEn?: Prisma.SortOrder
   minimumOrderQuantity?: Prisma.SortOrder
   leadTime?: Prisma.SortOrder
   factoryOrDistributorStatus?: Prisma.SortOrder
@@ -540,6 +562,7 @@ export type SellerProfileCreateWithoutCompanyInput = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn?: string
   exportCountries?: Prisma.SellerProfileCreateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileCreateproductCategoriesInput | string[]
   minimumOrderQuantity: string
@@ -555,6 +578,7 @@ export type SellerProfileUncheckedCreateWithoutCompanyInput = {
   koreanBusinessRegistrationNumber: string
   representativeName: string
   exportExperience: string
+  exportExperienceEn?: string
   exportCountries?: Prisma.SellerProfileCreateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileCreateproductCategoriesInput | string[]
   minimumOrderQuantity: string
@@ -586,6 +610,7 @@ export type SellerProfileUpdateWithoutCompanyInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -601,6 +626,7 @@ export type SellerProfileUncheckedUpdateWithoutCompanyInput = {
   koreanBusinessRegistrationNumber?: Prisma.StringFieldUpdateOperationsInput | string
   representativeName?: Prisma.StringFieldUpdateOperationsInput | string
   exportExperience?: Prisma.StringFieldUpdateOperationsInput | string
+  exportExperienceEn?: Prisma.StringFieldUpdateOperationsInput | string
   exportCountries?: Prisma.SellerProfileUpdateexportCountriesInput | string[]
   productCategories?: Prisma.SellerProfileUpdateproductCategoriesInput | string[]
   minimumOrderQuantity?: Prisma.StringFieldUpdateOperationsInput | string
@@ -619,6 +645,7 @@ export type SellerProfileSelect<ExtArgs extends runtime.Types.Extensions.Interna
   koreanBusinessRegistrationNumber?: boolean
   representativeName?: boolean
   exportExperience?: boolean
+  exportExperienceEn?: boolean
   exportCountries?: boolean
   productCategories?: boolean
   minimumOrderQuantity?: boolean
@@ -636,6 +663,7 @@ export type SellerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   koreanBusinessRegistrationNumber?: boolean
   representativeName?: boolean
   exportExperience?: boolean
+  exportExperienceEn?: boolean
   exportCountries?: boolean
   productCategories?: boolean
   minimumOrderQuantity?: boolean
@@ -653,6 +681,7 @@ export type SellerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   koreanBusinessRegistrationNumber?: boolean
   representativeName?: boolean
   exportExperience?: boolean
+  exportExperienceEn?: boolean
   exportCountries?: boolean
   productCategories?: boolean
   minimumOrderQuantity?: boolean
@@ -670,6 +699,7 @@ export type SellerProfileSelectScalar = {
   koreanBusinessRegistrationNumber?: boolean
   representativeName?: boolean
   exportExperience?: boolean
+  exportExperienceEn?: boolean
   exportCountries?: boolean
   productCategories?: boolean
   minimumOrderQuantity?: boolean
@@ -680,7 +710,7 @@ export type SellerProfileSelectScalar = {
   factoryOrDistributorStatus?: boolean
 }
 
-export type SellerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "koreanBusinessRegistrationNumber" | "representativeName" | "exportExperience" | "exportCountries" | "productCategories" | "minimumOrderQuantity" | "leadTime" | "certifications" | "shippingTerms" | "paymentTerms" | "factoryOrDistributorStatus", ExtArgs["result"]["sellerProfile"]>
+export type SellerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "koreanBusinessRegistrationNumber" | "representativeName" | "exportExperience" | "exportExperienceEn" | "exportCountries" | "productCategories" | "minimumOrderQuantity" | "leadTime" | "certifications" | "shippingTerms" | "paymentTerms" | "factoryOrDistributorStatus", ExtArgs["result"]["sellerProfile"]>
 export type SellerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }
@@ -702,6 +732,7 @@ export type $SellerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inter
     koreanBusinessRegistrationNumber: string
     representativeName: string
     exportExperience: string
+    exportExperienceEn: string
     exportCountries: string[]
     productCategories: string[]
     minimumOrderQuantity: string
@@ -1139,6 +1170,7 @@ export interface SellerProfileFieldRefs {
   readonly koreanBusinessRegistrationNumber: Prisma.FieldRef<"SellerProfile", 'String'>
   readonly representativeName: Prisma.FieldRef<"SellerProfile", 'String'>
   readonly exportExperience: Prisma.FieldRef<"SellerProfile", 'String'>
+  readonly exportExperienceEn: Prisma.FieldRef<"SellerProfile", 'String'>
   readonly exportCountries: Prisma.FieldRef<"SellerProfile", 'String[]'>
   readonly productCategories: Prisma.FieldRef<"SellerProfile", 'String[]'>
   readonly minimumOrderQuantity: Prisma.FieldRef<"SellerProfile", 'String'>

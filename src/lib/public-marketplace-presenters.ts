@@ -1,8 +1,19 @@
 import type { Product, Seller } from "@/lib/types";
 import { isVerifiedSellerSubscription } from "@/lib/billing";
+import type { Locale } from "@/lib/i18n";
+import {
+  localizedArray,
+  localizedCompanyDescription,
+  localizedCompanyName,
+  localizedSellerExportExperience,
+  localizedText,
+} from "@/lib/multilingual-content";
 import { normalizeProductFieldVisibility } from "@/lib/product-field-visibility";
 
-export function databaseProductToCard(value: Record<string, unknown>): Product {
+export function databaseProductToCard(
+  value: Record<string, unknown>,
+  locale: Locale = "en",
+): Product {
   const company = (value.sellerCompany ?? {}) as Record<string, unknown>;
   const images = Array.isArray(value.images)
     ? (value.images as Array<Record<string, unknown>>)
@@ -27,10 +38,14 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
 
   return {
     id: String(value.id),
-    name: String(value.name),
+    name: localizedText({
+      locale,
+      original: value.name,
+      english: value.nameEn,
+    }),
     category: value.category as Product["category"],
     sellerId: String(company.id),
-    sellerName: String(company.tradeName ?? company.legalName ?? ""),
+    sellerName: localizedCompanyName(company, locale),
     sellerLocation: [company.city, company.country].filter(Boolean).join(", "),
     sellerLogoUrl:
       typeof company.logoThumbnailUrl === "string"
@@ -46,8 +61,16 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
       typeof company.subscriptionStatus === "string" ? company.subscriptionStatus : null,
       typeof company.subscriptionPlan === "string" ? company.subscriptionPlan : null,
     ),
-    shortDescription: String(value.shortDescription ?? ""),
-    longDescription: String(value.detailedDescription ?? ""),
+    shortDescription: localizedText({
+      locale,
+      original: value.shortDescription,
+      english: value.shortDescriptionEn,
+    }),
+    longDescription: localizedText({
+      locale,
+      original: value.detailedDescription,
+      english: value.detailedDescriptionEn,
+    }),
     wholesalePrice: price,
     wholesalePriceValue: priceMin,
     moq:
@@ -80,7 +103,11 @@ export function databaseProductToCard(value: Record<string, unknown>): Product {
     riskNotes: Array.isArray(value.riskNotes) ? (value.riskNotes as string[]) : [],
     imagePlaceholder: imageUrls[0] ?? fallbackImageUrl,
     imageUrls,
-    tags: Array.isArray(value.tags) ? (value.tags as string[]) : [],
+    tags: localizedArray({
+      locale,
+      original: value.tags,
+      english: value.tagsEn,
+    }),
     createdAt: String(value.createdAt ?? ""),
     verificationStatus: "verified",
   };
@@ -101,7 +128,10 @@ function companyLogoUrl(company: Record<string, unknown>) {
         : undefined;
 }
 
-export function databaseCompanyToSeller(company: Record<string, unknown>): Seller {
+export function databaseCompanyToSeller(
+  company: Record<string, unknown>,
+  locale: Locale = "en",
+): Seller {
   const profile = (company.sellerProfile ?? {}) as Record<string, unknown>;
   const count = (company._count ?? {}) as Record<string, unknown>;
   const reviews = Array.isArray(company.reviewsReceived)
@@ -112,7 +142,7 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
 
   return {
     id: String(company.id),
-    name: String(company.tradeName ?? company.legalName ?? ""),
+    name: localizedCompanyName(company, locale),
     logoUrl: companyLogoUrl(company),
     useDefaultLogo: company.useDefaultLogo !== false,
     location: [company.city, company.country].filter(Boolean).join(", "),
@@ -123,7 +153,7 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
     categories: (company.categories as Seller["categories"]) ?? [],
     certifications: (profile.certifications as string[]) ?? [],
     exportCountries: (profile.exportCountries as string[]) ?? [],
-    exportExperience: String(profile.exportExperience ?? ""),
+    exportExperience: localizedSellerExportExperience(profile, locale),
     monthlyCapacity: "",
     responseTime: "",
     paymentTerms: (profile.paymentTerms as string[]) ?? [],
@@ -147,7 +177,7 @@ export function databaseCompanyToSeller(company: Record<string, unknown>): Selle
         ? company.subscriptionPlan
         : null,
     ),
-    description: String(company.description ?? ""),
+    description: localizedCompanyDescription(company, locale),
   };
 }
 

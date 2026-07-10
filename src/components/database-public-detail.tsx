@@ -49,6 +49,13 @@ import {
 import { isVerifiedSellerSubscription } from "@/lib/billing";
 import { withLocale } from "@/lib/i18n";
 import {
+  localizedArray,
+  localizedCompanyDescription,
+  localizedCompanyName,
+  localizedSellerExportExperience,
+  localizedText,
+} from "@/lib/multilingual-content";
+import {
   normalizeProductFieldVisibility,
   productFieldVisibilityKeys,
   type ProductFieldVisibility,
@@ -62,6 +69,7 @@ type PublicCompany = {
   companyRole: "seller" | "buyer";
   legalName: string;
   tradeName: string | null;
+  displayNameEn: string;
   logoOriginalUrl: string | null;
   logoThumbnailUrl: string | null;
   logoUrl: string | null;
@@ -71,6 +79,7 @@ type PublicCompany = {
   stateOrProvince: string;
   website: string;
   description: string;
+  descriptionEn: string;
   categories: string[];
   verificationStatus: VerificationStatus;
   owner?: {
@@ -80,6 +89,7 @@ type PublicCompany = {
   sellerProfile?: {
     representativeName: string;
     exportExperience: string;
+    exportExperienceEn: string;
     exportCountries: string[];
     productCategories: string[];
     minimumOrderQuantity: string;
@@ -140,12 +150,12 @@ function usePublicMarketplace() {
 }
 
 export function DatabaseCompanyDetail({ id }: { id: string }) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const { payload, loaded } = usePublicMarketplace();
   const company = payload.companies.find((item) => item.id === id);
   const companyProducts = payload.products
     .filter((item) => (item.sellerCompany as { id?: string })?.id === id)
-    .map(publicProductToCard);
+    .map((item) => publicProductToCard(item, locale));
   const average = company?.reviewsReceived.length
     ? company.reviewsReceived.reduce((sum, review) => sum + review.rating, 0) /
       company.reviewsReceived.length
@@ -153,6 +163,8 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
 
   if (!loaded) return <PublicLoading />;
   if (!company) return <PublicUnavailable />;
+  const companyName = localizedCompanyName(company, locale);
+  const companyDescription = localizedCompanyDescription(company, locale);
   const verifiedSeller =
     company.companyRole === "seller" &&
     isVerifiedSellerSubscription(company.subscriptionStatus, company.subscriptionPlan);
@@ -166,7 +178,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
         />
         <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 sm:flex-row">
           <CompanyLogo
-            companyName={company.tradeName || company.legalName}
+            companyName={companyName}
             logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? company.logoOriginalUrl ?? undefined}
             logoUrls={[
               company.logoThumbnailUrl ?? "",
@@ -180,12 +192,12 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
           <div className="min-w-0">
             <VerificationBadge status={company.verificationStatus} subject={company.companyRole} />
             <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-              <h1 className="break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{company.tradeName || company.legalName}</h1>
+              <h1 className="break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{companyName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
               {verifiedSeller ? <VerifiedSellerBadge /> : null}
             </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
-            <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{company.description}</p>
+            <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{companyDescription}</p>
           </div>
         </section>
         {company.companyRole === "buyer" ? (
@@ -210,6 +222,8 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
 function BuyerProfileDetail({ company }: { company: PublicCompany }) {
   const { locale, t } = useI18n();
   const profile = company.buyerProfile;
+  const companyName = localizedCompanyName(company, locale);
+  const companyDescription = localizedCompanyDescription(company, locale);
   const location = formatCompanyLocation(company, locale);
   const contactPerson = [company.owner?.displayName, company.owner?.jobTitle]
     .filter(Boolean)
@@ -217,7 +231,7 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
   const categoryLabels = optionLabels(profile?.purchasingCategories, buyerCategoryLabel, locale);
   const salesChannelLabels = optionLabels(profile?.salesChannels, salesChannelLabel, locale);
   const rows = compactRows([
-    { label: t("settings.legalName"), value: company.tradeName || company.legalName },
+    { label: t("settings.legalName"), value: companyName },
     { label: t("settings.city"), value: location },
     { label: t("settings.buyerType"), value: buyerTypeOptionLabel(profile?.buyerType, locale) },
     { label: t("settings.purchasingCategories"), value: joinList(categoryLabels) },
@@ -242,10 +256,10 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
             <DetailTable rows={rows} />
           </div>
         ) : null}
-        {company.description.trim() ? (
+        {companyDescription.trim() ? (
           <div className="rounded-lg border border-zinc-200 bg-white p-5">
             <h2 className="text-lg font-semibold text-zinc-950">{t("buyer.marketStrategy")}</h2>
-            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
+            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{companyDescription}</p>
           </div>
         ) : null}
       </div>
@@ -268,9 +282,11 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
 function SellerProfileDetail({ company }: { company: PublicCompany }) {
   const { locale, t } = useI18n();
   const profile = company.sellerProfile;
+  const companyName = localizedCompanyName(company, locale);
+  const companyDescription = localizedCompanyDescription(company, locale);
   const location = formatCompanyLocation(company, locale);
   const companyRows = compactRows([
-    { label: t("settings.legalName"), value: company.tradeName || company.legalName },
+    { label: t("settings.legalName"), value: companyName },
     { label: t("settings.city"), value: location },
     { label: t("settings.supplierType"), value: sellerSupplierTypeLabel(profile?.factoryOrDistributorStatus, locale) },
     { label: t("settings.representativeName"), value: profile?.representativeName },
@@ -279,7 +295,7 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
   const capabilityRows = compactRows([
     { label: t("settings.productCategories"), value: joinList(profile?.productCategories.length ? profile.productCategories : company.categories) },
     { label: t("settings.exportCountries"), value: joinList(profile?.exportCountries) },
-    { label: t("settings.exportExperience"), value: profile?.exportExperience },
+    { label: t("settings.exportExperience"), value: localizedSellerExportExperience(profile, locale) },
     { label: t("settings.minimumOrderQuantity"), value: profile?.minimumOrderQuantity },
     { label: t("settings.leadTime"), value: profile?.leadTime },
     { label: t("settings.certifications"), value: joinList(profile?.certifications) },
@@ -296,10 +312,10 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
             <DetailTable rows={companyRows} />
           </div>
         ) : null}
-        {company.description.trim() ? (
+        {companyDescription.trim() ? (
           <div className="rounded-lg border border-zinc-200 bg-white p-5">
             <h2 className="text-lg font-semibold text-zinc-950">{t("company.about")}</h2>
-            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{company.description}</p>
+            <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{companyDescription}</p>
           </div>
         ) : null}
         {capabilityRows.length ? (
@@ -357,7 +373,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   const [ownerError, setOwnerError] = useState("");
   const { payload, loaded } = usePublicMarketplace();
   const raw = payload.products.find((item) => item.id === id);
-  const product = raw ? publicProductToCard(raw) : null;
+  const product = raw ? publicProductToCard(raw, locale) : null;
   const sellerCompanyRef = raw?.sellerCompany as Record<string, unknown> | undefined;
   const sellerCompanyId = String(sellerCompanyRef?.id ?? "");
   const sellerCompany = payload.companies.find((item) => item.id === sellerCompanyId);
@@ -368,12 +384,22 @@ export function DatabaseProductDetail({ id }: { id: string }) {
       const company = (item.sellerCompany ?? {}) as Record<string, unknown>;
       return String(company.id ?? "") === sellerCompanyId && String(item.id) !== id;
     })
-    .map(publicProductToCard)
+    .map((item) => publicProductToCard(item, locale))
     .slice(0, 3);
   if (!loaded) return <PublicLoading />;
   if (!product) return <PublicUnavailable />;
 
   const richRows = raw ?? {};
+  const buyerNotes = localizedText({
+    locale,
+    original: richRows.buyerNotes,
+    english: richRows.buyerNotesEn,
+  });
+  const sellerDescription = localizedText({
+    locale,
+    original: sellerCompanyRef?.description ?? sellerCompany?.description,
+    english: sellerCompanyRef?.descriptionEn ?? sellerCompany?.descriptionEn,
+  });
   const notProvided = t("productDetail.notProvided");
   const shippingOrigin = formatShippingOrigin(richRows, sellerCompanyRef, locale, notProvided);
   const countryOfOrigin =
@@ -627,9 +653,9 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
                 {product.longDescription || notProvided}
               </p>
-              {String(richRows.buyerNotes ?? "").trim() ? (
+              {buyerNotes ? (
                 <p className="mt-4 break-words text-sm leading-6 text-zinc-600">
-                  {String(richRows.buyerNotes)}
+                  {buyerNotes}
                 </p>
               ) : null}
             </div>
@@ -723,7 +749,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 <h2 className="text-lg font-semibold text-zinc-950">{t("productDetail.sellerInformation")}</h2>
               </div>
               <p className="mt-3 text-sm leading-6 text-zinc-600">
-                {String(sellerCompanyRef?.description ?? sellerCompany?.description ?? "") || product.sellerName}
+                {sellerDescription || product.sellerName}
               </p>
               <DetailTable
                 rows={compactRows([
@@ -927,7 +953,10 @@ function visibilityLabel(
   return t("productDetail.visibilityInquiryRequired");
 }
 
-function publicProductToCard(value: Record<string, unknown>): Product {
+function publicProductToCard(
+  value: Record<string, unknown>,
+  locale: "en" | "ko" = "ko",
+): Product {
   const company = (value.sellerCompany ?? {}) as Record<string, unknown>;
   const images = Array.isArray(value.images)
     ? (value.images as Array<Record<string, unknown>>)
@@ -946,10 +975,14 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     : String(value.moq ?? "");
   return {
     id: String(value.id),
-    name: String(value.name),
+    name: localizedText({
+      locale,
+      original: value.name,
+      english: value.nameEn,
+    }),
     category: value.category as Product["category"],
     sellerId: String(company.id),
-    sellerName: String(company.tradeName ?? company.legalName ?? ""),
+    sellerName: localizedCompanyName(company, locale),
     sellerLocation: [company.city, company.country].filter(Boolean).join(", "),
     sellerLogoUrl:
       typeof company.logoThumbnailUrl === "string"
@@ -969,8 +1002,16 @@ function publicProductToCard(value: Record<string, unknown>): Product {
         ? company.subscriptionPlan
         : null,
     ),
-    shortDescription: String(value.shortDescription ?? ""),
-    longDescription: String(value.detailedDescription ?? ""),
+    shortDescription: localizedText({
+      locale,
+      original: value.shortDescription,
+      english: value.shortDescriptionEn,
+    }),
+    longDescription: localizedText({
+      locale,
+      original: value.detailedDescription,
+      english: value.detailedDescriptionEn,
+    }),
     wholesalePrice: priceMin
       ? `${String(value.currency ?? "USD")} ${priceMin}${priceMax !== priceMin ? `-${priceMax}` : ""}`
       : fieldVisibility.minimumUnitPrice === "private"
@@ -1001,12 +1042,20 @@ function publicProductToCard(value: Record<string, unknown>): Product {
     packageSize: String(value.packageSize ?? value.packaging ?? ""),
     unitsPerCarton: String(value.unitsPerCarton ?? ""),
     cartonWeight: String(value.cartonWeight ?? ""),
-    koreanMarketFit: String(value.buyerNotes ?? value.ingredientsOrMaterials ?? ""),
+    koreanMarketFit: localizedText({
+      locale,
+      original: value.buyerNotes ?? value.ingredientsOrMaterials,
+      english: value.buyerNotesEn,
+    }),
     suggestedSalesChannels: arrayOfStrings(value.suggestedUsChannels),
     riskNotes: arrayOfStrings(value.riskNotes),
     imagePlaceholder: imageUrls[0] ?? fallbackImageUrl,
     imageUrls,
-    tags: arrayOfStrings(value.tags),
+    tags: localizedArray({
+      locale,
+      original: value.tags,
+      english: value.tagsEn,
+    }),
     createdAt: String(value.createdAt ?? new Date().toISOString()),
     verificationStatus: String(company.verificationStatus ?? "verified") as VerificationStatus,
   };

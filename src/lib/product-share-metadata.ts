@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import type { Locale } from "@/lib/i18n";
+import { localizedText } from "@/lib/multilingual-content";
 
 const DEFAULT_OG_IMAGE_URL = "https://trade82.com/og/linkpicture-v2.png";
 const DEFAULT_DESCRIPTION =
@@ -73,6 +75,7 @@ export async function getProductShareMetadata(
 ): Promise<Metadata> {
   const canonicalPath = `${localePrefix}/products/${encodeURIComponent(productId)}`;
   const url = absoluteUrl(canonicalPath);
+  const locale: Locale = localePrefix.startsWith("/ko") ? "ko" : "en";
 
   try {
     const product = await getDb().product.findFirst({
@@ -86,8 +89,11 @@ export async function getProductShareMetadata(
       },
       select: {
         name: true,
+        nameEn: true,
         shortDescription: true,
+        shortDescriptionEn: true,
         detailedDescription: true,
+        detailedDescriptionEn: true,
         imageUrl: true,
         images: {
           orderBy: { position: "asc" },
@@ -105,9 +111,19 @@ export async function getProductShareMetadata(
       return fallbackProductMetadata(url);
     }
 
-    const title = `${cleanMetaText(product.name, "Trade82 product")} | Trade82`;
+    const productName = localizedText({
+      locale,
+      original: product.name,
+      english: product.nameEn,
+    });
+    const productDescription = localizedText({
+      locale,
+      original: product.shortDescription || product.detailedDescription,
+      english: product.shortDescriptionEn || product.detailedDescriptionEn,
+    });
+    const title = `${cleanMetaText(productName, "Trade82 product")} | Trade82`;
     const description = cleanMetaText(
-      product.shortDescription || product.detailedDescription,
+      productDescription,
       DEFAULT_DESCRIPTION,
     );
     const imageUrl = publicProductImageUrl(product);
@@ -119,7 +135,7 @@ export async function getProductShareMetadata(
         canonical: url,
       },
       openGraph: {
-        title: product.name,
+        title: productName,
         description,
         url,
         type: "website",
@@ -127,13 +143,13 @@ export async function getProductShareMetadata(
         images: [
           {
             url: imageUrl,
-            alt: product.name,
+            alt: productName,
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: product.name,
+        title: productName,
         description,
         images: [imageUrl],
       },

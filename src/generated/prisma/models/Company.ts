@@ -44,6 +44,7 @@ export type CompanyMinAggregateOutputType = {
   companyRole: $Enums.CompanyRole | null
   legalName: string | null
   tradeName: string | null
+  displayNameEn: string | null
   logoOriginalUrl: string | null
   logoThumbnailUrl: string | null
   logoUrl: string | null
@@ -54,6 +55,7 @@ export type CompanyMinAggregateOutputType = {
   stateOrProvince: string | null
   businessAddress: string | null
   description: string | null
+  descriptionEn: string | null
   viewCount: number | null
   verificationStatus: $Enums.CompanyVerificationStatus | null
   stripeCustomerId: string | null
@@ -79,6 +81,7 @@ export type CompanyMaxAggregateOutputType = {
   companyRole: $Enums.CompanyRole | null
   legalName: string | null
   tradeName: string | null
+  displayNameEn: string | null
   logoOriginalUrl: string | null
   logoThumbnailUrl: string | null
   logoUrl: string | null
@@ -89,6 +92,7 @@ export type CompanyMaxAggregateOutputType = {
   stateOrProvince: string | null
   businessAddress: string | null
   description: string | null
+  descriptionEn: string | null
   viewCount: number | null
   verificationStatus: $Enums.CompanyVerificationStatus | null
   stripeCustomerId: string | null
@@ -114,6 +118,7 @@ export type CompanyCountAggregateOutputType = {
   companyRole: number
   legalName: number
   tradeName: number
+  displayNameEn: number
   logoOriginalUrl: number
   logoThumbnailUrl: number
   logoUrl: number
@@ -124,6 +129,7 @@ export type CompanyCountAggregateOutputType = {
   stateOrProvince: number
   businessAddress: number
   description: number
+  descriptionEn: number
   categories: number
   viewCount: number
   verificationStatus: number
@@ -164,6 +170,7 @@ export type CompanyMinAggregateInputType = {
   companyRole?: true
   legalName?: true
   tradeName?: true
+  displayNameEn?: true
   logoOriginalUrl?: true
   logoThumbnailUrl?: true
   logoUrl?: true
@@ -174,6 +181,7 @@ export type CompanyMinAggregateInputType = {
   stateOrProvince?: true
   businessAddress?: true
   description?: true
+  descriptionEn?: true
   viewCount?: true
   verificationStatus?: true
   stripeCustomerId?: true
@@ -199,6 +207,7 @@ export type CompanyMaxAggregateInputType = {
   companyRole?: true
   legalName?: true
   tradeName?: true
+  displayNameEn?: true
   logoOriginalUrl?: true
   logoThumbnailUrl?: true
   logoUrl?: true
@@ -209,6 +218,7 @@ export type CompanyMaxAggregateInputType = {
   stateOrProvince?: true
   businessAddress?: true
   description?: true
+  descriptionEn?: true
   viewCount?: true
   verificationStatus?: true
   stripeCustomerId?: true
@@ -234,6 +244,7 @@ export type CompanyCountAggregateInputType = {
   companyRole?: true
   legalName?: true
   tradeName?: true
+  displayNameEn?: true
   logoOriginalUrl?: true
   logoThumbnailUrl?: true
   logoUrl?: true
@@ -244,6 +255,7 @@ export type CompanyCountAggregateInputType = {
   stateOrProvince?: true
   businessAddress?: true
   description?: true
+  descriptionEn?: true
   categories?: true
   viewCount?: true
   verificationStatus?: true
@@ -357,6 +369,7 @@ export type CompanyGroupByOutputType = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName: string | null
+  displayNameEn: string
   logoOriginalUrl: string | null
   logoThumbnailUrl: string | null
   logoUrl: string | null
@@ -367,6 +380,7 @@ export type CompanyGroupByOutputType = {
   stateOrProvince: string
   businessAddress: string
   description: string
+  descriptionEn: string
   categories: string[]
   viewCount: number
   verificationStatus: $Enums.CompanyVerificationStatus
@@ -416,6 +430,7 @@ export type CompanyWhereInput = {
   companyRole?: Prisma.EnumCompanyRoleFilter<"Company"> | $Enums.CompanyRole
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  displayNameEn?: Prisma.StringFilter<"Company"> | string
   logoOriginalUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoThumbnailUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -426,6 +441,7 @@ export type CompanyWhereInput = {
   stateOrProvince?: Prisma.StringFilter<"Company"> | string
   businessAddress?: Prisma.StringFilter<"Company"> | string
   description?: Prisma.StringFilter<"Company"> | string
+  descriptionEn?: Prisma.StringFilter<"Company"> | string
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
@@ -475,6 +491,7 @@ export type CompanyOrderByWithRelationInput = {
   companyRole?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayNameEn?: Prisma.SortOrder
   logoOriginalUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   logoThumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -485,6 +502,7 @@ export type CompanyOrderByWithRelationInput = {
   stateOrProvince?: Prisma.SortOrder
   businessAddress?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -542,6 +560,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   companyRole?: Prisma.EnumCompanyRoleFilter<"Company"> | $Enums.CompanyRole
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  displayNameEn?: Prisma.StringFilter<"Company"> | string
   logoOriginalUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoThumbnailUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -552,6 +571,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   stateOrProvince?: Prisma.StringFilter<"Company"> | string
   businessAddress?: Prisma.StringFilter<"Company"> | string
   description?: Prisma.StringFilter<"Company"> | string
+  descriptionEn?: Prisma.StringFilter<"Company"> | string
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
@@ -597,6 +617,7 @@ export type CompanyOrderByWithAggregationInput = {
   companyRole?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayNameEn?: Prisma.SortOrder
   logoOriginalUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   logoThumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -607,6 +628,7 @@ export type CompanyOrderByWithAggregationInput = {
   stateOrProvince?: Prisma.SortOrder
   businessAddress?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -641,6 +663,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   companyRole?: Prisma.EnumCompanyRoleWithAggregatesFilter<"Company"> | $Enums.CompanyRole
   legalName?: Prisma.StringWithAggregatesFilter<"Company"> | string
   tradeName?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
+  displayNameEn?: Prisma.StringWithAggregatesFilter<"Company"> | string
   logoOriginalUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   logoThumbnailUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
@@ -651,6 +674,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   stateOrProvince?: Prisma.StringWithAggregatesFilter<"Company"> | string
   businessAddress?: Prisma.StringWithAggregatesFilter<"Company"> | string
   description?: Prisma.StringWithAggregatesFilter<"Company"> | string
+  descriptionEn?: Prisma.StringWithAggregatesFilter<"Company"> | string
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntWithAggregatesFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusWithAggregatesFilter<"Company"> | $Enums.CompanyVerificationStatus
@@ -676,6 +700,7 @@ export type CompanyCreateInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -686,6 +711,7 @@ export type CompanyCreateInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -735,6 +761,7 @@ export type CompanyUncheckedCreateInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -745,6 +772,7 @@ export type CompanyUncheckedCreateInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -792,6 +820,7 @@ export type CompanyUpdateInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -802,6 +831,7 @@ export type CompanyUpdateInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -851,6 +881,7 @@ export type CompanyUncheckedUpdateInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +892,7 @@ export type CompanyUncheckedUpdateInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -909,6 +941,7 @@ export type CompanyCreateManyInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -919,6 +952,7 @@ export type CompanyCreateManyInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -944,6 +978,7 @@ export type CompanyUpdateManyMutationInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -954,6 +989,7 @@ export type CompanyUpdateManyMutationInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -980,6 +1016,7 @@ export type CompanyUncheckedUpdateManyInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -990,6 +1027,7 @@ export type CompanyUncheckedUpdateManyInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -1039,6 +1077,7 @@ export type CompanyCountOrderByAggregateInput = {
   companyRole?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  displayNameEn?: Prisma.SortOrder
   logoOriginalUrl?: Prisma.SortOrder
   logoThumbnailUrl?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
@@ -1049,6 +1088,7 @@ export type CompanyCountOrderByAggregateInput = {
   stateOrProvince?: Prisma.SortOrder
   businessAddress?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -1081,6 +1121,7 @@ export type CompanyMaxOrderByAggregateInput = {
   companyRole?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  displayNameEn?: Prisma.SortOrder
   logoOriginalUrl?: Prisma.SortOrder
   logoThumbnailUrl?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
@@ -1091,6 +1132,7 @@ export type CompanyMaxOrderByAggregateInput = {
   stateOrProvince?: Prisma.SortOrder
   businessAddress?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
@@ -1116,6 +1158,7 @@ export type CompanyMinOrderByAggregateInput = {
   companyRole?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  displayNameEn?: Prisma.SortOrder
   logoOriginalUrl?: Prisma.SortOrder
   logoThumbnailUrl?: Prisma.SortOrder
   logoUrl?: Prisma.SortOrder
@@ -1126,6 +1169,7 @@ export type CompanyMinOrderByAggregateInput = {
   stateOrProvince?: Prisma.SortOrder
   businessAddress?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
@@ -1559,6 +1603,7 @@ export type CompanyCreateWithoutOwnerInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -1569,6 +1614,7 @@ export type CompanyCreateWithoutOwnerInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -1616,6 +1662,7 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -1626,6 +1673,7 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -1703,6 +1751,7 @@ export type CompanyScalarWhereInput = {
   companyRole?: Prisma.EnumCompanyRoleFilter<"Company"> | $Enums.CompanyRole
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  displayNameEn?: Prisma.StringFilter<"Company"> | string
   logoOriginalUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoThumbnailUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -1713,6 +1762,7 @@ export type CompanyScalarWhereInput = {
   stateOrProvince?: Prisma.StringFilter<"Company"> | string
   businessAddress?: Prisma.StringFilter<"Company"> | string
   description?: Prisma.StringFilter<"Company"> | string
+  descriptionEn?: Prisma.StringFilter<"Company"> | string
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
@@ -1738,6 +1788,7 @@ export type CompanyCreateWithoutSellerProfileInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -1748,6 +1799,7 @@ export type CompanyCreateWithoutSellerProfileInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -1796,6 +1848,7 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -1806,6 +1859,7 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -1868,6 +1922,7 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1878,6 +1933,7 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -1926,6 +1982,7 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1936,6 +1993,7 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -1982,6 +2040,7 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -1992,6 +2051,7 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2040,6 +2100,7 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2050,6 +2111,7 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2112,6 +2174,7 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2122,6 +2185,7 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2170,6 +2234,7 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2180,6 +2245,7 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2226,6 +2292,7 @@ export type CompanyCreateWithoutProductsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2236,6 +2303,7 @@ export type CompanyCreateWithoutProductsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2284,6 +2352,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2294,6 +2363,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2356,6 +2426,7 @@ export type CompanyUpdateWithoutProductsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2366,6 +2437,7 @@ export type CompanyUpdateWithoutProductsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2414,6 +2486,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2424,6 +2497,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2470,6 +2544,7 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2480,6 +2555,7 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2528,6 +2604,7 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2538,6 +2615,7 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2600,6 +2678,7 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2610,6 +2689,7 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2658,6 +2738,7 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2668,6 +2749,7 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -2714,6 +2796,7 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2724,6 +2807,7 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2772,6 +2856,7 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2782,6 +2867,7 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2833,6 +2919,7 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2843,6 +2930,7 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2891,6 +2979,7 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2901,6 +2990,7 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -2952,6 +3042,7 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -2962,6 +3053,7 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3010,6 +3102,7 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3020,6 +3113,7 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3082,6 +3176,7 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3092,6 +3187,7 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3140,6 +3236,7 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3150,6 +3247,7 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3207,6 +3305,7 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3217,6 +3316,7 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3265,6 +3365,7 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3275,6 +3376,7 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3332,6 +3434,7 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3342,6 +3445,7 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3390,6 +3494,7 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3400,6 +3505,7 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3446,6 +3552,7 @@ export type CompanyCreateWithoutBuyerRfqRequestsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3456,6 +3563,7 @@ export type CompanyCreateWithoutBuyerRfqRequestsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3504,6 +3612,7 @@ export type CompanyUncheckedCreateWithoutBuyerRfqRequestsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3514,6 +3623,7 @@ export type CompanyUncheckedCreateWithoutBuyerRfqRequestsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3576,6 +3686,7 @@ export type CompanyUpdateWithoutBuyerRfqRequestsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3586,6 +3697,7 @@ export type CompanyUpdateWithoutBuyerRfqRequestsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3634,6 +3746,7 @@ export type CompanyUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3644,6 +3757,7 @@ export type CompanyUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3690,6 +3804,7 @@ export type CompanyCreateWithoutRfqSellerQuotesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3700,6 +3815,7 @@ export type CompanyCreateWithoutRfqSellerQuotesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3748,6 +3864,7 @@ export type CompanyUncheckedCreateWithoutRfqSellerQuotesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3758,6 +3875,7 @@ export type CompanyUncheckedCreateWithoutRfqSellerQuotesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3820,6 +3938,7 @@ export type CompanyUpdateWithoutRfqSellerQuotesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3830,6 +3949,7 @@ export type CompanyUpdateWithoutRfqSellerQuotesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3878,6 +3998,7 @@ export type CompanyUncheckedUpdateWithoutRfqSellerQuotesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3888,6 +4009,7 @@ export type CompanyUncheckedUpdateWithoutRfqSellerQuotesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -3934,6 +4056,7 @@ export type CompanyCreateWithoutSavedItemsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -3944,6 +4067,7 @@ export type CompanyCreateWithoutSavedItemsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -3992,6 +4116,7 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4002,6 +4127,7 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4064,6 +4190,7 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4074,6 +4201,7 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4122,6 +4250,7 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4132,6 +4261,7 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4178,6 +4308,7 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4188,6 +4319,7 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4236,6 +4368,7 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4246,6 +4379,7 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4297,6 +4431,7 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4307,6 +4442,7 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4355,6 +4491,7 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4365,6 +4502,7 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4427,6 +4565,7 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4437,6 +4576,7 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4485,6 +4625,7 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4495,6 +4636,7 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4552,6 +4694,7 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4562,6 +4705,7 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4610,6 +4754,7 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4620,6 +4765,7 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4666,6 +4812,7 @@ export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4676,6 +4823,7 @@ export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4724,6 +4872,7 @@ export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4734,6 +4883,7 @@ export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4796,6 +4946,7 @@ export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4806,6 +4957,7 @@ export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4854,6 +5006,7 @@ export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4864,6 +5017,7 @@ export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -4910,6 +5064,7 @@ export type CompanyCreateWithoutDocumentFoldersInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4920,6 +5075,7 @@ export type CompanyCreateWithoutDocumentFoldersInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -4968,6 +5124,7 @@ export type CompanyUncheckedCreateWithoutDocumentFoldersInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -4978,6 +5135,7 @@ export type CompanyUncheckedCreateWithoutDocumentFoldersInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5040,6 +5198,7 @@ export type CompanyUpdateWithoutDocumentFoldersInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5050,6 +5209,7 @@ export type CompanyUpdateWithoutDocumentFoldersInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5098,6 +5258,7 @@ export type CompanyUncheckedUpdateWithoutDocumentFoldersInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5108,6 +5269,7 @@ export type CompanyUncheckedUpdateWithoutDocumentFoldersInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5154,6 +5316,7 @@ export type CompanyCreateWithoutTradeDocumentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5164,6 +5327,7 @@ export type CompanyCreateWithoutTradeDocumentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5212,6 +5376,7 @@ export type CompanyUncheckedCreateWithoutTradeDocumentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5222,6 +5387,7 @@ export type CompanyUncheckedCreateWithoutTradeDocumentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5273,6 +5439,7 @@ export type CompanyCreateWithoutSharedTradeDocumentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5283,6 +5450,7 @@ export type CompanyCreateWithoutSharedTradeDocumentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5331,6 +5499,7 @@ export type CompanyUncheckedCreateWithoutSharedTradeDocumentsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5341,6 +5510,7 @@ export type CompanyUncheckedCreateWithoutSharedTradeDocumentsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5403,6 +5573,7 @@ export type CompanyUpdateWithoutTradeDocumentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5413,6 +5584,7 @@ export type CompanyUpdateWithoutTradeDocumentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5461,6 +5633,7 @@ export type CompanyUncheckedUpdateWithoutTradeDocumentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5471,6 +5644,7 @@ export type CompanyUncheckedUpdateWithoutTradeDocumentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5528,6 +5702,7 @@ export type CompanyUpdateWithoutSharedTradeDocumentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5538,6 +5713,7 @@ export type CompanyUpdateWithoutSharedTradeDocumentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5586,6 +5762,7 @@ export type CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5596,6 +5773,7 @@ export type CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5642,6 +5820,7 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5652,6 +5831,7 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5700,6 +5880,7 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5710,6 +5891,7 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5761,6 +5943,7 @@ export type CompanyCreateWithoutSellerDealsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5771,6 +5954,7 @@ export type CompanyCreateWithoutSellerDealsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5819,6 +6003,7 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -5829,6 +6014,7 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -5891,6 +6077,7 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5901,6 +6088,7 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -5949,6 +6137,7 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5959,6 +6148,7 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6016,6 +6206,7 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6026,6 +6217,7 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6074,6 +6266,7 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6084,6 +6277,7 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6130,6 +6324,7 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6140,6 +6335,7 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6188,6 +6384,7 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6198,6 +6395,7 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6249,6 +6447,7 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6259,6 +6458,7 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6307,6 +6507,7 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6317,6 +6518,7 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6379,6 +6581,7 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6389,6 +6592,7 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6437,6 +6641,7 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6447,6 +6652,7 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6504,6 +6710,7 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6514,6 +6721,7 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6562,6 +6770,7 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6572,6 +6781,7 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6618,6 +6828,7 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6628,6 +6839,7 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6676,6 +6888,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6686,6 +6899,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6737,6 +6951,7 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6747,6 +6962,7 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6795,6 +7011,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -6805,6 +7022,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -6867,6 +7085,7 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6877,6 +7096,7 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6925,6 +7145,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6935,6 +7156,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -6992,6 +7214,7 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7002,6 +7225,7 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -7050,6 +7274,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7060,6 +7285,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -7106,6 +7332,7 @@ export type CompanyCreateManyOwnerInput = {
   companyRole: $Enums.CompanyRole
   legalName: string
   tradeName?: string | null
+  displayNameEn?: string
   logoOriginalUrl?: string | null
   logoThumbnailUrl?: string | null
   logoUrl?: string | null
@@ -7116,6 +7343,7 @@ export type CompanyCreateManyOwnerInput = {
   stateOrProvince?: string
   businessAddress: string
   description?: string
+  descriptionEn?: string
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
@@ -7141,6 +7369,7 @@ export type CompanyUpdateWithoutOwnerInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7151,6 +7380,7 @@ export type CompanyUpdateWithoutOwnerInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -7198,6 +7428,7 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7208,6 +7439,7 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -7255,6 +7487,7 @@ export type CompanyUncheckedUpdateManyWithoutOwnerInput = {
   companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
   logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7265,6 +7498,7 @@ export type CompanyUncheckedUpdateManyWithoutOwnerInput = {
   stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
   businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
@@ -7493,6 +7727,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   companyRole?: boolean
   legalName?: boolean
   tradeName?: boolean
+  displayNameEn?: boolean
   logoOriginalUrl?: boolean
   logoThumbnailUrl?: boolean
   logoUrl?: boolean
@@ -7503,6 +7738,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   stateOrProvince?: boolean
   businessAddress?: boolean
   description?: boolean
+  descriptionEn?: boolean
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
@@ -7553,6 +7789,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   companyRole?: boolean
   legalName?: boolean
   tradeName?: boolean
+  displayNameEn?: boolean
   logoOriginalUrl?: boolean
   logoThumbnailUrl?: boolean
   logoUrl?: boolean
@@ -7563,6 +7800,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   stateOrProvince?: boolean
   businessAddress?: boolean
   description?: boolean
+  descriptionEn?: boolean
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
@@ -7590,6 +7828,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   companyRole?: boolean
   legalName?: boolean
   tradeName?: boolean
+  displayNameEn?: boolean
   logoOriginalUrl?: boolean
   logoThumbnailUrl?: boolean
   logoUrl?: boolean
@@ -7600,6 +7839,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   stateOrProvince?: boolean
   businessAddress?: boolean
   description?: boolean
+  descriptionEn?: boolean
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
@@ -7627,6 +7867,7 @@ export type CompanySelectScalar = {
   companyRole?: boolean
   legalName?: boolean
   tradeName?: boolean
+  displayNameEn?: boolean
   logoOriginalUrl?: boolean
   logoThumbnailUrl?: boolean
   logoUrl?: boolean
@@ -7637,6 +7878,7 @@ export type CompanySelectScalar = {
   stateOrProvince?: boolean
   businessAddress?: boolean
   description?: boolean
+  descriptionEn?: boolean
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
@@ -7657,7 +7899,7 @@ export type CompanySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "companyRole" | "legalName" | "tradeName" | "logoOriginalUrl" | "logoThumbnailUrl" | "logoUrl" | "useDefaultLogo" | "website" | "country" | "city" | "stateOrProvince" | "businessAddress" | "description" | "categories" | "viewCount" | "verificationStatus" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionStatus" | "subscriptionPlan" | "subscriptionCurrentPeriodEnd" | "verifiedSellerSince" | "sellerSupportPlan" | "sellerSupportStatus" | "sellerSupportStripeCustomerId" | "sellerSupportStripeSubscriptionId" | "sellerSupportCurrentPeriodEnd" | "sellerSupportMonthlyLimit" | "sellerSupportMonthlyUsed" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "companyRole" | "legalName" | "tradeName" | "displayNameEn" | "logoOriginalUrl" | "logoThumbnailUrl" | "logoUrl" | "useDefaultLogo" | "website" | "country" | "city" | "stateOrProvince" | "businessAddress" | "description" | "descriptionEn" | "categories" | "viewCount" | "verificationStatus" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionStatus" | "subscriptionPlan" | "subscriptionCurrentPeriodEnd" | "verifiedSellerSince" | "sellerSupportPlan" | "sellerSupportStatus" | "sellerSupportStripeCustomerId" | "sellerSupportStripeSubscriptionId" | "sellerSupportCurrentPeriodEnd" | "sellerSupportMonthlyLimit" | "sellerSupportMonthlyUsed" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   sellerProfile?: boolean | Prisma.Company$sellerProfileArgs<ExtArgs>
@@ -7724,6 +7966,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     companyRole: $Enums.CompanyRole
     legalName: string
     tradeName: string | null
+    displayNameEn: string
     logoOriginalUrl: string | null
     logoThumbnailUrl: string | null
     logoUrl: string | null
@@ -7734,6 +7977,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     stateOrProvince: string
     businessAddress: string
     description: string
+    descriptionEn: string
     categories: string[]
     viewCount: number
     verificationStatus: $Enums.CompanyVerificationStatus
@@ -8203,6 +8447,7 @@ export interface CompanyFieldRefs {
   readonly companyRole: Prisma.FieldRef<"Company", 'CompanyRole'>
   readonly legalName: Prisma.FieldRef<"Company", 'String'>
   readonly tradeName: Prisma.FieldRef<"Company", 'String'>
+  readonly displayNameEn: Prisma.FieldRef<"Company", 'String'>
   readonly logoOriginalUrl: Prisma.FieldRef<"Company", 'String'>
   readonly logoThumbnailUrl: Prisma.FieldRef<"Company", 'String'>
   readonly logoUrl: Prisma.FieldRef<"Company", 'String'>
@@ -8213,6 +8458,7 @@ export interface CompanyFieldRefs {
   readonly stateOrProvince: Prisma.FieldRef<"Company", 'String'>
   readonly businessAddress: Prisma.FieldRef<"Company", 'String'>
   readonly description: Prisma.FieldRef<"Company", 'String'>
+  readonly descriptionEn: Prisma.FieldRef<"Company", 'String'>
   readonly categories: Prisma.FieldRef<"Company", 'String[]'>
   readonly viewCount: Prisma.FieldRef<"Company", 'Int'>
   readonly verificationStatus: Prisma.FieldRef<"Company", 'CompanyVerificationStatus'>

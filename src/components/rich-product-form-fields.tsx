@@ -37,10 +37,14 @@ type ProductFormVariant = "default" | "dashboard";
 export type RichProductFormValue = {
   images: UploadedListingImage[];
   name: string;
+  nameEn: string;
   category: string;
   tags: string;
+  tagsEn: string;
   shortDescription: string;
+  shortDescriptionEn: string;
   detailedDescription: string;
+  detailedDescriptionEn: string;
   priceMin: string;
   priceMax: string;
   currency: string;
@@ -62,6 +66,7 @@ export type RichProductFormValue = {
   documentsAvailable: string[];
   complianceClaims: string[];
   buyerNotes: string;
+  buyerNotesEn: string;
   packageSize: string;
   unitsPerCarton: string;
   cartonWeight: string;
@@ -109,10 +114,14 @@ export type RichProductFormErrors = Partial<
 export const emptyRichProductForm: RichProductFormValue = {
   images: [],
   name: "",
+  nameEn: "",
   category: "",
   tags: "",
+  tagsEn: "",
   shortDescription: "",
+  shortDescriptionEn: "",
   detailedDescription: "",
+  detailedDescriptionEn: "",
   priceMin: "",
   priceMax: "",
   currency: "USD",
@@ -134,6 +143,7 @@ export const emptyRichProductForm: RichProductFormValue = {
   documentsAvailable: [],
   complianceClaims: [],
   buyerNotes: "",
+  buyerNotesEn: "",
   packageSize: "",
   unitsPerCarton: "",
   cartonWeight: "",
@@ -158,6 +168,10 @@ export function productPayloadFromForm(product: RichProductFormValue) {
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
+  const tagsEn = product.tagsEn
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
   const moq = productFieldRequiresValue(normalized, "moq")
     ? formatMoqValue(visibleProduct.moqQuantity, visibleProduct.moqUnit)
     : "";
@@ -165,6 +179,7 @@ export function productPayloadFromForm(product: RichProductFormValue) {
   return {
     ...visibleProduct,
     tags,
+    tagsEn,
     moq,
     leadTimeCode: visibleProduct.leadTime,
     countryOfOrigin: visibleProduct.countryOfOrigin || SOUTH_KOREA,
@@ -382,10 +397,14 @@ export function formFromProductRecord(product: Record<string, unknown>): RichPro
       ? (product.images as UploadedListingImage[])
       : [],
     name: String(product.name ?? ""),
+    nameEn: String(product.nameEn ?? ""),
     category: String(product.category ?? ""),
     tags: Array.isArray(product.tags) ? (product.tags as string[]).join(", ") : "",
+    tagsEn: Array.isArray(product.tagsEn) ? (product.tagsEn as string[]).join(", ") : "",
     shortDescription: String(product.shortDescription ?? ""),
+    shortDescriptionEn: String(product.shortDescriptionEn ?? ""),
     detailedDescription: String(product.detailedDescription ?? ""),
+    detailedDescriptionEn: String(product.detailedDescriptionEn ?? ""),
     priceMin: product.priceMin == null ? "" : String(product.priceMin),
     priceMax: product.priceMax == null ? "" : String(product.priceMax),
     currency: String(product.currency ?? "USD"),
@@ -407,6 +426,7 @@ export function formFromProductRecord(product: Record<string, unknown>): RichPro
     documentsAvailable: arrayOfStrings(product.documentsAvailable),
     complianceClaims: arrayOfStrings(product.complianceClaims ?? product.certifications),
     buyerNotes: String(product.buyerNotes ?? ""),
+    buyerNotesEn: String(product.buyerNotesEn ?? ""),
     packageSize: String(product.packageSize ?? ""),
     unitsPerCarton: String(product.unitsPerCarton ?? ""),
     cartonWeight: String(product.cartonWeight ?? ""),
@@ -540,6 +560,51 @@ export function RichProductFormFields({
           label={t("productForm.buyerNotes")}
           value={value.buyerNotes}
           onChange={(nextValue) => onChange("buyerNotes", nextValue)}
+          rows={3}
+          variant={variant}
+        />
+      </Section>
+
+      <Section
+        id="english-content"
+        title={t("productForm.englishContent")}
+        description={t("productForm.englishContentHelper")}
+        variant={variant}
+      >
+        {/* TODO: Wire translation generation when an approved provider is configured. */}
+        <TextField
+          label={t("productForm.productNameEn")}
+          value={value.nameEn}
+          onChange={(nextValue) => onChange("nameEn", nextValue)}
+          variant={variant}
+        />
+        <TextField
+          label={t("productForm.shortSummaryEn")}
+          value={value.shortDescriptionEn}
+          onChange={(nextValue) => onChange("shortDescriptionEn", nextValue)}
+          className="sm:col-span-2"
+          maxLength={240}
+          variant={variant}
+        />
+        <TextareaField
+          label={t("productForm.detailedOverviewEn")}
+          value={value.detailedDescriptionEn}
+          onChange={(nextValue) => onChange("detailedDescriptionEn", nextValue)}
+          rows={5}
+          variant={variant}
+        />
+        <TextField
+          label={t("productForm.tagsEn")}
+          value={value.tagsEn}
+          onChange={(nextValue) => onChange("tagsEn", nextValue)}
+          placeholder={t("listing.tagsPlaceholder")}
+          className="sm:col-span-2"
+          variant={variant}
+        />
+        <TextareaField
+          label={t("productForm.buyerNotesEn")}
+          value={value.buyerNotesEn}
+          onChange={(nextValue) => onChange("buyerNotesEn", nextValue)}
           rows={3}
           variant={variant}
         />
@@ -818,12 +883,14 @@ function withCurrentOption(options: SelectOption[], value: string) {
 function Section({
   id,
   title,
+  description,
   children,
   variant = "default",
   required = false,
 }: {
   id?: string;
   title: string;
+  description?: string;
   children: React.ReactNode;
   variant?: ProductFormVariant;
   required?: boolean;
@@ -838,20 +905,32 @@ function Section({
           : "border-zinc-200 bg-white",
       )}
     >
-      <h3
-        className={cx(
-          "text-base font-semibold sm:col-span-2",
-          variant === "dashboard" ? "theme-foreground" : "text-zinc-950",
-        )}
-      >
-        {title}
-        {required ? (
-          <span className="text-red-600">
-            {" "}
-            *
-          </span>
+      <div className="sm:col-span-2">
+        <h3
+          className={cx(
+            "text-base font-semibold",
+            variant === "dashboard" ? "theme-foreground" : "text-zinc-950",
+          )}
+        >
+          {title}
+          {required ? (
+            <span className="text-red-600">
+              {" "}
+              *
+            </span>
+          ) : null}
+        </h3>
+        {description ? (
+          <p
+            className={cx(
+              "mt-1 text-sm leading-6",
+              variant === "dashboard" ? "theme-muted" : "text-zinc-500",
+            )}
+          >
+            {description}
+          </p>
         ) : null}
-      </h3>
+      </div>
       {children}
     </section>
   );

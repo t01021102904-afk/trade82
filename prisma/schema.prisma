@@ -167,6 +167,7 @@ model Company {
   companyRole                  CompanyRole
   legalName                    String
   tradeName                    String?
+  displayNameEn                String                    @default("")
   logoOriginalUrl              String?
   logoThumbnailUrl             String?
   logoUrl                      String?
@@ -177,6 +178,7 @@ model Company {
   stateOrProvince              String                    @default("")
   businessAddress              String
   description                  String                    @default("")
+  descriptionEn                String                    @default("")
   categories                   String[]                  @default([])
   viewCount                    Int                       @default(0)
   verificationStatus           CompanyVerificationStatus @default(unverified)
@@ -231,6 +233,7 @@ model SellerProfile {
   koreanBusinessRegistrationNumber String
   representativeName               String
   exportExperience                 String
+  exportExperienceEn               String   @default("")
   exportCountries                  String[] @default([])
   productCategories                String[] @default([])
   minimumOrderQuantity             String
@@ -260,12 +263,16 @@ model Product {
   sellerCompanyId          String
   sellerCompany            Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
   name                     String
+  nameEn                   String         @default("")
   slug                     String         @unique
   imageUrl                 String?
   category                 String
   tags                     String[]       @default([])
+  tagsEn                   String[]       @default([])
   shortDescription         String
+  shortDescriptionEn       String         @default("")
   detailedDescription      String
+  detailedDescriptionEn    String         @default("")
   priceMin                 Decimal?       @db.Decimal(14, 2)
   priceMax                 Decimal?       @db.Decimal(14, 2)
   currency                 String         @default("USD")
@@ -290,6 +297,7 @@ model Product {
   documentsAvailable       String[]       @default([])
   complianceClaims         String[]       @default([])
   buyerNotes               String         @default("")
+  buyerNotesEn             String         @default("")
   riskNotes                String[]       @default([])
   certifications           String[]       @default([])
   ingredientsOrMaterials   String

@@ -42,11 +42,14 @@ export type ProductMinAggregateOutputType = {
   id: string | null
   sellerCompanyId: string | null
   name: string | null
+  nameEn: string | null
   slug: string | null
   imageUrl: string | null
   category: string | null
   shortDescription: string | null
+  shortDescriptionEn: string | null
   detailedDescription: string | null
+  detailedDescriptionEn: string | null
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string | null
@@ -68,6 +71,7 @@ export type ProductMinAggregateOutputType = {
   shelfLife: string | null
   storageRequirements: string | null
   buyerNotes: string | null
+  buyerNotesEn: string | null
   ingredientsOrMaterials: string | null
   packaging: string | null
   packageSize: string | null
@@ -87,11 +91,14 @@ export type ProductMaxAggregateOutputType = {
   id: string | null
   sellerCompanyId: string | null
   name: string | null
+  nameEn: string | null
   slug: string | null
   imageUrl: string | null
   category: string | null
   shortDescription: string | null
+  shortDescriptionEn: string | null
   detailedDescription: string | null
+  detailedDescriptionEn: string | null
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string | null
@@ -113,6 +120,7 @@ export type ProductMaxAggregateOutputType = {
   shelfLife: string | null
   storageRequirements: string | null
   buyerNotes: string | null
+  buyerNotesEn: string | null
   ingredientsOrMaterials: string | null
   packaging: string | null
   packageSize: string | null
@@ -132,12 +140,16 @@ export type ProductCountAggregateOutputType = {
   id: number
   sellerCompanyId: number
   name: number
+  nameEn: number
   slug: number
   imageUrl: number
   category: number
   tags: number
+  tagsEn: number
   shortDescription: number
+  shortDescriptionEn: number
   detailedDescription: number
+  detailedDescriptionEn: number
   priceMin: number
   priceMax: number
   currency: number
@@ -162,6 +174,7 @@ export type ProductCountAggregateOutputType = {
   documentsAvailable: number
   complianceClaims: number
   buyerNotes: number
+  buyerNotesEn: number
   riskNotes: number
   certifications: number
   ingredientsOrMaterials: number
@@ -199,11 +212,14 @@ export type ProductMinAggregateInputType = {
   id?: true
   sellerCompanyId?: true
   name?: true
+  nameEn?: true
   slug?: true
   imageUrl?: true
   category?: true
   shortDescription?: true
+  shortDescriptionEn?: true
   detailedDescription?: true
+  detailedDescriptionEn?: true
   priceMin?: true
   priceMax?: true
   currency?: true
@@ -225,6 +241,7 @@ export type ProductMinAggregateInputType = {
   shelfLife?: true
   storageRequirements?: true
   buyerNotes?: true
+  buyerNotesEn?: true
   ingredientsOrMaterials?: true
   packaging?: true
   packageSize?: true
@@ -244,11 +261,14 @@ export type ProductMaxAggregateInputType = {
   id?: true
   sellerCompanyId?: true
   name?: true
+  nameEn?: true
   slug?: true
   imageUrl?: true
   category?: true
   shortDescription?: true
+  shortDescriptionEn?: true
   detailedDescription?: true
+  detailedDescriptionEn?: true
   priceMin?: true
   priceMax?: true
   currency?: true
@@ -270,6 +290,7 @@ export type ProductMaxAggregateInputType = {
   shelfLife?: true
   storageRequirements?: true
   buyerNotes?: true
+  buyerNotesEn?: true
   ingredientsOrMaterials?: true
   packaging?: true
   packageSize?: true
@@ -289,12 +310,16 @@ export type ProductCountAggregateInputType = {
   id?: true
   sellerCompanyId?: true
   name?: true
+  nameEn?: true
   slug?: true
   imageUrl?: true
   category?: true
   tags?: true
+  tagsEn?: true
   shortDescription?: true
+  shortDescriptionEn?: true
   detailedDescription?: true
+  detailedDescriptionEn?: true
   priceMin?: true
   priceMax?: true
   currency?: true
@@ -319,6 +344,7 @@ export type ProductCountAggregateInputType = {
   documentsAvailable?: true
   complianceClaims?: true
   buyerNotes?: true
+  buyerNotesEn?: true
   riskNotes?: true
   certifications?: true
   ingredientsOrMaterials?: true
@@ -429,12 +455,16 @@ export type ProductGroupByOutputType = {
   id: string
   sellerCompanyId: string
   name: string
+  nameEn: string
   slug: string
   imageUrl: string | null
   category: string
   tags: string[]
+  tagsEn: string[]
   shortDescription: string
+  shortDescriptionEn: string
   detailedDescription: string
+  detailedDescriptionEn: string
   priceMin: runtime.Decimal | null
   priceMax: runtime.Decimal | null
   currency: string
@@ -459,6 +489,7 @@ export type ProductGroupByOutputType = {
   documentsAvailable: string[]
   complianceClaims: string[]
   buyerNotes: string
+  buyerNotesEn: string
   riskNotes: string[]
   certifications: string[]
   ingredientsOrMaterials: string
@@ -505,12 +536,16 @@ export type ProductWhereInput = {
   id?: Prisma.StringFilter<"Product"> | string
   sellerCompanyId?: Prisma.StringFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
+  nameEn?: Prisma.StringFilter<"Product"> | string
   slug?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   category?: Prisma.StringFilter<"Product"> | string
   tags?: Prisma.StringNullableListFilter<"Product">
+  tagsEn?: Prisma.StringNullableListFilter<"Product">
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  shortDescriptionEn?: Prisma.StringFilter<"Product"> | string
   detailedDescription?: Prisma.StringFilter<"Product"> | string
+  detailedDescriptionEn?: Prisma.StringFilter<"Product"> | string
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
@@ -535,6 +570,7 @@ export type ProductWhereInput = {
   documentsAvailable?: Prisma.StringNullableListFilter<"Product">
   complianceClaims?: Prisma.StringNullableListFilter<"Product">
   buyerNotes?: Prisma.StringFilter<"Product"> | string
+  buyerNotesEn?: Prisma.StringFilter<"Product"> | string
   riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
@@ -565,12 +601,16 @@ export type ProductOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   sellerCompanyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  tagsEn?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  shortDescriptionEn?: Prisma.SortOrder
   detailedDescription?: Prisma.SortOrder
+  detailedDescriptionEn?: Prisma.SortOrder
   priceMin?: Prisma.SortOrderInput | Prisma.SortOrder
   priceMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -595,6 +635,7 @@ export type ProductOrderByWithRelationInput = {
   documentsAvailable?: Prisma.SortOrder
   complianceClaims?: Prisma.SortOrder
   buyerNotes?: Prisma.SortOrder
+  buyerNotesEn?: Prisma.SortOrder
   riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
@@ -629,11 +670,15 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProductWhereInput | Prisma.ProductWhereInput[]
   sellerCompanyId?: Prisma.StringFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
+  nameEn?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   category?: Prisma.StringFilter<"Product"> | string
   tags?: Prisma.StringNullableListFilter<"Product">
+  tagsEn?: Prisma.StringNullableListFilter<"Product">
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  shortDescriptionEn?: Prisma.StringFilter<"Product"> | string
   detailedDescription?: Prisma.StringFilter<"Product"> | string
+  detailedDescriptionEn?: Prisma.StringFilter<"Product"> | string
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
@@ -658,6 +703,7 @@ export type ProductWhereUniqueInput = Prisma.AtLeast<{
   documentsAvailable?: Prisma.StringNullableListFilter<"Product">
   complianceClaims?: Prisma.StringNullableListFilter<"Product">
   buyerNotes?: Prisma.StringFilter<"Product"> | string
+  buyerNotesEn?: Prisma.StringFilter<"Product"> | string
   riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
@@ -688,12 +734,16 @@ export type ProductOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   sellerCompanyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  tagsEn?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  shortDescriptionEn?: Prisma.SortOrder
   detailedDescription?: Prisma.SortOrder
+  detailedDescriptionEn?: Prisma.SortOrder
   priceMin?: Prisma.SortOrderInput | Prisma.SortOrder
   priceMax?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -718,6 +768,7 @@ export type ProductOrderByWithAggregationInput = {
   documentsAvailable?: Prisma.SortOrder
   complianceClaims?: Prisma.SortOrder
   buyerNotes?: Prisma.SortOrder
+  buyerNotesEn?: Prisma.SortOrder
   riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
@@ -749,12 +800,16 @@ export type ProductScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Product"> | string
   sellerCompanyId?: Prisma.StringWithAggregatesFilter<"Product"> | string
   name?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  nameEn?: Prisma.StringWithAggregatesFilter<"Product"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Product"> | string | null
   category?: Prisma.StringWithAggregatesFilter<"Product"> | string
   tags?: Prisma.StringNullableListFilter<"Product">
+  tagsEn?: Prisma.StringNullableListFilter<"Product">
   shortDescription?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  shortDescriptionEn?: Prisma.StringWithAggregatesFilter<"Product"> | string
   detailedDescription?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  detailedDescriptionEn?: Prisma.StringWithAggregatesFilter<"Product"> | string
   priceMin?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableWithAggregatesFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringWithAggregatesFilter<"Product"> | string
@@ -779,6 +834,7 @@ export type ProductScalarWhereWithAggregatesInput = {
   documentsAvailable?: Prisma.StringNullableListFilter<"Product">
   complianceClaims?: Prisma.StringNullableListFilter<"Product">
   buyerNotes?: Prisma.StringWithAggregatesFilter<"Product"> | string
+  buyerNotesEn?: Prisma.StringWithAggregatesFilter<"Product"> | string
   riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringWithAggregatesFilter<"Product"> | string
@@ -801,12 +857,16 @@ export type ProductScalarWhereWithAggregatesInput = {
 export type ProductCreateInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -831,6 +891,7 @@ export type ProductCreateInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -861,12 +922,16 @@ export type ProductUncheckedCreateInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -891,6 +956,7 @@ export type ProductUncheckedCreateInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -919,12 +985,16 @@ export type ProductUncheckedCreateInput = {
 export type ProductUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -949,6 +1019,7 @@ export type ProductUpdateInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -979,12 +1050,16 @@ export type ProductUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1009,6 +1084,7 @@ export type ProductUncheckedUpdateInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1038,12 +1114,16 @@ export type ProductCreateManyInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -1068,6 +1148,7 @@ export type ProductCreateManyInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -1090,12 +1171,16 @@ export type ProductCreateManyInput = {
 export type ProductUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1120,6 +1205,7 @@ export type ProductUpdateManyMutationInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1143,12 +1229,16 @@ export type ProductUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1173,6 +1263,7 @@ export type ProductUncheckedUpdateManyInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1206,12 +1297,16 @@ export type ProductCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sellerCompanyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   category?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  tagsEn?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  shortDescriptionEn?: Prisma.SortOrder
   detailedDescription?: Prisma.SortOrder
+  detailedDescriptionEn?: Prisma.SortOrder
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -1236,6 +1331,7 @@ export type ProductCountOrderByAggregateInput = {
   documentsAvailable?: Prisma.SortOrder
   complianceClaims?: Prisma.SortOrder
   buyerNotes?: Prisma.SortOrder
+  buyerNotesEn?: Prisma.SortOrder
   riskNotes?: Prisma.SortOrder
   certifications?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
@@ -1265,11 +1361,14 @@ export type ProductMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sellerCompanyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   category?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  shortDescriptionEn?: Prisma.SortOrder
   detailedDescription?: Prisma.SortOrder
+  detailedDescriptionEn?: Prisma.SortOrder
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -1291,6 +1390,7 @@ export type ProductMaxOrderByAggregateInput = {
   shelfLife?: Prisma.SortOrder
   storageRequirements?: Prisma.SortOrder
   buyerNotes?: Prisma.SortOrder
+  buyerNotesEn?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
   packageSize?: Prisma.SortOrder
@@ -1310,11 +1410,14 @@ export type ProductMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   sellerCompanyId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   category?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  shortDescriptionEn?: Prisma.SortOrder
   detailedDescription?: Prisma.SortOrder
+  detailedDescriptionEn?: Prisma.SortOrder
   priceMin?: Prisma.SortOrder
   priceMax?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -1336,6 +1439,7 @@ export type ProductMinOrderByAggregateInput = {
   shelfLife?: Prisma.SortOrder
   storageRequirements?: Prisma.SortOrder
   buyerNotes?: Prisma.SortOrder
+  buyerNotesEn?: Prisma.SortOrder
   ingredientsOrMaterials?: Prisma.SortOrder
   packaging?: Prisma.SortOrder
   packageSize?: Prisma.SortOrder
@@ -1413,6 +1517,10 @@ export type ProductCreatetagsInput = {
   set: string[]
 }
 
+export type ProductCreatetagsEnInput = {
+  set: string[]
+}
+
 export type ProductCreateincotermsInput = {
   set: string[]
 }
@@ -1438,6 +1546,11 @@ export type ProductCreatesuggestedUsChannelsInput = {
 }
 
 export type ProductUpdatetagsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
+export type ProductUpdatetagsEnInput = {
   set?: string[]
   push?: string | string[]
 }
@@ -1579,12 +1692,16 @@ export type ProductUpdateOneWithoutDealsNestedInput = {
 export type ProductCreateWithoutSellerCompanyInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -1609,6 +1726,7 @@ export type ProductCreateWithoutSellerCompanyInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -1637,12 +1755,16 @@ export type ProductCreateWithoutSellerCompanyInput = {
 export type ProductUncheckedCreateWithoutSellerCompanyInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -1667,6 +1789,7 @@ export type ProductUncheckedCreateWithoutSellerCompanyInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -1725,12 +1848,16 @@ export type ProductScalarWhereInput = {
   id?: Prisma.StringFilter<"Product"> | string
   sellerCompanyId?: Prisma.StringFilter<"Product"> | string
   name?: Prisma.StringFilter<"Product"> | string
+  nameEn?: Prisma.StringFilter<"Product"> | string
   slug?: Prisma.StringFilter<"Product"> | string
   imageUrl?: Prisma.StringNullableFilter<"Product"> | string | null
   category?: Prisma.StringFilter<"Product"> | string
   tags?: Prisma.StringNullableListFilter<"Product">
+  tagsEn?: Prisma.StringNullableListFilter<"Product">
   shortDescription?: Prisma.StringFilter<"Product"> | string
+  shortDescriptionEn?: Prisma.StringFilter<"Product"> | string
   detailedDescription?: Prisma.StringFilter<"Product"> | string
+  detailedDescriptionEn?: Prisma.StringFilter<"Product"> | string
   priceMin?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.DecimalNullableFilter<"Product"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFilter<"Product"> | string
@@ -1755,6 +1882,7 @@ export type ProductScalarWhereInput = {
   documentsAvailable?: Prisma.StringNullableListFilter<"Product">
   complianceClaims?: Prisma.StringNullableListFilter<"Product">
   buyerNotes?: Prisma.StringFilter<"Product"> | string
+  buyerNotesEn?: Prisma.StringFilter<"Product"> | string
   riskNotes?: Prisma.StringNullableListFilter<"Product">
   certifications?: Prisma.StringNullableListFilter<"Product">
   ingredientsOrMaterials?: Prisma.StringFilter<"Product"> | string
@@ -1777,12 +1905,16 @@ export type ProductScalarWhereInput = {
 export type ProductCreateWithoutImagesInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -1807,6 +1939,7 @@ export type ProductCreateWithoutImagesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -1836,12 +1969,16 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -1866,6 +2003,7 @@ export type ProductUncheckedCreateWithoutImagesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -1909,12 +2047,16 @@ export type ProductUpdateToOneWithWhereWithoutImagesInput = {
 export type ProductUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1939,6 +2081,7 @@ export type ProductUpdateWithoutImagesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1968,12 +2111,16 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1998,6 +2145,7 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2025,12 +2173,16 @@ export type ProductUncheckedUpdateWithoutImagesInput = {
 export type ProductCreateWithoutInquiriesInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2055,6 +2207,7 @@ export type ProductCreateWithoutInquiriesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2084,12 +2237,16 @@ export type ProductUncheckedCreateWithoutInquiriesInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2114,6 +2271,7 @@ export type ProductUncheckedCreateWithoutInquiriesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2157,12 +2315,16 @@ export type ProductUpdateToOneWithWhereWithoutInquiriesInput = {
 export type ProductUpdateWithoutInquiriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2187,6 +2349,7 @@ export type ProductUpdateWithoutInquiriesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2216,12 +2379,16 @@ export type ProductUncheckedUpdateWithoutInquiriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2246,6 +2413,7 @@ export type ProductUncheckedUpdateWithoutInquiriesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2273,12 +2441,16 @@ export type ProductUncheckedUpdateWithoutInquiriesInput = {
 export type ProductCreateWithoutRfqMatchesInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2303,6 +2475,7 @@ export type ProductCreateWithoutRfqMatchesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2332,12 +2505,16 @@ export type ProductUncheckedCreateWithoutRfqMatchesInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2362,6 +2539,7 @@ export type ProductUncheckedCreateWithoutRfqMatchesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2405,12 +2583,16 @@ export type ProductUpdateToOneWithWhereWithoutRfqMatchesInput = {
 export type ProductUpdateWithoutRfqMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2435,6 +2617,7 @@ export type ProductUpdateWithoutRfqMatchesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2464,12 +2647,16 @@ export type ProductUncheckedUpdateWithoutRfqMatchesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2494,6 +2681,7 @@ export type ProductUncheckedUpdateWithoutRfqMatchesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2521,12 +2709,16 @@ export type ProductUncheckedUpdateWithoutRfqMatchesInput = {
 export type ProductCreateWithoutRfqSellerQuotesInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2551,6 +2743,7 @@ export type ProductCreateWithoutRfqSellerQuotesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2580,12 +2773,16 @@ export type ProductUncheckedCreateWithoutRfqSellerQuotesInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2610,6 +2807,7 @@ export type ProductUncheckedCreateWithoutRfqSellerQuotesInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2653,12 +2851,16 @@ export type ProductUpdateToOneWithWhereWithoutRfqSellerQuotesInput = {
 export type ProductUpdateWithoutRfqSellerQuotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2683,6 +2885,7 @@ export type ProductUpdateWithoutRfqSellerQuotesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2712,12 +2915,16 @@ export type ProductUncheckedUpdateWithoutRfqSellerQuotesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2742,6 +2949,7 @@ export type ProductUncheckedUpdateWithoutRfqSellerQuotesInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2769,12 +2977,16 @@ export type ProductUncheckedUpdateWithoutRfqSellerQuotesInput = {
 export type ProductCreateWithoutSavedItemsInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2799,6 +3011,7 @@ export type ProductCreateWithoutSavedItemsInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2828,12 +3041,16 @@ export type ProductUncheckedCreateWithoutSavedItemsInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -2858,6 +3075,7 @@ export type ProductUncheckedCreateWithoutSavedItemsInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -2901,12 +3119,16 @@ export type ProductUpdateToOneWithWhereWithoutSavedItemsInput = {
 export type ProductUpdateWithoutSavedItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2931,6 +3153,7 @@ export type ProductUpdateWithoutSavedItemsInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2960,12 +3183,16 @@ export type ProductUncheckedUpdateWithoutSavedItemsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2990,6 +3217,7 @@ export type ProductUncheckedUpdateWithoutSavedItemsInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3017,12 +3245,16 @@ export type ProductUncheckedUpdateWithoutSavedItemsInput = {
 export type ProductCreateWithoutDealsInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -3047,6 +3279,7 @@ export type ProductCreateWithoutDealsInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -3076,12 +3309,16 @@ export type ProductUncheckedCreateWithoutDealsInput = {
   id?: string
   sellerCompanyId: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -3106,6 +3343,7 @@ export type ProductUncheckedCreateWithoutDealsInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -3149,12 +3387,16 @@ export type ProductUpdateToOneWithWhereWithoutDealsInput = {
 export type ProductUpdateWithoutDealsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3179,6 +3421,7 @@ export type ProductUpdateWithoutDealsInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3208,12 +3451,16 @@ export type ProductUncheckedUpdateWithoutDealsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3238,6 +3485,7 @@ export type ProductUncheckedUpdateWithoutDealsInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3265,12 +3513,16 @@ export type ProductUncheckedUpdateWithoutDealsInput = {
 export type ProductCreateManySellerCompanyInput = {
   id?: string
   name: string
+  nameEn?: string
   slug: string
   imageUrl?: string | null
   category: string
   tags?: Prisma.ProductCreatetagsInput | string[]
+  tagsEn?: Prisma.ProductCreatetagsEnInput | string[]
   shortDescription: string
+  shortDescriptionEn?: string
   detailedDescription: string
+  detailedDescriptionEn?: string
   priceMin?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: string
@@ -3295,6 +3547,7 @@ export type ProductCreateManySellerCompanyInput = {
   documentsAvailable?: Prisma.ProductCreatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductCreatecomplianceClaimsInput | string[]
   buyerNotes?: string
+  buyerNotesEn?: string
   riskNotes?: Prisma.ProductCreateriskNotesInput | string[]
   certifications?: Prisma.ProductCreatecertificationsInput | string[]
   ingredientsOrMaterials: string
@@ -3317,12 +3570,16 @@ export type ProductCreateManySellerCompanyInput = {
 export type ProductUpdateWithoutSellerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3347,6 +3604,7 @@ export type ProductUpdateWithoutSellerCompanyInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3375,12 +3633,16 @@ export type ProductUpdateWithoutSellerCompanyInput = {
 export type ProductUncheckedUpdateWithoutSellerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3405,6 +3667,7 @@ export type ProductUncheckedUpdateWithoutSellerCompanyInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3433,12 +3696,16 @@ export type ProductUncheckedUpdateWithoutSellerCompanyInput = {
 export type ProductUncheckedUpdateManyWithoutSellerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
   tags?: Prisma.ProductUpdatetagsInput | string[]
+  tagsEn?: Prisma.ProductUpdatetagsEnInput | string[]
   shortDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  shortDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   detailedDescription?: Prisma.StringFieldUpdateOperationsInput | string
+  detailedDescriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
   priceMin?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   priceMax?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3463,6 +3730,7 @@ export type ProductUncheckedUpdateManyWithoutSellerCompanyInput = {
   documentsAvailable?: Prisma.ProductUpdatedocumentsAvailableInput | string[]
   complianceClaims?: Prisma.ProductUpdatecomplianceClaimsInput | string[]
   buyerNotes?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerNotesEn?: Prisma.StringFieldUpdateOperationsInput | string
   riskNotes?: Prisma.ProductUpdateriskNotesInput | string[]
   certifications?: Prisma.ProductUpdatecertificationsInput | string[]
   ingredientsOrMaterials?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3562,12 +3830,16 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   sellerCompanyId?: boolean
   name?: boolean
+  nameEn?: boolean
   slug?: boolean
   imageUrl?: boolean
   category?: boolean
   tags?: boolean
+  tagsEn?: boolean
   shortDescription?: boolean
+  shortDescriptionEn?: boolean
   detailedDescription?: boolean
+  detailedDescriptionEn?: boolean
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
@@ -3592,6 +3864,7 @@ export type ProductSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   documentsAvailable?: boolean
   complianceClaims?: boolean
   buyerNotes?: boolean
+  buyerNotesEn?: boolean
   riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
@@ -3623,12 +3896,16 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   sellerCompanyId?: boolean
   name?: boolean
+  nameEn?: boolean
   slug?: boolean
   imageUrl?: boolean
   category?: boolean
   tags?: boolean
+  tagsEn?: boolean
   shortDescription?: boolean
+  shortDescriptionEn?: boolean
   detailedDescription?: boolean
+  detailedDescriptionEn?: boolean
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
@@ -3653,6 +3930,7 @@ export type ProductSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   documentsAvailable?: boolean
   complianceClaims?: boolean
   buyerNotes?: boolean
+  buyerNotesEn?: boolean
   riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
@@ -3677,12 +3955,16 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   id?: boolean
   sellerCompanyId?: boolean
   name?: boolean
+  nameEn?: boolean
   slug?: boolean
   imageUrl?: boolean
   category?: boolean
   tags?: boolean
+  tagsEn?: boolean
   shortDescription?: boolean
+  shortDescriptionEn?: boolean
   detailedDescription?: boolean
+  detailedDescriptionEn?: boolean
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
@@ -3707,6 +3989,7 @@ export type ProductSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   documentsAvailable?: boolean
   complianceClaims?: boolean
   buyerNotes?: boolean
+  buyerNotesEn?: boolean
   riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
@@ -3731,12 +4014,16 @@ export type ProductSelectScalar = {
   id?: boolean
   sellerCompanyId?: boolean
   name?: boolean
+  nameEn?: boolean
   slug?: boolean
   imageUrl?: boolean
   category?: boolean
   tags?: boolean
+  tagsEn?: boolean
   shortDescription?: boolean
+  shortDescriptionEn?: boolean
   detailedDescription?: boolean
+  detailedDescriptionEn?: boolean
   priceMin?: boolean
   priceMax?: boolean
   currency?: boolean
@@ -3761,6 +4048,7 @@ export type ProductSelectScalar = {
   documentsAvailable?: boolean
   complianceClaims?: boolean
   buyerNotes?: boolean
+  buyerNotesEn?: boolean
   riskNotes?: boolean
   certifications?: boolean
   ingredientsOrMaterials?: boolean
@@ -3780,7 +4068,7 @@ export type ProductSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "slug" | "imageUrl" | "category" | "tags" | "shortDescription" | "detailedDescription" | "priceMin" | "priceMax" | "currency" | "priceUnit" | "moq" | "moqQuantity" | "moqUnit" | "leadTime" | "leadTimeCode" | "sampleAvailability" | "privateLabelAvailability" | "monthlyCapacity" | "monthlyCapacityUnit" | "origin" | "countryOfOrigin" | "shippingOriginCountry" | "shippingOriginRegion" | "incoterms" | "hsCode" | "shelfLife" | "storageRequirements" | "documentsAvailable" | "complianceClaims" | "buyerNotes" | "riskNotes" | "certifications" | "ingredientsOrMaterials" | "packaging" | "packageSize" | "unitsPerCarton" | "cartonWeight" | "cartonDimensions" | "palletQuantity" | "storageTemperature" | "suggestedUsChannels" | "fieldVisibility" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
+export type ProductOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "sellerCompanyId" | "name" | "nameEn" | "slug" | "imageUrl" | "category" | "tags" | "tagsEn" | "shortDescription" | "shortDescriptionEn" | "detailedDescription" | "detailedDescriptionEn" | "priceMin" | "priceMax" | "currency" | "priceUnit" | "moq" | "moqQuantity" | "moqUnit" | "leadTime" | "leadTimeCode" | "sampleAvailability" | "privateLabelAvailability" | "monthlyCapacity" | "monthlyCapacityUnit" | "origin" | "countryOfOrigin" | "shippingOriginCountry" | "shippingOriginRegion" | "incoterms" | "hsCode" | "shelfLife" | "storageRequirements" | "documentsAvailable" | "complianceClaims" | "buyerNotes" | "buyerNotesEn" | "riskNotes" | "certifications" | "ingredientsOrMaterials" | "packaging" | "packageSize" | "unitsPerCarton" | "cartonWeight" | "cartonDimensions" | "palletQuantity" | "storageTemperature" | "suggestedUsChannels" | "fieldVisibility" | "exportReadiness" | "viewCount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["product"]>
 export type ProductInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   images?: boolean | Prisma.Product$imagesArgs<ExtArgs>
@@ -3813,12 +4101,16 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id: string
     sellerCompanyId: string
     name: string
+    nameEn: string
     slug: string
     imageUrl: string | null
     category: string
     tags: string[]
+    tagsEn: string[]
     shortDescription: string
+    shortDescriptionEn: string
     detailedDescription: string
+    detailedDescriptionEn: string
     priceMin: runtime.Decimal | null
     priceMax: runtime.Decimal | null
     currency: string
@@ -3843,6 +4135,7 @@ export type $ProductPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     documentsAvailable: string[]
     complianceClaims: string[]
     buyerNotes: string
+    buyerNotesEn: string
     riskNotes: string[]
     certifications: string[]
     ingredientsOrMaterials: string
@@ -4293,12 +4586,16 @@ export interface ProductFieldRefs {
   readonly id: Prisma.FieldRef<"Product", 'String'>
   readonly sellerCompanyId: Prisma.FieldRef<"Product", 'String'>
   readonly name: Prisma.FieldRef<"Product", 'String'>
+  readonly nameEn: Prisma.FieldRef<"Product", 'String'>
   readonly slug: Prisma.FieldRef<"Product", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Product", 'String'>
   readonly category: Prisma.FieldRef<"Product", 'String'>
   readonly tags: Prisma.FieldRef<"Product", 'String[]'>
+  readonly tagsEn: Prisma.FieldRef<"Product", 'String[]'>
   readonly shortDescription: Prisma.FieldRef<"Product", 'String'>
+  readonly shortDescriptionEn: Prisma.FieldRef<"Product", 'String'>
   readonly detailedDescription: Prisma.FieldRef<"Product", 'String'>
+  readonly detailedDescriptionEn: Prisma.FieldRef<"Product", 'String'>
   readonly priceMin: Prisma.FieldRef<"Product", 'Decimal'>
   readonly priceMax: Prisma.FieldRef<"Product", 'Decimal'>
   readonly currency: Prisma.FieldRef<"Product", 'String'>
@@ -4323,6 +4620,7 @@ export interface ProductFieldRefs {
   readonly documentsAvailable: Prisma.FieldRef<"Product", 'String[]'>
   readonly complianceClaims: Prisma.FieldRef<"Product", 'String[]'>
   readonly buyerNotes: Prisma.FieldRef<"Product", 'String'>
+  readonly buyerNotesEn: Prisma.FieldRef<"Product", 'String'>
   readonly riskNotes: Prisma.FieldRef<"Product", 'String[]'>
   readonly certifications: Prisma.FieldRef<"Product", 'String[]'>
   readonly ingredientsOrMaterials: Prisma.FieldRef<"Product", 'String'>

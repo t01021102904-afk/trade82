@@ -184,6 +184,7 @@ function buildCompanyProfile(
       companyRole: role,
       legalName: String(stored?.legalName ?? ""),
       tradeName: String(stored?.tradeName ?? ""),
+      displayNameEn: String(stored?.displayNameEn ?? ""),
       logoOriginalUrl: String(stored?.logoOriginalUrl ?? ""),
       logoThumbnailUrl: String(stored?.logoThumbnailUrl ?? ""),
       logoUrl: String(stored?.logoUrl ?? ""),
@@ -196,6 +197,7 @@ function buildCompanyProfile(
       stateOrProvince: String(stored?.stateOrProvince ?? ""),
       businessAddress: String(stored?.businessAddress ?? ""),
       description: String(stored?.description ?? ""),
+      descriptionEn: String(stored?.descriptionEn ?? ""),
       categories: Array.isArray(stored?.categories)
         ? (stored.categories as string[])
         : [],
@@ -212,6 +214,7 @@ function buildCompanyProfile(
       ),
       representativeName: String(sellerProfile.representativeName ?? ""),
       exportExperience: String(sellerProfile.exportExperience ?? ""),
+      exportExperienceEn: String(sellerProfile.exportExperienceEn ?? ""),
       exportCountries: (sellerProfile.exportCountries as string[]) ?? [],
       productCategories: (sellerProfile.productCategories as string[]) ?? [],
       minimumOrderQuantity: String(sellerProfile.minimumOrderQuantity ?? ""),
@@ -705,6 +708,7 @@ function CompanyProfileForm({
                     seller.businessRegistrationNumber,
                   representativeName: seller.representativeName,
                   exportExperience: seller.exportExperience,
+                  exportExperienceEn: seller.exportExperienceEn ?? "",
                   exportCountries: seller.exportCountries,
                   productCategories: seller.productCategories,
                   minimumOrderQuantity: seller.minimumOrderQuantity,
@@ -982,6 +986,33 @@ function CompanyProfileForm({
             </label>
           </section>
 
+          <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <h3 className="text-base font-semibold text-zinc-950">
+                {t("settings.englishCompanyContent")}
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-zinc-500">
+                {t("settings.englishCompanyContentHelp")}
+              </p>
+            </div>
+            <Field
+              label={t("settings.companyDisplayNameEn")}
+              value={company.displayNameEn ?? ""}
+              onChange={(value) => updateCompany("displayNameEn", value)}
+            />
+            <label className="grid gap-1 text-sm sm:col-span-2">
+              <span className="font-medium text-zinc-700">
+                {t("settings.companyDescriptionEn")}
+              </span>
+              <textarea
+                value={company.descriptionEn ?? ""}
+                onChange={(event) => updateCompany("descriptionEn", event.target.value)}
+                rows={4}
+                className="rounded-md border border-zinc-200 px-3 py-2"
+              />
+            </label>
+          </section>
+
           <SellerFields seller={seller} setSeller={setSeller} onDirty={markDirty} />
         </>
       ) : (
@@ -1178,6 +1209,12 @@ function SellerFields({
       <Field label={t("settings.registrationNumber")} value={seller.businessRegistrationNumber} onChange={(value) => update("businessRegistrationNumber", value)} />
       <Field label={t("settings.representativeName")} value={seller.representativeName} onChange={(value) => update("representativeName", value)} />
       <Field label={t("settings.exportExperience")} value={seller.exportExperience} onChange={(value) => update("exportExperience", value)} className="sm:col-span-2" />
+      <Field
+        label={t("settings.exportExperienceEn")}
+        value={seller.exportExperienceEn ?? ""}
+        onChange={(value) => update("exportExperienceEn", value)}
+        className="sm:col-span-2"
+      />
       <CountryMultiSelect
         label={t("settings.exportCountries")}
         helperText={t("settings.exportCountriesHelp")}
