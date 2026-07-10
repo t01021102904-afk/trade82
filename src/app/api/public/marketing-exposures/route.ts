@@ -10,7 +10,7 @@ export async function GET() {
   try {
     const profile = await getCurrentUserProfile().catch(() => null);
     const admin = profile ? await isAdminUser().catch(() => false) : false;
-    const productIds = await listActiveMarketingProductIds(10);
+    const productIds = await listActiveMarketingProductIds(100);
 
     if (!productIds.length) {
       return Response.json({ products: [] });

@@ -229,7 +229,7 @@ export async function activateMarketingExposure({
   return { productId, companyId, startsAt, endsAt };
 }
 
-export async function listActiveMarketingProductIds(limit = 10) {
+export async function listActiveMarketingProductIds(limit = 100) {
   const now = new Date();
   const rows = await getDb().$queryRaw<Array<{ productId: string }>>`
     SELECT DISTINCT ON (me."productId")
@@ -256,7 +256,7 @@ export async function listActiveMarketingProductIds(limit = 10) {
       const rightHash = dailyHash(`${right}:${dateSeed}`);
       return leftHash - rightHash;
     })
-    .slice(0, limit);
+    .slice(0, Math.max(1, Math.min(limit, 100)));
 }
 
 function dailyHash(value: string) {

@@ -67,9 +67,9 @@ const copy = {
     promoted: "Promoted",
     until: "Until",
     planTitles: {
-      landing_7d: "Landing Page Exposure - 7 Days",
-      landing_30d: "Landing Page Exposure - 30 Days",
-      landing_90d: "Landing Page Exposure - 3 Months",
+      landing_7d: "Landing Page Rotating Exposure - 7 Days",
+      landing_30d: "Landing Page Rotating Exposure - 30 Days",
+      landing_90d: "Landing Page Rotating Exposure - 3 Months",
     },
     planDescriptions: {
       landing_7d:
@@ -104,9 +104,9 @@ const copy = {
     promoted: "광고 중",
     until: "종료일",
     planTitles: {
-      landing_7d: "랜딩페이지 노출 - 7일",
-      landing_30d: "랜딩페이지 노출 - 30일",
-      landing_90d: "랜딩페이지 노출 - 3개월",
+      landing_7d: "랜딩페이지 회전 노출 - 7일",
+      landing_30d: "랜딩페이지 회전 노출 - 30일",
+      landing_90d: "랜딩페이지 회전 노출 - 3개월",
     },
     planDescriptions: {
       landing_7d: "신규 상품이나 시즌 상품을 짧게 노출하기 좋은 플랜입니다.",

@@ -12,12 +12,14 @@ import type { Product } from "@/lib/types";
 const copy = {
   en: {
     label: "Trending products",
-    title: "Products buyers are seeing now",
+    title: "Product buyers are seeing now",
+    subtitle: "Promoted products from active Trade82 sellers.",
     viewAll: "Explore marketplace",
   },
   ko: {
     label: "인기 상품",
-    title: "지금 바이어에게 노출 중인 상품",
+    title: "바이어가 지금 보고 있는 상품",
+    subtitle: "Trade82 셀러가 노출 중인 상품입니다.",
     viewAll: "마켓플레이스 보기",
   },
 };
@@ -65,6 +67,7 @@ export function HomeMarketingExposureStrip() {
             <h2 className="mt-2 text-xl font-semibold tracking-[-0.01em] theme-foreground sm:text-2xl">
               {text.title}
             </h2>
+            <p className="mt-2 text-sm theme-muted">{text.subtitle}</p>
           </div>
           <Link
             href={withLocale("/marketplace", locale)}
@@ -74,20 +77,54 @@ export function HomeMarketingExposureStrip() {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }, (_, index) => (
-              <ProductCardSkeleton key={index} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {products.slice(0, 8).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="product-exposure-marquee-mask">
+          {isLoading ? (
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div
+                  key={index}
+                  className="w-[210px] shrink-0 sm:w-[230px] lg:w-[240px]"
+                >
+                  <ProductCardSkeleton />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="product-exposure-marquee-track flex w-max">
+              <ProductMarqueeGroup products={products} />
+              <div className="product-exposure-marquee-copy flex" aria-hidden="true">
+                <ProductMarqueeGroup products={products} keyPrefix="copy" />
+              </div>
+            </div>
+          )}
+        </div>
+        {!isLoading ? (
+          <p className="sr-only" aria-live="polite">
+            {products.length} {text.label}
+          </p>
+        ) : null}
       </div>
     </section>
+  );
+}
+
+function ProductMarqueeGroup({
+  products,
+  keyPrefix = "primary",
+}: {
+  products: Product[];
+  keyPrefix?: string;
+}) {
+  return (
+    <div className="flex gap-4 pr-4">
+      {products.map((product) => (
+        <div
+          key={`${keyPrefix}-${product.id}`}
+          className="w-[210px] shrink-0 sm:w-[230px] lg:w-[240px]"
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
   );
 }
