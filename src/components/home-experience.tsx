@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HomeAutoVideo, HomeFaqAccordion, HomeReveal } from "@/components/home-landing-interactions";
+import { HomeMarketingExposureStrip } from "@/components/home-marketing-exposure-strip";
 import { HomeWorkflowVisual } from "@/components/home-workflow-visual";
 import { withLocale, type Locale } from "@/lib/i18n";
 
@@ -463,6 +464,8 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         </div>
         <BuiltWithMarquee label={copy.hero.builtWith} />
       </section>
+
+      <HomeMarketingExposureStrip />
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
         <HomeReveal>

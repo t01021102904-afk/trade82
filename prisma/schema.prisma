@@ -126,6 +126,19 @@ enum RfqSellerQuoteStatus {
   CLOSED
 }
 
+enum MarketingExposurePlan {
+  LANDING_7D
+  LANDING_30D
+  LANDING_90D
+}
+
+enum MarketingExposureStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
 model UserProfile {
   id                         String                @id @default(cuid())
   clerkUserId                String                @unique
@@ -156,6 +169,7 @@ model UserProfile {
   createdDeals               Deal[]                @relation("DealCreator")
   buyerRfqRequests           RfqRequest[]          @relation("BuyerRfqRequests")
   reviewedRfqRequests        RfqRequest[]          @relation("ReviewedRfqRequests")
+  marketingExposures         MarketingExposure[]
   createdAt                  DateTime              @default(now())
   updatedAt                  DateTime              @updatedAt
 }
@@ -213,6 +227,7 @@ model Company {
   buyerDeals                   Deal[]                    @relation("BuyerCompanyDeals")
   sellerDeals                  Deal[]                    @relation("SellerCompanyDeals")
   buyerRfqRequests             RfqRequest[]              @relation("BuyerCompanyRfqs")
+  marketingExposures           MarketingExposure[]
   reviewsWritten               Review[]                  @relation("ReviewWriter")
   reviewsReceived              Review[]                  @relation("ReviewRecipient")
   companyReviewsWritten        CompanyReview[]           @relation("CompanyReviewWriter")
@@ -319,6 +334,7 @@ model Product {
   deals                    Deal[]
   rfqMatches               RfqMatchedProduct[]
   rfqSellerQuotes          RfqSellerQuote[]
+  marketingExposures       MarketingExposure[]
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
 
@@ -485,6 +501,32 @@ model RfqSellerQuote {
   @@index([sellerCompanyId, createdAt])
   @@index([productId])
   @@index([conversationId])
+}
+
+model MarketingExposure {
+  id                      String                  @id @default(cuid())
+  companyId               String
+  company                 Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  productId               String
+  product                 Product                 @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId                  String
+  user                    UserProfile             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                    MarketingExposurePlan
+  status                  MarketingExposureStatus @default(PENDING)
+  stripeCustomerId        String?
+  stripeCheckoutSessionId String?                 @unique
+  stripePaymentIntentId   String?
+  priceId                 String
+  amount                  Int
+  currency                String                  @default("usd")
+  startsAt                DateTime?
+  endsAt                  DateTime?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  @@index([companyId, status])
+  @@index([productId, status])
+  @@index([status, startsAt, endsAt])
 }
 
 model SavedItem {

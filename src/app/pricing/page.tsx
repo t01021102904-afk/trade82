@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import { SellerSupportPricingPage } from "@/components/seller-support-pricing-page";
+import { SellerMarketingPage } from "@/components/seller-marketing-page";
 import { publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Seller Support Pricing | Trade82",
+  title: "Trade82 Marketing | Trade82",
   description:
-    "Choose a Trade82 Seller Support plan for global buyer-facing copy, inquiry replies, and product page improvements.",
+    "Promote your product on the Trade82 landing page and reach global buyers.",
   path: "/pricing",
   languages: {
     en: "/pricing",
@@ -14,6 +14,11 @@ export const metadata: Metadata = publicPageMetadata({
   },
 });
 
-export default function PricingPage() {
-  return <SellerSupportPricingPage />;
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ marketing?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  return <SellerMarketingPage initialSuccess={params.marketing === "success"} />;
 }

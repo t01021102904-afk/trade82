@@ -4,7 +4,7 @@ import {
   ClipboardList,
   FileText,
   LayoutDashboard,
-  LifeBuoy,
+  Megaphone,
   MessageCircle,
   Package,
   Settings as SettingsIcon,
@@ -12,7 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AdminBadge } from "@/components/admin-badge";
@@ -32,7 +32,6 @@ import {
   getCountryOptions,
 } from "@/lib/company-select-options";
 import { stripLocale, withLocale } from "@/lib/i18n";
-import { isActiveSellerSupportSubscription } from "@/lib/seller-support";
 import type { VerificationStatus } from "@/lib/types";
 import { cx } from "@/lib/utils";
 
@@ -68,7 +67,6 @@ type DashboardAccountProfile = {
 export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   const { context, isLoaded, user } = useUserContext();
   const { locale, t } = useI18n();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const userId = user?.id ?? "";
@@ -81,8 +79,6 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     useState<DashboardSection>(() =>
       parseDashboardSection(searchParams.get("section"), role) ?? "overview",
     );
-  const [supportOpening, setSupportOpening] = useState(false);
-  const [supportError, setSupportError] = useState("");
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
@@ -192,44 +188,6 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
     company.subscriptionStatus,
     company.subscriptionPlan,
   );
-  const supportActive =
-    role === "seller" &&
-    isActiveSellerSupportSubscription(
-      company.sellerSupportStatus,
-      company.sellerSupportPlan,
-    );
-  const openSupportTeam = async () => {
-    setSupportError("");
-    if (!supportActive) {
-      router.push(withLocale("/pricing", locale));
-      return;
-    }
-
-    setSupportOpening(true);
-    try {
-      const response = await fetch("/api/support/conversation", {
-        method: "POST",
-      });
-      const body = (await response.json().catch(() => null)) as
-        | { messageRoute?: string; error?: string; pricingPath?: string }
-        | null;
-      if (!response.ok) {
-        if (response.status === 402 && body?.pricingPath) {
-          router.push(withLocale(body.pricingPath, locale));
-          return;
-        }
-        throw new Error(body?.error || "Support Team could not be opened.");
-      }
-      router.push(withLocale(body?.messageRoute || "/messages", locale));
-    } catch (error) {
-      setSupportError(
-        error instanceof Error ? error.message : "Support Team could not be opened.",
-      );
-      setActiveSection("support-team");
-    } finally {
-      setSupportOpening(false);
-    }
-  };
   const navItems: Array<{
     id: DashboardSection;
     label: string;
@@ -274,12 +232,10 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
             icon: FileText,
           },
           {
-            id: "support-team" as const,
-            label: t("dashboard.dashboardNavSupportTeam"),
-            icon: LifeBuoy,
-            badge: t("dashboard.proBadge"),
-            onClick: openSupportTeam,
-            loading: supportOpening,
+            id: "marketing" as const,
+            label: t("dashboard.dashboardNavMarketing"),
+            icon: Megaphone,
+            badge: t("dashboard.promoteBadge"),
           },
         ]
       : []),
@@ -447,7 +403,7 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
           role={role}
           activeSection={safeActiveSection}
           onSectionChange={setActiveSection}
-          supportError={supportError}
+          marketingSuccess={searchParams.get("marketing") === "success"}
         />
       </div>
     </div>
@@ -472,7 +428,9 @@ function parseDashboardSection(
   }
   if (role === "seller" && value === "products") return value;
   if (role === "seller" && value === "documents") return value;
-  if (role === "seller" && value === "support-team") return value;
+  if (role === "seller" && (value === "marketing" || value === "support-team")) {
+    return "marketing";
+  }
   if (role === "buyer" && value === "saved-products") return value;
   return null;
 }

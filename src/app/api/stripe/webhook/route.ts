@@ -2,6 +2,11 @@ import Stripe from "stripe";
 
 import { VERIFIED_SELLER_PLAN, isVerifiedSellerSubscription } from "@/lib/billing";
 import { getDb } from "@/lib/db";
+import { activateMarketingExposure } from "@/lib/marketing-exposure";
+import {
+  MARKETING_EXPOSURE_FEATURE,
+  isMarketingExposurePlanId,
+} from "@/lib/marketing-exposure-shared";
 import {
   SELLER_SUPPORT_PRODUCT_TYPE,
   isActiveSellerSupportSubscription,
@@ -147,6 +152,51 @@ async function updateFromSubscriptionId(subscriptionId: string | null) {
   await updateCompanyFromSubscription(subscription);
 }
 
+async function activateMarketingExposureFromSession(
+  session: Stripe.Checkout.Session,
+) {
+  if (session.metadata?.feature !== MARKETING_EXPOSURE_FEATURE) return false;
+
+  const productId = session.metadata.productId;
+  const companyId = session.metadata.companyId;
+  const userId = session.metadata.userId;
+  const plan = session.metadata.plan;
+  const priceId = session.metadata.priceId;
+
+  if (
+    !productId ||
+    !companyId ||
+    !userId ||
+    !isMarketingExposurePlanId(plan) ||
+    !priceId
+  ) {
+    console.warn("Marketing exposure checkout session had incomplete metadata.", {
+      sessionId: session.id,
+      hasProductId: Boolean(productId),
+      hasCompanyId: Boolean(companyId),
+      hasUserId: Boolean(userId),
+      hasPlan: Boolean(plan),
+      hasPriceId: Boolean(priceId),
+    });
+    return true;
+  }
+
+  await activateMarketingExposure({
+    checkoutSessionId: session.id,
+    customerId: idOf(session.customer),
+    paymentIntentId: idOf(session.payment_intent),
+    productId,
+    companyId,
+    userId,
+    planId: plan,
+    priceId,
+    amount: session.amount_total ?? 0,
+    currency: session.currency ?? "usd",
+  });
+
+  return true;
+}
+
 export async function POST(request: Request) {
   const stripe = getStripe();
   const signature = request.headers.get("stripe-signature");
@@ -175,6 +225,9 @@ export async function POST(request: Request) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+        if (await activateMarketingExposureFromSession(session)) {
+          break;
+        }
         await updateFromSubscriptionId(idOf(session.subscription));
         break;
       }

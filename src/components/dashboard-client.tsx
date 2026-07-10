@@ -5,14 +5,12 @@ import {
   ClipboardCheck,
   Eye,
   Handshake,
-  LifeBuoy,
   MessageCircle,
   ShoppingBag,
   Star,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -29,13 +27,9 @@ import {
   type EditableProduct,
 } from "@/components/product-management";
 import { ProductImage } from "@/components/product-image";
+import { SellerMarketingPage } from "@/components/seller-marketing-page";
 import { withLocale } from "@/lib/i18n";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
-import {
-  isActiveSellerSupportSubscription,
-  sellerSupportMonthlyLimit,
-  sellerSupportPlanById,
-} from "@/lib/seller-support";
 
 export type DashboardSection =
   | "overview"
@@ -43,7 +37,7 @@ export type DashboardSection =
   | "messages"
   | "products"
   | "documents"
-  | "support-team";
+  | "marketing";
 
 type Summary = {
   company?: {
@@ -134,12 +128,12 @@ export function DashboardClient({
   role,
   activeSection = "overview",
   onSectionChange,
-  supportError,
+  marketingSuccess = false,
 }: {
   role: "buyer" | "seller";
   activeSection?: DashboardSection;
   onSectionChange?: (section: DashboardSection) => void;
-  supportError?: string;
+  marketingSuccess?: boolean;
 }) {
   const { locale, t } = useI18n();
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -282,143 +276,10 @@ export function DashboardClient({
         <SellerDocumentsSection />
       ) : null}
 
-      {role === "seller" && activeSection === "support-team" ? (
-        <SellerSupportPanel
-          company={summary.company ?? null}
-          locale={locale}
-          supportError={supportError}
-        />
+      {role === "seller" && activeSection === "marketing" ? (
+        <SellerMarketingPage embedded initialSuccess={marketingSuccess} />
       ) : null}
     </div>
-  );
-}
-
-function SellerSupportPanel({
-  company,
-  locale,
-  supportError,
-}: {
-  company: Summary["company"] | null;
-  locale: "en" | "ko";
-  supportError?: string;
-}) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const [opening, setOpening] = useState(false);
-  const [error, setError] = useState("");
-  const active = isActiveSellerSupportSubscription(
-    company?.sellerSupportStatus,
-    company?.sellerSupportPlan,
-  );
-  const plan = sellerSupportPlanById(company?.sellerSupportPlan);
-  const monthlyLimit =
-    company?.sellerSupportMonthlyLimit || sellerSupportMonthlyLimit(plan?.id);
-  const used = company?.sellerSupportMonthlyUsed ?? 0;
-
-  const openConversation = async () => {
-    setError("");
-    if (!active) {
-      router.push(withLocale("/pricing", locale));
-      return;
-    }
-    setOpening(true);
-    try {
-      const response = await fetch("/api/support/conversation", {
-        method: "POST",
-      });
-      const body = (await response.json().catch(() => null)) as
-        | { messageRoute?: string; error?: string; pricingPath?: string }
-        | null;
-      if (!response.ok) {
-        if (response.status === 402 && body?.pricingPath) {
-          router.push(withLocale(body.pricingPath, locale));
-          return;
-        }
-        throw new Error(body?.error || "Support Team could not be opened.");
-      }
-      router.push(withLocale(body?.messageRoute || "/messages", locale));
-    } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : "Support Team could not be opened.",
-      );
-    } finally {
-      setOpening(false);
-    }
-  };
-
-  const displayedError = error || supportError || "";
-
-  return (
-    <section className="rounded-2xl border p-5 theme-surface-elevated">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex size-9 items-center justify-center rounded-xl border theme-surface-muted">
-              <LifeBuoy className="size-4 theme-success-text" aria-hidden="true" />
-            </span>
-            <div className="min-w-0">
-              <h3 className="text-lg font-semibold theme-foreground">
-                {t("dashboard.supportTeamTitle")}
-              </h3>
-              <p className="mt-1 text-sm theme-muted">
-                {active
-                  ? t("dashboard.supportTeamActiveDescription")
-                  : t("dashboard.supportTeamDescription")}
-              </p>
-            </div>
-          </div>
-
-          {active ? (
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl border p-3 theme-surface-muted">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] theme-muted">
-                  {t("dashboard.supportTeamActivePlan")}
-                </p>
-                <p className="mt-1 text-sm font-semibold theme-foreground">
-                  {plan?.name || t("dashboard.supportTeamActivePlan")}
-                </p>
-              </div>
-              <div className="rounded-xl border p-3 theme-surface-muted">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] theme-muted">
-                  {t("dashboard.supportTeamMonthlyRequests")}
-                </p>
-                <p className="mt-1 text-sm font-semibold theme-foreground">
-                  {used}/{monthlyLimit}
-                </p>
-              </div>
-            </div>
-          ) : null}
-
-          {displayedError ? (
-            <p className="mt-4 rounded-xl border px-3 py-2 text-sm theme-danger-badge">
-              {displayedError}
-            </p>
-          ) : null}
-        </div>
-
-        {active ? (
-          <button
-            type="button"
-            onClick={openConversation}
-            disabled={opening}
-            className="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-3 text-sm font-semibold transition theme-primary-button disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {opening
-              ? t("common.loading")
-              : t("dashboard.supportTeamMessageButton")}
-          </button>
-        ) : (
-          <Link
-            href={withLocale("/pricing", locale)}
-            className="inline-flex h-9 shrink-0 items-center justify-center rounded-xl px-3 text-sm font-semibold transition theme-primary-button"
-          >
-            {t("dashboard.supportTeamViewPlans")}
-          </Link>
-        )}
-      </div>
-    </section>
   );
 }
 
