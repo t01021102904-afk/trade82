@@ -45,11 +45,6 @@ type Summary = {
     name: string;
     verificationStatus: string;
     categories?: string[];
-    sellerSupportPlan?: string | null;
-    sellerSupportStatus?: string | null;
-    sellerSupportCurrentPeriodEnd?: string | null;
-    sellerSupportMonthlyLimit?: number | null;
-    sellerSupportMonthlyUsed?: number | null;
   } | null;
   buyerProfile?: {
     displayName: string;

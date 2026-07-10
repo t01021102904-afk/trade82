@@ -23,10 +23,8 @@ import {
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { VerificationBadge } from "@/components/verification-badge";
-import { VerifiedSellerBadge } from "@/components/verified-seller-badge";
 import { loadAccountCompanies } from "@/hooks/use-account-companies";
 import { useUserContext } from "@/hooks/use-user-context";
-import { isVerifiedSellerSubscription } from "@/lib/billing";
 import {
   getBuyerTypeOptions,
   getCountryOptions,
@@ -53,10 +51,6 @@ type DashboardCompany = {
   sellerProfile: Record<string, unknown> | null;
   buyerProfile: Record<string, unknown> | null;
   verificationRequests: Array<{ adminNote: string | null }>;
-  subscriptionStatus?: string | null;
-  subscriptionPlan?: string | null;
-  sellerSupportPlan?: string | null;
-  sellerSupportStatus?: string | null;
 };
 
 type DashboardAccountProfile = {
@@ -184,10 +178,6 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
   );
   const status = company.verificationStatus;
   const rejectionReason = company.verificationRequests[0]?.adminNote;
-  const verifiedSeller = role === "seller" && isVerifiedSellerSubscription(
-    company.subscriptionStatus,
-    company.subscriptionPlan,
-  );
   const navItems: Array<{
     id: DashboardSection;
     label: string;
@@ -328,7 +318,6 @@ export function RoleDashboard({ role }: { role: "seller" | "buyer" }) {
                       : company.tradeName || company.legalName}
                   </h1>
                   {context?.isAdmin ? <AdminBadge /> : null}
-                  {verifiedSeller ? <VerifiedSellerBadge /> : null}
                 </div>
                 <p className="mt-1 text-sm theme-muted">
                   {role === "seller"

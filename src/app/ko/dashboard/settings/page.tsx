@@ -1,15 +1,10 @@
 import { DashboardSettingsPage } from "@/components/dashboard-settings-page";
 
-export default async function KoSettingsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tab?: string | string[] }>;
-}) {
+export default async function KoSettingsPage() {
   return (
     <DashboardSettingsPage
       locale="ko"
       redirectUrl="/ko/dashboard/settings"
-      searchParams={searchParams}
     />
   );
 }

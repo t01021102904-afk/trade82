@@ -3,7 +3,6 @@ import "server-only";
 import Stripe from "stripe";
 import {
   SELLER_SUPPORT_PLANS,
-  type SellerSupportPlanId,
 } from "@/lib/seller-support";
 
 let stripeClient: Stripe | null = null;
@@ -24,28 +23,11 @@ export function getStripe() {
   return stripeClient;
 }
 
-export function getVerifiedSellerPriceId() {
-  const priceId = process.env.STRIPE_VERIFIED_SELLER_PRICE_ID;
-  if (!priceId) {
-    throw new Error("Verified Seller Stripe price is not configured.");
-  }
-  return priceId;
-}
-
-const supportPriceEnvByPlan: Record<SellerSupportPlanId, string> = {
+const supportPriceEnvByPlan = {
   starter: "STRIPE_SUPPORT_STARTER_PRICE_ID",
   growth: "STRIPE_SUPPORT_GROWTH_PRICE_ID",
   full: "STRIPE_SUPPORT_FULL_PRICE_ID",
 };
-
-export function getSellerSupportPriceId(planId: SellerSupportPlanId) {
-  const envName = supportPriceEnvByPlan[planId];
-  const priceId = process.env[envName];
-  if (!priceId) {
-    throw new Error("Seller Support Stripe price is not configured.");
-  }
-  return priceId;
-}
 
 export function getSellerSupportPlanForPriceId(priceId: string | null | undefined) {
   if (!priceId) return null;

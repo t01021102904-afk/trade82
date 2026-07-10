@@ -1,5 +1,4 @@
 import type { Product, Seller } from "@/lib/types";
-import { isVerifiedSellerSubscription } from "@/lib/billing";
 import type { Locale } from "@/lib/i18n";
 import {
   localizedArray,
@@ -57,10 +56,6 @@ export function databaseProductToCard(
             : undefined,
     sellerUseDefaultLogo: company.useDefaultLogo !== false,
     sellerIsTrade82Team: company.isTrade82Team === true,
-    sellerIsVerifiedSeller: isVerifiedSellerSubscription(
-      typeof company.subscriptionStatus === "string" ? company.subscriptionStatus : null,
-      typeof company.subscriptionPlan === "string" ? company.subscriptionPlan : null,
-    ),
     shortDescription: localizedText({
       locale,
       original: value.shortDescription,
@@ -169,14 +164,6 @@ export function databaseCompanyToSeller(
     verified: true,
     verificationStatus: "verified",
     isTrade82Team: company.isTrade82Team === true,
-    isVerifiedSeller: isVerifiedSellerSubscription(
-      typeof company.subscriptionStatus === "string"
-        ? company.subscriptionStatus
-        : null,
-      typeof company.subscriptionPlan === "string"
-        ? company.subscriptionPlan
-        : null,
-    ),
     description: localizedCompanyDescription(company, locale),
   };
 }
