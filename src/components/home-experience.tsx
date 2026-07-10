@@ -101,7 +101,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
   en: {
     hero: {
       eyebrow: "Trade82",
-      headline: "Korean Sellers. Global Buyers. One B2B Workspace.",
+      headline: "Korean Sellers. Global Buyers. One Marketplace.",
       subheadline:
         "Trade82 helps Korean suppliers and global buyers connect, manage product sourcing, share trade documents, and move inquiries into real business.",
       sellerCta: "Join as seller",
@@ -262,7 +262,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
   ko: {
     hero: {
       eyebrow: "Trade82",
-      headline: "한국 셀러와 글로벌 바이어를 연결하는 B2B 워크스페이스.",
+      headline: "한국 셀러와 글로벌 바이어를 연결하는 마켓플레이스.",
       subheadline:
         "Trade82는 한국 공급사와 전 세계 바이어가 만나고, 상품 소싱을 관리하고, 무역 서류를 공유하고, 문의를 실제 비즈니스 대화로 이어가도록 돕습니다.",
       sellerCta: "셀러로 시작하기",
