@@ -65,6 +65,7 @@
     "sellers": "셀러",
     "sell": "상품 등록",
     "buyers": "바이어",
+    "pricing": "요금",
     "dashboard": "대시보드",
     "messages": "메시지",
     "menu": "메뉴",
@@ -83,7 +84,9 @@
       "login": "로그인",
       "signup": "회원가입",
       "marketplace": "마켓플레이스",
-      "sellers": "셀러"
+      "sellers": "셀러",
+      "buyers": "바이어",
+      "pricing": "요금"
     },
     "legalLinksTitle": "약관 및 안내 문서",
     "legalLinks": [

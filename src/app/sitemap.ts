@@ -1,29 +1,132 @@
 import type { MetadataRoute } from "next";
 
+import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
+import { getDb } from "@/lib/db";
 import { absoluteSiteUrl } from "@/lib/seo";
 
-const publicRoutes = [
+export const dynamic = "force-dynamic";
+
+const staticPublicRoutes = [
   { path: "/", priority: 1 },
+  { path: "/en", priority: 0.9 },
+  { path: "/ko", priority: 0.9 },
   { path: "/marketplace", priority: 0.9 },
+  { path: "/en/marketplace", priority: 0.85 },
+  { path: "/ko/marketplace", priority: 0.85 },
   { path: "/sellers", priority: 0.85 },
-  { path: "/login", priority: 0.7 },
-  { path: "/signup", priority: 0.7 },
-  { path: "/en", priority: 0.8 },
-  { path: "/en/marketplace", priority: 0.75 },
-  { path: "/en/sellers", priority: 0.7 },
-  { path: "/en/login", priority: 0.6 },
-  { path: "/en/signup", priority: 0.6 },
-  { path: "/ko", priority: 0.8 },
-  { path: "/ko/marketplace", priority: 0.75 },
-  { path: "/ko/sellers", priority: 0.7 },
-  { path: "/ko/login", priority: 0.6 },
-  { path: "/ko/signup", priority: 0.6 },
+  { path: "/en/sellers", priority: 0.8 },
+  { path: "/ko/sellers", priority: 0.8 },
+  { path: "/buyers", priority: 0.75 },
+  { path: "/en/buyers", priority: 0.72 },
+  { path: "/ko/buyers", priority: 0.72 },
+  { path: "/pricing", priority: 0.7 },
+  { path: "/en/pricing", priority: 0.68 },
+  { path: "/ko/pricing", priority: 0.68 },
+  { path: "/terms", priority: 0.35 },
+  { path: "/en/terms", priority: 0.33 },
+  { path: "/ko/terms", priority: 0.33 },
+  { path: "/privacy", priority: 0.35 },
+  { path: "/en/privacy", priority: 0.33 },
+  { path: "/ko/privacy", priority: 0.33 },
+  { path: "/sourcing-terms", priority: 0.35 },
+  { path: "/en/sourcing-terms", priority: 0.33 },
+  { path: "/ko/sourcing-terms", priority: 0.33 },
+  { path: "/business", priority: 0.25 },
+  { path: "/en/business", priority: 0.23 },
+  { path: "/ko/business", priority: 0.23 },
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return publicRoutes.map((route) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+  const staticRoutes = staticPublicRoutes.map((route) => ({
     url: absoluteSiteUrl(route.path),
-    changeFrequency: route.path === "/" ? "weekly" : "daily",
+    changeFrequency: route.path === "/" ? ("weekly" as const) : ("daily" as const),
     priority: route.priority,
+    lastModified: now,
   }));
+
+  return [...staticRoutes, ...(await dynamicPublicRoutes())];
+}
+
+async function dynamicPublicRoutes(): Promise<MetadataRoute.Sitemap> {
+  try {
+    const [products, companies] = await Promise.all([
+      getDb().product.findMany({
+        where: {
+          status: "active",
+          sellerCompany: {
+            verificationStatus: "verified",
+            legalName: { not: DELETED_COMPANY_NAME },
+          },
+        },
+        select: {
+          id: true,
+          updatedAt: true,
+        },
+        orderBy: { updatedAt: "desc" },
+        take: 5000,
+      }),
+      getDb().company.findMany({
+        where: {
+          verificationStatus: "verified",
+          legalName: { not: DELETED_COMPANY_NAME },
+        },
+        select: {
+          id: true,
+          companyRole: true,
+          updatedAt: true,
+        },
+        orderBy: { updatedAt: "desc" },
+        take: 5000,
+      }),
+    ]);
+
+    const productRoutes = products.flatMap((product) =>
+      localizedRoutes(`/products/${encodeURIComponent(product.id)}`, product.updatedAt, 0.64),
+    );
+
+    const companyRoutes = companies.flatMap((company) => {
+      const profileRoutes =
+        company.companyRole === "buyer"
+          ? localizedRoutes(`/buyers/${encodeURIComponent(company.id)}`, company.updatedAt, 0.58)
+          : localizedRoutes(`/companies/${encodeURIComponent(company.id)}`, company.updatedAt, 0.62);
+      const storeRoutes =
+        company.companyRole === "seller"
+          ? localizedRoutes(`/stores/${encodeURIComponent(company.id)}`, company.updatedAt, 0.58)
+          : [];
+      return [...profileRoutes, ...storeRoutes];
+    });
+
+    return [...productRoutes, ...companyRoutes];
+  } catch (error) {
+    console.warn("Sitemap dynamic public routes were skipped.", {
+      name: error instanceof Error ? error.name : "UnknownError",
+    });
+    return [];
+  }
+}
+
+function localizedRoutes(
+  basePath: string,
+  lastModified: Date,
+  priority: number,
+): MetadataRoute.Sitemap {
+  return [
+    sitemapEntry(basePath, lastModified, priority),
+    sitemapEntry(`/en${basePath}`, lastModified, Math.max(priority - 0.02, 0.1)),
+    sitemapEntry(`/ko${basePath}`, lastModified, Math.max(priority - 0.02, 0.1)),
+  ];
+}
+
+function sitemapEntry(
+  path: string,
+  lastModified: Date,
+  priority: number,
+) {
+  return {
+    url: absoluteSiteUrl(path),
+    changeFrequency: "weekly" as const,
+    priority,
+    lastModified,
+  };
 }

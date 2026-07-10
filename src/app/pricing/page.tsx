@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
+import { JsonLd } from "@/components/json-ld";
 import { SellerMarketingPage } from "@/components/seller-marketing-page";
-import { publicPageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Trade82 Marketing | Trade82",
+  title: "Pricing | Trade82",
   description:
-    "Promote your product on the Trade82 landing page and reach global buyers.",
+    "View Trade82 pricing for product marketing exposure and seller growth tools.",
   path: "/pricing",
   languages: {
     en: "/pricing",
@@ -20,5 +21,15 @@ export default async function PricingPage({
   searchParams: Promise<{ marketing?: string | string[] }>;
 }) {
   const params = await searchParams;
-  return <SellerMarketingPage initialSuccess={params.marketing === "success"} />;
+  return (
+    <>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Home", path: "/" },
+          { name: "Pricing", path: "/pricing" },
+        ])}
+      />
+      <SellerMarketingPage initialSuccess={params.marketing === "success"} />
+    </>
+  );
 }

@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 
 import { HomeExperience } from "@/components/home-experience";
-import { publicPageMetadata } from "@/lib/seo";
+import {
+  DEFAULT_HOME_DESCRIPTION,
+  DEFAULT_HOME_TITLE,
+  publicPageMetadata,
+} from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Trade82 | Korean-Global B2B Marketplace",
-  description:
-    "Connect Korean sellers with buyers worldwide and manage export workflows in one workspace.",
+  title: DEFAULT_HOME_TITLE,
+  description: DEFAULT_HOME_DESCRIPTION,
   path: "/",
   languages: {
     en: "/",
+    "x-default": "/",
     ko: "/ko",
   },
 });

@@ -3,47 +3,38 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { I18nProvider } from "@/components/i18n-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { DEFAULT_OG_IMAGE_URL, SITE_URL } from "@/lib/seo";
+import {
+  DEFAULT_HOME_DESCRIPTION,
+  DEFAULT_HOME_TITLE,
+  DEFAULT_OG_IMAGE_URL,
+  SITE_URL,
+  organizationJsonLd,
+  siteNavigationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
 
-const defaultTitle = "Trade82 | Korean-Global B2B Marketplace";
-const defaultDescription =
-  "Connect Korean sellers with buyers worldwide and manage export workflows in one workspace.";
 const structuredData = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Trade82",
-    url: SITE_URL,
-    logo: `${SITE_URL}/trade82-logo.png`,
-    sameAs: [],
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Trade82",
-    url: SITE_URL,
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Trade82 primary navigation",
-    itemListElement: [
-      { "@type": "SiteNavigationElement", position: 1, name: "Login", url: `${SITE_URL}/login` },
-      { "@type": "SiteNavigationElement", position: 2, name: "Sign up", url: `${SITE_URL}/signup` },
-      { "@type": "SiteNavigationElement", position: 3, name: "Marketplace", url: `${SITE_URL}/marketplace` },
-      { "@type": "SiteNavigationElement", position: 4, name: "Sellers", url: `${SITE_URL}/sellers` },
-    ],
-  },
+  organizationJsonLd(),
+  websiteJsonLd(),
+  siteNavigationJsonLd(),
 ];
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: defaultTitle,
-  description: defaultDescription,
+  title: DEFAULT_HOME_TITLE,
+  description: DEFAULT_HOME_DESCRIPTION,
+  alternates: {
+    canonical: SITE_URL,
+    languages: {
+      en: SITE_URL,
+      ko: `${SITE_URL}/ko`,
+      "x-default": SITE_URL,
+    },
+  },
   openGraph: {
-    title: defaultTitle,
-    description: defaultDescription,
+    title: DEFAULT_HOME_TITLE,
+    description: DEFAULT_HOME_DESCRIPTION,
     url: "https://trade82.com",
     siteName: "Trade82",
     type: "website",
@@ -52,14 +43,14 @@ export const metadata: Metadata = {
         url: DEFAULT_OG_IMAGE_URL,
         width: 1200,
         height: 630,
-        alt: "Trade82 Korean-Global B2B Marketplace",
+        alt: "Trade82 global B2B marketplace for Korean products",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: defaultTitle,
-    description: defaultDescription,
+    title: DEFAULT_HOME_TITLE,
+    description: DEFAULT_HOME_DESCRIPTION,
     images: [DEFAULT_OG_IMAGE_URL],
   },
   icons: {

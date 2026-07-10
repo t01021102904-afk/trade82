@@ -65,6 +65,7 @@
     "sellers": "Sellers",
     "sell": "List product",
     "buyers": "Buyers",
+    "pricing": "Pricing",
     "dashboard": "Dashboard",
     "messages": "Messages",
     "menu": "Menu",
@@ -82,7 +83,9 @@
       "login": "Login",
       "signup": "Sign up",
       "marketplace": "Marketplace",
-      "sellers": "Sellers"
+      "sellers": "Sellers",
+      "buyers": "Buyers",
+      "pricing": "Pricing"
     },
     "legalLinksTitle": "Legal documents",
     "legalLinks": [

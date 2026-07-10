@@ -10,6 +10,37 @@ const securityHeaders = [
   },
 ];
 
+const privateRobotsHeaders = [
+  { key: "X-Robots-Tag", value: "noindex, nofollow" },
+];
+
+const privateRouteSources = [
+  "/login/:path*",
+  "/signup/:path*",
+  "/dashboard/:path*",
+  "/settings/:path*",
+  "/messages/:path*",
+  "/admin/:path*",
+  "/onboarding/:path*",
+  "/deals/:path*",
+  "/en/login/:path*",
+  "/en/signup/:path*",
+  "/en/dashboard/:path*",
+  "/en/settings/:path*",
+  "/en/messages/:path*",
+  "/en/admin/:path*",
+  "/en/onboarding/:path*",
+  "/en/deals/:path*",
+  "/ko/login/:path*",
+  "/ko/signup/:path*",
+  "/ko/dashboard/:path*",
+  "/ko/settings/:path*",
+  "/ko/messages/:path*",
+  "/ko/admin/:path*",
+  "/ko/onboarding/:path*",
+  "/ko/deals/:path*",
+] as const;
+
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
@@ -26,6 +57,10 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      ...privateRouteSources.map((source) => ({
+        source,
+        headers: privateRobotsHeaders,
+      })),
     ];
   },
 };
