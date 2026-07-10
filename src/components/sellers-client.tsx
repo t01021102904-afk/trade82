@@ -38,7 +38,7 @@ function SelectField({
 }
 
 export function SellersClient() {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const [databaseSellers, setDatabaseSellers] = useState<Seller[]>([]);
   const [databaseLoading, setDatabaseLoading] = useState(true);
   useEffect(() => {
@@ -48,7 +48,7 @@ export function SellersClient() {
         setDatabaseSellers(
           (result.companies ?? [])
             .filter((company) => company.companyRole === "seller")
-            .map(databaseCompanyToSeller),
+            .map((company) => databaseCompanyToSeller(company, locale)),
         );
         setDatabaseLoading(false);
       })
@@ -56,7 +56,7 @@ export function SellersClient() {
         setDatabaseSellers([]);
         setDatabaseLoading(false);
       });
-  }, []);
+  }, [locale]);
   const visibleSellers = databaseSellers;
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");

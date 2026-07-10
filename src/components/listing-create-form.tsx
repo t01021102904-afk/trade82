@@ -124,6 +124,7 @@ export function ListingCreateForm() {
   const sectionLinks = [
     ["product-images", t("productForm.productImages")],
     ["basic-information", t("productForm.basicInfo")],
+    ["english-content", t("productForm.englishContent")],
     ["pricing-order-terms", t("productForm.pricingTerms")],
     ["origin-shipping", t("productForm.originShipping")],
     ["compliance", t("productForm.complianceDocuments")],

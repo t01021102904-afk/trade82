@@ -131,8 +131,10 @@ export async function POST(request: Request) {
     }
 
     const name = cleanPlainText(body.name, 120);
+    const nameEn = cleanPlainText(body.nameEn, 120);
     const category = cleanPlainText(body.category, 80);
     const detailedDescription = cleanPlainText(body.detailedDescription, 5000);
+    const detailedDescriptionEn = cleanPlainText(body.detailedDescriptionEn, 5000);
     const fieldVisibility = parseProductFieldVisibilityInput(body.fieldVisibility);
     const priceIsPublic = productFieldRequiresValue(fieldVisibility, "minimumUnitPrice");
     const moqIsPublic = productFieldRequiresValue(fieldVisibility, "moq");
@@ -301,14 +303,18 @@ export async function POST(request: Request) {
       data: {
         sellerCompanyId: company.id,
         name,
+        nameEn,
         slug: `${slugify(name) || "product"}-${crypto.randomUUID().slice(0, 8)}`,
         imageUrl: firstImage?.cardUrl ?? null,
         category,
         tags: cleanTags(body.tags),
+        tagsEn: cleanTags(body.tagsEn),
         shortDescription:
           cleanPlainText(body.shortDescription, 240) ||
           detailedDescription.slice(0, 240),
+        shortDescriptionEn: cleanPlainText(body.shortDescriptionEn, 240),
         detailedDescription,
+        detailedDescriptionEn,
         priceMin: priceMin === null ? null : String(priceMin),
         priceMax: priceMax === null ? null : String(priceMax),
         currency: cleanPlainText(body.currency, 8) || "USD",
@@ -362,6 +368,7 @@ export async function POST(request: Request) {
           ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
           : [],
         buyerNotes: cleanPlainText(body.buyerNotes, 1000),
+        buyerNotesEn: cleanPlainText(body.buyerNotesEn, 1000),
         riskNotes: strings(body.riskNotes).map((item) => cleanPlainText(item, 300)).filter(Boolean),
         certifications: productFieldRequiresValue(fieldVisibility, "complianceInfo")
           ? allowedList(

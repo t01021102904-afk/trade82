@@ -317,16 +317,29 @@ export async function PATCH(
           typeof body.name === "string"
             ? cleanPlainText(body.name, 120)
             : undefined,
+        nameEn:
+          typeof body.nameEn === "string"
+            ? cleanPlainText(body.nameEn, 120)
+            : undefined,
         imageUrl: images ? images[0]?.cardUrl ?? null : undefined,
         category,
         tags: body.tags === undefined ? undefined : cleanTags(body.tags),
+        tagsEn: body.tagsEn === undefined ? undefined : cleanTags(body.tagsEn),
         shortDescription:
           typeof body.shortDescription === "string"
             ? cleanPlainText(body.shortDescription, 240)
             : undefined,
+        shortDescriptionEn:
+          typeof body.shortDescriptionEn === "string"
+            ? cleanPlainText(body.shortDescriptionEn, 240)
+            : undefined,
         detailedDescription:
           typeof body.detailedDescription === "string"
             ? cleanPlainText(body.detailedDescription, 5000)
+            : undefined,
+        detailedDescriptionEn:
+          typeof body.detailedDescriptionEn === "string"
+            ? cleanPlainText(body.detailedDescriptionEn, 5000)
             : undefined,
         priceMin:
           priceMin === undefined
@@ -444,6 +457,10 @@ export async function PATCH(
         buyerNotes:
           typeof body.buyerNotes === "string"
             ? cleanPlainText(body.buyerNotes, 1000)
+            : undefined,
+        buyerNotesEn:
+          typeof body.buyerNotesEn === "string"
+            ? cleanPlainText(body.buyerNotesEn, 1000)
             : undefined,
         riskNotes:
           body.riskNotes === undefined

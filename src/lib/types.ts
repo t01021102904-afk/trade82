@@ -51,6 +51,7 @@ export type CompanyProfile = {
   companyRole: "seller" | "buyer";
   legalName: string;
   tradeName?: string;
+  displayNameEn?: string;
   logoOriginalUrl?: string;
   logoThumbnailUrl?: string;
   logoUrl?: string;
@@ -61,6 +62,7 @@ export type CompanyProfile = {
   stateOrProvince: string;
   businessAddress: string;
   description: string;
+  descriptionEn?: string;
   categories: string[];
   verificationStatus: VerificationStatus;
   needsReverification?: boolean;
@@ -73,6 +75,7 @@ export type SellerCompanyProfile = {
   businessRegistrationNumber: string;
   representativeName: string;
   exportExperience: string;
+  exportExperienceEn?: string;
   exportCountries: string[];
   productCategories: string[];
   minimumOrderQuantity: string;

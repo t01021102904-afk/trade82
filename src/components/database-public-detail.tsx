@@ -13,6 +13,7 @@ import { DetailTable } from "@/components/detail-table";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
 import { ProductCard } from "@/components/product-card";
+import { ProductImage } from "@/components/product-image";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { ProductShareButton } from "@/components/product-share-button";
 import { VerificationBadge } from "@/components/verification-badge";
@@ -373,19 +374,25 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   const [ownerError, setOwnerError] = useState("");
   const { payload, loaded } = usePublicMarketplace();
   const raw = payload.products.find((item) => item.id === id);
-  const product = raw ? publicProductToCard(raw, locale) : null;
+  const localizedProducts = payload.products.map((item) =>
+    publicProductToCard(item, locale),
+  );
+  const product = localizedProducts.find((item) => item.id === id) ?? null;
   const sellerCompanyRef = raw?.sellerCompany as Record<string, unknown> | undefined;
   const sellerCompanyId = String(sellerCompanyRef?.id ?? "");
   const sellerCompany = payload.companies.find((item) => item.id === sellerCompanyId);
   const sellerProfile =
     (sellerCompany?.sellerProfile ?? sellerCompanyRef?.sellerProfile ?? {}) as Record<string, unknown>;
-  const relatedProducts = payload.products
-    .filter((item) => {
-      const company = (item.sellerCompany ?? {}) as Record<string, unknown>;
-      return String(company.id ?? "") === sellerCompanyId && String(item.id) !== id;
-    })
-    .map((item) => publicProductToCard(item, locale))
-    .slice(0, 3);
+  const relatedProducts = localizedProducts
+    .filter((item) => item.sellerId === sellerCompanyId && item.id !== id)
+    .slice(0, 4);
+  const similarProducts = product
+    ? selectSimilarProducts({
+        currentProduct: product,
+        products: localizedProducts,
+        excludedIds: new Set([id, ...relatedProducts.map((item) => item.id)]),
+      })
+    : [];
   if (!loaded) return <PublicLoading />;
   if (!product) return <PublicUnavailable />;
 
@@ -785,20 +792,210 @@ export function DatabaseProductDetail({ id }: { id: string }) {
         </section>
 
         {relatedProducts.length ? (
-          <section className="grid gap-5">
-            <h2 className="text-lg font-semibold text-zinc-950">
-              {t("productDetail.moreFromSeller")}
-            </h2>
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {relatedProducts.map((item) => (
-                <ProductCard key={item.id} product={item} />
-              ))}
-            </div>
-          </section>
+          <RelatedProductsSection
+            title={t("productDetail.moreFromSeller")}
+            products={relatedProducts}
+          />
+        ) : null}
+
+        {similarProducts.length ? (
+          <RelatedProductsSection
+            title={t("productDetail.similarProducts")}
+            subtitle={t("productDetail.similarProductsSubtitle")}
+            products={similarProducts}
+          />
         ) : null}
       </div>
     </div>
   );
+}
+
+function RelatedProductsSection({
+  title,
+  subtitle,
+  products,
+}: {
+  title: string;
+  subtitle?: string;
+  products: Product[];
+}) {
+  return (
+    <section className="grid gap-3">
+      <div>
+        <h2 className="text-base font-semibold text-zinc-950">{title}</h2>
+        {subtitle ? (
+          <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>
+        ) : null}
+      </div>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+        {products.map((item) => (
+          <CompactRelatedProductCard key={item.id} product={item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CompactRelatedProductCard({ product }: { product: Product }) {
+  const { locale, t } = useI18n();
+  const href = withLocale(`/products/${product.id}`, locale);
+
+  return (
+    <article className="group min-w-0 rounded-lg border border-zinc-200 bg-white p-2.5 shadow-sm shadow-zinc-100/60">
+      <div className="relative h-36 overflow-hidden rounded-md bg-zinc-50 sm:h-40 lg:h-44">
+        <Link href={href} className="relative block size-full">
+          <ProductImage
+            urls={[product.imagePlaceholder, ...(product.imageUrls ?? [])]}
+            alt={product.name}
+            sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+            className="size-full rounded-md"
+            imageClassName="bg-white object-contain p-2 transition-transform duration-200 motion-safe:group-hover:scale-[1.02]"
+            showLabel={false}
+          />
+        </Link>
+        <SaveButton
+          id={product.id}
+          kind="product"
+          iconOnly
+          className="absolute right-1.5 top-1.5 h-8 w-8 border border-zinc-200 bg-white/95 shadow-sm"
+        />
+      </div>
+      <div className="grid min-w-0 gap-1.5 pt-2.5">
+        <Link href={href} className="min-w-0">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-zinc-950 transition-colors group-hover:text-blue-700">
+            {product.name}
+          </h3>
+        </Link>
+        <Link
+          href={withLocale(`/companies/${product.sellerId}`, locale)}
+          className="flex min-w-0 items-center gap-1 text-xs text-zinc-500 hover:text-blue-700"
+        >
+          <span className="truncate">{product.sellerName}</span>
+          {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
+          {product.sellerIsVerifiedSeller ? <VerifiedSellerBadge compact /> : null}
+        </Link>
+        <WholesalePriceGate
+          value={product.wholesalePrice}
+          className="max-w-full"
+          valueClassName="truncate text-sm font-semibold text-zinc-950"
+          gateClassName="text-xs"
+        />
+        <p className="truncate text-xs text-zinc-500">
+          {t("marketplace.moq")}: {product.moq}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+function selectSimilarProducts({
+  currentProduct,
+  products,
+  excludedIds,
+}: {
+  currentProduct: Product;
+  products: Product[];
+  excludedIds: Set<string>;
+}) {
+  const currentNameKeywords = keywordSet(currentProduct.name);
+  const currentTagKeywords = keywordSet((currentProduct.tags ?? []).join(" "));
+  const currentDescriptionKeywords = keywordSet(
+    `${currentProduct.shortDescription} ${currentProduct.longDescription}`,
+  );
+  const selectedIds = new Set(excludedIds);
+
+  const scored = products
+    .filter((item) => item.id !== currentProduct.id && !selectedIds.has(item.id))
+    .map((item) => {
+      const nameOverlap = overlapCount(currentNameKeywords, keywordSet(item.name));
+      const tagOverlap = overlapCount(
+        currentTagKeywords,
+        keywordSet((item.tags ?? []).join(" ")),
+      );
+      const descriptionOverlap = overlapCount(
+        currentDescriptionKeywords,
+        keywordSet(`${item.shortDescription} ${item.longDescription}`),
+      );
+      const sameCategory = item.category === currentProduct.category;
+      const otherSeller = item.sellerId !== currentProduct.sellerId;
+      const hasSimilarity =
+        sameCategory ||
+        nameOverlap > 0 ||
+        tagOverlap > 0 ||
+        descriptionOverlap > 0;
+      const score =
+        (sameCategory ? 60 : 0) +
+        nameOverlap * 8 +
+        tagOverlap * 10 +
+        descriptionOverlap * 3 +
+        (otherSeller ? 8 : 0);
+
+      return {
+        item,
+        score,
+        hasSimilarity,
+        createdAt: sortableCreatedAt(item.createdAt),
+      };
+    })
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      return right.createdAt - left.createdAt;
+    });
+
+  const selected: Product[] = [];
+  for (const match of scored) {
+    if (!match.hasSimilarity || selectedIds.has(match.item.id)) continue;
+    selected.push(match.item);
+    selectedIds.add(match.item.id);
+    if (selected.length >= 8) return selected;
+  }
+
+  for (const match of scored) {
+    if (selectedIds.has(match.item.id)) continue;
+    selected.push(match.item);
+    selectedIds.add(match.item.id);
+    if (selected.length >= 8) return selected;
+  }
+
+  return selected;
+}
+
+function keywordSet(value: string) {
+  const ignored = new Set([
+    "and",
+    "for",
+    "the",
+    "with",
+    "from",
+    "product",
+    "products",
+    "상품",
+    "제품",
+    "세트",
+  ]);
+
+  return new Set(
+    value
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s]/gu, " ")
+      .split(/\s+/)
+      .map((word) => word.trim())
+      .filter((word) => word.length >= 2 && !ignored.has(word)),
+  );
+}
+
+function overlapCount(left: Set<string>, right: Set<string>) {
+  let count = 0;
+  for (const item of left) {
+    if (right.has(item)) count += 1;
+  }
+  return count;
+}
+
+function sortableCreatedAt(value: string | undefined) {
+  if (!value) return 0;
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? time : 0;
 }
 
 function ReviewCard({ review }: { review: PublicCompany["reviewsReceived"][number] }) {

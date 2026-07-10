@@ -39,7 +39,7 @@ function SelectField({
 }
 
 export function MarketplaceClient() {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const [databaseProducts, setDatabaseProducts] = useState<Product[]>([]);
   const [databaseLoading, setDatabaseLoading] = useState(true);
   const visibleProducts = databaseProducts;
@@ -48,14 +48,18 @@ export function MarketplaceClient() {
     void fetch("/api/public/marketplace")
       .then((response) => (response.ok ? response.json() : { products: [] }))
       .then((result: { products?: Array<Record<string, unknown>> }) => {
-        setDatabaseProducts((result.products ?? []).map(databaseProductToCard));
+        setDatabaseProducts(
+          (result.products ?? []).map((product) =>
+            databaseProductToCard(product, locale),
+          ),
+        );
         setDatabaseLoading(false);
       })
       .catch(() => {
         setDatabaseProducts([]);
         setDatabaseLoading(false);
       });
-  }, []);
+  }, [locale]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [price, setPrice] = useState("all");

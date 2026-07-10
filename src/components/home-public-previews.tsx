@@ -24,11 +24,15 @@ export function HomePublicPreviews() {
     void fetch("/api/public/marketplace")
       .then((response) => (response.ok ? response.json() : { products: [], companies: [] }))
       .then((result: { products?: Array<Record<string, unknown>>; companies?: Array<Record<string, unknown>> }) => {
-        setProducts((result.products ?? []).map(databaseProductToCard).slice(0, 3));
+        setProducts(
+          (result.products ?? [])
+            .map((product) => databaseProductToCard(product, locale))
+            .slice(0, 3),
+        );
         setSellers(
           (result.companies ?? [])
             .filter((company) => company.companyRole === "seller")
-            .map(databaseCompanyToSeller)
+            .map((company) => databaseCompanyToSeller(company, locale))
             .slice(0, 3),
         );
         setIsLoading(false);
@@ -38,7 +42,7 @@ export function HomePublicPreviews() {
         setSellers([]);
         setIsLoading(false);
       });
-  }, []);
+  }, [locale]);
 
   return (
     <>
