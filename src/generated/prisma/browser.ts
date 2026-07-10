@@ -68,6 +68,11 @@ export type Inquiry = Prisma.InquiryModel
  */
 export type RfqRequest = Prisma.RfqRequestModel
 /**
+ * Model RfqMatchedProduct
+ * 
+ */
+export type RfqMatchedProduct = Prisma.RfqMatchedProductModel
+/**
  * Model SavedItem
  * 
  */

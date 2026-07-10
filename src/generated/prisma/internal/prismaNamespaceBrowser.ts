@@ -61,6 +61,7 @@ export const ModelName = {
   VerificationRequest: 'VerificationRequest',
   Inquiry: 'Inquiry',
   RfqRequest: 'RfqRequest',
+  RfqMatchedProduct: 'RfqMatchedProduct',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -339,6 +340,18 @@ export const RfqRequestScalarFieldEnum = {
 } as const
 
 export type RfqRequestScalarFieldEnum = (typeof RfqRequestScalarFieldEnum)[keyof typeof RfqRequestScalarFieldEnum]
+
+
+export const RfqMatchedProductScalarFieldEnum = {
+  id: 'id',
+  rfqRequestId: 'rfqRequestId',
+  productId: 'productId',
+  rank: 'rank',
+  reasons: 'reasons',
+  createdAt: 'createdAt'
+} as const
+
+export type RfqMatchedProductScalarFieldEnum = (typeof RfqMatchedProductScalarFieldEnum)[keyof typeof RfqMatchedProductScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {

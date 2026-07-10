@@ -394,6 +394,7 @@ export const ModelName = {
   VerificationRequest: 'VerificationRequest',
   Inquiry: 'Inquiry',
   RfqRequest: 'RfqRequest',
+  RfqMatchedProduct: 'RfqMatchedProduct',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1158,6 +1159,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.RfqRequestCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.RfqRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    RfqMatchedProduct: {
+      payload: Prisma.$RfqMatchedProductPayload<ExtArgs>
+      fields: Prisma.RfqMatchedProductFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RfqMatchedProductFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RfqMatchedProductFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        findFirst: {
+          args: Prisma.RfqMatchedProductFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RfqMatchedProductFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        findMany: {
+          args: Prisma.RfqMatchedProductFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>[]
+        }
+        create: {
+          args: Prisma.RfqMatchedProductCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        createMany: {
+          args: Prisma.RfqMatchedProductCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RfqMatchedProductCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>[]
+        }
+        delete: {
+          args: Prisma.RfqMatchedProductDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        update: {
+          args: Prisma.RfqMatchedProductUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        deleteMany: {
+          args: Prisma.RfqMatchedProductDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RfqMatchedProductUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RfqMatchedProductUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>[]
+        }
+        upsert: {
+          args: Prisma.RfqMatchedProductUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RfqMatchedProductPayload>
+        }
+        aggregate: {
+          args: Prisma.RfqMatchedProductAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRfqMatchedProduct>
+        }
+        groupBy: {
+          args: Prisma.RfqMatchedProductGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RfqMatchedProductGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RfqMatchedProductCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RfqMatchedProductCountAggregateOutputType> | number
         }
       }
     }
@@ -2046,6 +2121,18 @@ export const RfqRequestScalarFieldEnum = {
 export type RfqRequestScalarFieldEnum = (typeof RfqRequestScalarFieldEnum)[keyof typeof RfqRequestScalarFieldEnum]
 
 
+export const RfqMatchedProductScalarFieldEnum = {
+  id: 'id',
+  rfqRequestId: 'rfqRequestId',
+  productId: 'productId',
+  rank: 'rank',
+  reasons: 'reasons',
+  createdAt: 'createdAt'
+} as const
+
+export type RfqMatchedProductScalarFieldEnum = (typeof RfqMatchedProductScalarFieldEnum)[keyof typeof RfqMatchedProductScalarFieldEnum]
+
+
 export const SavedItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2675,6 +2762,7 @@ export type GlobalOmitConfig = {
   verificationRequest?: Prisma.VerificationRequestOmit
   inquiry?: Prisma.InquiryOmit
   rfqRequest?: Prisma.RfqRequestOmit
+  rfqMatchedProduct?: Prisma.RfqMatchedProductOmit
   savedItem?: Prisma.SavedItemOmit
   message?: Prisma.MessageOmit
   messageAttachment?: Prisma.MessageAttachmentOmit

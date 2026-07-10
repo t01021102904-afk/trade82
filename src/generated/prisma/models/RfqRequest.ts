@@ -387,6 +387,7 @@ export type RfqRequestWhereInput = {
   buyerUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   buyerCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   reviewedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  matchedProducts?: Prisma.RfqMatchedProductListRelationFilter
 }
 
 export type RfqRequestOrderByWithRelationInput = {
@@ -419,6 +420,7 @@ export type RfqRequestOrderByWithRelationInput = {
   buyerUser?: Prisma.UserProfileOrderByWithRelationInput
   buyerCompany?: Prisma.CompanyOrderByWithRelationInput
   reviewedByUser?: Prisma.UserProfileOrderByWithRelationInput
+  matchedProducts?: Prisma.RfqMatchedProductOrderByRelationAggregateInput
 }
 
 export type RfqRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -454,6 +456,7 @@ export type RfqRequestWhereUniqueInput = Prisma.AtLeast<{
   buyerUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   buyerCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   reviewedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  matchedProducts?: Prisma.RfqMatchedProductListRelationFilter
 }, "id">
 
 export type RfqRequestOrderByWithAggregationInput = {
@@ -549,6 +552,7 @@ export type RfqRequestCreateInput = {
   buyerUser: Prisma.UserProfileCreateNestedOneWithoutBuyerRfqRequestsInput
   buyerCompany?: Prisma.CompanyCreateNestedOneWithoutBuyerRfqRequestsInput
   reviewedByUser?: Prisma.UserProfileCreateNestedOneWithoutReviewedRfqRequestsInput
+  matchedProducts?: Prisma.RfqMatchedProductCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestUncheckedCreateInput = {
@@ -578,6 +582,7 @@ export type RfqRequestUncheckedCreateInput = {
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestUpdateInput = {
@@ -607,6 +612,7 @@ export type RfqRequestUpdateInput = {
   buyerUser?: Prisma.UserProfileUpdateOneRequiredWithoutBuyerRfqRequestsNestedInput
   buyerCompany?: Prisma.CompanyUpdateOneWithoutBuyerRfqRequestsNestedInput
   reviewedByUser?: Prisma.UserProfileUpdateOneWithoutReviewedRfqRequestsNestedInput
+  matchedProducts?: Prisma.RfqMatchedProductUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateInput = {
@@ -636,6 +642,7 @@ export type RfqRequestUncheckedUpdateInput = {
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestCreateManyInput = {
@@ -827,6 +834,11 @@ export type RfqRequestSumOrderByAggregateInput = {
   preferredUnitPriceAmount?: Prisma.SortOrder
 }
 
+export type RfqRequestScalarRelationFilter = {
+  is?: Prisma.RfqRequestWhereInput
+  isNot?: Prisma.RfqRequestWhereInput
+}
+
 export type RfqRequestCreateNestedManyWithoutBuyerUserInput = {
   create?: Prisma.XOR<Prisma.RfqRequestCreateWithoutBuyerUserInput, Prisma.RfqRequestUncheckedCreateWithoutBuyerUserInput> | Prisma.RfqRequestCreateWithoutBuyerUserInput[] | Prisma.RfqRequestUncheckedCreateWithoutBuyerUserInput[]
   connectOrCreate?: Prisma.RfqRequestCreateOrConnectWithoutBuyerUserInput | Prisma.RfqRequestCreateOrConnectWithoutBuyerUserInput[]
@@ -961,6 +973,20 @@ export type EnumRfqAdminStatusFieldUpdateOperationsInput = {
   set?: $Enums.RfqAdminStatus
 }
 
+export type RfqRequestCreateNestedOneWithoutMatchedProductsInput = {
+  create?: Prisma.XOR<Prisma.RfqRequestCreateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedCreateWithoutMatchedProductsInput>
+  connectOrCreate?: Prisma.RfqRequestCreateOrConnectWithoutMatchedProductsInput
+  connect?: Prisma.RfqRequestWhereUniqueInput
+}
+
+export type RfqRequestUpdateOneRequiredWithoutMatchedProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.RfqRequestCreateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedCreateWithoutMatchedProductsInput>
+  connectOrCreate?: Prisma.RfqRequestCreateOrConnectWithoutMatchedProductsInput
+  upsert?: Prisma.RfqRequestUpsertWithoutMatchedProductsInput
+  connect?: Prisma.RfqRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RfqRequestUpdateToOneWithWhereWithoutMatchedProductsInput, Prisma.RfqRequestUpdateWithoutMatchedProductsInput>, Prisma.RfqRequestUncheckedUpdateWithoutMatchedProductsInput>
+}
+
 export type RfqRequestCreateWithoutBuyerUserInput = {
   id?: string
   productName: string
@@ -987,6 +1013,7 @@ export type RfqRequestCreateWithoutBuyerUserInput = {
   updatedAt?: Date | string
   buyerCompany?: Prisma.CompanyCreateNestedOneWithoutBuyerRfqRequestsInput
   reviewedByUser?: Prisma.UserProfileCreateNestedOneWithoutReviewedRfqRequestsInput
+  matchedProducts?: Prisma.RfqMatchedProductCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestUncheckedCreateWithoutBuyerUserInput = {
@@ -1015,6 +1042,7 @@ export type RfqRequestUncheckedCreateWithoutBuyerUserInput = {
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestCreateOrConnectWithoutBuyerUserInput = {
@@ -1053,6 +1081,7 @@ export type RfqRequestCreateWithoutReviewedByUserInput = {
   updatedAt?: Date | string
   buyerUser: Prisma.UserProfileCreateNestedOneWithoutBuyerRfqRequestsInput
   buyerCompany?: Prisma.CompanyCreateNestedOneWithoutBuyerRfqRequestsInput
+  matchedProducts?: Prisma.RfqMatchedProductCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestUncheckedCreateWithoutReviewedByUserInput = {
@@ -1081,6 +1110,7 @@ export type RfqRequestUncheckedCreateWithoutReviewedByUserInput = {
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestCreateOrConnectWithoutReviewedByUserInput = {
@@ -1183,6 +1213,7 @@ export type RfqRequestCreateWithoutBuyerCompanyInput = {
   updatedAt?: Date | string
   buyerUser: Prisma.UserProfileCreateNestedOneWithoutBuyerRfqRequestsInput
   reviewedByUser?: Prisma.UserProfileCreateNestedOneWithoutReviewedRfqRequestsInput
+  matchedProducts?: Prisma.RfqMatchedProductCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestUncheckedCreateWithoutBuyerCompanyInput = {
@@ -1211,6 +1242,7 @@ export type RfqRequestUncheckedCreateWithoutBuyerCompanyInput = {
   reviewedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedCreateNestedManyWithoutRfqRequestInput
 }
 
 export type RfqRequestCreateOrConnectWithoutBuyerCompanyInput = {
@@ -1237,6 +1269,138 @@ export type RfqRequestUpdateWithWhereUniqueWithoutBuyerCompanyInput = {
 export type RfqRequestUpdateManyWithWhereWithoutBuyerCompanyInput = {
   where: Prisma.RfqRequestScalarWhereInput
   data: Prisma.XOR<Prisma.RfqRequestUpdateManyMutationInput, Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerCompanyInput>
+}
+
+export type RfqRequestCreateWithoutMatchedProductsInput = {
+  id?: string
+  productName: string
+  category: string
+  sourcingType: string
+  sourcingPurpose?: string | null
+  quantity: string
+  tradeTerms: string
+  destinationCountry?: string | null
+  preferredUnitPriceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  preferredUnitPriceCurrency?: string | null
+  shape?: string | null
+  capacity?: string | null
+  material?: string | null
+  certification?: string | null
+  feature?: string | null
+  targetDeliveryDate?: Date | string | null
+  details: string
+  status?: $Enums.RfqStatus
+  adminStatus?: $Enums.RfqAdminStatus
+  adminNote?: string | null
+  reviewedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyerUser: Prisma.UserProfileCreateNestedOneWithoutBuyerRfqRequestsInput
+  buyerCompany?: Prisma.CompanyCreateNestedOneWithoutBuyerRfqRequestsInput
+  reviewedByUser?: Prisma.UserProfileCreateNestedOneWithoutReviewedRfqRequestsInput
+}
+
+export type RfqRequestUncheckedCreateWithoutMatchedProductsInput = {
+  id?: string
+  buyerUserId: string
+  buyerCompanyId?: string | null
+  productName: string
+  category: string
+  sourcingType: string
+  sourcingPurpose?: string | null
+  quantity: string
+  tradeTerms: string
+  destinationCountry?: string | null
+  preferredUnitPriceAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  preferredUnitPriceCurrency?: string | null
+  shape?: string | null
+  capacity?: string | null
+  material?: string | null
+  certification?: string | null
+  feature?: string | null
+  targetDeliveryDate?: Date | string | null
+  details: string
+  status?: $Enums.RfqStatus
+  adminStatus?: $Enums.RfqAdminStatus
+  adminNote?: string | null
+  reviewedByUserId?: string | null
+  reviewedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type RfqRequestCreateOrConnectWithoutMatchedProductsInput = {
+  where: Prisma.RfqRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.RfqRequestCreateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedCreateWithoutMatchedProductsInput>
+}
+
+export type RfqRequestUpsertWithoutMatchedProductsInput = {
+  update: Prisma.XOR<Prisma.RfqRequestUpdateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedUpdateWithoutMatchedProductsInput>
+  create: Prisma.XOR<Prisma.RfqRequestCreateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedCreateWithoutMatchedProductsInput>
+  where?: Prisma.RfqRequestWhereInput
+}
+
+export type RfqRequestUpdateToOneWithWhereWithoutMatchedProductsInput = {
+  where?: Prisma.RfqRequestWhereInput
+  data: Prisma.XOR<Prisma.RfqRequestUpdateWithoutMatchedProductsInput, Prisma.RfqRequestUncheckedUpdateWithoutMatchedProductsInput>
+}
+
+export type RfqRequestUpdateWithoutMatchedProductsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  sourcingType?: Prisma.StringFieldUpdateOperationsInput | string
+  sourcingPurpose?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredUnitPriceAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  preferredUnitPriceCurrency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shape?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetDeliveryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  details?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRfqStatusFieldUpdateOperationsInput | $Enums.RfqStatus
+  adminStatus?: Prisma.EnumRfqAdminStatusFieldUpdateOperationsInput | $Enums.RfqAdminStatus
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyerUser?: Prisma.UserProfileUpdateOneRequiredWithoutBuyerRfqRequestsNestedInput
+  buyerCompany?: Prisma.CompanyUpdateOneWithoutBuyerRfqRequestsNestedInput
+  reviewedByUser?: Prisma.UserProfileUpdateOneWithoutReviewedRfqRequestsNestedInput
+}
+
+export type RfqRequestUncheckedUpdateWithoutMatchedProductsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  sourcingType?: Prisma.StringFieldUpdateOperationsInput | string
+  sourcingPurpose?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  destinationCountry?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredUnitPriceAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  preferredUnitPriceCurrency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shape?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  capacity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  material?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  certification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feature?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetDeliveryDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  details?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumRfqStatusFieldUpdateOperationsInput | $Enums.RfqStatus
+  adminStatus?: Prisma.EnumRfqAdminStatusFieldUpdateOperationsInput | $Enums.RfqAdminStatus
+  adminNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type RfqRequestCreateManyBuyerUserInput = {
@@ -1321,6 +1485,7 @@ export type RfqRequestUpdateWithoutBuyerUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyerCompany?: Prisma.CompanyUpdateOneWithoutBuyerRfqRequestsNestedInput
   reviewedByUser?: Prisma.UserProfileUpdateOneWithoutReviewedRfqRequestsNestedInput
+  matchedProducts?: Prisma.RfqMatchedProductUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateWithoutBuyerUserInput = {
@@ -1349,6 +1514,7 @@ export type RfqRequestUncheckedUpdateWithoutBuyerUserInput = {
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateManyWithoutBuyerUserInput = {
@@ -1405,6 +1571,7 @@ export type RfqRequestUpdateWithoutReviewedByUserInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyerUser?: Prisma.UserProfileUpdateOneRequiredWithoutBuyerRfqRequestsNestedInput
   buyerCompany?: Prisma.CompanyUpdateOneWithoutBuyerRfqRequestsNestedInput
+  matchedProducts?: Prisma.RfqMatchedProductUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateWithoutReviewedByUserInput = {
@@ -1433,6 +1600,7 @@ export type RfqRequestUncheckedUpdateWithoutReviewedByUserInput = {
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateManyWithoutReviewedByUserInput = {
@@ -1517,6 +1685,7 @@ export type RfqRequestUpdateWithoutBuyerCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyerUser?: Prisma.UserProfileUpdateOneRequiredWithoutBuyerRfqRequestsNestedInput
   reviewedByUser?: Prisma.UserProfileUpdateOneWithoutReviewedRfqRequestsNestedInput
+  matchedProducts?: Prisma.RfqMatchedProductUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateWithoutBuyerCompanyInput = {
@@ -1545,6 +1714,7 @@ export type RfqRequestUncheckedUpdateWithoutBuyerCompanyInput = {
   reviewedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  matchedProducts?: Prisma.RfqMatchedProductUncheckedUpdateManyWithoutRfqRequestNestedInput
 }
 
 export type RfqRequestUncheckedUpdateManyWithoutBuyerCompanyInput = {
@@ -1575,6 +1745,35 @@ export type RfqRequestUncheckedUpdateManyWithoutBuyerCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type RfqRequestCountOutputType
+ */
+
+export type RfqRequestCountOutputType = {
+  matchedProducts: number
+}
+
+export type RfqRequestCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  matchedProducts?: boolean | RfqRequestCountOutputTypeCountMatchedProductsArgs
+}
+
+/**
+ * RfqRequestCountOutputType without action
+ */
+export type RfqRequestCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RfqRequestCountOutputType
+   */
+  select?: Prisma.RfqRequestCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * RfqRequestCountOutputType without action
+ */
+export type RfqRequestCountOutputTypeCountMatchedProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RfqMatchedProductWhereInput
+}
 
 
 export type RfqRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1607,6 +1806,8 @@ export type RfqRequestSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   buyerUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   buyerCompany?: boolean | Prisma.RfqRequest$buyerCompanyArgs<ExtArgs>
   reviewedByUser?: boolean | Prisma.RfqRequest$reviewedByUserArgs<ExtArgs>
+  matchedProducts?: boolean | Prisma.RfqRequest$matchedProductsArgs<ExtArgs>
+  _count?: boolean | Prisma.RfqRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["rfqRequest"]>
 
 export type RfqRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1707,6 +1908,8 @@ export type RfqRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   buyerUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   buyerCompany?: boolean | Prisma.RfqRequest$buyerCompanyArgs<ExtArgs>
   reviewedByUser?: boolean | Prisma.RfqRequest$reviewedByUserArgs<ExtArgs>
+  matchedProducts?: boolean | Prisma.RfqRequest$matchedProductsArgs<ExtArgs>
+  _count?: boolean | Prisma.RfqRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RfqRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   buyerUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1725,6 +1928,7 @@ export type $RfqRequestPayload<ExtArgs extends runtime.Types.Extensions.Internal
     buyerUser: Prisma.$UserProfilePayload<ExtArgs>
     buyerCompany: Prisma.$CompanyPayload<ExtArgs> | null
     reviewedByUser: Prisma.$UserProfilePayload<ExtArgs> | null
+    matchedProducts: Prisma.$RfqMatchedProductPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2150,6 +2354,7 @@ export interface Prisma__RfqRequestClient<T, Null = never, ExtArgs extends runti
   buyerUser<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   buyerCompany<T extends Prisma.RfqRequest$buyerCompanyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RfqRequest$buyerCompanyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewedByUser<T extends Prisma.RfqRequest$reviewedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RfqRequest$reviewedByUserArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  matchedProducts<T extends Prisma.RfqRequest$matchedProductsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.RfqRequest$matchedProductsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RfqMatchedProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2641,6 +2846,30 @@ export type RfqRequest$reviewedByUserArgs<ExtArgs extends runtime.Types.Extensio
    */
   include?: Prisma.UserProfileInclude<ExtArgs> | null
   where?: Prisma.UserProfileWhereInput
+}
+
+/**
+ * RfqRequest.matchedProducts
+ */
+export type RfqRequest$matchedProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RfqMatchedProduct
+   */
+  select?: Prisma.RfqMatchedProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RfqMatchedProduct
+   */
+  omit?: Prisma.RfqMatchedProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RfqMatchedProductInclude<ExtArgs> | null
+  where?: Prisma.RfqMatchedProductWhereInput
+  orderBy?: Prisma.RfqMatchedProductOrderByWithRelationInput | Prisma.RfqMatchedProductOrderByWithRelationInput[]
+  cursor?: Prisma.RfqMatchedProductWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RfqMatchedProductScalarFieldEnum | Prisma.RfqMatchedProductScalarFieldEnum[]
 }
 
 /**

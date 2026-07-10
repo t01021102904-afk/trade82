@@ -299,6 +299,7 @@ model Product {
   inquiries                Inquiry[]
   savedItems               SavedItem[]
   deals                    Deal[]
+  rfqMatches               RfqMatchedProduct[]
   createdAt                DateTime       @default(now())
   updatedAt                DateTime       @updatedAt
 
@@ -410,6 +411,7 @@ model RfqRequest {
   reviewedByUserId               String?
   reviewedByUser                 UserProfile?   @relation("ReviewedRfqRequests", fields: [reviewedByUserId], references: [id])
   reviewedAt                     DateTime?
+  matchedProducts                RfqMatchedProduct[]
   createdAt                      DateTime       @default(now())
   updatedAt                      DateTime       @updatedAt
 
@@ -417,6 +419,21 @@ model RfqRequest {
   @@index([buyerCompanyId, createdAt])
   @@index([status, createdAt])
   @@index([adminStatus, createdAt])
+}
+
+model RfqMatchedProduct {
+  id           String     @id @default(cuid())
+  rfqRequestId String
+  rfqRequest   RfqRequest @relation(fields: [rfqRequestId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rank         Int
+  reasons      String[]   @default([])
+  createdAt    DateTime   @default(now())
+
+  @@unique([rfqRequestId, productId])
+  @@index([rfqRequestId, rank])
+  @@index([productId])
 }
 
 model SavedItem {

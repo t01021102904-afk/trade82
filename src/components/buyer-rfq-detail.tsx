@@ -7,13 +7,17 @@ import { useRouter } from "next/navigation";
 import { BuyerRfqForm } from "@/components/buyer-rfq-form";
 import { StatusBadge } from "@/components/buyer-rfqs";
 import { useI18n } from "@/components/i18n-provider";
+import { ProductImage } from "@/components/product-image";
+import { WholesalePriceGate } from "@/components/wholesale-price-gate";
 import { withLocale } from "@/lib/i18n";
 import {
   canCancelRfq,
   canEditRfq,
   isRfqRecord,
   rfqApiErrorMessage,
+  rfqMatchReasonLabel,
   type RfqRecord,
+  type RfqSuggestedMatch,
 } from "@/lib/rfq";
 
 export function BuyerRfqDetail({ id }: { id: string }) {
@@ -149,6 +153,10 @@ export function BuyerRfqDetail({ id }: { id: string }) {
       ) : (
         <ReadOnlyRfq rfq={rfq} />
       )}
+
+      {rfq.status === "MATCHING_READY" || rfq.status === "APPROVED" ? (
+        <SuggestedMatches matches={rfq.suggestedMatches ?? []} />
+      ) : null}
     </div>
   );
 }
@@ -178,6 +186,11 @@ function ReadOnlyRfq({ rfq }: { rfq: RfqRecord }) {
 
   return (
     <section className="grid gap-4 rounded-2xl border p-5 theme-surface-elevated">
+      <div>
+        <h2 className="text-base font-semibold theme-foreground">
+          {t("rfq.requestDetails")}
+        </h2>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {fields.map(([label, value]) => (
           <div key={label} className="rounded-xl border p-3 theme-surface">
@@ -196,6 +209,101 @@ function ReadOnlyRfq({ rfq }: { rfq: RfqRecord }) {
           {rfq.details}
         </p>
       </div>
+    </section>
+  );
+}
+
+function SuggestedMatches({ matches }: { matches: RfqSuggestedMatch[] }) {
+  const { locale, t } = useI18n();
+
+  return (
+    <section className="grid gap-4 rounded-2xl border p-5 theme-surface-elevated">
+      <div>
+        <h2 className="text-base font-semibold theme-foreground">
+          {t("rfq.suggestedMatches")}
+        </h2>
+        <p className="mt-1 text-sm theme-muted">{t("rfq.reviewNotice")}</p>
+      </div>
+
+      {matches.length ? (
+        <div className="grid gap-3">
+          {matches.map((match) => {
+            const product = match.product;
+            return (
+              <article
+                key={match.id}
+                className="grid gap-4 rounded-xl border p-3 theme-surface md:grid-cols-[120px_1fr]"
+              >
+                <Link
+                  href={withLocale(`/products/${product.id}`, locale)}
+                  className="block"
+                >
+                  <ProductImage
+                    urls={[product.imagePlaceholder, ...(product.imageUrls ?? [])]}
+                    alt={product.name}
+                    sizes="120px"
+                    className="aspect-square rounded-lg"
+                    imageClassName="bg-white object-contain p-2"
+                    placeholderLabel={t("dashboard.noProductImage")}
+                  />
+                </Link>
+                <div className="grid min-w-0 gap-3">
+                  <div className="min-w-0">
+                    <Link href={withLocale(`/products/${product.id}`, locale)}>
+                      <h3 className="line-clamp-2 text-sm font-semibold theme-foreground hover:text-[var(--accent-foreground)]">
+                        {product.name}
+                      </h3>
+                    </Link>
+                    <p className="mt-1 text-xs theme-muted">
+                      {product.sellerName} · {product.category}
+                    </p>
+                  </div>
+                  <div className="grid gap-1 text-sm">
+                    <WholesalePriceGate
+                      value={product.wholesalePrice}
+                      valueClassName="font-semibold theme-foreground"
+                      gateClassName="text-sm"
+                    />
+                    <p className="text-xs theme-muted">
+                      {t("rfq.moq")}: {product.moq || t("rfq.moqOnInquiry")}
+                    </p>
+                  </div>
+                  {match.reasons.length ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {match.reasons.map((reason) => (
+                        <span
+                          key={reason}
+                          className="rounded-full border px-2 py-0.5 text-[11px] font-medium theme-surface-muted theme-foreground"
+                        >
+                          {rfqMatchReasonLabel(reason, locale)}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={withLocale(`/products/${product.id}`, locale)}
+                      className="inline-flex h-8 items-center rounded-md px-2.5 text-xs font-semibold theme-primary-button"
+                    >
+                      {t("rfq.viewProduct")}
+                    </Link>
+                    <Link
+                      href={withLocale(`/stores/${product.sellerId}`, locale)}
+                      className="inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-medium theme-secondary-button"
+                    >
+                      {t("rfq.selectSeller")}
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="rounded-xl border p-5 text-sm theme-surface">
+          <p className="theme-muted">{t("rfq.noSuggestedMatches")}</p>
+        </div>
+      )}
     </section>
   );
 }

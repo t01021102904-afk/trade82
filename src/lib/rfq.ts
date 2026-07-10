@@ -1,4 +1,5 @@
 import type { Locale } from "@/lib/i18n";
+import type { Product } from "@/lib/types";
 
 export const rfqStatuses = [
   "DRAFT",
@@ -14,6 +15,26 @@ export const rfqStatuses = [
 export type RfqStatus = (typeof rfqStatuses)[number];
 
 export type RfqAdminStatus = "PENDING_REVIEW" | "APPROVED" | "REJECTED";
+
+export const rfqMatchReasonCodes = [
+  "same_category",
+  "similar_keywords",
+  "exports_destination",
+  "matching_material",
+  "matching_certification",
+  "matching_feature",
+  "similar_description",
+] as const;
+
+export type RfqMatchReasonCode = (typeof rfqMatchReasonCodes)[number];
+
+export type RfqSuggestedMatch = {
+  id: string;
+  productId: string;
+  rank: number;
+  reasons: RfqMatchReasonCode[];
+  product: Product;
+};
 
 export type RfqRecord = {
   id: string;
@@ -43,6 +64,7 @@ export type RfqRecord = {
   adminNote: string | null;
   reviewedByUserId: string | null;
   reviewedAt: string | null;
+  suggestedMatches?: RfqSuggestedMatch[];
   createdAt: string;
   updatedAt: string;
 };
@@ -204,6 +226,31 @@ export function rfqStatusLabel(status: RfqStatus, locale: Locale) {
     CANCELLED: { en: "Cancelled", ko: "취소됨" },
   };
   return labels[status]?.[locale] ?? status;
+}
+
+export function normalizeRfqMatchReason(value: string): RfqMatchReasonCode | null {
+  return rfqMatchReasonCodes.includes(value as RfqMatchReasonCode)
+    ? (value as RfqMatchReasonCode)
+    : null;
+}
+
+export function rfqMatchReasonLabel(reason: RfqMatchReasonCode, locale: Locale) {
+  const labels: Record<RfqMatchReasonCode, { en: string; ko: string }> = {
+    same_category: { en: "Same category", ko: "같은 카테고리" },
+    similar_keywords: { en: "Similar keywords", ko: "유사 키워드" },
+    exports_destination: {
+      en: "Seller exports to destination country",
+      ko: "납품 국가 수출 대응 가능",
+    },
+    matching_material: { en: "Matching material", ko: "유사 소재" },
+    matching_certification: { en: "Matching certification", ko: "유사 인증" },
+    matching_feature: { en: "Matching feature", ko: "유사 특징" },
+    similar_description: {
+      en: "Similar product description",
+      ko: "유사 상품 설명",
+    },
+  };
+  return labels[reason][locale];
 }
 
 export function canEditRfq(status: RfqStatus) {

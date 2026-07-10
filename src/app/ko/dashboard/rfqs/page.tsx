@@ -1,4 +1,4 @@
-import { BuyerRfqsPageContent } from "../../../dashboard/rfqs/page";
+import { BuyerRfqsPageContent } from "@/components/buyer-rfq-pages";
 import { requireDashboardRole } from "@/lib/require-auth";
 
 export default async function KoreanBuyerRfqsPage() {

@@ -91,7 +91,11 @@ export function AdminRfqs() {
       setNotes((current) => ({ ...current, [id]: result.adminNote ?? "" }));
       setActionState((current) => ({
         ...current,
-        [id]: { pending: false, message: t("rfq.actionDone"), error: "" },
+        [id]: {
+          pending: false,
+          message: action === "approve" ? t("rfq.approveDone") : t("rfq.actionDone"),
+          error: "",
+        },
       }));
     } catch {
       setActionState((current) => ({
