@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { ListingImageUploader } from "@/components/image-uploader";
 import { useI18n } from "@/components/i18n-provider";
 import {
@@ -450,6 +452,7 @@ export function RichProductFormFields({
   errors = {},
   onChange,
   onUploadingChange,
+  productId,
   variant = "default",
 }: {
   value: RichProductFormValue;
@@ -459,9 +462,13 @@ export function RichProductFormFields({
     nextValue: RichProductFormValue[K],
   ) => void;
   onUploadingChange: (uploading: boolean) => void;
+  productId?: string;
   variant?: ProductFormVariant;
 }) {
   const { locale, t } = useI18n();
+  const [translationPending, setTranslationPending] = useState(false);
+  const [translationError, setTranslationError] = useState("");
+  const [translationNotice, setTranslationNotice] = useState("");
   const categoryOptions = withCurrentOption(
     getSellerProductCategoryOptions(locale),
     value.category,
@@ -492,6 +499,81 @@ export function RichProductFormFields({
     quantity: value.moqQuantity || parseMoqValue(formatMoqValue(value.moqQuantity, value.moqUnit)).quantity,
     unit: value.moqUnit || "Units",
   };
+  const hasProductSourceContent = Boolean(
+    value.name.trim() ||
+      value.shortDescription.trim() ||
+      value.detailedDescription.trim() ||
+      value.buyerNotes.trim() ||
+      parseCommaList(value.tags).length,
+  );
+
+  async function generateEnglishContent() {
+    if (translationPending) return;
+    setTranslationError("");
+    setTranslationNotice("");
+    if (!hasProductSourceContent) {
+      setTranslationError(t("productForm.translationSourceRequired"));
+      return;
+    }
+
+    const hasExistingEnglish = Boolean(
+      value.nameEn.trim() ||
+        value.shortDescriptionEn.trim() ||
+        value.detailedDescriptionEn.trim() ||
+        value.buyerNotesEn.trim() ||
+        parseCommaList(value.tagsEn).length,
+    );
+    if (
+      hasExistingEnglish &&
+      !window.confirm(t("productForm.replaceEnglishContentConfirm"))
+    ) {
+      return;
+    }
+
+    setTranslationPending(true);
+    try {
+      const response = await fetch("/api/translation/english", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "product",
+          ...(productId ? { productId } : {}),
+          payload: {
+            name: value.name,
+            shortDescription: value.shortDescription,
+            detailedDescription: value.detailedDescription,
+            buyerNotes: value.buyerNotes,
+            tags: parseCommaList(value.tags),
+          },
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | {
+            nameEn?: string;
+            shortDescriptionEn?: string;
+            detailedDescriptionEn?: string;
+            buyerNotesEn?: string;
+            tagsEn?: string[];
+            error?: string;
+          }
+        | null;
+      if (!response.ok || !result) {
+        setTranslationError(result?.error ?? t("productForm.translationFailed"));
+        return;
+      }
+
+      onChange("nameEn", result.nameEn ?? "");
+      onChange("shortDescriptionEn", result.shortDescriptionEn ?? "");
+      onChange("detailedDescriptionEn", result.detailedDescriptionEn ?? "");
+      onChange("buyerNotesEn", result.buyerNotesEn ?? "");
+      onChange("tagsEn", Array.isArray(result.tagsEn) ? result.tagsEn.join(", ") : "");
+      setTranslationNotice(t("productForm.englishTranslationGenerated"));
+    } catch {
+      setTranslationError(t("productForm.translationFailed"));
+    } finally {
+      setTranslationPending(false);
+    }
+  }
 
   return (
     <div className={cx("grid gap-5", variant === "dashboard" && "gap-6")}>
@@ -571,7 +653,29 @@ export function RichProductFormFields({
         description={t("productForm.englishContentHelper")}
         variant={variant}
       >
-        {/* TODO: Wire translation generation when an approved provider is configured. */}
+        <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
+          <button
+            type="button"
+            disabled={translationPending || !hasProductSourceContent}
+            onClick={() => void generateEnglishContent()}
+            className={cx(
+              "inline-flex h-9 items-center justify-center rounded-md border px-3 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60",
+              variant === "dashboard"
+                ? "theme-secondary-button"
+                : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
+            )}
+          >
+            {translationPending
+              ? t("productForm.generatingEnglishTranslation")
+              : t("productForm.generateEnglishTranslation")}
+          </button>
+          {translationNotice ? (
+            <span className="text-xs font-medium text-emerald-700">
+              {translationNotice}
+            </span>
+          ) : null}
+          {translationError ? <ErrorText>{translationError}</ErrorText> : null}
+        </div>
         <TextField
           label={t("productForm.productNameEn")}
           value={value.nameEn}
@@ -878,6 +982,13 @@ function arrayOfStrings(value: unknown) {
 function withCurrentOption(options: SelectOption[], value: string) {
   if (!value || options.some((option) => option.value === value)) return options;
   return [{ value, label: value }, ...options];
+}
+
+function parseCommaList(value: string) {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function Section({

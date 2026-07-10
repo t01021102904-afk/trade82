@@ -489,6 +489,9 @@ function CompanyProfileForm({
   const [saveQueuedAfterUpload, setSaveQueuedAfterUpload] = useState(false);
   const [clearCompanyLogo, setClearCompanyLogo] = useState(false);
   const [error, setError] = useState("");
+  const [translationPending, setTranslationPending] = useState(false);
+  const [translationNotice, setTranslationNotice] = useState("");
+  const [translationError, setTranslationError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CompanyFormErrors>({});
   const formRef = useRef<HTMLFormElement>(null);
   const buyerAvatarInputRef = useRef<HTMLInputElement>(null);
@@ -589,6 +592,80 @@ function CompanyProfileForm({
     setCompany(nextCompany);
     setBuyer(nextBuyer);
     markDirty();
+  }
+
+  async function generateEnglishCompanyContent() {
+    if (translationPending) return;
+    setTranslationError("");
+    setTranslationNotice("");
+
+    const hasSourceContent = Boolean(
+      company.legalName.trim() ||
+        String(company.tradeName ?? "").trim() ||
+        company.description.trim() ||
+        seller.exportExperience.trim(),
+    );
+    if (!hasSourceContent) {
+      setTranslationError(t("settings.translationSourceRequired"));
+      return;
+    }
+
+    const hasExistingEnglish = Boolean(
+      String(company.displayNameEn ?? "").trim() ||
+        String(company.descriptionEn ?? "").trim() ||
+        String(seller.exportExperienceEn ?? "").trim(),
+    );
+    if (
+      hasExistingEnglish &&
+      !window.confirm(t("settings.replaceEnglishContentConfirm"))
+    ) {
+      return;
+    }
+
+    setTranslationPending(true);
+    try {
+      const response = await fetch("/api/translation/english", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "company",
+          ...(company.id.startsWith("new-") ? {} : { companyId: company.id }),
+          payload: {
+            companyName: company.tradeName || company.legalName,
+            description: company.description,
+            exportExperience: seller.exportExperience,
+          },
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | {
+            displayNameEn?: string;
+            descriptionEn?: string;
+            exportExperienceEn?: string;
+            error?: string;
+          }
+        | null;
+      if (!response.ok || !result) {
+        setTranslationError(result?.error ?? t("settings.translationFailed"));
+        return;
+      }
+
+      setCompany((current) => ({
+        ...current,
+        displayNameEn: result.displayNameEn ?? "",
+        descriptionEn: result.descriptionEn ?? "",
+      }));
+      setSeller((current) => ({
+        ...current,
+        exportExperienceEn: result.exportExperienceEn ?? "",
+      }));
+      markDirty();
+      setTranslationNotice(t("settings.englishTranslationGenerated"));
+    } catch {
+      setTranslationError(t("settings.translationFailed"));
+    } finally {
+      setTranslationPending(false);
+    }
   }
 
   function validate() {
@@ -988,12 +1065,34 @@ function CompanyProfileForm({
 
           <section className="grid gap-4 rounded-lg border border-zinc-200 bg-white p-5 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <h3 className="text-base font-semibold text-zinc-950">
-                {t("settings.englishCompanyContent")}
-              </h3>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-base font-semibold text-zinc-950">
+                  {t("settings.englishCompanyContent")}
+                </h3>
+                <button
+                  type="button"
+                  disabled={translationPending}
+                  onClick={() => void generateEnglishCompanyContent()}
+                  className="inline-flex h-9 items-center justify-center rounded-md border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {translationPending
+                    ? t("settings.generatingEnglishTranslation")
+                    : t("settings.generateEnglishTranslation")}
+                </button>
+              </div>
               <p className="mt-1 text-sm leading-6 text-zinc-500">
                 {t("settings.englishCompanyContentHelp")}
               </p>
+              {translationNotice ? (
+                <p className="mt-2 text-xs font-medium text-emerald-700">
+                  {translationNotice}
+                </p>
+              ) : null}
+              {translationError ? (
+                <p className="mt-2 text-xs font-medium text-red-700">
+                  {translationError}
+                </p>
+              ) : null}
             </div>
             <Field
               label={t("settings.companyDisplayNameEn")}

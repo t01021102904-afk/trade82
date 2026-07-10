@@ -490,6 +490,7 @@ export function ProductEditor({
         errors={errors}
         onChange={update}
         onUploadingChange={setUploading}
+        productId={String(initialProduct.id)}
         variant="dashboard"
       />
       <div className="flex flex-wrap justify-end gap-2 border-t pt-4 theme-border">

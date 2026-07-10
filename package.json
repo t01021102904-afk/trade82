@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "backfill:english": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/backfill-english-content.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.5.9",
