@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -58,6 +58,29 @@ const DEFAULT_PAGINATION: PaginationState = {
 };
 
 export function SellersClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="grid gap-8">
+          <div className="bm-premium-card min-h-32 rounded-lg border border-zinc-200 bg-white/90 p-4 shadow-sm shadow-zinc-100" />
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div
+                key={index}
+                className="h-80 animate-pulse rounded-lg border border-zinc-200 bg-white shadow-sm shadow-zinc-100"
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <SellersClientContent />
+    </Suspense>
+  );
+}
+
+function SellersClientContent() {
   const { locale, t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
@@ -103,13 +126,14 @@ export function SellersClient() {
           filterOptions?: { states?: string[] };
         }) => {
           if (!active) return;
-        setDatabaseSellers(
-          (result.companies ?? [])
-            .map((company) => databaseCompanyToSeller(company, locale)),
-        );
+          setDatabaseSellers(
+            (result.companies ?? []).map((company) =>
+              databaseCompanyToSeller(company, locale),
+            ),
+          );
           setPagination(result.pagination ?? DEFAULT_PAGINATION);
           setFilterOptions({ states: result.filterOptions?.states ?? [] });
-        setDatabaseLoading(false);
+          setDatabaseLoading(false);
         },
       )
       .catch(() => {
@@ -151,7 +175,10 @@ export function SellersClient() {
     }
     if (options.scroll) {
       requestAnimationFrame(() => {
-        gridTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        gridTopRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       });
     }
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cx } from "@/lib/utils";
@@ -100,7 +101,7 @@ function PaginationButton({
   disabled = false,
   onClick,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   label: string;
   active?: boolean;
   disabled?: boolean;

@@ -282,9 +282,9 @@ function publicProductInclude() {
 }
 
 function serializeCompanies(
-  companies: Awaited<ReturnType<typeof getDb>>["company"] extends never
-    ? never[]
-    : Array<Prisma.CompanyGetPayload<{ include: ReturnType<typeof publicCompanyInclude> }>>,
+  companies: Array<
+    Prisma.CompanyGetPayload<{ include: ReturnType<typeof publicCompanyInclude> }>
+  >,
 ) {
   return companies.map((company) => {
     const { owner, ...publicCompany } = company;
@@ -326,7 +326,7 @@ function serializeProducts(
 }
 
 function buildProductQuery(searchParams: URLSearchParams) {
-  const query = cleanQuery(searchParams.get("q"));
+  const query = cleanSearch(searchParams.get("q"));
   const category = cleanQuery(searchParams.get("category"));
   const price = cleanQuery(searchParams.get("price"));
   const moq = cleanQuery(searchParams.get("moq"));
@@ -385,7 +385,7 @@ function buildProductQuery(searchParams: URLSearchParams) {
 }
 
 function buildCompanyQuery(searchParams: URLSearchParams) {
-  const query = cleanQuery(searchParams.get("q"));
+  const query = cleanSearch(searchParams.get("q"));
   const category = cleanQuery(searchParams.get("category"));
   const state = cleanQuery(searchParams.get("state"));
   const verified = cleanQuery(searchParams.get("verified"));
@@ -440,8 +440,9 @@ async function getProductFilterOptions() {
   const [certificationRows, shippingRows] = await Promise.all([
     getDb().$queryRaw<Array<{ value: string }>>`
       SELECT DISTINCT value
-      FROM "Product" p, unnest(p."certifications") value
+      FROM "Product" p
       JOIN "Company" c ON c."id" = p."sellerCompanyId"
+      CROSS JOIN LATERAL unnest(p."certifications") AS value
       WHERE p."status" = 'active'::"ProductStatus"
         AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
         AND c."legalName" <> ${DELETED_COMPANY_NAME}
@@ -450,8 +451,9 @@ async function getProductFilterOptions() {
     `,
     getDb().$queryRaw<Array<{ value: string }>>`
       SELECT DISTINCT value
-      FROM "Product" p, unnest(p."incoterms") value
+      FROM "Product" p
       JOIN "Company" c ON c."id" = p."sellerCompanyId"
+      CROSS JOIN LATERAL unnest(p."incoterms") AS value
       WHERE p."status" = 'active'::"ProductStatus"
         AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
         AND c."legalName" <> ${DELETED_COMPANY_NAME}
@@ -481,6 +483,10 @@ async function getCompanyFilterOptions() {
 function cleanQuery(value: string | null) {
   const cleaned = cleanPlainText(value ?? "", 120);
   return cleaned || "all";
+}
+
+function cleanSearch(value: string | null) {
+  return cleanPlainText(value ?? "", 120);
 }
 
 function parsePage(value: string | null) {

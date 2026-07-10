@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -64,6 +64,25 @@ const DEFAULT_PAGINATION: PaginationState = {
 };
 
 export function MarketplaceClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="grid min-w-0 gap-8">
+          <div className="bm-premium-card min-h-40 rounded-lg border p-4 theme-surface-elevated" />
+          <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 8 }, (_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <MarketplaceClientContent />
+    </Suspense>
+  );
+}
+
+function MarketplaceClientContent() {
   const { locale, t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
@@ -112,14 +131,16 @@ export function MarketplaceClient() {
           filterOptions?: ProductFilterOptions;
         }) => {
           if (!active) return;
-        setDatabaseProducts(
-          (result.products ?? []).map((product) =>
-            databaseProductToCard(product, locale),
-          ),
-        );
+          setDatabaseProducts(
+            (result.products ?? []).map((product) =>
+              databaseProductToCard(product, locale),
+            ),
+          );
           setPagination(result.pagination ?? DEFAULT_PAGINATION);
-          setFilterOptions(result.filterOptions ?? { certifications: [], shippingTerms: [] });
-        setDatabaseLoading(false);
+          setFilterOptions(
+            result.filterOptions ?? { certifications: [], shippingTerms: [] },
+          );
+          setDatabaseLoading(false);
         },
       )
       .catch(() => {
@@ -165,7 +186,10 @@ export function MarketplaceClient() {
     }
     if (options.scroll) {
       requestAnimationFrame(() => {
-        gridTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        gridTopRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       });
     }
   };
