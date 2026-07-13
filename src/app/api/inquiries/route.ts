@@ -18,6 +18,7 @@ import {
 import { getDb } from "@/lib/db";
 import { sha256Hex } from "@/lib/message-attachments";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
+import { paymentRequestConversationSelect } from "@/lib/payment-requests";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
@@ -33,6 +34,10 @@ const inquiryThreadInclude = {
         orderBy: { createdAt: "asc" },
       },
     },
+  },
+  paymentRequests: {
+    orderBy: { createdAt: "asc" },
+    select: paymentRequestConversationSelect,
   },
 } satisfies Prisma.InquiryInclude;
 
@@ -89,6 +94,10 @@ export async function GET() {
         deals: {
           orderBy: { updatedAt: "desc" },
           include: { reviews: true },
+        },
+        paymentRequests: {
+          orderBy: { createdAt: "asc" },
+          select: paymentRequestConversationSelect,
         },
       },
       orderBy: { updatedAt: "desc" },
