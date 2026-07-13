@@ -64,6 +64,11 @@ export const ModelName = {
   RfqMatchedProduct: 'RfqMatchedProduct',
   RfqSellerQuote: 'RfqSellerQuote',
   MarketingExposure: 'MarketingExposure',
+  PaymentRequest: 'PaymentRequest',
+  PaymentRefund: 'PaymentRefund',
+  PaymentDispute: 'PaymentDispute',
+  PaymentRequestEvent: 'PaymentRequestEvent',
+  PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -407,6 +412,104 @@ export const MarketingExposureScalarFieldEnum = {
 } as const
 
 export type MarketingExposureScalarFieldEnum = (typeof MarketingExposureScalarFieldEnum)[keyof typeof MarketingExposureScalarFieldEnum]
+
+
+export const PaymentRequestScalarFieldEnum = {
+  id: 'id',
+  inquiryId: 'inquiryId',
+  buyerCompanyId: 'buyerCompanyId',
+  sellerCompanyId: 'sellerCompanyId',
+  createdByUserId: 'createdByUserId',
+  productName: 'productName',
+  quantity: 'quantity',
+  unit: 'unit',
+  productAmount: 'productAmount',
+  shippingAmount: 'shippingAmount',
+  grossAmount: 'grossAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  stripeProcessingFeeAmount: 'stripeProcessingFeeAmount',
+  stripeFeeSyncStatus: 'stripeFeeSyncStatus',
+  stripeFeeSyncError: 'stripeFeeSyncError',
+  stripeFeeSyncedAt: 'stripeFeeSyncedAt',
+  refundAmount: 'refundAmount',
+  currency: 'currency',
+  paymentDueDate: 'paymentDueDate',
+  orderTerms: 'orderTerms',
+  status: 'status',
+  stripeCheckoutSessionId: 'stripeCheckoutSessionId',
+  stripePaymentIntentId: 'stripePaymentIntentId',
+  stripeChargeId: 'stripeChargeId',
+  checkoutAttempt: 'checkoutAttempt',
+  checkoutLockToken: 'checkoutLockToken',
+  checkoutLockExpiresAt: 'checkoutLockExpiresAt',
+  paidAt: 'paidAt',
+  cancelledAt: 'cancelledAt',
+  releasedAt: 'releasedAt',
+  manualPayoutReference: 'manualPayoutReference',
+  manualPayoutDate: 'manualPayoutDate',
+  manualPayoutNote: 'manualPayoutNote',
+  sellerReleasedAmount: 'sellerReleasedAmount',
+  releasedByUserId: 'releasedByUserId',
+  requiresManualReconciliation: 'requiresManualReconciliation',
+  reconciliationNote: 'reconciliationNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentRequestScalarFieldEnum = (typeof PaymentRequestScalarFieldEnum)[keyof typeof PaymentRequestScalarFieldEnum]
+
+
+export const PaymentRefundScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  stripeRefundId: 'stripeRefundId',
+  amount: 'amount',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
+
+
+export const PaymentDisputeScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  stripeDisputeId: 'stripeDisputeId',
+  amount: 'amount',
+  status: 'status',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentDisputeScalarFieldEnum = (typeof PaymentDisputeScalarFieldEnum)[keyof typeof PaymentDisputeScalarFieldEnum]
+
+
+export const PaymentRequestEventScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  eventType: 'eventType',
+  actorUserId: 'actorUserId',
+  stripeEventId: 'stripeEventId',
+  message: 'message',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentRequestEventScalarFieldEnum = (typeof PaymentRequestEventScalarFieldEnum)[keyof typeof PaymentRequestEventScalarFieldEnum]
+
+
+export const PaymentRequestWebhookEventScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  stripeEventId: 'stripeEventId',
+  stripeEventType: 'stripeEventType',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentRequestWebhookEventScalarFieldEnum = (typeof PaymentRequestWebhookEventScalarFieldEnum)[keyof typeof PaymentRequestWebhookEventScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {
