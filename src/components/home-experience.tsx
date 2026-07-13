@@ -48,6 +48,14 @@ type HomeCopy = {
     text: string;
     items: CapabilityItem[];
   };
+  rfq: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    bullets: string[];
+    fallbackTitle: string;
+    fallbackText: string;
+  };
   documents: {
     eyebrow: string;
     title: string;
@@ -146,6 +154,21 @@ const homeCopy: Record<Locale, HomeCopy> = {
           icon: ShieldCheck,
         },
       ],
+    },
+    rfq: {
+      eyebrow: "RFQ product search",
+      title: "Find the right Korean product faster with RFQs",
+      description:
+        "Tell Trade82 what you are looking for once, and use RFQs to organize your sourcing request. Buyers can review relevant Korean products and suppliers faster instead of searching through scattered emails, catalogs, and spreadsheets.",
+      bullets: [
+        "Submit one RFQ with your product requirements",
+        "Find relevant Korean products and suppliers faster",
+        "Compare product options before starting a conversation",
+        "Request pricing, samples, MOQ, and documents in one place",
+        "Keep sourcing activity organized from search to follow-up",
+      ],
+      fallbackTitle: "RFQ product search walkthrough",
+      fallbackText: "Add /public/videos/rfqvideo.mp4 to show the auto-playing RFQ demo here.",
     },
     documents: {
       eyebrow: "Documents and templates",
@@ -307,6 +330,21 @@ const homeCopy: Record<Locale, HomeCopy> = {
           icon: ShieldCheck,
         },
       ],
+    },
+    rfq: {
+      eyebrow: "RFQ 상품 검색",
+      title: "RFQ로 원하는 한국 상품을 더 빠르게 찾으세요",
+      description:
+        "찾고 있는 상품 조건을 Trade82에 한 번만 입력하면, RFQ를 통해 소싱 요청을 더 체계적으로 정리할 수 있습니다. 흩어진 이메일, 카탈로그, 엑셀 자료를 따로 찾는 대신 관련 한국 상품과 셀러를 더 빠르게 검토할 수 있습니다.",
+      bullets: [
+        "원하는 상품 조건을 RFQ로 한 번에 제출",
+        "관련 한국 상품과 셀러를 더 빠르게 확인",
+        "대화를 시작하기 전에 상품 옵션 비교",
+        "가격, 샘플, MOQ, 문서를 한 곳에서 요청",
+        "검색부터 후속 문의까지 소싱 활동 정리",
+      ],
+      fallbackTitle: "RFQ 상품 검색 데모",
+      fallbackText: "/public/videos/rfqvideo.mp4 파일을 추가하면 RFQ 데모 영상이 자동 재생됩니다.",
     },
     documents: {
       eyebrow: "문서와 템플릿",
@@ -481,6 +519,18 @@ export function HomeExperience({ locale }: { locale: Locale }) {
           ))}
         </div>
       </section>
+
+      <VideoFeatureSection
+        eyebrow={copy.rfq.eyebrow}
+        title={copy.rfq.title}
+        description={copy.rfq.description}
+        bullets={copy.rfq.bullets}
+        videoSrc="/videos/rfqvideo.mp4"
+        videoTitle={copy.rfq.title}
+        fallbackTitle={copy.rfq.fallbackTitle}
+        fallbackText={copy.rfq.fallbackText}
+        mediaSide="left"
+      />
 
       <VideoFeatureSection
         eyebrow={copy.documents.eyebrow}
