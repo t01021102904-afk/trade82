@@ -16,8 +16,13 @@ import {
   isTrade82TeamCompanyName,
 } from "@/lib/admin-team-company";
 import { getDb } from "@/lib/db";
+import {
+  getMessagePaymentFeatureState,
+  loadOptionalMessagePaymentData,
+} from "@/lib/message-payment-feature";
 import { sha256Hex } from "@/lib/message-attachments";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
+import { paymentRequestConversationSelect } from "@/lib/payment-requests";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 
@@ -36,10 +41,45 @@ const inquiryThreadInclude = {
   },
 } satisfies Prisma.InquiryInclude;
 
+async function loadInquiryPaymentRequests({
+  inquiryIds,
+  enabled,
+}: {
+  inquiryIds: string[];
+  enabled: boolean;
+}) {
+  const paymentRequests = await loadOptionalMessagePaymentData({
+    enabled: enabled && inquiryIds.length > 0,
+    load: () =>
+      getDb().paymentRequest.findMany({
+        where: { inquiryId: { in: inquiryIds } },
+        orderBy: { createdAt: "asc" },
+        select: {
+          inquiryId: true,
+          ...paymentRequestConversationSelect,
+        },
+      }),
+    onError: (error) => {
+      console.error("Unable to load optional message payment data.", {
+        errorName: error instanceof Error ? error.name : "UnknownError",
+      });
+    },
+  });
+
+  const byInquiryId = new Map<string, NonNullable<typeof paymentRequests>>();
+  for (const paymentRequest of paymentRequests ?? []) {
+    const items = byInquiryId.get(paymentRequest.inquiryId) ?? [];
+    items.push(paymentRequest);
+    byInquiryId.set(paymentRequest.inquiryId, items);
+  }
+  return byInquiryId;
+}
+
 export async function GET() {
   try {
     const user = await requireAuth();
     const admin = await isAdminUser();
+    const paymentFeature = getMessagePaymentFeatureState(user.id);
     const viewerCompanies = await getDb().company.findMany({
       where: { ownerUserId: user.id },
       select: { id: true },
@@ -93,6 +133,10 @@ export async function GET() {
       },
       orderBy: { updatedAt: "desc" },
     });
+    const paymentRequestsByInquiryId = await loadInquiryPaymentRequests({
+      inquiryIds: inquiries.map((inquiry) => inquiry.id),
+      enabled: paymentFeature.enabled,
+    });
     const viewerCompanyIds = [
       ...viewerCompanies.map((company) => company.id),
       ...(admin
@@ -105,14 +149,16 @@ export async function GET() {
           )
         : []),
     ];
-    return Response.json(
-      inquiries.map((inquiry) => ({
+    return Response.json({
+      paymentFeature,
+      inquiries: inquiries.map((inquiry) => ({
         ...inquiry,
         buyerCompany: publicThreadCompany(inquiry.buyerCompany),
         sellerCompany: publicThreadCompany(inquiry.sellerCompany),
+        paymentRequests: paymentRequestsByInquiryId.get(inquiry.id) ?? [],
         viewerCompanyIds,
       })),
-    );
+    });
   } catch (error) {
     return apiError(error);
   }

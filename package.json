@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test:payments": "node --experimental-strip-types --test tests/payment-request-rules.test.ts tests/payment-request-safety.test.ts",
+    "production:payments:check": "node scripts/check-payment-production-env.mjs",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
