@@ -363,6 +363,15 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
   });
   assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: partial.payout.id } })).status, "HOLD");
   assert.equal((await db.tradeOrder.findUniqueOrThrow({ where: { id: partial.order.id } })).payoutStatus, "HOLD");
+  await assert.rejects(
+    payouts.setSellerPayoutStatus({
+      payoutId: partial.payout.id,
+      actorUserId: partial.fixture.admin.id,
+      status: "PROCESSING",
+    }),
+    /on hold until the payment issue is resolved/i,
+  );
+  assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: partial.payout.id } })).status, "HOLD");
 
   const fullRefund = await createFixture("full-refund");
   const fullRefundOrder = await createOrder(fullRefund);

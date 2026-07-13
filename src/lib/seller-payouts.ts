@@ -220,12 +220,35 @@ export async function setSellerPayoutStatus({
   failureReason?: string;
 }) {
   const result = await getDb().$transaction(async (tx) => {
-    const payout = await tx.sellerPayout.findUniqueOrThrow({ where: { id: payoutId } });
+    const payout = await tx.sellerPayout.findUniqueOrThrow({
+      where: { id: payoutId },
+      include: {
+        order: {
+          include: {
+            paymentRequest: {
+              include: { disputes: { select: { status: true } } },
+            },
+          },
+        },
+      },
+    });
     if (
       payout.status === SellerPayoutStatus.SENT ||
       payout.status === SellerPayoutStatus.CANCELLED
     ) {
       throw new Error("A sent or cancelled payout cannot be changed.");
+    }
+    if (status === "PROCESSING") {
+      const paymentRequest = payout.order.paymentRequest;
+      const hasActiveDispute = paymentRequest.disputes.some((item) => ACTIVE_DISPUTE_STATUSES.has(item.status));
+      if (
+        paymentRequest.status !== "PAID" ||
+        paymentRequest.refundAmount > 0 ||
+        paymentRequest.requiresManualReconciliation ||
+        hasActiveDispute
+      ) {
+        throw new Error("This payout is on hold until the payment issue is resolved.");
+      }
     }
     const update = await tx.sellerPayout.updateMany({
       where: { id: payout.id, status: { in: ["READY", "HOLD", "PROCESSING", "FAILED"] } },
