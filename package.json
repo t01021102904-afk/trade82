@@ -8,12 +8,15 @@
     "start": "next start",
     "lint": "eslint",
     "test:payments": "node --experimental-strip-types --test tests/payment-request-rules.test.ts tests/payment-request-safety.test.ts",
+    "test:orders": "NODE_OPTIONS=--conditions=react-server node --experimental-strip-types --test tests/order-manual-payout.test.ts",
+    "test:orders:integration": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test --test-concurrency=1 tests/order-manual-payout.integration.test.ts",
     "production:payments:check": "node scripts/check-payment-production-env.mjs",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
+    "db:seed:south-korean-banks": "node --experimental-strip-types scripts/seed-south-korea-bank-directory.ts",
     "backfill:english": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/backfill-english-content.ts"
   },
   "dependencies": {

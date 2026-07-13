@@ -13,6 +13,7 @@ import {
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
+import { syncTradeOrderFromPaymentRequest } from "@/lib/trade-orders";
 
 const cancelFields = new Set(["action"]);
 
@@ -129,6 +130,18 @@ export async function PATCH(
           message: "Seller cancelled the pending payment request.",
         },
       });
+      await syncTradeOrderFromPaymentRequest(
+        tx,
+        {
+          id: paymentRequest.id,
+          status: PaymentRequestStatus.CANCELLED,
+          grossAmount: 0,
+          refundAmount: 0,
+          paidAt: null,
+          stripeProcessingFeeAmount: null,
+        },
+        "cancelled",
+      );
       await tx.inquiry.update({
         where: { id: paymentRequest.inquiryId },
         data: { updatedAt: new Date() },

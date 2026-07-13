@@ -169,42 +169,207 @@ enum StripeFeeSyncStatus {
   FAILED
 }
 
+enum TradeOrderStatus {
+  PAYMENT_PENDING
+  PAID
+  PROCESSING
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  DISPUTED
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  PARTIALLY_REFUNDED
+  REFUNDED
+  FAILED
+  DISPUTED
+}
+
+enum OrderShipmentStatus {
+  NOT_READY
+  READY
+  BOOKED
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  EXCEPTION
+  CANCELLED
+}
+
+enum OrderPayoutStatus {
+  NOT_READY
+  HOLD
+  READY
+  PROCESSING
+  SENT
+  FAILED
+  RETURNED
+  CANCELLED
+}
+
+enum Incoterm {
+  EXW
+  FCA
+  FAS
+  FOB
+  CFR
+  CIF
+  CPT
+  CIP
+  DAP
+  DPU
+  DDP
+  OTHER
+}
+
+enum ShippingMethod {
+  OCEAN
+  AIR
+  EXPRESS
+  POSTAL
+  TRUCK
+  COURIER
+  OTHER
+}
+
+enum SellerPayoutProfileStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+  DISABLED
+}
+
+enum PayoutAccountType {
+  LOCAL
+  FOREIGN_CURRENCY
+  IBAN
+  OTHER
+}
+
+enum SellerPayoutStatus {
+  NOT_READY
+  HOLD
+  READY
+  PROCESSING
+  SENT
+  FAILED
+  RETURNED
+  CANCELLED
+}
+
+enum WireFeeBearer {
+  OUR
+  SHA
+  BEN
+  NOT_APPLICABLE
+}
+
+enum TradeOrderEventType {
+  ORDER_CREATED
+  PAYMENT_REQUESTED
+  CHECKOUT_STARTED
+  PAYMENT_PAID
+  PAYMENT_FAILED
+  REFUND_CREATED
+  REFUND_COMPLETED
+  DISPUTE_OPENED
+  DISPUTE_CLOSED
+  PROCESSING_STARTED
+  SHIPMENT_UPDATED
+  SHIPPED
+  DELIVERED
+  PAYOUT_HOLD
+  PAYOUT_READY
+  PAYOUT_PROCESSING
+  PAYOUT_SENT
+  PAYOUT_FAILED
+  ORDER_CANCELLED
+  ORDER_COMPLETED
+  ADMIN_NOTE
+}
+
+enum SellerPayoutEventType {
+  CREATED
+  ELIGIBILITY_CHECKED
+  READY
+  HOLD
+  PROCESSING
+  SENT
+  FAILED
+  RETURNED
+  CANCELLED
+  BANK_DETAILS_REVEALED
+  INSTRUCTIONS_EXPORTED
+  ADJUSTMENT_ADDED
+}
+
+enum SellerPayoutAdjustmentType {
+  CREDIT
+  DEBIT
+  REFUND_RECOVERY
+  BANK_FEE
+  FX_ADJUSTMENT
+  OTHER
+}
+
+enum BankDirectorySourceType {
+  SEED
+  ADMIN
+  ADMIN_OVERRIDE
+}
+
 model UserProfile {
-  id                         String                @id @default(cuid())
-  clerkUserId                String                @unique
-  email                      String                @unique
-  displayName                String
-  avatarOriginalUrl          String?
-  avatarUrl                  String?
-  companyAffiliation         String                @default("")
-  jobTitle                   String                @default("")
-  department                 String                @default("")
-  bio                        String                @default("")
-  phoneNumber                String                @default("")
-  linkedinUrl                String                @default("")
-  country                    String                @default("")
-  city                       String                @default("")
-  role                       AccountRole
-  preferredLanguage          PreferredLanguage     @default(en)
-  companies                  Company[]
-  requestedVerifications     VerificationRequest[] @relation("RequestedVerification")
-  reviewedVerifications      VerificationRequest[] @relation("ReviewedVerification")
-  sentInquiries              Inquiry[]             @relation("InquirySender")
-  sentMessages               Message[]             @relation("MessageSender")
-  receivedMessages           Message[]             @relation("MessageReceiver")
-  uploadedMessageAttachments MessageAttachment[]   @relation("MessageAttachmentUploader")
-  createdDocumentFolders     DocumentFolder[]      @relation("CreatedDocumentFolders")
-  uploadedTradeDocuments     TradeDocument[]       @relation("UploadedTradeDocuments")
-  savedItems                 SavedItem[]
-  createdDeals               Deal[]                @relation("DealCreator")
-  buyerRfqRequests           RfqRequest[]          @relation("BuyerRfqRequests")
-  reviewedRfqRequests        RfqRequest[]          @relation("ReviewedRfqRequests")
-  marketingExposures         MarketingExposure[]
-  createdPaymentRequests     PaymentRequest[]      @relation("PaymentRequestCreator")
-  releasedPaymentRequests    PaymentRequest[]      @relation("PaymentRequestReleasedBy")
-  paymentRequestEvents       PaymentRequestEvent[] @relation("PaymentRequestEventActor")
-  createdAt                  DateTime              @default(now())
-  updatedAt                  DateTime              @updatedAt
+  id                             String                          @id @default(cuid())
+  clerkUserId                    String                          @unique
+  email                          String                          @unique
+  displayName                    String
+  avatarOriginalUrl              String?
+  avatarUrl                      String?
+  companyAffiliation             String                          @default("")
+  jobTitle                       String                          @default("")
+  department                     String                          @default("")
+  bio                            String                          @default("")
+  phoneNumber                    String                          @default("")
+  linkedinUrl                    String                          @default("")
+  country                        String                          @default("")
+  city                           String                          @default("")
+  role                           AccountRole
+  preferredLanguage              PreferredLanguage               @default(en)
+  companies                      Company[]
+  requestedVerifications         VerificationRequest[]           @relation("RequestedVerification")
+  reviewedVerifications          VerificationRequest[]           @relation("ReviewedVerification")
+  sentInquiries                  Inquiry[]                       @relation("InquirySender")
+  sentMessages                   Message[]                       @relation("MessageSender")
+  receivedMessages               Message[]                       @relation("MessageReceiver")
+  uploadedMessageAttachments     MessageAttachment[]             @relation("MessageAttachmentUploader")
+  createdDocumentFolders         DocumentFolder[]                @relation("CreatedDocumentFolders")
+  uploadedTradeDocuments         TradeDocument[]                 @relation("UploadedTradeDocuments")
+  savedItems                     SavedItem[]
+  createdDeals                   Deal[]                          @relation("DealCreator")
+  buyerRfqRequests               RfqRequest[]                    @relation("BuyerRfqRequests")
+  reviewedRfqRequests            RfqRequest[]                    @relation("ReviewedRfqRequests")
+  marketingExposures             MarketingExposure[]
+  createdPaymentRequests         PaymentRequest[]                @relation("PaymentRequestCreator")
+  releasedPaymentRequests        PaymentRequest[]                @relation("PaymentRequestReleasedBy")
+  paymentRequestEvents           PaymentRequestEvent[]           @relation("PaymentRequestEventActor")
+  tradeOrderEvents               TradeOrderEvent[]               @relation("TradeOrderEventActor")
+  sellerPayoutEvents             SellerPayoutEvent[]             @relation("SellerPayoutEventActor")
+  sellerPayoutAdjustments        SellerPayoutAdjustment[]        @relation("SellerPayoutAdjustmentActor")
+  preparedSellerPayouts          SellerPayout[]                  @relation("SellerPayoutPreparedBy")
+  approvedSellerPayouts          SellerPayout[]                  @relation("SellerPayoutApprovedBy")
+  sentSellerPayouts              SellerPayout[]                  @relation("SellerPayoutSentBy")
+  verifiedSellerPayoutProfiles   SellerPayoutProfile[]           @relation("SellerPayoutProfileVerifiedBy")
+  sellerPayoutProfileAuditEvents SellerPayoutProfileAuditEvent[] @relation("SellerPayoutProfileAuditActor")
+  createdAt                      DateTime                        @default(now())
+  updatedAt                      DateTime                        @updatedAt
 }
 
 model Company {
@@ -263,6 +428,10 @@ model Company {
   marketingExposures                MarketingExposure[]
   buyerPaymentRequests              PaymentRequest[]          @relation("BuyerCompanyPaymentRequests")
   sellerPaymentRequests             PaymentRequest[]          @relation("SellerCompanyPaymentRequests")
+  buyerTradeOrders                  TradeOrder[]              @relation("BuyerCompanyTradeOrders")
+  sellerTradeOrders                 TradeOrder[]              @relation("SellerCompanyTradeOrders")
+  sellerPayoutProfile               SellerPayoutProfile?      @relation("SellerCompanyPayoutProfile")
+  sellerPayouts                     SellerPayout[]            @relation("SellerCompanyPayouts")
   reviewsWritten                    Review[]                  @relation("ReviewWriter")
   reviewsReceived                   Review[]                  @relation("ReviewRecipient")
   companyReviewsWritten             CompanyReview[]           @relation("CompanyReviewWriter")
@@ -370,6 +539,7 @@ model Product {
   rfqMatches               RfqMatchedProduct[]
   rfqSellerQuotes          RfqSellerQuote[]
   marketingExposures       MarketingExposure[]
+  orderItems               TradeOrderItem[]
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
 
@@ -447,6 +617,7 @@ model Inquiry {
   attachments        MessageAttachment[]
   deals              Deal[]
   paymentRequests    PaymentRequest[]
+  tradeOrders        TradeOrder[]
   rfqSellerQuotes    RfqSellerQuote[]    @relation("RfqQuoteConversation")
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -609,6 +780,9 @@ model PaymentRequest {
   releasedByUser               UserProfile?                 @relation("PaymentRequestReleasedBy", fields: [releasedByUserId], references: [id], onDelete: SetNull)
   requiresManualReconciliation Boolean                      @default(false)
   reconciliationNote           String?
+  orderId                      String?                      @unique
+  order                        TradeOrder?                  @relation("PaymentRequestOrder", fields: [orderId], references: [id], onDelete: Restrict)
+  tradeOrderByPaymentRequest   TradeOrder?                  @relation("TradeOrderPaymentRequest")
   refunds                      PaymentRefund[]
   disputes                     PaymentDispute[]
   events                       PaymentRequestEvent[]
@@ -675,6 +849,312 @@ model PaymentRequestWebhookEvent {
   createdAt        DateTime       @default(now())
 
   @@index([paymentRequestId, createdAt])
+}
+
+// Financial order records deliberately use restrictive foreign keys. Historical
+// payments and payout instructions must remain auditable even when other app data
+// is otherwise eligible for deletion.
+model OrderNumberCounter {
+  year               Int      @id
+  lastOrderSequence  Int      @default(0)
+  lastPayoutSequence Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model TradeOrder {
+  id                      String              @id @default(cuid())
+  orderNumber             String              @unique
+  inquiryId               String
+  inquiry                 Inquiry             @relation(fields: [inquiryId], references: [id], onDelete: Restrict)
+  paymentRequestId        String              @unique
+  paymentRequest          PaymentRequest      @relation("TradeOrderPaymentRequest", fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  paymentRequestByOrderId PaymentRequest?     @relation("PaymentRequestOrder")
+  buyerCompanyId          String
+  buyerCompany            Company             @relation("BuyerCompanyTradeOrders", fields: [buyerCompanyId], references: [id], onDelete: Restrict)
+  sellerCompanyId         String
+  sellerCompany           Company             @relation("SellerCompanyTradeOrders", fields: [sellerCompanyId], references: [id], onDelete: Restrict)
+  orderStatus             TradeOrderStatus    @default(PAYMENT_PENDING)
+  paymentStatus           OrderPaymentStatus  @default(PENDING)
+  shipmentStatus          OrderShipmentStatus @default(NOT_READY)
+  payoutStatus            OrderPayoutStatus   @default(NOT_READY)
+
+  buyerCompanyName  String
+  buyerContactName  String?
+  buyerEmail        String
+  buyerPhone        String?
+  buyerCountry      String
+  buyerAddress      String?
+  sellerCompanyName String
+  sellerContactName String?
+  sellerEmail       String
+  sellerPhone       String?
+  sellerCountry     String
+  sellerAddress     String?
+
+  productAmount             Int
+  shippingAmount            Int
+  grossAmount               Int
+  platformFeeRateBps        Int       @default(500)
+  platformFeeAmount         Int
+  sellerPayableAmount       Int
+  stripeProcessingFeeAmount Int?
+  refundAmount              Int       @default(0)
+  currency                  String    @default("usd")
+  paidAt                    DateTime?
+  refundedAt                DateTime?
+  disputedAt                DateTime?
+
+  items     TradeOrderItem[]
+  shipment  TradeOrderShipment?
+  events    TradeOrderEvent[]
+  payout    SellerPayout?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@index([buyerCompanyId, createdAt])
+  @@index([sellerCompanyId, createdAt])
+  @@index([orderStatus, createdAt])
+  @@index([paymentStatus, createdAt])
+  @@index([payoutStatus, createdAt])
+}
+
+model TradeOrderItem {
+  id              String     @id @default(cuid())
+  orderId         String
+  order           TradeOrder @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  productId       String?
+  product         Product?   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productName     String
+  sku             String?
+  hsCode          String?
+  countryOfOrigin String?
+  quantity        String
+  unit            String
+  unitPrice       Int?
+  productAmount   Int
+  currency        String     @default("usd")
+  productSnapshot Json?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([orderId, createdAt])
+  @@index([productId])
+}
+
+model TradeOrderShipment {
+  id                   String              @id @default(cuid())
+  orderId              String              @unique
+  order                TradeOrder          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  incoterm             Incoterm            @default(OTHER)
+  shippingMethod       ShippingMethod      @default(OTHER)
+  originCountry        String
+  originCity           String?
+  destinationCountry   String
+  destinationCity      String?
+  destinationAddress   String?
+  carrierName          String?
+  freightForwarderName String?
+  trackingNumber       String?
+  billOfLadingNumber   String?
+  airWaybillNumber     String?
+  shipmentReference    String?
+  shipDate             DateTime?
+  estimatedArrivalDate DateTime?
+  deliveredAt          DateTime?
+  shipmentStatus       OrderShipmentStatus @default(NOT_READY)
+  notes                String?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  @@index([shipmentStatus, updatedAt])
+  @@index([destinationCountry])
+}
+
+model TradeOrderEvent {
+  id          String              @id @default(cuid())
+  orderId     String
+  order       TradeOrder          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  actorUserId String?
+  actorUser   UserProfile?        @relation("TradeOrderEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  eventType   TradeOrderEventType
+  message     String?
+  metadata    Json                @default("{}")
+  createdAt   DateTime            @default(now())
+
+  @@index([orderId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+model BankDirectory {
+  id                 String                  @id @default(cuid())
+  countryCode        String
+  bankNameLocal      String
+  bankNameEnglish    String
+  bankCode           String?
+  defaultSwiftBic    String?
+  defaultBankAddress String?
+  officialWebsite    String?
+  sourceUrl          String?
+  verifiedAt         DateTime?
+  sourceType         BankDirectorySourceType @default(ADMIN)
+  isActive           Boolean                 @default(true)
+  payoutProfiles     SellerPayoutProfile[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@unique([countryCode, bankNameEnglish])
+  @@index([countryCode, isActive])
+}
+
+model SellerPayoutProfile {
+  id                      String                          @id @default(cuid())
+  companyId               String                          @unique
+  company                 Company                         @relation("SellerCompanyPayoutProfile", fields: [companyId], references: [id], onDelete: Restrict)
+  bankDirectoryId         String?
+  bankDirectory           BankDirectory?                  @relation(fields: [bankDirectoryId], references: [id], onDelete: SetNull)
+  country                 String
+  bankName                String
+  branchName              String?
+  accountHolder           String
+  accountNumberCiphertext Bytes?
+  accountNumberIv         Bytes?
+  accountNumberAuthTag    Bytes?
+  accountNumberKeyVersion String?
+  accountNumberLast4      String?
+  accountNumberMasked     String?
+  accountType             PayoutAccountType               @default(LOCAL)
+  bankCode                String?
+  swiftBic                String?
+  bankAddress             String?
+  beneficiaryAddress      String?
+  payoutCurrency          String                          @default("usd")
+  supportedCurrencies     String[]                        @default([])
+  intermediaryBankName    String?
+  intermediaryBankSwift   String?
+  intermediaryBankAddress String?
+  payoutMemo              String?
+  accountBelongsToCompany Boolean                         @default(false)
+  manualBankOverride      Boolean                         @default(false)
+  manualOverrideReason    String?
+  status                  SellerPayoutProfileStatus       @default(DRAFT)
+  verifiedAt              DateTime?
+  verifiedByUserId        String?
+  verifiedByUser          UserProfile?                    @relation("SellerPayoutProfileVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: SetNull)
+  auditEvents             SellerPayoutProfileAuditEvent[]
+  payouts                 SellerPayout[]
+  createdAt               DateTime                        @default(now())
+  updatedAt               DateTime                        @updatedAt
+
+  @@index([status, updatedAt])
+  @@index([bankDirectoryId])
+}
+
+model SellerPayoutProfileAuditEvent {
+  id              String              @id @default(cuid())
+  payoutProfileId String
+  payoutProfile   SellerPayoutProfile @relation(fields: [payoutProfileId], references: [id], onDelete: Restrict)
+  actorUserId     String
+  actorUser       UserProfile         @relation("SellerPayoutProfileAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+  action          String
+  metadata        Json                @default("{}")
+  createdAt       DateTime            @default(now())
+
+  @@index([payoutProfileId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
+model SellerPayout {
+  id                            String                   @id @default(cuid())
+  orderId                       String                   @unique
+  order                         TradeOrder               @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  sellerCompanyId               String
+  sellerCompany                 Company                  @relation("SellerCompanyPayouts", fields: [sellerCompanyId], references: [id], onDelete: Restrict)
+  payoutProfileId               String
+  payoutProfile                 SellerPayoutProfile      @relation(fields: [payoutProfileId], references: [id], onDelete: Restrict)
+  payoutNumber                  String                   @unique
+  status                        SellerPayoutStatus       @default(READY)
+  currency                      String                   @default("usd")
+  grossAmount                   Int
+  platformFeeRateBps            Int                      @default(500)
+  platformFeeAmount             Int
+  sellerPayableAmount           Int
+  refundAdjustmentAmount        Int                      @default(0)
+  manualAdjustmentAmount        Int                      @default(0)
+  finalPayoutAmount             Int
+  processingFeeAmount           Int?
+  exchangeRate                  Decimal?                 @db.Decimal(20, 8)
+  settlementCurrency            String?
+  settlementAmount              Int?
+  wireFeeBearer                 WireFeeBearer            @default(NOT_APPLICABLE)
+  beneficiarySnapshotEncrypted  Bytes
+  beneficiarySnapshotIv         Bytes
+  beneficiarySnapshotAuthTag    Bytes
+  beneficiarySnapshotKeyVersion String
+  accountNumberLast4            String?
+  bankNameSnapshot              String
+  swiftBicSnapshot              String?
+  officialBankWebsiteSnapshot   String?
+  preparedAt                    DateTime?
+  preparedByUserId              String?
+  preparedByUser                UserProfile?             @relation("SellerPayoutPreparedBy", fields: [preparedByUserId], references: [id], onDelete: SetNull)
+  approvedAt                    DateTime?
+  approvedByUserId              String?
+  approvedByUser                UserProfile?             @relation("SellerPayoutApprovedBy", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  sentAt                        DateTime?
+  sentByUserId                  String?
+  sentByUser                    UserProfile?             @relation("SellerPayoutSentBy", fields: [sentByUserId], references: [id], onDelete: SetNull)
+  failedAt                      DateTime?
+  externalTransferReference     String?
+  externalBankReference         String?
+  payoutProofStoragePath        String?
+  failureReason                 String?
+  internalNote                  String?
+  events                        SellerPayoutEvent[]
+  adjustments                   SellerPayoutAdjustment[]
+  createdAt                     DateTime                 @default(now())
+  updatedAt                     DateTime                 @updatedAt
+
+  @@index([sellerCompanyId, createdAt])
+  @@index([status, createdAt])
+  @@index([payoutProfileId])
+}
+
+model SellerPayoutEvent {
+  id          String                @id @default(cuid())
+  payoutId    String
+  payout      SellerPayout          @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+  actorUserId String?
+  actorUser   UserProfile?          @relation("SellerPayoutEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  eventType   SellerPayoutEventType
+  message     String?
+  metadata    Json                  @default("{}")
+  createdAt   DateTime              @default(now())
+
+  @@index([payoutId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+// Adjustments are append-only accounting entries. For unsent payouts, the
+// materialized totals are recalculated from this ledger in one transaction.
+// Sent payouts keep their recorded financial amounts immutable and instead
+// receive a reconciliation-required adjustment record.
+model SellerPayoutAdjustment {
+  id                           String                     @id @default(cuid())
+  payoutId                     String
+  payout                       SellerPayout               @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+  adjustmentType               SellerPayoutAdjustmentType
+  amount                       Int
+  currency                     String                     @default("usd")
+  reason                       String
+  internalNote                 String?
+  requiresManualReconciliation Boolean                    @default(false)
+  createdByUserId              String
+  createdByUser                UserProfile                @relation("SellerPayoutAdjustmentActor", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  createdAt                    DateTime                   @default(now())
+
+  @@index([payoutId, createdAt])
+  @@index([createdByUserId, createdAt])
 }
 
 model SavedItem {

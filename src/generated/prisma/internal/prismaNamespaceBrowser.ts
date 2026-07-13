@@ -17,8 +17,8 @@
 
 import * as runtime from "@prisma/client/runtime/index-browser"
 
-export type * from '../models'
-export type * from './prismaNamespace'
+export type * from '../models.ts'
+export type * from './prismaNamespace.ts'
 
 export const Decimal = runtime.Decimal
 
@@ -69,6 +69,17 @@ export const ModelName = {
   PaymentDispute: 'PaymentDispute',
   PaymentRequestEvent: 'PaymentRequestEvent',
   PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
+  OrderNumberCounter: 'OrderNumberCounter',
+  TradeOrder: 'TradeOrder',
+  TradeOrderItem: 'TradeOrderItem',
+  TradeOrderShipment: 'TradeOrderShipment',
+  TradeOrderEvent: 'TradeOrderEvent',
+  BankDirectory: 'BankDirectory',
+  SellerPayoutProfile: 'SellerPayoutProfile',
+  SellerPayoutProfileAuditEvent: 'SellerPayoutProfileAuditEvent',
+  SellerPayout: 'SellerPayout',
+  SellerPayoutEvent: 'SellerPayoutEvent',
+  SellerPayoutAdjustment: 'SellerPayoutAdjustment',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -453,6 +464,7 @@ export const PaymentRequestScalarFieldEnum = {
   releasedByUserId: 'releasedByUserId',
   requiresManualReconciliation: 'requiresManualReconciliation',
   reconciliationNote: 'reconciliationNote',
+  orderId: 'orderId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -510,6 +522,267 @@ export const PaymentRequestWebhookEventScalarFieldEnum = {
 } as const
 
 export type PaymentRequestWebhookEventScalarFieldEnum = (typeof PaymentRequestWebhookEventScalarFieldEnum)[keyof typeof PaymentRequestWebhookEventScalarFieldEnum]
+
+
+export const OrderNumberCounterScalarFieldEnum = {
+  year: 'year',
+  lastOrderSequence: 'lastOrderSequence',
+  lastPayoutSequence: 'lastPayoutSequence',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderNumberCounterScalarFieldEnum = (typeof OrderNumberCounterScalarFieldEnum)[keyof typeof OrderNumberCounterScalarFieldEnum]
+
+
+export const TradeOrderScalarFieldEnum = {
+  id: 'id',
+  orderNumber: 'orderNumber',
+  inquiryId: 'inquiryId',
+  paymentRequestId: 'paymentRequestId',
+  buyerCompanyId: 'buyerCompanyId',
+  sellerCompanyId: 'sellerCompanyId',
+  orderStatus: 'orderStatus',
+  paymentStatus: 'paymentStatus',
+  shipmentStatus: 'shipmentStatus',
+  payoutStatus: 'payoutStatus',
+  buyerCompanyName: 'buyerCompanyName',
+  buyerContactName: 'buyerContactName',
+  buyerEmail: 'buyerEmail',
+  buyerPhone: 'buyerPhone',
+  buyerCountry: 'buyerCountry',
+  buyerAddress: 'buyerAddress',
+  sellerCompanyName: 'sellerCompanyName',
+  sellerContactName: 'sellerContactName',
+  sellerEmail: 'sellerEmail',
+  sellerPhone: 'sellerPhone',
+  sellerCountry: 'sellerCountry',
+  sellerAddress: 'sellerAddress',
+  productAmount: 'productAmount',
+  shippingAmount: 'shippingAmount',
+  grossAmount: 'grossAmount',
+  platformFeeRateBps: 'platformFeeRateBps',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  stripeProcessingFeeAmount: 'stripeProcessingFeeAmount',
+  refundAmount: 'refundAmount',
+  currency: 'currency',
+  paidAt: 'paidAt',
+  refundedAt: 'refundedAt',
+  disputedAt: 'disputedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TradeOrderScalarFieldEnum = (typeof TradeOrderScalarFieldEnum)[keyof typeof TradeOrderScalarFieldEnum]
+
+
+export const TradeOrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  productName: 'productName',
+  sku: 'sku',
+  hsCode: 'hsCode',
+  countryOfOrigin: 'countryOfOrigin',
+  quantity: 'quantity',
+  unit: 'unit',
+  unitPrice: 'unitPrice',
+  productAmount: 'productAmount',
+  currency: 'currency',
+  productSnapshot: 'productSnapshot',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TradeOrderItemScalarFieldEnum = (typeof TradeOrderItemScalarFieldEnum)[keyof typeof TradeOrderItemScalarFieldEnum]
+
+
+export const TradeOrderShipmentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  incoterm: 'incoterm',
+  shippingMethod: 'shippingMethod',
+  originCountry: 'originCountry',
+  originCity: 'originCity',
+  destinationCountry: 'destinationCountry',
+  destinationCity: 'destinationCity',
+  destinationAddress: 'destinationAddress',
+  carrierName: 'carrierName',
+  freightForwarderName: 'freightForwarderName',
+  trackingNumber: 'trackingNumber',
+  billOfLadingNumber: 'billOfLadingNumber',
+  airWaybillNumber: 'airWaybillNumber',
+  shipmentReference: 'shipmentReference',
+  shipDate: 'shipDate',
+  estimatedArrivalDate: 'estimatedArrivalDate',
+  deliveredAt: 'deliveredAt',
+  shipmentStatus: 'shipmentStatus',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TradeOrderShipmentScalarFieldEnum = (typeof TradeOrderShipmentScalarFieldEnum)[keyof typeof TradeOrderShipmentScalarFieldEnum]
+
+
+export const TradeOrderEventScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  actorUserId: 'actorUserId',
+  eventType: 'eventType',
+  message: 'message',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type TradeOrderEventScalarFieldEnum = (typeof TradeOrderEventScalarFieldEnum)[keyof typeof TradeOrderEventScalarFieldEnum]
+
+
+export const BankDirectoryScalarFieldEnum = {
+  id: 'id',
+  countryCode: 'countryCode',
+  bankNameLocal: 'bankNameLocal',
+  bankNameEnglish: 'bankNameEnglish',
+  bankCode: 'bankCode',
+  defaultSwiftBic: 'defaultSwiftBic',
+  defaultBankAddress: 'defaultBankAddress',
+  officialWebsite: 'officialWebsite',
+  sourceUrl: 'sourceUrl',
+  verifiedAt: 'verifiedAt',
+  sourceType: 'sourceType',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BankDirectoryScalarFieldEnum = (typeof BankDirectoryScalarFieldEnum)[keyof typeof BankDirectoryScalarFieldEnum]
+
+
+export const SellerPayoutProfileScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  bankDirectoryId: 'bankDirectoryId',
+  country: 'country',
+  bankName: 'bankName',
+  branchName: 'branchName',
+  accountHolder: 'accountHolder',
+  accountNumberCiphertext: 'accountNumberCiphertext',
+  accountNumberIv: 'accountNumberIv',
+  accountNumberAuthTag: 'accountNumberAuthTag',
+  accountNumberKeyVersion: 'accountNumberKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  accountNumberMasked: 'accountNumberMasked',
+  accountType: 'accountType',
+  bankCode: 'bankCode',
+  swiftBic: 'swiftBic',
+  bankAddress: 'bankAddress',
+  beneficiaryAddress: 'beneficiaryAddress',
+  payoutCurrency: 'payoutCurrency',
+  supportedCurrencies: 'supportedCurrencies',
+  intermediaryBankName: 'intermediaryBankName',
+  intermediaryBankSwift: 'intermediaryBankSwift',
+  intermediaryBankAddress: 'intermediaryBankAddress',
+  payoutMemo: 'payoutMemo',
+  accountBelongsToCompany: 'accountBelongsToCompany',
+  manualBankOverride: 'manualBankOverride',
+  manualOverrideReason: 'manualOverrideReason',
+  status: 'status',
+  verifiedAt: 'verifiedAt',
+  verifiedByUserId: 'verifiedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerPayoutProfileScalarFieldEnum = (typeof SellerPayoutProfileScalarFieldEnum)[keyof typeof SellerPayoutProfileScalarFieldEnum]
+
+
+export const SellerPayoutProfileAuditEventScalarFieldEnum = {
+  id: 'id',
+  payoutProfileId: 'payoutProfileId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type SellerPayoutProfileAuditEventScalarFieldEnum = (typeof SellerPayoutProfileAuditEventScalarFieldEnum)[keyof typeof SellerPayoutProfileAuditEventScalarFieldEnum]
+
+
+export const SellerPayoutScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  sellerCompanyId: 'sellerCompanyId',
+  payoutProfileId: 'payoutProfileId',
+  payoutNumber: 'payoutNumber',
+  status: 'status',
+  currency: 'currency',
+  grossAmount: 'grossAmount',
+  platformFeeRateBps: 'platformFeeRateBps',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  refundAdjustmentAmount: 'refundAdjustmentAmount',
+  manualAdjustmentAmount: 'manualAdjustmentAmount',
+  finalPayoutAmount: 'finalPayoutAmount',
+  processingFeeAmount: 'processingFeeAmount',
+  exchangeRate: 'exchangeRate',
+  settlementCurrency: 'settlementCurrency',
+  settlementAmount: 'settlementAmount',
+  wireFeeBearer: 'wireFeeBearer',
+  beneficiarySnapshotEncrypted: 'beneficiarySnapshotEncrypted',
+  beneficiarySnapshotIv: 'beneficiarySnapshotIv',
+  beneficiarySnapshotAuthTag: 'beneficiarySnapshotAuthTag',
+  beneficiarySnapshotKeyVersion: 'beneficiarySnapshotKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  bankNameSnapshot: 'bankNameSnapshot',
+  swiftBicSnapshot: 'swiftBicSnapshot',
+  officialBankWebsiteSnapshot: 'officialBankWebsiteSnapshot',
+  preparedAt: 'preparedAt',
+  preparedByUserId: 'preparedByUserId',
+  approvedAt: 'approvedAt',
+  approvedByUserId: 'approvedByUserId',
+  sentAt: 'sentAt',
+  sentByUserId: 'sentByUserId',
+  failedAt: 'failedAt',
+  externalTransferReference: 'externalTransferReference',
+  externalBankReference: 'externalBankReference',
+  payoutProofStoragePath: 'payoutProofStoragePath',
+  failureReason: 'failureReason',
+  internalNote: 'internalNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerPayoutScalarFieldEnum = (typeof SellerPayoutScalarFieldEnum)[keyof typeof SellerPayoutScalarFieldEnum]
+
+
+export const SellerPayoutEventScalarFieldEnum = {
+  id: 'id',
+  payoutId: 'payoutId',
+  actorUserId: 'actorUserId',
+  eventType: 'eventType',
+  message: 'message',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type SellerPayoutEventScalarFieldEnum = (typeof SellerPayoutEventScalarFieldEnum)[keyof typeof SellerPayoutEventScalarFieldEnum]
+
+
+export const SellerPayoutAdjustmentScalarFieldEnum = {
+  id: 'id',
+  payoutId: 'payoutId',
+  adjustmentType: 'adjustmentType',
+  amount: 'amount',
+  currency: 'currency',
+  reason: 'reason',
+  internalNote: 'internalNote',
+  requiresManualReconciliation: 'requiresManualReconciliation',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SellerPayoutAdjustmentScalarFieldEnum = (typeof SellerPayoutAdjustmentScalarFieldEnum)[keyof typeof SellerPayoutAdjustmentScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {
@@ -674,6 +947,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

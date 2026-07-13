@@ -1,5 +1,7 @@
+import { calculateOrderFinancials, PLATFORM_FEE_BPS } from "./order-financials.ts";
+
 export const PAYMENT_REQUEST_CURRENCY = "usd";
-export const PLATFORM_FEE_BASIS_POINTS = 500;
+export const PLATFORM_FEE_BASIS_POINTS = PLATFORM_FEE_BPS;
 export const MAX_PAYMENT_AMOUNT_MINOR = 2_000_000_000;
 
 export class PaymentRequestValidationError extends Error {}
@@ -51,13 +53,7 @@ export function calculatePaymentAmounts(productAmount: number, shippingAmount: n
     throw new PaymentRequestValidationError("The total payment amount is too large.");
   }
 
-  // Round the 5% platform fee to the nearest cent. The seller payable never includes Stripe fees.
-  const platformFeeAmount = Math.floor(
-    (grossAmount * PLATFORM_FEE_BASIS_POINTS + 5_000) / 10_000,
-  );
-  const sellerPayableAmount = grossAmount - platformFeeAmount;
-
-  return { grossAmount, platformFeeAmount, sellerPayableAmount };
+  return calculateOrderFinancials(productAmount, shippingAmount);
 }
 
 export function checkoutIdempotencyKey(paymentRequestId: string, checkoutAttempt: number) {

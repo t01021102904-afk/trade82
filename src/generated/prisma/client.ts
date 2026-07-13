@@ -16,12 +16,12 @@ import { fileURLToPath } from 'node:url'
 globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
 import * as runtime from "@prisma/client/runtime/client"
-import * as $Enums from "./enums"
-import * as $Class from "./internal/class"
-import * as Prisma from "./internal/prismaNamespace"
+import * as $Enums from "./enums.ts"
+import * as $Class from "./internal/class.ts"
+import * as Prisma from "./internal/prismaNamespace.ts"
 
-export * as $Enums from './enums'
-export * from "./enums"
+export * as $Enums from './enums.ts'
+export * from "./enums.ts"
 /**
  * ## Prisma Client
  * 
@@ -131,6 +131,61 @@ export type PaymentRequestEvent = Prisma.PaymentRequestEventModel
  * 
  */
 export type PaymentRequestWebhookEvent = Prisma.PaymentRequestWebhookEventModel
+/**
+ * Model OrderNumberCounter
+ * 
+ */
+export type OrderNumberCounter = Prisma.OrderNumberCounterModel
+/**
+ * Model TradeOrder
+ * 
+ */
+export type TradeOrder = Prisma.TradeOrderModel
+/**
+ * Model TradeOrderItem
+ * 
+ */
+export type TradeOrderItem = Prisma.TradeOrderItemModel
+/**
+ * Model TradeOrderShipment
+ * 
+ */
+export type TradeOrderShipment = Prisma.TradeOrderShipmentModel
+/**
+ * Model TradeOrderEvent
+ * 
+ */
+export type TradeOrderEvent = Prisma.TradeOrderEventModel
+/**
+ * Model BankDirectory
+ * 
+ */
+export type BankDirectory = Prisma.BankDirectoryModel
+/**
+ * Model SellerPayoutProfile
+ * 
+ */
+export type SellerPayoutProfile = Prisma.SellerPayoutProfileModel
+/**
+ * Model SellerPayoutProfileAuditEvent
+ * 
+ */
+export type SellerPayoutProfileAuditEvent = Prisma.SellerPayoutProfileAuditEventModel
+/**
+ * Model SellerPayout
+ * 
+ */
+export type SellerPayout = Prisma.SellerPayoutModel
+/**
+ * Model SellerPayoutEvent
+ * 
+ */
+export type SellerPayoutEvent = Prisma.SellerPayoutEventModel
+/**
+ * Model SellerPayoutAdjustment
+ * 
+ */
+export type SellerPayoutAdjustment = Prisma.SellerPayoutAdjustmentModel
 /**
  * Model SavedItem
  * 
