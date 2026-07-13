@@ -83,31 +83,6 @@ export type RfqSellerQuote = Prisma.RfqSellerQuoteModel
  */
 export type MarketingExposure = Prisma.MarketingExposureModel
 /**
- * Model PaymentRequest
- * 
- */
-export type PaymentRequest = Prisma.PaymentRequestModel
-/**
- * Model PaymentRefund
- * 
- */
-export type PaymentRefund = Prisma.PaymentRefundModel
-/**
- * Model PaymentDispute
- * 
- */
-export type PaymentDispute = Prisma.PaymentDisputeModel
-/**
- * Model PaymentRequestEvent
- * 
- */
-export type PaymentRequestEvent = Prisma.PaymentRequestEventModel
-/**
- * Model PaymentRequestWebhookEvent
- * 
- */
-export type PaymentRequestWebhookEvent = Prisma.PaymentRequestWebhookEventModel
-/**
  * Model SavedItem
  * 
  */

@@ -89,11 +89,6 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
               href={withLocale("/admin/rfqs", locale)}
             />
             <AdminCard
-              title={messages.payments.adminCardTitle}
-              description={messages.payments.adminCardDescription}
-              href={withLocale("/admin/payments", locale)}
-            />
-            <AdminCard
               title={admin.inquiryHistory}
               description={admin.inquiryHistoryDescription}
               disabled

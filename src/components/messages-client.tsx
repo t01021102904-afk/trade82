@@ -2,7 +2,6 @@
 
 import {
   ChevronLeft,
-  CreditCard,
   Download,
   FileText,
   FolderOpen,
@@ -43,10 +42,6 @@ import {
 } from "@/lib/message-attachment-rules";
 import { safeExternalUrl } from "@/lib/url-security";
 import { cx, formatDate } from "@/lib/utils";
-import {
-  decidePaymentCheckoutResponse,
-  type PaymentCheckoutResponsePayload,
-} from "@/lib/payment-checkout-client-response";
 
 type DealSummary = {
   id: string;
@@ -54,54 +49,6 @@ type DealSummary = {
   confirmedByBuyer: boolean;
   confirmedBySeller: boolean;
   reviews: Array<{ id: string; reviewerCompanyId: string }>;
-};
-
-type PaymentRequestSummary = {
-  id: string;
-  productName: string;
-  quantity: string;
-  unit: string;
-  productAmount: number;
-  shippingAmount: number;
-  grossAmount: number;
-  platformFeeAmount: number;
-  sellerPayableAmount: number;
-  stripeProcessingFeeAmount: number | null;
-  refundAmount: number;
-  currency: string;
-  paymentDueDate: string;
-  orderTerms: string;
-  status:
-    | "PENDING"
-    | "PAID"
-    | "RELEASED"
-    | "CANCELLED"
-    | "PARTIALLY_REFUNDED"
-    | "REFUNDED"
-    | "DISPUTED";
-  paidAt: string | null;
-  cancelledAt: string | null;
-  releasedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  disputes: Array<{ status: string; reason: string | null; updatedAt: string }>;
-  events: Array<{
-    id: string;
-    eventType:
-      | "CREATED"
-      | "CHECKOUT_STARTED"
-      | "PAID"
-      | "RELEASED"
-      | "CANCELLED"
-      | "PARTIALLY_REFUNDED"
-      | "REFUNDED"
-      | "DISPUTE_OPENED"
-      | "DISPUTE_UPDATED"
-      | "DISPUTE_CLOSED"
-      | "RECONCILIATION_REQUIRED";
-    message: string | null;
-    createdAt: string;
-  }>;
 };
 
 type ThreadCompany = {
@@ -143,7 +90,6 @@ type InquiryThread = {
     attachments: MessageAttachment[];
   }>;
   deals?: DealSummary[];
-  paymentRequests?: PaymentRequestSummary[];
   viewerCompanyIds?: string[];
   unreadCount?: number;
 };
@@ -793,7 +739,6 @@ export function MessagesClient({
             dealError={dealError}
             onCreateDeal={() => void createDeal(selected)}
             onUpdateDeal={(deal, action) => void updateDeal(selected, deal, action)}
-            onPaymentUpdated={() => void load()}
           />
         ) : null}
       </div>
@@ -843,7 +788,6 @@ export function MessagesClient({
                 <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
               )}
               {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
-              <PaymentRequestControls thread={selected} onUpdated={() => void load()} />
               <DealControls
                 thread={selected}
                 pending={dealPending}
@@ -853,7 +797,7 @@ export function MessagesClient({
               />
             </header>
             <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
-              <MessageTimeline thread={selected} onOpenAttachment={openAttachment} onPaymentUpdated={() => void load()} />
+              <MessageTimeline thread={selected} onOpenAttachment={openAttachment} />
               <div ref={messagesEndRef} aria-hidden="true" />
             </div>
             <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
@@ -1138,7 +1082,6 @@ function MobileChatDetail({
   dealError,
   onCreateDeal,
   onUpdateDeal,
-  onPaymentUpdated,
 }: {
   thread: InquiryThread;
   reply: string;
@@ -1174,7 +1117,6 @@ function MobileChatDetail({
     deal: DealSummary,
     action: "mark_in_progress" | "request_completion" | "confirm_completion",
   ) => void;
-  onPaymentUpdated: () => void;
 }) {
   const { t } = useI18n();
   const company = getCounterparty(thread);
@@ -1229,7 +1171,7 @@ function MobileChatDetail({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-zinc-50 px-3 py-3">
-        <MessageTimeline thread={thread} onOpenAttachment={onOpenAttachment} onPaymentUpdated={onPaymentUpdated} />
+        <MessageTimeline thread={thread} onOpenAttachment={onOpenAttachment} />
         <div ref={messagesEndRef} aria-hidden="true" />
       </div>
 
@@ -1304,7 +1246,6 @@ function MobileChatDetail({
           onClose={onCloseDealSheet}
           onCreate={onCreateDeal}
           onUpdate={onUpdateDeal}
-          onPaymentUpdated={onPaymentUpdated}
         />
       ) : null}
     </section>
@@ -1432,7 +1373,6 @@ function MobileDealSheet({
   onClose,
   onCreate,
   onUpdate,
-  onPaymentUpdated,
 }: {
   thread: InquiryThread;
   pending: boolean;
@@ -1443,7 +1383,6 @@ function MobileDealSheet({
     deal: DealSummary,
     action: "mark_in_progress" | "request_completion" | "confirm_completion",
   ) => void;
-  onPaymentUpdated: () => void;
 }) {
   const { t } = useI18n();
 
@@ -1467,7 +1406,6 @@ function MobileDealSheet({
           onCreate={onCreate}
           onUpdate={onUpdate}
         />
-        <PaymentRequestControls thread={thread} onUpdated={onPaymentUpdated} />
       </div>
     </div>
   );
@@ -1668,24 +1606,12 @@ type TimelineMessage = {
   attachments: MessageAttachment[];
 };
 
-type TimelineEntry =
-  | { kind: "message"; key: string; createdAt: string; item: TimelineMessage }
-  | { kind: "payment"; key: string; createdAt: string; item: PaymentRequestSummary }
-  | {
-      kind: "payment-event";
-      key: string;
-      createdAt: string;
-      item: PaymentRequestSummary["events"][number];
-    };
-
 function MessageTimeline({
   thread,
   onOpenAttachment,
-  onPaymentUpdated,
 }: {
   thread: InquiryThread;
   onOpenAttachment: (attachment: MessageAttachment) => void;
-  onPaymentUpdated: () => void;
 }) {
   const { locale } = useI18n();
   const messages: TimelineMessage[] = [
@@ -1709,87 +1635,33 @@ function MessageTimeline({
       attachments: message.attachments,
     })),
   ];
-  const timeline: TimelineEntry[] = [
-    ...messages.map((message) => ({
-      kind: "message" as const,
-      key: message.key,
-      createdAt: message.createdAt,
-      item: message,
-    })),
-    ...(thread.paymentRequests ?? []).flatMap((paymentRequest) => [
-      {
-        kind: "payment" as const,
-        key: `payment-${paymentRequest.id}`,
-        createdAt: paymentRequest.createdAt,
-        item: paymentRequest,
-      },
-      ...paymentRequest.events.map((event) => ({
-        kind: "payment-event" as const,
-        key: `payment-event-${event.id}`,
-        createdAt: event.createdAt,
-        item: event,
-      })),
-    ]),
-  ].sort((left, right) => {
-    const dateDifference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
-    if (dateDifference !== 0) return dateDifference;
-    const order = { message: 0, payment: 1, "payment-event": 2 } as const;
-    return order[left.kind] - order[right.kind] || left.key.localeCompare(right.key);
-  });
+  let previousDateKey = "";
+
   return (
     <>
-      {timeline.map((entry, index) => {
-        const dateKey = getMessageDateKey(entry.createdAt);
-        const previousEntry = timeline[index - 1];
-        const showDateSeparator =
-          !previousEntry || dateKey !== getMessageDateKey(previousEntry.createdAt);
+      {messages.map((message) => {
+        const dateKey = getMessageDateKey(message.createdAt);
+        const showDateSeparator = dateKey !== previousDateKey;
+        previousDateKey = dateKey;
 
         return (
-          <Fragment key={entry.key}>
+          <Fragment key={message.key}>
             {showDateSeparator ? (
-              <DateSeparator label={formatMessageDate(entry.createdAt, locale)} />
+              <DateSeparator label={formatMessageDate(message.createdAt, locale)} />
             ) : null}
-            {entry.kind === "message" ? (
-              <ChatBubble
-                id={entry.item.id}
-                body={entry.item.body}
-                createdAt={entry.item.createdAt}
-                senderCompanyId={entry.item.senderCompanyId}
-                thread={thread}
-                attachments={entry.item.attachments}
-                onOpenAttachment={onOpenAttachment}
-              />
-            ) : entry.kind === "payment" ? (
-              <PaymentRequestCard
-                paymentRequest={entry.item}
-                thread={thread}
-                onUpdated={onPaymentUpdated}
-              />
-            ) : (
-              <PaymentRequestTimelineEvent event={entry.item} locale={locale} />
-            )}
+            <ChatBubble
+              id={message.id}
+              body={message.body}
+              createdAt={message.createdAt}
+              senderCompanyId={message.senderCompanyId}
+              thread={thread}
+              attachments={message.attachments}
+              onOpenAttachment={onOpenAttachment}
+            />
           </Fragment>
         );
       })}
     </>
-  );
-}
-
-function PaymentRequestTimelineEvent({
-  event,
-  locale,
-}: {
-  event: PaymentRequestSummary["events"][number];
-  locale: string;
-}) {
-  return (
-    <div className="mx-auto my-2 flex max-w-xl items-center justify-center gap-2 px-3 text-center text-xs text-zinc-500">
-      <span className="h-px flex-1 bg-zinc-100" />
-      <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1">
-        {event.message ?? event.eventType.replaceAll("_", " ")} · {new Date(event.createdAt).toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" })}
-      </span>
-      <span className="h-px flex-1 bg-zinc-100" />
-    </div>
   );
 }
 
@@ -2170,396 +2042,6 @@ function safeParseJson(value: string) {
   } catch {
     return null;
   }
-}
-
-function PaymentRequestControls({
-  thread,
-  onUpdated,
-}: {
-  thread: InquiryThread;
-  onUpdated: () => void;
-}) {
-  const { t } = useI18n();
-  const [open, setOpen] = useState(false);
-  const viewerCompanyId = getViewerCompanyId(thread);
-  const isSeller = viewerCompanyId === thread.sellerCompany.id;
-
-  if (!isSeller) return null;
-
-  return (
-    <div className="mt-3">
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-800 transition hover:border-zinc-950 hover:text-zinc-950"
-      >
-        <CreditCard className="size-4" />
-        {t("payments.requestPayment")}
-      </button>
-      {open ? (
-        <PaymentRequestDialog
-          thread={thread}
-          onClose={() => setOpen(false)}
-          onCreated={() => {
-            setOpen(false);
-            onUpdated();
-          }}
-        />
-      ) : null}
-    </div>
-  );
-}
-
-function PaymentRequestDialog({
-  thread,
-  onClose,
-  onCreated,
-}: {
-  thread: InquiryThread;
-  onClose: () => void;
-  onCreated: () => void;
-}) {
-  const { t } = useI18n();
-  const [productName, setProductName] = useState(thread.product?.name ?? "");
-  const [quantity, setQuantity] = useState(thread.quantity ?? "");
-  const [unit, setUnit] = useState("units");
-  const [productAmount, setProductAmount] = useState("");
-  const [shippingAmount, setShippingAmount] = useState("0.00");
-  const [paymentDueDate, setPaymentDueDate] = useState(() => defaultPaymentDueDate());
-  const [orderTerms, setOrderTerms] = useState("");
-  const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !saving) onClose();
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onClose, saving]);
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSaving(true);
-    setError("");
-    try {
-      const response = await fetch(`/api/inquiries/${thread.id}/payment-requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productName,
-          quantity,
-          unit,
-          productAmount,
-          shippingAmount,
-          paymentDueDate,
-          orderTerms,
-        }),
-      });
-      const result = (await response.json().catch(() => null)) as { error?: string } | null;
-      if (!response.ok) {
-        setError(result?.error ?? "Unable to create the payment request.");
-        return;
-      }
-      onCreated();
-    } catch {
-      setError("Unable to create the payment request.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 p-4"
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !saving) onClose();
-      }}
-    >
-      <form
-        className="w-full max-w-2xl rounded-xl border bg-white p-5 text-zinc-950 shadow-2xl sm:p-6"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="payment-request-title"
-        onSubmit={(event) => void submit(event)}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 id="payment-request-title" className="text-lg font-semibold">{t("payments.requestPaymentTitle")}</h2>
-            <p className="mt-1 text-sm leading-6 text-zinc-600">{t("payments.requestPaymentDescription")}</p>
-          </div>
-          <button type="button" onClick={onClose} disabled={saving} className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100" aria-label={t("payments.cancel")}>
-            <X className="size-5" />
-          </button>
-        </div>
-
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          <PaymentFormField label={t("payments.productName")} value={productName} onChange={setProductName} required className="sm:col-span-2" />
-          <PaymentFormField label={t("payments.quantity")} value={quantity} onChange={setQuantity} required />
-          <PaymentFormField label={t("payments.unit")} value={unit} onChange={setUnit} required />
-          <PaymentFormField label={t("payments.productAmount")} value={productAmount} onChange={setProductAmount} required inputMode="decimal" placeholder="0.00" />
-          <PaymentFormField label={t("payments.shippingAmount")} value={shippingAmount} onChange={setShippingAmount} required inputMode="decimal" placeholder="0.00" />
-          <label className="grid gap-1.5 text-sm font-medium text-zinc-800">
-            {t("payments.currency")}
-            <input value="USD" disabled className="h-10 rounded-md border border-zinc-200 bg-zinc-50 px-3 text-sm text-zinc-500" />
-          </label>
-          <label className="grid gap-1.5 text-sm font-medium text-zinc-800">
-            {t("payments.paymentDueDate")}
-            <input type="date" value={paymentDueDate} onChange={(event) => setPaymentDueDate(event.target.value)} required className="h-10 rounded-md border border-zinc-200 px-3 text-sm outline-none focus:border-zinc-950" />
-          </label>
-          <label className="grid gap-1.5 text-sm font-medium text-zinc-800 sm:col-span-2">
-            {t("payments.orderTerms")}
-            <textarea value={orderTerms} onChange={(event) => setOrderTerms(event.target.value)} required rows={4} className="rounded-md border border-zinc-200 px-3 py-2 text-sm outline-none focus:border-zinc-950" />
-          </label>
-        </div>
-        {error ? <p className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={saving} className="h-10 rounded-md border border-zinc-200 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50">{t("payments.cancel")}</button>
-          <button type="submit" disabled={saving} className="inline-flex h-10 items-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60">
-            <CreditCard className="size-4" />
-            {t("payments.createRequest")}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function PaymentFormField({
-  label,
-  value,
-  onChange,
-  required,
-  className,
-  inputMode,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  required?: boolean;
-  className?: string;
-  inputMode?: "decimal" | "numeric" | "text";
-  placeholder?: string;
-}) {
-  return (
-    <label className={`grid gap-1.5 text-sm font-medium text-zinc-800 ${className ?? ""}`}>
-      {label}
-      <input
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        required={required}
-        inputMode={inputMode}
-        placeholder={placeholder}
-        className="h-10 rounded-md border border-zinc-200 px-3 text-sm outline-none focus:border-zinc-950"
-      />
-    </label>
-  );
-}
-
-function PaymentRequestCard({
-  paymentRequest,
-  thread,
-  onUpdated,
-}: {
-  paymentRequest: PaymentRequestSummary;
-  thread: InquiryThread;
-  onUpdated: () => void;
-}) {
-  const { locale, t } = useI18n();
-  const [busy, setBusy] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const [currentTime, setCurrentTime] = useState(0);
-  const checkoutActionLockedRef = useRef(false);
-  const viewerCompanyId = getViewerCompanyId(thread);
-  const isSeller = viewerCompanyId === thread.sellerCompany.id;
-  const isBuyer = viewerCompanyId === thread.buyerCompany.id;
-  const expired =
-    currentTime > 0 &&
-    paymentRequest.status === "PENDING" &&
-    new Date(paymentRequest.paymentDueDate).getTime() <= currentTime;
-  const dispute = paymentRequest.disputes[0] ?? null;
-
-  useEffect(() => {
-    const updateCurrentTime = () => setCurrentTime(Date.now());
-    updateCurrentTime();
-    const timer = window.setInterval(updateCurrentTime, 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  async function pay() {
-    if (busy || processing || checkoutActionLockedRef.current) return;
-
-    checkoutActionLockedRef.current = true;
-    setBusy(true);
-    setError("");
-    setNotice("");
-    let keepCheckoutLocked = false;
-    try {
-      const returnPath =
-        window.location.pathname === "/ko/messages" || window.location.pathname === "/en/messages"
-          ? window.location.pathname
-          : "/messages";
-      const response = await fetch(`/api/payment-requests/${paymentRequest.id}/checkout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ returnPath }),
-      });
-      const result = (await response.json().catch(() => null)) as PaymentCheckoutResponsePayload;
-      const decision = decidePaymentCheckoutResponse({
-        statusCode: response.status,
-        payload: result,
-        processingFallback: t(
-          "payments.paymentProcessing",
-          "Payment confirmation is being processed. Please wait a moment and refresh the conversation.",
-        ),
-        errorFallback: t("payments.checkoutStartFailed", "Unable to start Checkout."),
-      });
-
-      if (decision.action === "redirect") {
-        window.location.assign(decision.url);
-        return;
-      }
-
-      if (decision.action === "processing") {
-        keepCheckoutLocked = true;
-        setProcessing(true);
-        setNotice(decision.message);
-        onUpdated();
-        window.setTimeout(onUpdated, 1_500);
-        return;
-      }
-
-      setError(decision.message);
-    } catch {
-      setError(t("payments.checkoutStartFailed", "Unable to start Checkout."));
-    } finally {
-      setBusy(false);
-      if (!keepCheckoutLocked) checkoutActionLockedRef.current = false;
-    }
-  }
-
-  async function cancel() {
-    if (!window.confirm(t("payments.cancelPaymentRequest"))) return;
-    setBusy(true);
-    setError("");
-    try {
-      const response = await fetch(`/api/payment-requests/${paymentRequest.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel" }),
-      });
-      const result = (await response.json().catch(() => null)) as { error?: string } | null;
-      if (!response.ok) {
-        setError(result?.error ?? "Unable to cancel this payment request.");
-        return;
-      }
-      onUpdated();
-    } catch {
-      setError("Unable to cancel this payment request.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <article className="mx-auto my-4 w-full max-w-xl rounded-xl border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">
-            <CreditCard className="size-3.5" />
-            {t("payments.paymentRequest")}
-          </p>
-          <h3 className="mt-1 text-base font-semibold">{paymentRequest.productName}</h3>
-          <p className="mt-1 text-sm text-zinc-600">{paymentRequest.quantity} {paymentRequest.unit}</p>
-        </div>
-        <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${paymentRequestStatusTone(paymentRequest.status)}`}>
-          {expired ? t("payments.paymentExpired") : paymentRequestStatusLabel(paymentRequest.status, t)}
-        </span>
-      </div>
-
-      <dl className="mt-4 grid gap-x-4 gap-y-2 border-y border-zinc-100 py-3 text-sm sm:grid-cols-2">
-        <PaymentCardMetric label={t("payments.productAmount")} value={formatPaymentMoney(paymentRequest.productAmount, paymentRequest.currency)} />
-        <PaymentCardMetric label={t("payments.shippingAmount")} value={formatPaymentMoney(paymentRequest.shippingAmount, paymentRequest.currency)} />
-        <PaymentCardMetric label={t("payments.grossAmount")} value={formatPaymentMoney(paymentRequest.grossAmount, paymentRequest.currency)} strong />
-        <PaymentCardMetric label={t("payments.paymentDue")} value={new Date(paymentRequest.paymentDueDate).toLocaleDateString(locale)} />
-        {isSeller ? <PaymentCardMetric label={t("payments.platformFee")} value={formatPaymentMoney(paymentRequest.platformFeeAmount, paymentRequest.currency)} /> : null}
-        {isSeller ? <PaymentCardMetric label={t("payments.sellerPayable")} value={formatPaymentMoney(paymentRequest.sellerPayableAmount, paymentRequest.currency)} strong /> : null}
-        {paymentRequest.refundAmount > 0 ? <PaymentCardMetric label={t("payments.refundAmount")} value={formatPaymentMoney(paymentRequest.refundAmount, paymentRequest.currency)} /> : null}
-        {dispute ? <PaymentCardMetric label={t("payments.disputeStatus")} value={dispute.status} /> : null}
-      </dl>
-
-      <div className="mt-3">
-        <p className="text-xs font-medium text-zinc-500">{t("payments.orderTermsLabel")}</p>
-        <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-700">{paymentRequest.orderTerms}</p>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-zinc-500">{new Date(paymentRequest.createdAt).toLocaleString(locale)}</p>
-        {isBuyer && paymentRequest.status === "PENDING" && !expired ? (
-          <button type="button" onClick={() => void pay()} disabled={busy || processing} className="inline-flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-xs font-semibold text-white hover:bg-zinc-800 disabled:opacity-60">
-            <CreditCard className="size-4" />
-            {t("payments.payNow")}
-          </button>
-        ) : null}
-        {isSeller && paymentRequest.status === "PENDING" ? (
-          <button type="button" onClick={() => void cancel()} disabled={busy} className="inline-flex h-9 items-center rounded-md border border-red-200 bg-white px-3 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60">
-            {t("payments.cancelPaymentRequest")}
-          </button>
-        ) : null}
-      </div>
-      {notice ? <p className="mt-3 text-sm font-medium text-blue-700">{notice}</p> : null}
-      {error ? <p className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
-    </article>
-  );
-}
-
-function PaymentCardMetric({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 sm:block">
-      <dt className="text-xs text-zinc-500">{label}</dt>
-      <dd className={`mt-0.5 ${strong ? "font-semibold text-zinc-950" : "font-medium text-zinc-700"}`}>{value}</dd>
-    </div>
-  );
-}
-
-function defaultPaymentDueDate() {
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 7);
-  return dueDate.toISOString().slice(0, 10);
-}
-
-function formatPaymentMoney(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(amount / 100);
-}
-
-function paymentRequestStatusLabel(
-  status: PaymentRequestSummary["status"],
-  t: (key: string, fallback?: string) => string,
-) {
-  const keyByStatus: Record<PaymentRequestSummary["status"], string> = {
-    PENDING: "payments.paymentPending",
-    PAID: "payments.paymentPaid",
-    RELEASED: "payments.paymentReleased",
-    CANCELLED: "payments.paymentCancelled",
-    PARTIALLY_REFUNDED: "payments.paymentPartiallyRefunded",
-    REFUNDED: "payments.paymentRefunded",
-    DISPUTED: "payments.paymentDisputed",
-  };
-  return t(keyByStatus[status], status);
-}
-
-function paymentRequestStatusTone(status: PaymentRequestSummary["status"]) {
-  if (status === "PAID" || status === "RELEASED") return "border-emerald-200 bg-emerald-50 text-emerald-800";
-  if (status === "DISPUTED" || status.includes("REFUND")) return "border-amber-200 bg-amber-50 text-amber-900";
-  if (status === "CANCELLED") return "border-zinc-200 bg-zinc-100 text-zinc-600";
-  return "border-blue-200 bg-blue-50 text-blue-800";
 }
 
 function DealControls({

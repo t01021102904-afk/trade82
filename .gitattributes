@@ -1,2 +1,0 @@
-# Preserve Prisma generator output exactly while excluding its known trailing whitespace from diff checks.
-src/generated/prisma/** whitespace=-trailing-space

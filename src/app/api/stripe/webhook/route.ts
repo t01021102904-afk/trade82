@@ -8,12 +8,6 @@ import {
   isMarketingExposurePlanId,
 } from "@/lib/marketing-exposure-shared";
 import {
-  markPaymentRequestPaidFromCheckoutSession,
-  markPaymentRequestPaidFromPaymentIntent,
-  syncPaymentRequestDispute,
-  syncPaymentRequestRefund,
-} from "@/lib/payment-requests";
-import {
   SELLER_SUPPORT_PRODUCT_TYPE,
   isActiveSellerSupportSubscription,
   isSellerSupportPlanId,
@@ -234,47 +228,7 @@ export async function POST(request: Request) {
         if (await activateMarketingExposureFromSession(session)) {
           break;
         }
-        if (
-          await markPaymentRequestPaidFromCheckoutSession(session, {
-            stripeEventId: event.id,
-            stripeEventType: event.type,
-          })
-        ) {
-          break;
-        }
         await updateFromSubscriptionId(idOf(session.subscription));
-        break;
-      }
-      case "checkout.session.async_payment_succeeded": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        await markPaymentRequestPaidFromCheckoutSession(session, {
-          stripeEventId: event.id,
-          stripeEventType: event.type,
-        });
-        break;
-      }
-      case "payment_intent.succeeded": {
-        await markPaymentRequestPaidFromPaymentIntent(event.data.object as Stripe.PaymentIntent, {
-          stripeEventId: event.id,
-          stripeEventType: event.type,
-        });
-        break;
-      }
-      case "refund.created":
-      case "refund.updated": {
-        await syncPaymentRequestRefund(event.data.object as Stripe.Refund, {
-          stripeEventId: event.id,
-          stripeEventType: event.type,
-        });
-        break;
-      }
-      case "charge.dispute.created":
-      case "charge.dispute.updated":
-      case "charge.dispute.closed": {
-        await syncPaymentRequestDispute(event.data.object as Stripe.Dispute, {
-          stripeEventId: event.id,
-          stripeEventType: event.type,
-        });
         break;
       }
       case "customer.subscription.created":

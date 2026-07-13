@@ -212,17 +212,6 @@ export async function hardDeleteCompanyForAdmin(companyId: string) {
   const productIds = company.products.map((product) => product.id);
   const attachmentIds = attachments.map((attachment) => attachment.id);
 
-  if (inquiryIds.length) {
-    const paymentRequestCount = await db.paymentRequest.count({
-      where: { inquiryId: { in: inquiryIds } },
-    });
-    if (paymentRequestCount > 0) {
-      throw new Error(
-        "Companies with payment history cannot be permanently deleted. Retain the record for financial reconciliation.",
-      );
-    }
-  }
-
   await db.$transaction(async (tx) => {
     if (attachmentIds.length) {
       await tx.messageAttachment.deleteMany({
