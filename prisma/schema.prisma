@@ -139,6 +139,36 @@ enum MarketingExposureStatus {
   CANCELLED
 }
 
+enum PaymentRequestStatus {
+  PENDING
+  PAID
+  RELEASED
+  CANCELLED
+  PARTIALLY_REFUNDED
+  REFUNDED
+  DISPUTED
+}
+
+enum PaymentRequestEventType {
+  CREATED
+  CHECKOUT_STARTED
+  PAID
+  RELEASED
+  CANCELLED
+  PARTIALLY_REFUNDED
+  REFUNDED
+  DISPUTE_OPENED
+  DISPUTE_UPDATED
+  DISPUTE_CLOSED
+  RECONCILIATION_REQUIRED
+}
+
+enum StripeFeeSyncStatus {
+  PENDING
+  SYNCED
+  FAILED
+}
+
 model UserProfile {
   id                         String                @id @default(cuid())
   clerkUserId                String                @unique
@@ -170,38 +200,41 @@ model UserProfile {
   buyerRfqRequests           RfqRequest[]          @relation("BuyerRfqRequests")
   reviewedRfqRequests        RfqRequest[]          @relation("ReviewedRfqRequests")
   marketingExposures         MarketingExposure[]
+  createdPaymentRequests     PaymentRequest[]      @relation("PaymentRequestCreator")
+  releasedPaymentRequests    PaymentRequest[]      @relation("PaymentRequestReleasedBy")
+  paymentRequestEvents       PaymentRequestEvent[] @relation("PaymentRequestEventActor")
   createdAt                  DateTime              @default(now())
   updatedAt                  DateTime              @updatedAt
 }
 
 model Company {
-  id                           String                    @id @default(cuid())
-  ownerUserId                  String
-  owner                        UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
-  companyRole                  CompanyRole
-  legalName                    String
-  tradeName                    String?
-  displayNameEn                String                    @default("")
-  logoOriginalUrl              String?
-  logoThumbnailUrl             String?
-  logoUrl                      String?
-  useDefaultLogo               Boolean                   @default(true)
-  website                      String                    @default("")
-  country                      String
-  city                         String                    @default("")
-  stateOrProvince              String                    @default("")
-  businessAddress              String
-  description                  String                    @default("")
-  descriptionEn                String                    @default("")
-  categories                   String[]                  @default([])
-  viewCount                    Int                       @default(0)
-  verificationStatus           CompanyVerificationStatus @default(unverified)
-  stripeCustomerId             String?                   @unique
-  stripeSubscriptionId         String?                   @unique
-  subscriptionStatus           String?
-  subscriptionPlan             String?
-  subscriptionCurrentPeriodEnd DateTime?
-  verifiedSellerSince          DateTime?
+  id                                String                    @id @default(cuid())
+  ownerUserId                       String
+  owner                             UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  companyRole                       CompanyRole
+  legalName                         String
+  tradeName                         String?
+  displayNameEn                     String                    @default("")
+  logoOriginalUrl                   String?
+  logoThumbnailUrl                  String?
+  logoUrl                           String?
+  useDefaultLogo                    Boolean                   @default(true)
+  website                           String                    @default("")
+  country                           String
+  city                              String                    @default("")
+  stateOrProvince                   String                    @default("")
+  businessAddress                   String
+  description                       String                    @default("")
+  descriptionEn                     String                    @default("")
+  categories                        String[]                  @default([])
+  viewCount                         Int                       @default(0)
+  verificationStatus                CompanyVerificationStatus @default(unverified)
+  stripeCustomerId                  String?                   @unique
+  stripeSubscriptionId              String?                   @unique
+  subscriptionStatus                String?
+  subscriptionPlan                  String?
+  subscriptionCurrentPeriodEnd      DateTime?
+  verifiedSellerSince               DateTime?
   sellerSupportPlan                 String?
   sellerSupportStatus               String?
   sellerSupportStripeCustomerId     String?                   @unique
@@ -209,31 +242,33 @@ model Company {
   sellerSupportCurrentPeriodEnd     DateTime?
   sellerSupportMonthlyLimit         Int                       @default(0)
   sellerSupportMonthlyUsed          Int                       @default(0)
-  sellerProfile                SellerProfile?
-  buyerProfile                 BuyerProfile?
-  products                     Product[]
-  verificationRequests         VerificationRequest[]
-  buyerInquiries               Inquiry[]                 @relation("BuyerCompanyInquiries")
-  sellerInquiries              Inquiry[]                 @relation("SellerCompanyInquiries")
-  recipientInquiries           Inquiry[]                 @relation("RecipientCompanyInquiries")
-  rfqSellerQuotes              RfqSellerQuote[]          @relation("SellerCompanyRfqQuotes")
-  sentCompanyMessages          Message[]                 @relation("MessageSenderCompany")
-  receivedMessages             Message[]                 @relation("MessageReceiverCompany")
-  uploadedMessageAttachments   MessageAttachment[]       @relation("MessageAttachmentCompany")
-  documentFolders              DocumentFolder[]          @relation("CompanyDocumentFolders")
-  tradeDocuments               TradeDocument[]           @relation("CompanyTradeDocuments")
-  sharedTradeDocuments         TradeDocument[]           @relation("SharedBuyerDocuments")
-  savedItems                   SavedItem[]
-  buyerDeals                   Deal[]                    @relation("BuyerCompanyDeals")
-  sellerDeals                  Deal[]                    @relation("SellerCompanyDeals")
-  buyerRfqRequests             RfqRequest[]              @relation("BuyerCompanyRfqs")
-  marketingExposures           MarketingExposure[]
-  reviewsWritten               Review[]                  @relation("ReviewWriter")
-  reviewsReceived              Review[]                  @relation("ReviewRecipient")
-  companyReviewsWritten        CompanyReview[]           @relation("CompanyReviewWriter")
-  companyReviewsReceived       CompanyReview[]           @relation("CompanyReviewRecipient")
-  createdAt                    DateTime                  @default(now())
-  updatedAt                    DateTime                  @updatedAt
+  sellerProfile                     SellerProfile?
+  buyerProfile                      BuyerProfile?
+  products                          Product[]
+  verificationRequests              VerificationRequest[]
+  buyerInquiries                    Inquiry[]                 @relation("BuyerCompanyInquiries")
+  sellerInquiries                   Inquiry[]                 @relation("SellerCompanyInquiries")
+  recipientInquiries                Inquiry[]                 @relation("RecipientCompanyInquiries")
+  rfqSellerQuotes                   RfqSellerQuote[]          @relation("SellerCompanyRfqQuotes")
+  sentCompanyMessages               Message[]                 @relation("MessageSenderCompany")
+  receivedMessages                  Message[]                 @relation("MessageReceiverCompany")
+  uploadedMessageAttachments        MessageAttachment[]       @relation("MessageAttachmentCompany")
+  documentFolders                   DocumentFolder[]          @relation("CompanyDocumentFolders")
+  tradeDocuments                    TradeDocument[]           @relation("CompanyTradeDocuments")
+  sharedTradeDocuments              TradeDocument[]           @relation("SharedBuyerDocuments")
+  savedItems                        SavedItem[]
+  buyerDeals                        Deal[]                    @relation("BuyerCompanyDeals")
+  sellerDeals                       Deal[]                    @relation("SellerCompanyDeals")
+  buyerRfqRequests                  RfqRequest[]              @relation("BuyerCompanyRfqs")
+  marketingExposures                MarketingExposure[]
+  buyerPaymentRequests              PaymentRequest[]          @relation("BuyerCompanyPaymentRequests")
+  sellerPaymentRequests             PaymentRequest[]          @relation("SellerCompanyPaymentRequests")
+  reviewsWritten                    Review[]                  @relation("ReviewWriter")
+  reviewsReceived                   Review[]                  @relation("ReviewRecipient")
+  companyReviewsWritten             CompanyReview[]           @relation("CompanyReviewWriter")
+  companyReviewsReceived            CompanyReview[]           @relation("CompanyReviewRecipient")
+  createdAt                         DateTime                  @default(now())
+  updatedAt                         DateTime                  @updatedAt
 
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
@@ -274,60 +309,60 @@ model BuyerProfile {
 }
 
 model Product {
-  id                       String         @id @default(cuid())
+  id                       String              @id @default(cuid())
   sellerCompanyId          String
-  sellerCompany            Company        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  sellerCompany            Company             @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
   name                     String
-  nameEn                   String         @default("")
-  slug                     String         @unique
+  nameEn                   String              @default("")
+  slug                     String              @unique
   imageUrl                 String?
   category                 String
-  tags                     String[]       @default([])
-  tagsEn                   String[]       @default([])
+  tags                     String[]            @default([])
+  tagsEn                   String[]            @default([])
   shortDescription         String
-  shortDescriptionEn       String         @default("")
+  shortDescriptionEn       String              @default("")
   detailedDescription      String
-  detailedDescriptionEn    String         @default("")
-  priceMin                 Decimal?       @db.Decimal(14, 2)
-  priceMax                 Decimal?       @db.Decimal(14, 2)
-  currency                 String         @default("USD")
-  priceUnit                String         @default("unit")
+  detailedDescriptionEn    String              @default("")
+  priceMin                 Decimal?            @db.Decimal(14, 2)
+  priceMax                 Decimal?            @db.Decimal(14, 2)
+  currency                 String              @default("USD")
+  priceUnit                String              @default("unit")
   moq                      String
-  moqQuantity              String         @default("")
-  moqUnit                  String         @default("Units")
+  moqQuantity              String              @default("")
+  moqUnit                  String              @default("Units")
   leadTime                 String
-  leadTimeCode             String         @default("")
-  sampleAvailability       String         @default("")
-  privateLabelAvailability String         @default("")
-  monthlyCapacity          String         @default("")
-  monthlyCapacityUnit      String         @default("Units")
-  origin                   String         @default("South Korea")
-  countryOfOrigin          String         @default("South Korea")
-  shippingOriginCountry    String         @default("South Korea")
-  shippingOriginRegion     String         @default("")
-  incoterms                String[]       @default([])
-  hsCode                   String         @default("")
-  shelfLife                String         @default("")
-  storageRequirements      String         @default("")
-  documentsAvailable       String[]       @default([])
-  complianceClaims         String[]       @default([])
-  buyerNotes               String         @default("")
-  buyerNotesEn             String         @default("")
-  riskNotes                String[]       @default([])
-  certifications           String[]       @default([])
+  leadTimeCode             String              @default("")
+  sampleAvailability       String              @default("")
+  privateLabelAvailability String              @default("")
+  monthlyCapacity          String              @default("")
+  monthlyCapacityUnit      String              @default("Units")
+  origin                   String              @default("South Korea")
+  countryOfOrigin          String              @default("South Korea")
+  shippingOriginCountry    String              @default("South Korea")
+  shippingOriginRegion     String              @default("")
+  incoterms                String[]            @default([])
+  hsCode                   String              @default("")
+  shelfLife                String              @default("")
+  storageRequirements      String              @default("")
+  documentsAvailable       String[]            @default([])
+  complianceClaims         String[]            @default([])
+  buyerNotes               String              @default("")
+  buyerNotesEn             String              @default("")
+  riskNotes                String[]            @default([])
+  certifications           String[]            @default([])
   ingredientsOrMaterials   String
   packaging                String
-  packageSize              String         @default("")
-  unitsPerCarton           String         @default("")
-  cartonWeight             String         @default("")
-  cartonDimensions         String         @default("")
-  palletQuantity           String         @default("")
-  storageTemperature       String         @default("")
-  suggestedUsChannels      String[]       @default([])
-  fieldVisibility          Json           @default("{}") @map("field_visibility")
-  exportReadiness          Boolean        @default(false)
-  viewCount                Int            @default(0)
-  status                   ProductStatus  @default(draft)
+  packageSize              String              @default("")
+  unitsPerCarton           String              @default("")
+  cartonWeight             String              @default("")
+  cartonDimensions         String              @default("")
+  palletQuantity           String              @default("")
+  storageTemperature       String              @default("")
+  suggestedUsChannels      String[]            @default([])
+  fieldVisibility          Json                @default("{}") @map("field_visibility")
+  exportReadiness          Boolean             @default(false)
+  viewCount                Int                 @default(0)
+  status                   ProductStatus       @default(draft)
   images                   ProductImage[]
   inquiries                Inquiry[]
   savedItems               SavedItem[]
@@ -335,8 +370,8 @@ model Product {
   rfqMatches               RfqMatchedProduct[]
   rfqSellerQuotes          RfqSellerQuote[]
   marketingExposures       MarketingExposure[]
-  createdAt                DateTime       @default(now())
-  updatedAt                DateTime       @updatedAt
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 
   @@index([sellerCompanyId, status])
   @@index([category])
@@ -411,7 +446,8 @@ model Inquiry {
   messages           Message[]
   attachments        MessageAttachment[]
   deals              Deal[]
-  rfqSellerQuotes    RfqSellerQuote[]     @relation("RfqQuoteConversation")
+  paymentRequests    PaymentRequest[]
+  rfqSellerQuotes    RfqSellerQuote[]    @relation("RfqQuoteConversation")
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
@@ -420,37 +456,37 @@ model Inquiry {
 }
 
 model RfqRequest {
-  id                             String         @id @default(cuid())
-  buyerUserId                    String
-  buyerUser                      UserProfile    @relation("BuyerRfqRequests", fields: [buyerUserId], references: [id], onDelete: Cascade)
-  buyerCompanyId                 String?
-  buyerCompany                   Company?       @relation("BuyerCompanyRfqs", fields: [buyerCompanyId], references: [id], onDelete: SetNull)
-  productName                    String
-  category                       String
-  sourcingType                   String
-  sourcingPurpose                String?
-  quantity                       String
-  tradeTerms                     String
-  destinationCountry             String?
-  preferredUnitPriceAmount       Decimal?       @db.Decimal(14, 2)
-  preferredUnitPriceCurrency     String?
-  shape                          String?
-  capacity                       String?
-  material                       String?
-  certification                  String?
-  feature                        String?
-  targetDeliveryDate             DateTime?
-  details                        String
-  status                         RfqStatus      @default(SUBMITTED)
-  adminStatus                    RfqAdminStatus @default(PENDING_REVIEW)
-  adminNote                      String?
-  reviewedByUserId               String?
-  reviewedByUser                 UserProfile?   @relation("ReviewedRfqRequests", fields: [reviewedByUserId], references: [id])
-  reviewedAt                     DateTime?
-  matchedProducts                RfqMatchedProduct[]
-  sellerQuotes                   RfqSellerQuote[]
-  createdAt                      DateTime       @default(now())
-  updatedAt                      DateTime       @updatedAt
+  id                         String              @id @default(cuid())
+  buyerUserId                String
+  buyerUser                  UserProfile         @relation("BuyerRfqRequests", fields: [buyerUserId], references: [id], onDelete: Cascade)
+  buyerCompanyId             String?
+  buyerCompany               Company?            @relation("BuyerCompanyRfqs", fields: [buyerCompanyId], references: [id], onDelete: SetNull)
+  productName                String
+  category                   String
+  sourcingType               String
+  sourcingPurpose            String?
+  quantity                   String
+  tradeTerms                 String
+  destinationCountry         String?
+  preferredUnitPriceAmount   Decimal?            @db.Decimal(14, 2)
+  preferredUnitPriceCurrency String?
+  shape                      String?
+  capacity                   String?
+  material                   String?
+  certification              String?
+  feature                    String?
+  targetDeliveryDate         DateTime?
+  details                    String
+  status                     RfqStatus           @default(SUBMITTED)
+  adminStatus                RfqAdminStatus      @default(PENDING_REVIEW)
+  adminNote                  String?
+  reviewedByUserId           String?
+  reviewedByUser             UserProfile?        @relation("ReviewedRfqRequests", fields: [reviewedByUserId], references: [id])
+  reviewedAt                 DateTime?
+  matchedProducts            RfqMatchedProduct[]
+  sellerQuotes               RfqSellerQuote[]
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
 
   @@index([buyerUserId, createdAt])
   @@index([buyerCompanyId, createdAt])
@@ -527,6 +563,118 @@ model MarketingExposure {
   @@index([companyId, status])
   @@index([productId, status])
   @@index([status, startsAt, endsAt])
+}
+
+model PaymentRequest {
+  id                           String                       @id @default(cuid())
+  inquiryId                    String
+  inquiry                      Inquiry                      @relation(fields: [inquiryId], references: [id], onDelete: Restrict)
+  buyerCompanyId               String
+  buyerCompany                 Company                      @relation("BuyerCompanyPaymentRequests", fields: [buyerCompanyId], references: [id], onDelete: Restrict)
+  sellerCompanyId              String
+  sellerCompany                Company                      @relation("SellerCompanyPaymentRequests", fields: [sellerCompanyId], references: [id], onDelete: Restrict)
+  createdByUserId              String
+  createdByUser                UserProfile                  @relation("PaymentRequestCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  productName                  String
+  quantity                     String
+  unit                         String
+  productAmount                Int
+  shippingAmount               Int
+  grossAmount                  Int
+  platformFeeAmount            Int
+  sellerPayableAmount          Int
+  stripeProcessingFeeAmount    Int?
+  stripeFeeSyncStatus          StripeFeeSyncStatus          @default(PENDING)
+  stripeFeeSyncError           String?
+  stripeFeeSyncedAt            DateTime?
+  refundAmount                 Int                          @default(0)
+  currency                     String                       @default("usd")
+  paymentDueDate               DateTime
+  orderTerms                   String
+  status                       PaymentRequestStatus         @default(PENDING)
+  stripeCheckoutSessionId      String?                      @unique
+  stripePaymentIntentId        String?                      @unique
+  stripeChargeId               String?                      @unique
+  checkoutAttempt              Int                          @default(0)
+  checkoutLockToken            String?
+  checkoutLockExpiresAt        DateTime?
+  paidAt                       DateTime?
+  cancelledAt                  DateTime?
+  releasedAt                   DateTime?
+  manualPayoutReference        String?
+  manualPayoutDate             DateTime?
+  manualPayoutNote             String?
+  sellerReleasedAmount         Int?
+  releasedByUserId             String?
+  releasedByUser               UserProfile?                 @relation("PaymentRequestReleasedBy", fields: [releasedByUserId], references: [id], onDelete: SetNull)
+  requiresManualReconciliation Boolean                      @default(false)
+  reconciliationNote           String?
+  refunds                      PaymentRefund[]
+  disputes                     PaymentDispute[]
+  events                       PaymentRequestEvent[]
+  webhookEvents                PaymentRequestWebhookEvent[]
+  createdAt                    DateTime                     @default(now())
+  updatedAt                    DateTime                     @updatedAt
+
+  @@index([inquiryId, createdAt])
+  @@index([buyerCompanyId, status])
+  @@index([sellerCompanyId, status])
+  @@index([status, paymentDueDate])
+  @@index([status, checkoutLockExpiresAt])
+}
+
+model PaymentRefund {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeRefundId   String         @unique
+  amount           Int
+  status           String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([paymentRequestId, createdAt])
+}
+
+model PaymentDispute {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeDisputeId  String         @unique
+  amount           Int
+  status           String
+  reason           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([paymentRequestId, createdAt])
+}
+
+model PaymentRequestEvent {
+  id               String                  @id @default(cuid())
+  paymentRequestId String
+  paymentRequest   PaymentRequest          @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  eventType        PaymentRequestEventType
+  actorUserId      String?
+  actorUser        UserProfile?            @relation("PaymentRequestEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  stripeEventId    String?                 @unique
+  message          String?
+  metadata         Json                    @default("{}")
+  createdAt        DateTime                @default(now())
+
+  @@index([paymentRequestId, createdAt])
+  @@index([eventType, createdAt])
+}
+
+model PaymentRequestWebhookEvent {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeEventId    String         @unique
+  stripeEventType  String
+  createdAt        DateTime       @default(now())
+
+  @@index([paymentRequestId, createdAt])
 }
 
 model SavedItem {
