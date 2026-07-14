@@ -80,6 +80,7 @@ export const ModelName = {
   SellerPayout: 'SellerPayout',
   SellerPayoutEvent: 'SellerPayoutEvent',
   SellerPayoutAdjustment: 'SellerPayoutAdjustment',
+  InternalOrderTestRun: 'InternalOrderTestRun',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -783,6 +784,33 @@ export const SellerPayoutAdjustmentScalarFieldEnum = {
 } as const
 
 export type SellerPayoutAdjustmentScalarFieldEnum = (typeof SellerPayoutAdjustmentScalarFieldEnum)[keyof typeof SellerPayoutAdjustmentScalarFieldEnum]
+
+
+export const InternalOrderTestRunScalarFieldEnum = {
+  id: 'id',
+  isInternalTest: 'isInternalTest',
+  testLabel: 'testLabel',
+  testerClerkUserId: 'testerClerkUserId',
+  idempotencyKey: 'idempotencyKey',
+  testOrderReference: 'testOrderReference',
+  status: 'status',
+  productName: 'productName',
+  productAmount: 'productAmount',
+  shippingAmount: 'shippingAmount',
+  grossAmount: 'grossAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  currency: 'currency',
+  simulatedPaidAmount: 'simulatedPaidAmount',
+  simulatedRefundAmount: 'simulatedRefundAmount',
+  payoutPreviewAmount: 'payoutPreviewAmount',
+  payoutPreviewGeneratedAt: 'payoutPreviewGeneratedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InternalOrderTestRunScalarFieldEnum = (typeof InternalOrderTestRunScalarFieldEnum)[keyof typeof InternalOrderTestRunScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {

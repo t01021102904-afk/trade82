@@ -427,6 +427,17 @@ export const SellerPayoutAdjustmentType = {
 export type SellerPayoutAdjustmentType = (typeof SellerPayoutAdjustmentType)[keyof typeof SellerPayoutAdjustmentType]
 
 
+export const InternalOrderTestStatus = {
+  CREATED: 'CREATED',
+  SIMULATED_PAID: 'SIMULATED_PAID',
+  SIMULATED_PARTIALLY_REFUNDED: 'SIMULATED_PARTIALLY_REFUNDED',
+  SIMULATED_REFUNDED: 'SIMULATED_REFUNDED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type InternalOrderTestStatus = (typeof InternalOrderTestStatus)[keyof typeof InternalOrderTestStatus]
+
+
 export const BankDirectorySourceType = {
   SEED: 'SEED',
   ADMIN: 'ADMIN',

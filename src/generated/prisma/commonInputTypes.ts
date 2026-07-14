@@ -871,6 +871,23 @@ export type EnumSellerPayoutAdjustmentTypeWithAggregatesFilter<$PrismaModel = ne
   _max?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
 }
 
+export type EnumInternalOrderTestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.InternalOrderTestStatus | Prisma.EnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel> | $Enums.InternalOrderTestStatus
+}
+
+export type EnumInternalOrderTestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InternalOrderTestStatus | Prisma.EnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInternalOrderTestStatusWithAggregatesFilter<$PrismaModel> | $Enums.InternalOrderTestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel>
+}
+
 export type EnumSavedItemTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.SavedItemType | Prisma.EnumSavedItemTypeFieldRefInput<$PrismaModel>
   in?: $Enums.SavedItemType[] | Prisma.ListEnumSavedItemTypeFieldRefInput<$PrismaModel>
@@ -1831,6 +1848,23 @@ export type NestedEnumSellerPayoutAdjustmentTypeWithAggregatesFilter<$PrismaMode
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumInternalOrderTestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.InternalOrderTestStatus | Prisma.EnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel> | $Enums.InternalOrderTestStatus
+}
+
+export type NestedEnumInternalOrderTestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.InternalOrderTestStatus | Prisma.EnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.InternalOrderTestStatus[] | Prisma.ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumInternalOrderTestStatusWithAggregatesFilter<$PrismaModel> | $Enums.InternalOrderTestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumInternalOrderTestStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumSavedItemTypeFilter<$PrismaModel = never> = {

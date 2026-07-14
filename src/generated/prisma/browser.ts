@@ -163,6 +163,11 @@ export type SellerPayoutEvent = Prisma.SellerPayoutEventModel
  */
 export type SellerPayoutAdjustment = Prisma.SellerPayoutAdjustmentModel
 /**
+ * Model InternalOrderTestRun
+ * 
+ */
+export type InternalOrderTestRun = Prisma.InternalOrderTestRunModel
+/**
  * Model SavedItem
  * 
  */
