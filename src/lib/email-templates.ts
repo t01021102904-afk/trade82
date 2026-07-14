@@ -66,6 +66,24 @@ type SecurityNoticeEmailInput = {
   baseUrl?: string;
 };
 
+export type TradeOrderNotificationKind =
+  | "order_created"
+  | "payment_received"
+  | "shipment_updated"
+  | "payout_on_hold"
+  | "payout_sent"
+  | "payout_failed";
+
+type TradeOrderNotificationEmailInput = {
+  kind: TradeOrderNotificationKind;
+  orderNumber: string;
+  productName: string;
+  counterpartyCompanyName: string;
+  ctaPath: string;
+  locale?: EmailLocale;
+  baseUrl?: string;
+};
+
 const brandName = "Trade82";
 const brandPrefix = brandName.slice(0, -2);
 const brandSuffix = brandName.slice(-2);
@@ -384,6 +402,47 @@ export function messageNotificationEmail({
         : `${senderCompanyName} sent you a new message.`,
     body,
     ctaLabel: locale === "ko" ? "메시지 보기" : "Open message",
+    ctaPath,
+    baseUrl,
+  });
+}
+
+export function tradeOrderNotificationEmail({
+  kind,
+  orderNumber,
+  productName,
+  counterpartyCompanyName,
+  ctaPath,
+  locale = "en",
+  baseUrl,
+}: TradeOrderNotificationEmailInput): EmailRender {
+  const english = {
+    order_created: ["Order created", "A Trade82 order is ready for review."],
+    payment_received: ["Payment received", "Payment was confirmed for your Trade82 order."],
+    shipment_updated: ["Shipment updated", "Shipment information was updated for your Trade82 order."],
+    payout_on_hold: ["Seller payout on hold", "A seller payout requires review before it can proceed."],
+    payout_sent: ["Seller payout marked as sent", "Trade82 recorded an external seller payout as sent."],
+    payout_failed: ["Seller payout needs attention", "A seller payout could not be completed and requires review."],
+  } as const;
+  const korean = {
+    order_created: ["주문이 생성되었습니다", "Trade82 주문이 검토 준비되었습니다."],
+    payment_received: ["결제가 확인되었습니다", "Trade82 주문의 결제가 확인되었습니다."],
+    shipment_updated: ["배송 정보가 업데이트되었습니다", "Trade82 주문의 배송 정보가 업데이트되었습니다."],
+    payout_on_hold: ["셀러 정산이 보류되었습니다", "셀러 정산을 진행하기 전에 검토가 필요합니다."],
+    payout_sent: ["셀러 정산이 전송 완료로 기록되었습니다", "Trade82가 외부 셀러 정산을 전송 완료로 기록했습니다."],
+    payout_failed: ["셀러 정산 확인이 필요합니다", "셀러 정산을 완료할 수 없어 검토가 필요합니다."],
+  } as const;
+  const [title, intro] = (locale === "ko" ? korean : english)[kind];
+  const body = locale === "ko"
+    ? `주문 번호: ${orderNumber}\n상품: ${productName}\n상대 회사: ${counterpartyCompanyName}`
+    : `Order: ${orderNumber}\nProduct: ${productName}\nCounterparty: ${counterpartyCompanyName}`;
+  return renderBrandedEmail({
+    locale,
+    preview: title,
+    title,
+    intro,
+    body,
+    ctaLabel: locale === "ko" ? "주문 보기" : "View order",
     ctaPath,
     baseUrl,
   });

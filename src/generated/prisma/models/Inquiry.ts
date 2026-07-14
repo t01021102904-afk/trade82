@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model Inquiry
@@ -247,6 +247,7 @@ export type InquiryWhereInput = {
   attachments?: Prisma.MessageAttachmentListRelationFilter
   deals?: Prisma.DealListRelationFilter
   paymentRequests?: Prisma.PaymentRequestListRelationFilter
+  tradeOrders?: Prisma.TradeOrderListRelationFilter
   rfqSellerQuotes?: Prisma.RfqSellerQuoteListRelationFilter
 }
 
@@ -272,6 +273,7 @@ export type InquiryOrderByWithRelationInput = {
   attachments?: Prisma.MessageAttachmentOrderByRelationAggregateInput
   deals?: Prisma.DealOrderByRelationAggregateInput
   paymentRequests?: Prisma.PaymentRequestOrderByRelationAggregateInput
+  tradeOrders?: Prisma.TradeOrderOrderByRelationAggregateInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteOrderByRelationAggregateInput
 }
 
@@ -300,6 +302,7 @@ export type InquiryWhereUniqueInput = Prisma.AtLeast<{
   attachments?: Prisma.MessageAttachmentListRelationFilter
   deals?: Prisma.DealListRelationFilter
   paymentRequests?: Prisma.PaymentRequestListRelationFilter
+  tradeOrders?: Prisma.TradeOrderListRelationFilter
   rfqSellerQuotes?: Prisma.RfqSellerQuoteListRelationFilter
 }, "id">
 
@@ -356,6 +359,7 @@ export type InquiryCreateInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -376,6 +380,7 @@ export type InquiryUncheckedCreateInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -396,6 +401,7 @@ export type InquiryUpdateInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -416,6 +422,7 @@ export type InquiryUncheckedUpdateInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -768,6 +775,20 @@ export type InquiryUpdateOneRequiredWithoutPaymentRequestsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InquiryUpdateToOneWithWhereWithoutPaymentRequestsInput, Prisma.InquiryUpdateWithoutPaymentRequestsInput>, Prisma.InquiryUncheckedUpdateWithoutPaymentRequestsInput>
 }
 
+export type InquiryCreateNestedOneWithoutTradeOrdersInput = {
+  create?: Prisma.XOR<Prisma.InquiryCreateWithoutTradeOrdersInput, Prisma.InquiryUncheckedCreateWithoutTradeOrdersInput>
+  connectOrCreate?: Prisma.InquiryCreateOrConnectWithoutTradeOrdersInput
+  connect?: Prisma.InquiryWhereUniqueInput
+}
+
+export type InquiryUpdateOneRequiredWithoutTradeOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.InquiryCreateWithoutTradeOrdersInput, Prisma.InquiryUncheckedCreateWithoutTradeOrdersInput>
+  connectOrCreate?: Prisma.InquiryCreateOrConnectWithoutTradeOrdersInput
+  upsert?: Prisma.InquiryUpsertWithoutTradeOrdersInput
+  connect?: Prisma.InquiryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InquiryUpdateToOneWithWhereWithoutTradeOrdersInput, Prisma.InquiryUpdateWithoutTradeOrdersInput>, Prisma.InquiryUncheckedUpdateWithoutTradeOrdersInput>
+}
+
 export type InquiryCreateNestedOneWithoutMessagesInput = {
   create?: Prisma.XOR<Prisma.InquiryCreateWithoutMessagesInput, Prisma.InquiryUncheckedCreateWithoutMessagesInput>
   connectOrCreate?: Prisma.InquiryCreateOrConnectWithoutMessagesInput
@@ -830,6 +851,7 @@ export type InquiryCreateWithoutSenderInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -849,6 +871,7 @@ export type InquiryUncheckedCreateWithoutSenderInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -912,6 +935,7 @@ export type InquiryCreateWithoutBuyerCompanyInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -931,6 +955,7 @@ export type InquiryUncheckedCreateWithoutBuyerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -960,6 +985,7 @@ export type InquiryCreateWithoutSellerCompanyInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -979,6 +1005,7 @@ export type InquiryUncheckedCreateWithoutSellerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1008,6 +1035,7 @@ export type InquiryCreateWithoutRecipientCompanyInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1027,6 +1055,7 @@ export type InquiryUncheckedCreateWithoutRecipientCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1104,6 +1133,7 @@ export type InquiryCreateWithoutProductInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1123,6 +1153,7 @@ export type InquiryUncheckedCreateWithoutProductInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1169,6 +1200,7 @@ export type InquiryCreateWithoutRfqSellerQuotesInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
 }
 
 export type InquiryUncheckedCreateWithoutRfqSellerQuotesInput = {
@@ -1188,6 +1220,7 @@ export type InquiryUncheckedCreateWithoutRfqSellerQuotesInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
 }
 
 export type InquiryCreateOrConnectWithoutRfqSellerQuotesInput = {
@@ -1223,6 +1256,7 @@ export type InquiryUpdateWithoutRfqSellerQuotesInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
 }
 
 export type InquiryUncheckedUpdateWithoutRfqSellerQuotesInput = {
@@ -1242,6 +1276,7 @@ export type InquiryUncheckedUpdateWithoutRfqSellerQuotesInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
 }
 
 export type InquiryCreateWithoutPaymentRequestsInput = {
@@ -1260,6 +1295,7 @@ export type InquiryCreateWithoutPaymentRequestsInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutInquiryInput
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1279,6 +1315,7 @@ export type InquiryUncheckedCreateWithoutPaymentRequestsInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutInquiryInput
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1314,6 +1351,7 @@ export type InquiryUpdateWithoutPaymentRequestsInput = {
   messages?: Prisma.MessageUpdateManyWithoutInquiryNestedInput
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1333,6 +1371,103 @@ export type InquiryUncheckedUpdateWithoutPaymentRequestsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutInquiryNestedInput
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
+}
+
+export type InquiryCreateWithoutTradeOrdersInput = {
+  id?: string
+  message: string
+  quantity?: string | null
+  targetDate?: Date | string | null
+  status?: $Enums.InquiryStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerInquiriesInput
+  sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerInquiriesInput
+  product?: Prisma.ProductCreateNestedOneWithoutInquiriesInput
+  sender: Prisma.UserProfileCreateNestedOneWithoutSentInquiriesInput
+  recipientCompany: Prisma.CompanyCreateNestedOneWithoutRecipientInquiriesInput
+  messages?: Prisma.MessageCreateNestedManyWithoutInquiryInput
+  attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
+  deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
+  paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
+}
+
+export type InquiryUncheckedCreateWithoutTradeOrdersInput = {
+  id?: string
+  buyerCompanyId: string
+  sellerCompanyId: string
+  productId?: string | null
+  senderUserId: string
+  recipientCompanyId: string
+  message: string
+  quantity?: string | null
+  targetDate?: Date | string | null
+  status?: $Enums.InquiryStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutInquiryInput
+  attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
+  paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
+}
+
+export type InquiryCreateOrConnectWithoutTradeOrdersInput = {
+  where: Prisma.InquiryWhereUniqueInput
+  create: Prisma.XOR<Prisma.InquiryCreateWithoutTradeOrdersInput, Prisma.InquiryUncheckedCreateWithoutTradeOrdersInput>
+}
+
+export type InquiryUpsertWithoutTradeOrdersInput = {
+  update: Prisma.XOR<Prisma.InquiryUpdateWithoutTradeOrdersInput, Prisma.InquiryUncheckedUpdateWithoutTradeOrdersInput>
+  create: Prisma.XOR<Prisma.InquiryCreateWithoutTradeOrdersInput, Prisma.InquiryUncheckedCreateWithoutTradeOrdersInput>
+  where?: Prisma.InquiryWhereInput
+}
+
+export type InquiryUpdateToOneWithWhereWithoutTradeOrdersInput = {
+  where?: Prisma.InquiryWhereInput
+  data: Prisma.XOR<Prisma.InquiryUpdateWithoutTradeOrdersInput, Prisma.InquiryUncheckedUpdateWithoutTradeOrdersInput>
+}
+
+export type InquiryUpdateWithoutTradeOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerInquiriesNestedInput
+  sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerInquiriesNestedInput
+  product?: Prisma.ProductUpdateOneWithoutInquiriesNestedInput
+  sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentInquiriesNestedInput
+  recipientCompany?: Prisma.CompanyUpdateOneRequiredWithoutRecipientInquiriesNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutInquiryNestedInput
+  attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
+  deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
+  paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
+}
+
+export type InquiryUncheckedUpdateWithoutTradeOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  recipientCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  status?: Prisma.EnumInquiryStatusFieldUpdateOperationsInput | $Enums.InquiryStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutInquiryNestedInput
+  attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
+  paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1352,6 +1487,7 @@ export type InquiryCreateWithoutMessagesInput = {
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1371,6 +1507,7 @@ export type InquiryUncheckedCreateWithoutMessagesInput = {
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1406,6 +1543,7 @@ export type InquiryUpdateWithoutMessagesInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1425,6 +1563,7 @@ export type InquiryUncheckedUpdateWithoutMessagesInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1444,6 +1583,7 @@ export type InquiryCreateWithoutAttachmentsInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1463,6 +1603,7 @@ export type InquiryUncheckedCreateWithoutAttachmentsInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutInquiryInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1498,6 +1639,7 @@ export type InquiryUpdateWithoutAttachmentsInput = {
   messages?: Prisma.MessageUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1517,6 +1659,7 @@ export type InquiryUncheckedUpdateWithoutAttachmentsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1536,6 +1679,7 @@ export type InquiryCreateWithoutDealsInput = {
   messages?: Prisma.MessageCreateNestedManyWithoutInquiryInput
   attachments?: Prisma.MessageAttachmentCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutConversationInput
 }
 
@@ -1555,6 +1699,7 @@ export type InquiryUncheckedCreateWithoutDealsInput = {
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutInquiryInput
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutInquiryInput
   paymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutInquiryInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutInquiryInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutConversationInput
 }
 
@@ -1590,6 +1735,7 @@ export type InquiryUpdateWithoutDealsInput = {
   messages?: Prisma.MessageUpdateManyWithoutInquiryNestedInput
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1609,6 +1755,7 @@ export type InquiryUncheckedUpdateWithoutDealsInput = {
   messages?: Prisma.MessageUncheckedUpdateManyWithoutInquiryNestedInput
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1642,6 +1789,7 @@ export type InquiryUpdateWithoutSenderInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1661,6 +1809,7 @@ export type InquiryUncheckedUpdateWithoutSenderInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1736,6 +1885,7 @@ export type InquiryUpdateWithoutBuyerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1755,6 +1905,7 @@ export type InquiryUncheckedUpdateWithoutBuyerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1788,6 +1939,7 @@ export type InquiryUpdateWithoutSellerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1807,6 +1959,7 @@ export type InquiryUncheckedUpdateWithoutSellerCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1840,6 +1993,7 @@ export type InquiryUpdateWithoutRecipientCompanyInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1859,6 +2013,7 @@ export type InquiryUncheckedUpdateWithoutRecipientCompanyInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1906,6 +2061,7 @@ export type InquiryUpdateWithoutProductInput = {
   attachments?: Prisma.MessageAttachmentUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutConversationNestedInput
 }
 
@@ -1925,6 +2081,7 @@ export type InquiryUncheckedUpdateWithoutProductInput = {
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutInquiryNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutInquiryNestedInput
   paymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutInquiryNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutInquiryNestedInput
   rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutConversationNestedInput
 }
 
@@ -1952,6 +2109,7 @@ export type InquiryCountOutputType = {
   attachments: number
   deals: number
   paymentRequests: number
+  tradeOrders: number
   rfqSellerQuotes: number
 }
 
@@ -1960,6 +2118,7 @@ export type InquiryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   attachments?: boolean | InquiryCountOutputTypeCountAttachmentsArgs
   deals?: boolean | InquiryCountOutputTypeCountDealsArgs
   paymentRequests?: boolean | InquiryCountOutputTypeCountPaymentRequestsArgs
+  tradeOrders?: boolean | InquiryCountOutputTypeCountTradeOrdersArgs
   rfqSellerQuotes?: boolean | InquiryCountOutputTypeCountRfqSellerQuotesArgs
 }
 
@@ -2004,6 +2163,13 @@ export type InquiryCountOutputTypeCountPaymentRequestsArgs<ExtArgs extends runti
 /**
  * InquiryCountOutputType without action
  */
+export type InquiryCountOutputTypeCountTradeOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TradeOrderWhereInput
+}
+
+/**
+ * InquiryCountOutputType without action
+ */
 export type InquiryCountOutputTypeCountRfqSellerQuotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RfqSellerQuoteWhereInput
 }
@@ -2031,6 +2197,7 @@ export type InquirySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   attachments?: boolean | Prisma.Inquiry$attachmentsArgs<ExtArgs>
   deals?: boolean | Prisma.Inquiry$dealsArgs<ExtArgs>
   paymentRequests?: boolean | Prisma.Inquiry$paymentRequestsArgs<ExtArgs>
+  tradeOrders?: boolean | Prisma.Inquiry$tradeOrdersArgs<ExtArgs>
   rfqSellerQuotes?: boolean | Prisma.Inquiry$rfqSellerQuotesArgs<ExtArgs>
   _count?: boolean | Prisma.InquiryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inquiry"]>
@@ -2101,6 +2268,7 @@ export type InquiryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   attachments?: boolean | Prisma.Inquiry$attachmentsArgs<ExtArgs>
   deals?: boolean | Prisma.Inquiry$dealsArgs<ExtArgs>
   paymentRequests?: boolean | Prisma.Inquiry$paymentRequestsArgs<ExtArgs>
+  tradeOrders?: boolean | Prisma.Inquiry$tradeOrdersArgs<ExtArgs>
   rfqSellerQuotes?: boolean | Prisma.Inquiry$rfqSellerQuotesArgs<ExtArgs>
   _count?: boolean | Prisma.InquiryCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2131,6 +2299,7 @@ export type $InquiryPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     attachments: Prisma.$MessageAttachmentPayload<ExtArgs>[]
     deals: Prisma.$DealPayload<ExtArgs>[]
     paymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
+    tradeOrders: Prisma.$TradeOrderPayload<ExtArgs>[]
     rfqSellerQuotes: Prisma.$RfqSellerQuotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2549,6 +2718,7 @@ export interface Prisma__InquiryClient<T, Null = never, ExtArgs extends runtime.
   attachments<T extends Prisma.Inquiry$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inquiry$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessageAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deals<T extends Prisma.Inquiry$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inquiry$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentRequests<T extends Prisma.Inquiry$paymentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inquiry$paymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tradeOrders<T extends Prisma.Inquiry$tradeOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inquiry$tradeOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rfqSellerQuotes<T extends Prisma.Inquiry$rfqSellerQuotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inquiry$rfqSellerQuotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RfqSellerQuotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3104,6 +3274,30 @@ export type Inquiry$paymentRequestsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.PaymentRequestScalarFieldEnum | Prisma.PaymentRequestScalarFieldEnum[]
+}
+
+/**
+ * Inquiry.tradeOrders
+ */
+export type Inquiry$tradeOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeOrder
+   */
+  select?: Prisma.TradeOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeOrder
+   */
+  omit?: Prisma.TradeOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeOrderInclude<ExtArgs> | null
+  where?: Prisma.TradeOrderWhereInput
+  orderBy?: Prisma.TradeOrderOrderByWithRelationInput | Prisma.TradeOrderOrderByWithRelationInput[]
+  cursor?: Prisma.TradeOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TradeOrderScalarFieldEnum | Prisma.TradeOrderScalarFieldEnum[]
 }
 
 /**

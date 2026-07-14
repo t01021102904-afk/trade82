@@ -29,6 +29,8 @@ import {
   claimPaymentRequestWebhookEvent,
   claimPendingPaymentRequestPaid,
 } from "@/lib/payment-request-webhook";
+import { syncTradeOrderFromPaymentRequest } from "@/lib/trade-orders";
+import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
 
 export {
   MAX_PAYMENT_AMOUNT_MINOR,
@@ -611,6 +613,7 @@ export async function markPaymentRequestPaid({
         }
     : null;
 
+  let paymentConfirmedOrderId: string | null = null;
   await getDb().$transaction(async (tx) => {
     if (!(await claimPaymentRequestWebhookEvent({
       locker: tx,
@@ -751,6 +754,20 @@ export async function markPaymentRequestPaid({
         message: "Payment confirmed by Stripe.",
         metadata: { source: stripeEvent.stripeEventType },
       });
+      paymentConfirmedOrderId = await syncTradeOrderFromPaymentRequest(
+        tx,
+        {
+          id: current.id,
+          status: PaymentRequestStatus.PAID,
+          grossAmount: current.grossAmount,
+          refundAmount: current.refundAmount,
+          paidAt: current.paidAt ?? new Date(),
+          stripeProcessingFeeAmount: feeResult?.ok
+            ? feeResult.details.stripeProcessingFeeAmount
+            : current.stripeProcessingFeeAmount,
+        },
+        "paid",
+      );
       await tx.inquiry.update({ where: { id: current.inquiryId }, data: { updatedAt: new Date() } });
       return;
     }
@@ -797,6 +814,18 @@ export async function markPaymentRequestPaid({
     });
   });
 
+  if (paymentConfirmedOrderId) {
+    try {
+      await sendTradeOrderNotification({
+        orderId: paymentConfirmedOrderId,
+        kind: "payment_received",
+        recipient: "seller",
+        idempotencyKey: `trade82-order-payment-${stripeEvent.stripeEventId}`,
+      });
+    } catch {
+      console.error("Trade order notification delivery failed.", { kind: "payment_received" });
+    }
+  }
   return true;
 }
 
@@ -847,6 +876,8 @@ export async function syncPaymentRequestRefund(
   const paymentRequest = await findPaymentRequestFromPaymentIntent(paymentIntentId);
   if (!paymentRequest) return false;
 
+  let payoutHoldOrderId: string | null = null;
+  let payoutHoldRequired = false;
   await getDb().$transaction(async (tx) => {
     if (!(await claimPaymentRequestWebhookEvent({
       locker: tx,
@@ -894,6 +925,19 @@ export async function syncPaymentRequestRefund(
       message: "Refund confirmed by Stripe.",
       metadata: { source: stripeEvent.stripeEventType },
     });
+    payoutHoldOrderId = await syncTradeOrderFromPaymentRequest(
+      tx,
+      {
+        id: current.id,
+        status,
+        grossAmount: current.grossAmount,
+        refundAmount,
+        paidAt: current.paidAt,
+        stripeProcessingFeeAmount: current.stripeProcessingFeeAmount,
+      },
+      "refund",
+    );
+    payoutHoldRequired = status === PaymentRequestStatus.PARTIALLY_REFUNDED;
     if (current.releasedAt) {
       await markReconciliationRequired(tx, {
         paymentRequestId: current.id,
@@ -902,6 +946,18 @@ export async function syncPaymentRequestRefund(
       });
     }
   });
+  if (payoutHoldOrderId && payoutHoldRequired) {
+    try {
+      await sendTradeOrderNotification({
+        orderId: payoutHoldOrderId,
+        kind: "payout_on_hold",
+        recipient: "seller",
+        idempotencyKey: `trade82-payout-hold-refund-${stripeEvent.stripeEventId}`,
+      });
+    } catch {
+      console.error("Trade order notification delivery failed.", { kind: "payout_on_hold" });
+    }
+  }
   return true;
 }
 
@@ -920,6 +976,8 @@ export async function syncPaymentRequestDispute(
   if (!paymentRequest) return false;
   const disputeStatus = dispute.status as string;
 
+  let payoutHoldOrderId: string | null = null;
+  let payoutHoldRequired = false;
   await getDb().$transaction(async (tx) => {
     if (!(await claimPaymentRequestWebhookEvent({
       locker: tx,
@@ -984,6 +1042,19 @@ export async function syncPaymentRequestDispute(
       message: "Dispute status updated by Stripe.",
       metadata: { source: stripeEvent.stripeEventType, disputeStatus },
     });
+    payoutHoldOrderId = await syncTradeOrderFromPaymentRequest(
+      tx,
+      {
+        id: current.id,
+        status: nextStatus,
+        grossAmount: current.grossAmount,
+        refundAmount,
+        paidAt: current.paidAt,
+        stripeProcessingFeeAmount: current.stripeProcessingFeeAmount,
+      },
+      "dispute",
+    );
+    payoutHoldRequired = nextStatus === PaymentRequestStatus.DISPUTED;
     if (current.releasedAt) {
       await markReconciliationRequired(tx, {
         paymentRequestId: current.id,
@@ -992,5 +1063,17 @@ export async function syncPaymentRequestDispute(
       });
     }
   });
+  if (payoutHoldOrderId && payoutHoldRequired) {
+    try {
+      await sendTradeOrderNotification({
+        orderId: payoutHoldOrderId,
+        kind: "payout_on_hold",
+        recipient: "seller",
+        idempotencyKey: `trade82-payout-hold-dispute-${stripeEvent.stripeEventId}`,
+      });
+    } catch {
+      console.error("Trade order notification delivery failed.", { kind: "payout_on_hold" });
+    }
+  }
   return true;
 }

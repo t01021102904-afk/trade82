@@ -103,6 +103,16 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
         </section>
 
         <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">Order operations</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminCard title="Orders" description="Review payment, shipment, and manual payout status." href={withLocale("/admin/orders", locale)} />
+            <AdminCard title="Manual payouts" description="Prepare verified seller payout instructions and record external transfers." href={withLocale("/admin/payouts", locale)} />
+            <AdminCard title="Seller payout profiles" description="Verify encrypted seller payout information before payout preparation." href={withLocale("/admin/payout-profiles", locale)} />
+            <AdminCard title="Bank directory" description="Manage officially verified bank directory entries." href={withLocale("/admin/banks", locale)} />
+          </div>
+        </section>
+
+        <section>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.filesDocuments}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <AdminCard

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model PaymentRequest
@@ -89,6 +89,7 @@ export type PaymentRequestMinAggregateOutputType = {
   releasedByUserId: string | null
   requiresManualReconciliation: boolean | null
   reconciliationNote: string | null
+  orderId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -132,6 +133,7 @@ export type PaymentRequestMaxAggregateOutputType = {
   releasedByUserId: string | null
   requiresManualReconciliation: boolean | null
   reconciliationNote: string | null
+  orderId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -175,6 +177,7 @@ export type PaymentRequestCountAggregateOutputType = {
   releasedByUserId: number
   requiresManualReconciliation: number
   reconciliationNote: number
+  orderId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -244,6 +247,7 @@ export type PaymentRequestMinAggregateInputType = {
   releasedByUserId?: true
   requiresManualReconciliation?: true
   reconciliationNote?: true
+  orderId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -287,6 +291,7 @@ export type PaymentRequestMaxAggregateInputType = {
   releasedByUserId?: true
   requiresManualReconciliation?: true
   reconciliationNote?: true
+  orderId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -330,6 +335,7 @@ export type PaymentRequestCountAggregateInputType = {
   releasedByUserId?: true
   requiresManualReconciliation?: true
   reconciliationNote?: true
+  orderId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -460,6 +466,7 @@ export type PaymentRequestGroupByOutputType = {
   releasedByUserId: string | null
   requiresManualReconciliation: boolean
   reconciliationNote: string | null
+  orderId: string | null
   createdAt: Date
   updatedAt: Date
   _count: PaymentRequestCountAggregateOutputType | null
@@ -526,6 +533,7 @@ export type PaymentRequestWhereInput = {
   releasedByUserId?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
   requiresManualReconciliation?: Prisma.BoolFilter<"PaymentRequest"> | boolean
   reconciliationNote?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
+  orderId?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PaymentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentRequest"> | Date | string
   inquiry?: Prisma.XOR<Prisma.InquiryScalarRelationFilter, Prisma.InquiryWhereInput>
@@ -533,6 +541,8 @@ export type PaymentRequestWhereInput = {
   sellerCompany?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   createdByUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   releasedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  order?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
+  tradeOrderByPaymentRequest?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
   refunds?: Prisma.PaymentRefundListRelationFilter
   disputes?: Prisma.PaymentDisputeListRelationFilter
   events?: Prisma.PaymentRequestEventListRelationFilter
@@ -578,6 +588,7 @@ export type PaymentRequestOrderByWithRelationInput = {
   releasedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   requiresManualReconciliation?: Prisma.SortOrder
   reconciliationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   inquiry?: Prisma.InquiryOrderByWithRelationInput
@@ -585,6 +596,8 @@ export type PaymentRequestOrderByWithRelationInput = {
   sellerCompany?: Prisma.CompanyOrderByWithRelationInput
   createdByUser?: Prisma.UserProfileOrderByWithRelationInput
   releasedByUser?: Prisma.UserProfileOrderByWithRelationInput
+  order?: Prisma.TradeOrderOrderByWithRelationInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderOrderByWithRelationInput
   refunds?: Prisma.PaymentRefundOrderByRelationAggregateInput
   disputes?: Prisma.PaymentDisputeOrderByRelationAggregateInput
   events?: Prisma.PaymentRequestEventOrderByRelationAggregateInput
@@ -596,6 +609,7 @@ export type PaymentRequestWhereUniqueInput = Prisma.AtLeast<{
   stripeCheckoutSessionId?: string
   stripePaymentIntentId?: string
   stripeChargeId?: string
+  orderId?: string
   AND?: Prisma.PaymentRequestWhereInput | Prisma.PaymentRequestWhereInput[]
   OR?: Prisma.PaymentRequestWhereInput[]
   NOT?: Prisma.PaymentRequestWhereInput | Prisma.PaymentRequestWhereInput[]
@@ -640,11 +654,13 @@ export type PaymentRequestWhereUniqueInput = Prisma.AtLeast<{
   sellerCompany?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   createdByUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   releasedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  order?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
+  tradeOrderByPaymentRequest?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
   refunds?: Prisma.PaymentRefundListRelationFilter
   disputes?: Prisma.PaymentDisputeListRelationFilter
   events?: Prisma.PaymentRequestEventListRelationFilter
   webhookEvents?: Prisma.PaymentRequestWebhookEventListRelationFilter
-}, "id" | "stripeCheckoutSessionId" | "stripePaymentIntentId" | "stripeChargeId">
+}, "id" | "stripeCheckoutSessionId" | "stripePaymentIntentId" | "stripeChargeId" | "orderId">
 
 export type PaymentRequestOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -685,6 +701,7 @@ export type PaymentRequestOrderByWithAggregationInput = {
   releasedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   requiresManualReconciliation?: Prisma.SortOrder
   reconciliationNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentRequestCountOrderByAggregateInput
@@ -736,6 +753,7 @@ export type PaymentRequestScalarWhereWithAggregatesInput = {
   releasedByUserId?: Prisma.StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
   requiresManualReconciliation?: Prisma.BoolWithAggregatesFilter<"PaymentRequest"> | boolean
   reconciliationNote?: Prisma.StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
+  orderId?: Prisma.StringNullableWithAggregatesFilter<"PaymentRequest"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentRequest"> | Date | string
 }
@@ -781,6 +799,8 @@ export type PaymentRequestCreateInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -826,8 +846,10 @@ export type PaymentRequestUncheckedCreateInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -875,6 +897,8 @@ export type PaymentRequestUpdateInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -920,8 +944,10 @@ export type PaymentRequestUncheckedUpdateInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -967,6 +993,7 @@ export type PaymentRequestCreateManyInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1048,6 +1075,7 @@ export type PaymentRequestUncheckedUpdateManyInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1101,6 +1129,7 @@ export type PaymentRequestCountOrderByAggregateInput = {
   releasedByUserId?: Prisma.SortOrder
   requiresManualReconciliation?: Prisma.SortOrder
   reconciliationNote?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1156,6 +1185,7 @@ export type PaymentRequestMaxOrderByAggregateInput = {
   releasedByUserId?: Prisma.SortOrder
   requiresManualReconciliation?: Prisma.SortOrder
   reconciliationNote?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1199,6 +1229,7 @@ export type PaymentRequestMinOrderByAggregateInput = {
   releasedByUserId?: Prisma.SortOrder
   requiresManualReconciliation?: Prisma.SortOrder
   reconciliationNote?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1218,6 +1249,11 @@ export type PaymentRequestSumOrderByAggregateInput = {
 export type PaymentRequestScalarRelationFilter = {
   is?: Prisma.PaymentRequestWhereInput
   isNot?: Prisma.PaymentRequestWhereInput
+}
+
+export type PaymentRequestNullableScalarRelationFilter = {
+  is?: Prisma.PaymentRequestWhereInput | null
+  isNot?: Prisma.PaymentRequestWhereInput | null
 }
 
 export type PaymentRequestCreateNestedManyWithoutCreatedByUserInput = {
@@ -1494,6 +1530,52 @@ export type PaymentRequestUpdateOneRequiredWithoutWebhookEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutWebhookEventsInput, Prisma.PaymentRequestUpdateWithoutWebhookEventsInput>, Prisma.PaymentRequestUncheckedUpdateWithoutWebhookEventsInput>
 }
 
+export type PaymentRequestCreateNestedOneWithoutTradeOrderByPaymentRequestInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutTradeOrderByPaymentRequestInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+}
+
+export type PaymentRequestCreateNestedOneWithoutOrderInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutOrderInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+}
+
+export type PaymentRequestUncheckedCreateNestedOneWithoutOrderInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutOrderInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+}
+
+export type PaymentRequestUpdateOneRequiredWithoutTradeOrderByPaymentRequestNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutTradeOrderByPaymentRequestInput
+  upsert?: Prisma.PaymentRequestUpsertWithoutTradeOrderByPaymentRequestInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUpdateWithoutTradeOrderByPaymentRequestInput>, Prisma.PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput>
+}
+
+export type PaymentRequestUpdateOneWithoutOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutOrderInput
+  upsert?: Prisma.PaymentRequestUpsertWithoutOrderInput
+  disconnect?: Prisma.PaymentRequestWhereInput | boolean
+  delete?: Prisma.PaymentRequestWhereInput | boolean
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutOrderInput, Prisma.PaymentRequestUpdateWithoutOrderInput>, Prisma.PaymentRequestUncheckedUpdateWithoutOrderInput>
+}
+
+export type PaymentRequestUncheckedUpdateOneWithoutOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutOrderInput
+  upsert?: Prisma.PaymentRequestUpsertWithoutOrderInput
+  disconnect?: Prisma.PaymentRequestWhereInput | boolean
+  delete?: Prisma.PaymentRequestWhereInput | boolean
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutOrderInput, Prisma.PaymentRequestUpdateWithoutOrderInput>, Prisma.PaymentRequestUncheckedUpdateWithoutOrderInput>
+}
+
 export type PaymentRequestCreateWithoutCreatedByUserInput = {
   id?: string
   productName: string
@@ -1534,6 +1616,8 @@ export type PaymentRequestCreateWithoutCreatedByUserInput = {
   buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -1578,8 +1662,10 @@ export type PaymentRequestUncheckedCreateWithoutCreatedByUserInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -1636,6 +1722,8 @@ export type PaymentRequestCreateWithoutReleasedByUserInput = {
   buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -1680,8 +1768,10 @@ export type PaymentRequestUncheckedCreateWithoutReleasedByUserInput = {
   sellerReleasedAmount?: number | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -1756,6 +1846,7 @@ export type PaymentRequestScalarWhereInput = {
   releasedByUserId?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
   requiresManualReconciliation?: Prisma.BoolFilter<"PaymentRequest"> | boolean
   reconciliationNote?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
+  orderId?: Prisma.StringNullableFilter<"PaymentRequest"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PaymentRequest"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentRequest"> | Date | string
 }
@@ -1816,6 +1907,8 @@ export type PaymentRequestCreateWithoutBuyerCompanyInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -1860,8 +1953,10 @@ export type PaymentRequestUncheckedCreateWithoutBuyerCompanyInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -1918,6 +2013,8 @@ export type PaymentRequestCreateWithoutSellerCompanyInput = {
   buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -1962,8 +2059,10 @@ export type PaymentRequestUncheckedCreateWithoutSellerCompanyInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2052,6 +2151,8 @@ export type PaymentRequestCreateWithoutInquiryInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -2096,8 +2197,10 @@ export type PaymentRequestUncheckedCreateWithoutInquiryInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2171,6 +2274,8 @@ export type PaymentRequestCreateWithoutRefundsInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
@@ -2215,8 +2320,10 @@ export type PaymentRequestUncheckedCreateWithoutRefundsInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2279,6 +2386,8 @@ export type PaymentRequestUpdateWithoutRefundsInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
@@ -2323,8 +2432,10 @@ export type PaymentRequestUncheckedUpdateWithoutRefundsInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -2371,6 +2482,8 @@ export type PaymentRequestCreateWithoutDisputesInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
@@ -2415,8 +2528,10 @@ export type PaymentRequestUncheckedCreateWithoutDisputesInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2479,6 +2594,8 @@ export type PaymentRequestUpdateWithoutDisputesInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
@@ -2523,8 +2640,10 @@ export type PaymentRequestUncheckedUpdateWithoutDisputesInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -2571,6 +2690,8 @@ export type PaymentRequestCreateWithoutEventsInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
@@ -2615,8 +2736,10 @@ export type PaymentRequestUncheckedCreateWithoutEventsInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2679,6 +2802,8 @@ export type PaymentRequestUpdateWithoutEventsInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
@@ -2723,8 +2848,10 @@ export type PaymentRequestUncheckedUpdateWithoutEventsInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -2771,6 +2898,8 @@ export type PaymentRequestCreateWithoutWebhookEventsInput = {
   sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
   createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
   releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
@@ -2815,8 +2944,10 @@ export type PaymentRequestUncheckedCreateWithoutWebhookEventsInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
@@ -2879,6 +3010,8 @@ export type PaymentRequestUpdateWithoutWebhookEventsInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -2923,11 +3056,429 @@ export type PaymentRequestUncheckedUpdateWithoutWebhookEventsInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput = {
+  id?: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inquiry: Prisma.InquiryCreateNestedOneWithoutPaymentRequestsInput
+  buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
+  sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
+  createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
+  releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput = {
+  id?: string
+  inquiryId: string
+  buyerCompanyId: string
+  sellerCompanyId: string
+  createdByUserId: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  releasedByUserId?: string | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  orderId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestCreateOrConnectWithoutTradeOrderByPaymentRequestInput = {
+  where: Prisma.PaymentRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput>
+}
+
+export type PaymentRequestCreateWithoutOrderInput = {
+  id?: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inquiry: Prisma.InquiryCreateNestedOneWithoutPaymentRequestsInput
+  buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
+  sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
+  createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
+  releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestUncheckedCreateWithoutOrderInput = {
+  id?: string
+  inquiryId: string
+  buyerCompanyId: string
+  sellerCompanyId: string
+  createdByUserId: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  releasedByUserId?: string | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestCreateOrConnectWithoutOrderInput = {
+  where: Prisma.PaymentRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+}
+
+export type PaymentRequestUpsertWithoutTradeOrderByPaymentRequestInput = {
+  update: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput>
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput>
+  where?: Prisma.PaymentRequestWhereInput
+}
+
+export type PaymentRequestUpdateToOneWithWhereWithoutTradeOrderByPaymentRequestInput = {
+  where?: Prisma.PaymentRequestWhereInput
+  data: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput>
+}
+
+export type PaymentRequestUpdateWithoutTradeOrderByPaymentRequestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inquiry?: Prisma.InquiryUpdateOneRequiredWithoutPaymentRequestsNestedInput
+  buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
+  sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
+  createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
+  releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  inquiryId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestUpsertWithoutOrderInput = {
+  update: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutOrderInput, Prisma.PaymentRequestUncheckedUpdateWithoutOrderInput>
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutOrderInput, Prisma.PaymentRequestUncheckedCreateWithoutOrderInput>
+  where?: Prisma.PaymentRequestWhereInput
+}
+
+export type PaymentRequestUpdateToOneWithWhereWithoutOrderInput = {
+  where?: Prisma.PaymentRequestWhereInput
+  data: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutOrderInput, Prisma.PaymentRequestUncheckedUpdateWithoutOrderInput>
+}
+
+export type PaymentRequestUpdateWithoutOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inquiry?: Prisma.InquiryUpdateOneRequiredWithoutPaymentRequestsNestedInput
+  buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
+  sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
+  createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
+  releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestUncheckedUpdateWithoutOrderInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  inquiryId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateManyCreatedByUserInput = {
@@ -2968,6 +3519,7 @@ export type PaymentRequestCreateManyCreatedByUserInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3010,6 +3562,7 @@ export type PaymentRequestCreateManyReleasedByUserInput = {
   sellerReleasedAmount?: number | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3054,6 +3607,8 @@ export type PaymentRequestUpdateWithoutCreatedByUserInput = {
   buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -3098,8 +3653,10 @@ export type PaymentRequestUncheckedUpdateWithoutCreatedByUserInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -3144,6 +3701,7 @@ export type PaymentRequestUncheckedUpdateManyWithoutCreatedByUserInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3188,6 +3746,8 @@ export type PaymentRequestUpdateWithoutReleasedByUserInput = {
   buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -3232,8 +3792,10 @@ export type PaymentRequestUncheckedUpdateWithoutReleasedByUserInput = {
   sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -3278,6 +3840,7 @@ export type PaymentRequestUncheckedUpdateManyWithoutReleasedByUserInput = {
   sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3320,6 +3883,7 @@ export type PaymentRequestCreateManyBuyerCompanyInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3362,6 +3926,7 @@ export type PaymentRequestCreateManySellerCompanyInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3406,6 +3971,8 @@ export type PaymentRequestUpdateWithoutBuyerCompanyInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -3450,8 +4017,10 @@ export type PaymentRequestUncheckedUpdateWithoutBuyerCompanyInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -3496,6 +4065,7 @@ export type PaymentRequestUncheckedUpdateManyWithoutBuyerCompanyInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3540,6 +4110,8 @@ export type PaymentRequestUpdateWithoutSellerCompanyInput = {
   buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -3584,8 +4156,10 @@ export type PaymentRequestUncheckedUpdateWithoutSellerCompanyInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -3630,6 +4204,7 @@ export type PaymentRequestUncheckedUpdateManyWithoutSellerCompanyInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3672,6 +4247,7 @@ export type PaymentRequestCreateManyInquiryInput = {
   releasedByUserId?: string | null
   requiresManualReconciliation?: boolean
   reconciliationNote?: string | null
+  orderId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3716,6 +4292,8 @@ export type PaymentRequestUpdateWithoutInquiryInput = {
   sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
   createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
   releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
@@ -3760,8 +4338,10 @@ export type PaymentRequestUncheckedUpdateWithoutInquiryInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
@@ -3806,6 +4386,7 @@ export type PaymentRequestUncheckedUpdateManyWithoutInquiryInput = {
   releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3907,6 +4488,7 @@ export type PaymentRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   releasedByUserId?: boolean
   requiresManualReconciliation?: boolean
   reconciliationNote?: boolean
+  orderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
@@ -3914,6 +4496,8 @@ export type PaymentRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
+  tradeOrderByPaymentRequest?: boolean | Prisma.PaymentRequest$tradeOrderByPaymentRequestArgs<ExtArgs>
   refunds?: boolean | Prisma.PaymentRequest$refundsArgs<ExtArgs>
   disputes?: boolean | Prisma.PaymentRequest$disputesArgs<ExtArgs>
   events?: boolean | Prisma.PaymentRequest$eventsArgs<ExtArgs>
@@ -3960,6 +4544,7 @@ export type PaymentRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   releasedByUserId?: boolean
   requiresManualReconciliation?: boolean
   reconciliationNote?: boolean
+  orderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
@@ -3967,6 +4552,7 @@ export type PaymentRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
 }, ExtArgs["result"]["paymentRequest"]>
 
 export type PaymentRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -4008,6 +4594,7 @@ export type PaymentRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   releasedByUserId?: boolean
   requiresManualReconciliation?: boolean
   reconciliationNote?: boolean
+  orderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
@@ -4015,6 +4602,7 @@ export type PaymentRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
 }, ExtArgs["result"]["paymentRequest"]>
 
 export type PaymentRequestSelectScalar = {
@@ -4056,17 +4644,20 @@ export type PaymentRequestSelectScalar = {
   releasedByUserId?: boolean
   requiresManualReconciliation?: boolean
   reconciliationNote?: boolean
+  orderId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "inquiryId" | "buyerCompanyId" | "sellerCompanyId" | "createdByUserId" | "productName" | "quantity" | "unit" | "productAmount" | "shippingAmount" | "grossAmount" | "platformFeeAmount" | "sellerPayableAmount" | "stripeProcessingFeeAmount" | "stripeFeeSyncStatus" | "stripeFeeSyncError" | "stripeFeeSyncedAt" | "refundAmount" | "currency" | "paymentDueDate" | "orderTerms" | "status" | "stripeCheckoutSessionId" | "stripePaymentIntentId" | "stripeChargeId" | "checkoutAttempt" | "checkoutLockToken" | "checkoutLockExpiresAt" | "paidAt" | "cancelledAt" | "releasedAt" | "manualPayoutReference" | "manualPayoutDate" | "manualPayoutNote" | "sellerReleasedAmount" | "releasedByUserId" | "requiresManualReconciliation" | "reconciliationNote" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentRequest"]>
+export type PaymentRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "inquiryId" | "buyerCompanyId" | "sellerCompanyId" | "createdByUserId" | "productName" | "quantity" | "unit" | "productAmount" | "shippingAmount" | "grossAmount" | "platformFeeAmount" | "sellerPayableAmount" | "stripeProcessingFeeAmount" | "stripeFeeSyncStatus" | "stripeFeeSyncError" | "stripeFeeSyncedAt" | "refundAmount" | "currency" | "paymentDueDate" | "orderTerms" | "status" | "stripeCheckoutSessionId" | "stripePaymentIntentId" | "stripeChargeId" | "checkoutAttempt" | "checkoutLockToken" | "checkoutLockExpiresAt" | "paidAt" | "cancelledAt" | "releasedAt" | "manualPayoutReference" | "manualPayoutDate" | "manualPayoutNote" | "sellerReleasedAmount" | "releasedByUserId" | "requiresManualReconciliation" | "reconciliationNote" | "orderId" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentRequest"]>
 export type PaymentRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
   buyerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
+  tradeOrderByPaymentRequest?: boolean | Prisma.PaymentRequest$tradeOrderByPaymentRequestArgs<ExtArgs>
   refunds?: boolean | Prisma.PaymentRequest$refundsArgs<ExtArgs>
   disputes?: boolean | Prisma.PaymentRequest$disputesArgs<ExtArgs>
   events?: boolean | Prisma.PaymentRequest$eventsArgs<ExtArgs>
@@ -4079,6 +4670,7 @@ export type PaymentRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Typ
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
 }
 export type PaymentRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inquiry?: boolean | Prisma.InquiryDefaultArgs<ExtArgs>
@@ -4086,6 +4678,7 @@ export type PaymentRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Typ
   sellerCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   createdByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   releasedByUser?: boolean | Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>
+  order?: boolean | Prisma.PaymentRequest$orderArgs<ExtArgs>
 }
 
 export type $PaymentRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4096,6 +4689,8 @@ export type $PaymentRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     sellerCompany: Prisma.$CompanyPayload<ExtArgs>
     createdByUser: Prisma.$UserProfilePayload<ExtArgs>
     releasedByUser: Prisma.$UserProfilePayload<ExtArgs> | null
+    order: Prisma.$TradeOrderPayload<ExtArgs> | null
+    tradeOrderByPaymentRequest: Prisma.$TradeOrderPayload<ExtArgs> | null
     refunds: Prisma.$PaymentRefundPayload<ExtArgs>[]
     disputes: Prisma.$PaymentDisputePayload<ExtArgs>[]
     events: Prisma.$PaymentRequestEventPayload<ExtArgs>[]
@@ -4140,6 +4735,7 @@ export type $PaymentRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     releasedByUserId: string | null
     requiresManualReconciliation: boolean
     reconciliationNote: string | null
+    orderId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["paymentRequest"]>
@@ -4541,6 +5137,8 @@ export interface Prisma__PaymentRequestClient<T, Null = never, ExtArgs extends r
   sellerCompany<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   createdByUser<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   releasedByUser<T extends Prisma.PaymentRequest$releasedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$releasedByUserArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.PaymentRequest$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$orderArgs<ExtArgs>>): Prisma.Prisma__TradeOrderClient<runtime.Types.Result.GetResult<Prisma.$TradeOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tradeOrderByPaymentRequest<T extends Prisma.PaymentRequest$tradeOrderByPaymentRequestArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$tradeOrderByPaymentRequestArgs<ExtArgs>>): Prisma.Prisma__TradeOrderClient<runtime.Types.Result.GetResult<Prisma.$TradeOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refunds<T extends Prisma.PaymentRequest$refundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$refundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRefundPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   disputes<T extends Prisma.PaymentRequest$disputesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$disputesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentDisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.PaymentRequest$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4612,6 +5210,7 @@ export interface PaymentRequestFieldRefs {
   readonly releasedByUserId: Prisma.FieldRef<"PaymentRequest", 'String'>
   readonly requiresManualReconciliation: Prisma.FieldRef<"PaymentRequest", 'Boolean'>
   readonly reconciliationNote: Prisma.FieldRef<"PaymentRequest", 'String'>
+  readonly orderId: Prisma.FieldRef<"PaymentRequest", 'String'>
   readonly createdAt: Prisma.FieldRef<"PaymentRequest", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PaymentRequest", 'DateTime'>
 }
@@ -5031,6 +5630,44 @@ export type PaymentRequest$releasedByUserArgs<ExtArgs extends runtime.Types.Exte
    */
   include?: Prisma.UserProfileInclude<ExtArgs> | null
   where?: Prisma.UserProfileWhereInput
+}
+
+/**
+ * PaymentRequest.order
+ */
+export type PaymentRequest$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeOrder
+   */
+  select?: Prisma.TradeOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeOrder
+   */
+  omit?: Prisma.TradeOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeOrderInclude<ExtArgs> | null
+  where?: Prisma.TradeOrderWhereInput
+}
+
+/**
+ * PaymentRequest.tradeOrderByPaymentRequest
+ */
+export type PaymentRequest$tradeOrderByPaymentRequestArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeOrder
+   */
+  select?: Prisma.TradeOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeOrder
+   */
+  omit?: Prisma.TradeOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeOrderInclude<ExtArgs> | null
+  where?: Prisma.TradeOrderWhereInput
 }
 
 /**

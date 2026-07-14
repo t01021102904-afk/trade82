@@ -142,6 +142,15 @@ export function DashboardSettingsClient({
             icon={FileText}
             href={`${sellerDashboardHref}?section=documents`}
           />
+          {!buyerOnly ? (
+            <SettingsActionCard
+              title="Payout Information"
+              description="Encrypted bank instructions and verification status for manual seller payouts."
+              rightLabel="Edit"
+              icon={CreditCard}
+              href={withLocale("/settings/payout-information", locale)}
+            />
+          ) : null}
           <SettingsActionCard
             title="Matching Preferences"
             description="Control how Trade82 matches your products with buyer RFQs."

@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums"
-import type * as Prisma from "../internal/prismaNamespace"
+import type * as $Enums from "../enums.ts"
+import type * as Prisma from "../internal/prismaNamespace.ts"
 
 /**
  * Model UserProfile
@@ -303,6 +303,14 @@ export type UserProfileWhereInput = {
   createdPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   releasedPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   paymentRequestEvents?: Prisma.PaymentRequestEventListRelationFilter
+  tradeOrderEvents?: Prisma.TradeOrderEventListRelationFilter
+  sellerPayoutEvents?: Prisma.SellerPayoutEventListRelationFilter
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentListRelationFilter
+  preparedSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  approvedSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  sentSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileListRelationFilter
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventListRelationFilter
 }
 
 export type UserProfileOrderByWithRelationInput = {
@@ -341,6 +349,14 @@ export type UserProfileOrderByWithRelationInput = {
   createdPaymentRequests?: Prisma.PaymentRequestOrderByRelationAggregateInput
   releasedPaymentRequests?: Prisma.PaymentRequestOrderByRelationAggregateInput
   paymentRequestEvents?: Prisma.PaymentRequestEventOrderByRelationAggregateInput
+  tradeOrderEvents?: Prisma.TradeOrderEventOrderByRelationAggregateInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventOrderByRelationAggregateInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentOrderByRelationAggregateInput
+  preparedSellerPayouts?: Prisma.SellerPayoutOrderByRelationAggregateInput
+  approvedSellerPayouts?: Prisma.SellerPayoutOrderByRelationAggregateInput
+  sentSellerPayouts?: Prisma.SellerPayoutOrderByRelationAggregateInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileOrderByRelationAggregateInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventOrderByRelationAggregateInput
 }
 
 export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -382,6 +398,14 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   createdPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   releasedPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   paymentRequestEvents?: Prisma.PaymentRequestEventListRelationFilter
+  tradeOrderEvents?: Prisma.TradeOrderEventListRelationFilter
+  sellerPayoutEvents?: Prisma.SellerPayoutEventListRelationFilter
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentListRelationFilter
+  preparedSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  approvedSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  sentSellerPayouts?: Prisma.SellerPayoutListRelationFilter
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileListRelationFilter
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventListRelationFilter
 }, "id" | "clerkUserId" | "email">
 
 export type UserProfileOrderByWithAggregationInput = {
@@ -468,6 +492,14 @@ export type UserProfileCreateInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateInput = {
@@ -506,6 +538,14 @@ export type UserProfileUncheckedCreateInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUpdateInput = {
@@ -544,6 +584,14 @@ export type UserProfileUpdateInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateInput = {
@@ -582,6 +630,14 @@ export type UserProfileUncheckedUpdateInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateManyInput = {
@@ -888,6 +944,130 @@ export type UserProfileUpdateOneWithoutPaymentRequestEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutPaymentRequestEventsInput, Prisma.UserProfileUpdateWithoutPaymentRequestEventsInput>, Prisma.UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput>
 }
 
+export type UserProfileCreateNestedOneWithoutTradeOrderEventsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedCreateWithoutTradeOrderEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutTradeOrderEventsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneWithoutTradeOrderEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedCreateWithoutTradeOrderEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutTradeOrderEventsInput
+  upsert?: Prisma.UserProfileUpsertWithoutTradeOrderEventsInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutTradeOrderEventsInput, Prisma.UserProfileUpdateWithoutTradeOrderEventsInput>, Prisma.UserProfileUncheckedUpdateWithoutTradeOrderEventsInput>
+}
+
+export type UserProfileCreateNestedOneWithoutVerifiedSellerPayoutProfilesInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutVerifiedSellerPayoutProfilesInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneWithoutVerifiedSellerPayoutProfilesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutVerifiedSellerPayoutProfilesInput
+  upsert?: Prisma.UserProfileUpsertWithoutVerifiedSellerPayoutProfilesInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput>, Prisma.UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput>
+}
+
+export type UserProfileCreateNestedOneWithoutSellerPayoutProfileAuditEventsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutProfileAuditEventsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutSellerPayoutProfileAuditEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutProfileAuditEventsInput
+  upsert?: Prisma.UserProfileUpsertWithoutSellerPayoutProfileAuditEventsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput>, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput>
+}
+
+export type UserProfileCreateNestedOneWithoutPreparedSellerPayoutsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutPreparedSellerPayoutsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileCreateNestedOneWithoutApprovedSellerPayoutsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutApprovedSellerPayoutsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileCreateNestedOneWithoutSentSellerPayoutsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutSentSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSentSellerPayoutsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneWithoutPreparedSellerPayoutsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutPreparedSellerPayoutsInput
+  upsert?: Prisma.UserProfileUpsertWithoutPreparedSellerPayoutsInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUpdateWithoutPreparedSellerPayoutsInput>, Prisma.UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput>
+}
+
+export type UserProfileUpdateOneWithoutApprovedSellerPayoutsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutApprovedSellerPayoutsInput
+  upsert?: Prisma.UserProfileUpsertWithoutApprovedSellerPayoutsInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUpdateWithoutApprovedSellerPayoutsInput>, Prisma.UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput>
+}
+
+export type UserProfileUpdateOneWithoutSentSellerPayoutsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutSentSellerPayoutsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSentSellerPayoutsInput
+  upsert?: Prisma.UserProfileUpsertWithoutSentSellerPayoutsInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutSentSellerPayoutsInput, Prisma.UserProfileUpdateWithoutSentSellerPayoutsInput>, Prisma.UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput>
+}
+
+export type UserProfileCreateNestedOneWithoutSellerPayoutEventsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutEventsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneWithoutSellerPayoutEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutEventsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutEventsInput
+  upsert?: Prisma.UserProfileUpsertWithoutSellerPayoutEventsInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutSellerPayoutEventsInput, Prisma.UserProfileUpdateWithoutSellerPayoutEventsInput>, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput>
+}
+
+export type UserProfileCreateNestedOneWithoutSellerPayoutAdjustmentsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutAdjustmentsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutSellerPayoutAdjustmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSellerPayoutAdjustmentsInput
+  upsert?: Prisma.UserProfileUpsertWithoutSellerPayoutAdjustmentsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUpdateWithoutSellerPayoutAdjustmentsInput>, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput>
+}
+
 export type UserProfileCreateNestedOneWithoutSavedItemsInput = {
   create?: Prisma.XOR<Prisma.UserProfileCreateWithoutSavedItemsInput, Prisma.UserProfileUncheckedCreateWithoutSavedItemsInput>
   connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutSavedItemsInput
@@ -1023,6 +1203,14 @@ export type UserProfileCreateWithoutCompaniesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutCompaniesInput = {
@@ -1060,6 +1248,14 @@ export type UserProfileUncheckedCreateWithoutCompaniesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutCompaniesInput = {
@@ -1113,6 +1309,14 @@ export type UserProfileUpdateWithoutCompaniesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
@@ -1150,6 +1354,14 @@ export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutRequestedVerificationsInput = {
@@ -1187,6 +1399,14 @@ export type UserProfileCreateWithoutRequestedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
@@ -1224,6 +1444,14 @@ export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutRequestedVerificationsInput = {
@@ -1266,6 +1494,14 @@ export type UserProfileCreateWithoutReviewedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
@@ -1303,6 +1539,14 @@ export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutReviewedVerificationsInput = {
@@ -1356,6 +1600,14 @@ export type UserProfileUpdateWithoutRequestedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
@@ -1393,6 +1645,14 @@ export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUpsertWithoutReviewedVerificationsInput = {
@@ -1441,6 +1701,14 @@ export type UserProfileUpdateWithoutReviewedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
@@ -1478,6 +1746,14 @@ export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutSentInquiriesInput = {
@@ -1515,6 +1791,14 @@ export type UserProfileCreateWithoutSentInquiriesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
@@ -1552,6 +1836,14 @@ export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutSentInquiriesInput = {
@@ -1605,6 +1897,14 @@ export type UserProfileUpdateWithoutSentInquiriesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
@@ -1642,6 +1942,14 @@ export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutBuyerRfqRequestsInput = {
@@ -1679,6 +1987,14 @@ export type UserProfileCreateWithoutBuyerRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutBuyerRfqRequestsInput = {
@@ -1716,6 +2032,14 @@ export type UserProfileUncheckedCreateWithoutBuyerRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutBuyerRfqRequestsInput = {
@@ -1758,6 +2082,14 @@ export type UserProfileCreateWithoutReviewedRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutReviewedRfqRequestsInput = {
@@ -1795,6 +2127,14 @@ export type UserProfileUncheckedCreateWithoutReviewedRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutReviewedRfqRequestsInput = {
@@ -1848,6 +2188,14 @@ export type UserProfileUpdateWithoutBuyerRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutBuyerRfqRequestsInput = {
@@ -1885,6 +2233,14 @@ export type UserProfileUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUpsertWithoutReviewedRfqRequestsInput = {
@@ -1933,6 +2289,14 @@ export type UserProfileUpdateWithoutReviewedRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutReviewedRfqRequestsInput = {
@@ -1970,6 +2334,14 @@ export type UserProfileUncheckedUpdateWithoutReviewedRfqRequestsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutMarketingExposuresInput = {
@@ -2007,6 +2379,14 @@ export type UserProfileCreateWithoutMarketingExposuresInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutMarketingExposuresInput = {
@@ -2044,6 +2424,14 @@ export type UserProfileUncheckedCreateWithoutMarketingExposuresInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutMarketingExposuresInput = {
@@ -2097,6 +2485,14 @@ export type UserProfileUpdateWithoutMarketingExposuresInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutMarketingExposuresInput = {
@@ -2134,6 +2530,14 @@ export type UserProfileUncheckedUpdateWithoutMarketingExposuresInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutCreatedPaymentRequestsInput = {
@@ -2171,6 +2575,14 @@ export type UserProfileCreateWithoutCreatedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutCreatedPaymentRequestsInput = {
@@ -2208,6 +2620,14 @@ export type UserProfileUncheckedCreateWithoutCreatedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutCreatedPaymentRequestsInput = {
@@ -2250,6 +2670,14 @@ export type UserProfileCreateWithoutReleasedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutReleasedPaymentRequestsInput = {
@@ -2287,6 +2715,14 @@ export type UserProfileUncheckedCreateWithoutReleasedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutReleasedPaymentRequestsInput = {
@@ -2340,6 +2776,14 @@ export type UserProfileUpdateWithoutCreatedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutCreatedPaymentRequestsInput = {
@@ -2377,6 +2821,14 @@ export type UserProfileUncheckedUpdateWithoutCreatedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUpsertWithoutReleasedPaymentRequestsInput = {
@@ -2425,6 +2877,14 @@ export type UserProfileUpdateWithoutReleasedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutReleasedPaymentRequestsInput = {
@@ -2462,6 +2922,14 @@ export type UserProfileUncheckedUpdateWithoutReleasedPaymentRequestsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutPaymentRequestEventsInput = {
@@ -2499,6 +2967,14 @@ export type UserProfileCreateWithoutPaymentRequestEventsInput = {
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutPaymentRequestEventsInput = {
@@ -2536,6 +3012,14 @@ export type UserProfileUncheckedCreateWithoutPaymentRequestEventsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutPaymentRequestEventsInput = {
@@ -2589,6 +3073,14 @@ export type UserProfileUpdateWithoutPaymentRequestEventsInput = {
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput = {
@@ -2626,6 +3118,1582 @@ export type UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput = {
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileCreateWithoutTradeOrderEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutTradeOrderEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutTradeOrderEventsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedCreateWithoutTradeOrderEventsInput>
+}
+
+export type UserProfileUpsertWithoutTradeOrderEventsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedUpdateWithoutTradeOrderEventsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedCreateWithoutTradeOrderEventsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutTradeOrderEventsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutTradeOrderEventsInput, Prisma.UserProfileUncheckedUpdateWithoutTradeOrderEventsInput>
+}
+
+export type UserProfileUpdateWithoutTradeOrderEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutTradeOrderEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutVerifiedSellerPayoutProfilesInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput>
+}
+
+export type UserProfileUpsertWithoutVerifiedSellerPayoutProfilesInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutVerifiedSellerPayoutProfilesInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput, Prisma.UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput>
+}
+
+export type UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutSellerPayoutProfileAuditEventsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput>
+}
+
+export type UserProfileUpsertWithoutSellerPayoutProfileAuditEventsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutSellerPayoutProfileAuditEventsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput>
+}
+
+export type UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+}
+
+export type UserProfileCreateWithoutPreparedSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutPreparedSellerPayoutsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput>
+}
+
+export type UserProfileCreateWithoutApprovedSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutApprovedSellerPayoutsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput>
+}
+
+export type UserProfileCreateWithoutSentSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutSentSellerPayoutsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutSentSellerPayoutsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutSentSellerPayoutsInput>
+}
+
+export type UserProfileUpsertWithoutPreparedSellerPayoutsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutPreparedSellerPayoutsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutPreparedSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput>
+}
+
+export type UserProfileUpdateWithoutPreparedSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUpsertWithoutApprovedSellerPayoutsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutApprovedSellerPayoutsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutApprovedSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput>
+}
+
+export type UserProfileUpdateWithoutApprovedSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUpsertWithoutSentSellerPayoutsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedCreateWithoutSentSellerPayoutsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutSentSellerPayoutsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutSentSellerPayoutsInput, Prisma.UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput>
+}
+
+export type UserProfileUpdateWithoutSentSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileCreateWithoutSellerPayoutEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutSellerPayoutEventsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutSellerPayoutEventsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutEventsInput>
+}
+
+export type UserProfileUpsertWithoutSellerPayoutEventsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutEventsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutSellerPayoutEventsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutEventsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput>
+}
+
+export type UserProfileUpdateWithoutSellerPayoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileCreateWithoutSellerPayoutAdjustmentsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutSellerPayoutAdjustmentsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput>
+}
+
+export type UserProfileUpsertWithoutSellerPayoutAdjustmentsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutSellerPayoutAdjustmentsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutSellerPayoutAdjustmentsInput, Prisma.UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput>
+}
+
+export type UserProfileUpdateWithoutSellerPayoutAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutSavedItemsInput = {
@@ -2663,6 +4731,14 @@ export type UserProfileCreateWithoutSavedItemsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
@@ -2700,6 +4776,14 @@ export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutSavedItemsInput = {
@@ -2753,6 +4837,14 @@ export type UserProfileUpdateWithoutSavedItemsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
@@ -2790,6 +4882,14 @@ export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutSentMessagesInput = {
@@ -2827,6 +4927,14 @@ export type UserProfileCreateWithoutSentMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
@@ -2864,6 +4972,14 @@ export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutSentMessagesInput = {
@@ -2906,6 +5022,14 @@ export type UserProfileCreateWithoutReceivedMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
@@ -2943,6 +5067,14 @@ export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutReceivedMessagesInput = {
@@ -2996,6 +5128,14 @@ export type UserProfileUpdateWithoutSentMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
@@ -3033,6 +5173,14 @@ export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUpsertWithoutReceivedMessagesInput = {
@@ -3081,6 +5229,14 @@ export type UserProfileUpdateWithoutReceivedMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
@@ -3118,6 +5274,14 @@ export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
@@ -3155,6 +5319,14 @@ export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
@@ -3192,6 +5364,14 @@ export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutUploadedMessageAttachmentsInput = {
@@ -3245,6 +5425,14 @@ export type UserProfileUpdateWithoutUploadedMessageAttachmentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
@@ -3282,6 +5470,14 @@ export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutCreatedDocumentFoldersInput = {
@@ -3319,6 +5515,14 @@ export type UserProfileCreateWithoutCreatedDocumentFoldersInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutCreatedDocumentFoldersInput = {
@@ -3356,6 +5560,14 @@ export type UserProfileUncheckedCreateWithoutCreatedDocumentFoldersInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutCreatedDocumentFoldersInput = {
@@ -3409,6 +5621,14 @@ export type UserProfileUpdateWithoutCreatedDocumentFoldersInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutCreatedDocumentFoldersInput = {
@@ -3446,6 +5666,14 @@ export type UserProfileUncheckedUpdateWithoutCreatedDocumentFoldersInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutUploadedTradeDocumentsInput = {
@@ -3483,6 +5711,14 @@ export type UserProfileCreateWithoutUploadedTradeDocumentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutUploadedTradeDocumentsInput = {
@@ -3520,6 +5756,14 @@ export type UserProfileUncheckedCreateWithoutUploadedTradeDocumentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutUploadedTradeDocumentsInput = {
@@ -3573,6 +5817,14 @@ export type UserProfileUpdateWithoutUploadedTradeDocumentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutUploadedTradeDocumentsInput = {
@@ -3610,6 +5862,14 @@ export type UserProfileUncheckedUpdateWithoutUploadedTradeDocumentsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileCreateWithoutCreatedDealsInput = {
@@ -3647,6 +5907,14 @@ export type UserProfileCreateWithoutCreatedDealsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
@@ -3684,6 +5952,14 @@ export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutCreatedDealsInput = {
@@ -3737,6 +6013,14 @@ export type UserProfileUpdateWithoutCreatedDealsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
@@ -3774,6 +6058,14 @@ export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
 }
 
 
@@ -3799,6 +6091,14 @@ export type UserProfileCountOutputType = {
   createdPaymentRequests: number
   releasedPaymentRequests: number
   paymentRequestEvents: number
+  tradeOrderEvents: number
+  sellerPayoutEvents: number
+  sellerPayoutAdjustments: number
+  preparedSellerPayouts: number
+  approvedSellerPayouts: number
+  sentSellerPayouts: number
+  verifiedSellerPayoutProfiles: number
+  sellerPayoutProfileAuditEvents: number
 }
 
 export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3819,6 +6119,14 @@ export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   createdPaymentRequests?: boolean | UserProfileCountOutputTypeCountCreatedPaymentRequestsArgs
   releasedPaymentRequests?: boolean | UserProfileCountOutputTypeCountReleasedPaymentRequestsArgs
   paymentRequestEvents?: boolean | UserProfileCountOutputTypeCountPaymentRequestEventsArgs
+  tradeOrderEvents?: boolean | UserProfileCountOutputTypeCountTradeOrderEventsArgs
+  sellerPayoutEvents?: boolean | UserProfileCountOutputTypeCountSellerPayoutEventsArgs
+  sellerPayoutAdjustments?: boolean | UserProfileCountOutputTypeCountSellerPayoutAdjustmentsArgs
+  preparedSellerPayouts?: boolean | UserProfileCountOutputTypeCountPreparedSellerPayoutsArgs
+  approvedSellerPayouts?: boolean | UserProfileCountOutputTypeCountApprovedSellerPayoutsArgs
+  sentSellerPayouts?: boolean | UserProfileCountOutputTypeCountSentSellerPayoutsArgs
+  verifiedSellerPayoutProfiles?: boolean | UserProfileCountOutputTypeCountVerifiedSellerPayoutProfilesArgs
+  sellerPayoutProfileAuditEvents?: boolean | UserProfileCountOutputTypeCountSellerPayoutProfileAuditEventsArgs
 }
 
 /**
@@ -3950,6 +6258,62 @@ export type UserProfileCountOutputTypeCountPaymentRequestEventsArgs<ExtArgs exte
   where?: Prisma.PaymentRequestEventWhereInput
 }
 
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountTradeOrderEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TradeOrderEventWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountSellerPayoutEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutEventWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountSellerPayoutAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutAdjustmentWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountPreparedSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountApprovedSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountSentSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountVerifiedSellerPayoutProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutProfileWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountSellerPayoutProfileAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SellerPayoutProfileAuditEventWhereInput
+}
+
 
 export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3987,6 +6351,14 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdPaymentRequests?: boolean | Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>
   releasedPaymentRequests?: boolean | Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>
   paymentRequestEvents?: boolean | Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>
+  tradeOrderEvents?: boolean | Prisma.UserProfile$tradeOrderEventsArgs<ExtArgs>
+  sellerPayoutEvents?: boolean | Prisma.UserProfile$sellerPayoutEventsArgs<ExtArgs>
+  sellerPayoutAdjustments?: boolean | Prisma.UserProfile$sellerPayoutAdjustmentsArgs<ExtArgs>
+  preparedSellerPayouts?: boolean | Prisma.UserProfile$preparedSellerPayoutsArgs<ExtArgs>
+  approvedSellerPayouts?: boolean | Prisma.UserProfile$approvedSellerPayoutsArgs<ExtArgs>
+  sentSellerPayouts?: boolean | Prisma.UserProfile$sentSellerPayoutsArgs<ExtArgs>
+  verifiedSellerPayoutProfiles?: boolean | Prisma.UserProfile$verifiedSellerPayoutProfilesArgs<ExtArgs>
+  sellerPayoutProfileAuditEvents?: boolean | Prisma.UserProfile$sellerPayoutProfileAuditEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userProfile"]>
 
@@ -4072,6 +6444,14 @@ export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.Internal
   createdPaymentRequests?: boolean | Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>
   releasedPaymentRequests?: boolean | Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>
   paymentRequestEvents?: boolean | Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>
+  tradeOrderEvents?: boolean | Prisma.UserProfile$tradeOrderEventsArgs<ExtArgs>
+  sellerPayoutEvents?: boolean | Prisma.UserProfile$sellerPayoutEventsArgs<ExtArgs>
+  sellerPayoutAdjustments?: boolean | Prisma.UserProfile$sellerPayoutAdjustmentsArgs<ExtArgs>
+  preparedSellerPayouts?: boolean | Prisma.UserProfile$preparedSellerPayoutsArgs<ExtArgs>
+  approvedSellerPayouts?: boolean | Prisma.UserProfile$approvedSellerPayoutsArgs<ExtArgs>
+  sentSellerPayouts?: boolean | Prisma.UserProfile$sentSellerPayoutsArgs<ExtArgs>
+  verifiedSellerPayoutProfiles?: boolean | Prisma.UserProfile$verifiedSellerPayoutProfilesArgs<ExtArgs>
+  sellerPayoutProfileAuditEvents?: boolean | Prisma.UserProfile$sellerPayoutProfileAuditEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -4097,6 +6477,14 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     createdPaymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
     releasedPaymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
     paymentRequestEvents: Prisma.$PaymentRequestEventPayload<ExtArgs>[]
+    tradeOrderEvents: Prisma.$TradeOrderEventPayload<ExtArgs>[]
+    sellerPayoutEvents: Prisma.$SellerPayoutEventPayload<ExtArgs>[]
+    sellerPayoutAdjustments: Prisma.$SellerPayoutAdjustmentPayload<ExtArgs>[]
+    preparedSellerPayouts: Prisma.$SellerPayoutPayload<ExtArgs>[]
+    approvedSellerPayouts: Prisma.$SellerPayoutPayload<ExtArgs>[]
+    sentSellerPayouts: Prisma.$SellerPayoutPayload<ExtArgs>[]
+    verifiedSellerPayoutProfiles: Prisma.$SellerPayoutProfilePayload<ExtArgs>[]
+    sellerPayoutProfileAuditEvents: Prisma.$SellerPayoutProfileAuditEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4528,6 +6916,14 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
   createdPaymentRequests<T extends Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   releasedPaymentRequests<T extends Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentRequestEvents<T extends Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tradeOrderEvents<T extends Prisma.UserProfile$tradeOrderEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$tradeOrderEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeOrderEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sellerPayoutEvents<T extends Prisma.UserProfile$sellerPayoutEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sellerPayoutEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sellerPayoutAdjustments<T extends Prisma.UserProfile$sellerPayoutAdjustmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sellerPayoutAdjustmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutAdjustmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  preparedSellerPayouts<T extends Prisma.UserProfile$preparedSellerPayoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$preparedSellerPayoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  approvedSellerPayouts<T extends Prisma.UserProfile$approvedSellerPayoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$approvedSellerPayoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentSellerPayouts<T extends Prisma.UserProfile$sentSellerPayoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sentSellerPayoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  verifiedSellerPayoutProfiles<T extends Prisma.UserProfile$verifiedSellerPayoutProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$verifiedSellerPayoutProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sellerPayoutProfileAuditEvents<T extends Prisma.UserProfile$sellerPayoutProfileAuditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$sellerPayoutProfileAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutProfileAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5373,6 +7769,198 @@ export type UserProfile$paymentRequestEventsArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.PaymentRequestEventScalarFieldEnum | Prisma.PaymentRequestEventScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.tradeOrderEvents
+ */
+export type UserProfile$tradeOrderEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeOrderEvent
+   */
+  select?: Prisma.TradeOrderEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeOrderEvent
+   */
+  omit?: Prisma.TradeOrderEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeOrderEventInclude<ExtArgs> | null
+  where?: Prisma.TradeOrderEventWhereInput
+  orderBy?: Prisma.TradeOrderEventOrderByWithRelationInput | Prisma.TradeOrderEventOrderByWithRelationInput[]
+  cursor?: Prisma.TradeOrderEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TradeOrderEventScalarFieldEnum | Prisma.TradeOrderEventScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.sellerPayoutEvents
+ */
+export type UserProfile$sellerPayoutEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayoutEvent
+   */
+  select?: Prisma.SellerPayoutEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayoutEvent
+   */
+  omit?: Prisma.SellerPayoutEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutEventInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutEventWhereInput
+  orderBy?: Prisma.SellerPayoutEventOrderByWithRelationInput | Prisma.SellerPayoutEventOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutEventScalarFieldEnum | Prisma.SellerPayoutEventScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.sellerPayoutAdjustments
+ */
+export type UserProfile$sellerPayoutAdjustmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayoutAdjustment
+   */
+  select?: Prisma.SellerPayoutAdjustmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayoutAdjustment
+   */
+  omit?: Prisma.SellerPayoutAdjustmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutAdjustmentInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutAdjustmentWhereInput
+  orderBy?: Prisma.SellerPayoutAdjustmentOrderByWithRelationInput | Prisma.SellerPayoutAdjustmentOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutAdjustmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutAdjustmentScalarFieldEnum | Prisma.SellerPayoutAdjustmentScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.preparedSellerPayouts
+ */
+export type UserProfile$preparedSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayout
+   */
+  select?: Prisma.SellerPayoutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayout
+   */
+  omit?: Prisma.SellerPayoutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutWhereInput
+  orderBy?: Prisma.SellerPayoutOrderByWithRelationInput | Prisma.SellerPayoutOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutScalarFieldEnum | Prisma.SellerPayoutScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.approvedSellerPayouts
+ */
+export type UserProfile$approvedSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayout
+   */
+  select?: Prisma.SellerPayoutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayout
+   */
+  omit?: Prisma.SellerPayoutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutWhereInput
+  orderBy?: Prisma.SellerPayoutOrderByWithRelationInput | Prisma.SellerPayoutOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutScalarFieldEnum | Prisma.SellerPayoutScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.sentSellerPayouts
+ */
+export type UserProfile$sentSellerPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayout
+   */
+  select?: Prisma.SellerPayoutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayout
+   */
+  omit?: Prisma.SellerPayoutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutWhereInput
+  orderBy?: Prisma.SellerPayoutOrderByWithRelationInput | Prisma.SellerPayoutOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutScalarFieldEnum | Prisma.SellerPayoutScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.verifiedSellerPayoutProfiles
+ */
+export type UserProfile$verifiedSellerPayoutProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayoutProfile
+   */
+  select?: Prisma.SellerPayoutProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayoutProfile
+   */
+  omit?: Prisma.SellerPayoutProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutProfileInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutProfileWhereInput
+  orderBy?: Prisma.SellerPayoutProfileOrderByWithRelationInput | Prisma.SellerPayoutProfileOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutProfileScalarFieldEnum | Prisma.SellerPayoutProfileScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.sellerPayoutProfileAuditEvents
+ */
+export type UserProfile$sellerPayoutProfileAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerPayoutProfileAuditEvent
+   */
+  select?: Prisma.SellerPayoutProfileAuditEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerPayoutProfileAuditEvent
+   */
+  omit?: Prisma.SellerPayoutProfileAuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerPayoutProfileAuditEventInclude<ExtArgs> | null
+  where?: Prisma.SellerPayoutProfileAuditEventWhereInput
+  orderBy?: Prisma.SellerPayoutProfileAuditEventOrderByWithRelationInput | Prisma.SellerPayoutProfileAuditEventOrderByWithRelationInput[]
+  cursor?: Prisma.SellerPayoutProfileAuditEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SellerPayoutProfileAuditEventScalarFieldEnum | Prisma.SellerPayoutProfileAuditEventScalarFieldEnum[]
 }
 
 /**

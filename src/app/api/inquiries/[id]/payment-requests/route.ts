@@ -12,6 +12,9 @@ import {
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 import { isMessagePaymentFeatureEnabledForUser } from "@/lib/message-payment-feature";
+import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
+import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
+import { createTradeOrderForPaymentRequest } from "@/lib/trade-orders";
 import {
   calculatePaymentAmounts,
   parsePaymentDueDate,
@@ -71,6 +74,7 @@ export async function POST(
       productAmount,
       shippingAmount,
     );
+    const shouldCreateTradeOrder = isTradeOrderSystemEnabledForClerkUser(user.clerkUserId);
 
     const inquiry = await getDb().inquiry.findFirst({
       where: {
@@ -87,6 +91,7 @@ export async function POST(
       return Response.json({ error: "Conversation not found." }, { status: 404 });
     }
 
+    let tradeOrderId: string | null = null;
     const paymentRequest = await getDb().$transaction(async (tx) => {
       const created = await tx.paymentRequest.create({
         data: {
@@ -118,6 +123,14 @@ export async function POST(
         },
       });
 
+      // Order rollout is independent from message payments. When it is off, the
+      // existing request flow is unchanged; when enabled, both records commit or
+      // roll back together.
+      if (shouldCreateTradeOrder) {
+        const order = await createTradeOrderForPaymentRequest(tx, created.id);
+        tradeOrderId = order.id;
+      }
+
       await tx.inquiry.update({
         where: { id: inquiry.id },
         data: { updatedAt: new Date() },
@@ -128,6 +141,19 @@ export async function POST(
         select: paymentRequestConversationSelect,
       });
     });
+
+    if (tradeOrderId) {
+      try {
+        await sendTradeOrderNotification({
+          orderId: tradeOrderId,
+          kind: "order_created",
+          recipient: "both",
+          idempotencyKey: `trade82-order-created-${tradeOrderId}`,
+        });
+      } catch {
+        console.error("Trade order notification delivery failed.", { kind: "order_created" });
+      }
+    }
 
     return Response.json(paymentRequest, { status: 201 });
   } catch (error) {

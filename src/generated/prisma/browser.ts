@@ -13,10 +13,10 @@
  * 🟢 You can import this file directly.
  */
 
-import * as Prisma from './internal/prismaNamespaceBrowser'
+import * as Prisma from './internal/prismaNamespaceBrowser.ts'
 export { Prisma }
-export * as $Enums from './enums'
-export * from './enums';
+export * as $Enums from './enums.ts'
+export * from './enums.ts';
 /**
  * Model UserProfile
  * 
@@ -107,6 +107,61 @@ export type PaymentRequestEvent = Prisma.PaymentRequestEventModel
  * 
  */
 export type PaymentRequestWebhookEvent = Prisma.PaymentRequestWebhookEventModel
+/**
+ * Model OrderNumberCounter
+ * 
+ */
+export type OrderNumberCounter = Prisma.OrderNumberCounterModel
+/**
+ * Model TradeOrder
+ * 
+ */
+export type TradeOrder = Prisma.TradeOrderModel
+/**
+ * Model TradeOrderItem
+ * 
+ */
+export type TradeOrderItem = Prisma.TradeOrderItemModel
+/**
+ * Model TradeOrderShipment
+ * 
+ */
+export type TradeOrderShipment = Prisma.TradeOrderShipmentModel
+/**
+ * Model TradeOrderEvent
+ * 
+ */
+export type TradeOrderEvent = Prisma.TradeOrderEventModel
+/**
+ * Model BankDirectory
+ * 
+ */
+export type BankDirectory = Prisma.BankDirectoryModel
+/**
+ * Model SellerPayoutProfile
+ * 
+ */
+export type SellerPayoutProfile = Prisma.SellerPayoutProfileModel
+/**
+ * Model SellerPayoutProfileAuditEvent
+ * 
+ */
+export type SellerPayoutProfileAuditEvent = Prisma.SellerPayoutProfileAuditEventModel
+/**
+ * Model SellerPayout
+ * 
+ */
+export type SellerPayout = Prisma.SellerPayoutModel
+/**
+ * Model SellerPayoutEvent
+ * 
+ */
+export type SellerPayoutEvent = Prisma.SellerPayoutEventModel
+/**
+ * Model SellerPayoutAdjustment
+ * 
+ */
+export type SellerPayoutAdjustment = Prisma.SellerPayoutAdjustmentModel
 /**
  * Model SavedItem
  * 

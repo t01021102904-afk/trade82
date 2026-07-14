@@ -235,3 +235,202 @@ export const StripeFeeSyncStatus = {
 } as const
 
 export type StripeFeeSyncStatus = (typeof StripeFeeSyncStatus)[keyof typeof StripeFeeSyncStatus]
+
+
+export const TradeOrderStatus = {
+  PAYMENT_PENDING: 'PAYMENT_PENDING',
+  PAID: 'PAID',
+  PROCESSING: 'PROCESSING',
+  READY_TO_SHIP: 'READY_TO_SHIP',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED',
+  DISPUTED: 'DISPUTED'
+} as const
+
+export type TradeOrderStatus = (typeof TradeOrderStatus)[keyof typeof TradeOrderStatus]
+
+
+export const OrderPaymentStatus = {
+  UNPAID: 'UNPAID',
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  PARTIALLY_REFUNDED: 'PARTIALLY_REFUNDED',
+  REFUNDED: 'REFUNDED',
+  FAILED: 'FAILED',
+  DISPUTED: 'DISPUTED'
+} as const
+
+export type OrderPaymentStatus = (typeof OrderPaymentStatus)[keyof typeof OrderPaymentStatus]
+
+
+export const OrderShipmentStatus = {
+  NOT_READY: 'NOT_READY',
+  READY: 'READY',
+  BOOKED: 'BOOKED',
+  SHIPPED: 'SHIPPED',
+  IN_TRANSIT: 'IN_TRANSIT',
+  DELIVERED: 'DELIVERED',
+  EXCEPTION: 'EXCEPTION',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderShipmentStatus = (typeof OrderShipmentStatus)[keyof typeof OrderShipmentStatus]
+
+
+export const OrderPayoutStatus = {
+  NOT_READY: 'NOT_READY',
+  HOLD: 'HOLD',
+  READY: 'READY',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderPayoutStatus = (typeof OrderPayoutStatus)[keyof typeof OrderPayoutStatus]
+
+
+export const Incoterm = {
+  EXW: 'EXW',
+  FCA: 'FCA',
+  FAS: 'FAS',
+  FOB: 'FOB',
+  CFR: 'CFR',
+  CIF: 'CIF',
+  CPT: 'CPT',
+  CIP: 'CIP',
+  DAP: 'DAP',
+  DPU: 'DPU',
+  DDP: 'DDP',
+  OTHER: 'OTHER'
+} as const
+
+export type Incoterm = (typeof Incoterm)[keyof typeof Incoterm]
+
+
+export const ShippingMethod = {
+  OCEAN: 'OCEAN',
+  AIR: 'AIR',
+  EXPRESS: 'EXPRESS',
+  POSTAL: 'POSTAL',
+  TRUCK: 'TRUCK',
+  COURIER: 'COURIER',
+  OTHER: 'OTHER'
+} as const
+
+export type ShippingMethod = (typeof ShippingMethod)[keyof typeof ShippingMethod]
+
+
+export const SellerPayoutProfileStatus = {
+  DRAFT: 'DRAFT',
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+  DISABLED: 'DISABLED'
+} as const
+
+export type SellerPayoutProfileStatus = (typeof SellerPayoutProfileStatus)[keyof typeof SellerPayoutProfileStatus]
+
+
+export const PayoutAccountType = {
+  LOCAL: 'LOCAL',
+  FOREIGN_CURRENCY: 'FOREIGN_CURRENCY',
+  IBAN: 'IBAN',
+  OTHER: 'OTHER'
+} as const
+
+export type PayoutAccountType = (typeof PayoutAccountType)[keyof typeof PayoutAccountType]
+
+
+export const SellerPayoutStatus = {
+  NOT_READY: 'NOT_READY',
+  HOLD: 'HOLD',
+  READY: 'READY',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SellerPayoutStatus = (typeof SellerPayoutStatus)[keyof typeof SellerPayoutStatus]
+
+
+export const WireFeeBearer = {
+  OUR: 'OUR',
+  SHA: 'SHA',
+  BEN: 'BEN',
+  NOT_APPLICABLE: 'NOT_APPLICABLE'
+} as const
+
+export type WireFeeBearer = (typeof WireFeeBearer)[keyof typeof WireFeeBearer]
+
+
+export const TradeOrderEventType = {
+  ORDER_CREATED: 'ORDER_CREATED',
+  PAYMENT_REQUESTED: 'PAYMENT_REQUESTED',
+  CHECKOUT_STARTED: 'CHECKOUT_STARTED',
+  PAYMENT_PAID: 'PAYMENT_PAID',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  REFUND_CREATED: 'REFUND_CREATED',
+  REFUND_COMPLETED: 'REFUND_COMPLETED',
+  DISPUTE_OPENED: 'DISPUTE_OPENED',
+  DISPUTE_CLOSED: 'DISPUTE_CLOSED',
+  PROCESSING_STARTED: 'PROCESSING_STARTED',
+  SHIPMENT_UPDATED: 'SHIPMENT_UPDATED',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  PAYOUT_HOLD: 'PAYOUT_HOLD',
+  PAYOUT_READY: 'PAYOUT_READY',
+  PAYOUT_PROCESSING: 'PAYOUT_PROCESSING',
+  PAYOUT_SENT: 'PAYOUT_SENT',
+  PAYOUT_FAILED: 'PAYOUT_FAILED',
+  ORDER_CANCELLED: 'ORDER_CANCELLED',
+  ORDER_COMPLETED: 'ORDER_COMPLETED',
+  ADMIN_NOTE: 'ADMIN_NOTE'
+} as const
+
+export type TradeOrderEventType = (typeof TradeOrderEventType)[keyof typeof TradeOrderEventType]
+
+
+export const SellerPayoutEventType = {
+  CREATED: 'CREATED',
+  ELIGIBILITY_CHECKED: 'ELIGIBILITY_CHECKED',
+  READY: 'READY',
+  HOLD: 'HOLD',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED',
+  BANK_DETAILS_REVEALED: 'BANK_DETAILS_REVEALED',
+  INSTRUCTIONS_EXPORTED: 'INSTRUCTIONS_EXPORTED',
+  ADJUSTMENT_ADDED: 'ADJUSTMENT_ADDED'
+} as const
+
+export type SellerPayoutEventType = (typeof SellerPayoutEventType)[keyof typeof SellerPayoutEventType]
+
+
+export const SellerPayoutAdjustmentType = {
+  CREDIT: 'CREDIT',
+  DEBIT: 'DEBIT',
+  REFUND_RECOVERY: 'REFUND_RECOVERY',
+  BANK_FEE: 'BANK_FEE',
+  FX_ADJUSTMENT: 'FX_ADJUSTMENT',
+  OTHER: 'OTHER'
+} as const
+
+export type SellerPayoutAdjustmentType = (typeof SellerPayoutAdjustmentType)[keyof typeof SellerPayoutAdjustmentType]
+
+
+export const BankDirectorySourceType = {
+  SEED: 'SEED',
+  ADMIN: 'ADMIN',
+  ADMIN_OVERRIDE: 'ADMIN_OVERRIDE'
+} as const
+
+export type BankDirectorySourceType = (typeof BankDirectorySourceType)[keyof typeof BankDirectorySourceType]
