@@ -57,6 +57,33 @@ export const ProductStatus = {
 export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
 
 
+export const ProductBulkImportStatus = {
+  PREVIEWED: 'PREVIEWED',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type ProductBulkImportStatus = (typeof ProductBulkImportStatus)[keyof typeof ProductBulkImportStatus]
+
+
+export const ProductBulkImportRowStatus = {
+  VALID: 'VALID',
+  ERROR: 'ERROR',
+  CREATED: 'CREATED',
+  UPDATED: 'UPDATED',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type ProductBulkImportRowStatus = (typeof ProductBulkImportRowStatus)[keyof typeof ProductBulkImportRowStatus]
+
+
+export const ProductBulkImportDuplicateMode = {
+  SKIP: 'SKIP',
+  UPDATE: 'UPDATE'
+} as const
+
+export type ProductBulkImportDuplicateMode = (typeof ProductBulkImportDuplicateMode)[keyof typeof ProductBulkImportDuplicateMode]
+
+
 export const VerificationRequestStatus = {
   pending_review: 'pending_review',
   verified: 'verified',
