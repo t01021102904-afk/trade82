@@ -67,16 +67,6 @@ export type BuyerProfile = Prisma.BuyerProfileModel
  */
 export type Product = Prisma.ProductModel
 /**
- * Model ProductBulkImport
- * 
- */
-export type ProductBulkImport = Prisma.ProductBulkImportModel
-/**
- * Model ProductBulkImportRow
- * 
- */
-export type ProductBulkImportRow = Prisma.ProductBulkImportRowModel
-/**
  * Model ProductImage
  * 
  */

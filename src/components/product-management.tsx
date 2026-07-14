@@ -126,20 +126,12 @@ export function ProductManagement() {
           <h2 className="text-lg font-semibold text-zinc-950">{t("settings.myProducts")}</h2>
           <p className="mt-1 text-sm text-zinc-500">{t("settings.productVisibilityRule")}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={withLocale("/sell", locale)}
-            className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white"
-          >
-            {t("settings.addProduct")}
-          </Link>
-          <Link
-            href={withLocale("/products/import", locale)}
-            className="inline-flex h-8 items-center justify-center rounded-md border border-zinc-300 bg-white px-2.5 text-xs font-medium text-zinc-800 transition hover:bg-zinc-50"
-          >
-            {t("productBulkImport.button")}
-          </Link>
-        </div>
+        <Link
+          href={withLocale("/sell", locale)}
+          className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white"
+        >
+          {t("settings.addProduct")}
+        </Link>
       </div>
 
       {editing ? (

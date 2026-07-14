@@ -56,8 +56,6 @@ export const ModelName = {
   SellerProfile: 'SellerProfile',
   BuyerProfile: 'BuyerProfile',
   Product: 'Product',
-  ProductBulkImport: 'ProductBulkImport',
-  ProductBulkImportRow: 'ProductBulkImportRow',
   ProductImage: 'ProductImage',
   Category: 'Category',
   VerificationRequest: 'VerificationRequest',
@@ -212,7 +210,6 @@ export type BuyerProfileScalarFieldEnum = (typeof BuyerProfileScalarFieldEnum)[k
 export const ProductScalarFieldEnum = {
   id: 'id',
   sellerCompanyId: 'sellerCompanyId',
-  sellerSku: 'sellerSku',
   name: 'name',
   nameEn: 'nameEn',
   slug: 'slug',
@@ -269,41 +266,6 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
-
-
-export const ProductBulkImportScalarFieldEnum = {
-  id: 'id',
-  sellerCompanyId: 'sellerCompanyId',
-  createdByUserId: 'createdByUserId',
-  sourceFilename: 'sourceFilename',
-  sourceFormat: 'sourceFormat',
-  duplicateMode: 'duplicateMode',
-  status: 'status',
-  committedAt: 'committedAt',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ProductBulkImportScalarFieldEnum = (typeof ProductBulkImportScalarFieldEnum)[keyof typeof ProductBulkImportScalarFieldEnum]
-
-
-export const ProductBulkImportRowScalarFieldEnum = {
-  id: 'id',
-  importId: 'importId',
-  rowNumber: 'rowNumber',
-  sellerSku: 'sellerSku',
-  productName: 'productName',
-  category: 'category',
-  rawData: 'rawData',
-  normalizedData: 'normalizedData',
-  status: 'status',
-  errorMessages: 'errorMessages',
-  resultProductId: 'resultProductId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type ProductBulkImportRowScalarFieldEnum = (typeof ProductBulkImportRowScalarFieldEnum)[keyof typeof ProductBulkImportRowScalarFieldEnum]
 
 
 export const ProductImageScalarFieldEnum = {

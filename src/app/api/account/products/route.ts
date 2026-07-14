@@ -1,9 +1,87 @@
 import { apiError } from "@/lib/api-response";
 import { rateLimitOrResponse } from "@/lib/api-security";
 import { requireSeller } from "@/lib/authz";
+import {
+  getComplianceClaimOptions,
+  getCountryOptions,
+  getIncotermOptions,
+  getKoreanRegionOptions,
+  getLeadTimeOptions,
+  getMoqUnitOptions,
+  getPriceUnitOptions,
+  getPrivateLabelOptions,
+  getSampleAvailabilityOptions,
+  getSalesChannelOptions,
+  getSellerDocumentOptions,
+  SOUTH_KOREA,
+  type SelectOption,
+} from "@/lib/company-select-options";
 import { getDb } from "@/lib/db";
-import { parseUploadedImages } from "@/lib/marketplace";
-import { createProductSlug, normalizeProductInput } from "@/lib/product-input";
+import {
+  cleanPlainText,
+  cleanTags,
+  isMarketplaceCategory,
+  parseUploadedImages,
+} from "@/lib/marketplace";
+import {
+  parseProductFieldVisibilityInput,
+  productFieldRequiresValue,
+} from "@/lib/product-field-visibility";
+
+function strings(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function optionValues(options: SelectOption[]) {
+  return new Set(options.map((option) => option.value));
+}
+
+function allowedOption(value: unknown, options: SelectOption[], fallback = "") {
+  const text = cleanPlainText(value, 120);
+  return optionValues(options).has(text) ? text : fallback;
+}
+
+function allowedList(value: unknown, options: SelectOption[]) {
+  const allowed = optionValues(options);
+  return Array.from(
+    new Set(
+      strings(value)
+        .map((item) => cleanPlainText(item, 120))
+        .filter((item) => allowed.has(item)),
+    ),
+  );
+}
+
+function optionalPositiveText(value: unknown, maxLength = 80) {
+  const text = cleanPlainText(value, maxLength);
+  if (!text) return "";
+  const number = Number(text);
+  return Number.isFinite(number) && number >= 0 ? text : "";
+}
+
+function publicFieldRequiredResponse() {
+  return Response.json(
+    { error: "공개 항목으로 설정한 경우 입력이 필요합니다." },
+    { status: 400 },
+  );
+}
+
+function productImageRequiredResponse() {
+  return Response.json(
+    { error: "상품 공개에는 상품 이미지가 필요합니다." },
+    { status: 400 },
+  );
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
 export async function GET() {
   try {
@@ -52,22 +130,286 @@ export async function POST(request: Request) {
       );
     }
 
+    const name = cleanPlainText(body.name, 120);
+    const nameEn = cleanPlainText(body.nameEn, 120);
+    const category = cleanPlainText(body.category, 80);
+    const detailedDescription = cleanPlainText(body.detailedDescription, 5000);
+    const detailedDescriptionEn = cleanPlainText(body.detailedDescriptionEn, 5000);
+    const fieldVisibility = parseProductFieldVisibilityInput(body.fieldVisibility);
+    const priceIsPublic = productFieldRequiresValue(fieldVisibility, "minimumUnitPrice");
+    const moqIsPublic = productFieldRequiresValue(fieldVisibility, "moq");
+    const leadTimeIsPublic = productFieldRequiresValue(fieldVisibility, "leadTime");
+    const priceMin = priceIsPublic ? Number(body.priceMin) : null;
+    const priceMax =
+      !priceIsPublic ||
+      body.priceMax === null ||
+      body.priceMax === undefined ||
+      body.priceMax === ""
+        ? null
+        : Number(body.priceMax);
+    const moqQuantity = moqIsPublic ? optionalPositiveText(body.moqQuantity) : "";
+    const moqUnit = allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
+    const leadTime = leadTimeIsPublic
+      ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
+      : "";
     const images = parseUploadedImages(body.images);
+    const countryOfOrigin = allowedOption(
+      body.countryOfOrigin,
+      getCountryOptions("en"),
+      SOUTH_KOREA,
+    );
+    const shippingOriginCountry = allowedOption(
+      body.shippingOriginCountry,
+      getCountryOptions("en"),
+      SOUTH_KOREA,
+    );
+    const shippingOriginRegion =
+      shippingOriginCountry === SOUTH_KOREA
+        ? allowedOption(body.shippingOriginRegion, getKoreanRegionOptions("en"))
+        : cleanPlainText(body.shippingOriginRegion, 120);
     const status =
       body.status === "inactive" || body.status === "draft"
         ? body.status
         : "active";
-    const productInput = normalizeProductInput(body, {
-      status,
-      hasImages: images.length > 0,
-    });
+
+    if (!name) {
+      return Response.json({ error: "상품명을 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (!isMarketplaceCategory(category)) {
+      return Response.json({ error: "카테고리를 선택해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (priceIsPublic && (priceMin === null || !Number.isFinite(priceMin) || priceMin <= 0)) {
+      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (priceIsPublic && priceMax !== null && (!Number.isFinite(priceMax) || priceMax < 0)) {
+      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (moqIsPublic && moqUnit !== "Not fixed" && (!moqQuantity || Number(moqQuantity) <= 0)) {
+      return Response.json({ error: "MOQ를 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (leadTimeIsPublic && !leadTime) {
+      return Response.json({ error: "리드타임을 선택해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (!detailedDescription) {
+      return Response.json({ error: "상품 설명을 입력해 주시기 바랍니다." }, { status: 400 });
+    }
+    if (status === "active" && !images.length) {
+      return productImageRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "sampleAvailability") &&
+      !allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en"))
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "privateLabelAvailability") &&
+      !allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en"))
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "monthlySupplyCapacity") &&
+      !optionalPositiveText(body.monthlyCapacity)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "incoterms") &&
+      !allowedList(body.incoterms, getIncotermOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "hsCode") &&
+      !cleanPlainText(body.hsCode, 40)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "shelfLife") &&
+      !cleanPlainText(body.shelfLife, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "storageRequirements") &&
+      !cleanPlainText(body.storageRequirements, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "documents") &&
+      !allowedList(body.documentsAvailable, getSellerDocumentOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "complianceInfo") &&
+      !allowedList(body.complianceClaims, getComplianceClaimOptions("en")).length
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "ingredientsMaterials") &&
+      !cleanPlainText(body.ingredientsOrMaterials, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "packageSize") &&
+      !cleanPlainText(body.packageSize, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "unitsPerCarton") &&
+      !optionalPositiveText(body.unitsPerCarton)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "cartonWeight") &&
+      !cleanPlainText(body.cartonWeight, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "cartonDimensions") &&
+      !cleanPlainText(body.cartonDimensions, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "palletQuantity") &&
+      !optionalPositiveText(body.palletQuantity)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "storageTemperature") &&
+      !cleanPlainText(body.storageTemperature, 120)
+    ) {
+      return publicFieldRequiredResponse();
+    }
+    if (
+      productFieldRequiresValue(fieldVisibility, "packaging") &&
+      !cleanPlainText(body.packaging, 1000)
+    ) {
+      return publicFieldRequiredResponse();
+    }
     const firstImage = images[0];
     const product = await getDb().product.create({
       data: {
         sellerCompanyId: company.id,
-        slug: `${createProductSlug(productInput.name) || "product"}-${crypto.randomUUID().slice(0, 8)}`,
+        name,
+        nameEn,
+        slug: `${slugify(name) || "product"}-${crypto.randomUUID().slice(0, 8)}`,
         imageUrl: firstImage?.cardUrl ?? null,
-        ...productInput,
+        category,
+        tags: cleanTags(body.tags),
+        tagsEn: cleanTags(body.tagsEn),
+        shortDescription:
+          cleanPlainText(body.shortDescription, 240) ||
+          detailedDescription.slice(0, 240),
+        shortDescriptionEn: cleanPlainText(body.shortDescriptionEn, 240),
+        detailedDescription,
+        detailedDescriptionEn,
+        priceMin: priceMin === null ? null : String(priceMin),
+        priceMax: priceMax === null ? null : String(priceMax),
+        currency: cleanPlainText(body.currency, 8) || "USD",
+        priceUnit: allowedOption(body.priceUnit, getPriceUnitOptions("en"), "unit"),
+        moq:
+          moqIsPublic
+            ? cleanPlainText(body.moq, 120) ||
+              (moqUnit === "Not fixed" ? "Not fixed" : `${moqQuantity} ${moqUnit}`)
+            : "",
+        moqQuantity,
+        moqUnit,
+        leadTime,
+        leadTimeCode: leadTime,
+        sampleAvailability: productFieldRequiresValue(fieldVisibility, "sampleAvailability")
+          ? allowedOption(body.sampleAvailability, getSampleAvailabilityOptions("en"))
+          : "",
+        privateLabelAvailability: productFieldRequiresValue(
+          fieldVisibility,
+          "privateLabelAvailability",
+        )
+          ? allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en"))
+          : "",
+        monthlyCapacity: productFieldRequiresValue(fieldVisibility, "monthlySupplyCapacity")
+          ? optionalPositiveText(body.monthlyCapacity)
+          : "",
+        monthlyCapacityUnit: allowedOption(
+          body.monthlyCapacityUnit,
+          getPriceUnitOptions("en"),
+          "unit",
+        ),
+        origin: countryOfOrigin,
+        countryOfOrigin,
+        shippingOriginCountry,
+        shippingOriginRegion,
+        incoterms: productFieldRequiresValue(fieldVisibility, "incoterms")
+          ? allowedList(body.incoterms, getIncotermOptions("en"))
+          : [],
+        hsCode: productFieldRequiresValue(fieldVisibility, "hsCode")
+          ? cleanPlainText(body.hsCode, 40)
+          : "",
+        shelfLife: productFieldRequiresValue(fieldVisibility, "shelfLife")
+          ? cleanPlainText(body.shelfLife, 120)
+          : "",
+        storageRequirements: productFieldRequiresValue(fieldVisibility, "storageRequirements")
+          ? cleanPlainText(body.storageRequirements, 1000)
+          : "",
+        documentsAvailable: productFieldRequiresValue(fieldVisibility, "documents")
+          ? allowedList(body.documentsAvailable, getSellerDocumentOptions("en"))
+          : [],
+        complianceClaims: productFieldRequiresValue(fieldVisibility, "complianceInfo")
+          ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
+          : [],
+        buyerNotes: cleanPlainText(body.buyerNotes, 1000),
+        buyerNotesEn: cleanPlainText(body.buyerNotesEn, 1000),
+        riskNotes: strings(body.riskNotes).map((item) => cleanPlainText(item, 300)).filter(Boolean),
+        certifications: productFieldRequiresValue(fieldVisibility, "complianceInfo")
+          ? allowedList(
+              body.complianceClaims ?? body.certifications,
+              getComplianceClaimOptions("en"),
+            )
+          : [],
+        ingredientsOrMaterials: productFieldRequiresValue(
+          fieldVisibility,
+          "ingredientsMaterials",
+        )
+          ? cleanPlainText(body.ingredientsOrMaterials, 1000)
+          : "",
+        packaging: productFieldRequiresValue(fieldVisibility, "packaging")
+          ? cleanPlainText(body.packaging, 1000)
+          : "",
+        packageSize: productFieldRequiresValue(fieldVisibility, "packageSize")
+          ? cleanPlainText(body.packageSize, 120)
+          : "",
+        unitsPerCarton: productFieldRequiresValue(fieldVisibility, "unitsPerCarton")
+          ? optionalPositiveText(body.unitsPerCarton)
+          : "",
+        cartonWeight: productFieldRequiresValue(fieldVisibility, "cartonWeight")
+          ? cleanPlainText(body.cartonWeight, 120)
+          : "",
+        cartonDimensions: productFieldRequiresValue(fieldVisibility, "cartonDimensions")
+          ? cleanPlainText(body.cartonDimensions, 120)
+          : "",
+        palletQuantity: productFieldRequiresValue(fieldVisibility, "palletQuantity")
+          ? optionalPositiveText(body.palletQuantity)
+          : "",
+        storageTemperature: productFieldRequiresValue(fieldVisibility, "storageTemperature")
+          ? cleanPlainText(body.storageTemperature, 120)
+          : "",
+        suggestedUsChannels: allowedList(
+          body.suggestedUsChannels,
+          getSalesChannelOptions("en"),
+        ),
+        fieldVisibility,
+        exportReadiness: body.exportReadiness === true,
+        status,
         images: images.length
           ? {
               create: images.map((image) => ({
@@ -79,7 +421,7 @@ export async function POST(request: Request) {
                 position: image.position,
                 width: image.width,
                 height: image.height,
-                altText: productInput.name,
+                altText: name,
               })),
             }
           : undefined,
