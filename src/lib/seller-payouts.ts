@@ -243,6 +243,9 @@ export async function setSellerPayoutStatus({
       const hasActiveDispute = paymentRequest.disputes.some((item) => ACTIVE_DISPUTE_STATUSES.has(item.status));
       if (
         paymentRequest.status !== "PAID" ||
+        payout.order.paymentStatus !== "PAID" ||
+        ["CANCELLED", "REFUNDED", "DISPUTED"].includes(payout.order.orderStatus) ||
+        payout.order.payoutStatus === "CANCELLED" ||
         paymentRequest.refundAmount > 0 ||
         paymentRequest.requiresManualReconciliation ||
         hasActiveDispute
@@ -268,7 +271,7 @@ export async function setSellerPayoutStatus({
       message: `Manual payout marked ${status.toLowerCase()}.`,
     });
     return { orderId: payout.orderId };
-  });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
   if (status === "HOLD" || status === "FAILED") {
     try {
       await sendTradeOrderNotification({

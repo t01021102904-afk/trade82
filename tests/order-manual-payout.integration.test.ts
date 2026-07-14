@@ -222,6 +222,38 @@ async function createReadyPayout(prefix = "ready-payout") {
   return { fixture, order, payout };
 }
 
+async function assertProcessingIsBlocked(payoutId: string, actorUserId: string) {
+  const before = await db.sellerPayout.findUniqueOrThrow({
+    where: { id: payoutId },
+    select: {
+      status: true,
+      preparedAt: true,
+      approvedAt: true,
+      sentAt: true,
+      finalPayoutAmount: true,
+      order: { select: { paymentRequest: { select: { releasedAt: true } } } },
+    },
+  });
+  const processingEvents = await db.sellerPayoutEvent.count({ where: { payoutId, eventType: "PROCESSING" } });
+  await assert.rejects(
+    payouts.setSellerPayoutStatus({ payoutId, actorUserId, status: "PROCESSING" }),
+    /on hold|sent or cancelled/i,
+  );
+  const after = await db.sellerPayout.findUniqueOrThrow({
+    where: { id: payoutId },
+    select: {
+      status: true,
+      preparedAt: true,
+      approvedAt: true,
+      sentAt: true,
+      finalPayoutAmount: true,
+      order: { select: { paymentRequest: { select: { releasedAt: true } } } },
+    },
+  });
+  assert.deepEqual(after, before);
+  assert.equal(await db.sellerPayoutEvent.count({ where: { payoutId, eventType: "PROCESSING" } }), processingEvents);
+}
+
 async function runBankSeed() {
   await execFile(process.execPath, ["--experimental-strip-types", "scripts/seed-south-korea-bank-directory.ts"], {
     cwd: process.cwd(),
@@ -325,6 +357,50 @@ test("a single order can prepare only one payout during concurrent requests", as
   assert.equal(results.filter((result) => result.status === "fulfilled").length, 1);
 });
 
+test("a paid eligible payout can enter processing", async () => {
+  const { fixture, payout } = await createReadyPayout("processing-eligible");
+  await payouts.setSellerPayoutStatus({
+    payoutId: payout.id,
+    actorUserId: fixture.admin.id,
+    status: "PROCESSING",
+  });
+  assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: payout.id } })).status, "PROCESSING");
+  assert.equal(await db.sellerPayoutEvent.count({ where: { payoutId: payout.id, eventType: "PROCESSING" } }), 1);
+});
+
+test("cancelled orders and payouts cannot enter processing", async () => {
+  const cancelledOrder = await createReadyPayout("processing-cancelled-order");
+  await db.tradeOrder.update({
+    where: { id: cancelledOrder.order.id },
+    data: { orderStatus: "CANCELLED", payoutStatus: "CANCELLED" },
+  });
+  await assertProcessingIsBlocked(cancelledOrder.payout.id, cancelledOrder.fixture.admin.id);
+
+  const cancelledPayout = await createReadyPayout("processing-cancelled-payout");
+  await db.sellerPayout.update({ where: { id: cancelledPayout.payout.id }, data: { status: "CANCELLED" } });
+  await assertProcessingIsBlocked(cancelledPayout.payout.id, cancelledPayout.fixture.admin.id);
+});
+
+test("active disputes and reconciliation holds cannot enter processing", async () => {
+  const activeDispute = await createReadyPayout("processing-active-dispute");
+  await db.paymentDispute.create({
+    data: {
+      paymentRequestId: activeDispute.order.paymentRequestId,
+      stripeDisputeId: `dp_${unique("processing-active")}`,
+      amount: 11_000,
+      status: "needs_response",
+    },
+  });
+  await assertProcessingIsBlocked(activeDispute.payout.id, activeDispute.fixture.admin.id);
+
+  const reconciliation = await createReadyPayout("processing-reconciliation");
+  await db.paymentRequest.update({
+    where: { id: reconciliation.order.paymentRequestId },
+    data: { requiresManualReconciliation: true },
+  });
+  await assertProcessingIsBlocked(reconciliation.payout.id, reconciliation.fixture.admin.id);
+});
+
 test("simultaneous SENT actions release payment only once", async () => {
   const { fixture, order, payout } = await createReadyPayout("sent-race");
   const sentAt = new Date();
@@ -363,28 +439,17 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
   });
   assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: partial.payout.id } })).status, "HOLD");
   assert.equal((await db.tradeOrder.findUniqueOrThrow({ where: { id: partial.order.id } })).payoutStatus, "HOLD");
-  await assert.rejects(
-    payouts.setSellerPayoutStatus({
-      payoutId: partial.payout.id,
-      actorUserId: partial.fixture.admin.id,
-      status: "PROCESSING",
-    }),
-    /on hold until the payment issue is resolved/i,
-  );
-  assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: partial.payout.id } })).status, "HOLD");
+  await assertProcessingIsBlocked(partial.payout.id, partial.fixture.admin.id);
 
-  const fullRefund = await createFixture("full-refund");
-  const fullRefundOrder = await createOrder(fullRefund);
-  await markOrderPaid(fullRefundOrder.id);
-  await createVerifiedProfile(fullRefund);
+  const fullRefund = await createReadyPayout("full-refund");
   await db.$transaction(async (tx) => {
     const request = await tx.paymentRequest.update({
-      where: { id: fullRefundOrder.paymentRequestId },
+      where: { id: fullRefund.order.paymentRequestId },
       data: { status: "REFUNDED", refundAmount: 11_000 },
     });
     await tradeOrders.syncTradeOrderFromPaymentRequest(tx, request, "refund");
   });
-  await assert.rejects(payouts.prepareSellerPayout({ orderId: fullRefundOrder.id, actorUserId: fullRefund.admin.id }));
+  await assertProcessingIsBlocked(fullRefund.payout.id, fullRefund.fixture.admin.id);
 
   const dispute = await createReadyPayout("dispute");
   await db.$transaction(async (tx) => {
@@ -395,6 +460,7 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
     await tradeOrders.syncTradeOrderFromPaymentRequest(tx, request, "dispute");
   });
   assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: dispute.payout.id } })).status, "HOLD");
+  await assertProcessingIsBlocked(dispute.payout.id, dispute.fixture.admin.id);
 
   const sent = await createReadyPayout("sent-refund");
   await payouts.markSellerPayoutSent({
@@ -407,7 +473,7 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
   await db.$transaction(async (tx) => {
     const request = await tx.paymentRequest.update({
       where: { id: sent.order.paymentRequestId },
-      data: { status: "REFUNDED", refundAmount: 11_000 },
+      data: { status: "REFUNDED", refundAmount: 11_000, requiresManualReconciliation: true },
     });
     await tradeOrders.syncTradeOrderFromPaymentRequest(tx, request, "refund");
   });
@@ -416,6 +482,25 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
   assert.equal(preserved.status, "SENT");
   assert.equal(sentOrder.payoutStatus, "HOLD");
   assert.ok(preserved.externalTransferReference);
+  await assertProcessingIsBlocked(sent.payout.id, sent.fixture.admin.id);
+});
+
+test("a concurrent refund cannot leave a payout in processing", async () => {
+  const { fixture, order, payout } = await createReadyPayout("processing-refund-race");
+  const results = await Promise.allSettled([
+    payouts.setSellerPayoutStatus({ payoutId: payout.id, actorUserId: fixture.admin.id, status: "PROCESSING" }),
+    db.$transaction(async (tx) => {
+      const request = await tx.paymentRequest.update({
+        where: { id: order.paymentRequestId },
+        data: { status: "PARTIALLY_REFUNDED", refundAmount: 500 },
+      });
+      await tradeOrders.syncTradeOrderFromPaymentRequest(tx, request, "refund");
+    }),
+  ]);
+  assert.equal(results[1].status, "fulfilled");
+  assert.equal((await db.paymentRequest.findUniqueOrThrow({ where: { id: order.paymentRequestId } })).status, "PARTIALLY_REFUNDED");
+  assert.equal((await db.sellerPayout.findUniqueOrThrow({ where: { id: payout.id } })).status, "HOLD");
+  assert.equal((await db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } })).payoutStatus, "HOLD");
 });
 
 test("adjustments use an immutable ledger with safe totals and post-sent reconciliation", async () => {
