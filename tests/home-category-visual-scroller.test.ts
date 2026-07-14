@@ -59,20 +59,11 @@ test("creates locale-aware marketplace links with safely encoded category values
   );
 });
 
-test("uses local SVG artwork with unique definition identifiers", async () => {
-  const allIds = new Set<string>();
-
+test("uses a local PNG asset for every category", async () => {
   for (const item of homeProductCategories) {
-    const source = await readFile(path.join(rootDirectory, "public", item.imageSrc), "utf8");
-    assert.match(source, /<svg[\s>]/);
-    assert.doesNotMatch(source, /[\u{1F000}-\u{1FAFF}]/u);
-
-    const ids = [...source.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]);
-    assert.ok(ids.length >= 3, `${item.id} must include its own gradients and shadow filter`);
-    ids.forEach((id) => {
-      assert.ok(!allIds.has(id), `duplicate SVG definition id: ${id}`);
-      allIds.add(id);
-    });
+    assert.match(item.imageSrc, /^\/categories\/[a-z]+\.png$/);
+    const source = await readFile(path.join(rootDirectory, "public", item.imageSrc));
+    assert.deepEqual([...source.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
   }
 });
 
