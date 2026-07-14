@@ -253,6 +253,41 @@ export async function setSellerPayoutStatus({
         throw new Error("This payout is on hold until the payment issue is resolved.");
       }
     }
+    const orderPayoutStatus = status === "HOLD"
+      ? OrderPayoutStatus.HOLD
+      : status === "PROCESSING"
+        ? OrderPayoutStatus.PROCESSING
+        : OrderPayoutStatus.FAILED;
+    // Refund/dispute synchronization locks the order before the payout. Keep
+    // the same lock order here so a concurrent refund can always place both
+    // records on hold instead of losing to a deadlock victim selection.
+    const orderUpdate = await tx.tradeOrder.updateMany({
+      where: {
+        id: payout.orderId,
+        ...(status === "PROCESSING"
+          ? {
+              paymentStatus: "PAID",
+              orderStatus: "PAID",
+              paymentRequest: {
+                is: {
+                  status: "PAID",
+                  refundAmount: 0,
+                  requiresManualReconciliation: false,
+                  disputes: {
+                    none: {
+                      status: { in: [...ACTIVE_DISPUTE_STATUSES] },
+                    },
+                  },
+                },
+              },
+            }
+          : {}),
+      },
+      data: { payoutStatus: orderPayoutStatus },
+    });
+    if (!orderUpdate.count) {
+      throw new Error("This payout is on hold until the payment issue is resolved.");
+    }
     const update = await tx.sellerPayout.updateMany({
       where: { id: payout.id, status: { in: ["READY", "HOLD", "PROCESSING", "FAILED"] } },
       data: {
@@ -261,8 +296,6 @@ export async function setSellerPayoutStatus({
       },
     });
     if (!update.count) throw new Error("Payout state changed. Refresh and try again.");
-    const orderPayoutStatus = status === "HOLD" ? OrderPayoutStatus.HOLD : status === "PROCESSING" ? OrderPayoutStatus.PROCESSING : OrderPayoutStatus.FAILED;
-    await tx.tradeOrder.update({ where: { id: payout.orderId }, data: { payoutStatus: orderPayoutStatus } });
     await addPayoutEvent(tx, payout.id, status as SellerPayoutEventType, actorUserId, `Payout marked ${status.toLowerCase()}.`);
     await appendTradeOrderEvent(tx, {
       orderId: payout.orderId,
