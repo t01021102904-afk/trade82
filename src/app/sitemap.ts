@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { documentSlugs, getDocumentPath } from "@/lib/document-registry";
 import { absoluteSiteUrl } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -22,12 +23,6 @@ const staticPublicRoutes = [
   { path: "/pricing", priority: 0.7 },
   { path: "/en/pricing", priority: 0.68 },
   { path: "/ko/pricing", priority: 0.68 },
-  { path: "/terms", priority: 0.35 },
-  { path: "/en/terms", priority: 0.33 },
-  { path: "/ko/terms", priority: 0.33 },
-  { path: "/privacy", priority: 0.35 },
-  { path: "/en/privacy", priority: 0.33 },
-  { path: "/ko/privacy", priority: 0.33 },
   { path: "/sourcing-terms", priority: 0.35 },
   { path: "/en/sourcing-terms", priority: 0.33 },
   { path: "/ko/sourcing-terms", priority: 0.33 },
@@ -38,7 +33,14 @@ const staticPublicRoutes = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const staticRoutes = staticPublicRoutes.map((route) => ({
+  const staticRoutes = [
+    ...staticPublicRoutes,
+    ...documentSlugs.flatMap((slug) => [
+      { path: getDocumentPath(slug, "en"), priority: 0.35 },
+      { path: `/en${getDocumentPath(slug, "en")}`, priority: 0.33 },
+      { path: getDocumentPath(slug, "ko"), priority: 0.33 },
+    ]),
+  ].map((route) => ({
     url: absoluteSiteUrl(route.path),
     changeFrequency: route.path === "/" ? ("weekly" as const) : ("daily" as const),
     priority: route.priority,

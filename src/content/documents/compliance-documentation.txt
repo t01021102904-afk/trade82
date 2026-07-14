@@ -1,0 +1,616 @@
+﻿Compliance & Documentation Guide
+This Compliance & Documentation Guide explains how buyers and sellers may use Trade82’s product-information fields, document library, document-storage tools, templates, official-source links, and transaction records.
+Trade82 provides general workflow tools and reference materials for B2B trade. Trade82 is not a law firm, customs broker, regulatory consultant, testing laboratory, certification body, government agency, manufacturer, importer of record, exporter of record, or guarantor of product compliance.
+This Guide should be read together with the Trade82 Terms of Service, applicable transaction terms, product policies, and any written agreement between the buyer and seller.
+1. Trade82’s Limited Role
+Trade82 may provide:
+* Product-information fields
+* Seller-provided compliance-information fields
+* Seller-provided document-availability fields
+* Trade-document templates
+* Links to government or agency resources
+* Private document-storage tools
+* Message attachments
+* Order and transaction records
+* Administrative account or listing review
+* General operational guidance
+Unless Trade82 expressly agrees otherwise in a separate written agreement, Trade82 does not:
+* Determine which laws apply to a product
+* Classify a product for regulatory purposes
+* Issue a certification
+* Conduct laboratory testing
+* Audit a manufacturing facility
+* Approve an ingredient
+* Approve a product label
+* File a government application
+* Act as a responsible person
+* Act as importer or exporter of record
+* Provide legal, customs, tax, safety, or regulatory advice
+* Guarantee that a document is genuine
+* Guarantee that a document remains valid
+* Guarantee that a product may legally be sold or imported
+* Guarantee acceptance by a buyer, carrier, bank, customs authority, marketplace, or government agency
+The availability of a field, template, link, badge, document category, or upload function does not create such a service or guarantee.
+2. User Responsibility
+Each user is responsible for determining the legal, regulatory, technical, labeling, testing, documentation, licensing, and certification requirements that apply to the user’s product and transaction.
+Requirements may depend on:
+* Product category
+* Product composition
+* Intended use
+* Product claims
+* Consumer group
+* Destination country
+* State, province, or local law
+* Sales channel
+* Shipping method
+* Importer
+* Exporter
+* Manufacturer
+* End user
+* End use
+* Order quantity
+* Packaging
+* Labeling
+* Applicable exemptions
+A document suitable for one product, shipment, company, or destination may be unsuitable for another.
+3. Seller-Provided Information
+Product listings may display information entered or selected by sellers, including:
+* Certifications
+* Compliance-related information
+* Available documents
+* Ingredients or materials
+* Country of origin
+* HS code
+* Shelf life
+* Storage requirements
+* Packaging information
+* Product claims
+* Labeling information
+This information is seller-provided unless Trade82 expressly states otherwise.
+A seller’s selection of a document or compliance option means only that the seller represented that the information or document applies or can be provided. It does not mean that Trade82 has inspected, authenticated, certified, approved, or legally evaluated it.
+4. No Automatic Compliance Determination
+A product is not automatically compliant merely because:
+* It is listed on Trade82
+* A seller account is verified
+* A product contains a certification label
+* A seller selected a compliance option
+* A document was uploaded
+* A template was completed
+* A government website was linked
+* A buyer accepted a quotation
+* Payment was processed
+* An order was created
+* A shipment passed through customs
+Compliance must be evaluated based on the actual product, claims, documents, transaction, destination, and applicable law.
+5. Seller Responsibilities
+The seller is responsible for ensuring that product and company information submitted to Trade82 is accurate, current, complete, and not misleading.
+Seller responsibilities may include:
+* Confirming product classification
+* Confirming ingredient or material information
+* Confirming country of origin
+* Confirming manufacturing information
+* Confirming applicable certifications
+* Maintaining current certificates
+* Maintaining test reports
+* Maintaining safety records
+* Maintaining batch or lot records
+* Confirming product claims
+* Confirming labels and packaging
+* Confirming trademark and distribution authority
+* Confirming export eligibility
+* Providing accurate commercial and shipping documents
+* Informing buyers when a document expires, changes, or becomes unavailable
+* Preserving original records
+* Responding to regulatory or safety inquiries
+* Conducting recalls or corrective action when legally required
+The seller must not describe a product as approved, registered, certified, tested, compliant, organic, vegan, medical, therapeutic, clinically proven, or government-authorized unless the statement is accurate and appropriately supported.
+6. Buyer Responsibilities
+The buyer is responsible for conducting independent due diligence before purchasing, importing, distributing, advertising, or selling a product.
+Buyer responsibilities may include:
+* Determining applicable import requirements
+* Determining the importer of record
+* Confirming local product classification
+* Confirming required registrations
+* Confirming required licenses
+* Confirming labeling requirements
+* Confirming testing requirements
+* Confirming document validity
+* Confirming certificate scope
+* Confirming the identity of the certificate holder
+* Confirming whether a certificate applies to the exact product
+* Confirming the issuing laboratory or organization
+* Confirming expiration dates
+* Confirming product claims
+* Confirming intellectual-property rights
+* Confirming customs and tariff information
+* Confirming marketplace requirements
+* Confirming insurance requirements
+* Obtaining advice from qualified professionals
+Receiving a document from a seller does not remove the buyer’s obligation to evaluate whether the document is sufficient for the intended market and transaction.
+7. Product Documents Available
+The current product-registration process allows sellers to indicate that certain documents may be available, including:
+* Commercial invoice
+* Packing list
+* Certificate of Origin
+* Certificate of Analysis
+* Material Safety Data Sheet
+* Laboratory test report
+* FDA-related documents
+* Product specification sheet
+* Ingredient list
+* Packaging or labeling information
+* Other seller-provided documents
+Selecting one of these options does not upload the document itself.
+It also does not mean that Trade82 has reviewed the document, confirmed its contents, or determined that it satisfies a buyer’s legal or commercial requirements.
+8. Seller-Provided Compliance Information
+The current product-registration process may allow a seller to select compliance-related information such as:
+* GMP
+* HACCP
+* ISO
+* NSF
+* FDA registration information provided
+* Organic-related documents
+* Vegan-related documents
+* Not applicable
+* Other
+These selections are representations made by the seller.
+The wording FDA registration information provided does not mean that Trade82 or FDA approved the product. Registration, listing, clearance, authorization, certification, and approval are different regulatory concepts and must not be used interchangeably.
+9. Forms Library
+Trade82’s Forms Library contains a combination of:
+* Trade82-created templates
+* Links to official government sources
+* Government or agency references
+* Carrier- or forwarder-issued document references
+* Product-compliance planning materials
+The current library is organized into categories such as:
+* Trade Templates
+* CBP
+* FDA
+* USDA
+* Logistics
+* Compliance
+Available materials may include:
+* Proforma Invoice
+* Commercial Invoice
+* Packing List
+* Purchase Order
+* Export Sales Contract
+* Certificate of Origin Template
+* Shipper’s Letter of Instruction
+* Document Checklist
+* Government form references
+* FDA and USDA guidance links
+* Logistics document references
+* Product-specification templates
+* Compliance-planning checklists
+Some Trade82 templates may be previewed, printed, saved as PDF, or downloaded where the applicable function is available. Official-source items open an external government or agency source.
+10. Templates Are General Materials
+A Trade82 template is a general starting point.
+A template is not:
+* Legal advice
+* A completed government filing
+* A government-issued form
+* A binding customs ruling
+* A certificate
+* A laboratory report
+* Proof of compliance
+* Proof of origin
+* Proof of inspection
+* Proof of registration
+* Proof of approval
+* A substitute for professional review
+Users must review and modify templates according to the actual transaction and applicable requirements.
+Trade82 does not guarantee that a template:
+* Contains every required field
+* Is suitable for every jurisdiction
+* Is suitable for every product
+* Will be accepted by a government agency
+* Will be accepted by a carrier
+* Will be accepted by a bank
+* Will be accepted by a buyer or seller
+* Will remain current after laws or procedures change
+11. Official-Source Links
+Trade82 may link to government or agency websites for convenience.
+An external link does not mean that:
+* Trade82 controls the external website
+* Trade82 guarantees the page remains available
+* Trade82 guarantees that the linked material is current
+* The linked material applies to the user
+* The linked material is the only applicable requirement
+* A government agency endorses Trade82
+* Trade82 is authorized to represent that agency
+Users should review the current official source directly before relying on regulatory information.
+When Trade82 content conflicts with an applicable law, regulation, official instruction, or current agency publication, the applicable authority and official source control.
+12. My Documents
+The My Documents workspace allows eligible seller accounts with a company profile to organize uploaded business and trade documents.
+Current document categories include:
+* Company
+* Product
+* Compliance
+* Shipping
+* Contracts
+* Shared with buyer
+Users may create folders, organize files, search documents, rename supported records, open documents, download documents, and delete documents where those functions are available.
+Categories are organizational labels. Assigning a file to a category does not validate its contents or determine its legal status.
+13. Upload Requirements
+The current My Documents interface accepts:
+* PDF
+* JPG
+* JPEG
+* PNG
+* WebP
+The current interface allows files up to 20MB each.
+Trade82 may change supported formats, file sizes, upload limits, storage limits, or security controls.
+A technically successful upload does not mean that the document:
+* Is readable
+* Is complete
+* Is genuine
+* Is legally valid
+* Is correctly categorized
+* Is free from errors
+* Is current
+* Applies to the product
+* Has been reviewed by Trade82
+14. Private Documents and Sharing
+New documents uploaded through the current My Documents flow are stored as Private by default.
+A document should not be considered disclosed to a buyer merely because it:
+* Was uploaded
+* Was placed in a folder
+* Was labeled as Compliance
+* Was placed in a Shared with buyer category
+* Contains a buyer’s name
+* Is referenced in a message
+* Appears in the seller’s document workspace
+A document is shared only when Trade82 expressly provides access to the intended authorized recipient through an enabled sharing function or when the user sends it through another supported Trade82 communication function.
+Users must confirm that the intended recipient can access the correct document before relying on delivery.
+15. Confidential and Sensitive Information
+Users should review and redact documents before uploading or sharing them.
+Do not upload unnecessary:
+* Passwords
+* Authentication codes
+* Full payment-card information
+* Personal identification numbers
+* Social Security numbers
+* Unnecessary passport copies
+* Unnecessary bank-account information
+* Private encryption keys
+* Employee medical information
+* Unrelated customer information
+* Confidential pricing unrelated to the transaction
+* Internal passwords or system credentials
+* Trade secrets that the recipient is not authorized to receive
+Users are responsible for obtaining permission to upload, store, process, or disclose personal, confidential, copyrighted, or proprietary information.
+Trade82’s technical access controls do not replace an NDA, confidentiality agreement, data-processing agreement, or other legal protection that may be appropriate.
+16. Document Access and Storage
+Trade82 may use private storage, account authorization, and temporary access links for stored documents.
+These measures reduce unauthorized access risk but cannot guarantee absolute security, permanent availability, or recovery of every file.
+Users should maintain their own original records and backups.
+Trade82 document storage should not be used as the only recordkeeping system for legally required documents.
+Trade82 may restrict, remove, quarantine, or delete files when necessary for:
+* Security
+* Malware prevention
+* Legal compliance
+* Account enforcement
+* Storage management
+* Privacy protection
+* Court orders
+* Government requests
+* Platform maintenance
+* Terms of Service enforcement
+17. Document Authenticity
+The user providing a document is responsible for its authenticity.
+Users must not upload, alter, create, or distribute:
+* Forged certificates
+* Altered test reports
+* Fake invoices
+* False government forms
+* Fabricated laboratory results
+* Misleading Certificates of Analysis
+* Expired documents presented as current
+* Certificates belonging to another company
+* Certificates for a different product
+* False Letters of Authorization
+* False Certificates of Origin
+* Edited registration confirmations
+* Falsified shipping records
+* False safety documents
+* Documents with removed restrictions or qualifications
+Trade82 may request additional information or restrict access when document fraud is suspected.
+A Trade82 review does not transfer responsibility for the document from the submitting user to Trade82.
+18. Validity, Scope, and Expiration
+A document may be genuine but still be unsuitable for a transaction.
+Users should confirm:
+* Issuer
+* Certificate holder
+* Product name
+* Model or formula
+* Manufacturer
+* Manufacturing location
+* Test method
+* Test date
+* Issue date
+* Expiration date
+* Covered market
+* Covered standard
+* Covered batch or lot
+* Included annexes
+* Exclusions
+* Amendments
+* Authorized signature
+* Verification number
+Trade82 does not continuously monitor uploaded documents for expiration, suspension, revocation, amendment, or changes in legal requirements.
+Users must update or remove outdated documents.
+19. Laboratories and Certification Organizations
+Test reports and certificates may be issued by independent third parties.
+Trade82 does not guarantee a third party’s:
+* Accreditation
+* Authorization
+* Independence
+* Competence
+* Testing method
+* Sample integrity
+* Chain of custody
+* Scope of certification
+* Financial condition
+* Continued operation
+* Acceptance by a regulator
+* Acceptance by a buyer or marketplace
+Users should independently verify the issuing organization and determine whether the test or certification applies to the exact product and destination.
+20. Product Claims and Advertising
+A certificate or test report does not automatically support every marketing statement.
+Users are responsible for ensuring that product claims are:
+* Truthful
+* Not misleading
+* Properly qualified
+* Supported by appropriate evidence
+* Consistent with the product’s legal classification
+* Appropriate for the intended market
+A product may be classified differently because of its intended use or claims.
+Users should not convert a cosmetic, food, supplement, household product, or general consumer product into a drug, medical device, pesticide, or other regulated category through unsupported claims.
+21. Cosmetics and MoCRA
+For cosmetic products marketed in the United States, MoCRA includes requirements involving facility registration, product listing, serious adverse-event reporting, safety substantiation, and recordkeeping, subject to applicable definitions and exemptions. Responsibility may fall on facilities and the legally defined responsible person—not on Trade82 merely because the product is listed or sold through the platform.
+Trade82 does not act as the responsible person, U.S. agent, facility registrant, product-listing filer, safety assessor, or adverse-event reporter unless expressly agreed in a separate written service agreement.
+The presence of FDA-related information on a product page does not mean:
+* FDA approved the cosmetic
+* FDA reviewed the product’s safety
+* FDA reviewed the product claims
+* FDA confirmed the label
+* Trade82 confirmed MoCRA compliance
+* An exemption applies
+The responsible parties must independently determine their obligations.
+22. Other Regulated Products
+Different rules may apply to:
+* Food
+* Dietary supplements
+* Medical devices
+* Electronic products
+* Children’s products
+* Textiles
+* Agricultural products
+* Animal products
+* Pet products
+* Household chemicals
+* Pesticides
+* Batteries
+* Wireless devices
+* Products making environmental claims
+* Products containing hazardous materials
+The presence of a form or checklist in Trade82’s library does not mean that the document is required or sufficient for a particular product.
+Users must identify the correct agency, standard, filing, test, permit, license, and responsible party.
+23. Import and Export Controls
+A transaction may be restricted based on the product, technology, destination, purchaser, consignee, intermediary, end user, or end use.
+BIS explains that end-user and end-use restrictions can create licensing requirements even where an item’s classification or destination would not otherwise require a license, and listed-party restrictions may apply to purchasers, consignees, and other transaction parties—not only the final recipient.
+Users are responsible for:
+* Product classification
+* Export-control classification
+* Destination review
+* End-user review
+* End-use review
+* Restricted-party screening
+* License determination
+* License-exception eligibility
+* Diversion-risk review
+* Record retention
+Trade82 does not guarantee that a screening result is complete or that a transaction is legally permitted.
+24. Sanctions Compliance
+Users must not use Trade82 to conduct or facilitate transactions prohibited by applicable sanctions.
+OFAC encourages a risk-based sanctions compliance program that includes management commitment, risk assessment, internal controls, testing or auditing, and training.
+Users should evaluate:
+* Buyers
+* Sellers
+* Owners
+* Beneficial owners
+* Banks
+* Payment participants
+* Consignees
+* Freight forwarders
+* Intermediaries
+* Destinations
+* End users
+* End uses
+Trade82 may conduct its own screening or review, but any platform review does not replace the user’s independent obligations.
+Trade82 may suspend, reject, cancel, delay, block, or report activity where sanctions, export-control, fraud, or other legal risks are identified.
+25. Company Verification
+A Trade82 company-verification status or badge relates only to the limited review performed under Trade82’s verification process.
+It does not mean that Trade82 has verified:
+* Every product
+* Every factory
+* Every certification
+* Every employee
+* Every document
+* Financial solvency
+* Manufacturing capacity
+* Regulatory compliance
+* Product safety
+* Legal importability
+* Legal exportability
+* Intellectual-property ownership
+* Future performance
+* Authenticity of every representation
+Buyers must continue performing transaction-specific due diligence.
+Trade82 may require reverification or remove a verification status when material company information changes or when concerns arise.
+26. Administrative Review
+Trade82 may review documents, listings, claims, accounts, and transaction information for platform-policy purposes.
+Trade82 may:
+* Request additional documents
+* Request clearer copies
+* Request current versions
+* Request issuer information
+* Ask a seller to revise a claim
+* Restrict a document
+* Hide a listing
+* Reject a listing
+* Suspend an account
+* Preserve relevant records
+* Refer users to official sources
+* Cooperate with lawful government requests
+Trade82 is not required to identify every error, expired document, fraudulent statement, or regulatory issue.
+Failure by Trade82 to detect a problem does not constitute approval or acceptance of responsibility.
+27. Government Filings
+Government forms and filings should be prepared and submitted by the legally responsible party or an authorized professional.
+Trade82 does not submit a document merely because:
+* A user completed a template
+* A document was uploaded
+* A document was stored
+* A form appears in the Forms Library
+* A link to an agency website was opened
+* A user selected a compliance option
+Users must separately confirm that any required filing was properly submitted, received, accepted, and maintained.
+28. Recordkeeping
+Users should keep records for the period required by applicable law, contract, insurance policy, marketplace rule, certification program, or internal policy.
+Relevant records may include:
+* Contracts
+* Purchase orders
+* Invoices
+* Packing lists
+* Product specifications
+* Ingredient lists
+* Certificates
+* Test reports
+* Labels
+* Safety records
+* Batch records
+* Manufacturing records
+* Shipping documents
+* Customs records
+* Communications
+* Payment records
+* Complaints
+* Adverse-event records
+* Recall records
+Trade82 does not determine the required retention period for each user.
+Deleting a file from Trade82 does not cancel a legal recordkeeping obligation.
+29. Updates and Regulatory Changes
+Laws, regulations, forms, agency procedures, standards, guidance, and enforcement priorities may change.
+A document or template that was previously acceptable may later become outdated.
+Users are responsible for checking current requirements before:
+* Listing a product
+* Accepting an order
+* Making a claim
+* Printing a label
+* Manufacturing goods
+* Shipping goods
+* Filing with an agency
+* Importing goods
+* Distributing goods
+* Selling goods
+Trade82 may update its library and guidance but does not guarantee immediate or complete updates.
+30. No Warranty
+To the fullest extent permitted by applicable law, Trade82 makes no warranty that:
+* A document is genuine
+* A document is complete
+* A document is current
+* A document applies to a specific product
+* A certificate will be accepted
+* A template is legally sufficient
+* A product is compliant
+* A product may be imported
+* A product may be exported
+* A label is lawful
+* A claim is substantiated
+* A filing will be accepted
+* A government approval will be granted
+* A stored file will always remain available
+* A third-party link will remain active
+* A regulatory authority will reach a particular decision
+31. Limitation of Trade82 Responsibility
+To the fullest extent permitted by applicable law and subject to the Trade82 Terms of Service, Trade82 does not assume responsibility for losses arising from:
+* Incorrect product information
+* False certifications
+* Forged documents
+* Expired documents
+* Incomplete records
+* Incorrect labels
+* Unsupported claims
+* Regulatory rejection
+* Customs refusal
+* Product detention
+* Product seizure
+* Product recall
+* Government penalties
+* Marketplace suspension
+* Certification withdrawal
+* Laboratory error
+* Third-party fraud
+* Unavailable official websites
+* Changes in law
+* Reliance on a template
+* Reliance on user-submitted information
+* Unauthorized document disclosure
+* Failure to maintain independent backups
+* Acts or omissions of buyers, sellers, manufacturers, laboratories, consultants, brokers, agencies, or other third parties
+Nothing in this Guide excludes or limits liability that cannot legally be excluded or limited.
+32. Trade82 Assistance
+Trade82 may, at its discretion:
+* Provide access to general templates
+* Provide official-source links
+* Help locate platform records
+* Request additional documents
+* Facilitate communication
+* Review platform-policy concerns
+* Restrict suspicious content
+* Provide general operational information
+Trade82 is not obligated to:
+* Provide a legal opinion
+* Certify a product
+* Confirm regulatory classification
+* File a government form
+* Contact a laboratory
+* Obtain a certificate
+* Act as importer or exporter of record
+* Defend a user in an enforcement action
+* Pay penalties
+* Replace rejected goods
+* Reimburse compliance expenses
+* Conduct a recall
+* Guarantee approval or market access
+Assistance provided in one matter does not create a continuing obligation to provide the same assistance in another matter.
+33. Final Compliance Checklist
+Before proceeding with a transaction, the responsible parties should confirm:
+* Product identity
+* Intended use
+* Product claims
+* Ingredients or materials
+* Manufacturer
+* Country of origin
+* Destination market
+* Required registrations
+* Required licenses
+* Required certifications
+* Required testing
+* Required labels
+* Required warnings
+* Required documents
+* Importer and exporter responsibilities
+* Restricted-party screening
+* End-user and end-use review
+* Document validity
+* Certificate scope
+* Expiration dates
+* Recordkeeping requirements
+* Recall and complaint procedures
+* Professional review where appropriate
+Compliance and Documentation Process Summary
+The seller enters product and compliance information, identifies documents that may be available, and stores relevant files in the seller document workspace.
+The buyer reviews the available information and requests any documents necessary for its due diligence. Both parties independently verify that the documents apply to the exact product, transaction, destination, and intended use.
+Trade82 may provide templates, official-source links, private storage, communication tools, and limited administrative review. Trade82 does not become the manufacturer, certification body, laboratory, responsible person, importer, exporter, customs broker, regulatory adviser, or guarantor of compliance.

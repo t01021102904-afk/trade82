@@ -1,0 +1,411 @@
+Trade82 Privacy Policy
+
+Effective Date: July 14, 2026
+Last Updated: July 14, 2026
+
+Trade82 is currently operated by William Zun Park as an individual under the trade name “Trade82,” and not as a separate corporation or limited liability company. This Privacy Policy explains how personal information is handled through the Trade82 website, marketplace, dashboards, messaging, RFQs, payments, orders, shipping, payouts, and related support features (collectively, the “Service”).
+
+Trade82 is a business-to-business service. Information about a company may still be personal information when it relates to an identifiable person, such as a representative’s name, business email, phone number, job title, or bank account holder information.
+
+1. Controller and Contact Details
+
+• Controller: William Zun Park, an individual operating under the trade name “Trade82”
+• Address: 37-34 33rd ST, Long Island City, New York 11101, United States
+• Email: contact@trade82.com
+• Phone: +1 (929) 994-4473
+• Privacy Contact: William Zun Park
+
+Requests concerning access, correction, deletion, restriction, withdrawal of consent, account closure, international transfers, or other privacy matters may be sent to the email address above.
+
+2. Scope
+
+This Policy may apply to personal information relating to:
+
+• people who register for or sign in to Trade82;
+• sellers, buyers, partners, and their owners, representatives, employees, and contacts;
+• people participating in product inquiries, RFQs, quotations, messages, orders, or payouts;
+• people communicating with Trade82 support or receiving transactional emails; and
+• visitors to the public marketplace.
+
+This Policy does not govern information that users independently process outside Trade82 or the independent practices of third-party websites, banks, logistics providers, government agencies, laboratories, or certification bodies.
+
+3. Information We Collect
+
+The information processed depends on the features used and the stage of a transaction.
+
+3.1 Account and Authentication Information
+
+• Clerk user identifier
+• name, display name, email address, and profile image
+• account role, such as seller, buyer, both, or administrator
+• language preference
+• sign-in, session, authentication status, and security events
+• authentication information supplied through Clerk when Google Sign-In is selected
+
+Trade82 does not collect or store a user’s Google password.
+
+3.2 Personal and Professional Profile Information
+
+• company affiliation, job title, department, and biography
+• phone number and LinkedIn URL
+• country and city
+• other business information the user adds to a profile
+
+3.3 Company and Verification Information
+
+• legal name, trade name, and English display name
+• seller or buyer role, website, country, state or province, city, and business address
+• descriptions, categories, and logos
+• representative name and Korean business registration number
+• export experience, export countries, certifications, and manufacturer or distributor status
+• verification requests, status, results, and administrator notes
+• filenames, storage paths, and contents of documents submitted for verification
+
+A verification status reflects only the limited platform review performed. It is not a guarantee of product safety, regulatory compliance, financial condition, manufacturing capacity, or the authenticity of every representation or document.
+
+3.4 Seller and Buyer Business Information
+
+Seller profile information may include product categories, minimum order quantities, lead times, certifications, shipping terms, payment terms, and manufacturing or distribution information.
+
+Buyer profile information may include buyer type, purchasing categories, preferred supplier type, target order size, monthly import volume, import experience, purchase timeline, and sales channels.
+
+3.5 Product and Public Marketplace Information
+
+• product names and English names
+• product images and image metadata
+• categories, tags, and descriptions
+• price ranges, currency, and pricing units
+• minimum order quantities, lead times, sample availability, and private-label availability
+• production capacity, origin, and shipping origin
+• Incoterms and HS codes
+• ingredients or materials, packaging, storage, and shelf life
+• certifications, regulatory or compliance claims, and available documents
+• buyer notes, visibility controls, views, saves, and listing status
+
+Company, product, review, image, and document information that a user publishes may be visible to unauthenticated visitors and search engines.
+
+3.6 Inquiries, RFQs, Quotations, and Messages
+
+• buyer, seller, recipient company, and relevant contacts
+• product, message, quantity, and target date
+• RFQ product name, category, sourcing type and purpose
+• quantity, target price, currency, trade terms, and destination country
+• shape, capacity, material, certification, features, and target delivery date
+• quotations, MOQ, lead time, Incoterms, sample or OEM availability
+• messages, attachments, timestamps, and conversation status
+
+Messages and attachments are not public, but they may be accessible to the participating users and companies, authorized Trade82 administrators, and infrastructure providers that need access to provide the Service.
+
+3.7 Payment, Order, Refund, and Dispute Information
+
+Trade82 may process:
+
+• order number, products, quantity, price, and transaction terms
+• product amount, shipping amount, gross amount, platform fee, and seller payable amount
+• currency and payment deadline
+• Stripe customer, Checkout Session, Payment Intent, and Charge identifiers
+• payment status and timestamps
+• refund amounts and status
+• dispute or chargeback identifiers, reason, and status
+• payment, refund, dispute, and administrator audit events
+
+Payment card numbers, CVCs, and complete card credentials are entered directly into Stripe’s payment environment and are not designed to be collected or stored by Trade82. Trade82 may retain transaction identifiers, amounts, status, and information needed for fraud, refund, and dispute handling.
+
+3.8 Order Contact and Shipping Information
+
+Transaction snapshots may include:
+
+• buyer and seller company names and contact names
+• email addresses and phone numbers
+• countries and addresses
+• origin and destination
+• carrier and freight forwarder names
+• tracking, bill of lading, air waybill, and shipment reference numbers
+• ship dates, estimated arrival dates, status, and notes
+
+Some transaction snapshots may remain after a profile is changed or an account is closed to preserve historical, accounting, dispute, and audit records.
+
+3.9 Seller Payout Information
+
+• country, bank, and branch
+• account holder
+• account number
+• account type, bank code, and SWIFT or BIC
+• bank and beneficiary addresses
+• payout and supported currencies
+• intermediary bank information
+• payout memo, external transfer reference, and payout proof
+
+Complete account numbers are designed to be stored using application-level encryption and normally displayed only in masked form or by the last four digits. Authorized administrators may access full details only when needed for payout processing, audit, security investigation, or legal compliance. Necessary information may also be provided to the bank or financial institution completing the transfer.
+
+3.10 Uploaded Files
+
+Uploads may include product images, company logos, verification documents, certificates, test reports, contracts, trade documents, buyer-shared files, message attachments, and payout proof.
+
+Public files may be visible to anyone. Restricted files are designed to use role and ownership checks and time-limited signed access. Users should not upload unnecessary government identifiers, passport information, medical information, personal banking passwords, government login credentials, or sensitive information belonging to another person.
+
+3.11 Technical Information Collected Automatically
+
+• IP address
+• browser, device, and operating system information
+• request path, time, and response status
+• session identifiers and essential authentication cookies
+• server, security, error, and rate-limit logs
+• authentication, administrator, and transaction event records
+• diagnostic information required for reliability, fraud prevention, and troubleshooting
+
+The current Trade82 source code does not include an advertising behavioral tracking SDK or a third-party behavioral analytics SDK. Before adding such technology, Trade82 will update this Policy and implement any notice, consent, or opt-out mechanism required by law.
+
+3.12 Support and Other Sources
+
+Trade82 may receive information from support emails, counterparties involved in an order, public business websites or official sources used for verification, and payment or security providers that provide legally permitted fraud and risk signals.
+
+4. How We Use Information
+
+Trade82 uses personal information to:
+
+• register, authenticate, and manage accounts and language preferences;
+• onboard sellers, buyers, and partners;
+• operate company and product listings and marketplace search;
+• review company verification requests and marketplace quality;
+• provide inquiries, RFQs, recommendations, quotations, and messaging;
+• create payment requests and confirm Stripe payments;
+• manage orders, shipping, refunds, disputes, and chargebacks;
+• register and review seller payout information and record external payouts;
+• provide necessary information to transaction counterparties;
+• send operational, transactional, and security emails;
+• provide support and troubleshoot technical issues;
+• prevent and investigate fraud, spam, account compromise, fee avoidance, and policy violations;
+• maintain security, audit records, backups, disaster recovery, and reliability;
+• comply with accounting, tax, sanctions, legal process, and lawful government requests;
+• establish, exercise, or defend legal claims; and
+• improve localization, workflow quality, and features requested by users.
+
+5. Legal Bases
+
+Depending on applicable law, Trade82 may rely on:
+
+• performance of a contract or steps requested before a contract, including account, marketplace, messaging, RFQ, payment, order, shipping, and payout functions;
+• legal obligations, including accounting, tax, legal process, sanctions, fraud, and dispute requirements;
+• legitimate interests, including security, abuse prevention, marketplace quality, support, audit, and protection of legal rights;
+• consent, when required for optional processing, marketing, sensitive information, or a particular international transfer; and
+• the user’s direction, when the user publishes a listing or sends information to a counterparty.
+
+Where processing is based on consent, consent may be withdrawn prospectively. Withdrawal does not affect processing that was lawful before withdrawal.
+
+6. Public Information and Counterparties
+
+Information a user publishes may be accessed, copied, indexed, or stored worldwide. Removing a public listing may not immediately remove search-engine caches or copies previously saved by third parties.
+
+When a user starts an inquiry, RFQ, quotation, order, or shipment, Trade82 may provide the other party with company and contact information, messages and attachments, transaction terms, shipping details, and information needed to perform or document the transaction. Each user is responsible for protecting information received from a counterparty and using it only for the relevant business relationship and lawful purposes.
+
+7. Service Providers
+
+Trade82 currently uses the providers below. A provider may act as Trade82’s processor or service provider for some activities and as an independent controller for activities such as fraud prevention, legal compliance, or its own account administration.
+
+Clerk, Inc.
+
+Purpose: registration, sign-in, session management, authentication, and Google Sign-In.
+Data: name, email, profile information, authentication identifiers, session and security information, and essential cookies.
+Primary location: United States and other locations used by Clerk and its subprocessors.
+Transfer: when registration, sign-in, or authentication is used, through encrypted network connections.
+Retention: according to Trade82’s Clerk configuration, the account relationship, provider terms, and legal requirements.
+
+Google LLC — Only When Google Sign-In Is Selected
+
+Purpose: Google account authentication.
+Data: information Google provides through OAuth, such as name, email, profile, and authentication identifiers.
+Location: United States and locations where Google operates.
+Transfer: when the user selects Google Sign-In, through encrypted network connections.
+Retention: according to Google and Clerk account and security practices.
+
+Supabase, Inc. and Its Infrastructure Providers
+
+Purpose: PostgreSQL database, public image storage, and restricted file storage.
+Data: account, company, product, inquiry, message, RFQ, transaction, order, shipping, payout, audit, and uploaded-file information described in this Policy.
+Current primary database region: United States, East region (us-east-2).
+Transfer: continuously or as needed when the Service or file uploads are used, through encrypted connections.
+Retention: until Trade82 directs deletion, followed by provider backup cycles and any contractual or legal retention.
+
+Vercel Inc. and Its Infrastructure Providers
+
+Purpose: hosting, application execution, content delivery, server logs, troubleshooting, and security.
+Data: IP address, request and device metadata, data included in service requests, and error, performance, and security logs.
+Location: United States and other locations where Vercel and its subprocessors operate infrastructure.
+Transfer: continuously when the website and functions are used, through encrypted network connections.
+Retention: according to Vercel settings, contract terms, log and backup cycles, and legal requirements.
+
+Stripe, Inc. and Relevant Stripe Affiliates
+
+Purpose: checkout, payment processing, authentication, fraud prevention, refunds, disputes, chargebacks, and payments compliance.
+Data: name, email, billing and shipping data, payment method information, order and payment amounts, refund or dispute information, IP, device, and risk signals.
+Location: United States and locations used by Stripe, payment networks, banks, and subprocessors.
+Transfer: during checkout, payment, refund, and dispute handling, through encrypted networks and financial networks.
+Retention: according to Stripe’s legal, regulatory, fraud prevention, and contractual requirements.
+
+Complete payment card information is provided directly to Stripe and is not designed to be stored by Trade82.
+
+Plus Five Five, Inc. (Resend)
+
+Purpose: sending and monitoring transactional emails concerning approvals, inquiries, messages, orders, payments, shipping, and security.
+Data: recipient email, name or company name, email subject and content, links, delivery, bounce, error, and related metadata.
+Location: United States and locations used by Resend’s subprocessors.
+Transfer: when an email is sent, through encrypted network connections.
+Retention: for email delivery, security, and abuse prevention and as required by provider terms or law.
+
+Banks, Financial Institutions, and Payout Providers
+
+Purpose: seller payouts, refund or transaction verification, sanctions screening, and fraud review.
+Data: account holder, account number, bank and SWIFT information, addresses, amount, currency, and transfer references.
+Location: countries where the relevant bank, intermediary, or financial institution operates.
+Transfer: when a payout or financial review is required, through appropriate financial or business channels.
+Retention: according to the receiving institution’s financial and legal obligations.
+
+Trade82 may also disclose necessary information to lawyers, accountants, auditors, insurers, courts, regulators, law enforcement, or other government agencies.
+
+8. GitHub
+
+Trade82 uses GitHub for source-code and change management. The current architecture is intended not to transfer or store production user records, private uploaded documents, payout account information, database dumps, or secret keys in GitHub.
+
+Users must not place personal information, private documents, credentials, API keys, or banking information in a public GitHub repository, issue, pull request, or public developer discussion. If personal information is mistakenly committed, Trade82 may restrict access, clean history where appropriate, rotate credentials, and take incident-response measures.
+
+9. International Transfers
+
+Trade82 is operated from the United States. Information may be processed in the United States and in other countries where its providers and subprocessors operate.
+
+Transfers occur when a user registers, signs in, visits the site, uploads content, sends messages or email, uses payment, order, shipping, or payout features, and may occur continuously or as needed through encrypted network connections, provider APIs, and payment or banking networks.
+
+Where required, Trade82 and its providers use contractual terms, standard contractual clauses, data protection addenda, consent, or another lawful transfer mechanism. Refusing transfers required for core infrastructure or a requested transaction may prevent Trade82 from providing authentication, storage, payment, email, or other essential functions.
+
+10. Cookies and Similar Technologies
+
+Trade82 and its authentication and payment providers may use:
+
+• Clerk authentication and session cookies, such as session and clientuat;
+• essential infrastructure and security cookies;
+• Stripe-domain cookies required for Checkout and fraud prevention; and
+• local storage used for language, theme, or essential session state.
+
+These technologies are necessary for sign-in, authentication, security, fraud prevention, and payment. Blocking them may prevent sign-in or checkout from functioning.
+
+Trade82 does not currently use cookies for personalized advertising or cross-site behavioral tracking.
+
+11. No Sale or Targeted Advertising Sharing
+
+Trade82 does not currently:
+
+• sell personal information for money;
+• rent personal information;
+• share personal information for cross-context behavioral advertising or targeted advertising; or
+• use sensitive personal information to infer characteristics for advertising profiles.
+
+Allowing authentication, hosting, storage, payment, and email providers to process information to perform their services is not intended as a sale. If this practice changes, Trade82 will provide any notice, consent, or opt-out required by law before the new processing begins.
+
+12. Retention
+
+Trade82 applies the following retention criteria:
+
+• Account, profile, company, and product information: while the account or company profile remains active, followed by review of deletion, de-identification, and legal exceptions after closure.
+• Verification requests and documents: for the period necessary to review, reverify, prevent fraud, and address challenges, then deleted or access-restricted when no longer needed.
+• Inquiries, RFQs, quotations, messages, and attachments: for the business conversation; records not connected to a transaction are generally retained for up to three years after the last activity, while transaction or dispute records follow the transaction period.
+• Orders, payments, refunds, disputes, shipping, payouts, and audit records: generally up to seven years after the transaction closes, or longer when required by accounting, tax, anti-fraud, limitations, or other law.
+• Security, access, and error logs: generally up to twelve months, longer when connected to an actual or suspected incident, fraud, dispute, or legal hold.
+• Support records: generally up to three years after closure.
+• Consent records: as needed to establish consent and withdrawal.
+• Backups: information may remain for a limited additional period in encrypted backups and is overwritten through normal backup cycles. Backup information is generally used only for restoration, security, or legal preservation.
+
+Deletion may be limited while a legal obligation, dispute, fraud review, payout, refund, chargeback, or legal claim remains open. When retention is no longer necessary, information is deleted or de-identified using reasonable methods.
+
+13. Security
+
+Trade82’s current design includes:
+
+• Clerk authentication and session management;
+• role, company-ownership, and administrator authorization checks;
+• server-side access control and API validation;
+• rate limits on sensitive write operations;
+• private storage and time-limited signed file access;
+• application-level encryption and masking of payout account numbers;
+• financial and administrative audit events;
+• encryption in transit;
+• separation of production secrets from source code;
+• separation of public listings from restricted records; and
+• backup and recovery procedures.
+
+No online system can guarantee absolute security. Users should protect their accounts and promptly report suspected account or email compromise.
+
+File type, size, and access checks may be used, but Trade82 does not guarantee that every uploaded file receives complete malware scanning. Users should independently scan untrusted attachments.
+
+14. Security Incidents
+
+When a suspected or confirmed personal information incident occurs, Trade82 may investigate, restrict affected access, rotate credentials, cooperate with providers, preserve evidence, notify affected people or authorities when legally required, and take steps to prevent recurrence. The timing and contents of notice depend on the incident, likely harm, and applicable law.
+
+15. Privacy Rights
+
+Subject to applicable law, a person may request:
+
+• confirmation and a copy of personal information;
+• correction of inaccurate or incomplete information;
+• deletion or de-identification;
+• restriction of processing;
+• objection to certain processing;
+• withdrawal of consent;
+• data portability;
+• information and human review concerning automated processing;
+• opt-out from a sale or targeted-advertising sharing, if such processing exists; and
+• non-discrimination for exercising privacy rights.
+
+Requests may be sent to contact@trade82.com. Trade82 may verify identity, authority, and account ownership. A request may be limited to protect other people, satisfy legal retention, preserve security and fraud controls, comply with tax or accounting obligations, or establish, exercise, or defend legal claims.
+
+16. Korea
+
+To the extent Korean privacy law applies, users may request access, correction, deletion, suspension, and withdrawal of consent. Information relating to Korean users may be processed in the United States and other provider locations to provide essential infrastructure and requested transaction functions.
+
+Trade82 will apply notices, contractual protections, consent, and other safeguards required for applicable overseas transfers. Korean users may also seek assistance from the Personal Information Protection Commission, the Personal Information Infringement Report Center, or the Personal Information Dispute Mediation Committee.
+
+17. EEA, United Kingdom, and Switzerland
+
+Where applicable, Trade82 processes personal data on the basis of contract, legal obligation, legitimate interests, or consent. Legitimate interests include security, fraud prevention, support, audit, and protection of legal rights.
+
+People in these jurisdictions may have rights of access, correction, deletion, restriction, portability, objection, withdrawal of consent, and complaint to a supervisory authority. Transfers to the United States may use standard contractual clauses, a UK transfer addendum, or another lawful safeguard where required.
+
+Trade82 is not designed to make decisions producing legal or similarly significant effects solely through automated processing. Recommendations, matching, and risk signals support information and operations, and significant verification, account, and transaction actions may be reviewed by a person.
+
+18. California and Other U.S. States
+
+To the extent a U.S. state privacy law applies, residents may have rights to know categories, sources, purposes, recipients, and specific information; to correct, delete, or obtain portable data; to opt out of certain processing; and to avoid discrimination for exercising rights.
+
+Trade82 does not currently sell personal information or share it for cross-context behavioral advertising. Accordingly, there is currently no sale or advertising-sharing transaction to opt out from.
+
+Trade82 may verify the identity of a requester and the authority of an authorized agent.
+
+19. Children
+
+Trade82 is a B2B service and is not intended for anyone under 18. If Trade82 learns that it has improperly collected personal information from a person under 18, it will delete or restrict the information unless retention is legally required.
+
+20. Third-Party Links
+
+The Service may link to government agencies, certification bodies, logistics providers, banks, sellers, buyers, or other external sites. Those entities apply their own privacy practices. Trade82 does not control the privacy or security of an external service.
+
+21. Legal Disclosure, Protection of Rights, and Business Transfers
+
+Trade82 may disclose information as reasonably necessary to comply with law, subpoena, court order, or lawful government request; investigate fraud, security, crime, sanctions, or policy violations; protect life, safety, property, or legal rights; obtain legal, accounting, insurance, or audit services; resolve disputes; or evaluate a merger, asset transfer, investment, restructuring, or business succession.
+
+If a business transfer occurs, personal information may be transferred subject to this Policy and applicable law. Material changes will be communicated as required.
+
+22. Changes to This Policy
+
+Trade82 may update this Policy to reflect changes in the Service, providers, law, or processing. Material changes may be communicated through the website, account notice, or email, and the “Last Updated” date will be revised. Separate consent will be obtained before a change when required by law.
+
+23. Languages
+
+The English and Korean versions are intended to have materially the same meaning. If they differ, the interpretation required by mandatory law applicable to the relevant person and processing will control.
+
+24. Contact
+
+William Zun Park / Trade82 Privacy Contact
+37-34 33rd ST
+Long Island City, New York 11101
+United States
+Email: contact@trade82.com
+Phone: +1 (929) 994-4473

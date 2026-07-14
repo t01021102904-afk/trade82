@@ -1,2 +1,5 @@
 # Preserve Prisma generator output exactly while excluding its known trailing whitespace from diff checks.
 src/generated/prisma/** whitespace=-trailing-space
+
+# Source documents are retained verbatim, including their supplied Windows line endings.
+src/content/documents/** whitespace=-trailing-space

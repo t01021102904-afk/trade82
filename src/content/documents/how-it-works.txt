@@ -1,0 +1,109 @@
+﻿How It Works
+Overview
+Trade82 is a global B2B marketplace that connects international buyers with Korean manufacturers, brands, exporters, and suppliers. Buyers use Trade82 to discover Korean products, submit sourcing requests, communicate with sellers, negotiate commercial terms, and manage transactions in one place.
+Sellers use Trade82 to introduce their companies and products to international buyers, respond to inquiries and RFQs, send payment requests, manage orders, provide shipping information, and receive payouts after eligible transactions are completed.
+Trade82 is designed to make cross-border sourcing more organized and transparent. Instead of relying on scattered emails, spreadsheets, messaging apps, and disconnected payment records, buyers and sellers can manage the main stages of a transaction through one platform.
+The Goal
+The goal of Trade82 is to make international B2B trade more accessible for both sides.
+Many Korean companies have competitive products but struggle to reach reliable overseas buyers. At the same time, international buyers often have difficulty finding Korean suppliers, confirming product information, comparing commercial terms, and receiving timely responses.
+Trade82 brings these parties together and provides a structured process for moving from product discovery to an actual business transaction.
+For buyers, this means spending less time searching for suppliers and organizing conversations. For sellers, it means gaining more opportunities to meet international buyers and convert inquiries into orders.
+For Buyers
+Buyers can join Trade82, create a company profile, browse Korean products, contact sellers, and submit requests for products they want to source.
+A buyer does not need to know the exact supplier in advance. They can search existing listings or submit an RFQ describing the product, quantity, destination country, preferred price, specifications, certifications, and delivery requirements.
+When a relevant seller is available, the buyer can discuss the transaction directly with the seller through Trade82.
+For Sellers
+Sellers can create a company profile that introduces their business, export capabilities, product categories, certifications, and target markets.
+They can then upload products with photos, descriptions, wholesale pricing, minimum order quantities, lead times, available certifications, sample information, and trade terms.
+When buyers send inquiries or RFQs, sellers can respond with product information, quotations, available quantities, estimated production schedules, shipping terms, and other commercial details.
+Before completing seller onboarding, sellers provide the payout account information required for future transaction settlements. This information is stored securely and remains subject to administrative verification before a payout can be processed.
+Company Profiles
+Every buyer and seller begins by creating a company profile.
+Buyer profiles help sellers understand who is making an inquiry, where the company is located, which products it is sourcing, and the intended purpose of the purchase.
+Seller profiles help buyers evaluate the supplier’s business, product range, export experience, certifications, manufacturing capabilities, and other relevant information.
+A complete company profile makes it easier for both parties to evaluate whether a potential transaction is worth pursuing.
+Product Listings
+Sellers can publish product listings for buyers to discover.
+A listing may include the product name, category, product images, description, specifications, minimum order quantity, estimated unit price, lead time, sample availability, available certifications, production capabilities, and preferred trade terms.
+Product listings are intended to give buyers enough information to decide whether they should contact the seller. Final prices, shipping costs, availability, and commercial terms may still be discussed directly between the buyer and seller.
+Product Discovery
+Buyers can browse products by category, review seller information, compare listings, and save products for later consideration.
+Trade82 focuses on helping overseas buyers discover products offered by Korean companies, including products that may not yet be widely available through international distribution channels.
+When buyers find a relevant product, they can send an inquiry directly from the product page.
+Requests for Quotation
+Buyers who cannot find the exact product they need can submit a Request for Quotation, commonly called an RFQ.
+An RFQ allows the buyer to describe the product, quantity, destination, preferred unit price, target delivery date, certifications, materials, dimensions, capacity, packaging requirements, sourcing purpose, and other specifications.
+Relevant sellers can review the request and submit a quotation or product proposal.
+This gives buyers another way to find suppliers without searching through every product listing individually.
+Inquiries and Messaging
+After a buyer contacts a seller, the parties communicate through a dedicated message thread.
+The message thread keeps product questions, pricing discussions, documents, order terms, and transaction updates connected to the same inquiry.
+Buyers can ask about wholesale prices, minimum order quantities, samples, certifications, customization, private labeling, production capacity, delivery schedules, and shipping options.
+Sellers can answer questions, provide additional product details, explain available terms, and request any information needed to prepare an accurate quotation.
+Quotations and Commercial Terms
+Before payment, the buyer and seller should agree on the main commercial terms of the transaction.
+These terms may include the product, quantity, unit price, product amount, shipping amount, total amount, payment deadline, expected delivery schedule, trade terms, packaging requirements, documents, and any special conditions.
+Trade82 provides the communication and transaction tools, but buyers and sellers remain responsible for carefully reviewing and agreeing to the commercial details before payment.
+Payment Requests
+Once both parties agree on the transaction, the seller can create a payment request inside the message thread.
+The payment request records the product name, quantity, product amount, shipping amount, total amount, payment due date, and agreed order terms.
+The buyer can review the payment request before proceeding to payment.
+Only the buyer company connected to the original inquiry can access and pay that request. This prevents unrelated users from viewing or paying another company’s transaction.
+Payments
+Buyers complete eligible payments through the payment flow provided on Trade82.
+A payment is not treated as completed simply because the buyer reaches a success page. Trade82 waits for verified payment confirmation from the payment provider before updating the payment and order status.
+After confirmation, the transaction is marked as paid and the related order record is updated.
+Trade82 may charge a platform service fee as part of the transaction. The seller’s expected payout amount is calculated separately from the total amount paid by the buyer.
+Order Creation
+When an eligible payment request is created, Trade82 also creates an order record for the transaction.
+The order includes a unique Trade82 order number, buyer information, seller information, product information, payment amounts, platform fee, seller payable amount, payment status, shipping status, payout status, and transaction history.
+Buyer and seller company details are saved as transaction snapshots so that later profile changes do not alter the original order record.
+Buyer Orders
+Buyers can review their orders through their Trade82 account.
+The buyer order page shows the order number, seller, purchased product, quantity, payment amount, payment status, shipping status, and available transaction updates.
+Buyers do not receive access to the seller’s private payout account information.
+Seller Orders
+Sellers can review orders connected to their company.
+The seller order page shows the buyer, product, quantity, payment status, shipping requirements, and transaction progress.
+After payment is confirmed, the seller can prepare the goods according to the agreed terms and update the order with shipping information when appropriate.
+Shipping
+Sellers can add shipping details to an order, including the carrier, tracking number, shipping date, estimated arrival date, and other logistics information.
+Shipping requirements may vary depending on the product, destination, trade terms, freight method, and agreement between the buyer and seller.
+Trade82 records the shipping information provided by the seller, but the seller remains responsible for accurate documentation, product preparation, customs requirements, and fulfillment of the agreed delivery terms.
+Refunds and Disputes
+If a payment is refunded or disputed, the payment and order records are updated accordingly.
+Refund amounts cannot exceed the amount that was successfully paid. When a refund or dispute exists, seller payout eligibility may be reduced or placed on hold.
+Transactions requiring further review can be flagged for manual reconciliation before any payout is completed.
+Seller Payout Information
+Sellers provide payout information as part of the seller onboarding process.
+This may include the account country, bank name, account holder, account number, account type, payout currency, SWIFT or BIC information, and other banking details required for international settlement.
+Sensitive account numbers are stored in encrypted form. The complete account number is not displayed in normal seller or administrator views. Only masked information and the final digits are shown unless an authorized administrative process requires temporary access.
+Submitting payout information does not automatically verify the account. The account remains pending until it is reviewed.
+Seller Payouts
+Trade82 currently manages seller payouts through a reviewed manual payout process.
+After an order becomes eligible for payout, the platform calculates the seller’s payable amount based on the completed payment, platform fee, refunds, disputes, holds, and approved adjustments.
+An administrator reviews the transaction and payout information before recording an external transfer to the seller.
+Trade82 records the payout reference, payout date, amount, status, and relevant audit history. The platform does not automatically initiate a bank transfer through the payout-management interface.
+Verification
+Verification helps Trade82 reduce inaccurate profiles, fraudulent transactions, and unauthorized payout requests.
+Seller companies, payout information, and transaction details may be reviewed before certain actions are approved.
+A verified company status does not guarantee the quality of a product or the performance of a transaction. Buyers should still conduct their own commercial, regulatory, and supplier due diligence before placing an order.
+Transaction Records
+Trade82 keeps important transaction records connected to the original inquiry and order.
+These records may include messages, payment requests, payment status, order information, shipping updates, refund events, dispute events, payout calculations, and administrative actions.
+Keeping these details in one place makes it easier for buyers, sellers, and authorized administrators to understand the history of a transaction.
+Security
+Trade82 uses server-side authorization to separate buyer, seller, and administrator access.
+Buyers can access transactions belonging to their buyer company. Sellers can access transactions connected to their seller company. Administrative financial information is restricted to authorized administrators.
+Sensitive payout account information is encrypted and masked. Financial status changes are recorded through controlled server-side processes, and direct public access to financial database tables is restricted.
+Platform Administration
+Authorized Trade82 administrators can review payments, orders, shipping information, refunds, disputes, seller payout profiles, and payout records.
+The administrative system provides search, filtering, transaction summaries, order details, masked financial identifiers, and audit histories.
+Administrators can also place payouts on hold, review payout eligibility, record adjustments, and document completed external transfers.
+Support
+Trade82 may assist buyers and sellers with platform usage, product registration, RFQ submissions, transaction records, and communication issues.
+Trade82 does not replace legal, tax, customs, certification, banking, or regulatory professionals. Buyers and sellers remain responsible for obtaining the professional advice required for their products, countries, and transactions.
+The Trade82 Process
+Trade82 brings the main stages of B2B sourcing together.
+A buyer discovers a product or submits an RFQ. A seller responds and discusses the opportunity. Both parties agree on the product, quantity, price, shipping cost, and transaction terms. The seller sends a payment request. The buyer completes payment. Trade82 creates and updates the order. The seller ships the goods and provides logistics information. After the transaction becomes eligible, the seller payout is reviewed and recorded.
+The purpose of Trade82 is to make this process easier to understand, easier to manage, and easier to track for companies trading across borders.

@@ -1,0 +1,525 @@
+﻿Frequently Asked Questions
+These Frequently Asked Questions provide a general overview of Trade82.
+They do not replace the Trade82 Terms of Service, applicable transaction terms, Partner Program Terms, Privacy Policy, or any written agreement between a buyer and seller.
+General
+What is Trade82?
+Trade82 is a B2B marketplace designed to help international buyers discover Korean products and connect with sellers.
+The platform may provide:
+* Product listings
+* Company profiles
+* RFQ submission and review
+* Product and seller recommendations
+* Buyer–seller messaging
+* Payment requests
+* Order records
+* Shipment-status records
+* Seller document tools
+* Trade-document templates
+* Partner referrals
+Trade82 provides technology and workflow tools. It does not manufacture or purchase the products listed by sellers.
+Is Trade82 the seller of the products?
+No.
+Unless Trade82 expressly states otherwise in a separate written agreement, the seller shown on the product or transaction record is responsible for supplying the product.
+Trade82 is not normally:
+* The manufacturer
+* The seller of record
+* The buyer of record
+* The exporter of record
+* The importer of record
+* A carrier
+* A customs broker
+* A certification body
+* A testing laboratory
+* A guarantor of the transaction
+Does Trade82 guarantee that a transaction will be completed?
+No.
+Trade82 does not guarantee:
+* Buyer interest
+* Seller responses
+* RFQ approval
+* Product availability
+* Final pricing
+* Sample availability
+* Order completion
+* Shipping performance
+* Customs clearance
+* Regulatory approval
+* Refund approval
+* Commercial success
+Each buyer and seller is responsible for deciding whether to proceed with a transaction.
+Which languages does Trade82 support?
+Trade82 provides English and Korean interfaces for supported parts of the platform.
+Users remain responsible for reviewing translations and confirming that product, commercial, legal, and regulatory information is accurate.
+Can one account act as both a buyer and seller?
+Trade82 supports Buyer, Seller, and Both account roles.
+The user may need to complete separate company information and requirements for each business role.
+Is registering an account a guarantee of approval?
+No.
+Trade82 may review, restrict, reject, suspend, or terminate accounts that contain incomplete, false, misleading, unlawful, suspicious, or prohibited information.
+Accounts and Verification
+What does a Verified Seller badge mean?
+A Verified Seller badge indicates that the seller company completed the limited verification process required by Trade82.
+It does not mean that Trade82 has verified:
+* Every product
+* Every factory
+* Every certificate
+* Every document
+* Product safety
+* Regulatory compliance
+* Financial condition
+* Manufacturing capacity
+* Intellectual-property ownership
+* Future seller performance
+Buyers must still conduct transaction-specific due diligence.
+Does Trade82 verify every product?
+No.
+Product information is primarily provided by the seller.
+Trade82 may review listings for platform-policy or formatting purposes, but it is not required to independently test, inspect, authenticate, certify, or legally approve each product.
+What happens if verified company information changes?
+Material changes to company information may require another review.
+Trade82 may change the company’s verification status, request updated information, limit marketplace visibility, or require reverification.
+Can Trade82 suspend an account?
+Yes.
+Trade82 may warn, restrict, suspend, or terminate an account for reasons including:
+* False information
+* Fraud
+* Counterfeit goods
+* Forged documents
+* Payment circumvention
+* Abusive conduct
+* Sanctions concerns
+* Prohibited products
+* Security risks
+* Repeated policy violations
+* Failure to provide requested verification
+Enforcement actions may be taken without guaranteeing advance notice where immediate action is reasonably necessary.
+Buyers and RFQs
+What is an RFQ?
+An RFQ, or Request for Quotation, allows a buyer to describe a product and the commercial conditions they are seeking.
+An RFQ may include:
+* Product name
+* Category
+* Sourcing type
+* Quantity
+* Trade terms
+* Destination country
+* Target price
+* Delivery date
+* Product specifications
+* Materials
+* Required certification
+* Product features
+* Detailed requirements
+Who can submit an RFQ?
+RFQs are available to buyer accounts.
+A buyer may be required to complete additional company information before opening a conversation or proceeding with certain transaction functions.
+Is an RFQ sent directly to every seller?
+No.
+A submitted RFQ first enters Trade82’s administrative review process.
+The administrator may:
+* Approve the RFQ
+* Reject the RFQ
+* Request additional information
+* Add an administrative note
+The RFQ is not automatically distributed to every seller.
+What happens after an RFQ is approved?
+After approval, the RFQ becomes ready for matching.
+Trade82 may compare the RFQ with registered products and seller information using factors such as:
+* Category
+* Product keywords
+* Description
+* Materials
+* Certification information
+* Product features
+* Capacity
+* Destination information
+Relevant products may then appear as suggested matches.
+Does Trade82 use AI to guarantee the best match?
+No.
+The current matching process uses information recorded in the RFQ, product listings, and seller profiles.
+A recommendation is not a guarantee that the product or seller satisfies every buyer requirement.
+The buyer must independently review each recommendation.
+Is an approved RFQ guaranteed to receive recommendations?
+No.
+An approved RFQ may receive few or no recommendations when:
+* No relevant active product exists
+* Relevant sellers are not verified
+* Product information is incomplete
+* Required specifications are unavailable
+* The destination or certification requirement cannot be matched
+* Current sellers do not support the requested conditions
+Can I upload files when initially submitting an RFQ?
+Attachment upload is not currently enabled on the initial RFQ submission form.
+Trade82 or a seller may request additional materials later through an available communication process.
+Can I edit an RFQ?
+An RFQ may generally be edited while it is in an editable pre-approval status, including Submitted, Under Review, or Rejected.
+Editing a reviewed or rejected request may return it to the review process.
+After approval or matching begins, normal editing may no longer be available.
+Can I cancel an RFQ?
+A buyer may cancel an RFQ before it reaches the approved or matching-ready stage.
+An approved RFQ may instead be closed when the sourcing request has ended.
+Am I required to select a recommended seller?
+No.
+The buyer may review recommendations and decide whether any product or seller is suitable.
+A recommendation does not require the buyer to request a quote, open a conversation, make payment, or place an order.
+Sellers and Products
+Who can register products?
+Product registration is available to seller accounts with the required seller company information.
+Products are connected to the seller company that owns the listing.
+Does saving a product automatically publish it?
+No.
+A seller may save a product as a draft or submit it as an active product.
+Publishing may require:
+* Product name
+* Category
+* Detailed overview
+* At least one product image
+* Valid values for fields marked Public
+An active product may not appear publicly unless the related seller company meets Trade82’s verification requirements.
+What information should a product listing contain?
+A listing may include:
+* Product name
+* Category
+* Product images
+* Short summary
+* Detailed overview
+* Tags
+* Buyer notes
+* Price
+* MOQ
+* Lead time
+* Samples
+* Private-label availability
+* Monthly capacity
+* Country of origin
+* Shipping origin
+* Incoterms
+* HS code
+* Shelf life
+* Ingredients or materials
+* Packaging information
+* Available documents
+* Seller-provided compliance information
+Does selecting a certificate mean Trade82 verified it?
+No.
+A seller’s selection means the seller represented that the certificate, information, or related documentation applies or may be provided.
+It does not mean that Trade82 independently authenticated, approved, or certified it.
+Can a seller use medical or guaranteed-result claims?
+Only claims that are truthful, lawful, properly supported, and appropriate for the product category may be used.
+Sellers should not use unsupported claims such as:
+* Guaranteed results
+* No side effects
+* Permanent results
+* Cures disease
+* FDA approved, without a correct legal basis
+* Clinically proven, without appropriate evidence
+* Completely safe for everyone
+Trade82 may request revisions or restrict a listing containing high-risk or unsupported claims.
+Can counterfeit or unauthorized branded goods be listed?
+No.
+Sellers must have the legal right to manufacture, distribute, export, advertise, and sell the products they list.
+Trade82 may remove products or restrict accounts involving suspected:
+* Counterfeit goods
+* Stolen goods
+* Unauthorized trademarks
+* False brand authorization
+* Forged certificates
+* Misrepresented country of origin
+* Prohibited or unlawful goods
+Does registering a product guarantee buyer inquiries?
+No.
+Completing a product listing may improve the information available to buyers, but Trade82 does not guarantee views, inquiries, RFQ matches, quotations, orders, or revenue.
+Messages and Documents
+Should important transaction terms be confirmed through Trade82?
+Yes.
+Buyers and sellers should record important terms through Trade82 where supported, including:
+* Product
+* Quantity
+* Price
+* Shipping amount
+* MOQ
+* Lead time
+* Incoterm
+* Sample conditions
+* Packaging
+* Documents
+* Payment terms
+* Delivery terms
+Platform records may assist in reviewing a transaction, but they do not replace a complete written contract where one is appropriate.
+What is the Forms Library?
+The Forms Library contains a combination of:
+* Trade82-created templates
+* Official government or agency links
+* General compliance references
+* Logistics document references
+Not every form applies to every transaction.
+Are Trade82 templates official government documents?
+No, unless the item is expressly identified as an official government form or opens an official government source.
+A Trade82 template is a general organizational tool and does not guarantee acceptance by a government agency, bank, carrier, customs authority, buyer, or seller.
+What files can currently be uploaded to My Documents?
+The current My Documents interface accepts:
+* PDF
+* JPG
+* JPEG
+* PNG
+* WebP
+The current interface limit is 20MB per file.
+Trade82 may modify these technical limits.
+Are uploaded documents automatically shared with buyers?
+No.
+New documents uploaded through the current My Documents workflow are Private by default.
+Uploading a document, placing it in a folder, or assigning it to the Shared with buyer category does not by itself guarantee that a specific buyer received access.
+Does Trade82 verify uploaded documents?
+Not necessarily.
+A successful upload confirms only that the file was technically accepted by the platform.
+It does not prove that the document is:
+* Genuine
+* Complete
+* Current
+* Legally valid
+* Applicable to the product
+* Issued by an authorized organization
+* Accepted by a regulator
+Should users keep their own copies?
+Yes.
+Users should maintain independent copies of contracts, certificates, invoices, test reports, shipping documents, and legally required records.
+Trade82 document storage should not be the only recordkeeping or backup system.
+Can sensitive information be uploaded?
+Users should avoid uploading unnecessary sensitive information.
+Do not upload unnecessary:
+* Passwords
+* Authentication codes
+* Complete card information
+* Personal identification numbers
+* Private encryption keys
+* Unnecessary bank-account information
+* Unrelated customer records
+The uploading user is responsible for having the legal authority to store or share the document.
+Payments, Fees, and Orders
+What is the Trade82 platform fee?
+The standard Trade82 platform fee is 5% of the eligible payment amount processed through Trade82, unless different terms are displayed or separately agreed in writing.
+The fee is generally deducted from the seller’s transaction proceeds.
+Is the fee 5% of the seller’s profit?
+No.
+The standard fee is based on the eligible amount processed through the platform, not the seller’s profit or manufacturing cost.
+For example:
+* Eligible payment amount: USD 10,000
+* Standard Trade82 fee: USD 500
+* Initial seller amount before other applicable adjustments: USD 9,500
+Refunds, payment reversals, bank charges, processing costs, disputes, or other adjustments may affect the final amount.
+Is shipping included in the fee calculation?
+When the product amount and shipping amount are processed together as part of the same eligible Trade82 payment, the platform fee may be calculated on the combined amount unless the transaction terms state otherwise.
+Sellers should review the payment request before sending it.
+Must transactions that begin on Trade82 be paid through Trade82?
+Yes.
+A transaction that originates through Trade82 product discovery, RFQ matching, messaging, seller selection, or another platform connection must be completed through the supported Trade82 payment process.
+Users must not move the transaction outside the platform to avoid the platform fee.
+Can users exchange bank details to pay outside Trade82?
+Users must not share bank details, external payment links, QR codes, private messaging accounts, or other payment instructions for the purpose of bypassing Trade82.
+Legitimate contact information required for shipping, customs, documentation, or operational coordination may be exchanged when reasonably necessary, but it must not be used to circumvent platform payment requirements.
+Is Trade82 an escrow service?
+Trade82 should not be treated as a bank, escrow agent, trustee, fiduciary, or deposit-taking institution unless a specific service is expressly identified as such in binding transaction terms.
+Supported payments may be processed through third-party payment providers.
+The existence of a Trade82 payment record does not guarantee product quality, delivery, regulatory compliance, or refund eligibility.
+When does a seller receive payment?
+Seller payout is not necessarily immediate after buyer payment.
+Payout may depend on:
+* Payment settlement
+* Seller payout verification
+* Refund status
+* Chargeback status
+* Payment disputes
+* Fraud review
+* Compliance review
+* Bank processing
+* Accurate payout information
+* Other transaction requirements
+Any estimated payout date is not guaranteed.
+Can Trade82 place a payout on hold?
+Yes.
+Trade82 may delay, hold, adjust, or suspend a payout where reasonably necessary because of:
+* Refunds
+* Disputes
+* Chargebacks
+* Fraud concerns
+* Incorrect bank information
+* Compliance concerns
+* Account restrictions
+* Transaction inconsistencies
+* Legal requests
+* Payment-processor restrictions
+Are refunds automatic?
+No.
+A refund is not automatically granted because a buyer requests one.
+Refund eligibility may depend on:
+* Payment status
+* Whether the seller shipped the goods
+* The agreed transaction terms
+* Product conformity
+* Delivery obligations
+* Evidence submitted by the parties
+* Chargeback status
+* Applicable law
+* Trade82 policies
+Trade82 does not guarantee that a refund will be approved or successfully recovered.
+What happens if a payment is disputed or charged back?
+Trade82 may update the payment and order status, request evidence, place seller payout on hold, adjust a pending payout, or require further review.
+A chargeback decision may be made by the payment provider, card network, bank, or other financial institution—not solely by Trade82.
+Does an order record prove that the goods were delivered?
+No.
+An order record shows information stored within the Trade82 workflow.
+It does not independently prove:
+* Physical shipment
+* Customs clearance
+* Delivery
+* Buyer acceptance
+* Product quality
+* Contract performance
+Export and Shipping
+Does Trade82 arrange transportation?
+Not unless Trade82 expressly agrees to a separate logistics service in writing.
+Normally, the buyer and seller arrange transportation with an independent carrier, freight forwarder, broker, warehouse, courier, postal service, or other provider.
+Who is responsible for shipping?
+Shipping responsibility is determined by the buyer–seller agreement, selected Incoterm, named place, and applicable law.
+The parties should confirm:
+* Carrier selection
+* Freight cost
+* Export clearance
+* Import clearance
+* Duties and taxes
+* Insurance
+* Risk transfer
+* Required documents
+* Final delivery
+Does Trade82 guarantee shipping or delivery dates?
+No.
+Production dates, shipping dates, tracking estimates, customs-release dates, and delivery dates may change.
+Trade82 does not control carriers, customs authorities, ports, airports, warehouses, brokers, or other logistics providers.
+Does a Shipped or Delivered status prove shipment or delivery?
+No.
+Shipment-status labels are provided for order organization.
+They do not replace:
+* Carrier records
+* Bill of lading
+* Air waybill
+* Delivery receipt
+* Customs records
+* Inspection evidence
+* The buyer–seller contract
+Who pays customs duties and taxes?
+The responsible party is determined by the transaction agreement, applicable Incoterm, destination-country rules, and applicable law.
+Trade82 does not guarantee customs classifications, tariff rates, duties, taxes, exemptions, or landed-cost estimates.
+What happens if customs rejects or detains a shipment?
+The buyer and seller must work with the responsible carrier, customs broker, importer, exporter, or authority.
+Trade82 does not guarantee customs release and is not responsible for a government authority’s decision to inspect, delay, detain, return, seize, or destroy goods.
+Compliance
+Does Trade82 guarantee regulatory compliance?
+No.
+Buyers and sellers are responsible for determining which laws, registrations, tests, labels, licenses, filings, and certifications apply to the product and destination.
+Does “FDA registration information provided” mean FDA approval?
+No.
+FDA registration, product listing, clearance, authorization, certification, and approval are different concepts.
+A seller stating that FDA-related information is available does not mean that FDA or Trade82 approved the product.
+Is Trade82 the responsible person or U.S. agent for a cosmetic product?
+No, unless Trade82 expressly accepts that role in a separate written agreement signed by an authorized representative.
+Listing or processing payment for a product does not make Trade82 the product’s responsible person, U.S. agent, manufacturer, importer, safety assessor, or regulatory filer.
+Can Trade82 remove a product for compliance reasons?
+Yes.
+Trade82 may restrict, hide, reject, or remove a product when it reasonably identifies concerns involving:
+* Safety
+* Illegal products
+* False claims
+* Forged documents
+* Sanctions
+* Export controls
+* Counterfeit goods
+* Misleading origin information
+* Regulatory risk
+* Platform-policy violations
+Trade82 is not required to identify every compliance problem before a product is listed or sold.
+Partner Program
+How does the Partner Program work?
+An approved partner receives a unique referral link.
+When a new buyer or seller registers through the link and later completes an eligible Trade82 transaction, the partner may earn a commission.
+How much does a partner earn?
+Trade82’s standard platform fee is 5% of the eligible payment amount.
+The standard partner commission is 10% of the platform fee actually earned and retained by Trade82.
+This is generally equivalent to 0.5% of the eligible transaction amount.
+Example:
+* Transaction amount: USD 10,000
+* Trade82 fee: USD 500
+* Partner commission: USD 50
+When is partner commission paid?
+Under the standard Partner Program terms:
+* Commission remains pending during a validation period of at least 30 calendar days.
+* Approved balances are normally paid within 60 calendar days after the end of the month in which the commission became approved.
+* The standard minimum payout amount is USD 100.
+* Balances below USD 100 are carried forward.
+Refunds, chargebacks, fraud reviews, missing tax information, bank-processing issues, or incomplete verification may extend the timeline.
+What happens when two partners referred the buyer and seller?
+Unless a separate written agreement states otherwise, Trade82 will not pay more than a total of 10% of its platform fee as partner commission for one transaction.
+The available commission may be divided between the buyer’s referring partner and the seller’s referring partner.
+Do off-platform payments earn partner commission?
+No.
+Partner commission applies only to eligible transactions completed through Trade82 where Trade82 successfully collects and retains the applicable platform fee.
+Safety and Support
+What should I do if I suspect fraud?
+Stop the transaction and contact Trade82 through the Legal, Safety, or Policy Report category.
+Provide available information such as:
+* Account or company name
+* Order number
+* RFQ number
+* Payment reference
+* Message screenshots
+* Documents
+* Payment instructions
+* Description of the suspicious activity
+Do not send additional money while the matter is unresolved.
+What are common warning signs?
+Warning signs may include:
+* Requests to pay outside Trade82
+* Last-minute bank-account changes
+* Payment through an unrelated third party
+* Fake payment receipts
+* Overpayment followed by a refund request
+* Requests for secrecy
+* False urgency
+* Inconsistent company information
+* Refusal to provide basic business information
+* Altered certificates
+* Suspiciously large first orders
+* Requests to misstate customs value
+* Requests to conceal the final destination
+Will Trade82 ask for my password?
+No.
+Trade82 support should not ask users to provide:
+* Account passwords
+* Authentication codes
+* Complete card numbers
+* Private encryption keys
+* Login credentials
+Users should not rely on external messages claiming to represent Trade82 without verifying them through the platform.
+Are off-platform transactions protected by Trade82?
+Trade82 may be unable to verify, review, or support payments and agreements completed outside the platform.
+Off-platform transactions may be excluded from available platform assistance or protection, subject to applicable law and the Trade82 Terms of Service.
+How long does support take to respond?
+Trade82 aims to respond to ordinary inquiries within 2–5 business days.
+Payment, fraud, security, verification, refund, compliance, or legal matters may require additional time.
+Submitting repeated requests for the same issue may delay review.
+Does contacting support guarantee a particular result?
+No.
+Trade82 may review platform records, request additional information, facilitate communication, or take platform-enforcement action.
+Trade82 does not guarantee:
+* Refunds
+* Seller responses
+* Product replacement
+* Recovery of external payments
+* Customs release
+* Insurance payment
+* Chargeback outcomes
+* Regulatory approval
+* Resolution within a specific period
+Can these FAQs change?
+Yes.
+Trade82 may revise these FAQs as the platform, laws, payment providers, operational procedures, and available features change.
+The current Terms of Service and transaction-specific terms control where they conflict with this FAQ.

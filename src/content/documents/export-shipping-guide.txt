@@ -1,0 +1,605 @@
+﻿Export & Shipping Guide
+This Export & Shipping Guide explains how buyers and sellers may coordinate export, transportation, customs, delivery, and shipment records when using Trade82.
+Trade82 provides a digital B2B marketplace, communication tools, payment and order records, and limited shipment-status functionality. Trade82 does not provide transportation, freight forwarding, customs clearance, warehousing, cargo inspection, or cargo insurance unless Trade82 expressly agrees to provide a specific service in a separate written agreement signed by an authorized representative.
+This Guide should be read together with the Trade82 Terms of Service, applicable transaction terms, and any written agreement between the buyer and seller.
+1. Trade82’s Limited Role
+Trade82 is a technology platform that helps buyers and sellers discover each other, communicate, record transaction terms, process supported payments, and maintain order and shipment information.
+Unless expressly stated in a separate written agreement, Trade82 is not:
+* The buyer or seller of the goods
+* The manufacturer of the goods
+* The exporter of record
+* The importer of record
+* The owner of the goods
+* A carrier
+* A freight forwarder
+* A non-vessel-operating common carrier
+* An ocean transportation intermediary
+* A customs broker
+* A warehouse operator
+* A fulfillment provider
+* A cargo inspector
+* A certification body
+* A regulatory consultant
+* A tax adviser
+* An insurance company
+* An issuer of shipping documents
+* A guarantor of delivery or customs clearance
+Trade82 does not normally take possession, custody, control, or title to goods listed or sold through the platform.
+A payment processed through Trade82 does not mean that Trade82 owns, inspects, stores, exports, imports, ships, or delivers the goods.
+2. No Shipping or Customs Agency Relationship
+The buyer and seller are responsible for arranging transportation directly or through an independent carrier, freight forwarder, customs broker, warehouse, courier, postal service, or other logistics provider.
+A shipping agreement entered into with a carrier or logistics provider is separate from the user’s agreement with Trade82.
+Trade82 is not a party to that shipping agreement and does not become the agent, representative, employee, partner, subcontractor, or guarantor of the carrier or logistics provider.
+When Trade82 displays information about a logistics provider, provides an external link, or introduces a user to a third-party service provider, that information or introduction does not by itself constitute:
+* An endorsement
+* A warranty
+* A partnership
+* An agency relationship
+* A guarantee of pricing
+* A guarantee of availability
+* A guarantee of regulatory compliance
+* A guarantee of delivery performance
+Users must independently evaluate and contract with any third-party logistics provider.
+3. Agreement Between Buyer and Seller
+Before payment or shipment, the buyer and seller should clearly agree on:
+* The exact product
+* Quantity
+* Unit and total price
+* Packaging requirements
+* Shipping cost
+* Shipping method
+* Carrier-selection responsibility
+* Freight-forwarder responsibility
+* Incoterm
+* Named port, place, terminal, warehouse, or destination
+* Export-clearance responsibility
+* Import-clearance responsibility
+* Duties and taxes
+* Cargo-insurance responsibility
+* Required shipping documents
+* Production lead time
+* Expected ship date
+* Estimated arrival date
+* Inspection requirements
+* Risk-of-loss transfer
+* Procedures for damaged, missing, delayed, or rejected goods
+Information shown in a product listing, RFQ, message, payment request, or order record does not replace a clear agreement between the buyer and seller.
+Where information conflicts, the parties should resolve the conflict in writing before payment or shipment.
+4. Incoterms
+Incoterms are used to clarify the tasks, costs, and risks allocated between a buyer and seller in the delivery of goods. The current version is Incoterms® 2020.
+Selecting or mentioning an Incoterm on Trade82 does not automatically create a complete shipping agreement.
+The buyer and seller should record:
+1. The exact Incoterm
+2. The exact named place or port
+3. The applicable version, such as Incoterms® 2020
+Example:
+FOB Busan Port, South Korea — Incoterms® 2020
+Not:
+FOB
+The parties are responsible for understanding the selected Incoterm and confirming how freight, loading, unloading, insurance, export clearance, import clearance, duties, taxes, and risk are allocated.
+Trade82 does not select the correct Incoterm for the parties and does not guarantee that an Incoterm selected in a listing, RFQ, quotation, message, or order is suitable for a particular transaction.
+5. Seller Responsibilities
+Unless the parties expressly agree otherwise, the seller is responsible for accurately describing and preparing the goods it agrees to supply.
+The seller’s responsibilities may include:
+* Supplying the agreed product and quantity
+* Confirming production availability
+* Using packaging appropriate for the goods and agreed transportation method
+* Accurately stating product origin
+* Accurately stating the product description, quantity, value, weight, and dimensions
+* Providing documents the seller agreed to provide
+* Complying with applicable export restrictions
+* Confirming whether an export license or authorization is required
+* Using truthful invoices and shipping records
+* Delivering the goods according to the agreed Incoterm
+* Selecting qualified service providers when the seller is responsible for transportation
+* Entering accurate shipment information in Trade82
+* Correcting shipment information when an error is discovered
+* Informing the buyer of known delays, exceptions, damage, shortages, or documentation problems
+* Retaining evidence of packing, dispatch, carrier handover, and delivery when available
+The seller must not:
+* Enter a false shipping status
+* Submit a false tracking number
+* Mark an order as shipped before carrier handover
+* Mark an order as delivered without a reasonable basis
+* Falsify a commercial invoice
+* Understate or overstate customs value
+* Misstate product origin
+* Use a false HS code
+* Conceal regulated or hazardous contents
+* Submit altered shipping documents
+* Attempt to bypass export controls, sanctions, customs requirements, or import restrictions
+Trade82 may restrict an account or order when shipment information appears false, misleading, unlawful, or materially inconsistent with the transaction record.
+6. Buyer Responsibilities
+The buyer is responsible for determining whether the goods may lawfully be imported, distributed, marketed, and sold in the destination country.
+The buyer’s responsibilities may include:
+* Providing a complete and accurate delivery address
+* Providing the correct legal company and consignee information
+* Confirming the intended destination and end use
+* Determining whether the buyer or another party will act as importer of record
+* Appointing a customs broker when required
+* Confirming local import licenses and registrations
+* Confirming product-specific regulations
+* Confirming labeling requirements
+* Confirming duties, taxes, tariffs, and customs fees
+* Providing required importer information
+* Responding to carrier and customs requests
+* Paying charges allocated to the buyer
+* Arranging delivery appointments when required
+* Receiving and inspecting the goods
+* Reporting visible damage, shortage, or incorrect goods promptly
+* Preserving packaging, photographs, delivery records, and inspection evidence
+* Complying with applicable sanctions, restricted-party, and end-use rules
+The buyer must not provide a false delivery address, false importer information, false end-use information, or instructions intended to evade duties, taxes, sanctions, customs controls, or product regulations.
+7. Shipping Charges
+A shipping amount shown in a Trade82 payment request or order represents the amount entered or agreed by the transaction parties.
+Unless expressly stated otherwise, it is not:
+* A carrier-issued quotation
+* A guaranteed freight rate
+* A customs-duty calculation
+* An insurance premium
+* A final landed-cost calculation
+* A guarantee that no additional charge will arise
+The buyer and seller should confirm what the shipping amount includes.
+This may include or exclude:
+* Pickup
+* Export handling
+* Terminal charges
+* Documentation fees
+* Freight
+* Fuel surcharges
+* Security fees
+* Insurance
+* Customs-broker fees
+* Import duties
+* Import taxes
+* Inspection charges
+* Storage charges
+* Demurrage
+* Detention
+* Remote-area charges
+* Final-mile delivery
+* Residential-delivery charges
+* Redelivery charges
+* Return-shipping charges
+Trade82 is not responsible for differences between an estimated shipping amount and the amount ultimately charged by a carrier, freight forwarder, customs authority, warehouse, broker, or other service provider.
+8. Selecting a Carrier or Freight Forwarder
+The party responsible for transportation should independently evaluate the proposed carrier or freight forwarder.
+Relevant considerations may include:
+* Legal registration and licensing
+* Service coverage
+* Experience with the product category
+* Experience with the destination
+* Dangerous-goods capability
+* Temperature-control capability
+* Cargo-insurance options
+* Tracking capability
+* Claims procedures
+* Limitation-of-liability terms
+* Excluded commodities
+* Delivery schedule
+* Storage and delay charges
+* Subcontracting practices
+* Required documents
+* Customer-support availability
+Trade82 does not guarantee the solvency, licensing, insurance, security, legal compliance, or performance of any carrier, freight forwarder, customs broker, or logistics provider.
+9. Shipment Information on Trade82
+Under the current Trade82 order system, an authorized seller may enter or update shipment information such as:
+* Carrier name
+* Tracking number
+* Shipment reference
+* Shipment status
+The buyer may view available shipment and tracking information through the related order page.
+Trade82 may also maintain internal shipment-record fields for information such as:
+* Incoterm
+* Shipping method
+* Origin
+* Destination
+* Freight forwarder
+* Bill of lading number
+* Air waybill number
+* Shipping dates
+* Estimated arrival
+* Delivery date
+* Shipment notes
+The existence of a field does not mean that the information has been entered, independently verified, or confirmed by a carrier.
+10. Shipment Statuses
+A Trade82 order may display shipment-status labels such as:
+* Not Ready
+* Ready
+* Booked
+* Shipped
+* In Transit
+* Delivered
+* Exception
+* Cancelled
+These labels are provided for order organization and communication.
+A shipment status:
+* Is not a carrier-issued certificate
+* Is not proof of export
+* Is not proof of customs clearance
+* Is not proof of delivery
+* Is not proof that the goods were received in acceptable condition
+* Does not determine legal title
+* Does not independently determine risk of loss
+* Does not override the agreed Incoterm
+* Does not override the buyer–seller contract
+* Does not override applicable law
+Shipment information may be entered by a seller and may be incomplete, delayed, inaccurate, or inconsistent with the carrier’s records.
+Users should verify important shipment information directly with the relevant carrier, freight forwarder, customs broker, warehouse, or consignee.
+11. Tracking Information
+A tracking number may not become active immediately after it is created.
+Carrier tracking information may be delayed, unavailable, inaccurate, or incomplete because of:
+* Delayed carrier scanning
+* Consolidated shipments
+* Handovers between carriers
+* Freight-forwarder systems
+* Customs holds
+* Port or terminal delays
+* Data-entry errors
+* Carrier-system outages
+* Local delivery partners
+* Changes to the transportation route
+Trade82 does not control carrier tracking systems and does not guarantee the availability, accuracy, or timeliness of tracking data.
+A tracking number displayed on Trade82 should be checked through the relevant carrier or freight forwarder.
+12. Export and Shipping Documents
+The required documents depend on the goods, destination, transaction structure, carrier, and applicable law.
+Common documents may include:
+* Pro forma invoice
+* Commercial invoice
+* Packing list
+* Certificate of origin
+* Bill of lading
+* Air waybill
+* Export declaration
+* Export license
+* Insurance certificate
+* Inspection certificate
+* Certificate of analysis
+* Safety data sheet
+* Product registration or compliance documents
+* Other destination-specific documents
+The U.S. International Trade Administration notes that document requirements may vary by product and destination and advises exporters to confirm required documents with the foreign customer, importer, or freight forwarder. It also distinguishes commercial invoices, packing lists, air waybills, bills of lading, export filings, and licenses.
+Trade82 does not issue, sign, validate, authenticate, approve, or guarantee shipping or customs documents unless expressly stated for a specific document.
+A document template provided by Trade82 is provided for general organizational assistance only. It does not guarantee that the completed document is legally sufficient or accepted by:
+* A customs authority
+* A bank
+* A carrier
+* A port
+* A warehouse
+* An insurer
+* A government agency
+* A buyer
+* A seller
+The responsible party must review each document before use.
+13. Accuracy and Consistency of Documents
+Information should be consistent across the:
+* Product description
+* Commercial invoice
+* Packing list
+* Purchase order
+* Payment request
+* Bill of lading
+* Air waybill
+* Certificate of origin
+* Customs entry
+* Product label
+* Shipment record
+Differences in product name, quantity, value, weight, origin, consignee, or package count may cause delay, inspection, rejection, additional charges, or seizure.
+Trade82 does not verify that separate documents are consistent with one another.
+The user submitting or using a document is responsible for reviewing its accuracy.
+14. Customs Clearance
+Trade82 does not provide customs-clearance services and does not guarantee that goods will be admitted into any country.
+Customs authorities may:
+* Request additional information
+* Inspect the goods
+* Reclassify the goods
+* Revalue the goods
+* Assess additional duties or taxes
+* Delay release
+* Refuse entry
+* Require relabeling
+* Require testing
+* Require permits
+* Detain the shipment
+* Seize the shipment
+* Order return or destruction
+The buyer and seller must determine which party is responsible under their contract, Incoterm, and applicable law.
+Trade82 is not responsible for a customs authority’s decision, processing time, inspection, classification, valuation, duty assessment, penalty, detention, seizure, release, return, or destruction of goods.
+15. Product Classification and Origin
+HS codes, tariff classifications, origin statements, and customs values affect customs processing and may affect duties, taxes, licenses, quotas, and regulatory requirements.
+Product information shown on Trade82 may be supplied by the seller and is not a binding customs ruling.
+Trade82 does not guarantee:
+* The correctness of an HS code
+* Eligibility for a free-trade-agreement benefit
+* The correctness of country-of-origin treatment
+* The applicable tariff rate
+* The acceptability of a declared customs value
+* The availability of a duty exemption
+* The legality of a particular import or export
+The responsible party should obtain advice from a qualified customs broker, trade professional, or relevant government authority when needed.
+16. Export Controls, Sanctions, and Restricted Parties
+The parties are responsible for confirming whether the goods, destination, purchaser, consignee, intermediary, end user, or intended end use is subject to export controls or sanctions.
+U.S. export restrictions may apply based on the end user, end use, destination, or participation of a restricted party, including circumstances where a license would not otherwise be required. BIS also directs parties to restricted-party lists and due-diligence guidance.
+Users must not use Trade82 to:
+* Export prohibited goods
+* Transact with prohibited persons
+* Conceal the final destination
+* Conceal the final recipient
+* Misstate the end use
+* Route goods through another country to avoid restrictions
+* Use false consignee information
+* Evade sanctions
+* Circumvent licensing requirements
+* Facilitate unlawful transshipment
+Trade82 may restrict, suspend, cancel, or report activity that appears unlawful or high risk. Any review performed by Trade82 does not replace the users’ own compliance obligations.
+17. Duties, Taxes, and Government Charges
+The buyer and seller must agree on who is responsible for duties, taxes, tariffs, customs fees, brokerage charges, and related government or carrier charges.
+The selected Incoterm may allocate certain responsibilities, but the parties must still confirm whether the selected arrangement is legally and operationally possible in the destination country.
+Trade82 does not calculate or guarantee:
+* Import duties
+* Export duties
+* Sales tax
+* Value-added tax
+* Goods and services tax
+* Tariffs
+* Antidumping duties
+* Countervailing duties
+* Excise taxes
+* Customs bonds
+* Brokerage charges
+* Government-inspection charges
+A tax, duty, or fee estimate obtained through an external source may change and may not reflect the final assessment.
+18. Cargo Insurance
+Trade82 does not provide cargo insurance and does not insure goods merely because payment or order information appears on the platform.
+The party responsible for insurance should determine:
+* Whether insurance is required
+* The insured value
+* The insured risks
+* Coverage territory
+* Coverage period
+* Exclusions
+* Deductibles
+* Claim-notice deadlines
+* Required evidence
+* Whether loss, damage, theft, moisture, temperature deviation, delay, or war risk is covered
+Carrier liability is not necessarily the same as cargo-insurance coverage.
+Trade82 does not guarantee that a carrier, seller, buyer, or insurer will compensate a loss.
+19. Estimated Dates
+Production dates, ship dates, transit times, and estimated arrival dates are estimates unless the parties expressly agree otherwise in a binding contract.
+Dates may change because of:
+* Production delays
+* Raw-material shortages
+* Packaging delays
+* Carrier capacity
+* Flight or vessel cancellation
+* Port congestion
+* Customs inspection
+* Weather
+* Labor disruption
+* Government action
+* War or civil unrest
+* Sanctions
+* Public-health events
+* Documentation problems
+* Address errors
+* Buyer or seller delay
+* Events outside the parties’ reasonable control
+Trade82 does not guarantee any ship date, transit time, customs-release date, arrival date, or final-delivery date.
+20. Loss, Damage, Shortage, or Incorrect Goods
+When goods appear lost, damaged, short, or incorrect, the buyer should preserve available evidence, including:
+* Outer packaging
+* Inner packaging
+* Labels
+* Photographs
+* Videos
+* Delivery receipt
+* Carrier records
+* Package count
+* Weight records
+* Inspection report
+* Commercial invoice
+* Packing list
+* Message history
+The buyer and seller should contact the responsible carrier, freight forwarder, warehouse, insurer, or customs broker within the deadlines applicable to that service.
+Trade82 may allow the parties to exchange information or preserve platform records, but Trade82 does not inspect the goods and does not determine the physical cause of a loss.
+Trade82 does not guarantee that a carrier, insurer, buyer, or seller will accept or pay a claim.
+21. Delivery and Inspection
+A Delivered status does not mean that the buyer has inspected or accepted the goods.
+The buyer should inspect the shipment within a commercially reasonable period and in accordance with the buyer–seller agreement, carrier terms, insurance requirements, and applicable law.
+The buyer should promptly notify the seller and responsible service provider of:
+* Visible damage
+* Missing cartons
+* Quantity shortages
+* Incorrect products
+* Broken seals
+* Temperature problems
+* Packaging damage
+* Suspected tampering
+Trade82 does not conduct physical delivery inspections and does not certify that goods were delivered in the agreed condition.
+22. Incorrect Address or Delivery Information
+The buyer is responsible for providing accurate consignee, contact, address, telephone, and delivery information.
+The seller should review available delivery information before dispatch.
+Additional expenses caused by incorrect or incomplete information may include:
+* Address-correction charges
+* Storage charges
+* Redelivery charges
+* Return freight
+* Customs amendments
+* Brokerage charges
+* Disposal charges
+* Duty or tax reassessment
+Trade82 is not responsible for losses or additional costs arising from information supplied incorrectly by a buyer, seller, consignee, or third-party service provider.
+23. Customs Holds, Abandoned Goods, Returns, and Destruction
+A shipment may incur storage, demurrage, detention, return, disposal, or destruction costs when it cannot be cleared or delivered.
+The responsible party will be determined by:
+* The buyer–seller agreement
+* The agreed Incoterm
+* Carrier terms
+* Customs rules
+* Applicable law
+* The cause of the problem
+Trade82 does not accept physical returns and does not provide a warehouse or return address unless expressly agreed in writing.
+No user should instruct a carrier to return goods to Trade82 without Trade82’s prior written authorization.
+24. Shipment Exceptions
+An Exception status may indicate a delay, hold, failed delivery, customs issue, documentation problem, damage report, route change, or another transportation problem.
+The status does not identify the responsible party and does not automatically establish a right to:
+* A refund
+* A replacement
+* Compensation
+* Cancellation
+* Insurance payment
+* Chargeback
+* Seller payout release or suspension
+The buyer and seller must review the underlying facts and their agreement.
+25. Refunds and Shipping Disputes
+A delay, shipment exception, or tracking problem does not automatically require a full refund.
+Refund eligibility may depend on:
+* Whether the goods were shipped
+* The agreed Incoterm
+* The agreed delivery obligation
+* The reason for the delay
+* Whether the buyer provided correct information
+* Whether customs clearance was completed
+* Whether the goods were returned
+* Whether the seller breached the agreed terms
+* Whether a carrier or insurer accepted a claim
+* Applicable law
+* Trade82’s payment and dispute rules
+Trade82 may request transaction, shipment, message, tracking, or document records when reviewing a dispute.
+Any review or assistance provided by Trade82 does not mean that Trade82 caused the shipping problem, accepted responsibility for the shipment, or guaranteed recovery of funds.
+26. Off-Platform Shipping Arrangements
+Buyers and sellers may need to communicate with carriers, customs brokers, warehouses, and other providers to complete an order.
+However, users must not use shipping coordination as a pretext to move payment outside Trade82 or avoid the platform fee.
+Trade82 may be unable to verify or support:
+* Undisclosed side payments
+* False shipping charges
+* External deposits
+* Payments to unrelated parties
+* Transactions completed outside Trade82
+* Shipping arrangements that are not connected to the platform order record
+27. Prohibited Shipping Conduct
+Users must not:
+* Create false shipment records
+* Use fabricated tracking information
+* Submit forged shipping documents
+* Misrepresent the goods
+* Conceal hazardous contents
+* Falsify value or origin
+* Facilitate smuggling
+* Evade customs duties
+* Evade sanctions
+* Ship counterfeit goods
+* Ship prohibited products
+* Use another company as an undisclosed importer
+* Redirect goods to an undisclosed restricted destination
+* Ask another user to make payments to an unrelated carrier account
+* Use shipping charges to conceal an off-platform payment
+Trade82 may restrict access, suspend transactions, preserve records, or cooperate with lawful requests when prohibited conduct is suspected.
+28. Third-Party Failures
+Trade82 is not responsible for acts or omissions of independent third parties, including:
+* Carriers
+* Freight forwarders
+* Customs brokers
+* Warehouses
+* Ports
+* Airlines
+* Shipping lines
+* Trucking companies
+* Postal services
+* Couriers
+* Insurers
+* Inspection companies
+* Banks
+* Government agencies
+* Subcontractors used by those parties
+This includes delay, loss, damage, theft, misdelivery, refusal of service, insolvency, system failure, document error, rate change, customs action, or failure to pay a claim.
+29. No Shipping Warranty
+To the fullest extent permitted by applicable law, Trade82 makes no warranty that:
+* Goods will be shipped
+* Goods will arrive
+* Goods will arrive on time
+* Goods will clear customs
+* Tracking information will be accurate
+* Shipping documents will be accepted
+* A carrier will perform as promised
+* Goods will arrive undamaged
+* Goods will conform to the buyer’s expectations
+* Insurance will cover a claim
+* Duties or taxes will match an estimate
+* A buyer or seller will fulfill its contractual obligations
+Trade82’s display of an order, payment, tracking number, shipment status, estimated date, or document reference does not constitute such a warranty.
+30. Limitation of Trade82 Responsibility
+To the fullest extent permitted by applicable law and subject to the Trade82 Terms of Service, Trade82 does not assume responsibility for losses arising from:
+* Export or import restrictions
+* Customs delay or refusal
+* Incorrect classification
+* Incorrect origin information
+* Incorrect customs value
+* Duties, taxes, tariffs, fines, or penalties
+* Carrier delay
+* Port congestion
+* Lost or damaged goods
+* Theft
+* Misdelivery
+* Incorrect addresses
+* Storage, demurrage, or detention
+* Failed inspections
+* Regulatory rejection
+* Missing or incorrect documents
+* Product seizure
+* Product return or destruction
+* Cargo-insurance denial
+* Third-party fraud
+* Acts or omissions of buyers, sellers, carriers, brokers, or government agencies
+* Reliance on user-submitted shipment information
+* Events outside Trade82’s reasonable control
+Nothing in this Guide excludes or limits any liability that cannot legally be excluded or limited under applicable law.
+31. Trade82 Assistance
+Trade82 may, at its discretion:
+* Help the parties locate platform records
+* Request additional information
+* Preserve relevant account records
+* Facilitate communication
+* Restrict suspicious activity
+* Review a platform-payment dispute
+* Provide general operational guidance
+Trade82 is not obligated to:
+* Locate missing cargo
+* Contact every carrier
+* File a customs entry
+* File an insurance claim
+* Pay duties
+* Pay storage charges
+* Recover goods
+* Inspect goods
+* Negotiate with customs
+* Replace damaged goods
+* Reimburse transportation losses
+* Provide legal, customs, tax, or regulatory representation
+Providing assistance in one case does not create a continuing duty to provide the same assistance in another case.
+32. Final Checklist
+Before shipping, the buyer and seller should confirm:
+* The exact goods and quantity
+* Packaging requirements
+* Shipping amount and included charges
+* Incoterm, named place, and version
+* Responsible carrier-selection party
+* Exporter and importer responsibilities
+* Origin and destination
+* Customs classification
+* Product value
+* Required licenses
+* Restricted-party and end-use review
+* Required documents
+* Insurance responsibility
+* Ship-date estimate
+* Arrival-date estimate
+* Inspection requirements
+* Damage and shortage procedures
+* Contact information
+* The information recorded in Trade82
+Export and Shipping Process Summary
+The buyer and seller agree on the product, shipping cost, Incoterm, destination, required documents, and other commercial terms.
+The party responsible for transportation selects and contracts with an independent carrier or logistics provider. The seller prepares the goods and documents according to the parties’ agreement. After dispatch, the seller may enter carrier, tracking, shipment-reference, and status information in Trade82.
+The buyer can review the available shipment information through the order page. All shipment information remains informational and should be verified with the responsible carrier or logistics provider.
+The buyer and seller remain responsible for export compliance, import compliance, customs clearance, duties, taxes, insurance, inspections, and claims. Trade82 provides platform records and communication tools but does not become the carrier, exporter, importer, customs broker, warehouse, insurer, or guarantor of the shipment.

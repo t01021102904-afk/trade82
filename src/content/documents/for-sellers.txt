@@ -1,0 +1,186 @@
+﻿For Sellers
+Trade82 is a B2B trade platform that helps Korean sellers connect with international buyers, present their products, negotiate pricing and commercial terms, and manage payment, order, shipping, and payout records in one place.
+Sellers must provide accurate company, product, pricing, certification, production-capacity, shipping, and payout information. Any transaction that begins through Trade82 must remain within Trade82’s messaging and payment systems.
+1. Platform Fee
+Trade82 charges a platform fee equal to 5% of the total amount actually paid through the platform.
+For example, if a buyer pays a total of USD 1,000, the standard Trade82 platform fee is USD 50, and the seller’s initial expected payout is USD 950.
+The final payout amount may change if any of the following applies:
+* Full or partial refunds
+* Chargebacks
+* Payment disputes
+* Payout holds
+* Transaction cancellations
+* Agreed adjustments
+* Other deductions permitted under the applicable terms
+When product charges and shipping charges are processed as one payment, the platform fee may be calculated on the full payment amount unless otherwise stated.
+2. Transactions That Begin on Trade82 Must Be Paid Through Trade82
+Any transaction involving a buyer first introduced to the seller through Trade82 must be completed through Trade82’s payment system.
+Sellers may not ask or encourage buyers to make payment through any of the following methods:
+* Direct transfer to a personal or company bank account
+* PayPal, Wise, Western Union, or another external payment service
+* Cryptocurrency or a digital wallet
+* An external online store or separate payment page
+* An invoice sent by email that directs the buyer to an outside bank account
+* Partial payment through Trade82 with the remaining amount paid outside the platform
+* A payment request showing an amount lower than the actual transaction value
+* Separate collection of sample fees, shipping fees, deposits, or remaining balances outside Trade82
+* Cancellation of a Trade82 transaction followed by completion of the same transaction outside the platform
+* Changing the contracting party or payment party to avoid Trade82 fees
+These actions may be treated as transaction circumvention or platform-fee avoidance.
+3. Restrictions on External Contact Information and Circumvention
+Sellers may not send or request the following information for the purpose of moving a Trade82 transaction outside the platform or arranging off-platform payment:
+* Telephone numbers
+* Personal email addresses
+* Bank account numbers
+* KakaoTalk IDs
+* WhatsApp numbers
+* WeChat, Telegram, LINE, or other messaging accounts
+* Social-media usernames
+* QR codes
+* External payment links
+* Separate video-meeting links
+* Business cards or images containing contact details
+* PDF files or attachments containing bank or contact information
+Indirect attempts to exchange contact information may also be restricted, including:
+* Inserting letters or symbols between the digits of a phone number
+* Replacing “@” or “.” in an email address with words
+* Sending a phone number or bank account number as an image
+* Hiding contact information in a product description, company name, or filename
+* Dividing a phone number across multiple messages
+* Asking a buyer to search for the seller’s company and make contact independently
+Contact details may be shared when reasonably necessary to fulfill an existing order, including shipping, customs clearance, warehouse delivery, carrier coordination, certification-document delivery, or urgent order handling. Such information must not be used to arrange outside payment or avoid the Trade82 platform fee.
+4. Fraud and Criminal Risks Sellers May Face
+Stolen Card and Identity-Theft Payments
+A criminal may place an order using a stolen card or another person’s payment information. A payment may initially appear successful, but the legitimate cardholder may later report the transaction and initiate a chargeback.
+If the goods have already been shipped, the seller may lose both the merchandise and the payment. Sellers must not ship goods based only on a screenshot, payment receipt, or unverified confirmation.
+Forged Payment Confirmation
+A buyer may send a manipulated bank-transfer receipt, payment-completion email, bank screenshot, or other false payment document and demand immediate shipment.
+A receipt or screenshot is not proof that funds have actually been received. Sellers must not ship goods until Trade82 officially shows the payment as completed.
+Overpayment and Refund Fraud
+A buyer may claim to have mistakenly paid more than the order amount and ask the seller to return the excess amount to a different account.
+If the original payment is later reversed or found to be fraudulent, the seller may also lose the amount that was returned. Any excess payment must not be sent to a third party and should be handled only through the original payment method.
+Third-Party Refund Fraud
+A buyer may ask for a refund to be sent to an individual or company that did not make the original payment.
+This may be an attempt to use the seller’s account to move stolen or illicit funds. Refunds must be returned only through the original payment method and to the original payer.
+Money Laundering and Use of the Seller as a Money Mule
+A criminal may try to make illegal funds appear to be legitimate trade proceeds or use the seller’s bank account as an intermediary account.
+The following requests are particularly high risk:
+* Sending more money than the value of the goods
+* Asking the seller to send the difference to a third party
+* Splitting payment across several unrelated accounts
+* Having an unrelated individual make the payment
+* Paying and then requesting a refund without shipment
+* Asking for the refund to be divided among multiple accounts
+* Asking the seller to pay a carrier, agent, or another third party on the buyer’s behalf
+* Asking the seller to temporarily hold or transfer money unrelated to the transaction
+Even when the seller is unaware of the criminal purpose, the seller’s bank account may be frozen, funds may be withheld, and the seller may be required to respond to bank inquiries, legal investigations, or document requests.
+Email and Account Takeover Fraud
+A criminal may gain access to a legitimate buyer’s or seller’s email or messaging account and then change the bank account, shipping address, refund instructions, or transaction terms.
+Additional verification is required when:
+* Payment information suddenly changes
+* The contact person suddenly changes
+* A message comes from a different email address
+* The shipping address changes after payment
+* The buyer repeatedly demands urgent payment or refund action
+Invoice Manipulation Fraud
+A criminal may intercept or modify an invoice and replace the seller’s bank details before forwarding it to the buyer. The buyer may believe payment has been made correctly, while the seller never receives the funds.
+Payment should be made only through the official Trade82 payment request, not solely according to an invoice sent through external email.
+Triangulation Fraud
+A criminal may position themselves between a legitimate buyer and seller and provide each party with different pricing, company details, shipping instructions, or payment information.
+The seller may believe the order is legitimate even though the payer, contracting company, recipient, and delivery address do not match. A transaction must be paused and reviewed when the payment party, buyer company, recipient, and delivery location are inconsistent.
+Fake Large-Order Fraud
+A new buyer may place an unusually large order without asking meaningful product questions or negotiating normal commercial terms. The buyer may then demand advance payment for a registration fee, supplier-approval fee, insurance fee, customs deposit, agent fee, legal fee, or another supposed requirement.
+A large order that requires the seller to pay an unrelated party in advance may be fraudulent.
+False Disputes and Chargebacks
+A buyer may receive the goods and later claim that:
+* The payment was unauthorized
+* The goods were never received
+* The goods did not match the agreed specifications
+* The quantity was short
+* Delivery was unreasonably delayed
+* The goods arrived damaged
+Sellers should retain message records, quotations, specifications, packing photographs, dispatch records, tracking information, delivery confirmation, and evidence of the terms agreed with the buyer.
+Counterfeit or Unlawful Product Requests
+A buyer may request:
+* Counterfeit goods using another party’s trademark
+* Unapproved medicines or medical devices
+* Products containing prohibited ingredients
+* Products supported by false certificates
+* Products subject to export or import restrictions
+* Products with false origin or manufacturer information
+A seller must not manufacture, supply, or export an unlawful or noncompliant product merely because a buyer requested it.
+Sanctioned Persons and Restricted Destinations
+The buyer, payer, recipient, beneficial owner, or final shipping destination may be connected to a sanctioned person or restricted jurisdiction.
+A transaction should be paused for additional review when the buyer attempts to hide the final recipient, repeatedly changes the destination, or uses a receiving company that does not match the contracting party.
+Bribery and Kickback Requests
+An employee, purchasing agent, or intermediary may demand payment to a personal account, cash, gifts, or an unofficial commission in exchange for awarding the contract.
+Sellers must not make personal payments that are not documented in the official agreement or invoice.
+5. Warning Signs That Require Immediate Review
+Sellers should pause payment or shipment and request review from Trade82 when any of the following occurs:
+* A first-time buyer places an unusually large order
+* The buyer rushes payment without asking normal product questions
+* The payer, contracting company, recipient, and shipping destination are different
+* The buyer uses only a free email account
+* The company website and email domain do not match
+* The buyer refuses to provide verifiable company or representative information
+* The shipping address changes immediately after payment
+* A different individual or company makes the payment
+* The buyer asks for an overpayment to be sent to another account
+* The buyer asks for a refund to a third-party account
+* The buyer insists on communicating only through an external messenger
+* The buyer asks the seller to delete Trade82 messages
+* The buyer suggests avoiding the platform fee
+* The buyer presents only a payment screenshot and demands immediate shipment
+* The seller is asked to pay an unrelated fee before receiving the order
+* The buyer appears more interested in refunds or fund transfers than in the goods
+* The buyer creates excessive urgency and tries to bypass verification procedures
+6. Enforcement Actions
+Trade82 may review user reports, message history, payment records, order activity, and other transaction information to determine whether platform circumvention, fraud, or prohibited conduct has occurred.
+Depending on the seriousness of the violation, Trade82 may take one or more of the following actions:
+1. Issue a notice or warning
+2. Remove related messages or content
+3. Restrict contact-sharing or messaging functions
+4. Suspend product visibility
+5. Restrict new inquiries or orders
+6. Disable payment-request functionality
+7. Place transactions or payouts under review or on hold
+8. Require additional company, identity, or bank verification
+9. Temporarily suspend the account
+10. Permanently suspend the account
+A first-time violation caused by an apparent mistake may result in a warning. However, the following conduct may result in immediate restriction or permanent suspension without prior warning:
+* Intentional platform-fee avoidance
+* Sending bank details or external payment links
+* Repeated exchange of outside contact information
+* Deliberately understating the transaction amount
+* Submitting false orders or shipping records
+* Fraudulent or suspected money-laundering activity
+* Submission of forged documents
+* Transfer of third-party funds
+* Creating a new account to replace a suspended account
+* Interfering with a Trade82 investigation or verification process
+A permanently suspended seller may lose access to product listings, inquiries, messages, orders, payment functions, and future selling privileges on Trade82.
+7. Off-Platform Transactions Are Not Protected
+Trade82 cannot reliably verify the payer, recipient, transaction amount, refund, shipment, or agreed terms of a transaction completed outside the platform.
+As a result, off-platform transactions may be excluded from:
+* Trade82 payment verification
+* Official order records
+* Payment and shipping-status management
+* Refund-processing assistance
+* Dispute review
+* Chargeback-response documentation
+* Seller payout records
+* Transaction-related customer support
+When users violate Trade82’s rules and complete a transaction outside the platform, they may be responsible for resulting nonpayment, fraud, product loss, account freezes, failed refunds, chargebacks, shipping disputes, legal investigations, and other losses.
+The specific extent of Trade82’s responsibility and each user’s legal rights will be determined by applicable law and the Trade82 Terms of Service.
+8. Rules Every Seller Must Follow
+Sellers must:
+* Receive payment through Trade82 for transactions that begin on Trade82
+* Never ship goods before Trade82 confirms payment completion
+* Never rely solely on an external receipt or screenshot
+* Process refunds only through the original payment method
+* Never send refunds to a third-party bank account
+* Never receive or transfer funds unrelated to the transaction
+* Perform additional verification when the payer, recipient, and shipping destination do not match
+* Immediately pause and report suspicious transactions
+* Retain messages, contracts, shipping records, and supporting evidence
+* Keep company and payout information accurate and up to date

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { LegalDocumentPage, getLegalMetadata } from "@/components/legal-document-page";
+import { DocumentRoutePage, documentRouteMetadata } from "@/components/document-route-page";
 
-export const metadata: Metadata = getLegalMetadata("ko", "terms");
+export const metadata: Metadata = documentRouteMetadata("ko", "terms");
 
 export default function KoTermsPage() {
-  return <LegalDocumentPage locale="ko" documentKey="terms" />;
+  return <DocumentRoutePage locale="ko" documentSlug="terms" />;
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { LegalDocumentPage, getLegalMetadata } from "@/components/legal-document-page";
+import { DocumentRoutePage, documentRouteMetadata } from "@/components/document-route-page";
 
-export const metadata: Metadata = getLegalMetadata("en", "privacy");
+export const metadata: Metadata = documentRouteMetadata("en", "privacy");
 
 export default function PrivacyPage() {
-  return <LegalDocumentPage locale="en" documentKey="privacy" />;
+  return <DocumentRoutePage locale="en" documentSlug="privacy" />;
 }

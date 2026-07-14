@@ -1,0 +1,248 @@
+﻿Product Registration Guide
+Trade82 product listings are designed to help international buyers understand your product and decide whether to contact your company.
+A useful listing should clearly explain what the product is, where it is made, what commercial terms are available, and what information can be provided to a buyer.
+This guide follows the current Trade82 product registration form and explains how each field should be completed.
+Who Can Register a Product
+Product registration is available to seller accounts.
+Before registering a product, make sure that your seller company information has been completed. The product will be connected to the seller company that owns the account.
+Only enter information that is accurate and that your company is authorized to use.
+Saving and Publishing
+The product registration page provides two options:
+Save Draft saves the product without publishing it.
+Publish Product changes the product status to active.
+A draft still requires:
+* Product name
+* Product category
+* Detailed product overview
+* Any field that you have marked as Public
+A product image is not required when saving a draft. However, at least one product image is required before the product can be published.
+Publishing a product does not automatically guarantee that it will appear publicly. An active product is displayed on the public marketplace only when the seller company is also in verified status.
+After saving a product, you can return to the seller dashboard to edit, preview, publish, move the product to Preparing status, or delete it.
+1. Product Images
+Upload images that accurately represent the product being offered.
+Trade82 currently supports:
+* JPG
+* JPEG
+* PNG
+* WebP
+* AVIF
+HEIC and HEIF images are not currently supported.
+Each product image may be up to 50MB, and a product may contain up to 12 images.
+The first image in the list becomes the primary product image. You can change the image order before saving the listing.
+The image editor allows you to:
+* Fit the full image inside the frame
+* Fill the image frame
+* Zoom in or out
+* Rotate the image
+* Reposition the image
+* Reorder uploaded images
+* Remove an image
+Product images are public. Do not upload images containing confidential information, bank details, personal information, private customer information, or anything that your company is not authorized to publish.
+Use images of the exact product being offered. Packaging, labels, sizes, colors, and models shown in the images should match the written listing.
+2. Basic Information
+Product Name
+The product name is required.
+Enter the official or commonly used commercial name of the product. The current maximum length is 120 characters.
+A useful product name may include:
+* Brand name
+* Product type
+* Model or collection name
+* Size or capacity
+* Important product variation
+Do not place contact information, payment instructions, promotional symbols, or unrelated keywords in the product name.
+Category
+A product category is required.
+Choose the category that most accurately represents the product. The selected category is used to organize the product and help buyers find relevant listings.
+Do not select an unrelated category simply to receive additional exposure.
+Short Summary
+The short summary is optional and may contain up to 240 characters.
+Use it to explain the product in one or two clear sentences. Focus on the product type, intended use, and main commercial characteristics.
+When the short summary is left blank, Trade82 may use the beginning of the detailed overview as the short description.
+Detailed Overview
+The detailed overview is required and may contain up to 5,000 characters.
+Explain the product clearly enough for a professional buyer to understand what is being offered.
+Relevant information may include:
+* Intended product use
+* Main product characteristics
+* Available variations
+* Size or capacity
+* Texture, format, shape, or material
+* Intended retail or business channel
+* Manufacturing or supply information
+* Important handling information
+* Available wholesale options
+Use factual language. Do not include claims that your company cannot support.
+Tags
+Tags are optional.
+Enter relevant search terms separated by commas. Use terms that directly describe the product, category, material, use, or wholesale opportunity.
+Do not add unrelated brand names, competitor names, or popular keywords that do not apply to the product.
+Buyer Notes
+Buyer Notes are optional and may contain up to 1,000 characters.
+Use this field for additional information that would be useful to a potential buyer, such as:
+* Available order conditions
+* Sample information
+* Target distribution channels
+* Customization possibilities
+* Information required before quotation
+* Important product limitations
+Do not include bank-account information, external payment instructions, or confidential internal information.
+3. English Content
+The English Content section is optional.
+It contains separate fields for:
+* Product name in English
+* Short summary in English
+* Detailed overview in English
+* English tags
+* Buyer notes in English
+Trade82 also provides a Generate English Translation button.
+The translation tool can generate English content from the product name, short summary, detailed overview, buyer notes, and tags entered in the original-language fields.
+Generated content should be reviewed before the product is saved. The seller remains responsible for confirming that the English version accurately describes the product.
+If English content already exists, the system may ask for confirmation before replacing it.
+4. Field Visibility
+Many commercial, compliance, and logistics fields include a visibility setting.
+The available settings are:
+Public
+The information is shown on the public product page.
+When a field is set to Public, a valid value must be entered before the product can be saved.
+Inquiry Required
+The information is not displayed publicly. Buyers are informed that the information is available through an inquiry.
+Use this setting for information that you prefer to provide after reviewing the buyer’s request.
+Private
+The field is not displayed to buyers.
+Under the current registration flow, values for fields set to Inquiry Required or Private are not saved as confidential buyer-facing values. Leave those fields blank and provide the relevant information later through the appropriate Trade82 communication process.
+The default visibility is Inquiry Required for most commercial and logistics fields. Sample availability is Public by default, so it must be selected unless its visibility setting is changed.
+5. Pricing and Order Terms
+Minimum Unit Price
+Enter the lowest unit price that applies under your normal wholesale conditions.
+New product listings use USD as the displayed currency. Select the appropriate price unit from the available options.
+When Minimum Unit Price is Public, the amount must be greater than zero.
+The displayed price should match the selected unit. Do not enter a carton price while selecting a single-unit price basis.
+If the final price depends on quantity, packaging, customization, destination, or other conditions, set the field to Inquiry Required instead of publishing a misleading price.
+Minimum Order Quantity
+Enter the minimum quantity that your company normally accepts.
+Select both:
+* MOQ quantity
+* MOQ unit
+The available unit options are provided in the form. A Not Fixed option is also available.
+When MOQ is Public, the quantity must be greater than zero unless Not Fixed is selected.
+Clarify whether the MOQ applies per product, variation, color, model, package, or production run in the product description or buyer notes when necessary.
+Lead Time
+Select the expected lead time from the available options.
+Lead time should represent the normal period needed to prepare or produce the order. It should not be used as a guaranteed international delivery date.
+When Lead Time is Public, an option must be selected.
+Sample Availability
+Select the option that accurately describes whether samples are available.
+Sample availability is Public by default. Therefore, a selection is required unless the visibility setting is changed.
+Any sample price, shipping cost, preparation time, or quantity limit should be explained later through the inquiry process or in Buyer Notes.
+Private Label Availability
+Select the option that accurately describes the product’s private-label availability.
+Do not indicate that private-label production is available unless your company can actually provide it.
+Details such as separate MOQ, packaging requirements, development costs, or sample conditions can be discussed after an inquiry.
+Monthly Supply Capacity
+Enter the approximate quantity your company can normally supply in one month and select the applicable unit.
+When this field is Public, the quantity must be greater than zero.
+Enter a realistic operating estimate, not an unsupported theoretical maximum.
+6. Origin and Shipping
+Country of Origin
+Select the country where the product was manufactured or substantially produced.
+The default value for a new listing is South Korea. Change it when the actual country of origin is different.
+Country of origin should be consistent with the product label and the documents your company can provide.
+Shipping Origin Country
+Select the country from which the product will normally be dispatched.
+The default value is South Korea.
+The shipping origin may be different from the country of origin.
+Shipping Origin Region
+Enter or select the region from which the product will normally be shipped.
+When the shipping origin country is South Korea, the form provides a Korean city or region selector. For other countries, the region can be entered as text.
+Incoterms
+Select the Incoterms that your company can support.
+This field allows multiple selections. Only select terms that your company is actually prepared to quote and fulfill.
+The exact named place or port should be confirmed during the quotation and transaction discussion.
+When Incoterms are Public, at least one option must be selected.
+HS Code
+Enter the HS code applicable to the product. The current maximum length is 40 characters.
+Do not guess an HS code. Confirm the appropriate classification with the responsible customs or trade professional.
+When the field is Public, an HS code must be entered.
+Shelf Life
+Enter the product’s applicable shelf life. The current maximum length is 120 characters.
+Use a clear format and make sure the information matches the product label and available documentation.
+When the field is Public, a value must be entered.
+Storage Requirements
+Describe any relevant storage requirements, such as temperature, humidity, light exposure, or handling conditions.
+The current maximum length is 1,000 characters.
+When the field is Public, storage requirements must be entered.
+7. Compliance and Documents
+Seller-Provided Documents
+Select the documents that your company can provide to a buyer.
+This field is a checklist of available documents. It does not upload the actual document files during product registration.
+Only select documents that currently exist and can be provided when requested.
+When this field is Public, at least one document option must be selected.
+Seller-Provided Compliance Information
+Select the compliance statements that accurately apply to the product.
+Only select an option when your company has appropriate supporting information.
+Selecting a compliance option does not mean that Trade82 has independently verified, approved, or certified the product.
+When this field is Public, at least one compliance option must be selected.
+Ingredients or Materials
+Enter the relevant ingredients or materials used in the product.
+The current maximum length is 1,000 characters.
+Use accurate information from the manufacturer or official product documentation. Do not omit relevant materials or add ingredients that are not present.
+When this field is Public, the information must be entered.
+8. Packaging and Logistics
+Package Size
+Enter the applicable product or package size. The current maximum length is 120 characters.
+Use a clear unit and distinguish product capacity from carton size.
+Units per Carton
+Enter the number of sellable units contained in one carton.
+When this field is Public, the value must be greater than zero.
+Carton Weight
+Enter the applicable carton weight. The current maximum length is 120 characters.
+State clearly whether the weight is net or gross when necessary.
+Carton Dimensions
+Enter the carton dimensions. The current maximum length is 120 characters.
+Use a consistent order and measurement unit.
+Pallet Quantity
+Enter the number of applicable units or cartons per pallet.
+When this field is Public, the value must be greater than zero.
+Storage Temperature
+Enter the relevant storage-temperature information. The current maximum length is 120 characters.
+Do not use this field for a temperature claim that cannot be supported by the product’s handling requirements.
+Packaging
+Describe the product’s packaging arrangement. The current maximum length is 1,000 characters.
+Relevant information may include:
+* Individual packaging
+* Inner packaging
+* Carton configuration
+* Packaging material
+* Label language
+* Available packaging options
+When this field is Public, packaging information must be entered.
+Suggested U.S. Channels
+Select the U.S. sales channels that may be suitable for the product.
+This field is optional and is intended to help describe possible market positioning. Select only channels that reasonably fit the product.
+Information Required Before Publishing
+Before selecting Publish Product, confirm that:
+* At least one product image has been uploaded
+* The first image is suitable as the primary image
+* The product name is accurate
+* The correct category is selected
+* The detailed overview is complete
+* Every Public field contains a valid value
+* The English content has been reviewed, when used
+* Pricing and MOQ use the correct units
+* Origin and shipping information are accurate
+* Document and compliance selections can be supported
+* Packaging and logistics details are consistent
+* No confidential or unauthorized information is included
+After Registration
+After the product is saved, Trade82 opens the product detail page.
+The seller can later:
+* Preview the product
+* Edit the product
+* Update product information
+* Save changes as a draft
+* Publish the product
+* Move an active product to Preparing status
+* Publish it again
+* Delete the product
+Keep the listing current. Update it when pricing, MOQ, lead time, availability, packaging, origin, documents, or other material product information changes.
+A complete listing does not guarantee an inquiry or order. Its purpose is to provide buyers with accurate information so they can evaluate the product and begin a relevant business conversation.
