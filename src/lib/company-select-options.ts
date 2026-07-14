@@ -655,6 +655,15 @@ export function getCountryOptions(locale: OptionLocale) {
     .sort((a, b) => a.label.localeCompare(b.label, locale));
 }
 
+export function getCountryCodeOptions(locale: OptionLocale) {
+  return countryCodes
+    .map((code) => ({
+      value: code,
+      label: countryName(code, locale),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
+}
+
 export function getBuyerCategoryOptions(locale: OptionLocale) {
   return localized(buyerCategories, locale);
 }

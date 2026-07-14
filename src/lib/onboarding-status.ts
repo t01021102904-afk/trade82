@@ -6,6 +6,7 @@ import type { AccountRole } from "@/lib/types";
 export type CompanyRoleState = {
   hasBuyerCompany: boolean;
   hasSellerCompany: boolean;
+  hasSellerPayoutProfile: boolean;
 };
 
 export const ROLE_SELECTION_SOURCE = "trade82-role-picker";
@@ -15,12 +16,18 @@ export async function getOnboardingCompanyState(
 ): Promise<CompanyRoleState> {
   const companies = await getDb().company.findMany({
     where: { ownerUserId: userProfileId },
-    select: { companyRole: true },
+    select: {
+      companyRole: true,
+      sellerPayoutProfile: { select: { id: true } },
+    },
   });
 
   return {
     hasBuyerCompany: companies.some((company) => company.companyRole === "buyer"),
     hasSellerCompany: companies.some((company) => company.companyRole === "seller"),
+    hasSellerPayoutProfile: companies.some(
+      (company) => company.companyRole === "seller" && Boolean(company.sellerPayoutProfile),
+    ),
   };
 }
 
@@ -43,9 +50,15 @@ export function isOnboardingCompleteForRole(
 ) {
   if (role === "admin") return true;
   if (role === "buyer") return companyState.hasBuyerCompany;
-  if (role === "seller") return companyState.hasSellerCompany;
+  if (role === "seller") {
+    return companyState.hasSellerCompany && companyState.hasSellerPayoutProfile;
+  }
   if (role === "both") {
-    return companyState.hasBuyerCompany || companyState.hasSellerCompany;
+    return (
+      companyState.hasBuyerCompany &&
+      companyState.hasSellerCompany &&
+      companyState.hasSellerPayoutProfile
+    );
   }
   return false;
 }

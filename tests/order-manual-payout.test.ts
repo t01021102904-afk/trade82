@@ -24,6 +24,14 @@ const files = {
   payoutAdjustmentRoute: new URL("../src/app/api/admin/payouts/[id]/adjustments/route.ts", import.meta.url),
   payoutProfileService: new URL("../src/lib/seller-payout-profiles.ts", import.meta.url),
   sellerProfileRoute: new URL("../src/app/api/account/payout-profile/route.ts", import.meta.url),
+  onboardingStatus: new URL("../src/lib/onboarding-status.ts", import.meta.url),
+  onboardingRoute: new URL("../src/app/api/user/onboarding/route.ts", import.meta.url),
+  onboardingForm: new URL("../src/components/onboarding-form.tsx", import.meta.url),
+  onboardingStepper: new URL("../src/components/onboarding-stepper.tsx", import.meta.url),
+  sellerPayoutOnboarding: new URL("../src/components/seller-payout-onboarding-step.tsx", import.meta.url),
+  payoutSettingsUi: new URL("../src/components/payout-information-client.tsx", import.meta.url),
+  requireAuth: new URL("../src/lib/require-auth.ts", import.meta.url),
+  apiSecurity: new URL("../src/lib/api-security.ts", import.meta.url),
   orderListRoute: new URL("../src/app/api/orders/route.ts", import.meta.url),
   orderDetailRoute: new URL("../src/app/api/orders/[orderNumber]/route.ts", import.meta.url),
   adminPayoutRoute: new URL("../src/app/api/admin/payouts/route.ts", import.meta.url),
@@ -301,8 +309,50 @@ test("rollout flags fail closed and only a Clerk user ID in the allowlist is ena
 test("seller profile APIs use safe selects and prohibit cross-role access without encrypted fields", () => {
   assert.match(source.sellerProfileRoute, /requireSeller\(\)/);
   assert.match(source.sellerProfileRoute, /user\.clerkUserId/);
+  assert.match(source.sellerProfileRoute, /assertSameOrigin\(request\)/);
+  assert.match(source.sellerProfileRoute, /companyId: company\.id/);
+  assert.doesNotMatch(source.sellerProfileRoute, /body\.companyId/);
   assert.doesNotMatch(source.payoutProfileService.split("sellerPayoutProfileSafeSelect")[1]?.split("satisfies")[0] ?? "", /accountNumberCiphertext|accountNumberIv|accountNumberAuthTag/);
   assert.match(source.payoutProfileAdminRoute, /cannot verify their own seller payout profile/);
+});
+
+test("seller onboarding requires an encrypted payout profile while buyer onboarding remains unchanged", () => {
+  assert.match(
+    source.onboardingStatus,
+    /role === "seller"[\s\S]*hasSellerCompany && companyState\.hasSellerPayoutProfile/,
+  );
+  assert.match(
+    source.onboardingStatus,
+    /role === "buyer"\) return companyState\.hasBuyerCompany/,
+  );
+  assert.match(source.onboardingRoute, /Complete payout information before finishing seller onboarding/);
+  assert.match(source.requireAuth, /onboardingComplete: isOnboardingCompleteForRole/);
+  assert.match(source.requireAuth, /hasSellerCompany: companyState\.hasSellerCompany/);
+  assert.match(source.onboardingForm, /kind === "seller" \? "payout" : "personal"/);
+  assert.match(source.onboardingForm, /SellerPayoutOnboardingStep/);
+  assert.match(source.onboardingForm, /completeOnboardingAfterSave/);
+  assert.match(source.onboardingForm, /if \(kind === "buyer"\)/);
+  assert.match(source.onboardingStepper, /id: "payout"/);
+});
+
+test("payout onboarding accepts only required safe fields and never renders full account data", () => {
+  assert.match(source.sellerPayoutOnboarding, /accountNumber \? \{ accountNumber \} : \{\}/);
+  assert.match(source.sellerPayoutOnboarding, /setAccountNumber\(""\)/);
+  assert.match(source.sellerPayoutOnboarding, /accountNumberMasked/);
+  assert.match(source.sellerPayoutOnboarding, /accountNumberLast4/);
+  assert.doesNotMatch(source.sellerPayoutOnboarding, /localStorage|sessionStorage|document\.cookie|console\./);
+  assert.match(source.sellerProfileRoute, /status: 503/);
+  assert.match(source.sellerProfileRoute, /manualPayoutMaintenanceMessage/);
+  assert.match(source.sellerProfileRoute, /\^\[A-Za-z\]\{2\}\$/);
+  assert.match(source.sellerProfileRoute, /\^\[A-Za-z\]\{3\}\$/);
+  assert.match(source.payoutProfileService, /accountNumberCiphertext/);
+  assert.match(source.payoutProfileService, /PENDING_VERIFICATION/);
+  assert.match(source.payoutProfileService, /existing\?\.status === SellerPayoutProfileStatus\.VERIFIED/);
+  assert.doesNotMatch(source.payoutProfileService, /console\./);
+  assert.doesNotMatch(source.sellerProfileRoute, /console\./);
+  assert.match(source.apiSecurity, /export function assertSameOrigin/);
+  assert.match(source.payoutSettingsUi, /country: profile\.country/);
+  assert.doesNotMatch(source.payoutSettingsUi, /JSON\.stringify\(\{ \.\.\.profile/);
 });
 
 test("admin reveals require POST, no-store, a reason, and audit events without bank payloads", () => {

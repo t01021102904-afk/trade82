@@ -669,6 +669,24 @@ test("payout account data remains encrypted, decrypts only with its correct key,
       },
     }),
   );
+  const replacedProfile = await db.sellerPayoutProfile.findUniqueOrThrow({
+    where: { companyId: fixture.sellerCompany.id },
+    select: {
+      status: true,
+      verifiedAt: true,
+      verifiedByUserId: true,
+      accountNumberLast4: true,
+      accountNumberMasked: true,
+      accountNumberCiphertext: true,
+    },
+  });
+  assert.equal(replacedProfile.status, "PENDING_VERIFICATION");
+  assert.equal(replacedProfile.verifiedAt, null);
+  assert.equal(replacedProfile.verifiedByUserId, null);
+  assert.equal(replacedProfile.accountNumberLast4, "9876");
+  assert.equal(replacedProfile.accountNumberMasked, "•••• 9876");
+  assert.ok(replacedProfile.accountNumberCiphertext);
+  assert.ok(!Buffer.from(replacedProfile.accountNumberCiphertext).toString("base64").includes("9876"));
   const unchangedSnapshot = await db.sellerPayout.findUniqueOrThrow({ where: { id: payout.id } });
   const historical = crypto.decryptPayoutData({
     ciphertext: Buffer.from(unchangedSnapshot.beneficiarySnapshotEncrypted),

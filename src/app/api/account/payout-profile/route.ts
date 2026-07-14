@@ -1,5 +1,10 @@
 import { apiError } from "@/lib/api-response";
-import { readJsonObject } from "@/lib/api-security";
+import {
+  assertSameOrigin,
+  rateLimitOrResponse,
+  readJsonObject,
+  rejectUnexpectedFields,
+} from "@/lib/api-security";
 import { requireSeller } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
@@ -10,6 +15,30 @@ import {
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
+const manualPayoutMaintenanceMessage =
+  "Payout information is temporarily unavailable. Please try again when manual payout maintenance is complete.";
+const payoutProfileFields = new Set([
+  "country",
+  "bankDirectoryId",
+  "bankName",
+  "branchName",
+  "accountHolder",
+  "accountNumber",
+  "accountType",
+  "bankCode",
+  "swiftBic",
+  "bankAddress",
+  "beneficiaryAddress",
+  "payoutCurrency",
+  "supportedCurrencies",
+  "intermediaryBankName",
+  "intermediaryBankSwift",
+  "intermediaryBankAddress",
+  "payoutMemo",
+  "accountBelongsToCompany",
+  "manualBankOverride",
+  "manualOverrideReason",
+]);
 
 function text(body: Record<string, unknown>, key: string, required = false, max = 500) {
   const value = body[key];
@@ -24,8 +53,14 @@ function text(body: Record<string, unknown>, key: string, required = false, max 
   return result || null;
 }
 
-function list(body: Record<string, unknown>, key: string, maxItems = 12) {
+function list(
+  body: Record<string, unknown>,
+  key: string,
+  maxItems = 12,
+  fallback: string[] = [],
+) {
   const value = body[key];
+  if (value === undefined) return fallback;
   if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
     throw new Error(`${key} must be a list of text values.`);
   }
@@ -34,6 +69,7 @@ function list(body: Record<string, unknown>, key: string, maxItems = 12) {
 }
 
 function payoutInput(body: Record<string, unknown>): SellerPayoutProfileInput {
+  rejectUnexpectedFields(body, payoutProfileFields);
   const accountType = text(body, "accountType", true, 30);
   if (!accountType || !["LOCAL", "FOREIGN_CURRENCY", "IBAN", "OTHER"].includes(accountType)) {
     throw new Error("accountType is invalid.");
@@ -44,9 +80,18 @@ function payoutInput(body: Record<string, unknown>): SellerPayoutProfileInput {
   if (typeof body.manualBankOverride !== "boolean") {
     throw new Error("manualBankOverride must be true or false.");
   }
-  const accountNumber = text(body, "accountNumber", false, 120);
+  const country = text(body, "country", true, 2);
+  if (!country || !/^[A-Za-z]{2}$/.test(country)) {
+    throw new Error("country must be a two-letter ISO country code.");
+  }
+  const payoutCurrency = text(body, "payoutCurrency", true, 3);
+  if (!payoutCurrency || !/^[A-Za-z]{3}$/.test(payoutCurrency)) {
+    throw new Error("payoutCurrency must be a three-letter currency code.");
+  }
+  const accountNumber = text(body, "accountNumber", false, 64);
+  const supportedCurrencies = list(body, "supportedCurrencies", 12, [payoutCurrency]);
   return {
-    country: text(body, "country", true, 120) as string,
+    country: country.toUpperCase(),
     bankDirectoryId: text(body, "bankDirectoryId", false, 128),
     bankName: text(body, "bankName", true, 240) as string,
     branchName: text(body, "branchName", false, 240),
@@ -57,8 +102,8 @@ function payoutInput(body: Record<string, unknown>): SellerPayoutProfileInput {
     swiftBic: text(body, "swiftBic", false, 80),
     bankAddress: text(body, "bankAddress", false, 600),
     beneficiaryAddress: text(body, "beneficiaryAddress", false, 600),
-    payoutCurrency: text(body, "payoutCurrency", true, 3) as string,
-    supportedCurrencies: list(body, "supportedCurrencies"),
+    payoutCurrency: payoutCurrency.toLowerCase(),
+    supportedCurrencies,
     intermediaryBankName: text(body, "intermediaryBankName", false, 240),
     intermediaryBankSwift: text(body, "intermediaryBankSwift", false, 80),
     intermediaryBankAddress: text(body, "intermediaryBankAddress", false, 600),
@@ -73,7 +118,7 @@ export async function GET() {
   try {
     const { user, company } = await requireSeller();
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
-      return Response.json({ error: "Manual payouts are not enabled for this account." }, { status: 403, headers: noStore });
+      return Response.json({ error: manualPayoutMaintenanceMessage }, { status: 503, headers: noStore });
     }
     if (!company) return Response.json({ profile: null, companyRequired: true }, { headers: noStore });
     const profile = await getDb().sellerPayoutProfile.findUnique({
@@ -88,11 +133,21 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
+    assertSameOrigin(request);
     const { user, company } = await requireSeller();
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
-      return Response.json({ error: "Manual payouts are not enabled for this account." }, { status: 403, headers: noStore });
+      return Response.json({ error: manualPayoutMaintenanceMessage }, { status: 503, headers: noStore });
     }
     if (!company) return Response.json({ error: "Create a seller company before saving payout information." }, { status: 403, headers: noStore });
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "account-payout-profile-write",
+      userId: user.id,
+      limit: 20,
+      windowMs: 60 * 60_000,
+      message: "Too many payout profile updates. Please wait before trying again.",
+    });
+    if (rateLimited) return rateLimited;
     const profile = await saveSellerPayoutProfile({
       db: getDb(),
       companyId: company.id,
