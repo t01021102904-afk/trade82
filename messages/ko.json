@@ -1203,6 +1203,7 @@
     "dealInProgress": "거래 진행 중",
     "completionRequested": "완료 요청됨",
     "completedDeal": "완료된 거래",
+    "compactCompletedDeal": "거래 완료",
     "dealBasedReview": "거래 기반 후기",
     "reviewRequest": "후기 작성 요청",
     "writeReview": "후기 작성하기",

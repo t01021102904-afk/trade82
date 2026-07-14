@@ -9,10 +9,8 @@ import {
   Image as ImageIcon,
   MoreVertical,
   Paperclip,
-  Plus,
   Search,
   Send,
-  Smile,
   Upload,
   X,
 } from "lucide-react";
@@ -901,18 +899,10 @@ export function MessagesClient({
               ) : (
                 <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
               )}
-              {selected.product ? <p className="mt-3 text-xs font-medium uppercase tracking-wide text-blue-700">{t("messages.productInquiry")}</p> : null}
               <PaymentRequestControls
                 thread={selected}
                 paymentFeatureEnabled={paymentFeatureEnabled}
                 onUpdated={() => void load()}
-              />
-              <DealControls
-                thread={selected}
-                pending={dealPending}
-                error={dealError}
-                onCreate={() => void createDeal(selected)}
-                onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
               />
             </header>
             <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
@@ -948,7 +938,7 @@ export function MessagesClient({
                   onRemove={removeDraftAttachment}
                   onRetry={retryDraftAttachment}
                 />
-                <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-100 pt-2">
+                <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 border-t border-zinc-100 pt-2">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -976,26 +966,28 @@ export function MessagesClient({
                   >
                     <Paperclip className="size-4" />
                   </button>
-                  <button
-                    type="button"
-                    disabled
-                    className="inline-flex size-8 items-center justify-center rounded-full text-zinc-300"
-                    aria-label="Emoji"
-                  >
-                    <Smile className="size-4" />
-                  </button>
-                  <span className="ml-auto text-xs tabular-nums text-zinc-400">
-                    {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => void submitReply()}
-                    disabled={hasPendingUploads || !hasComposerContent}
-                    className="ml-2 inline-flex size-8 items-center justify-center rounded-full bg-zinc-950 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
-                    aria-label={t("messages.saveReply")}
-                  >
-                    <Send className="size-4" />
-                  </button>
+                  <CompactDealControls
+                    thread={selected}
+                    pending={dealPending}
+                    error={dealError}
+                    onCreate={() => void createDeal(selected)}
+                    onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
+                    className="min-w-[13rem] flex-1"
+                  />
+                  <div className="ml-auto flex shrink-0 items-center gap-1.5">
+                    <span className="text-xs tabular-nums text-zinc-400">
+                      {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void submitReply()}
+                      disabled={hasPendingUploads || !hasComposerContent}
+                      className="inline-flex size-8 items-center justify-center rounded-full bg-zinc-950 text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-400"
+                      aria-label={t("messages.saveReply")}
+                    >
+                      <Send className="size-4" />
+                    </button>
+                  </div>
                 </div>
                 {composerError ? (
                   <p className="mt-2 text-xs font-medium text-red-700">{composerError}</p>
@@ -1250,7 +1242,8 @@ function MobileChatDetail({
   const company = getCounterparty(thread);
   const companyName = getCompanyDisplayName(company, t);
   const subtitle = thread.product?.name || getInquiryLabel(thread, t);
-  const status = getMobileThreadStatus(thread);
+  const canRequestPayment =
+    paymentFeatureEnabled && getViewerCompanyId(thread) === thread.sellerCompany.id;
 
   return (
     <section className="fixed inset-0 z-40 flex h-[100dvh] flex-col overflow-hidden bg-white text-zinc-950 md:hidden">
@@ -1278,24 +1271,17 @@ function MobileChatDetail({
             </p>
             <p className="truncate text-xs text-zinc-500">{subtitle}</p>
           </div>
-          <button
-            type="button"
-            onClick={onOpenDealSheet}
-            aria-label={t("messages.mobileDealActions")}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-600 active:bg-zinc-100"
-          >
-            <MoreVertical className="size-5" />
-          </button>
+          {canRequestPayment ? (
+            <button
+              type="button"
+              onClick={onOpenDealSheet}
+              aria-label={t("messages.mobileDealActions")}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-600 active:bg-zinc-100"
+            >
+              <MoreVertical className="size-5" />
+            </button>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={onOpenDealSheet}
-          className="ml-12 mt-2 inline-flex max-w-[calc(100%-3rem)] items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-[11px] font-medium text-zinc-600"
-        >
-          <span>{getInquiryLabel(thread, t)}</span>
-          <span aria-hidden="true">·</span>
-          <span>{mobileThreadStatusLabel(status, t)}</span>
-        </button>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-zinc-50 px-3 py-3">
@@ -1328,32 +1314,53 @@ function MobileChatDetail({
             event.target.value = "";
           }}
         />
-        <div className="flex items-end gap-2 rounded-[1.4rem] border border-zinc-200 bg-zinc-50 px-2 py-2">
-          <button
-            type="button"
-            onClick={onOpenAttachmentSheet}
-            aria-label={t("messages.mobileAttach")}
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-zinc-600 shadow-sm active:bg-zinc-100"
-          >
-            <Plus className="size-5" />
-          </button>
+        <div className="rounded-[1.4rem] border border-zinc-200 bg-zinc-50 px-2.5 py-2">
           <textarea
             value={reply}
             onChange={(event) => onReplyChange(event.target.value)}
             maxLength={MESSAGE_COMPOSER_MAX_LENGTH}
             rows={1}
             placeholder={t("messages.mobileReplyPlaceholder")}
-            className="max-h-28 min-h-9 flex-1 resize-none border-0 bg-transparent px-1 py-2 text-sm leading-5 text-zinc-950 outline-none placeholder:text-zinc-400"
+            className="max-h-28 min-h-9 w-full resize-none border-0 bg-transparent px-1 py-2 text-sm leading-5 text-zinc-950 outline-none placeholder:text-zinc-400"
           />
-          <button
-            type="button"
-            onClick={onSubmitReply}
-            disabled={hasPendingUploads || !hasComposerContent}
-            aria-label={t("messages.saveReply")}
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-white disabled:bg-zinc-200 disabled:text-zinc-400"
-          >
-            <Send className="size-4" />
-          </button>
+          <CompactDealControls
+            thread={thread}
+            pending={dealPending}
+            error={dealError}
+            onCreate={onCreateDeal}
+            onUpdate={onUpdateDeal}
+            className="border-t border-zinc-200 px-0.5 pt-2"
+          />
+          <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-200 pt-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label={t("messages.attachFiles")}
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-zinc-600 shadow-sm active:bg-zinc-100"
+            >
+              <ImageIcon className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onOpenAttachmentSheet}
+              aria-label={t("messages.mobileAttach")}
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-zinc-600 shadow-sm active:bg-zinc-100"
+            >
+              <Paperclip className="size-4" />
+            </button>
+            <span className="ml-auto text-xs tabular-nums text-zinc-400">
+              {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
+            </span>
+            <button
+              type="button"
+              onClick={onSubmitReply}
+              disabled={hasPendingUploads || !hasComposerContent}
+              aria-label={t("messages.saveReply")}
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-950 text-white disabled:bg-zinc-200 disabled:text-zinc-400"
+            >
+              <Send className="size-4" />
+            </button>
+          </div>
         </div>
       </footer>
 
@@ -1371,14 +1378,10 @@ function MobileChatDetail({
         />
       ) : null}
 
-      {dealSheetOpen ? (
+      {dealSheetOpen && canRequestPayment ? (
         <MobileDealSheet
           thread={thread}
-          pending={dealPending}
-          error={dealError}
           onClose={onCloseDealSheet}
-          onCreate={onCreateDeal}
-          onUpdate={onUpdateDeal}
           onPaymentUpdated={onPaymentUpdated}
           paymentFeatureEnabled={paymentFeatureEnabled}
         />
@@ -1503,23 +1506,12 @@ function MobileAttachmentSheet({
 
 function MobileDealSheet({
   thread,
-  pending,
-  error,
   onClose,
-  onCreate,
-  onUpdate,
   onPaymentUpdated,
   paymentFeatureEnabled,
 }: {
   thread: InquiryThread;
-  pending: boolean;
-  error: string;
   onClose: () => void;
-  onCreate: () => void;
-  onUpdate: (
-    deal: DealSummary,
-    action: "mark_in_progress" | "request_completion" | "confirm_completion",
-  ) => void;
   onPaymentUpdated: () => void;
   paymentFeatureEnabled: boolean;
 }) {
@@ -1529,22 +1521,12 @@ function MobileDealSheet({
     <div className="fixed inset-x-0 bottom-0 z-50 overflow-hidden rounded-t-3xl border border-zinc-200 bg-white shadow-2xl md:hidden">
       <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200" />
       <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-3">
-        <div>
-          <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileDealActions")}</h3>
-          <p className="text-xs text-zinc-500">{mobileThreadStatusLabel(getMobileThreadStatus(thread), t)}</p>
-        </div>
+        <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileDealActions")}</h3>
         <button type="button" onClick={onClose} className="rounded-full p-2 text-zinc-500 active:bg-zinc-100">
           <X className="size-5" />
         </button>
       </div>
       <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
-        <DealControls
-          thread={thread}
-          pending={pending}
-          error={error}
-          onCreate={onCreate}
-          onUpdate={onUpdate}
-        />
         <PaymentRequestControls
           thread={thread}
           paymentFeatureEnabled={paymentFeatureEnabled}
@@ -2648,12 +2630,13 @@ function paymentRequestStatusTone(status: PaymentRequestSummary["status"]) {
   return "border-blue-200 bg-blue-50 text-blue-800";
 }
 
-function DealControls({
+function CompactDealControls({
   thread,
   pending,
   error,
   onCreate,
   onUpdate,
+  className,
 }: {
   thread: InquiryThread;
   pending: boolean;
@@ -2663,6 +2646,7 @@ function DealControls({
     deal: DealSummary,
     action: "mark_in_progress" | "request_completion" | "confirm_completion",
   ) => void;
+  className?: string;
 }) {
   const { locale, t } = useI18n();
   const deal = getActiveDeal(thread);
@@ -2676,55 +2660,65 @@ function DealControls({
   const hasReviewed = Boolean(
     deal?.reviews.some((review) => review.reviewerCompanyId === viewerCompanyId),
   );
-  const statusLabel = deal ? dealStatusLabel(deal.dealStatus, t) : null;
+  const statusLabel = deal
+    ? deal.dealStatus === "completed"
+      ? t("deals.compactCompletedDeal")
+      : dealStatusLabel(deal.dealStatus, t)
+    : null;
+  const inquiryLabel = thread.product ? t("messages.productInquiry") : getInquiryLabel(thread, t);
+  const otherCompanyRequestedCompletion =
+    deal?.dealStatus === "completion_requested" && !currentSideConfirmed;
+  const helperText = otherCompanyRequestedCompletion
+    ? t("deals.otherRequestedCompletion")
+    : deal?.dealStatus === "completed" && !hasReviewed
+      ? t("deals.completeReviewPrompt")
+      : "";
 
   return (
-    <div className="mt-4 grid gap-3">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className={cx("min-w-0", className)}>
+      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+        <span className="shrink-0 text-[11px] font-medium text-zinc-500">{inquiryLabel}</span>
         {statusLabel ? (
-          <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800">
+          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-600">
             {statusLabel}
           </span>
         ) : null}
         {!deal ? (
-          <ActionButton disabled={pending} onClick={onCreate}>
+          <CompactDealAction disabled={pending} onClick={onCreate}>
             {t("deals.markInProgress")}
-          </ActionButton>
+          </CompactDealAction>
         ) : null}
         {deal && (deal.dealStatus === "proposed" || deal.dealStatus === "in_progress") ? (
-          <ActionButton disabled={pending} onClick={() => onUpdate(deal, "request_completion")}>
+          <CompactDealAction disabled={pending} onClick={() => onUpdate(deal, "request_completion")}>
             {t("deals.requestCompletion")}
-          </ActionButton>
+          </CompactDealAction>
         ) : null}
         {deal && deal.dealStatus === "completion_requested" && !currentSideConfirmed ? (
-          <ActionButton disabled={pending} onClick={() => onUpdate(deal, "confirm_completion")}>
+          <CompactDealAction disabled={pending} onClick={() => onUpdate(deal, "confirm_completion")}>
             {t("deals.confirmCompletion")}
-          </ActionButton>
+          </CompactDealAction>
         ) : null}
         {deal && deal.dealStatus === "completed" && !hasReviewed ? (
           <Link
             href={withLocale(`/deals/${deal.id}/review`, locale)}
-            className="rounded-md bg-zinc-950 px-3 py-2 text-xs font-medium text-white hover:bg-blue-700"
+            className="inline-flex h-7 items-center rounded-md border border-zinc-200 bg-white px-2 text-[11px] font-medium text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950"
           >
             {t("deals.writeReview")}
           </Link>
         ) : null}
         {deal && deal.dealStatus === "completed" && hasReviewed ? (
-          <span className="text-xs font-medium text-emerald-700">{t("deals.alreadyReviewed")}</span>
+          <span className="text-[11px] font-medium text-emerald-700">{t("deals.alreadyReviewed")}</span>
         ) : null}
       </div>
-      {deal?.dealStatus === "completion_requested" && !currentSideConfirmed ? (
-        <Banner>{t("deals.otherRequestedCompletion")}</Banner>
+      {helperText ? (
+        <p className="mt-0.5 text-[11px] leading-4 text-zinc-500">{helperText}</p>
       ) : null}
-      {deal?.dealStatus === "completed" && !hasReviewed ? (
-        <Banner>{t("deals.completeReviewPrompt")}</Banner>
-      ) : null}
-      {error ? <p className="text-xs font-medium text-red-700">{error}</p> : null}
+      {error ? <p role="alert" className="mt-0.5 text-[11px] font-medium leading-4 text-red-700">{error}</p> : null}
     </div>
   );
 }
 
-function ActionButton({
+function CompactDealAction({
   children,
   disabled,
   onClick,
@@ -2737,19 +2731,12 @@ function ActionButton({
     <button
       type="button"
       disabled={disabled}
+      aria-busy={disabled || undefined}
       onClick={onClick}
-      className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-xs font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700 disabled:cursor-wait disabled:opacity-60"
+      className="inline-flex h-7 items-center rounded-md border border-zinc-200 bg-white px-2 text-[11px] font-medium text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950 disabled:cursor-wait disabled:opacity-60"
     >
       {children}
     </button>
-  );
-}
-
-function Banner({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
-      {children}
-    </p>
   );
 }
 
@@ -2767,17 +2754,6 @@ function getMobileThreadStatus(thread: InquiryThread): MobileThreadFilter {
   }
   if (deal && deal.dealStatus !== "cancelled") return "in_progress";
   return "waiting";
-}
-
-function mobileThreadStatusLabel(
-  status: MobileThreadFilter,
-  t: (key: string, fallback?: string) => string,
-) {
-  if (status === "in_progress") return t("messages.filterInProgress", "In Progress");
-  if (status === "completed") return t("messages.filterCompleted", "Completed");
-  if (status === "archived") return t("messages.filterArchived", "Archived");
-  if (status === "waiting") return t("messages.filterWaiting", "Waiting");
-  return t("messages.filterAll", "All");
 }
 
 function getLatestThreadPreview(
