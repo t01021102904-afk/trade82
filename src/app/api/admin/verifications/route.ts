@@ -9,6 +9,10 @@ import {
   validationErrorResponse,
 } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
+import {
+  sendCompanyApprovalEmail,
+  shouldSendCompanyApprovalEmail,
+} from "@/lib/company-approval-email";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 
@@ -147,6 +151,14 @@ export async function POST(request: Request) {
       return Response.json({ error: "Not found" }, { status: 404 });
     }
 
+    const shouldSendApprovalEmail = shouldSendCompanyApprovalEmail({
+      companyRole: verificationRequest.company.companyRole,
+      companyVerificationStatus: verificationRequest.company.verificationStatus,
+      verificationRequestStatus: verificationRequest.status,
+      nextVerificationStatus: verificationStatus,
+      ownerEmail: verificationRequest.company.owner.email,
+    });
+
     await getDb().$transaction([
       getDb().verificationRequest.update({
         where: { id: requestId },
@@ -177,7 +189,15 @@ export async function POST(request: Request) {
       }),
     ]);
 
-    return Response.json({ ok: true, verificationStatus });
+    const emailSent = shouldSendApprovalEmail
+      ? await sendCompanyApprovalEmail({
+          verificationRequestId: verificationRequest.id,
+          ownerEmail: verificationRequest.company.owner.email,
+          preferredLanguage: verificationRequest.company.owner.preferredLanguage,
+        })
+      : false;
+
+    return Response.json({ ok: true, verificationStatus, emailSent });
   } catch (error) {
     if (error instanceof ApiValidationError) {
       return validationErrorResponse(error);
