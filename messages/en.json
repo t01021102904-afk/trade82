@@ -1202,6 +1202,7 @@
     "dealInProgress": "Deal in progress",
     "completionRequested": "Completion requested",
     "completedDeal": "Completed deal",
+    "compactCompletedDeal": "Deal completed",
     "dealBasedReview": "Deal-based review",
     "reviewRequest": "Review request",
     "writeReview": "Write a review",
