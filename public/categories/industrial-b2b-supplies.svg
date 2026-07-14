@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" fill="none">
+  <defs>
+    <linearGradient id="industrialGearGradient" x1="38" y1="55" x2="94" y2="115" gradientUnits="userSpaceOnUse"><stop stop-color="#BFCAD0"/><stop offset="1" stop-color="#687B87"/></linearGradient>
+    <linearGradient id="industrialCrateGradient" x1="91" y1="78" x2="143" y2="122" gradientUnits="userSpaceOnUse"><stop stop-color="#E7B978"/><stop offset="1" stop-color="#B9793F"/></linearGradient>
+    <filter id="industrialSoftShadow" x="18" y="23" width="165" height="121" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#2B3A43" flood-opacity=".18"/></filter>
+  </defs>
+  <g filter="url(#industrialSoftShadow)">
+    <ellipse cx="101" cy="126" rx="70" ry="8" fill="#D7D9D9" opacity=".75"/>
+    <g transform="translate(63 82)">
+      <path d="m-7-33 14-2 5 10 11 5 10-5 11 10-5 10 4 12 11 5-2 14-11 2-5 10 5 10-10 11-11-5-12 4-5 11-14-2-2-11-10-5-10 5-11-10 5-11-4-12-11-5 2-14 11-2 5-10-5-10 10-11 11 5 12-4 5-11Z" fill="url(#industrialGearGradient)"/>
+      <circle r="17" fill="#536873"/><circle r="8" fill="#DCE5E7"/>
+    </g>
+    <path d="m100 85 22-13 28 13-22 15-28-15Z" fill="#E8C78D"/>
+    <path d="m100 85 28 15v23l-28-14V85Z" fill="#B77B40"/>
+    <path d="m128 100 22-15v24l-22 14v-23Z" fill="url(#industrialCrateGradient)"/>
+    <path d="M105 95h19m-19 8h19m9-9h12m-12 8h12" stroke="#F6D7A7" stroke-width="3" stroke-linecap="round"/>
+    <path d="m154 45 8 8-20 20c-5 5-13 5-18 0l-5-5 10-10 5 5c2 2 5 2 7 0l13-18Z" fill="#E7A85F"/>
+    <circle cx="158" cy="49" r="8" fill="#F5D69D"/>
+  </g>
+</svg>

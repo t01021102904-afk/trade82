@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" fill="none">
+  <defs>
+    <linearGradient id="electronicsCaseGradient" x1="112" y1="42" x2="168" y2="121" gradientUnits="userSpaceOnUse"><stop stop-color="#D8D2FE"/><stop offset="1" stop-color="#8274D4"/></linearGradient>
+    <linearGradient id="electronicsChargeGradient" x1="77" y1="87" x2="123" y2="122" gradientUnits="userSpaceOnUse"><stop stop-color="#BDEDF4"/><stop offset="1" stop-color="#61AEC4"/></linearGradient>
+    <filter id="electronicsSoftShadow" x="21" y="23" width="158" height="121" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#30305D" flood-opacity=".18"/></filter>
+  </defs>
+  <g filter="url(#electronicsSoftShadow)">
+    <ellipse cx="100" cy="126" rx="69" ry="8" fill="#D9D8E8" opacity=".72"/>
+    <g transform="rotate(10 145 82)">
+      <rect x="119" y="40" width="47" height="82" rx="13" fill="url(#electronicsCaseGradient)"/>
+      <rect x="124" y="47" width="37" height="63" rx="8" fill="#F7F5FF"/>
+      <circle cx="130" cy="54" r="3" fill="#7B70BD"/><circle cx="139" cy="54" r="3" fill="#7B70BD"/>
+      <path d="M132 95h20" stroke="#C1B7EB" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <rect x="78" y="86" width="47" height="35" rx="12" fill="url(#electronicsChargeGradient)"/>
+    <ellipse cx="101" cy="96" rx="14" ry="6" fill="#E6FCFF"/>
+    <path d="m103 89-6 9h6l-3 7 9-11h-6l3-5Z" fill="#55A0B4"/>
+    <path d="M44 73c0-14 20-18 32-7l7 12v30c0 9-8 14-18 14s-19-5-19-14V78l-2-5Z" fill="#F2F2F9"/>
+    <path d="M51 78c1-9 16-11 21-1v20c0 6-5 9-11 9s-10-3-10-9V78Z" fill="#72738A"/>
+    <path d="M54 85c0-5 7-6 9-2v10c0 4-9 4-9 0V85Zm13-2c3-4 9-3 10 2v8c0 4-9 4-9 0l-1-10Z" fill="#E9F5F7"/>
+    <path d="M43 107c7 6 31 6 41 0" stroke="#C9C8DC" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>
