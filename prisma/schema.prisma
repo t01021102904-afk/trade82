@@ -40,6 +40,24 @@ enum ProductStatus {
   draft
 }
 
+enum ProductBulkImportStatus {
+  PREVIEWED
+  COMPLETED
+}
+
+enum ProductBulkImportRowStatus {
+  VALID
+  ERROR
+  CREATED
+  UPDATED
+  SKIPPED
+}
+
+enum ProductBulkImportDuplicateMode {
+  SKIP
+  UPDATE
+}
+
 enum VerificationRequestStatus {
   pending_review
   verified
@@ -368,6 +386,7 @@ model UserProfile {
   sentSellerPayouts              SellerPayout[]                  @relation("SellerPayoutSentBy")
   verifiedSellerPayoutProfiles   SellerPayoutProfile[]           @relation("SellerPayoutProfileVerifiedBy")
   sellerPayoutProfileAuditEvents SellerPayoutProfileAuditEvent[] @relation("SellerPayoutProfileAuditActor")
+  productBulkImports             ProductBulkImport[]             @relation("ProductBulkImportCreator")
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
 }
@@ -410,6 +429,7 @@ model Company {
   sellerProfile                     SellerProfile?
   buyerProfile                      BuyerProfile?
   products                          Product[]
+  productBulkImports                ProductBulkImport[]
   verificationRequests              VerificationRequest[]
   buyerInquiries                    Inquiry[]                 @relation("BuyerCompanyInquiries")
   sellerInquiries                   Inquiry[]                 @relation("SellerCompanyInquiries")
@@ -481,6 +501,7 @@ model Product {
   id                       String              @id @default(cuid())
   sellerCompanyId          String
   sellerCompany            Company             @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  sellerSku                String?
   name                     String
   nameEn                   String              @default("")
   slug                     String              @unique
@@ -543,8 +564,49 @@ model Product {
   createdAt                DateTime            @default(now())
   updatedAt                DateTime            @updatedAt
 
+  @@unique([sellerCompanyId, sellerSku])
   @@index([sellerCompanyId, status])
   @@index([category])
+}
+
+model ProductBulkImport {
+  id              String                         @id @default(cuid())
+  sellerCompanyId String
+  sellerCompany   Company                        @relation(fields: [sellerCompanyId], references: [id], onDelete: Cascade)
+  createdByUserId String
+  createdBy       UserProfile                    @relation("ProductBulkImportCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  sourceFilename  String
+  sourceFormat    String
+  duplicateMode   ProductBulkImportDuplicateMode @default(SKIP)
+  status          ProductBulkImportStatus        @default(PREVIEWED)
+  committedAt     DateTime?
+  rows            ProductBulkImportRow[]
+  createdAt       DateTime                       @default(now())
+  updatedAt       DateTime                       @updatedAt
+
+  @@index([sellerCompanyId, createdAt])
+  @@index([createdByUserId, createdAt])
+}
+
+model ProductBulkImportRow {
+  id              String                     @id @default(cuid())
+  importId        String
+  bulkImport      ProductBulkImport          @relation(fields: [importId], references: [id], onDelete: Cascade)
+  rowNumber       Int
+  sellerSku       String
+  productName     String
+  category        String
+  rawData         Json
+  normalizedData  Json?
+  status          ProductBulkImportRowStatus
+  errorMessages   String[]                   @default([])
+  resultProductId String?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  @@unique([importId, rowNumber])
+  @@index([importId, status])
+  @@index([resultProductId])
 }
 
 model ProductImage {

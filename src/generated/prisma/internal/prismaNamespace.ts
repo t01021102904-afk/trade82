@@ -389,6 +389,8 @@ export const ModelName = {
   SellerProfile: 'SellerProfile',
   BuyerProfile: 'BuyerProfile',
   Product: 'Product',
+  ProductBulkImport: 'ProductBulkImport',
+  ProductBulkImportRow: 'ProductBulkImportRow',
   ProductImage: 'ProductImage',
   Category: 'Category',
   VerificationRequest: 'VerificationRequest',
@@ -436,7 +438,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productBulkImport" | "productBulkImportRow" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -807,6 +809,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ProductCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ProductCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductBulkImport: {
+      payload: Prisma.$ProductBulkImportPayload<ExtArgs>
+      fields: Prisma.ProductBulkImportFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductBulkImportFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductBulkImportFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductBulkImportFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductBulkImportFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        findMany: {
+          args: Prisma.ProductBulkImportFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>[]
+        }
+        create: {
+          args: Prisma.ProductBulkImportCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        createMany: {
+          args: Prisma.ProductBulkImportCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductBulkImportCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductBulkImportDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        update: {
+          args: Prisma.ProductBulkImportUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductBulkImportDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductBulkImportUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductBulkImportUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductBulkImportUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductBulkImportAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductBulkImport>
+        }
+        groupBy: {
+          args: Prisma.ProductBulkImportGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductBulkImportGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductBulkImportCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductBulkImportCountAggregateOutputType> | number
+        }
+      }
+    }
+    ProductBulkImportRow: {
+      payload: Prisma.$ProductBulkImportRowPayload<ExtArgs>
+      fields: Prisma.ProductBulkImportRowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ProductBulkImportRowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ProductBulkImportRowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        findFirst: {
+          args: Prisma.ProductBulkImportRowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ProductBulkImportRowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        findMany: {
+          args: Prisma.ProductBulkImportRowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>[]
+        }
+        create: {
+          args: Prisma.ProductBulkImportRowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        createMany: {
+          args: Prisma.ProductBulkImportRowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ProductBulkImportRowCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>[]
+        }
+        delete: {
+          args: Prisma.ProductBulkImportRowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        update: {
+          args: Prisma.ProductBulkImportRowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        deleteMany: {
+          args: Prisma.ProductBulkImportRowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ProductBulkImportRowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ProductBulkImportRowUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>[]
+        }
+        upsert: {
+          args: Prisma.ProductBulkImportRowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ProductBulkImportRowPayload>
+        }
+        aggregate: {
+          args: Prisma.ProductBulkImportRowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateProductBulkImportRow>
+        }
+        groupBy: {
+          args: Prisma.ProductBulkImportRowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductBulkImportRowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ProductBulkImportRowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ProductBulkImportRowCountAggregateOutputType> | number
         }
       }
     }
@@ -3321,6 +3471,7 @@ export type BuyerProfileScalarFieldEnum = (typeof BuyerProfileScalarFieldEnum)[k
 export const ProductScalarFieldEnum = {
   id: 'id',
   sellerCompanyId: 'sellerCompanyId',
+  sellerSku: 'sellerSku',
   name: 'name',
   nameEn: 'nameEn',
   slug: 'slug',
@@ -3377,6 +3528,41 @@ export const ProductScalarFieldEnum = {
 } as const
 
 export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const ProductBulkImportScalarFieldEnum = {
+  id: 'id',
+  sellerCompanyId: 'sellerCompanyId',
+  createdByUserId: 'createdByUserId',
+  sourceFilename: 'sourceFilename',
+  sourceFormat: 'sourceFormat',
+  duplicateMode: 'duplicateMode',
+  status: 'status',
+  committedAt: 'committedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductBulkImportScalarFieldEnum = (typeof ProductBulkImportScalarFieldEnum)[keyof typeof ProductBulkImportScalarFieldEnum]
+
+
+export const ProductBulkImportRowScalarFieldEnum = {
+  id: 'id',
+  importId: 'importId',
+  rowNumber: 'rowNumber',
+  sellerSku: 'sellerSku',
+  productName: 'productName',
+  category: 'category',
+  rawData: 'rawData',
+  normalizedData: 'normalizedData',
+  status: 'status',
+  errorMessages: 'errorMessages',
+  resultProductId: 'resultProductId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProductBulkImportRowScalarFieldEnum = (typeof ProductBulkImportRowScalarFieldEnum)[keyof typeof ProductBulkImportRowScalarFieldEnum]
 
 
 export const ProductImageScalarFieldEnum = {
@@ -4247,6 +4433,48 @@ export type ListEnumProductStatusFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'ProductBulkImportDuplicateMode'
+ */
+export type EnumProductBulkImportDuplicateModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportDuplicateMode'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductBulkImportDuplicateMode[]'
+ */
+export type ListEnumProductBulkImportDuplicateModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportDuplicateMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductBulkImportStatus'
+ */
+export type EnumProductBulkImportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductBulkImportStatus[]'
+ */
+export type ListEnumProductBulkImportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductBulkImportRowStatus'
+ */
+export type EnumProductBulkImportRowStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportRowStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ProductBulkImportRowStatus[]'
+ */
+export type ListEnumProductBulkImportRowStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProductBulkImportRowStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'VerificationRequestStatus'
  */
 export type EnumVerificationRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'VerificationRequestStatus'>
@@ -4822,6 +5050,8 @@ export type GlobalOmitConfig = {
   sellerProfile?: Prisma.SellerProfileOmit
   buyerProfile?: Prisma.BuyerProfileOmit
   product?: Prisma.ProductOmit
+  productBulkImport?: Prisma.ProductBulkImportOmit
+  productBulkImportRow?: Prisma.ProductBulkImportRowOmit
   productImage?: Prisma.ProductImageOmit
   category?: Prisma.CategoryOmit
   verificationRequest?: Prisma.VerificationRequestOmit
