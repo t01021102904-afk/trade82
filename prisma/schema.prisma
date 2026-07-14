@@ -320,6 +320,16 @@ enum SellerPayoutAdjustmentType {
   OTHER
 }
 
+// This enum is intentionally isolated from real order, payment, and payout
+// states. Internal test runs are never linked to financial execution records.
+enum InternalOrderTestStatus {
+  CREATED
+  SIMULATED_PAID
+  SIMULATED_PARTIALLY_REFUNDED
+  SIMULATED_REFUNDED
+  CANCELLED
+}
+
 enum BankDirectorySourceType {
   SEED
   ADMIN
@@ -1155,6 +1165,36 @@ model SellerPayoutAdjustment {
 
   @@index([payoutId, createdAt])
   @@index([createdByUserId, createdAt])
+}
+
+// Internal production tests are stored separately from TradeOrder,
+// PaymentRequest, and SellerPayout. This keeps simulations permanently
+// identifiable and structurally unable to enter real financial workflows.
+model InternalOrderTestRun {
+  id                       String                  @id @default(cuid())
+  isInternalTest           Boolean                 @default(true)
+  testLabel                String                  @default("INTERNAL_PRODUCTION_TEST")
+  testerClerkUserId        String
+  idempotencyKey           String                  @unique
+  testOrderReference       String                  @unique
+  status                   InternalOrderTestStatus @default(CREATED)
+  productName              String
+  productAmount            Int
+  shippingAmount           Int
+  grossAmount              Int
+  platformFeeAmount        Int
+  sellerPayableAmount      Int
+  currency                 String                  @default("usd")
+  simulatedPaidAmount      Int                     @default(0)
+  simulatedRefundAmount    Int                     @default(0)
+  payoutPreviewAmount      Int?
+  payoutPreviewGeneratedAt DateTime?
+  version                  Int                     @default(0)
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+
+  @@index([testerClerkUserId, createdAt])
+  @@index([isInternalTest, createdAt])
 }
 
 model SavedItem {

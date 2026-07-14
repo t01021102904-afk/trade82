@@ -413,6 +413,7 @@ export const ModelName = {
   SellerPayout: 'SellerPayout',
   SellerPayoutEvent: 'SellerPayoutEvent',
   SellerPayoutAdjustment: 'SellerPayoutAdjustment',
+  InternalOrderTestRun: 'InternalOrderTestRun',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "internalOrderTestRun" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2586,6 +2587,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    InternalOrderTestRun: {
+      payload: Prisma.$InternalOrderTestRunPayload<ExtArgs>
+      fields: Prisma.InternalOrderTestRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InternalOrderTestRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InternalOrderTestRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        findFirst: {
+          args: Prisma.InternalOrderTestRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InternalOrderTestRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        findMany: {
+          args: Prisma.InternalOrderTestRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>[]
+        }
+        create: {
+          args: Prisma.InternalOrderTestRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        createMany: {
+          args: Prisma.InternalOrderTestRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InternalOrderTestRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>[]
+        }
+        delete: {
+          args: Prisma.InternalOrderTestRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        update: {
+          args: Prisma.InternalOrderTestRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.InternalOrderTestRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InternalOrderTestRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InternalOrderTestRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.InternalOrderTestRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InternalOrderTestRunPayload>
+        }
+        aggregate: {
+          args: Prisma.InternalOrderTestRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInternalOrderTestRun>
+        }
+        groupBy: {
+          args: Prisma.InternalOrderTestRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InternalOrderTestRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InternalOrderTestRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InternalOrderTestRunCountAggregateOutputType> | number
+        }
+      }
+    }
     SavedItem: {
       payload: Prisma.$SavedItemPayload<ExtArgs>
       fields: Prisma.SavedItemFieldRefs
@@ -3896,6 +3971,33 @@ export const SellerPayoutAdjustmentScalarFieldEnum = {
 export type SellerPayoutAdjustmentScalarFieldEnum = (typeof SellerPayoutAdjustmentScalarFieldEnum)[keyof typeof SellerPayoutAdjustmentScalarFieldEnum]
 
 
+export const InternalOrderTestRunScalarFieldEnum = {
+  id: 'id',
+  isInternalTest: 'isInternalTest',
+  testLabel: 'testLabel',
+  testerClerkUserId: 'testerClerkUserId',
+  idempotencyKey: 'idempotencyKey',
+  testOrderReference: 'testOrderReference',
+  status: 'status',
+  productName: 'productName',
+  productAmount: 'productAmount',
+  shippingAmount: 'shippingAmount',
+  grossAmount: 'grossAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  currency: 'currency',
+  simulatedPaidAmount: 'simulatedPaidAmount',
+  simulatedRefundAmount: 'simulatedRefundAmount',
+  payoutPreviewAmount: 'payoutPreviewAmount',
+  payoutPreviewGeneratedAt: 'payoutPreviewGeneratedAt',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InternalOrderTestRunScalarFieldEnum = (typeof InternalOrderTestRunScalarFieldEnum)[keyof typeof InternalOrderTestRunScalarFieldEnum]
+
+
 export const SavedItemScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -4597,6 +4699,20 @@ export type ListEnumSellerPayoutAdjustmentTypeFieldRefInput<$PrismaModel> = Fiel
 
 
 /**
+ * Reference to a field of type 'InternalOrderTestStatus'
+ */
+export type EnumInternalOrderTestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InternalOrderTestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'InternalOrderTestStatus[]'
+ */
+export type ListEnumInternalOrderTestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'InternalOrderTestStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'SavedItemType'
  */
 export type EnumSavedItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SavedItemType'>
@@ -4846,6 +4962,7 @@ export type GlobalOmitConfig = {
   sellerPayout?: Prisma.SellerPayoutOmit
   sellerPayoutEvent?: Prisma.SellerPayoutEventOmit
   sellerPayoutAdjustment?: Prisma.SellerPayoutAdjustmentOmit
+  internalOrderTestRun?: Prisma.InternalOrderTestRunOmit
   savedItem?: Prisma.SavedItemOmit
   message?: Prisma.MessageOmit
   messageAttachment?: Prisma.MessageAttachmentOmit
