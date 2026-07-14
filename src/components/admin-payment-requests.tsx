@@ -4,6 +4,7 @@ import { CreditCard, ExternalLink, Landmark, RefreshCw, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { formatTradeDate, formatTradeMoney, paymentDisputeStatusLabel, paymentRequestStatusLabel, stripeFeeSyncStatusLabel } from "@/lib/trade-order-i18n";
 
 type PaymentCompany = {
   id: string;
@@ -58,13 +59,6 @@ function companyName(company: PaymentCompany) {
   return company.tradeName || company.legalName;
 }
 
-function formatMoney(amount: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(amount / 100);
-}
-
 function truncateStripeId(value: string | null) {
   return value && value.length > 18 ? `${value.slice(0, 9)}…${value.slice(-6)}` : value;
 }
@@ -76,25 +70,12 @@ function statusTone(status: string) {
   return "border-blue-200 bg-blue-50 text-blue-800";
 }
 
-function paymentStatusLabel(status: string, t: (key: string, fallback?: string) => string) {
-  const keys: Record<string, string> = {
-    PENDING: "payments.paymentPending",
-    PAID: "payments.paymentPaid",
-    RELEASED: "payments.paymentReleased",
-    CANCELLED: "payments.paymentCancelled",
-    PARTIALLY_REFUNDED: "payments.paymentPartiallyRefunded",
-    REFUNDED: "payments.paymentRefunded",
-    DISPUTED: "payments.paymentDisputed",
-  };
-  return t(keys[status] ?? "payments.paymentPending", status);
-}
-
 function isAdminPaymentRequest(value: unknown): value is AdminPaymentRequest {
   return Boolean(value && typeof value === "object" && "id" in value && "status" in value);
 }
 
 export function AdminPaymentRequests() {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
   const [paymentRequests, setPaymentRequests] = useState<AdminPaymentRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -129,13 +110,13 @@ export function AdminPaymentRequests() {
           | null;
         if (!active) return;
         if (!response.ok || !Array.isArray(result)) {
-          setError(!Array.isArray(result) ? result?.error ?? "Unable to load payment requests." : "Unable to load payment requests.");
+          setError(t("payments.loadError"));
           return;
         }
         setPaymentRequests(result);
       })
       .catch(() => {
-        if (active) setError("Unable to load payment requests.");
+        if (active) setError(t("payments.loadError"));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -143,7 +124,7 @@ export function AdminPaymentRequests() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   function openPayoutDialog(paymentRequest: AdminPaymentRequest) {
     setSelectedId(paymentRequest.id);
@@ -174,7 +155,7 @@ export function AdminPaymentRequests() {
       });
       const result = (await response.json().catch(() => null)) as AdminPaymentRequest | { error?: string } | null;
       if (!response.ok || !isAdminPaymentRequest(result)) {
-        setError(result && !isAdminPaymentRequest(result) ? result.error ?? "Unable to record the payout." : "Unable to record the payout.");
+        setError(t("payments.recordPayoutError"));
         return;
       }
       setPaymentRequests((current) =>
@@ -186,7 +167,7 @@ export function AdminPaymentRequests() {
       );
       setSelectedId(null);
     } catch {
-      setError("Unable to record the payout.");
+      setError(t("payments.recordPayoutError"));
     } finally {
       setSaving(false);
     }
@@ -200,18 +181,16 @@ export function AdminPaymentRequests() {
         `/api/admin/payment-requests/${paymentRequestId}/refresh-stripe-fee`,
         { method: "POST" },
       );
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string }
-        | null;
+      await response.json().catch(() => null);
       if (!response.ok) {
-        setError(result?.error ?? "Unable to refresh the Stripe fee.");
+        setError(t("payments.refreshStripeFeeError"));
         return;
       }
       const refreshed = await fetch("/api/admin/payment-requests", { cache: "no-store" });
       const requests = (await refreshed.json().catch(() => null)) as AdminPaymentRequest[] | null;
       if (refreshed.ok && Array.isArray(requests)) setPaymentRequests(requests);
     } catch {
-      setError("Unable to refresh the Stripe fee.");
+      setError(t("payments.refreshStripeFeeError"));
     } finally {
       setRefreshingFeeId(null);
     }
@@ -239,36 +218,36 @@ export function AdminPaymentRequests() {
                 <div className="min-w-0">
                   <p className="text-xs font-medium uppercase tracking-wide theme-muted">{t("payments.paymentRequest")}</p>
                   <h2 className="mt-1 truncate text-lg font-semibold theme-foreground">{paymentRequest.productName}</h2>
-                  <p className="mt-1 text-sm theme-muted">{paymentRequest.quantity} {paymentRequest.unit} · {new Date(paymentRequest.createdAt).toLocaleDateString()}</p>
+                  <p className="mt-1 text-sm theme-muted">{paymentRequest.quantity} {paymentRequest.unit} · {formatTradeDate(paymentRequest.createdAt, locale)}</p>
                 </div>
                 <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusTone(paymentRequest.status)}`}>
-                  {paymentStatusLabel(paymentRequest.status, t)}
+                  {paymentRequestStatusLabel(paymentRequest.status, t)}
                 </span>
               </div>
 
               <div className="mt-5 grid gap-4 border-t pt-4 text-sm sm:grid-cols-2 lg:grid-cols-4 theme-border">
                 <PaymentMetric label={t("payments.buyer")} value={companyName(paymentRequest.buyerCompany)} detail={paymentRequest.buyerCompany.owner?.email} />
                 <PaymentMetric label={t("payments.seller")} value={companyName(paymentRequest.sellerCompany)} detail={paymentRequest.sellerCompany.owner?.email} />
-                <PaymentMetric label={t("payments.productAmount")} value={formatMoney(paymentRequest.productAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.shippingAmount")} value={formatMoney(paymentRequest.shippingAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.grossAmount")} value={formatMoney(paymentRequest.grossAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.platformFee")} value={formatMoney(paymentRequest.platformFeeAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.sellerPayable")} value={formatMoney(paymentRequest.sellerPayableAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.stripeProcessingFee")} value={paymentRequest.stripeProcessingFeeAmount === null ? "—" : formatMoney(paymentRequest.stripeProcessingFeeAmount, paymentRequest.currency)} detail={paymentRequest.stripeFeeSyncStatus === "FAILED" ? paymentRequest.stripeFeeSyncError ?? undefined : paymentRequest.stripeFeeSyncStatus} />
-                <PaymentMetric label={t("payments.refundAmount")} value={formatMoney(paymentRequest.refundAmount, paymentRequest.currency)} />
-                <PaymentMetric label={t("payments.disputeAmount")} value={dispute ? formatMoney(dispute.amount, paymentRequest.currency) : "—"} />
-                <PaymentMetric label={t("payments.disputeStatus")} value={dispute?.status ?? "—"} detail={dispute?.reason ?? undefined} />
+                <PaymentMetric label={t("payments.productAmount")} value={formatTradeMoney(paymentRequest.productAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.shippingAmount")} value={formatTradeMoney(paymentRequest.shippingAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.grossAmount")} value={formatTradeMoney(paymentRequest.grossAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.platformFee")} value={formatTradeMoney(paymentRequest.platformFeeAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.sellerPayable")} value={formatTradeMoney(paymentRequest.sellerPayableAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.stripeProcessingFee")} value={paymentRequest.stripeProcessingFeeAmount === null ? "—" : formatTradeMoney(paymentRequest.stripeProcessingFeeAmount, paymentRequest.currency, locale)} detail={paymentRequest.stripeFeeSyncStatus === "FAILED" ? paymentRequest.stripeFeeSyncError ?? undefined : stripeFeeSyncStatusLabel(paymentRequest.stripeFeeSyncStatus, t)} />
+                <PaymentMetric label={t("payments.refundAmount")} value={formatTradeMoney(paymentRequest.refundAmount, paymentRequest.currency, locale)} />
+                <PaymentMetric label={t("payments.disputeAmount")} value={dispute ? formatTradeMoney(dispute.amount, paymentRequest.currency, locale) : "—"} />
+                <PaymentMetric label={t("payments.disputeStatus")} value={dispute ? paymentDisputeStatusLabel(dispute.status, t) : "—"} detail={dispute?.reason ?? undefined} />
                 <PaymentMetric label={t("payments.payoutStatus")} value={paymentRequest.status === "RELEASED" ? t("payments.paymentReleased") : t("payments.payoutPending")} detail={paymentRequest.manualPayoutReference ?? undefined} />
-                <PaymentMetric label={t("payments.sellerReleasedAmount")} value={paymentRequest.sellerReleasedAmount === null ? "—" : formatMoney(paymentRequest.sellerReleasedAmount, paymentRequest.currency)} detail={paymentRequest.releasedByUser?.displayName} />
-                <PaymentMetric label={t("payments.payoutDate")} value={paymentRequest.manualPayoutDate ? new Date(paymentRequest.manualPayoutDate).toLocaleDateString() : "—"} detail={paymentRequest.manualPayoutNote ?? undefined} />
+                <PaymentMetric label={t("payments.sellerReleasedAmount")} value={paymentRequest.sellerReleasedAmount === null ? "—" : formatTradeMoney(paymentRequest.sellerReleasedAmount, paymentRequest.currency, locale)} detail={paymentRequest.releasedByUser?.displayName} />
+                <PaymentMetric label={t("payments.payoutDate")} value={formatTradeDate(paymentRequest.manualPayoutDate, locale)} detail={paymentRequest.manualPayoutNote ?? undefined} />
                 <PaymentMetric label={t("payments.reconciliation")} value={paymentRequest.requiresManualReconciliation ? t("payments.reconciliationRequired") : t("payments.reconciliationClear")} detail={paymentRequest.reconciliationNote ?? undefined} />
               </div>
 
               <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4 theme-border">
                 <div className="grid gap-1 text-xs theme-muted">
-                  <span title={paymentRequest.stripeCheckoutSessionId ?? undefined}>Checkout: {truncateStripeId(paymentRequest.stripeCheckoutSessionId) ?? "pending"}</span>
-                  <span title={paymentRequest.stripePaymentIntentId ?? undefined}>Payment intent: {truncateStripeId(paymentRequest.stripePaymentIntentId) ?? "pending"}</span>
-                  <span title={paymentRequest.stripeChargeId ?? undefined}>Charge: {truncateStripeId(paymentRequest.stripeChargeId) ?? "pending"}</span>
+                  <span title={paymentRequest.stripeCheckoutSessionId ?? undefined}>{t("payments.checkoutId")}: {truncateStripeId(paymentRequest.stripeCheckoutSessionId) ?? t("payments.pending")}</span>
+                  <span title={paymentRequest.stripePaymentIntentId ?? undefined}>{t("payments.paymentIntentId")}: {truncateStripeId(paymentRequest.stripePaymentIntentId) ?? t("payments.pending")}</span>
+                  <span title={paymentRequest.stripeChargeId ?? undefined}>{t("payments.chargeId")}: {truncateStripeId(paymentRequest.stripeChargeId) ?? t("payments.pending")}</span>
                 </div>
                 <div className="flex flex-wrap justify-end gap-2">
                   <button
@@ -332,7 +311,7 @@ export function AdminPaymentRequests() {
               </button>
             </div>
             <p className="mt-4 rounded-md bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-900">
-              {companyName(selected.sellerCompany)} · {formatMoney(selected.sellerPayableAmount, selected.currency)}
+              {companyName(selected.sellerCompany)} · {formatTradeMoney(selected.sellerPayableAmount, selected.currency, locale)}
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <Field label={t("payments.payoutReference")} value={payoutReference} onChange={setPayoutReference} required />

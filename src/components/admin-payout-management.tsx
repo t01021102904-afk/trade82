@@ -11,7 +11,9 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import { isSafeOfficialBankWebsite } from "@/lib/bank-directory-security";
+import { formatTradeDateTime, formatTradeMoney, payoutAdjustmentTypeLabel, payoutStatusLabel } from "@/lib/trade-order-i18n";
 
 type Payout = {
   id: string;
@@ -57,18 +59,12 @@ type RevealedInstructions = {
   instructions: Record<string, unknown>;
 };
 
-function money(value: number, currency: string) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(value / 100);
-}
-
 function isActionableStatus(status: string) {
   return status === "READY" || status === "PROCESSING";
 }
 
 export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
+  const { locale, t } = useI18n();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -91,14 +87,14 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       const query = selectedId ? `?id=${encodeURIComponent(selectedId)}` : "";
       const response = await fetch(`/api/admin/payouts${query}`, { cache: "no-store" });
       const data = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(data?.error ?? "Unable to load payouts.");
+      if (!response.ok) throw new Error(t("payouts.loadPayoutsError"));
       setPayouts(data.payouts ?? []);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to load payouts.");
+    } catch {
+      setError(t("payouts.loadPayoutsError"));
     } finally {
       setLoading(false);
     }
-  }, [selectedId]);
+  }, [selectedId, t]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void load(), 0);
@@ -142,15 +138,15 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
             : { action: nextAction },
         ),
       });
-      const data = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(data?.error ?? "Unable to update payout.");
+      await response.json().catch(() => null);
+      if (!response.ok) throw new Error(t("payouts.updatePayoutError"));
       setConfirmation("");
       setReference("");
       setBankReference("");
       setRevealed(null);
       await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to update payout.");
+    } catch {
+      setError(t("payouts.updatePayoutError"));
     } finally {
       setBusy(false);
     }
@@ -159,15 +155,15 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
   async function addAdjustment(payout: Payout) {
     const amount = Number(adjustmentAmount);
     if (!Number.isSafeInteger(amount) || amount <= 0) {
-      setError("Enter a positive whole-number minor-unit amount.");
+      setError(t("payouts.positiveMinorAmountError"));
       return;
     }
     if (adjustmentReason.trim().length < 3) {
-      setError("Enter an adjustment reason.");
+      setError(t("payouts.adjustmentReasonError"));
       return;
     }
     if (!adjustmentConfirmation.trim()) {
-      setError("Type the payout or order number to confirm this adjustment.");
+      setError(t("payouts.adjustmentConfirmationError"));
       return;
     }
     setAdjusting(true);
@@ -185,15 +181,15 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
           confirmation: adjustmentConfirmation.trim(),
         }),
       });
-      const data = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(data?.error ?? "Unable to add the payout adjustment.");
+      await response.json().catch(() => null);
+      if (!response.ok) throw new Error(t("payouts.addAdjustmentError"));
       setAdjustmentAmount("");
       setAdjustmentReason("");
       setAdjustmentNote("");
       setAdjustmentConfirmation("");
       await load();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to add the payout adjustment.");
+    } catch {
+      setError(t("payouts.addAdjustmentError"));
     } finally {
       setAdjusting(false);
     }
@@ -201,7 +197,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
 
   async function reveal(payout: Payout) {
     if (revealReason.trim().length < 3) {
-      setError("Enter a short reason before revealing bank instructions.");
+      setError(t("payouts.revealReasonError"));
       return;
     }
     setError("");
@@ -213,11 +209,11 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok || !data?.instructions || typeof data.instructions !== "object") {
-        throw new Error(data?.error ?? "Unable to reveal bank instructions.");
+        throw new Error(t("payouts.revealError"));
       }
       setRevealed({ payoutId: payout.id, scope: selectedId ?? null, instructions: data.instructions });
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to reveal bank instructions.");
+    } catch {
+      setError(t("payouts.revealError"));
     }
   }
 
@@ -228,8 +224,8 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       body: JSON.stringify({ action: actionName }),
     });
     if (!response.ok) {
-      const data = await response.json().catch(() => null);
-      throw new Error(data?.error ?? "Unable to record the instruction export.");
+      await response.json().catch(() => null);
+      throw new Error(t("payouts.exportRecordError"));
     }
   }
 
@@ -238,8 +234,8 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
     try {
       await navigator.clipboard.writeText(JSON.stringify(activeReveal.instructions, null, 2));
       await recordInstructionExport(payout.id, "copied");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to copy payout instructions.");
+    } catch {
+      setError(t("payouts.copyError"));
     }
   }
 
@@ -254,8 +250,8 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       link.click();
       URL.revokeObjectURL(url);
       await recordInstructionExport(payout.id, "downloaded");
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Unable to download payout instructions.");
+    } catch {
+      setError(t("payouts.downloadError"));
     }
   }
 
@@ -275,88 +271,88 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs theme-muted">{payout.order.orderNumber} · {payout.payoutNumber}</p>
-                <h2 className="mt-1 text-lg font-semibold theme-foreground">{payout.order.items[0]?.productName ?? "Order payout"}</h2>
-                <p className="mt-1 text-sm theme-muted">{payout.order.sellerCompanyName} · manual external payout record</p>
+                <h2 className="mt-1 text-lg font-semibold theme-foreground">{payout.order.items[0]?.productName ?? t("orders.payoutSummary")}</h2>
+                <p className="mt-1 text-sm theme-muted">{payout.order.sellerCompanyName} · {t("payouts.manualExternalRecord")}</p>
               </div>
-              <span className="rounded-full border px-2.5 py-1 text-xs font-semibold theme-success-badge">{payout.status}</span>
+              <span className="rounded-full border px-2.5 py-1 text-xs font-semibold theme-success-badge">{payoutStatusLabel(payout.status, t)}</span>
             </div>
             <p className="rounded-md border px-3 py-2 text-xs theme-muted">
-              Trade82 records manual external payouts. Clicking Mark as Sent does not initiate a bank transfer.
-              <br />Trade82는 외부 수동 정산을 기록합니다. 전송 완료 기록은 은행 이체를 실행하지 않습니다.
+              {t("payouts.manualExternalNotice")}
             </p>
             <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
-              <Metric label="Gross" value={money(payout.grossAmount, payout.currency)} />
-              <Metric label="Trade82 fee" value={money(payout.platformFeeAmount, payout.currency)} />
-              <Metric label="Stripe fee" value={payout.processingFeeAmount === null ? "—" : money(payout.processingFeeAmount, payout.currency)} />
-              <Metric label="Base seller payable" value={money(payout.sellerPayableAmount, payout.currency)} />
-              <Metric label="Manual adjustments" value={money(payout.manualAdjustmentAmount, payout.currency)} />
-              <Metric label="Final payout" value={money(payout.finalPayoutAmount, payout.currency)} />
-              <Metric label="Bank" value={payout.bankNameSnapshot} />
-              <Metric label="Account" value={payout.accountNumberLast4 ? `•••• ${payout.accountNumberLast4}` : "—"} />
+              <Metric label={t("payouts.gross")} value={formatTradeMoney(payout.grossAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.trade82Fee")} value={formatTradeMoney(payout.platformFeeAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.stripeFee")} value={payout.processingFeeAmount === null ? "—" : formatTradeMoney(payout.processingFeeAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.baseSellerPayable")} value={formatTradeMoney(payout.sellerPayableAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.manualAdjustments")} value={formatTradeMoney(payout.manualAdjustmentAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.finalPayout")} value={formatTradeMoney(payout.finalPayoutAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.bank")} value={payout.bankNameSnapshot} />
+              <Metric label={t("payouts.account")} value={payout.accountNumberLast4 ? `•••• ${payout.accountNumberLast4}` : "—"} />
               <Metric label="SWIFT / BIC" value={payout.swiftBicSnapshot ?? "—"} />
-              <Metric label="Refund adjustment" value={money(payout.refundAdjustmentAmount, payout.currency)} />
+              <Metric label={t("payouts.refundAdjustment")} value={formatTradeMoney(payout.refundAdjustmentAmount, payout.currency, locale)} />
             </div>
             <section className="grid gap-3 rounded-lg border p-4 theme-surface-muted">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-semibold theme-foreground">Manual adjustments</h3>
-                  <p className="mt-1 text-xs theme-muted">Append-only amounts use minor units. Credits increase the payout; all other adjustment types reduce it.</p>
+                  <h3 className="text-sm font-semibold theme-foreground">{t("payouts.manualAdjustments")}</h3>
+                  <p className="mt-1 text-xs theme-muted">{t("payouts.adjustmentsDescription")}</p>
                 </div>
-                {payout.status === "SENT" ? <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-900">Reconciliation required</span> : null}
+                {payout.status === "SENT" ? <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-900">{t("payouts.reconciliationRequired")}</span> : null}
               </div>
-              {payout.status === "SENT" ? <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950">This payout was already sent externally. A new adjustment will not alter the recorded sent amount and may require an additional external transfer or recovery. Trade82 will not claim an external payment occurred.</p> : null}
+              {payout.status === "SENT" ? <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950">{t("payouts.sentAdjustmentNotice")}</p> : null}
               <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                <label className="grid gap-1 text-xs font-medium theme-muted">Type
+                <label className="grid gap-1 text-xs font-medium theme-muted">{t("payouts.type")}
                   <select value={adjustmentType} onChange={(event) => setAdjustmentType(event.target.value as typeof adjustmentType)} className="input h-9">
-                    <option value="CREDIT">Credit</option><option value="DEBIT">Debit</option><option value="REFUND_RECOVERY">Refund recovery</option><option value="BANK_FEE">Bank fee</option><option value="FX_ADJUSTMENT">FX adjustment</option><option value="OTHER">Other</option>
+                    <option value="CREDIT">{payoutAdjustmentTypeLabel("CREDIT", t)}</option><option value="DEBIT">{payoutAdjustmentTypeLabel("DEBIT", t)}</option><option value="REFUND_RECOVERY">{payoutAdjustmentTypeLabel("REFUND_RECOVERY", t)}</option><option value="BANK_FEE">{payoutAdjustmentTypeLabel("BANK_FEE", t)}</option><option value="FX_ADJUSTMENT">{payoutAdjustmentTypeLabel("FX_ADJUSTMENT", t)}</option><option value="OTHER">{payoutAdjustmentTypeLabel("OTHER", t)}</option>
                   </select>
                 </label>
-                <label className="grid gap-1 text-xs font-medium theme-muted">Amount ({payout.currency.toUpperCase()} minor units)
-                  <input inputMode="numeric" value={adjustmentAmount} onChange={(event) => setAdjustmentAmount(event.target.value.replace(/[^0-9]/g, ""))} placeholder="e.g. 500" className="input h-9" />
+                <label className="grid gap-1 text-xs font-medium theme-muted">{t("payouts.amountMinorUnits").replace("{currency}", payout.currency.toUpperCase())}
+                  <input inputMode="numeric" value={adjustmentAmount} onChange={(event) => setAdjustmentAmount(event.target.value.replace(/[^0-9]/g, ""))} placeholder={t("payouts.amountExample")} className="input h-9" />
                 </label>
-                <label className="grid gap-1 text-xs font-medium theme-muted">Confirm payout or order number
+                <label className="grid gap-1 text-xs font-medium theme-muted">{t("payouts.confirmPayoutOrOrder")}
                   <input value={adjustmentConfirmation} onChange={(event) => setAdjustmentConfirmation(event.target.value)} placeholder={payout.payoutNumber} className="input h-9" />
                 </label>
-                <label className="grid gap-1 text-xs font-medium theme-muted md:col-span-2">Reason
-                  <input value={adjustmentReason} onChange={(event) => setAdjustmentReason(event.target.value)} maxLength={1000} placeholder="Required accounting reason" className="input h-9" />
+                <label className="grid gap-1 text-xs font-medium theme-muted md:col-span-2">{t("payouts.reason")}
+                  <input value={adjustmentReason} onChange={(event) => setAdjustmentReason(event.target.value)} maxLength={1000} placeholder={t("payouts.requiredAccountingReason")} className="input h-9" />
                 </label>
-                <label className="grid gap-1 text-xs font-medium theme-muted">Internal note (optional)
+                <label className="grid gap-1 text-xs font-medium theme-muted">{t("payouts.internalNoteOptional")}
                   <input value={adjustmentNote} onChange={(event) => setAdjustmentNote(event.target.value)} maxLength={2000} className="input h-9" />
                 </label>
               </div>
-              <div><button onClick={() => void addAdjustment(payout)} disabled={adjusting} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50">{adjusting ? "Adding adjustment…" : "Add adjustment"}</button></div>
+              <div><button onClick={() => void addAdjustment(payout)} disabled={adjusting} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50">{adjusting ? t("payouts.addingAdjustment") : t("payouts.addAdjustment")}</button></div>
               <div className="grid gap-2">
                 {payout.adjustments.length ? payout.adjustments.map((adjustment) => <div key={adjustment.id} className="grid gap-1 rounded-md border bg-white px-3 py-2 text-xs sm:grid-cols-[auto_1fr_auto] sm:items-center">
-                  <span className="font-semibold theme-foreground">{adjustment.adjustmentType.replaceAll("_", " ")} {adjustment.adjustmentType === "CREDIT" ? "+" : "−"}{money(adjustment.amount, adjustment.currency)}</span>
-                  <span className="theme-muted">{adjustment.reason}{adjustment.internalNote ? ` · ${adjustment.internalNote}` : ""}{adjustment.requiresManualReconciliation ? " · manual reconciliation required" : ""}</span>
-                  <span className="theme-muted">{adjustment.createdByUser.displayName || adjustment.createdByUser.email} · {new Date(adjustment.createdAt).toLocaleString()}</span>
-                </div>) : <p className="text-xs theme-muted">No manual adjustments have been recorded.</p>}
+                  <span className="font-semibold theme-foreground">{payoutAdjustmentTypeLabel(adjustment.adjustmentType, t)} {adjustment.adjustmentType === "CREDIT" ? "+" : "−"}{formatTradeMoney(adjustment.amount, adjustment.currency, locale)}</span>
+                  <span className="theme-muted">{adjustment.reason}{adjustment.internalNote ? ` · ${adjustment.internalNote}` : ""}{adjustment.requiresManualReconciliation ? ` · ${t("payouts.manualReconciliationRequired")}` : ""}</span>
+                  <span className="theme-muted">{adjustment.createdByUser.displayName || adjustment.createdByUser.email} · {formatTradeDateTime(adjustment.createdAt, locale)}</span>
+                </div>) : <p className="text-xs theme-muted">{t("payouts.noAdjustments")}</p>}
               </div>
             </section>
             {payout.status === "SENT" ? (
-              <p className="text-sm font-medium text-emerald-700">External payout recorded as sent {payout.sentAt ? new Date(payout.sentAt).toLocaleString() : ""}.</p>
+              <p className="text-sm font-medium text-emerald-700">{t("payouts.externalPayoutSent").replace("{date}", formatTradeDateTime(payout.sentAt, locale))}</p>
             ) : (
               <div className="grid gap-2 border-t pt-4 theme-border">
                 <label className="grid gap-1 text-xs font-medium theme-muted">
-                  Reason for bank-detail reveal
-                  <input value={revealReason} onChange={(event) => setRevealReason(event.target.value)} maxLength={500} className="input h-9" placeholder="Payout review" />
+                  {t("payouts.revealReason")}
+                  <input value={revealReason} onChange={(event) => setRevealReason(event.target.value)} maxLength={500} className="input h-9" placeholder={t("payouts.revealReasonPlaceholder")} />
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  <button onClick={() => void reveal(payout)} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold"><ShieldAlert className="size-4" />Reveal Bank Details</button>
-                  <button onClick={() => void copyInstructions(payout)} disabled={!instructionsAreRevealed} title={instructionsAreRevealed ? "Copy the revealed instructions" : "Reveal this payout's bank details first"} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"><ClipboardCopy className="size-4" />Copy Payout Instructions</button>
-                  <button onClick={() => void downloadInstructions(payout)} disabled={!instructionsAreRevealed} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"><Download className="size-4" />Download Payout Instruction</button>
-                  {bankPortalUrl ? <a href={bankPortalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold"><ExternalLink className="size-4" />Open Bank Portal</a> : null}
-                  {canMarkSent ? <button onClick={() => void action(payout, "hold")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">Place on Hold</button> : null}
-                  {payout.status === "READY" || payout.status === "HOLD" ? <button onClick={() => void action(payout, "processing")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">Mark as Processing</button> : null}
-                  {canMarkSent ? <button onClick={() => void action(payout, "failed")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold text-red-700">Mark as Failed</button> : null}
+                  <button onClick={() => void reveal(payout)} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold"><ShieldAlert className="size-4" />{t("payouts.revealBankDetails")}</button>
+                  <button onClick={() => void copyInstructions(payout)} disabled={!instructionsAreRevealed} title={instructionsAreRevealed ? t("payouts.copyInstructionsTitle") : t("payouts.revealFirstTitle")} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"><ClipboardCopy className="size-4" />{t("payouts.copyInstructions")}</button>
+                  <button onClick={() => void downloadInstructions(payout)} disabled={!instructionsAreRevealed} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"><Download className="size-4" />{t("payouts.downloadInstructions")}</button>
+                  {bankPortalUrl ? <a href={bankPortalUrl} target="_blank" rel="noopener noreferrer" className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold"><ExternalLink className="size-4" />{t("payouts.openBankPortal")}</a> : null}
+                  {canMarkSent ? <button onClick={() => void action(payout, "hold")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">{t("payouts.placeOnHold")}</button> : null}
+                  {payout.status === "READY" || payout.status === "HOLD" ? <button onClick={() => void action(payout, "processing")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">{t("payouts.markProcessing")}</button> : null}
+                  {canMarkSent ? <button onClick={() => void action(payout, "failed")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold text-red-700">{t("payouts.markFailed")}</button> : null}
                 </div>
-                {canMarkSent ? <div className="flex flex-wrap gap-2"><input value={reference} onChange={(event) => setReference(event.target.value)} placeholder="External transfer reference" className="input h-9" /><input value={bankReference} onChange={(event) => setBankReference(event.target.value)} placeholder="Sending bank reference (optional)" className="input h-9" /><input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder="Type order or payout number" className="input h-9" /><button onClick={() => void action(payout, "mark_sent")} disabled={busy || !reference || !confirmation} className="inline-flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-xs font-semibold text-white disabled:opacity-50"><Send className="size-4" />Mark as Sent</button></div> : null}
+                {canMarkSent ? <div className="flex flex-wrap gap-2"><input value={reference} onChange={(event) => setReference(event.target.value)} placeholder={t("payouts.externalTransferReference")} className="input h-9" /><input value={bankReference} onChange={(event) => setBankReference(event.target.value)} placeholder={t("payouts.sendingBankReference")} className="input h-9" /><input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder={t("payouts.confirmationPlaceholder")} className="input h-9" /><button onClick={() => void action(payout, "mark_sent")} disabled={busy || !reference || !confirmation} className="inline-flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-xs font-semibold text-white disabled:opacity-50"><Send className="size-4" />{t("payouts.markSent")}</button></div> : null}
               </div>
             )}
           </article>
         );
       })}
-      {activeReveal ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><div className="flex items-center justify-between gap-3"><p className="font-semibold">Revealed bank instructions</p><button onClick={() => setRevealed(null)} className="inline-flex size-7 items-center justify-center rounded border" aria-label="Hide revealed bank instructions"><X className="size-4" /></button></div><p className="mt-1 text-xs">This view clears automatically after one minute.</p><pre className="mt-2 overflow-auto whitespace-pre-wrap">{JSON.stringify(activeReveal.instructions, null, 2)}</pre></div> : null}
+      {!visible.length ? <p className="rounded-xl border px-5 py-8 text-sm theme-muted">{t("payouts.noPayouts")}</p> : null}
+      {activeReveal ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><div className="flex items-center justify-between gap-3"><p className="font-semibold">{t("payouts.revealedInstructions")}</p><button onClick={() => setRevealed(null)} className="inline-flex size-7 items-center justify-center rounded border" aria-label={t("payouts.hideRevealedInstructions")}><X className="size-4" /></button></div><p className="mt-1 text-xs">{t("payouts.revealExpiry")}</p><pre className="mt-2 overflow-auto whitespace-pre-wrap">{JSON.stringify(activeReveal.instructions, null, 2)}</pre></div> : null}
     </section>
   );
 }
