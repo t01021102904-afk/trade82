@@ -53,6 +53,16 @@ const source = Object.fromEntries(
   ),
 ) as Record<keyof typeof files, string>;
 
+const dictionaries = {
+  en: JSON.parse(await readFile(new URL("../messages/en.json", import.meta.url), "utf8")),
+  ko: JSON.parse(await readFile(new URL("../messages/ko.json", import.meta.url), "utf8")),
+};
+
+function dictionaryPaths(value: unknown, prefix = ""): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return [prefix];
+  return Object.entries(value).flatMap(([key, child]) => dictionaryPaths(child, prefix ? `${prefix}.${key}` : key));
+}
+
 type Counter = { lastOrderSequence: number; lastPayoutSequence: number };
 
 function atomicCounterTransaction() {
@@ -400,17 +410,17 @@ test("admin bank directory supports search, edit, active status, verified source
   assert.match(source.adminBankRoute, /bankNameEnglish: \{ contains: search/);
   assert.match(source.adminBankRoute, /sourceType: "ADMIN"/);
   assert.match(source.adminBankRoute, /sourceType: "ADMIN_OVERRIDE"/);
-  assert.match(source.adminBankUi, /Bank address/);
-  assert.match(source.adminBankUi, /Official source URL/);
-  assert.match(source.adminBankUi, /Active for seller selection/);
-  assert.match(source.adminBankUi, /Admin override/);
+  assert.match(source.adminBankUi, /t\("payouts\.bankAddress"\)/);
+  assert.match(source.adminBankUi, /t\("payouts\.bankDirectory\.officialSourceUrl"\)/);
+  assert.match(source.adminBankUi, /t\("payouts\.bankDirectory\.activeForSellerSelection"\)/);
+  assert.match(source.adminBankUi, /t\("payouts\.bankDirectory\.adminOverride"\)/);
 });
 
 test("Open Bank Portal is only a verified website link with noopener and noreferrer", () => {
   assert.match(source.payoutUi, /isSafeOfficialBankWebsite/);
   assert.match(source.payoutUi, /rel="noopener noreferrer"/);
-  assert.match(source.payoutUi, /Open Bank Portal/);
-  assert.match(source.payoutUi, /does not initiate a bank transfer/);
+  assert.match(source.payoutUi, /t\("payouts\.openBankPortal"\)/);
+  assert.match(source.payoutUi, /t\("payouts\.manualExternalNotice"\)/);
 });
 
 test("payout proof uploads use a private bucket, matching type and extension, and short signed URLs", () => {
@@ -463,12 +473,39 @@ test("migration is additive, uses restrictive financial foreign keys, and locks 
 });
 
 test("manual payout UI records only external transfers and clears revealed bank instructions", () => {
-  assert.match(source.payoutUi, /Mark as Sent/);
-  assert.match(source.payoutUi, /Mark as Failed/);
-  assert.match(source.payoutUi, /Place on Hold/);
-  assert.match(source.payoutUi, /Download Payout Instruction/);
+  assert.match(source.payoutUi, /t\("payouts\.markSent"\)/);
+  assert.match(source.payoutUi, /t\("payouts\.markFailed"\)/);
+  assert.match(source.payoutUi, /t\("payouts\.placeOnHold"\)/);
+  assert.match(source.payoutUi, /t\("payouts\.downloadInstructions"\)/);
   assert.match(source.payoutUi, /setRevealed\(null\)/);
   assert.match(source.payoutUi, /instructions-exported/);
+});
+
+test("order and payout translation namespaces stay structurally aligned and localize financial states", () => {
+  assert.deepEqual(dictionaryPaths(dictionaries.en).sort(), dictionaryPaths(dictionaries.ko).sort());
+
+  for (const key of [
+    "orders.status.order.PAYMENT_PENDING",
+    "orders.status.order.READY_TO_SHIP",
+    "orders.status.payment.PARTIALLY_REFUNDED",
+    "orders.status.shipment.IN_TRANSIT",
+    "payouts.status.PROCESSING",
+    "payouts.profileStatus.PENDING_VERIFICATION",
+    "payouts.adjustmentType.REFUND_RECOVERY",
+    "payouts.noPayouts",
+  ]) {
+    const value = key.split(".").reduce<unknown>((current, segment) => (
+      current && typeof current === "object" ? (current as Record<string, unknown>)[segment] : undefined
+    ), dictionaries.ko);
+    assert.equal(typeof value, "string", key);
+  }
+
+  assert.match(source.adminOrderUi, /tradeOrderStatusLabel/);
+  assert.match(source.adminOrderUi, /orderPaymentStatusLabel/);
+  assert.match(source.adminOrderUi, /shipmentStatusLabel/);
+  assert.match(source.adminOrderUi, /payoutStatusLabel/);
+  assert.match(source.payoutUi, /payoutAdjustmentTypeLabel/);
+  assert.match(source.payoutUi, /formatTradeMoney/);
 });
 
 test("order notifications do not contain account, encrypted bank, or Stripe identifier payloads", () => {

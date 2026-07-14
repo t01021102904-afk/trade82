@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
+import { useI18n } from "@/components/i18n-provider";
 import { getCountryCodeOptions } from "@/lib/company-select-options";
 import { withLocale } from "@/lib/i18n";
+import { payoutProfileStatusLabel } from "@/lib/trade-order-i18n";
 
 type AccountType = "LOCAL" | "FOREIGN_CURRENCY" | "IBAN" | "OTHER";
 
@@ -101,89 +103,43 @@ export function SellerPayoutOnboardingStep({
   onSaved?: () => void | Promise<void>;
 }) {
   const router = useRouter();
-  const korean = locale === "ko";
-  const copy = korean
-    ? {
-        label: "정산 정보",
-        title: "정산 계좌 정보를 입력하세요",
-        description:
-          "정산 계좌 정보는 암호화되어 저장됩니다. 저장 후에는 마스킹된 계좌 정보만 표시됩니다.",
-        maintenance:
-          "정산 정보 기능이 현재 점검 중입니다. 점검이 끝나기 전에는 셀러 가입을 완료할 수 없습니다.",
-        loadError: "정산 정보를 불러올 수 없습니다.",
-        saveError: "정산 정보를 저장할 수 없습니다.",
-        completeError: "정산 정보를 저장했지만 셀러 가입을 완료하지 못했습니다. 다시 시도해 주세요.",
-        saved: "정산 정보가 저장되었습니다. 관리자 확인 전까지는 미확인 상태로 유지됩니다.",
-        country: "국가",
-        bankName: "은행명",
-        accountHolder: "예금주명",
-        accountNumber: "계좌번호 또는 IBAN",
-        replaceAccountNumber: "계좌번호 변경",
-        accountType: "계좌 유형",
-        payoutCurrency: "정산 통화",
-        accountConfirmation: "이 계좌가 셀러 회사 또는 승인된 수취인에게 속해 있음을 확인합니다.",
-        optional: "선택 정보",
-        branchName: "지점명",
-        bankCode: "은행 코드",
-        swift: "SWIFT / BIC",
-        bankAddress: "은행 주소",
-        beneficiaryAddress: "수취인 주소",
-        intermediaryName: "중개 은행명",
-        intermediarySwift: "중개 은행 SWIFT",
-        intermediaryAddress: "중개 은행 주소",
-        payoutMemo: "정산 메모",
-        save: "정산 정보 저장",
-        saving: "저장 중...",
-        savedAccount: "저장된 계좌",
-        status: "확인 대기",
-        local: "일반 계좌",
-        foreign: "외화 계좌",
-        iban: "IBAN",
-        other: "기타",
-        selectCountry: "국가 선택",
-      }
-    : {
-        label: "Payout information",
-        title: "Add your payout bank information",
-        description:
-          "Payout instructions are encrypted at rest. Only masked account information is shown after saving.",
-        maintenance:
-          "Payout information is temporarily unavailable. Seller onboarding cannot be completed until maintenance ends.",
-        loadError: "Unable to load payout information.",
-        saveError: "Unable to save payout information.",
-        completeError:
-          "Payout information was saved, but seller onboarding could not be completed. Please try again.",
-        saved:
-          "Payout information saved. It remains unverified until an administrator reviews it.",
-        country: "Country",
-        bankName: "Bank name",
-        accountHolder: "Account holder name",
-        accountNumber: "Account number or IBAN",
-        replaceAccountNumber: "Replace account number",
-        accountType: "Account type",
-        payoutCurrency: "Payout currency",
-        accountConfirmation:
-          "I confirm this account belongs to the seller company or an authorized beneficiary.",
-        optional: "Optional information",
-        branchName: "Branch name",
-        bankCode: "Bank code",
-        swift: "SWIFT / BIC",
-        bankAddress: "Bank address",
-        beneficiaryAddress: "Beneficiary address",
-        intermediaryName: "Intermediary bank name",
-        intermediarySwift: "Intermediary bank SWIFT",
-        intermediaryAddress: "Intermediary bank address",
-        payoutMemo: "Payout memo",
-        save: "Save payout information",
-        saving: "Saving...",
-        savedAccount: "Saved account",
-        status: "Pending verification",
-        local: "Local account",
-        foreign: "Foreign currency account",
-        iban: "IBAN",
-        other: "Other",
-        selectCountry: "Select country",
-      };
+  const { t } = useI18n();
+  const copy = {
+    label: t("payouts.informationTitle"),
+    title: t("payouts.onboardingTitle"),
+    description: t("payouts.onboardingDescription"),
+    maintenance: t("payouts.onboardingMaintenance"),
+    loadError: t("payouts.loadError"),
+    saveError: t("payouts.saveError"),
+    completeError: t("payouts.onboardingCompleteError"),
+    saved: t("payouts.onboardingSaved"),
+    country: t("payouts.country"),
+    bankName: t("payouts.bankName"),
+    accountHolder: t("payouts.accountHolder"),
+    accountNumber: t("payouts.accountNumber"),
+    replaceAccountNumber: t("payouts.replaceAccountNumber"),
+    accountType: t("payouts.accountType"),
+    payoutCurrency: t("payouts.payoutCurrency"),
+    accountConfirmation: t("payouts.accountBelongsToCompany"),
+    optional: t("payouts.optionalInformation"),
+    branchName: t("payouts.branchName"),
+    bankCode: t("payouts.bankCode"),
+    swift: "SWIFT / BIC",
+    bankAddress: t("payouts.bankAddress"),
+    beneficiaryAddress: t("payouts.beneficiaryAddress"),
+    intermediaryName: t("payouts.intermediaryBank"),
+    intermediarySwift: t("payouts.intermediarySwift"),
+    intermediaryAddress: t("payouts.intermediaryAddress"),
+    payoutMemo: t("payouts.payoutMemo"),
+    save: t("payouts.saveInformation"),
+    saving: t("payouts.saving"),
+    savedAccount: t("payouts.savedAccount"),
+    local: t("payouts.accountType.LOCAL"),
+    foreign: t("payouts.accountType.FOREIGN_CURRENCY"),
+    iban: t("payouts.accountType.IBAN"),
+    other: t("payouts.accountType.OTHER"),
+    selectCountry: t("payouts.selectCountry"),
+  };
   const countries = useMemo(() => getCountryCodeOptions(locale), [locale]);
   const [form, setForm] = useState<PayoutForm>(initialForm);
   const [profile, setProfile] = useState<PayoutProfile | null>(null);
@@ -211,7 +167,7 @@ export function SellerPayoutOnboardingStep({
           setError(
             response.status === 503
               ? copy.maintenance
-              : data?.error ?? copy.loadError,
+              : copy.loadError,
           );
           return;
         }
@@ -274,7 +230,7 @@ export function SellerPayoutOnboardingStep({
         setError(
           response.status === 503
             ? copy.maintenance
-            : data?.error ?? copy.saveError,
+            : copy.saveError,
         );
         return;
       }
@@ -310,7 +266,7 @@ export function SellerPayoutOnboardingStep({
   if (loading) {
     return (
       <div className="flex min-h-56 items-center justify-center">
-        <Loader2 className="size-5 animate-spin theme-muted" aria-label="Loading" />
+        <Loader2 className="size-5 animate-spin theme-muted" aria-label={t("payouts.loading")} />
       </div>
     );
   }
@@ -410,7 +366,7 @@ export function SellerPayoutOnboardingStep({
         <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4 theme-border">
           <span className="inline-flex items-center gap-1.5 text-xs font-medium theme-muted">
             <ShieldCheck className="size-4 theme-success-text" aria-hidden="true" />
-            {copy.status}
+            {payoutProfileStatusLabel(profile?.status ?? "PENDING_VERIFICATION", t)}
           </span>
           <button type="submit" disabled={saving || maintenance} className="inline-flex h-10 items-center rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
             {saving ? copy.saving : copy.save}
