@@ -66,6 +66,11 @@ type SecurityNoticeEmailInput = {
   baseUrl?: string;
 };
 
+type CompanyApprovalEmailInput = {
+  locale?: EmailLocale;
+  baseUrl?: string;
+};
+
 export type TradeOrderNotificationKind =
   | "order_created"
   | "payment_received"
@@ -465,6 +470,29 @@ export function securityNoticeEmail({
     body: notice,
     ctaLabel: locale === "ko" ? "계정 확인하기" : "Review account",
     ctaPath: locale === "ko" ? "/ko/settings/profile" : "/settings/profile",
+    baseUrl,
+  });
+}
+
+export function companyApprovalEmail({
+  locale = "en",
+  baseUrl,
+}: CompanyApprovalEmailInput): EmailRender {
+  const title =
+    locale === "ko"
+      ? "[Trade82] 회사 등록이 승인되었습니다"
+      : "[Trade82] Your company has been approved";
+
+  return renderBrandedEmail({
+    locale,
+    preview: title,
+    title,
+    intro:
+      locale === "ko"
+        ? "회사 등록 검토가 완료되었습니다. 이제 Trade82에 상품을 등록하고 글로벌 바이어에게 회사를 공개할 수 있습니다."
+        : "Your company registration has been approved. You can now list products and make your company visible to global buyers on Trade82.",
+    ctaLabel: locale === "ko" ? "상품 등록하기" : "List a Product",
+    ctaPath: locale === "ko" ? "/ko/sell" : "/sell",
     baseUrl,
   });
 }
