@@ -10,6 +10,7 @@ import {
 } from "@/components/image-uploader";
 import { CountryMultiSelect } from "@/components/country-multi-select";
 import { useI18n } from "@/components/i18n-provider";
+import { SellerPayoutOnboardingStep } from "@/components/seller-payout-onboarding-step";
 import {
   OnboardingStepper,
   type OnboardingStepId,
@@ -51,7 +52,7 @@ import {
 import { withLocale } from "@/lib/i18n";
 import type { UploadedListingImage } from "@/lib/marketplace";
 
-type FlowStep = "company" | "personal" | "product" | "sourcing";
+type FlowStep = "company" | "payout" | "personal" | "product" | "sourcing";
 
 type CompanyStep = {
   companyName: string;
@@ -405,6 +406,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
       return;
     }
     if (selected === "company") setStep("company");
+    if (selected === "payout" && kind === "seller" && companyId) setStep("payout");
     if (selected === "personal" && companyId) setStep("personal");
     if (selected === "product" && companyId) setStep("product");
     if (selected === "sourcing" && companyId) setStep("sourcing");
@@ -469,7 +471,7 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
       clearDraft();
       setDirty(false);
       setSuccess(t("onboarding.companyStepSaved"));
-      setStep("personal");
+      setStep(kind === "seller" ? "payout" : "personal");
     } catch {
       setError(t("settings.companySaveError"));
     } finally {
@@ -894,6 +896,13 @@ export function OnboardingForm({ kind }: { kind: "buyer" | "seller" }) {
                 updateCompany("certificateFileName", file?.name ?? "");
               }}
               onUploadingChange={setUploading}
+            />
+          ) : null}
+
+          {step === "payout" && kind === "seller" ? (
+            <SellerPayoutOnboardingStep
+              locale={locale}
+              completeOnboardingAfterSave
             />
           ) : null}
 

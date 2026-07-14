@@ -3,7 +3,13 @@
 import { useI18n } from "@/components/i18n-provider";
 import { cx } from "@/lib/utils";
 
-export type OnboardingStepId = "role" | "company" | "personal" | "product" | "sourcing";
+export type OnboardingStepId =
+  | "role"
+  | "company"
+  | "payout"
+  | "personal"
+  | "product"
+  | "sourcing";
 
 export function OnboardingStepper({
   current,
@@ -15,22 +21,19 @@ export function OnboardingStepper({
   onSelect?: (step: OnboardingStepId) => void;
 }) {
   const { t } = useI18n();
-  const finalStep: OnboardingStepId =
-    role === "buyer" ? "sourcing" : role === "seller" ? "product" : "product";
-  const steps: Array<{ id: OnboardingStepId; label: string }> = [
-    { id: "role", label: t("onboarding.stepRole") },
-    { id: "company", label: t("onboarding.stepCompany") },
-    { id: "personal", label: t("onboarding.stepPersonal") },
-    {
-      id: finalStep,
-      label:
-        role === "buyer"
-          ? t("onboarding.stepBuyerSourcing")
-          : role === "seller"
-            ? t("onboarding.stepSellerProduct")
-            : t("onboarding.stepFinal"),
-    },
-  ];
+  const steps: Array<{ id: OnboardingStepId; label: string }> =
+    role === "seller"
+      ? [
+          { id: "role", label: t("onboarding.stepRole") },
+          { id: "company", label: t("onboarding.stepCompany") },
+          { id: "payout", label: t("onboarding.stepPayoutInformation") },
+        ]
+      : [
+          { id: "role", label: t("onboarding.stepRole") },
+          { id: "company", label: t("onboarding.stepCompany") },
+          { id: "personal", label: t("onboarding.stepPersonal") },
+          { id: "sourcing", label: t("onboarding.stepBuyerSourcing") },
+        ];
   const currentIndex = steps.findIndex((step) => step.id === current);
 
   return (

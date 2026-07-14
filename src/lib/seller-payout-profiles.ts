@@ -78,15 +78,36 @@ function nullable(value: string | null | undefined) {
   return trimmed || null;
 }
 
+function requiredText(value: string, field: string, maxLength: number) {
+  const trimmed = value.trim();
+  if (!trimmed) throw new Error(`${field} is required.`);
+  if (trimmed.length > maxLength) throw new Error(`${field} is too long.`);
+  return trimmed;
+}
+
 function normalizedCurrency(value: string) {
   const currency = value.trim().toLowerCase();
   if (!/^[a-z]{3}$/.test(currency)) throw new Error("Payout currency must be a three-letter code.");
   return currency;
 }
 
+function normalizedCountry(value: string) {
+  const country = value.trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(country)) {
+    throw new Error("Payout country must be a two-letter ISO country code.");
+  }
+  return country;
+}
+
 function encryptedAccountData(accountNumber: string): EncryptedPayoutData {
   const value = accountNumber.replace(/\s+/g, "");
-  if (value.length < 4 || value.length > 120) throw new Error("Account number is invalid.");
+  if (
+    value.length < 4 ||
+    value.length > 64 ||
+    !/^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(value)
+  ) {
+    throw new Error("Account number is invalid.");
+  }
   return encryptPayoutData(value);
 }
 
@@ -103,6 +124,14 @@ export async function saveSellerPayoutProfile({
   companyId: string;
   input: SellerPayoutProfileInput;
 }) {
+  if (![
+    "LOCAL",
+    "FOREIGN_CURRENCY",
+    "IBAN",
+    "OTHER",
+  ].includes(input.accountType)) {
+    throw new Error("Account type is invalid.");
+  }
   if (!input.accountBelongsToCompany) {
     throw new Error("Confirm that the payout account belongs to the seller company or authorized beneficiary.");
   }
@@ -160,20 +189,23 @@ export async function saveSellerPayoutProfile({
   // unverified directory entry are never auto-trusted or copied into a profile.
   const directoryDefaults = verifiedBankAutofill(directory, input.manualBankOverride);
 
+  const payoutCurrency = normalizedCurrency(input.payoutCurrency);
   const data = {
-    country: input.country.trim(),
+    country: normalizedCountry(input.country),
     bankDirectoryId: directory?.id ?? null,
-    bankName: directoryDefaults ? directoryDefaults.bankName : input.bankName.trim(),
+    bankName: directoryDefaults
+      ? directoryDefaults.bankName
+      : requiredText(input.bankName, "Bank name", 240),
     branchName: nullable(input.branchName),
-    accountHolder: input.accountHolder.trim(),
+    accountHolder: requiredText(input.accountHolder, "Account holder", 240),
     accountType: input.accountType,
     bankCode: nullable(input.bankCode),
     swiftBic: directoryDefaults ? directoryDefaults.swiftBic : nullable(input.swiftBic),
     bankAddress: directoryDefaults ? directoryDefaults.bankAddress : nullable(input.bankAddress),
     beneficiaryAddress: nullable(input.beneficiaryAddress),
-    payoutCurrency: normalizedCurrency(input.payoutCurrency),
+    payoutCurrency,
     supportedCurrencies: Array.from(
-      new Set(input.supportedCurrencies.map(normalizedCurrency)),
+      new Set([...input.supportedCurrencies, payoutCurrency].map(normalizedCurrency)),
     ).slice(0, 12),
     intermediaryBankName: nullable(input.intermediaryBankName),
     intermediaryBankSwift: nullable(input.intermediaryBankSwift),

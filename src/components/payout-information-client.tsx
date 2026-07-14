@@ -105,7 +105,32 @@ export function PayoutInformationClient({ locale = "en" }: { locale?: "en" | "ko
   async function save() {
     setSaving(true); setError(""); setNotice("");
     try {
-      const response = await fetch("/api/account/payout-profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...profile, accountNumber: accountNumber || undefined }) });
+      const response = await fetch("/api/account/payout-profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          country: profile.country,
+          bankDirectoryId: profile.bankDirectoryId,
+          bankName: profile.bankName,
+          branchName: profile.branchName,
+          accountHolder: profile.accountHolder,
+          ...(accountNumber ? { accountNumber } : {}),
+          accountType: profile.accountType,
+          bankCode: profile.bankCode,
+          swiftBic: profile.swiftBic,
+          bankAddress: profile.bankAddress,
+          beneficiaryAddress: profile.beneficiaryAddress,
+          payoutCurrency: profile.payoutCurrency,
+          supportedCurrencies: profile.supportedCurrencies,
+          intermediaryBankName: profile.intermediaryBankName,
+          intermediaryBankSwift: profile.intermediaryBankSwift,
+          intermediaryBankAddress: profile.intermediaryBankAddress,
+          payoutMemo: profile.payoutMemo,
+          accountBelongsToCompany: profile.accountBelongsToCompany,
+          manualBankOverride: profile.manualBankOverride,
+          manualOverrideReason: profile.manualOverrideReason,
+        }),
+      });
       const data = await response.json().catch(() => null);
       if (!response.ok) { setError(data?.error ?? "Unable to save payout information."); return; }
       setProfile({ ...emptyProfile, ...data.profile }); setAccountNumber(""); setNotice(korean ? "정산 정보가 저장되었습니다. 관리자 확인 후 정산 준비가 가능합니다." : "Payout information saved. It must be verified before a payout can be prepared.");

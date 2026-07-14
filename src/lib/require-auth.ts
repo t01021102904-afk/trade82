@@ -48,7 +48,11 @@ async function resolveOnboardingState(
 ) {
   const companyState = profile
     ? await getOnboardingCompanyState(profile.id)
-    : { hasBuyerCompany: false, hasSellerCompany: false };
+    : {
+        hasBuyerCompany: false,
+        hasSellerCompany: false,
+        hasSellerPayoutProfile: false,
+      };
   const inferredRole = inferRoleFromCompanyState(companyState);
   let role = profile?.role ?? "user";
 
@@ -81,6 +85,7 @@ async function resolveOnboardingState(
     role,
     canChangeRole: role !== "admin" && !hasAnyOnboardingCompany(companyState),
     onboardingComplete: isOnboardingCompleteForRole(role, companyState),
+    companyState,
   };
 }
 
@@ -229,7 +234,9 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     onboardingComplete,
   );
 
-  if (role === "user" || canChangeRole) return { role, canChangeRole };
+  if (role === "user" || canChangeRole) {
+    return { role, canChangeRole };
+  }
   if (role === "admin") redirect(`${prefix}/admin`);
 
   if (onboardingComplete) {
@@ -251,7 +258,8 @@ export async function requireOnboardingRole(
   ]);
   const prefix = localePrefix(redirectUrl);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete, companyState } =
+    await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -279,7 +287,7 @@ export async function requireOnboardingRole(
     redirect(`${prefix}/dashboard`);
   }
 
-  return { role, canChangeRole };
+  return { role, canChangeRole, hasSellerCompany: companyState.hasSellerCompany };
 }
 
 export async function requireDashboardRole(

@@ -199,6 +199,29 @@ export function clientIp(request: Request) {
   );
 }
 
+// Privileged browser writes must originate from this application. This is
+// intentionally an additional control, not a replacement for Clerk ownership checks.
+export function assertSameOrigin(request: Request) {
+  const origin = request.headers.get("origin");
+  const host = (request.headers.get("x-forwarded-host") ?? request.headers.get("host"))
+    ?.split(",")[0]
+    ?.trim();
+  const protocol = (request.headers.get("x-forwarded-proto") ?? "https")
+    .split(",")[0]
+    .trim();
+  if (!origin || !host) throw new Response("Forbidden", { status: 403 });
+
+  try {
+    const originUrl = new URL(origin);
+    if (originUrl.host !== host || originUrl.protocol !== `${protocol}:`) {
+      throw new Response("Forbidden", { status: 403 });
+    }
+  } catch (error) {
+    if (error instanceof Response) throw error;
+    throw new Response("Forbidden", { status: 403 });
+  }
+}
+
 export function rateLimitOrResponse({
   request,
   scope,
