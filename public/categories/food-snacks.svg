@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" fill="none">
+  <defs>
+    <linearGradient id="foodBagGradient" x1="39" y1="46" x2="93" y2="124" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE6A8"/><stop offset="1" stop-color="#F4A53C"/></linearGradient>
+    <linearGradient id="foodCupGradient" x1="92" y1="64" x2="143" y2="126" gradientUnits="userSpaceOnUse"><stop stop-color="#FF8C70"/><stop offset="1" stop-color="#D94A46"/></linearGradient>
+    <filter id="foodSoftShadow" x="23" y="26" width="154" height="114" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#4A2A12" flood-opacity=".18"/></filter>
+  </defs>
+  <g filter="url(#foodSoftShadow)">
+    <ellipse cx="100" cy="126" rx="69" ry="8" fill="#E7D2B4" opacity=".6"/>
+    <path d="M42 48 83 42l8 74-44 5-8-63 3-10Z" fill="url(#foodBagGradient)"/>
+    <path d="m42 48 42-6 5 14-47 6V48Z" fill="#F7C55D"/>
+    <path d="m50 75 27-3 3 23-27 4-3-24Z" fill="#FFF6D8" opacity=".88"/>
+    <path d="m58 84 12-5 5 9-11 6-6-10Z" fill="#E76C32"/>
+    <path d="M95 70h51l-5 50H100l-5-50Z" fill="url(#foodCupGradient)"/>
+    <ellipse cx="120" cy="69" rx="27" ry="9" fill="#FFF1D6"/>
+    <ellipse cx="120" cy="67" rx="21" ry="5" fill="#D89745"/>
+    <path d="M101 86h41M102 96h39" stroke="#FFE5B2" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+    <rect x="150" y="50" width="21" height="69" rx="10" fill="#65B895"/>
+    <rect x="155" y="40" width="11" height="14" rx="4" fill="#4C8A78"/>
+    <path d="M157 68h7v25h-7z" fill="#DDF6D9" opacity=".9"/>
+    <path d="M160 75c-4-3-5-8 0-11 5 3 4 8 0 11Z" fill="#F0D06A"/>
+  </g>
+</svg>

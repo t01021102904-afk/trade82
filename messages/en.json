@@ -109,6 +109,28 @@
     "copyright": "© Trade82. All rights reserved."
   },
   "home": {
+    "categorySection": {
+      "title": "Explore Categories",
+      "previous": "Show previous categories",
+      "next": "Show more categories",
+      "scrollRegion": "Product categories",
+      "items": {
+        "beauty": "Beauty & Personal Care",
+        "food": "Food & Snacks",
+        "household": "Household Goods",
+        "fashion": "Fashion & Apparel",
+        "baby": "Baby & Kids",
+        "pet": "Pet Products",
+        "health": "Health & Wellness",
+        "electronics": "Electronics Accessories",
+        "kitchenware": "Kitchenware",
+        "kpop": "K-Pop & Character Goods",
+        "stationery": "Stationery & Lifestyle",
+        "packaging": "Packaging",
+        "industrial": "Industrial / B2B Supplies",
+        "other": "Other"
+      }
+    },
     "heroBadge": "Trade82",
     "headline": "Move Korean products from listing to global buyer inquiry faster.",
     "subheadline": "Trade82 helps Korean suppliers structure product data, control sensitive fields, and turn global buyer discovery into qualified sourcing conversations.",

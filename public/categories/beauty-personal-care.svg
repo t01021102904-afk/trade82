@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150" fill="none">
+  <defs>
+    <linearGradient id="beautyBottleGradient" x1="65" y1="42" x2="100" y2="125" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD4DE"/><stop offset="1" stop-color="#E985A5"/></linearGradient>
+    <linearGradient id="beautyJarGradient" x1="97" y1="78" x2="147" y2="123" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF7E6"/><stop offset="1" stop-color="#F3B75B"/></linearGradient>
+    <filter id="beautySoftShadow" x="25" y="22" width="150" height="120" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#3D2030" flood-opacity=".17"/></filter>
+  </defs>
+  <g filter="url(#beautySoftShadow)">
+    <ellipse cx="101" cy="126" rx="65" ry="8" fill="#EACFD5" opacity=".55"/>
+    <rect x="54" y="50" width="42" height="70" rx="13" fill="url(#beautyBottleGradient)"/>
+    <rect x="64" y="37" width="22" height="18" rx="5" fill="#E9A9BB"/>
+    <rect x="61" y="33" width="28" height="8" rx="4" fill="#643C53"/>
+    <path d="M62 58c8-7 21-8 29-1v19c-10-5-20-4-29 1V58Z" fill="#FFF9FA" opacity=".9"/>
+    <circle cx="73" cy="66" r="4" fill="#EF9AB0"/>
+    <rect x="101" y="83" width="52" height="37" rx="13" fill="url(#beautyJarGradient)"/>
+    <rect x="98" y="74" width="58" height="15" rx="7" fill="#F5D9AE"/>
+    <path d="M113 94h29v12h-29z" fill="#FFFDF8" opacity=".8"/>
+    <rect x="144" y="54" width="17" height="62" rx="8" fill="#A74F72"/>
+    <rect x="144" y="76" width="17" height="40" rx="8" fill="#F1A5B7"/>
+    <path d="M146 73c0-13 13-19 13-6v9h-13v-3Z" fill="#E74E72"/>
+    <path d="M151 89h4" stroke="#FFF6F8" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

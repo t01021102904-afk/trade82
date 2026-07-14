@@ -110,6 +110,28 @@
     "copyright": "© Trade82. All rights reserved."
   },
   "home": {
+    "categorySection": {
+      "title": "상품 카테고리 둘러보기",
+      "previous": "이전 카테고리 보기",
+      "next": "다음 카테고리 보기",
+      "scrollRegion": "상품 카테고리",
+      "items": {
+        "beauty": "뷰티·퍼스널케어",
+        "food": "식품·스낵",
+        "household": "생활용품",
+        "fashion": "패션·의류",
+        "baby": "유아·키즈",
+        "pet": "반려동물용품",
+        "health": "헬스·웰니스",
+        "electronics": "전자 액세서리",
+        "kitchenware": "주방용품",
+        "kpop": "K-팝·캐릭터 굿즈",
+        "stationery": "문구·라이프스타일",
+        "packaging": "포장재",
+        "industrial": "산업·B2B 용품",
+        "other": "기타"
+      }
+    },
     "heroBadge": "Trade82",
     "headline": "한국 상품 등록부터 글로벌 바이어 문의까지 더 빠르게 연결합니다.",
     "subheadline": "Trade82는 한국 셀러가 상품 정보를 구조화하고 민감한 정보를 관리하며, 전 세계 바이어의 탐색을 실제 소싱 문의로 이어가도록 돕습니다.",

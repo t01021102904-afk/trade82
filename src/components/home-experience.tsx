@@ -12,6 +12,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+import { HomeCategoryVisualScroller } from "@/components/home-category-visual-scroller";
 import { HomeAutoVideo, HomeFaqAccordion, HomeReveal } from "@/components/home-landing-interactions";
 import { HomeMarketingExposureStrip } from "@/components/home-marketing-exposure-strip";
 import { HomeWorkflowVisual } from "@/components/home-workflow-visual";
@@ -40,7 +41,6 @@ type HomeCopy = {
     subheadline: string;
     sellerCta: string;
     buyerCta: string;
-    builtWith: string;
   };
   capabilities: {
     eyebrow: string;
@@ -94,18 +94,6 @@ type HomeCopy = {
   };
 };
 
-const builtWithLogos = [
-  { name: "ChatGPT", src: "/logo/chatgpt.webp" },
-  { name: "Codex", src: "/logo/codex.png" },
-  { name: "Vercel", src: "/logo/vercel.svg" },
-  { name: "Supabase", src: "/logo/supabase.webp" },
-  { name: "Stripe", src: "/logo/stripe.png" },
-  { name: "Clerk", src: "/logo/clerk.png" },
-  { name: "Resend", src: "/logo/resend.svg" },
-  { name: "GitHub", src: "/logo/github.png" },
-  { name: "Claude", src: "/logo/claude.png" },
-];
-
 const homeCopy: Record<Locale, HomeCopy> = {
   en: {
     hero: {
@@ -115,7 +103,6 @@ const homeCopy: Record<Locale, HomeCopy> = {
         "Trade82 helps Korean suppliers and global buyers connect, manage product sourcing, share trade documents, and move inquiries into real business.",
       sellerCta: "Join as seller",
       buyerCta: "Join as buyer",
-      builtWith: "Built with",
     },
     capabilities: {
       eyebrow: "What you can actually do",
@@ -291,7 +278,6 @@ const homeCopy: Record<Locale, HomeCopy> = {
         "Trade82는 한국 공급사와 전 세계 바이어가 만나고, 상품 소싱을 관리하고, 무역 서류를 공유하고, 문의를 실제 비즈니스 대화로 이어가도록 돕습니다.",
       sellerCta: "셀러로 시작하기",
       buyerCta: "바이어로 시작하기",
-      builtWith: "Built with",
     },
     capabilities: {
       eyebrow: "실제로 할 수 있는 일",
@@ -500,9 +486,9 @@ export function HomeExperience({ locale }: { locale: Locale }) {
             <HomeWorkflowVisual locale={locale} />
           </HomeReveal>
         </div>
-        <BuiltWithMarquee label={copy.hero.builtWith} />
       </section>
 
+      <HomeCategoryVisualScroller />
       <HomeMarketingExposureStrip />
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
@@ -579,40 +565,6 @@ export function HomeExperience({ locale }: { locale: Locale }) {
 
       <FinalCta copy={copy.cta} locale={locale} />
     </main>
-  );
-}
-
-function BuiltWithMarquee({ label }: { label: string }) {
-  const loop = [...builtWithLogos, ...builtWithLogos];
-
-  return (
-    <div className="relative border-t theme-border">
-      <div className="mx-auto flex max-w-7xl items-center gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <p className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] theme-muted">
-          {label}
-        </p>
-        <div className="home-marquee-mask min-w-0 flex-1 overflow-hidden">
-          <div className="home-marquee-track flex w-max items-center gap-3">
-            {loop.map((logo, index) => (
-              <span
-                key={`${logo.name}-${index}`}
-                className="inline-flex h-11 w-[112px] items-center justify-center rounded-full border border-black/10 bg-[rgba(255,255,255,0.96)] px-4 shadow-sm shadow-black/5"
-              >
-                <Image
-                  src={logo.src}
-                  alt={`${logo.name} logo`}
-                  width={96}
-                  height={32}
-                  className="max-h-6 w-auto max-w-[82px] object-contain"
-                  unoptimized
-                  draggable={false}
-                />
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
 
