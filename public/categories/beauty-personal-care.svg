@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="bottle" x1="48" y1="25" x2="92" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#D9FAF0"/><stop offset="1" stop-color="#67C7AE"/></linearGradient>
+    <linearGradient id="jar" x1="84" y1="56" x2="126" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE8F2"/><stop offset="1" stop-color="#E898B8"/></linearGradient>
+    <filter id="shadow" x="16" y="18" width="130" height="92" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#52766C" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="81" cy="94" rx="55" ry="10" fill="#CFE8E0" opacity=".7"/>
+  <g filter="url(#shadow)">
+    <path d="M52 33h27l4 11H48l4-11Z" fill="#A8DCCB"/>
+    <rect x="51" y="23" width="29" height="13" rx="5" fill="#F7FFFC"/>
+    <rect x="47" y="42" width="38" height="49" rx="12" fill="url(#bottle)"/>
+    <path d="M53 48c7-5 20-6 27-2v30c-9 5-20 4-27-1V48Z" fill="#B6ECDD" opacity=".72"/>
+    <rect x="89" y="58" width="38" height="12" rx="5" fill="#FCEBF2"/>
+    <rect x="85" y="68" width="46" height="24" rx="11" fill="url(#jar)"/>
+    <path d="M91 74c9-4 25-4 34 1v8c-10 5-25 4-34 0v-9Z" fill="#F8BDD3" opacity=".78"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="cubeA" x1="32" y1="42" x2="82" y2="98" gradientUnits="userSpaceOnUse"><stop stop-color="#E5E2FF"/><stop offset="1" stop-color="#9386D9"/></linearGradient>
+    <linearGradient id="cubeB" x1="80" y1="34" x2="132" y2="91" gradientUnits="userSpaceOnUse"><stop stop-color="#E1F7EF"/><stop offset="1" stop-color="#63B6A1"/></linearGradient>
+    <filter id="shadow" x="14" y="19" width="132" height="96" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#5D5A85" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="80" cy="97" rx="57" ry="9" fill="#DFE2EE"/>
+  <g filter="url(#shadow)">
+    <path d="m32 55 23-13 24 14v27L55 97 31 83l1-28Z" fill="url(#cubeA)"/>
+    <path d="m32 55 23 14 24-13M55 69v28" stroke="#F4F2FF" stroke-width="3" stroke-linejoin="round"/>
+    <path d="m82 43 22-13 26 14v31l-25 15-25-14 2-33Z" fill="url(#cubeB)"/>
+    <path d="m82 43 23 14 25-13M105 57v33" stroke="#F1FFFA" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="107" cy="68" r="5" fill="#FFF2BA"/>
+  </g>
+</svg>

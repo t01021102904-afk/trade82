@@ -111,6 +111,27 @@
   },
   "home": {
     "heroBadge": "Trade82",
+    "categorySection": {
+      "title": "상품 카테고리 둘러보기",
+      "previous": "이전 상품 카테고리 보기",
+      "next": "다음 상품 카테고리 보기",
+      "items": {
+        "beautyPersonalCare": "뷰티 / 퍼스널케어",
+        "foodSnacks": "식품 / 스낵",
+        "householdGoods": "생활용품",
+        "fashionApparel": "패션 / 의류",
+        "babyKids": "유아 / 키즈",
+        "petProducts": "반려동물용품",
+        "healthWellness": "헬스 / 웰니스",
+        "electronicsAccessories": "전자기기 액세서리",
+        "kitchenware": "주방용품",
+        "kpopCharacterGoods": "K-Pop / 캐릭터 굿즈",
+        "stationeryLifestyle": "문구 / 라이프스타일",
+        "packaging": "패키징",
+        "industrialB2bSupplies": "산업재 / B2B 소모품",
+        "other": "기타"
+      }
+    },
     "headline": "한국 상품 등록부터 글로벌 바이어 문의까지 더 빠르게 연결합니다.",
     "subheadline": "Trade82는 한국 셀러가 상품 정보를 구조화하고 민감한 정보를 관리하며, 전 세계 바이어의 탐색을 실제 소싱 문의로 이어가도록 돕습니다.",
     "valueTitle1": "등록 회사 프로필",

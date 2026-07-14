@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="cleaner" x1="46" y1="26" x2="93" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#D9EDFF"/><stop offset="1" stop-color="#68A8E4"/></linearGradient>
+    <linearGradient id="tablet" x1="92" y1="67" x2="127" y2="94" gradientUnits="userSpaceOnUse"><stop stop-color="#DDF7E6"/><stop offset="1" stop-color="#70C993"/></linearGradient>
+    <filter id="shadow" x="17" y="15" width="128" height="98" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#53779D" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="81" cy="95" rx="55" ry="10" fill="#D5E7EF"/>
+  <g filter="url(#shadow)">
+    <path d="M54 21h20v9H54z" fill="#5A94C9"/>
+    <path d="M60 18h26c4 0 6 3 6 6v4H60v-10Z" fill="#EAF6FF"/>
+    <path d="M49 34c0-6 5-10 11-10h24c6 0 11 4 11 10v50c0 6-5 10-11 10H60c-6 0-11-4-11-10V34Z" fill="url(#cleaner)"/>
+    <path d="M57 48h30v26H57z" rx="7" fill="#F5FBFF" opacity=".88"/>
+    <path d="M59 67c8-8 18-8 26 0" stroke="#73B99B" stroke-width="5" stroke-linecap="round"/>
+    <rect x="96" y="69" width="33" height="22" rx="10" fill="url(#tablet)"/>
+    <path d="M101 79h23" stroke="#F8FFF8" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  </g>
+</svg>

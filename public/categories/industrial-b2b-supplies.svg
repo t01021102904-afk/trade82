@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="gear" x1="34" y1="31" x2="99" y2="99" gradientUnits="userSpaceOnUse"><stop stop-color="#D9EAFA"/><stop offset="1" stop-color="#668FBF"/></linearGradient>
+    <linearGradient id="bolt" x1="102" y1="35" x2="138" y2="87" gradientUnits="userSpaceOnUse"><stop stop-color="#E7F6EF"/><stop offset="1" stop-color="#68B096"/></linearGradient>
+    <filter id="shadow" x="13" y="16" width="137" height="99" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#4A6680" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="97" rx="58" ry="9" fill="#D8E3EC"/>
+  <g filter="url(#shadow)">
+    <path d="m62 27 8 5 9-2 5 8 9 2v10l7 7-5 9 2 9-8 5-2 9-10 1-7 7-9-5-9 2-5-8-9-2V75l-7-7 5-9-2-9 8-5 2-9 10-1 7-8Z" fill="url(#gear)"/>
+    <circle cx="66" cy="63" r="18" fill="#F0F8FF"/>
+    <circle cx="66" cy="63" r="8" fill="#789FC8"/>
+    <path d="m112 39 20 7 4 21-17 13-21-7-4-21 18-13Z" fill="url(#bolt)"/>
+    <path d="m112 47 11 4 2 11-10 8-11-4-2-11 10-8Z" fill="#F4FFFA"/>
+  </g>
+</svg>

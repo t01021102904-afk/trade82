@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="notebook" x1="39" y1="28" x2="96" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#D9EEFF"/><stop offset="1" stop-color="#6B9FD3"/></linearGradient>
+    <linearGradient id="pen" x1="102" y1="42" x2="136" y2="88" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7AB"/><stop offset="1" stop-color="#E89D58"/></linearGradient>
+    <filter id="shadow" x="16" y="17" width="128" height="98" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#4A759B" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="96" rx="56" ry="9" fill="#D9E7EF"/>
+  <g filter="url(#shadow)">
+    <rect x="42" y="29" width="48" height="63" rx="7" fill="url(#notebook)"/>
+    <rect x="50" y="29" width="8" height="63" fill="#A2C8E8"/>
+    <path d="M63 45h20M63 55h20M63 65h13" stroke="#F2F9FF" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="54" cy="40" r="2" fill="#EAF5FF"/><circle cx="54" cy="52" r="2" fill="#EAF5FF"/><circle cx="54" cy="64" r="2" fill="#EAF5FF"/>
+    <path d="m101 78 24-37 9 6-24 37-12 4 3-10Z" fill="url(#pen)"/>
+    <path d="m125 41 5-8 9 6-5 8-9-6Z" fill="#5A7195"/>
+    <path d="m98 88 12-4-9-6-3 10Z" fill="#5A7195"/>
+  </g>
+</svg>

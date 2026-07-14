@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="shirt" x1="42" y1="29" x2="105" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#E7DEFF"/><stop offset="1" stop-color="#9C86DE"/></linearGradient>
+    <linearGradient id="box" x1="91" y1="54" x2="132" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE8D1"/><stop offset="1" stop-color="#E9A96E"/></linearGradient>
+    <filter id="shadow" x="13" y="18" width="138" height="94" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#74658E" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="96" rx="59" ry="9" fill="#E1DBF4"/>
+  <g filter="url(#shadow)">
+    <path d="m54 30 13-7 13 7 14 7-9 18-9-5v41H51V50l-8 5-9-18 20-7Z" fill="url(#shirt)"/>
+    <path d="m61 27 6 9 6-9" stroke="#FFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M57 58h14" stroke="#C5B5F1" stroke-width="4" stroke-linecap="round"/>
+    <path d="m93 58 20-10 20 10-1 28-20 9-20-9 1-28Z" fill="url(#box)"/>
+    <path d="m93 58 19 10 21-10M112 68v27" stroke="#F9E5C9" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

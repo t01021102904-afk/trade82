@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="album" x1="39" y1="31" x2="92" y2="97" gradientUnits="userSpaceOnUse"><stop stop-color="#EBDFFF"/><stop offset="1" stop-color="#9A7AD9"/></linearGradient>
+    <linearGradient id="stick" x1="104" y1="27" x2="133" y2="91" gradientUnits="userSpaceOnUse"><stop stop-color="#E0FCFA"/><stop offset="1" stop-color="#67BDB8"/></linearGradient>
+    <filter id="shadow" x="19" y="14" width="125" height="101" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#6E5C92" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="97" rx="56" ry="9" fill="#E5DCF4"/>
+  <g filter="url(#shadow)">
+    <path d="m45 30 36 8-9 55-37-9 10-54Z" fill="url(#album)"/>
+    <path d="m51 41 20 5M48 52l20 5" stroke="#F7F1FF" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+    <rect x="68" y="61" width="25" height="31" rx="4" fill="#FFE7D0" transform="rotate(8 68 61)"/>
+    <circle cx="80" cy="73" r="7" fill="#F09AAA"/>
+    <path d="M116 52v35" stroke="url(#stick)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M104 36c0-9 6-15 13-15s13 6 13 15c0 9-6 15-13 15s-13-6-13-15Z" fill="url(#stick)"/>
+    <path d="m111 35 6-6 6 6-6 6-6-6Z" fill="#F3FDFF"/>
+  </g>
+</svg>

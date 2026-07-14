@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="pot" x1="36" y1="48" x2="104" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE0B5"/><stop offset="1" stop-color="#D88655"/></linearGradient>
+    <linearGradient id="cup" x1="103" y1="52" x2="137" y2="93" gradientUnits="userSpaceOnUse"><stop stop-color="#E5F4FF"/><stop offset="1" stop-color="#82B9DD"/></linearGradient>
+    <filter id="shadow" x="12" y="18" width="140" height="95" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#93654D" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="96" rx="59" ry="9" fill="#F0E0CE"/>
+  <g filter="url(#shadow)">
+    <path d="M39 53h61l-8 35H47l-8-35Z" fill="url(#pot)"/>
+    <ellipse cx="69" cy="53" rx="31" ry="10" fill="#F9D4A9"/>
+    <ellipse cx="69" cy="51" rx="24" ry="6" fill="#775B52"/>
+    <path d="M33 61H22M106 61h11" stroke="#C97851" stroke-width="6" stroke-linecap="round"/>
+    <path d="M62 41c0-10 6-15 13-20M78 42c3-9 10-14 17-17" stroke="#ECA460" stroke-width="4" stroke-linecap="round"/>
+    <path d="M108 59h18v30h-18z" fill="url(#cup)"/>
+    <path d="M126 65c12 0 12 17 0 17" stroke="#7EACCB" stroke-width="5"/>
+  </g>
+</svg>

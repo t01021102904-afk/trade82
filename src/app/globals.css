@@ -387,10 +387,6 @@ textarea {
   animation: bm-flow-inquiry 7s ease-in-out infinite;
 }
 
-.home-marquee-mask {
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-
 .product-exposure-marquee-mask {
   margin-inline: -1rem;
   mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
@@ -403,12 +399,29 @@ textarea {
   display: none;
 }
 
-.home-marquee-track {
-  animation: home-marquee 34s linear infinite;
+.home-category-scroll {
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
 }
 
-.home-marquee-mask:hover .home-marquee-track {
-  animation-play-state: paused;
+.home-category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.home-category-scroll > a {
+  scroll-snap-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-category-scroll {
+    scroll-behavior: auto;
+  }
+
+  .home-category-scroll > a,
+  .home-category-scroll > a img {
+    transition: none;
+  }
 }
 
 .product-exposure-marquee-track {

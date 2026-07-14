@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="pouch" x1="38" y1="24" x2="82" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD7A7"/><stop offset="1" stop-color="#E97F52"/></linearGradient>
+    <linearGradient id="cup" x1="82" y1="48" x2="126" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF8D3"/><stop offset="1" stop-color="#F0C951"/></linearGradient>
+    <filter id="shadow" x="17" y="17" width="130" height="94" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#9C6A3E" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="80" cy="95" rx="56" ry="10" fill="#F2E5C7"/>
+  <g filter="url(#shadow)">
+    <path d="M39 27 75 22l7 64-43 7V33l4-6Z" fill="url(#pouch)"/>
+    <path d="m45 36 28-4 2 17-28 5-2-18Z" fill="#FFF4D8" opacity=".9"/>
+    <path d="M49 66c8-8 19-8 26-2l2 14-27 4-1-16Z" fill="#D95049"/>
+    <path d="M91 52h39l-5 39H96l-5-39Z" fill="url(#cup)"/>
+    <ellipse cx="110" cy="53" rx="20" ry="7" fill="#FFF6D4"/>
+    <ellipse cx="110" cy="52" rx="14" ry="4" fill="#C86A4A"/>
+    <path d="M107 44c-2-12 5-17 10-23M117 45c4-10 10-13 16-16" stroke="#D6A42F" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

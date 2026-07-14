@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="case" x1="42" y1="47" x2="101" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#E9EEFF"/><stop offset="1" stop-color="#8298DD"/></linearGradient>
+    <linearGradient id="charger" x1="102" y1="42" x2="135" y2="89" gradientUnits="userSpaceOnUse"><stop stop-color="#DDF7F4"/><stop offset="1" stop-color="#5EB5A8"/></linearGradient>
+    <filter id="shadow" x="16" y="16" width="128" height="99" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#52617D" flood-opacity=".2"/></filter>
+  </defs>
+  <ellipse cx="80" cy="96" rx="56" ry="9" fill="#DBE2F1"/>
+  <g filter="url(#shadow)">
+    <path d="M46 49c0-11 8-18 19-18h13c11 0 19 7 19 18v12H46V49Z" fill="#F7F9FF"/>
+    <rect x="42" y="57" width="59" height="36" rx="16" fill="url(#case)"/>
+    <circle cx="71" cy="75" r="3" fill="#F5F8FF"/>
+    <path d="M56 50v-8c0-7 5-12 11-12s11 5 11 12v8M76 50v-8c0-7 5-12 11-12s11 5 11 12v8" stroke="#7C8FD0" stroke-width="6" stroke-linecap="round"/>
+    <rect x="108" y="46" width="24" height="37" rx="7" fill="url(#charger)"/>
+    <path d="M114 43v-10M126 43v-10" stroke="#5B9A90" stroke-width="4" stroke-linecap="round"/>
+    <path d="M114 64h12" stroke="#F2FFFD" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

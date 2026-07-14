@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" fill="none">
+  <defs>
+    <linearGradient id="jar" x1="44" y1="26" x2="96" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#E1F7CB"/><stop offset="1" stop-color="#7FBE68"/></linearGradient>
+    <linearGradient id="capsule" x1="94" y1="63" x2="136" y2="93" gradientUnits="userSpaceOnUse"><stop stop-color="#FFE7ED"/><stop offset="1" stop-color="#ED92AB"/></linearGradient>
+    <filter id="shadow" x="15" y="15" width="132" height="100" filterUnits="userSpaceOnUse"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#54814B" flood-opacity=".18"/></filter>
+  </defs>
+  <ellipse cx="80" cy="96" rx="58" ry="9" fill="#DCEED2"/>
+  <g filter="url(#shadow)">
+    <rect x="51" y="21" width="35" height="15" rx="5" fill="#F7FFF1"/>
+    <rect x="46" y="34" width="45" height="57" rx="13" fill="url(#jar)"/>
+    <circle cx="68" cy="62" r="13" fill="#F6FFE8" opacity=".88"/>
+    <path d="M68 70c-8-8-7-17 2-22 7 7 7 15-2 22Z" fill="#71B25A"/>
+    <path d="M94 68c0-8 7-13 16-13h13c8 0 13 6 13 14 0 8-7 13-15 13h-13c-8 0-14-6-14-14Z" fill="url(#capsule)"/>
+    <path d="M115 56v26" stroke="#FFF4F6" stroke-width="3"/>
+  </g>
+</svg>
