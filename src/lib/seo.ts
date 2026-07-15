@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Product } from "@/lib/types";
 
 import {
   canonicalPublicPath,
@@ -150,6 +151,24 @@ export function breadcrumbJsonLd(
       position: index + 1,
       name: item.name,
       item: absoluteSiteUrl(item.path),
+    })),
+  };
+}
+
+export function marketplaceItemListJsonLd(
+  products: Array<Pick<Product, "id" | "name">>,
+  locale: "en" | "ko",
+) {
+  const productPathPrefix = locale === "ko" ? "/ko/products" : "/products";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: products.map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: product.name,
+      url: absoluteSiteUrl(`${productPathPrefix}/${product.id}`),
     })),
   };
 }
