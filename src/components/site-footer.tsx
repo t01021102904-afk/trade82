@@ -37,18 +37,16 @@ export function SiteFooter() {
             ))}
           </div>
         </nav>
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <p className="text-xs theme-muted">{footer.copyright}</p>
-          <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs theme-muted">
-            <span>{footer.advertisingPartnerships}</span>
-            <a
-              href="mailto:contact@trade82.com"
-              className="relative z-10 rounded-sm underline-offset-4 transition hover:text-[var(--foreground)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
-            >
-              contact@trade82.com
-            </a>
-          </p>
-        </div>
+        <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs theme-muted">
+          <span>{footer.advertisingPartnerships}</span>
+          <a
+            href="mailto:contact@trade82.com"
+            className="relative z-10 rounded-sm underline-offset-4 transition hover:text-[var(--foreground)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+          >
+            contact@trade82.com
+          </a>
+        </p>
+        <p className="mt-4 text-xs theme-muted">{footer.copyright}</p>
       </div>
     </footer>
   );

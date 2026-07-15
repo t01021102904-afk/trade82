@@ -93,7 +93,6 @@ type HomeCopy = {
     sellerCta: string;
     buyerCta: string;
     browseCta: string;
-    pricingCta: string;
   };
 };
 
@@ -275,7 +274,6 @@ const homeCopy: Record<Locale, HomeCopy> = {
       sellerCta: "Join as seller",
       buyerCta: "Join as buyer",
       browseCta: "Browse marketplace",
-      pricingCta: "View pricing",
     },
   },
   ko: {
@@ -454,7 +452,6 @@ const homeCopy: Record<Locale, HomeCopy> = {
       sellerCta: "셀러로 시작하기",
       buyerCta: "바이어로 시작하기",
       browseCta: "마켓플레이스 보기",
-      pricingCta: "요금 안내 보기",
     },
   },
 };
@@ -791,19 +788,13 @@ function FinalCta({ copy, locale }: { copy: HomeCopy["cta"]; locale: Locale }) {
               label={copy.buyerCta}
             />
           </div>
-          <div className="relative mt-6 flex flex-wrap justify-center gap-2">
+          <div className="relative mt-6 flex justify-center">
             <Link
               href={withLocale("/marketplace", locale)}
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
             >
               {copy.browseCta}
               <ArrowRight className="size-4" aria-hidden="true" />
-            </Link>
-            <Link
-              href={withLocale("/pricing", locale)}
-              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
-            >
-              {copy.pricingCta}
             </Link>
           </div>
         </div>
