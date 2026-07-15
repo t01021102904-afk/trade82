@@ -9,6 +9,7 @@ import {
   type EncryptedPayoutData,
 } from "@/lib/payout-crypto";
 import { verifiedBankAutofill } from "@/lib/bank-directory-security";
+import { normalizeKoreanAccountNumber } from "@/lib/seller-payout-profile-rules";
 
 export const sellerPayoutProfileSafeSelect = {
   id: true,
@@ -99,18 +100,6 @@ function normalizedCountry(value: string) {
   return country;
 }
 
-function encryptedAccountData(accountNumber: string): EncryptedPayoutData {
-  const value = accountNumber.replace(/\s+/g, "");
-  if (
-    value.length < 4 ||
-    value.length > 64 ||
-    !/^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(value)
-  ) {
-    throw new Error("Account number is invalid.");
-  }
-  return encryptPayoutData(value);
-}
-
 function prismaBytes(value: Uint8Array) {
   return Uint8Array.from(value);
 }
@@ -148,16 +137,30 @@ export async function saveSellerPayoutProfile({
       accountNumberAuthTag: true,
       accountNumberKeyVersion: true,
       status: true,
+      branchName: true,
+      bankCode: true,
+      swiftBic: true,
+      bankAddress: true,
+      beneficiaryAddress: true,
+      intermediaryBankName: true,
+      intermediaryBankSwift: true,
+      intermediaryBankAddress: true,
+      payoutMemo: true,
+      manualOverrideReason: true,
     },
   });
 
   const accountNumber = nullable(input.accountNumber);
   if (!existing && !accountNumber) {
-    throw new Error("Account number or IBAN is required for a new payout profile.");
+    throw new Error("Account number is required for a new payout profile.");
   }
 
+  const normalizedAccountNumber = accountNumber
+    ? normalizeKoreanAccountNumber(accountNumber)
+    : null;
+  const country = normalizedCountry(input.country);
   let encrypted: EncryptedPayoutData | null = null;
-  if (accountNumber) encrypted = encryptedAccountData(accountNumber);
+  if (normalizedAccountNumber) encrypted = encryptPayoutData(normalizedAccountNumber);
 
   let directory: {
     id: string;
@@ -169,7 +172,7 @@ export async function saveSellerPayoutProfile({
   } | null = null;
   if (input.bankDirectoryId) {
     directory = await db.bankDirectory.findFirst({
-      where: { id: input.bankDirectoryId, isActive: true },
+      where: { id: input.bankDirectoryId, countryCode: country, isActive: true },
       select: { id: true, bankNameEnglish: true, defaultSwiftBic: true, defaultBankAddress: true, officialWebsite: true, verifiedAt: true },
     });
     if (!directory) throw new Error("Selected bank is not available.");
@@ -189,31 +192,40 @@ export async function saveSellerPayoutProfile({
   // unverified directory entry are never auto-trusted or copied into a profile.
   const directoryDefaults = verifiedBankAutofill(directory, input.manualBankOverride);
 
+  const existingOptional = <T extends string | null | undefined>(
+    inputValue: T,
+    existingValue: string | null | undefined,
+  ) => inputValue === undefined ? existingValue ?? null : nullable(inputValue);
+
   const payoutCurrency = normalizedCurrency(input.payoutCurrency);
   const data = {
-    country: normalizedCountry(input.country),
+    country,
     bankDirectoryId: directory?.id ?? null,
     bankName: directoryDefaults
       ? directoryDefaults.bankName
       : requiredText(input.bankName, "Bank name", 240),
-    branchName: nullable(input.branchName),
+    branchName: existingOptional(input.branchName, existing?.branchName),
     accountHolder: requiredText(input.accountHolder, "Account holder", 240),
     accountType: input.accountType,
-    bankCode: nullable(input.bankCode),
-    swiftBic: directoryDefaults ? directoryDefaults.swiftBic : nullable(input.swiftBic),
-    bankAddress: directoryDefaults ? directoryDefaults.bankAddress : nullable(input.bankAddress),
-    beneficiaryAddress: nullable(input.beneficiaryAddress),
+    bankCode: existingOptional(input.bankCode, existing?.bankCode),
+    swiftBic: directoryDefaults
+      ? directoryDefaults.swiftBic
+      : existingOptional(input.swiftBic, existing?.swiftBic),
+    bankAddress: directoryDefaults
+      ? directoryDefaults.bankAddress
+      : existingOptional(input.bankAddress, existing?.bankAddress),
+    beneficiaryAddress: existingOptional(input.beneficiaryAddress, existing?.beneficiaryAddress),
     payoutCurrency,
     supportedCurrencies: Array.from(
       new Set([...input.supportedCurrencies, payoutCurrency].map(normalizedCurrency)),
     ).slice(0, 12),
-    intermediaryBankName: nullable(input.intermediaryBankName),
-    intermediaryBankSwift: nullable(input.intermediaryBankSwift),
-    intermediaryBankAddress: nullable(input.intermediaryBankAddress),
-    payoutMemo: nullable(input.payoutMemo),
+    intermediaryBankName: existingOptional(input.intermediaryBankName, existing?.intermediaryBankName),
+    intermediaryBankSwift: existingOptional(input.intermediaryBankSwift, existing?.intermediaryBankSwift),
+    intermediaryBankAddress: existingOptional(input.intermediaryBankAddress, existing?.intermediaryBankAddress),
+    payoutMemo: existingOptional(input.payoutMemo, existing?.payoutMemo),
     accountBelongsToCompany: true,
     manualBankOverride: input.manualBankOverride,
-    manualOverrideReason: nullable(input.manualOverrideReason),
+    manualOverrideReason: existingOptional(input.manualOverrideReason, existing?.manualOverrideReason),
     status,
     verifiedAt: null,
     verifiedByUserId: null,
@@ -223,8 +235,8 @@ export async function saveSellerPayoutProfile({
           accountNumberIv: prismaBytes(encrypted.iv),
           accountNumberAuthTag: prismaBytes(encrypted.authTag),
           accountNumberKeyVersion: encrypted.keyVersion,
-          accountNumberLast4: lastFour(accountNumber as string),
-          accountNumberMasked: maskAccountNumber(accountNumber as string),
+          accountNumberLast4: lastFour(normalizedAccountNumber as string),
+          accountNumberMasked: maskAccountNumber(normalizedAccountNumber as string),
         }
       : {}),
   };

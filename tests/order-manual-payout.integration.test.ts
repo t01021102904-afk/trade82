@@ -189,7 +189,7 @@ async function markOrderPaid(orderId: string) {
   });
 }
 
-async function createVerifiedProfile(fixture: Fixture, accountNumber = `TEST-${unique("account")}-1234`) {
+async function createVerifiedProfile(fixture: Fixture, accountNumber = "1000000000001234") {
   const saved = (await db.$transaction((tx) =>
     profiles.saveSellerPayoutProfile({
       db: tx,
@@ -619,7 +619,7 @@ test("authorization scopes cross-company reads and allows only audited administr
 
 test("payout account data remains encrypted, decrypts only with its correct key, and snapshots are historical", async () => {
   const fixture = await createFixture("encryption");
-  const firstAccount = `FIRST-${unique("account")}-1234`;
+  const firstAccount = "1000000000001234";
   const profile = await createVerifiedProfile(fixture, firstAccount);
   const raw = await directPool.query<{ encoded: string }>(
     'SELECT encode("accountNumberCiphertext", \'base64\') AS encoded FROM "SellerPayoutProfile" WHERE id = $1',
@@ -660,7 +660,7 @@ test("payout account data remains encrypted, decrypts only with its correct key,
         country: "KR",
         bankName: "Integration Test Bank",
         accountHolder: "Integration Seller",
-        accountNumber: `SECOND-${unique("account")}-9876`,
+        accountNumber: "2000000000009876",
         accountType: "LOCAL",
         payoutCurrency: "usd",
         supportedCurrencies: ["usd"],
