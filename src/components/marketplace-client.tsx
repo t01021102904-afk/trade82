@@ -9,6 +9,14 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { marketplaceCategories } from "@/lib/marketplace";
 import { databaseProductToCard } from "@/lib/public-marketplace-presenters";
+import {
+  marketplaceQueryState,
+  marketplaceSearchParams,
+  shouldFetchMarketplaceProducts,
+  type MarketplacePagination,
+  type MarketplaceProductFilterOptions,
+  type MarketplaceQueryState,
+} from "@/lib/public-marketplace-query-state";
 import type { Product } from "@/lib/types";
 
 function SelectField({
@@ -40,21 +48,7 @@ function SelectField({
   );
 }
 
-type PaginationState = {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-};
-
-type ProductFilterOptions = {
-  certifications: string[];
-  shippingTerms: string[];
-};
-
-const DEFAULT_PAGINATION: PaginationState = {
+const DEFAULT_PAGINATION: MarketplacePagination = {
   page: 1,
   pageSize: 24,
   total: 0,
@@ -63,7 +57,21 @@ const DEFAULT_PAGINATION: PaginationState = {
   hasPreviousPage: false,
 };
 
-export function MarketplaceClient() {
+type MarketplaceClientProps = {
+  initialProducts?: Product[];
+  initialPagination?: MarketplacePagination;
+  initialFilterOptions?: MarketplaceProductFilterOptions;
+  initialQueryState?: MarketplaceQueryState;
+  initialError?: boolean;
+};
+
+export function MarketplaceClient({
+  initialProducts,
+  initialPagination,
+  initialFilterOptions,
+  initialQueryState,
+  initialError = false,
+}: MarketplaceClientProps) {
   return (
     <Suspense
       fallback={
@@ -77,66 +85,93 @@ export function MarketplaceClient() {
         </div>
       }
     >
-      <MarketplaceClientContent />
+      <MarketplaceClientContent
+        initialProducts={initialProducts}
+        initialPagination={initialPagination}
+        initialFilterOptions={initialFilterOptions}
+        initialQueryState={initialQueryState}
+        initialError={initialError}
+      />
     </Suspense>
   );
 }
 
-function MarketplaceClientContent() {
+function MarketplaceClientContent({
+  initialProducts,
+  initialPagination,
+  initialFilterOptions,
+  initialQueryState,
+  initialError = false,
+}: MarketplaceClientProps) {
   const { locale, t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const gridTopRef = useRef<HTMLDivElement>(null);
-  const [databaseProducts, setDatabaseProducts] = useState<Product[]>([]);
+  const initialRequestRef = useRef(true);
+  const [databaseProducts, setDatabaseProducts] = useState<Product[]>(
+    initialProducts ?? [],
+  );
   const [pagination, setPagination] =
-    useState<PaginationState>(DEFAULT_PAGINATION);
-  const [filterOptions, setFilterOptions] = useState<ProductFilterOptions>({
-    certifications: [],
-    shippingTerms: [],
+    useState<MarketplacePagination>(initialPagination ?? DEFAULT_PAGINATION);
+  const [filterOptions, setFilterOptions] = useState<MarketplaceProductFilterOptions>({
+    certifications: initialFilterOptions?.certifications ?? [],
+    shippingTerms: initialFilterOptions?.shippingTerms ?? [],
   });
-  const [databaseLoading, setDatabaseLoading] = useState(true);
-  const search = searchParams.get("q") ?? "";
-  const category = searchParams.get("category") ?? "all";
-  const price = searchParams.get("price") ?? "all";
-  const moq = searchParams.get("moq") ?? "all";
-  const certification = searchParams.get("certification") ?? "all";
-  const shippingTerm = searchParams.get("shipping") ?? "all";
-  const page = parsePositiveInteger(searchParams.get("page"));
+  const [databaseLoading, setDatabaseLoading] = useState(
+    !initialQueryState && !initialError,
+  );
+  const [requestError, setRequestError] = useState(initialError);
+  const searchParamsKey = searchParams.toString();
+  const currentQueryState = useMemo(
+    () => marketplaceQueryState(new URLSearchParams(searchParamsKey)),
+    [searchParamsKey],
+  );
+  const {
+    q: search,
+    category,
+    price,
+    moq,
+    certification,
+    shipping: shippingTerm,
+  } = currentQueryState;
 
   useEffect(() => {
-    const requestParams = new URLSearchParams({
-      resource: "products",
-      page: String(page),
-      pageSize: "24",
+    const shouldFetch = shouldFetchMarketplaceProducts({
+      isInitialRender: initialRequestRef.current,
+      initialQueryState,
+      currentQueryState,
     });
-    setQueryParam(requestParams, "q", search);
-    setQueryParam(requestParams, "category", category);
-    setQueryParam(requestParams, "price", price);
-    setQueryParam(requestParams, "moq", moq);
-    setQueryParam(requestParams, "certification", certification);
-    setQueryParam(requestParams, "shipping", shippingTerm);
+    initialRequestRef.current = false;
+
+    if (!shouldFetch) return;
+
+    const requestParams = marketplaceSearchParams(currentQueryState);
 
     let active = true;
+    setDatabaseLoading(true);
+    setRequestError(false);
     void fetch(`/api/public/marketplace?${requestParams.toString()}`)
-      .then((response) =>
-        response.ok
-          ? response.json()
-          : { products: [], pagination: DEFAULT_PAGINATION },
-      )
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Marketplace request failed");
+        return response.json();
+      })
       .then(
         (result: {
           products?: Array<Record<string, unknown>>;
-          pagination?: PaginationState;
-          filterOptions?: ProductFilterOptions;
+          pagination?: MarketplacePagination;
+          filterOptions?: MarketplaceProductFilterOptions;
         }) => {
           if (!active) return;
+          if (!Array.isArray(result.products) || !result.pagination) {
+            throw new Error("Marketplace response was incomplete");
+          }
           setDatabaseProducts(
-            (result.products ?? []).map((product) =>
+            result.products.map((product) =>
               databaseProductToCard(product, locale),
             ),
           );
-          setPagination(result.pagination ?? DEFAULT_PAGINATION);
+          setPagination(result.pagination);
           setFilterOptions(
             result.filterOptions ?? { certifications: [], shippingTerms: [] },
           );
@@ -146,14 +181,14 @@ function MarketplaceClientContent() {
       .catch(() => {
         if (!active) return;
         setDatabaseProducts([]);
-        setPagination(DEFAULT_PAGINATION);
+        setRequestError(true);
         setDatabaseLoading(false);
       });
 
     return () => {
       active = false;
     };
-  }, [locale, page, search, category, price, moq, certification, shippingTerm]);
+  }, [locale, initialQueryState, currentQueryState]);
 
   const certifications = useMemo(
     () => filterOptions.certifications,
@@ -307,6 +342,8 @@ function MarketplaceClientContent() {
             <ProductCardSkeleton key={index} />
           ))}
         </div>
+      ) : requestError ? (
+        <MarketplaceUnavailable locale={locale} />
       ) : databaseProducts.length ? (
         <>
           <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -340,12 +377,14 @@ function MarketplaceClientContent() {
   );
 }
 
-function parsePositiveInteger(value: string | null) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
-}
+function MarketplaceUnavailable({ locale }: { locale: "en" | "ko" }) {
+  const message = locale === "ko"
+    ? "현재 상품 목록을 불러올 수 없습니다. 잠시 후 다시 시도해 주세요."
+    : "Product listings are temporarily unavailable. Please try again shortly.";
 
-function setQueryParam(params: URLSearchParams, key: string, value: string) {
-  if (!value || value === "all" || (key === "q" && !value.trim())) return;
-  params.set(key, value);
+  return (
+    <div className="rounded-lg border border-dashed p-5 text-center theme-surface" role="status">
+      <p className="text-sm theme-muted">{message}</p>
+    </div>
+  );
 }
