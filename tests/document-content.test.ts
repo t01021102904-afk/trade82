@@ -31,7 +31,7 @@ const englishSourceHashes = {
 } as const;
 
 const koreanLegalSourceHashes = {
-  privacy: "a1c7917a9170194e5c46eb085721622d307b7d9c617e0d995fcf5af1b367d7db",
+  privacy: "de34bc320292edf61a972743b0bce08a2327d8f50a95338669e1bf21e19d4b2c",
   terms: "4936c489485504ac704b89341b002992585f62d952c9412c053af7da87b35be7",
   "payment-refund-policy": "9b20d0da3df3fcef57b00b258d4886a7f51ea524f0df71aa2a79c6b90e428045",
 } as const;
