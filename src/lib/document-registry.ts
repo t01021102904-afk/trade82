@@ -19,62 +19,115 @@ export const documentSlugs = [
 export type DocumentSlug = (typeof documentSlugs)[number];
 
 export type DocumentDefinition = {
-  fileName: string;
-  description: string;
+  enFileName: string;
+  koFileName: string;
+  descriptions: Record<Locale, string>;
 };
 
 export const documentDefinitions: Record<DocumentSlug, DocumentDefinition> = {
   about: {
-    fileName: "about-us.txt",
-    description: "Learn about Trade82 and its global B2B marketplace mission.",
+    enFileName: "about-us.en.txt",
+    koFileName: "about-us.ko.txt",
+    descriptions: {
+      en: "Learn about Trade82 and its global B2B marketplace mission.",
+      ko: "Trade82와 글로벌 B2B 마켓플레이스의 미션을 소개합니다.",
+    },
   },
   "how-it-works": {
-    fileName: "how-it-works.txt",
-    description: "How Trade82 supports global sourcing and Korean suppliers.",
+    enFileName: "how-it-works.en.txt",
+    koFileName: "how-it-works.ko.txt",
+    descriptions: {
+      en: "How Trade82 supports global sourcing and Korean suppliers.",
+      ko: "Trade82가 글로벌 소싱과 한국 공급업체를 지원하는 방식을 안내합니다.",
+    },
   },
   "for-sellers": {
-    fileName: "for-sellers.txt",
-    description: "A guide for Korean sellers using Trade82.",
+    enFileName: "for-sellers.en.txt",
+    koFileName: "for-sellers.ko.txt",
+    descriptions: {
+      en: "A guide for Korean sellers using Trade82.",
+      ko: "Trade82를 이용하는 한국 셀러를 위한 안내입니다.",
+    },
   },
   "for-buyers": {
-    fileName: "for-buyers.txt",
-    description: "A guide for global buyers sourcing through Trade82.",
+    enFileName: "for-buyers.en.txt",
+    koFileName: "for-buyers.ko.txt",
+    descriptions: {
+      en: "A guide for global buyers sourcing through Trade82.",
+      ko: "Trade82를 통해 소싱하는 글로벌 바이어를 위한 안내입니다.",
+    },
   },
   "partner-program": {
-    fileName: "partner-program.txt",
-    description: "Information about the Trade82 partner program.",
+    enFileName: "partner-program.en.txt",
+    koFileName: "partner-program.ko.txt",
+    descriptions: {
+      en: "Information about the Trade82 partner program.",
+      ko: "Trade82 파트너 프로그램 정보를 안내합니다.",
+    },
   },
   "product-registration-guide": {
-    fileName: "product-registration-guide.txt",
-    description: "How sellers can register products on Trade82.",
+    enFileName: "product-registration-guide.en.txt",
+    koFileName: "product-registration-guide.ko.txt",
+    descriptions: {
+      en: "How sellers can register products on Trade82.",
+      ko: "셀러가 Trade82에 상품을 등록하는 방법을 안내합니다.",
+    },
   },
   "rfq-guide": {
-    fileName: "rfq-guide.txt",
-    description: "How to create and manage Trade82 RFQs.",
+    enFileName: "rfq-guide.en.txt",
+    koFileName: "rfq-guide.ko.txt",
+    descriptions: {
+      en: "How to create and manage Trade82 RFQs.",
+      ko: "Trade82 RFQ를 생성하고 관리하는 방법을 안내합니다.",
+    },
   },
   "export-shipping-guide": {
-    fileName: "export-shipping-guide.txt",
-    description: "Export and shipping guidance for Trade82 transactions.",
+    enFileName: "export-shipping-guide.en.txt",
+    koFileName: "export-shipping-guide.ko.txt",
+    descriptions: {
+      en: "Export and shipping guidance for Trade82 transactions.",
+      ko: "Trade82 거래의 수출 및 배송 절차를 안내합니다.",
+    },
   },
   "compliance-documentation": {
-    fileName: "compliance-documentation.txt",
-    description: "Compliance and documentation guidance for Trade82 users.",
+    enFileName: "compliance-documentation.en.txt",
+    koFileName: "compliance-documentation.ko.txt",
+    descriptions: {
+      en: "Compliance and documentation guidance for Trade82 users.",
+      ko: "Trade82 이용자를 위한 규정 준수 및 문서 안내입니다.",
+    },
   },
   faq: {
-    fileName: "faq.txt",
-    description: "Frequently asked questions about Trade82.",
+    enFileName: "faq.en.txt",
+    koFileName: "faq.ko.txt",
+    descriptions: {
+      en: "Frequently asked questions about Trade82.",
+      ko: "Trade82에 관해 자주 묻는 질문을 안내합니다.",
+    },
   },
   privacy: {
-    fileName: "privacy-policy.txt",
-    description: "Trade82 Privacy Policy.",
+    enFileName: "privacy-policy.en.txt",
+    koFileName: "privacy-policy.ko.txt",
+    descriptions: {
+      en: "Trade82 Privacy Policy.",
+      ko: "Trade82 개인정보처리방침입니다.",
+    },
   },
   terms: {
-    fileName: "terms-of-service.txt",
-    description: "Trade82 Terms of Service.",
+    enFileName: "terms-of-service.en.txt",
+    koFileName: "terms-of-service.ko.txt",
+    descriptions: {
+      en: "Trade82 Terms of Service.",
+      ko: "Trade82 이용약관입니다.",
+    },
   },
   "payment-refund-policy": {
-    fileName: "payment-refund-policy.txt",
-    description: "Trade82 Payment and Refund Policy.",
+    enFileName: "payment-refund-policy.en.txt",
+    koFileName: "payment-refund-policy.ko.txt",
+    descriptions: {
+      en: "Trade82 Payment and Refund Policy.",
+      ko: "Trade82 결제 및 환불 정책입니다.",
+    },
   },
 };
 

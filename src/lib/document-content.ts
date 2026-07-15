@@ -23,10 +23,10 @@ export {
 };
 export type { DocumentBlock, DocumentSection } from "@/lib/document-parser";
 
-const parsedDocumentCache = new Map<DocumentSlug, ParsedDocument>();
+const parsedDocumentCache = new Map<string, ParsedDocument>();
 
 export function getDocumentMetadata(slug: DocumentSlug, locale: Locale) {
-  const document = getDocument(slug);
+  const document = getDocument(slug, locale);
 
   return {
     title: `${document.title} | Trade82`,
@@ -41,16 +41,18 @@ export function getDocumentMetadata(slug: DocumentSlug, locale: Locale) {
   };
 }
 
-export function getDocument(slug: DocumentSlug): ParsedDocument {
-  const cached = parsedDocumentCache.get(slug);
+export function getDocument(slug: DocumentSlug, locale: Locale): ParsedDocument {
+  const cacheKey = `${locale}:${slug}`;
+  const cached = parsedDocumentCache.get(cacheKey);
   if (cached) return cached;
 
   const definition = documentDefinitions[slug];
+  const fileName = locale === "ko" ? definition.koFileName : definition.enFileName;
   const source = readFileSync(
-    path.join(process.cwd(), "src", "content", "documents", definition.fileName),
+    path.join(process.cwd(), "src", "content", "documents", fileName),
     "utf8",
   );
-  const parsed = parseDocumentSource(source, slug, definition.description);
-  parsedDocumentCache.set(slug, parsed);
+  const parsed = parseDocumentSource(source, slug, definition.descriptions[locale]);
+  parsedDocumentCache.set(cacheKey, parsed);
   return parsed;
 }

@@ -13,7 +13,7 @@ export function DocumentPage({
   locale: Locale;
   documentSlug: DocumentSlug;
 }) {
-  const document = getDocument(documentSlug);
+  const document = getDocument(documentSlug, locale);
   const alternateLocale = locale === "ko" ? "en" : "ko";
 
   return (
