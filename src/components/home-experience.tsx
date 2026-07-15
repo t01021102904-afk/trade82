@@ -32,6 +32,8 @@ type ValueSection = {
   image: string;
   imageAlt: string;
   imageSide: "left" | "right";
+  exploreCta: string;
+  exploreHref: "/buyers" | "/sellers";
 };
 
 type HomeCopy = {
@@ -91,6 +93,7 @@ type HomeCopy = {
     sellerCta: string;
     buyerCta: string;
     browseCta: string;
+    pricingCta: string;
   };
 };
 
@@ -201,6 +204,8 @@ const homeCopy: Record<Locale, HomeCopy> = {
       image: "/landing/beauty-products-chat.png",
       imageAlt: "Isometric buyer inquiry and beauty products illustration",
       imageSide: "right",
+      exploreCta: "Explore buyers",
+      exploreHref: "/buyers",
     },
     sellers: {
       eyebrow: "For Korean sellers",
@@ -218,6 +223,8 @@ const homeCopy: Record<Locale, HomeCopy> = {
       image: "/landing/export-documents.png",
       imageAlt: "Isometric export documents and contract templates illustration",
       imageSide: "left",
+      exploreCta: "Explore sellers",
+      exploreHref: "/sellers",
     },
     faq: {
       eyebrow: "FAQ",
@@ -268,6 +275,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       sellerCta: "Join as seller",
       buyerCta: "Join as buyer",
       browseCta: "Browse marketplace",
+      pricingCta: "View pricing",
     },
   },
   ko: {
@@ -376,6 +384,8 @@ const homeCopy: Record<Locale, HomeCopy> = {
       image: "/landing/beauty-products-chat.png",
       imageAlt: "뷰티 상품과 바이어 문의 아이소메트릭 일러스트",
       imageSide: "right",
+      exploreCta: "바이어 보기",
+      exploreHref: "/buyers",
     },
     sellers: {
       eyebrow: "한국 셀러를 위해",
@@ -393,6 +403,8 @@ const homeCopy: Record<Locale, HomeCopy> = {
       image: "/landing/export-documents.png",
       imageAlt: "수출 서류와 계약 템플릿 아이소메트릭 일러스트",
       imageSide: "left",
+      exploreCta: "셀러 보기",
+      exploreHref: "/sellers",
     },
     faq: {
       eyebrow: "FAQ",
@@ -442,6 +454,7 @@ const homeCopy: Record<Locale, HomeCopy> = {
       sellerCta: "셀러로 시작하기",
       buyerCta: "바이어로 시작하기",
       browseCta: "마켓플레이스 보기",
+      pricingCta: "요금 안내 보기",
     },
   },
 };
@@ -542,8 +555,8 @@ export function HomeExperience({ locale }: { locale: Locale }) {
         mediaSide="left"
       />
 
-      <ValueSectionBlock section={copy.buyers} />
-      <ValueSectionBlock section={copy.sellers} />
+      <ValueSectionBlock section={copy.buyers} locale={locale} />
+      <ValueSectionBlock section={copy.sellers} locale={locale} />
 
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-20 lg:px-8">
         <HomeReveal>
@@ -699,14 +712,23 @@ function FeatureText({
   );
 }
 
-function ValueSectionBlock({ section }: { section: ValueSection }) {
+function ValueSectionBlock({ section, locale }: { section: ValueSection; locale: Locale }) {
   const text = (
-    <FeatureText
-      eyebrow={section.eyebrow}
-      title={section.title}
-      description={section.description}
-      bullets={section.bullets}
-    />
+    <div>
+      <FeatureText
+        eyebrow={section.eyebrow}
+        title={section.title}
+        description={section.description}
+        bullets={section.bullets}
+      />
+      <Link
+        href={withLocale(section.exploreHref, locale)}
+        className="mt-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold theme-ghost-button"
+      >
+        {section.exploreCta}
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </Link>
+    </div>
   );
   const image = (
     <div className="home-magnetic-panel rounded-[1.6rem] border p-4 theme-surface">
@@ -769,13 +791,19 @@ function FinalCta({ copy, locale }: { copy: HomeCopy["cta"]; locale: Locale }) {
               label={copy.buyerCta}
             />
           </div>
-          <div className="relative mt-6 text-center">
+          <div className="relative mt-6 flex flex-wrap justify-center gap-2">
             <Link
               href={withLocale("/marketplace", locale)}
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
             >
               {copy.browseCta}
               <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+            <Link
+              href={withLocale("/pricing", locale)}
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold theme-ghost-button"
+            >
+              {copy.pricingCta}
             </Link>
           </div>
         </div>

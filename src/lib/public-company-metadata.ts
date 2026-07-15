@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { canonicalPublicPath } from "@/lib/english-canonical-path";
 import type { Locale } from "@/lib/i18n";
 import { localizedText } from "@/lib/multilingual-content";
 import {
@@ -49,7 +50,7 @@ export async function getPublicCompanyMetadata({
 }): Promise<Metadata> {
   const config = typeConfig[type];
   const encodedId = encodeURIComponent(id);
-  const path = `${localePrefix}/${config.path}/${encodedId}`;
+  const path = canonicalPublicPath(`${localePrefix}/${config.path}/${encodedId}`);
   const locale: Locale = localePrefix.startsWith("/ko") ? "ko" : "en";
 
   try {
@@ -143,7 +144,7 @@ function fallbackMetadata(
 
 function localizedLanguages(pathSegment: string, encodedId: string) {
   return {
-    en: `/en/${pathSegment}/${encodedId}`,
+    en: `/${pathSegment}/${encodedId}`,
     ko: `/ko/${pathSegment}/${encodedId}`,
     "x-default": `/${pathSegment}/${encodedId}`,
   };

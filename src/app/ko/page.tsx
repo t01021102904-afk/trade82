@@ -12,7 +12,7 @@ export const metadata: Metadata = publicPageMetadata({
   description: KOREAN_HOME_DESCRIPTION,
   path: "/ko",
   languages: {
-    en: "/en",
+    en: "/",
     "x-default": "/",
     ko: "/ko",
   },

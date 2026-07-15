@@ -1,5 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
+import { getUnprefixedEnglishPath } from "@/lib/english-canonical-path";
 import { safeInternalPath } from "@/lib/url-security";
 
 const isProtectedRoute = createRouteMatcher([
@@ -29,6 +31,13 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
+  const unprefixedEnglishPath = getUnprefixedEnglishPath(request.nextUrl.pathname);
+  if (unprefixedEnglishPath) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = unprefixedEnglishPath;
+    return NextResponse.redirect(redirectUrl, 308);
+  }
+
   if (isProtectedRoute(request)) {
     const pathname = request.nextUrl.pathname;
     const loginPath = pathname.startsWith("/ko")

@@ -1,18 +1,9 @@
 import type { Metadata } from "next";
 
 import { AuthShell } from "@/components/auth-shell";
-import { publicPageMetadata } from "@/lib/seo";
+import { privatePageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = publicPageMetadata({
-  title: "Login | Trade82",
-  description:
-    "Log in to your Trade82 account to manage products, inquiries, documents, and buyer conversations.",
-  path: "/ko/login",
-  languages: {
-    en: "/login",
-    ko: "/ko/login",
-  },
-});
+export const metadata: Metadata = privatePageMetadata;
 
 export default async function KoLoginPage({
   searchParams,

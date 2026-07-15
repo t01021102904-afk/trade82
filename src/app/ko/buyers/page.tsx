@@ -10,7 +10,7 @@ export const metadata: Metadata = publicPageMetadata({
     "Trade82에서 글로벌 바이어 프로필과 소싱 관심 분야를 확인하세요.",
   path: "/ko/buyers",
   languages: {
-    en: "/en/buyers",
+    en: "/buyers",
     ko: "/ko/buyers",
   },
 });

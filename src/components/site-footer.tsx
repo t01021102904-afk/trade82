@@ -9,7 +9,6 @@ const legalRoutes = ["/terms", "/privacy"] as const;
 
 function legalPrefix(pathname: string) {
   if (pathname === "/ko" || pathname.startsWith("/ko/")) return "/ko";
-  if (pathname === "/en" || pathname.startsWith("/en/")) return "/en";
   return "";
 }
 

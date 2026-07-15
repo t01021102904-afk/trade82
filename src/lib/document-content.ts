@@ -12,6 +12,7 @@ import {
 } from "@/lib/document-registry";
 import { parseDocumentSource, type ParsedDocument } from "@/lib/document-parser";
 import type { Locale } from "@/lib/i18n";
+import { absoluteSiteUrl } from "@/lib/seo";
 
 export {
   documentSlugs,
@@ -32,10 +33,11 @@ export function getDocumentMetadata(slug: DocumentSlug, locale: Locale) {
     title: `${document.title} | Trade82`,
     description: document.description,
     alternates: {
-      canonical: getDocumentPath(slug, locale),
+      canonical: absoluteSiteUrl(getDocumentPath(slug, locale)),
       languages: {
-        en: getDocumentPath(slug, "en"),
-        ko: getDocumentPath(slug, "ko"),
+        en: absoluteSiteUrl(getDocumentPath(slug, "en")),
+        ko: absoluteSiteUrl(getDocumentPath(slug, "ko")),
+        "x-default": absoluteSiteUrl(getDocumentPath(slug, "en")),
       },
     },
   };
