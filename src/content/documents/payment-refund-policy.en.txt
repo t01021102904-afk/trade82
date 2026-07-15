@@ -1,0 +1,343 @@
+Trade82 Payment and Refund Policy
+
+Effective Date: July 14, 2026
+Last Updated: July 14, 2026
+
+This Payment and Refund Policy applies to transaction payments, refunds, chargebacks, seller payouts, paid marketing exposure, subscriptions, and other paid features provided through the service operated by William Zun Park under the trade name “Trade82.”
+
+Trade82 is currently not a separate corporation or limited liability company. Unless otherwise stated, “Trade82” means William Zun Park individually.
+
+This Policy applies together with the Trade82 Terms of Service and Privacy Policy. A specific order, payment request, quotation, checkout term, separate written agreement, or Buyer-Seller agreement may control when it expressly provides different terms. A Buyer-Seller agreement cannot impose an obligation on Trade82 unless Trade82 expressly agrees to it.
+
+1. Business-to-Business Transactions
+
+Trade82 is a B2B platform. Users must use payment features for business or professional purposes rather than personal, family, or household consumption.
+
+This Policy does not limit any right that cannot legally be waived under mandatory consumer law, payment-network rules, or other Applicable Law.
+
+2. Trade82’s Role
+
+The relevant Buyer and Seller are the parties to each product Transaction unless Trade82 expressly becomes a party through a separate written agreement.
+
+Trade82 is generally not the manufacturer, seller, buyer, importer, exporter, carrier, customs broker, inspection body, insurer, or guarantor of product quality.
+
+Where supported, Trade82 may provide tools for Seller-created payment requests, Stripe Checkout, payment and refund records, dispute status, order and shipping records, Seller payable calculations, external bank-transfer records, and communication concerning a refund review.
+
+Providing those tools does not make Trade82 an escrow provider, bank, trustee, fiduciary, or payment guarantor.
+
+3. Payment Provider
+
+Card payments may be processed using Stripe Checkout and Stripe payment services.
+
+Buyer may be subject to authentication, fraud prevention, payment-method, and other terms imposed by Stripe and financial institutions.
+
+Trade82 is not designed to directly collect or store complete card numbers, card security codes, or card passwords.
+
+Trade82 may decline, delay, or cancel a payment if Stripe or another financial provider does not support a country, product, User, payment method, or Transaction, or requires additional verification.
+
+4. Currency and Payment Amount
+
+The default currency for currently supported Transaction payments is United States dollars.
+
+A payment request may identify the product, quantity, unit, product amount, shipping amount, Gross Payment Amount, payment deadline, and order terms.
+
+Buyer must review these items before paying. A change after payment may require written agreement and a new payment request.
+
+5. Platform Fee
+
+Unless otherwise displayed, Trade82’s current standard platform fee for a supported Transaction payment is 5 percent of the Gross Payment Amount.
+
+When the product amount and shipping are paid together, the fee may apply to the full amount.
+
+For example, a USD 1,000 Gross Payment Amount results in a standard USD 50 platform fee and an initial Seller payable amount of USD 950 before refunds, disputes, banking costs, and adjustments.
+
+The fee and Seller payable amount shown in the relevant payment request, checkout, Transaction record, or written terms control.
+
+6. Authorization and Payment Confirmation
+
+Selecting a payment button or reaching a Stripe success page does not by itself establish final payment.
+
+Trade82 records payment as complete after receiving a verified Stripe webhook, provider payment status, or equivalent confirmation.
+
+Production, shipment, order processing, or Seller payout may be delayed while a payment remains processing or under review.
+
+Trade82 may place a Transaction into manual reconciliation if duplicate charges, inconsistent status, or payment-data errors are detected.
+
+7. Cancellation Before Payment
+
+An unpaid payment request may be canceled or expire when its deadline passes, Seller cancels it, Buyer and Seller agree not to proceed, the Transaction presents legal or policy risk, or a payment or security error occurs.
+
+Canceling an unpaid request normally does not require a refund.
+
+8. Cancellation After Payment
+
+Buyer cannot unilaterally cancel an order after payment.
+
+Cancellation and refund amount may depend on the Buyer-Seller terms, whether production or shipment started, whether the goods are customized, costs already incurred, Applicable Law, provider rules, and fraud or sanctions review.
+
+Even when Seller agrees to cancel, nonrecoverable and reasonable costs may be deducted.
+
+9. Circumstances Eligible for Review
+
+Trade82 may review a full or partial refund request when:
+
+a. Seller cancels or fails to provide the agreed goods;
+b. materially different goods are delivered;
+c. a material shortage, damage, or specification failure is supported by objective evidence;
+d. the same Transaction is charged twice;
+e. the amount exceeds the authorized amount;
+f. Buyer and Seller agree in writing to a refund;
+g. Stripe, a bank, card network, or law requires a refund;
+h. Trade82 directly caused an incorrect charge; or
+i. a material part of a paid service sold directly by Trade82 was not provided due to Trade82’s fault.
+
+Review does not guarantee approval.
+
+10. Generally Nonrefundable Circumstances
+
+Refunds are generally not approved solely because of:
+
+a. Buyer’s change of mind;
+b. an incorrect estimate of demand, resale price, or commercial success;
+c. Buyer’s failure to confirm import, registration, certification, labeling, customs, tax, or resale requirements;
+d. disclosed characteristics or conditions approved before payment;
+e. differences within agreed tolerances or sample standards;
+f. improper storage, use, processing, repacking, resale, or alteration;
+g. incorrect address, specifications, files, labels, or destination information supplied by Buyer;
+h. delay caused by carriers, customs, ports, airports, government action, or force majeure;
+i. duties, taxes, customs, inspection, storage, demurrage, return, or other third-party costs;
+j. use, consumption, processing, resale, disposal, or loss of evidence;
+k. payment or a Transaction completed outside Trade82;
+l. failure of paid exposure to produce a particular impression, inquiry, contract, or sale;
+m. unused subscription or support capacity; or
+n. restriction caused by policy violation, false information, sanctions, or prohibited goods.
+
+Mandatory law, a written warranty, or specific Transaction terms may override these defaults.
+
+11. Default Notice Periods
+
+If specific order terms do not set another period, a Buyer seeking Trade82’s internal refund review should report:
+
+a. visible damage, shortage, or wrong goods within 3 business days after delivery;
+b. other material nonconformity within 7 calendar days after delivery;
+c. non-delivery within 7 calendar days after the agreed final delivery date;
+d. a latent defect promptly after discovery and generally no later than 30 calendar days after delivery;
+e. duplicate or incorrect charges within 7 calendar days after payment; and
+f. a Trade82 paid-service billing error within 7 calendar days after the charge.
+
+These periods govern Trade82’s internal review process and do not eliminate a right that cannot legally be waived or a right under a separate warranty or Buyer-Seller agreement.
+
+Late notice that materially prevents verification, carrier investigation, insurance recovery, or Seller response may limit relief.
+
+12. How to Request a Refund
+
+Buyer should contact contact@trade82.com or use an available Transaction-support channel and provide:
+
+a. account email and company name;
+b. order number, payment-request number, or payment identifier;
+c. requested refund amount;
+d. reason and timeline;
+e. relevant messages;
+f. photographs and video;
+g. packaging, labels, lot number, quantity, and condition;
+h. tracking, proof of delivery, or carrier damage report;
+i. inspection or testing evidence;
+j. whether goods were used, processed, resold, or discarded; and
+k. any agreement reached with Seller.
+
+Trade82 may request additional information and may ask Users not to submit unnecessary sensitive information.
+
+13. Inspection and Preservation
+
+Buyer should inspect quantity, visible condition, packaging, and agreed key specifications within a reasonable time after delivery.
+
+When a dispute is expected, Buyer should preserve the goods, original packaging, shipping labels, lot and manufacturing details, photographs, video, reports, communications, and a reasonable sample.
+
+Using, processing, repacking, reselling, discarding, or returning goods before verification may limit review.
+
+Where immediate disposal is legally or safely required, Buyer should first preserve photographs, video, and available government or expert evidence.
+
+14. Seller Response
+
+Seller should respond and provide relevant records within 5 business days after receiving a refund inquiry from Trade82.
+
+Seller must retain records of the order, production, inspection, packing, shipment, tracking, delivery, specifications, Buyer approval, and communications.
+
+If Seller does not respond or provide evidence within a reasonable period, Trade82 may act on the available record.
+
+15. Review and Outcomes
+
+Trade82 may consider the payment request, order terms, listing, quotation, messages, photographs, inspection and carrier evidence, Stripe records, tracking, User history, Applicable Law, and financial-provider requirements.
+
+Trade82 may manage platform records, safety measures, and support, but does not act as a court, arbitrator, laboratory, or final product expert.
+
+Possible outcomes include a full refund, partial refund, replacement, reshipment, rework, service credit, payout hold, additional inspection, negotiated resolution, or denial.
+
+Trade82 does not guarantee any particular outcome except where law requires it.
+
+16. Calculation of Refund Amount
+
+Refund amount depends on cause, responsibility, condition of the goods, production progress, shipping, use, and actual costs.
+
+When Seller cancellation, nonperformance, materially wrong goods, material shortage, or documented material defect is responsible, Trade82 may use funds available from the Transaction, Seller payable amount, reserves, future payouts, or Seller reimbursement to process all or part of a refund.
+
+When Buyer cancellation is approved for convenience or Buyer responsibility, deductions may include production and materials, inspections and documents, packaging and labeling, shipping, storage, returns, customs, nonrefundable processing costs, services already provided, banking or foreign-exchange costs, and diminished value.
+
+Trade82 is not required to fund a Buyer refund from Trade82’s own money solely because Seller funds cannot be recovered, except where Trade82 has an independent obligation under law, express written terms, or its own direct error.
+
+17. Platform and Processing Fees
+
+Original Stripe processing fees and other financial costs might not be returned to Trade82 after a refund.
+
+When Seller responsibility causes a refund, Trade82 may recover the refund amount, nonreturned processing costs, dispute costs, and reasonable administration costs from Seller payable amounts, future payouts, or a separate reimbursement request.
+
+When Buyer responsibility causes an approved refund, nonreturned payment costs and the value of services already performed may be deducted unless law or specific terms require otherwise.
+
+Trade82 may refund all or part of a Trade82 Fee when Trade82 directly caused a billing error or completely failed to provide a directly sold service.
+
+18. Shipping, Taxes, and Third-Party Costs
+
+When a full refund is approved because of Seller nonperformance or wrong goods, shipping included in the original Trade82 payment may also be reviewed for refund.
+
+Original or return shipping is generally not refundable when Buyer’s change of mind, incorrect address, failure to confirm import requirements, or other Buyer responsibility caused the issue.
+
+Trade82 does not refund duties, taxes, customs charges, inspections, storage, demurrage, return costs, bank fees, or other amounts paid directly to a government or third party and not received by Trade82.
+
+19. Refund Destination
+
+A card-payment refund is generally returned only to the original payment method and original payer.
+
+Buyer cannot require a refund to a different card, third-party account, cryptocurrency wallet, cash, or unrelated account.
+
+The issuing bank determines how an expired or canceled card refund is credited.
+
+20. Timing
+
+After Trade82 approves a refund and submits it to Stripe, the posting date depends on Stripe, the card network, issuing bank, and country.
+
+Card refunds commonly appear approximately 5 to 10 business days after submission, but can take longer.
+
+A refund processed as a reversal might cause the original charge to disappear rather than create a separate credit.
+
+Trade82 cannot guarantee a bank posting date.
+
+21. Failed Refunds and Tracing
+
+A refund can fail or return to the Stripe balance if the bank or card issuer cannot process it.
+
+Trade82 may review Stripe status and available refund reference information and may request additional verification from Buyer.
+
+A legally available alternative method can be reviewed after verifying the original payer, but remains subject to fraud and anti-money-laundering controls.
+
+22. No Double Recovery
+
+Buyer may not receive duplicate recovery for the same loss through a refund, insurer, carrier, Seller compensation, and card chargeback.
+
+If a chargeback begins while a refund is pending, Trade82 may pause or cancel the refund to prevent duplicate reimbursement and follow the card dispute process.
+
+An excess recovery must be returned.
+
+23. Chargebacks and Card Disputes
+
+A chargeback occurs when a cardholder challenges a payment with the card issuer.
+
+The card issuer or network can immediately reverse the payment and assess dispute fees against the Stripe balance.
+
+Trade82 may submit order, message, shipping, product, Buyer-approval, and refund records to Stripe and financial institutions.
+
+Stripe, card networks, and issuing banks determine the dispute outcome. Trade82 does not guarantee a result.
+
+Buyer is encouraged to contact Seller and Trade82 before filing a chargeback where practical. This does not waive a card right that cannot legally be waived.
+
+A false, abusive, or duplicate chargeback can result in account restriction, future payment refusal, and recovery action.
+
+24. Seller Payout Holds and Recovery
+
+Trade82 may hold Seller payout while a refund, dispute, chargeback, fraud review, or reconciliation remains open.
+
+If a refund or chargeback occurs before payout, the amount may be deducted from Seller payable amounts.
+
+If it occurs after payout, Seller must reimburse Trade82 for the amount, dispute fees, and reasonable related costs.
+
+To the extent permitted by law, Trade82 may set off reimbursement obligations against current or future payouts, credits, or other amounts owed to Seller.
+
+25. Seller Payout Timing
+
+A payout date is an estimate and not a guarantee.
+
+Payout can remain on hold pending settlement, company and account verification, refunds, disputes, fraud and sanctions review, order and shipping information, tax and banking details, and manual approval.
+
+Bank holidays, intermediary banks, foreign exchange, incorrect account details, or financial-provider issues can delay payout.
+
+26. Paid Marketing Exposure
+
+A User may request cancellation before paid marketing exposure begins.
+
+Exposure is generally nonrefundable after activation and does not guarantee impressions, clicks, inquiries, contracts, or revenue.
+
+If a direct Trade82 technical failure prevents a material portion of the promised period, Trade82 may choose an extension, re-performance, or pro rata refund for the unprovided portion.
+
+A refund may be denied when exposure ends because of User deactivation, loss of eligibility, policy violation, prohibited goods, inaccurate content, or account restriction.
+
+27. Subscriptions and Seller Support
+
+Where Trade82 offers a subscription or recurring Seller-support service, it may renew according to the billing cycle disclosed at checkout.
+
+A User may request cancellation before the next renewal. Cancellation generally becomes effective at the end of the current paid period.
+
+Fees for a billing period that has already started are generally not prorated or refunded.
+
+A full or partial refund may be reviewed for duplicate billing, clear Trade82 billing error, failure to activate after payment, material failure caused directly by Trade82, or a legal requirement.
+
+Unused capacity or failure to achieve expected business results is not a refund basis.
+
+28. Discounts and Credits
+
+Discounts, coupons, credits, and promotional value are not redeemable for cash unless specific terms say otherwise.
+
+A refund may expire or proportionally reverse a discount or credit.
+
+Abuse of promotions or multiple accounts can result in denial of refund or service.
+
+29. Off-Platform Payments
+
+Trade82 has no obligation to cancel, refund, charge back, recover, or protect a payment made outside Trade82 through bank transfer, PayPal, Wise, cryptocurrency, cash, or another method.
+
+Off-platform payment may also violate the anti-circumvention section of the Terms of Service.
+
+30. Fraud Prevention and Verification
+
+Trade82 may verify identity, authority, original payer, account holder, and Transaction relationship for payment, refund, payout, or bank-change requests.
+
+Trade82 may deny or hold a third-party refund request, overpayment scheme, manipulated evidence, unrelated payer, suspicious account change, sanctioned Transaction, or request lacking verification.
+
+Trade82 may provide necessary information to Stripe, banks, card networks, regulators, or law enforcement when legally permitted or required.
+
+31. Communications and Electronic Records
+
+Buyer and Seller should record important payment and refund agreements through Trade82 messages or another verifiable written method.
+
+An oral or external-messenger agreement may not be recognized in Trade82 review without reliable evidence.
+
+Server records, provider records, messages, files, acceptance timestamps, and audit events may be used as evidence to the extent permitted by law.
+
+32. Changes
+
+Trade82 may update this Policy for changes in payments, the Service, law, financial providers, or risk.
+
+Material changes may be communicated through email, account notice, or the website.
+
+The Policy in effect when a payment occurs generally governs that payment. Trade82 will not retroactively reduce an already established refund right except as permitted by law and agreed.
+
+33. Contact
+
+Payment, refund, and chargeback inquiries:
+
+William Zun Park
+Trade82 Payment Support
+37-34 33rd ST
+Long Island City, New York 11101
+United States
+
+Email: contact@trade82.com
+Phone: +1 (929) 994-4473

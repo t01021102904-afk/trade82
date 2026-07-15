@@ -1,0 +1,459 @@
+﻿RFQ Guide
+A Request for Quotation, or RFQ, allows buyers to describe the product they are looking for and ask Trade82 to review the request before recommending relevant Korean products and sellers.
+Instead of searching through individual product listings, buyers can submit their product requirements once and receive suggested matches after the RFQ has been reviewed and approved.
+This guide explains the current Trade82 RFQ process and the information required to submit a request.
+Who Can Submit an RFQ
+RFQ submission is available to Trade82 buyer accounts.
+A buyer may submit an RFQ through the buyer dashboard. Each RFQ belongs to the buyer account that created it, and only that buyer can view, edit, cancel, close, or use the RFQ to select sellers.
+A buyer company profile may not be required to submit the initial RFQ. However, a completed buyer company profile is required before the buyer can open a Trade82 conversation with a selected seller.
+Before You Submit
+Prepare the following information before completing the RFQ form:
+* Product name
+* Product category
+* Sourcing type
+* Required quantity
+* Preferred trade terms
+* Destination country, when applicable
+* Target unit price, when available
+* Target delivery date, when applicable
+* Product specifications
+* Certification requirements
+* A detailed explanation of the request
+More specific information generally produces more relevant product recommendations.
+The current RFQ form does not provide a Save Draft button. Submitting the form sends the RFQ directly to Trade82 for review.
+1. Basic Request
+Product Name
+The product name is required.
+Enter the product or product type you are trying to source. The current maximum length is 180 characters.
+The name does not need to match an existing Trade82 product exactly. It should be specific enough for Trade82 to understand the request.
+Examples:
+Facial moisturizing cream 50 ml
+Private-label hydrogel eye patches
+Korean pet dental-care products
+Avoid overly broad entries such as:
+Cosmetics
+Products
+Something popular in Korea
+When you know the brand, model, formulation, size, or product variation, include that information.
+Category
+The category is required.
+Select the category that most accurately represents the requested product. The category is used as one of the main factors when Trade82 generates suggested product matches.
+Select the product’s primary commercial category rather than an unrelated category that may appear to have more listings.
+Sourcing Type
+Sourcing Type is required.
+Choose one of the available options:
+Wholesale
+ For purchasing existing products in wholesale quantities.
+Distributor Sourcing
+ For buyers looking for products or brands to distribute in a specific market.
+Private Label
+ For buyers seeking an existing product that can be sold under the buyer’s own brand.
+OEM / ODM
+ For buyers seeking product manufacturing, formulation, design, or development services.
+Sample Request
+ For buyers primarily seeking samples before considering a larger order.
+Retail Supply
+ For buyers seeking products for retail stores, online stores, or other retail channels.
+Other
+ For sourcing requests that do not fit the available options.
+Select the option that best describes the expected transaction. Selecting a sourcing type does not guarantee that every recommended seller can provide that service.
+Sourcing Purpose
+Sourcing Purpose is optional.
+The available options are:
+* Compare suppliers
+* Request quotation
+* Find private-label partner
+* Request samples
+* Check export readiness
+* Other
+Use this field to explain what you want to accomplish through the RFQ.
+For example, a buyer who already understands the product but needs commercial pricing may select Request quotation. A buyer evaluating several Korean manufacturers may select Compare suppliers.
+2. Trade Conditions
+Quantity
+Quantity is required.
+The quantity field accepts text rather than only a number. Include both the amount and the appropriate unit.
+Examples:
+1,000 units
+50 cartons
+5,000 pieces per month
+Initial order of 500 units, followed by monthly orders
+The current maximum length is 160 characters.
+Be clear about whether the amount represents:
+* A sample quantity
+* An initial test order
+* A single purchase
+* A monthly requirement
+* An annual estimate
+* A quantity per product variation
+Do not enter an unrealistic quantity solely to attract more seller attention.
+Trade Terms
+Trade Terms are required.
+The current available options are:
+* EXW
+* FOB
+* CIF
+* DDP
+* DAP
+* Not sure / Need guidance
+Choose the term you expect to use. When you are unfamiliar with Incoterms or have not yet decided which party should manage freight, customs, duties, or final delivery, select Not sure / Need guidance.
+The selected trade term is a sourcing preference. Final responsibility, named port or destination, freight cost, customs handling, insurance, duties, and taxes must still be confirmed with the seller before payment.
+Destination Country
+Destination Country is optional.
+Select the country where the goods are expected to be delivered or imported.
+This information can help Trade82 identify sellers whose profiles indicate experience or export availability for the requested destination.
+Enter the actual destination market whenever possible. Do not select the buyer’s company country when the goods will be delivered somewhere else.
+Preferred Unit Price
+Preferred Unit Price is optional.
+Enter the target amount per unit when you have a clear budget.
+The current form accepts:
+* Whole numbers
+* Decimal amounts with up to two decimal places
+The available currencies are:
+* USD
+* KRW
+Examples:
+USD 8.50 per unit
+KRW 4,000 per piece
+The RFQ form records the amount and currency, but it does not contain a separate price-unit selector. Explain the applicable price basis in the Details field when necessary.
+For example:
+Target price is USD 8.50 per 50 ml unit based on an order of 2,000 units.
+The target price is a preference and does not guarantee that a seller can meet it. Final pricing may depend on quantity, packaging, customization, destination, certification, production requirements, and trade terms.
+When no preferred amount is entered, the currency selection is not treated as a confirmed target price.
+Target Delivery Date
+Target Delivery Date is optional.
+Choose the date by which you would prefer to receive or have the order prepared.
+The date should be treated as a target, not a guaranteed delivery commitment. Production, international shipping, customs procedures, documentation, and seller capacity may affect the final schedule.
+Explain whether the date refers to factory completion, shipment departure, arrival at the destination port, or final delivery when that distinction is important.
+3. Product Specifications
+All fields in this section are optional, but completing them may improve the relevance of suggested matches.
+Shape
+Describe the product’s physical shape, form, or format.
+Examples:
+* Round pad
+* Sheet mask
+* Powder
+* Liquid
+* Tablet
+* Tube
+* Pouch
+* Spray bottle
+The current maximum length is 160 characters.
+Capacity
+Enter the required size, volume, weight, count, or capacity.
+Examples:
+* 50 ml
+* 155 g
+* 30 tablets
+* 500 ml bottle
+* 100 sheets per package
+The current maximum length is 160 characters.
+Use a clear measurement unit.
+Material
+Enter the required material, ingredient category, fabric, packaging material, or construction material.
+Examples:
+* Recycled PET
+* Organic cotton
+* Stainless steel
+* Centella asiatica extract
+* Food-grade silicone
+The current maximum length is 240 characters.
+This field is used as one of the current automated matching factors. Use specific terms that are likely to appear in relevant product listings.
+Certification
+Enter certifications, registrations, test documents, or compliance information required for the intended market.
+Examples:
+* MoCRA-related information
+* HACCP
+* GMP
+* ISO certification
+* Certificate of Analysis
+* Safety Data Sheet
+* Vegan certification
+The current maximum length is 240 characters.
+Enter only requirements that are relevant to the product and destination market. Trade82 recommendations do not independently confirm that a certification is legally sufficient, current, or applicable to the buyer’s intended use.
+Feature
+Enter the product characteristics that are important to the request.
+Examples:
+* Fragrance-free
+* Private-label available
+* Recyclable packaging
+* Sensitive-skin positioning
+* Waterproof
+* Custom color available
+* Long shelf life
+The current maximum length is 240 characters.
+Shape, capacity, material, certification, and feature information may be considered when the system searches for relevant products.
+4. Details and Attachments
+Details
+Details are required.
+This is the main section for explaining everything that cannot be fully described through the structured fields.
+The current maximum length is 8,000 characters.
+Useful details may include:
+* Intended use
+* Target customer
+* Required product specifications
+* Packaging requirements
+* Label language
+* Private-label requirements
+* OEM or ODM requirements
+* Sample needs
+* Expected order frequency
+* Required documents
+* Destination-market requirements
+* Acceptable product alternatives
+* Questions for potential sellers
+* Important commercial deadlines
+A useful Details section might look like this:
+We are looking for a Korean facial moisturizer for distribution in the United States. The preferred size is 50 ml, with a target initial order of 2,000 units. We are interested in either an existing brand or a private-label option. Please confirm available ingredient documentation, packaging options, sample conditions, production lead time, and FOB pricing. English labeling is required.
+The details are also used by the current matching process when comparing RFQ keywords against registered product information.
+Do not include:
+* Passwords
+* Complete payment-card information
+* Private banking information
+* Authentication codes
+* Unnecessary personal identification information
+* Instructions to make payment outside Trade82
+Attachments
+Attachment upload is not currently enabled in the RFQ form.
+Files cannot be uploaded directly when the RFQ is first submitted. Trade82 may request relevant files separately during the review or sourcing process when additional documents are needed.
+Do not state that a file has been attached when no file has actually been provided.
+5. RFQ Submission
+When Submit RFQ is selected, Trade82 validates the required fields and saves the request.
+A newly submitted RFQ is recorded with:
+* RFQ status: Submitted
+* Administrative status: Pending review
+Submission does not immediately create recommended products or send the request directly to every seller.
+The RFQ first enters the Trade82 administrative review process.
+The current creation limit is up to 20 RFQ requests per buyer account within one hour. This limit is intended to reduce automated or abusive submissions.
+6. Trade82 Review
+A Trade82 administrator reviews the RFQ before matching begins.
+The administrator can review:
+* Product name
+* Category
+* Quantity
+* Destination country
+* Sourcing type
+* Trade terms
+* Preferred unit price
+* Detailed request
+* Buyer information
+* Buyer company information, when available
+The administrator may:
+* Approve the RFQ
+* Reject the RFQ
+* Add or save an administrative note
+Submitting an RFQ does not guarantee approval.
+An RFQ may be rejected when it is incomplete, unclear, suspicious, unlawful, outside the platform’s supported scope, or unsuitable for matching.
+If the RFQ is rejected and an administrative note is available, the note may be displayed to the buyer. The buyer can revise and resubmit a rejected RFQ.
+7. Editing an RFQ
+An RFQ can currently be edited while its status is:
+* Draft
+* Submitted
+* Under review
+* Rejected
+The current creation page does not offer a Save Draft function, although the system supports Draft as an RFQ status.
+When an editable RFQ is updated:
+* Its status returns to Submitted
+* Its administrative status returns to Pending review
+* The previous administrative note is cleared
+* Previous review information is cleared
+* The RFQ must be reviewed again
+After the RFQ becomes approved or ready for matching, it can no longer be edited through the normal buyer form.
+8. Cancelling an RFQ
+A buyer can cancel an RFQ before it reaches the approved or matching-ready stage.
+An RFQ cannot be cancelled after it is:
+* Approved
+* Ready for matching
+* Closed
+* Already cancelled
+Cancellation changes the RFQ status to Cancelled.
+Cancelling an RFQ does not delete the record. It remains part of the buyer’s RFQ history.
+9. Approval and Suggested Matches
+When a Trade82 administrator approves the RFQ, the current system changes its status to Ready for matching.
+Approval also starts the automated product-matching process.
+The system considers currently registered Trade82 products and may recommend up to 12 products.
+To qualify for a recommendation, a product must currently be:
+* Active
+* Connected to a verified seller company
+* Connected to a seller company that has not been deleted
+* Owned by someone other than the buyer who submitted the RFQ
+The current matching process may consider:
+* Matching product category
+* Similar keywords
+* Similar product descriptions
+* Requested material
+* Requested certification
+* Requested feature
+* Requested shape
+* Requested capacity
+* Seller export-country information
+* Product recency
+Recommendation reasons may be displayed beside a suggested product, including:
+* Same category
+* Similar keywords
+* Seller exports to the destination country
+* Matching material
+* Matching certification
+* Matching feature
+* Similar product description
+The current matching process is rule-based. It compares RFQ information with registered product and seller information. It is not a guarantee that the recommended product fully satisfies every requirement.
+Only information already registered on Trade82 can be considered. Incomplete seller listings may result in fewer or less precise recommendations.
+10. No Suggested Matches
+An approved RFQ may produce no suggested products.
+This can happen when:
+* No active product is sufficiently relevant
+* Relevant products are not connected to verified sellers
+* The category does not contain suitable listings
+* Product descriptions do not contain enough matching information
+* The requested material, certification, or feature is not represented in current listings
+* The destination requirement does not match available seller information
+RFQ approval does not guarantee that a suitable product or seller is available.
+When no suggested matches are generated, the RFQ page indicates that Trade82 may continue reviewing the sourcing request.
+11. Reviewing Suggested Products
+After approval, the Suggested Matches section may display:
+* Product image
+* Product name
+* Seller name
+* Product category
+* Available wholesale-price information
+* MOQ information
+* Match reasons
+* Link to the full product page
+* Select Seller button
+Some price or MOQ information may remain available only through inquiry, depending on the seller’s product visibility settings.
+Buyers should open the product page and independently review the available product and seller information before selecting a seller.
+A recommendation does not mean that Trade82 guarantees:
+* Product quality
+* Product availability
+* Final price
+* Required quantity
+* Certification validity
+* Regulatory compliance
+* Sample availability
+* Production capacity
+* Delivery schedule
+* Seller performance
+12. Selecting a Seller
+A buyer can select a seller only from the products recommended for an approved RFQ.
+Selecting a seller creates a seller quote request connected to the RFQ.
+The selected seller must still be:
+* Connected to the recommended product
+* Connected to an active product
+* A verified seller company
+* Different from the buyer’s own company
+A seller who was not included in the Suggested Matches section cannot be added through the normal Select Seller action.
+After selection, the seller appears in the Quote Comparison section. The initial quote status is Requested.
+Selecting a seller does not mean that the seller has accepted the request or submitted commercial terms.
+13. Quote Comparison
+The Quote Comparison section is available after the RFQ has been approved and a seller has been selected.
+The table currently supports the following information:
+* Seller
+* Product
+* Unit price
+* MOQ
+* Lead time
+* Incoterms
+* Sample availability
+* Private-label availability
+* Quote status
+* Chat action
+Until commercial information is available, the relevant fields display a waiting status.
+Possible quote statuses supported by the current system are:
+* Requested
+* Submitted
+* Declined
+* Negotiating
+* Accepted
+* Closed
+The quote comparison table organizes seller information but does not itself guarantee that a seller will respond or that the displayed offer will remain available indefinitely.
+Final terms should be confirmed through Trade82 messages before payment.
+14. Chatting With a Selected Seller
+After selecting a seller, the buyer can select Chat Now.
+A completed buyer company profile is required before opening a seller conversation.
+Trade82 creates a new inquiry conversation or reuses an existing conversation connected to the same RFQ seller selection.
+The initial message automatically includes available RFQ information such as:
+* Product name
+* Category
+* Quantity
+* Trade terms
+* Preferred unit price
+* Destination country
+* Shape
+* Capacity
+* Material
+* Certification
+* Feature
+* Detailed request
+The seller may also receive a notification that a new RFQ conversation has been opened.
+Important pricing, specifications, samples, documents, shipping conditions, and final commercial terms should be confirmed through the Trade82 conversation.
+15. Closing an RFQ
+A buyer can close an RFQ after it has reached the Approved or Ready for matching stage.
+Closing an RFQ changes its status to Closed.
+Close the RFQ when:
+* The sourcing request is no longer needed
+* A suitable supplier has been selected
+* The buyer has completed the sourcing process
+* The requested product is no longer required
+* The buyer does not wish to receive or compare additional responses
+Closing an RFQ does not delete its historical information.
+16. RFQ Statuses
+Draft
+The RFQ has not yet entered the standard review process.
+The current RFQ creation page does not provide a Save Draft button, but existing RFQs with this status remain editable.
+Submitted
+The RFQ has been submitted and is waiting for Trade82 review.
+Under Review
+The RFQ is being reviewed.
+The buyer may still edit the RFQ while it has this status. Editing it resubmits the request and resets the administrative review information.
+Approved
+The RFQ has been approved.
+The current administrative approval process normally moves an RFQ directly to Ready for matching.
+Rejected
+The RFQ was not approved.
+The buyer may revise and resubmit it. An administrative note may explain what needs to be corrected.
+Ready for Matching
+The RFQ has been approved, and suggested products can be displayed.
+The buyer can review matches, select sellers, compare quote information, and open conversations.
+Closed
+The buyer has ended the RFQ process.
+Cancelled
+The buyer cancelled the RFQ before approval.
+17. Writing a Strong RFQ
+A strong RFQ clearly answers the following questions:
+* What product do you need?
+* What quantity do you need?
+* Is this a test order or recurring order?
+* What product specifications are essential?
+* Which requirements are preferred rather than mandatory?
+* What is the destination country?
+* What is the target unit price?
+* Which trade term do you prefer?
+* When do you need the product?
+* Do you need samples?
+* Do you need private-label or OEM/ODM support?
+* Which documents or certifications are required?
+* What information should sellers include in their response?
+Avoid vague requests such as:
+I want Korean cosmetics. Send prices.
+A stronger request would be:
+We are looking for a Korean facial moisturizer in a 50 ml retail package for U.S. distribution. The initial order is expected to be 2,000 units. We prefer FOB terms and a target price below USD 9.00 per unit. Both existing-brand and private-label options may be considered. Please confirm sample availability, ingredients, packaging options, MOQ, production lead time, and available export documents.
+18. Final Review Checklist
+Before submitting, confirm that:
+* The product name clearly describes the requested item
+* The correct category is selected
+* The sourcing type matches the intended transaction
+* The quantity includes an appropriate unit
+* The preferred trade term is selected
+* The destination country is accurate
+* The target price includes the intended unit basis in the Details field
+* The target delivery date is realistic
+* Product specifications are specific
+* Certification requirements are relevant
+* Mandatory and optional requirements are clearly separated
+* The Details section contains enough information for review
+* No unsupported attachment claim is included
+* No passwords or sensitive financial information are included
+* The request does not direct users to transact outside Trade82
+RFQ Process Summary
+The current Trade82 RFQ process is:
+A buyer submits an RFQ through the buyer dashboard. The RFQ enters Pending Review status. A Trade82 administrator reviews the request and either approves or rejects it. When approved, the RFQ becomes Ready for matching, and the system searches active products from verified seller companies. Up to 12 suggested products may be displayed based on category, keywords, product information, specifications, certification, and destination-related information.
+The buyer reviews the suggested products, selects relevant sellers, views the Quote Comparison section, and opens Trade82 conversations with the selected sellers. The buyer can then discuss pricing, MOQ, lead time, samples, private-label availability, Incoterms, and other commercial requirements before deciding whether to proceed.

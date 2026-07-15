@@ -42,6 +42,9 @@ const privateRouteSources = [
 ] as const;
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    "/**": ["./src/content/documents/**/*.txt"],
+  },
   images: {
     remotePatterns: [
       {

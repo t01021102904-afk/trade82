@@ -506,6 +506,24 @@ textarea {
   transform: translateY(-5px) rotate(3deg);
 }
 
+@media (min-width: 64rem) {
+  .document-mobile-actions {
+    display: none !important;
+  }
+
+  .document-desktop-language,
+  .document-sidebar {
+    display: block !important;
+  }
+}
+
+@media (max-width: 63.999rem) {
+  .document-desktop-language,
+  .document-sidebar {
+    display: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .home-reveal {
     opacity: 1 !important;
@@ -536,5 +554,31 @@ textarea {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+@media print {
+  .document-print-hidden,
+  .document-sidebar,
+  body > header,
+  body > footer {
+    display: none !important;
+  }
+
+  .trade82-document-page {
+    background: #fff !important;
+  }
+
+  .trade82-document-page article {
+    max-width: none !important;
+  }
+
+  .trade82-document-page section {
+    break-inside: avoid;
+  }
+
+  .trade82-document-page h1,
+  .trade82-document-page h2 {
+    break-after: avoid;
   }
 }

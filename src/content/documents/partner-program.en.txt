@@ -1,0 +1,272 @@
+﻿Partner Program
+The Trade82 Partner Program allows individuals, companies, consultants, agencies, industry communities, and other approved partners to earn commission by introducing qualified buyers and sellers to Trade82.
+Each approved partner receives a unique referral link. When a new buyer or seller creates a Trade82 account through that link and later completes an eligible transaction through Trade82’s payment system, the partner may earn a percentage of the platform fee collected from that transaction.
+How the Program Works
+After joining the Partner Program, the partner receives a unique referral link connected to their Trade82 partner account.
+The partner may share this link with:
+* Korean manufacturers and brands
+* Exporters and suppliers
+* International buyers
+* Distributors and wholesalers
+* Retailers
+* Importers
+* Sourcing agents
+* Industry communities
+* Business associations
+* Other eligible companies or professionals
+A referral is recorded when a new user creates an account through the partner’s valid referral link.
+The referred user may register as either:
+* A seller
+* A buyer
+* Both a buyer and seller
+When the referred user later participates in an eligible transaction completed through Trade82, the referring partner may earn commission.
+Partner Commission
+Trade82 currently charges a platform fee equal to 5% of the total eligible transaction amount paid through Trade82.
+Approved partners receive 10% of the Trade82 platform fee actually earned and retained from an eligible referred transaction.
+This means the standard partner commission is effectively equal to 0.5% of the eligible transaction amount.
+Commission Example
+If a referred buyer or seller completes a transaction of USD 10,000:
+* Total transaction amount: USD 10,000
+* Trade82 platform fee at 5%: USD 500
+* Partner commission at 10% of the platform fee: USD 50
+* Effective partner commission rate: 0.5% of the transaction amount
+Another example:
+* Total transaction amount: USD 50,000
+* Trade82 platform fee: USD 2,500
+* Partner commission: USD 250
+The partner does not receive 10% of the total transaction amount. The partner receives 10% of the 5% platform fee collected by Trade82.
+Eligible Transactions
+A transaction is eligible for partner commission only when all of the following conditions are met:
+1. The buyer or seller created a new Trade82 account using the partner’s valid referral link.
+2. The referral was properly recorded in Trade82’s system.
+3. The transaction was initiated and completed through Trade82.
+4. Payment was successfully processed and confirmed.
+5. Trade82 successfully collected and retained the applicable platform fee.
+6. The transaction was not fraudulent, cancelled, fully refunded, reversed, or charged back.
+7. The referred account and transaction comply with the Trade82 Terms of Service and Partner Program rules.
+8. The transaction was not created solely to generate artificial partner commission.
+Trade82’s internal account, payment, referral, and transaction records will be used to determine whether a transaction qualifies.
+Referral Attribution
+A referred user must create their account through the partner’s unique referral link.
+Referral claims may not be applied retroactively when:
+* The user registered without using the referral link
+* The user already had a Trade82 account
+* The user used another partner’s referral link
+* The referral could not be reliably recorded
+* The partner submits the user’s information after registration
+* The account was created through an unrelated marketing channel
+Each referred account may normally be attributed to only one partner.
+Changing email addresses, creating duplicate accounts, or closing and reopening an account does not create a new referral.
+When Both the Buyer and Seller Were Referred
+Trade82 will not pay more than a total of 10% of its platform fee as partner commission for a single transaction unless a separate written agreement states otherwise.
+When the buyer and seller were referred by two different partners, the available commission may be divided equally:
+* Buyer’s referring partner: 5% of the Trade82 platform fee
+* Seller’s referring partner: 5% of the Trade82 platform fee
+* Total partner commission: 10% of the Trade82 platform fee
+For example, if Trade82 earns a USD 500 platform fee, each partner may receive USD 25.
+If the same partner referred both the buyer and seller, that partner may receive the full standard commission of USD 50.
+Commission Period
+Unless a separate written agreement provides otherwise, a partner may earn commission from eligible transactions completed during the first 12 months following the referred user’s first eligible transaction.
+The commission period begins on the date the referred user completes their first qualifying payment through Trade82.
+Transactions completed after the applicable commission period may not generate additional partner commission.
+Trade82 may offer extended, recurring, or customized commission periods to selected strategic partners through a separate written agreement.
+Commission Validation Period
+Partner commission does not become payable immediately when the buyer submits payment.
+Each commission remains pending during a validation period so that Trade82 can confirm:
+* Successful payment settlement
+* Platform fee collection
+* Order legitimacy
+* Refund status
+* Chargeback status
+* Payment disputes
+* Fraud indicators
+* Compliance with platform rules
+* Referral validity
+The standard validation period is at least 30 calendar days after the transaction payment is successfully confirmed.
+Trade82 may extend the validation period when a transaction involves:
+* A refund request
+* A payment dispute
+* A chargeback
+* Suspicious activity
+* Compliance review
+* Delayed payment settlement
+* Delivery-related investigation
+* A high-risk payment method
+* Incomplete partner verification
+Pending commission is not considered earned or payable until the validation process is completed.
+Payment Schedule
+Approved partner commissions are calculated monthly.
+Subject to validation, minimum payout requirements, and receipt of complete payment information, Trade82 will normally issue payment within 60 calendar days after the end of the month in which the commission became approved and payable.
+For example:
+* A transaction is completed on January 10.
+* The validation period ends in February.
+* The commission is approved during February.
+* The partner payment will normally be issued no later than April 30.
+The 60-day payment period gives Trade82 sufficient time to confirm payment settlement, refunds, disputes, chargebacks, compliance, and international transfer information.
+A payment may take additional time to appear in the partner’s account because of banking holidays, intermediary banks, currency conversion, international transfer processing, incorrect account information, or other circumstances outside Trade82’s reasonable control.
+Minimum Payout Amount
+The standard minimum payout amount is USD 100.
+When the approved commission balance is below USD 100, the balance will be carried forward to the following payment period.
+For example:
+* Approved balance in January: USD 35
+* Approved balance in February: USD 40
+* Approved balance in March: USD 45
+* Total approved balance: USD 120
+The partner becomes eligible for payment after the approved balance reaches the USD 100 minimum.
+Trade82 may pay a lower amount at its discretion, but it is not required to do so.
+Payment Method
+Partner payments may be issued through:
+* Bank transfer
+* International wire transfer
+* Wise or another approved transfer service
+* Another payment method approved by Trade82
+The available payment method may depend on the partner’s country, currency, identity verification, company status, and banking information.
+Payments are generally calculated in United States dollars. Currency conversion may be performed by Trade82, a bank, or a payment provider using the exchange rate available at the time of transfer.
+The partner is responsible for providing accurate payment information, including:
+* Legal name
+* Company name, when applicable
+* Country
+* Bank name
+* Account holder name
+* Account number
+* SWIFT or BIC code
+* Routing or bank code
+* Payment currency
+* Tax information requested by Trade82
+Trade82 is not responsible for delays caused by incorrect, incomplete, expired, or unsupported payment information.
+Transfer Fees and Currency Conversion
+Receiving-bank fees, intermediary-bank fees, currency-conversion fees, and other external transfer charges may be deducted from the payment amount or charged separately by the partner’s financial institution.
+Trade82 may combine multiple approved commission periods into one payment when doing so reduces international transfer costs.
+Refunds, Chargebacks, and Reversals
+Partner commission is based only on platform fees that Trade82 actually earns and retains.
+Commission will not be paid on amounts that are:
+* Fully refunded
+* Reversed
+* Charged back
+* Cancelled
+* Determined to be fraudulent
+* Returned to the buyer
+* Not successfully collected
+* Waived by Trade82
+* Otherwise removed from Trade82’s earned platform revenue
+For a partial refund, the partner commission may be recalculated based on the remaining eligible transaction amount.
+Partial Refund Example
+Original transaction:
+* Transaction amount: USD 10,000
+* Trade82 platform fee: USD 500
+* Partner commission: USD 50
+If USD 4,000 is refunded:
+* Remaining eligible amount: USD 6,000
+* Revised Trade82 platform fee: USD 300
+* Revised partner commission: USD 30
+If commission was already paid before the refund or chargeback occurred, Trade82 may:
+* Deduct the amount from future partner payments
+* Reduce the partner’s pending balance
+* Request repayment
+* Suspend future payments until the negative balance is recovered
+Taxes
+Partners are responsible for reporting and paying all taxes, duties, withholding obligations, and other government charges related to their commission income.
+Trade82 may request tax documentation before issuing payment, including forms required under United States or international tax rules.
+Trade82 may withhold taxes when required by applicable law.
+Failure to provide required tax information may delay or prevent commission payments.
+Participation in the Partner Program does not create an employment relationship between Trade82 and the partner.
+Partner Verification
+Trade82 may require partners to complete verification before referral commissions are approved or paid.
+Verification may include:
+* Identity verification
+* Company verification
+* Bank-account verification
+* Tax-information collection
+* Website or social-media review
+* Review of marketing methods
+* Confirmation of the partner’s relationship with referred users
+Trade82 may pause commission payments until the required verification is completed.
+Prohibited Partner Activities
+Partners may not:
+* Create fake buyers or sellers
+* Refer themselves or a company they own or control
+* Create duplicate accounts
+* Generate artificial transactions
+* Pay themselves through referred accounts
+* Manipulate transaction amounts
+* Offer unauthorized discounts funded by Trade82
+* Make false claims about Trade82
+* Represent themselves as a Trade82 employee
+* Guarantee orders, revenue, approvals, refunds, or business results
+* Send unlawful or deceptive advertising
+* Use spam, automated messaging, or purchased contact lists without authorization
+* Mislead users about platform fees
+* Hide the fact that they may earn a commission
+* Encourage buyers or sellers to transact outside Trade82
+* Share external bank details to avoid Trade82 fees
+* Use another person’s identity or company information
+* Interfere with Trade82’s referral tracking
+* Use Trade82 trademarks without permission
+* Bid on Trade82’s brand name in paid advertising without written approval
+* Engage in fraud, money laundering, bribery, sanctions violations, or other unlawful conduct
+Self-Referrals
+Partners may not earn commission by referring:
+* Themselves
+* Their own company
+* A company they control
+* Their employees acting on behalf of the same business
+* Duplicate accounts connected to an existing referred user
+* Accounts created primarily for earning commission
+Trade82 may deny or reverse commission when accounts share ownership, management, payment information, devices, addresses, or other indicators of self-referral or artificial activity.
+Off-Platform Transactions
+Partner commission applies only to transactions completed through Trade82’s payment system.
+No commission is earned when a referred buyer or seller:
+* Pays through an outside bank transfer
+* Uses an external payment link
+* Completes payment through email or a private messenger
+* Moves the transaction outside Trade82
+* Avoids or circumvents the platform fee
+* Reports a lower transaction amount than the actual amount paid
+Partners must not encourage referred users to complete transactions outside Trade82.
+Suspension and Termination
+Trade82 may warn, suspend, or terminate a partner for violating program rules.
+Grounds for immediate suspension or termination may include:
+* Fraudulent referrals
+* Fake accounts
+* Artificial transactions
+* Self-referrals
+* Platform-fee avoidance
+* Misleading advertising
+* Repeated customer complaints
+* Unauthorized use of Trade82 branding
+* Money-laundering concerns
+* Chargeback manipulation
+* Sharing confidential information
+* Failure to provide required verification
+* Violation of applicable law
+* Attempting to manipulate commission calculations
+When a partner account is terminated for fraud or serious misconduct, unpaid commission may be cancelled.
+When participation ends without misconduct, commission already approved before the termination date may remain payable, subject to the normal validation, minimum payout, refund, and chargeback rules.
+No commission is earned from transactions completed after the effective termination date unless Trade82 agrees otherwise in writing.
+Program Changes
+Trade82 may modify the commission rate, eligibility rules, attribution method, commission period, payment schedule, minimum payout amount, or other Partner Program terms.
+Trade82 will make reasonable efforts to provide advance notice of material changes. Unless immediate changes are required for legal, fraud-prevention, payment, or security reasons, material changes will generally take effect at least 30 days after notice.
+Commission already approved before a change takes effect will normally remain subject to the terms in effect when it was approved.
+No Guaranteed Income
+Participation in the Trade82 Partner Program does not guarantee:
+* Referral approval
+* Buyer or seller activity
+* Completed transactions
+* A minimum level of commission
+* Recurring income
+* Continued program availability
+* Continued eligibility of a referred account
+Commission depends on actual eligible transactions successfully completed through Trade82.
+Independent Relationship
+Partners participate as independent parties.
+The Partner Program does not create:
+* An employment relationship
+* A partnership
+* A joint venture
+* A franchise
+* An agency relationship
+* Authority to sign contracts on behalf of Trade82
+Partners may not make commitments, guarantees, representations, or agreements on behalf of Trade82.
+Partner Program Summary
+A partner shares their unique Trade82 referral link. A new buyer or seller creates an account through that link. The referred user completes an eligible payment through Trade82. Trade82 collects its standard 5% platform fee. The partner earns 10% of that fee, which is generally equivalent to 0.5% of the eligible transaction amount.
+Approved commission is validated for refunds, disputes, chargebacks, fraud, and compliance. Eligible balances are normally paid monthly, within 60 calendar days after the end of the month in which the commission became approved, once the USD 100 minimum payout threshold has been reached.

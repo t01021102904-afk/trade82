@@ -1,0 +1,139 @@
+﻿For Buyers
+Trade82 helps international buyers discover Korean products, submit sourcing requests, communicate with sellers, compare commercial terms, and manage transactions in one place.
+Buyers can browse existing product listings or submit a Request for Quotation when they need a specific product, quantity, price range, certification, packaging option, or delivery condition.
+Submit an RFQ
+An RFQ allows buyers to describe exactly what they are looking for.
+The request may include:
+* Product name and category
+* Required quantity
+* Target unit price
+* Destination country
+* Preferred delivery date
+* Product specifications
+* Materials or ingredients
+* Required certifications
+* Packaging requirements
+* Private-label or OEM requirements
+* Sample requirements
+* Preferred trade terms
+* Additional sourcing details
+Providing complete and accurate information helps Trade82 identify more relevant products and sellers.
+RFQ Review
+After an RFQ is submitted, it is reviewed by a Trade82 administrator.
+The administrator may review:
+* Whether the request contains enough information
+* Whether the requested product is within Trade82’s supported categories
+* Whether the quantity and commercial requirements are reasonably clear
+* Whether the request appears genuine
+* Whether additional specifications or documents are required
+* Whether suitable products or sellers may be available
+Submitting an RFQ does not mean it is automatically accepted. Trade82 may request additional information before approving the request.
+RFQs that contain incomplete, misleading, unlawful, prohibited, or suspicious information may be rejected.
+RFQ Approval
+When the administrator determines that the request is suitable, the RFQ is approved.
+Approval means that Trade82 can begin reviewing available products and sellers that may match the buyer’s requirements. Approval does not guarantee that a suitable product, supplier, price, quantity, certification, or delivery schedule will be available.
+Recommended Products
+After an RFQ is approved, the buyer may receive recommended products that match the request.
+Recommendations may be based on:
+* Product category
+* Product specifications
+* Requested quantity
+* Target price
+* Destination market
+* Available certifications
+* Sample availability
+* Production capacity
+* Lead time
+* Private-label availability
+* Seller information
+* Other commercial requirements
+Recommended products may come from existing Trade82 listings or from sellers identified by Trade82 during the sourcing process.
+A recommendation does not mean that Trade82 guarantees the product, seller, price, regulatory status, or transaction outcome. Buyers should review the product and seller information before proceeding.
+Seller Recommendations
+Trade82 may also recommend sellers that appear capable of meeting the buyer’s sourcing requirements.
+A seller recommendation may consider the seller’s:
+* Product range
+* Company profile
+* Export experience
+* Available certifications
+* Minimum order quantity
+* Production capacity
+* Sample availability
+* Lead time
+* Target markets
+* Responsiveness
+Buyers remain responsible for evaluating whether a seller is suitable for their business.
+Reviewing Recommendations
+Once recommendations are available, the buyer can review the products and sellers associated with the RFQ.
+The buyer may:
+* Open product listings
+* Review seller profiles
+* Compare product information
+* Ask additional questions
+* Request samples
+* Discuss pricing
+* Confirm available quantities
+* Review certifications and documents
+* Discuss packaging and private-label options
+* Negotiate shipping and delivery terms
+The buyer is not required to proceed with every recommendation.
+Buyer Inquiries
+If a recommended product appears suitable, the buyer can contact the seller through Trade82.
+The buyer should clearly explain any important requirements that were not included in the original RFQ. This may include destination-specific regulations, labeling requirements, shelf-life requirements, packaging standards, testing requirements, or required delivery deadlines.
+Important commercial terms should be confirmed through the Trade82 message thread so that the transaction history remains connected to the inquiry.
+Pricing and Availability
+Prices displayed on Trade82 or included in a recommendation may be estimates, starting prices, or prices based on specific quantities.
+The final price may depend on:
+* Order quantity
+* Product specifications
+* Packaging
+* Customization
+* Private labeling
+* Samples
+* Production schedule
+* Shipping method
+* Destination
+* Trade terms
+* Currency
+* Certification requirements
+Product availability and lead times may also change. Buyers should confirm the final terms directly with the seller before making payment.
+Samples
+Buyers may request samples before placing a larger order.
+Sample availability, sample price, shipping cost, delivery time, and customs responsibility depend on the seller and the destination country.
+Sample requests should be discussed through Trade82. A successful sample order does not guarantee that future production orders will have identical pricing, lead times, or availability.
+Payment
+When the buyer and seller agree on the product, quantity, price, shipping cost, and other terms, the seller can send a payment request through Trade82.
+Transactions that begin through Trade82 must be paid through Trade82’s payment system.
+Buyers should not send payment directly to a seller’s bank account or use an external payment link provided through email, messaging applications, documents, QR codes, or other outside channels.
+Trade82 may not be able to verify or support payments made outside the platform.
+Order and Shipping
+After payment is confirmed, the related order can be managed through Trade82.
+The buyer may receive information such as:
+* Order number
+* Seller information
+* Product and quantity
+* Payment status
+* Shipping status
+* Carrier
+* Tracking number
+* Estimated arrival date
+* Transaction updates
+Shipping dates and arrival estimates may change because of production delays, carrier conditions, customs procedures, documentation issues, or events outside the seller’s or Trade82’s control.
+Buyer Responsibility
+Buyers are responsible for providing accurate sourcing requirements and reviewing the recommended products and sellers before placing an order.
+Buyers should independently confirm:
+* Product suitability
+* Product specifications
+* Certifications
+* Legal import requirements
+* Labeling requirements
+* Customs requirements
+* Taxes and duties
+* Intellectual-property rights
+* Safety and regulatory compliance
+* Seller suitability
+* Final commercial terms
+Trade82 facilitates discovery, communication, recommendation, payment records, and order management, but it does not replace the buyer’s own commercial, legal, regulatory, or technical due diligence.
+The Buyer Process
+The Trade82 buyer process is straightforward:
+A buyer submits an RFQ. A Trade82 administrator reviews the request and may ask for additional information. Once the RFQ is approved, Trade82 identifies and recommends relevant products or sellers. The buyer reviews the recommendations, contacts suitable sellers, discusses pricing and order terms, and completes payment through Trade82 after reaching an agreement.

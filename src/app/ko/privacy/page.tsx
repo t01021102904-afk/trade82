@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { LegalDocumentPage, getLegalMetadata } from "@/components/legal-document-page";
+import { DocumentRoutePage, documentRouteMetadata } from "@/components/document-route-page";
 
-export const metadata: Metadata = getLegalMetadata("ko", "privacy");
+export const metadata: Metadata = documentRouteMetadata("ko", "privacy");
 
 export default function KoPrivacyPage() {
-  return <LegalDocumentPage locale="ko" documentKey="privacy" />;
+  return <DocumentRoutePage locale="ko" documentSlug="privacy" />;
 }

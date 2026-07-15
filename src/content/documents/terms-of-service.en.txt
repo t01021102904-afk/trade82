@@ -1,0 +1,475 @@
+Trade82 Terms of Service
+
+Effective Date: July 14, 2026
+Last Updated: July 14, 2026
+Draft for Legal Review
+
+These Terms of Service (“Terms”) are a legal agreement between William Zun Park, an individual operating under the trade name “Trade82” (“Trade82,” “we,” “us,” or “our”) and the person or business using the Trade82 website, marketplace, dashboards, RFQs, messaging, payments, orders, shipping, payouts, and related features (“User,” “you,” or “your”).
+
+Trade82 is currently not a separate corporation or limited liability company. Unless expressly stated otherwise, “Trade82” means William Zun Park individually.
+
+Important: These Terms contain warranty disclaimers, limitations of liability, indemnification obligations, individual arbitration, a class-action waiver, and a jury-trial waiver.
+
+1. Acceptance
+
+You agree to these Terms when you select an acceptance checkbox or button, create an account, list a company or product, submit an inquiry, RFQ, quotation, or message, create or pay a payment request, or purchase a paid feature.
+
+If you accept on behalf of a company, you represent and warrant that you have authority to bind that company. If you lack authority or do not agree, you must not use the Service.
+
+Trade82 does not intend to rely only on a footer link for material terms. Trade82 may require affirmative acceptance at sign-up, first sign-in, before payment, or after a material change.
+
+2. Operator and Contact
+
+• Operator: William Zun Park, an individual operating under the trade name “Trade82”
+• Address: 37-34 33rd ST, Long Island City, New York 11101, United States
+• Email: contact@trade82.com
+• Phone: +1 (929) 994-4473
+
+3. B2B Use and Eligibility
+
+Trade82 is a business-to-business service. You represent and warrant that:
+
+1. you are at least 18 years old;
+2. you use the Service for business or professional purposes, not personal, family, or household consumption;
+3. you have authority to act for yourself and any company you identify;
+4. your use and Transactions comply with Applicable Law; and
+5. you are not a sanctioned or restricted person or prohibited end user.
+
+Mandatory consumer rights that cannot legally be waived remain unaffected.
+
+4. Accounts and Security
+
+You must provide accurate, complete, and current account and company information. You may not use another person’s identity, email, company, or authority without permission.
+
+You must protect credentials, sessions, passwords, and authentication codes. You are responsible for activity through your account and must promptly report suspected compromise.
+
+Trade82 may require additional identity, company, banking, tax, or authority information for verification, high-value Transactions, payouts, refunds, disputes, fraud or sanctions review, or legal requirements.
+
+5. Scope and Changes to the Service
+
+Trade82 may provide:
+
+• public company and product marketplace features;
+• inquiries, RFQs, recommendations, quotations, and messages;
+• document and image uploads with controlled sharing;
+• Stripe payment requests and payment confirmation;
+• order, shipping, refund, and dispute records;
+• Seller payout information and manually recorded external transfers;
+• paid marketing exposure;
+• partner referrals; and
+• general templates and official-source links.
+
+Trade82 may add, modify, limit, test, or discontinue features. “Beta,” “preview,” “internal,” or “coming soon” does not mean a feature is complete or generally available.
+
+6. Trade82’s Limited Role
+
+Unless a separate written agreement expressly states otherwise, Trade82 is a B2B technology and workflow platform.
+
+Trade82 is generally not:
+
+• the manufacturer, owner, Seller, or Buyer of goods;
+• the importer or exporter of record;
+• a carrier, freight forwarder, NVOCC, customs broker, warehouse, or fulfillment provider;
+• an inspector, laboratory, or certification body;
+• a bank, deposit-taking institution, trustee, fiduciary, or escrow provider;
+• a legal, tax, accounting, regulatory, or product-safety adviser; or
+• a guarantor of payment, payout, quality, shipment, customs clearance, or a Transaction result.
+
+A payment record, order record, shipping status, verification badge, recommendation, template, or administrative review does not mean Trade82 owns, inspects, certifies, or guarantees goods or performance.
+
+The appearance of the Trade82 name on a receipt or card statement does not by itself transfer manufacturing, quality, regulatory, or fulfillment responsibility to Trade82. This Section does not exclude an independent obligation imposed by mandatory law, payment-network rules, or an express written commitment.
+
+7. Company Verification
+
+Trade82 may perform limited review of company information and documents. Verification does not guarantee:
+
+• solvency or payment ability;
+• authenticity or validity of every document or certificate;
+• full authority of a representative;
+• product quality, safety, or legality;
+• production capacity or inventory;
+• import, export, or customs eligibility; or
+• Transaction performance or refund availability.
+
+Users must conduct independent company checks, sampling, inspection, contract review, sanctions screening, and regulatory due diligence. Trade82 may change criteria, require reverification, or suspend or revoke status.
+
+8. Seller Obligations
+
+Seller represents and warrants that:
+
+1. it has lawful authority to manufacture, sell, distribute, and export each product;
+2. company, product, price, MOQ, capacity, lead time, composition, origin, certification, and document information is accurate;
+3. it has rights to use all images, trademarks, descriptions, certificates, and documents;
+4. products and claims comply with laws applicable to manufacture, sale, export, import, and destination markets;
+5. it will not offer counterfeit, infringing, prohibited, recalled, or falsely documented goods;
+6. it will promptly disclose material safety issues, recalls, investigations, certification withdrawal, delays, or errors;
+7. it will keep evidence needed for fulfillment, quality, refunds, and chargebacks; and
+8. payout information is accurate and belongs to Seller or an authorized recipient.
+
+9. Buyer Obligations
+
+Buyer represents and warrants that:
+
+1. RFQs, quantities, prices, destination, end user, and end use information are accurate;
+2. Buyer independently evaluates specifications, quality, certification, labeling, intellectual property, import permits, customs, taxes, and resale legality;
+3. Buyer identifies and fulfills any importer-of-record or similar legal role;
+4. Buyer is authorized to use the payment method;
+5. goods will not be used for illegal, sanctioned, or prohibited purposes; and
+6. Buyer will not submit false disputes, abusive chargebacks, third-party refund requests, or overpayment schemes.
+
+RFQ approval or recommendation does not guarantee a product, Seller, price, certification, lead time, or successful Transaction.
+
+10. RFQs, Recommendations, and Quotations
+
+Trade82 may approve, reject, request changes to, or close an RFQ. Approval only means that matching may be attempted.
+
+Recommendations, rankings, match reasons, and introductions are informational and may rely on incomplete or user-submitted information. Quotations are generally provided by Sellers. Buyer and Seller must confirm final price, quantity, lead time, Incoterms, samples, OEM terms, and all other conditions.
+
+11. Buyer-Seller Contract
+
+Buyer and Seller are the parties to each goods Transaction unless Trade82 expressly becomes a party in a separate written agreement.
+
+Before payment or production, Buyer and Seller should confirm in writing:
+
+• product, specification, tolerance, and sample standard;
+• quantity, unit, unit price, total, and currency;
+• packaging, labeling, and pallet requirements;
+• production and shipment schedule;
+• inspection, defect, shortage, and damage standards;
+• Incoterm and named place;
+• freight, insurance, export clearance, and import clearance;
+• duties and taxes;
+• required documents, tests, and certifications;
+• transfer of risk and title;
+• cancellation, refund, replacement, and rework; and
+• governing law and dispute procedure.
+
+Conflicts among a listing, message, RFQ, quotation, payment request, and order record must be resolved in writing before payment or shipment.
+
+12. Platform Fees
+
+Unless otherwise displayed, the current standard platform fee for a supported Transaction payment is 5% of the Gross Payment Amount. If product and shipping are paid together, the fee may apply to the full amount.
+
+Example: a USD 1,000 payment produces a standard USD 50 platform fee and an initial Seller payable amount of USD 950 before refunds, disputes, and adjustments.
+
+The following may be deducted from a payout or charged separately:
+
+• refunds and partial refunds;
+• disputes, chargebacks, and related fees;
+• payment-processing, bank, intermediary, wire, and FX fees;
+• taxes and withholding;
+• agreed adjustments;
+• erroneous payments; and
+• costs caused by Seller fraud, breach, or product issues.
+
+The fee displayed in the payment request, checkout, pricing page, or separate written terms controls.
+
+13. Supported Payments
+
+This Section applies only when Trade82 enables payments for the relevant account and Transaction.
+
+Buyer may pay a Seller-created payment request through Stripe Checkout. Reaching a success page does not prove final payment. Trade82 updates status after verified Stripe webhook or equivalent confirmation.
+
+By paying, Buyer confirms the product, quantity, product amount, shipping amount, total, deadline, and order terms and authorizes Trade82 and Stripe to charge the payment method.
+
+To the extent legally permitted and enabled, Seller authorizes Trade82 and the payment provider to perform limited collection functions. This does not make Trade82 a bank, escrow provider, trustee, fiduciary, financial adviser, or payment guarantor.
+
+14. Cancellation, Refunds, and Chargebacks
+
+An unpaid request may expire or be canceled. A paid order cannot be canceled unilaterally by Buyer.
+
+Refund eligibility may depend on the Buyer-Seller agreement, production or shipment status, product conformity, evidence, customs status, Applicable Law, Stripe rules, fraud review, and Trade82 policy.
+
+A refund may be processed when the parties agree, Seller approves, Trade82 determines it is appropriate under platform records and policy, a provider requires it, or law requires it.
+
+Trade82 does not guarantee a refund and is not required to fund a refund from its own money if recovery from Seller is unavailable, except where Trade82 has an independent legal or contractual duty.
+
+Refunds generally return to the original payer and original payment method. Third-party refund destinations are prohibited.
+
+Chargebacks may be decided by Stripe, the card network, or a bank. Trade82 may request evidence, hold or offset payouts, require reimbursement, restrict an account, or conduct manual reconciliation.
+
+15. Seller Payouts
+
+The current Seller payout workflow may involve eligibility review and a manually recorded external bank transfer rather than automatic Stripe Connect payout.
+
+Payout is not final immediately after Buyer payment and may depend on:
+
+• payment settlement;
+• company, bank, and tax verification;
+• refunds, disputes, and chargebacks;
+• fraud, sanctions, and compliance review;
+• order and shipping information;
+• manual reconciliation;
+• bank processing; and
+• accurate payout information.
+
+Trade82 may reasonably hold, delay, cancel, adjust, or split a payout.
+
+Seller agrees to reimburse Trade82 for refunds, chargebacks, violations, fraud, or erroneous payouts and authorizes setoff against current or future amounts. Estimated payout dates are not guaranteed.
+
+16. Paid Marketing Exposure
+
+Trade82 may offer one-time rotating exposure for eligible active products of verified Sellers.
+
+• Placement may rotate and is not fixed or exclusive.
+• Impressions, clicks, inquiries, sales, or a particular Buyer are not guaranteed.
+• Exposure interrupted by User deactivation, loss of eligibility, violation, or inaccurate content may be non-refundable.
+• If Trade82 fails to provide a material portion solely because of its technical error, the sole remedy, unless law requires otherwise, is an extension, re-performance, or pro rata refund selected by Trade82.
+• Activated exposure is generally non-refundable, subject to checkout terms and law.
+
+17. Shipping, Customs, and Incoterms
+
+Buyer and Seller contract directly with carriers, freight forwarders, customs brokers, warehouses, and insurers. A Trade82 introduction or link is not an endorsement, agency, partnership, or performance guarantee.
+
+Shipping status, tracking information, and estimates record information provided by Users or third parties. A “shipped” or “delivered” label does not independently prove shipment, acceptance, quality, or customs clearance.
+
+The parties must confirm the Incoterms version, named place, freight, insurance, risk transfer, export clearance, import clearance, and taxes.
+
+18. Taxes
+
+Each User is responsible for determining, collecting, reporting, and paying taxes, duties, VAT, sales tax, withholding, and other charges relating to its business, goods, Transactions, imports, exports, payouts, and fees.
+
+Trade82 may collect, deduct, withhold, or report amounts when legally required and may request tax documentation. Information displayed by Trade82 is not tax advice.
+
+19. Prohibited Products and Compliance
+
+Users must not list, request, sell, or pay for illegal, deceptive, dangerous, sanctioned, or provider-restricted goods or services, including as applicable:
+
+• counterfeit or infringing goods;
+• illegal weapons, explosives, dangerous materials, or toxins;
+• illegal drugs, controlled substances, or prohibited ingredients;
+• unauthorized drugs, medical devices, or prescription products;
+• sanctioned persons, entities, countries, or destinations;
+• money laundering, third-party fund transfers, remittance, or disguised escrow;
+• forged certification, origin, testing, or customs documents;
+• malware, hacking tools, unlawfully obtained personal data, or surveillance tools;
+• bribery, kickbacks, trafficking, or criminal activity; and
+• products violating safety, labeling, certification, or consumer-protection law.
+
+Food, cosmetics, wellness products, medical devices, electronics, and children’s products may require destination-specific authorization, testing, labeling, or responsible persons. Eligibility to list does not mean legal eligibility to sell.
+
+20. Circumvention and Off-Platform Payment
+
+Transactions with a Counterparty first introduced through Trade82 must use an available supported Trade82 payment flow until the later of:
+
+• 12 months after the first Trade82 inquiry, RFQ, or introduction; or
+• 12 months after the last completed Trade82 Transaction with that Counterparty.
+
+Users must not avoid fees or controls through an outside bank account, PayPal, Wise, cryptocurrency, external checkout, understated amount, separate sample or shipping payment, renamed contracting party, or completion of the same Transaction outside Trade82.
+
+Contact information may be shared when reasonably necessary for shipping, customs, certification, warehousing, or fulfillment, but not to arrange off-platform payment.
+
+Trade82 may restrict accounts and payouts and invoice the Trade82 Fees that would have applied to an intentionally circumvented Transaction.
+
+21. Fraud and Financial Crime
+
+Stolen-card use, identity theft, forged receipts, overpayment schemes, third-party refunds, unrelated fund transfers, money laundering, sanctions evasion, bribery, false orders, false shipment records, abusive chargebacks, and account takeover are prohibited.
+
+Trade82 may stop a Transaction, request information, hold payouts, preserve evidence, and provide necessary information to Stripe, banks, card networks, regulators, or law enforcement.
+
+22. User Content and License
+
+You retain ownership of User Content you lawfully own.
+
+You grant Trade82 a worldwide, non-exclusive, royalty-free, transferable, and sublicensable license necessary to operate the Service, including hosting, storage, reproduction, formatting, translation, display, transmission, thumbnail generation, marketplace and Trade82 promotional display of public listings, delivery to intended recipients, security review, legal compliance, dispute handling, and backup.
+
+The license for private content is limited to providing, securing, supporting, and legally administering the Service.
+
+You represent that you have all rights and consents required and that User Content is lawful, non-infringing, not misleading where accuracy is required, free of malicious code, and does not improperly disclose confidential information.
+
+23. Confidential Information
+
+Nonpublic prices, specifications, quotations, samples, contracts, and documents may be confidential.
+
+Each User must use a Counterparty’s confidential information only for the relevant Transaction, protect it reasonably, and disclose it only to people with a need to know and similar duties.
+
+Trade82 is not a party to a separate NDA between Buyer and Seller. Users should consider a separate NDA before sharing material trade secrets.
+
+24. Trade82 Intellectual Property
+
+The Service, software, design, user interface, data structure, trademarks, logos, branding, and Trade82-created templates and content belong to Trade82 or its licensors.
+
+Users may not copy, sell, redistribute, reverse engineer, bypass security, scrape at scale, build a competing dataset, train an AI model on marketplace data, access private data, or disrupt the Service except where law expressly permits.
+
+25. Templates, Translation, and General Information
+
+Contracts, invoices, packing lists, labels, checklists, links, translations, and generated content are general operational references.
+
+Trade82 does not guarantee legal sufficiency, country-specific suitability, translation accuracy, government or bank acceptance, certification, licensing, customs clearance, or continued currency of laws and links.
+
+Users must obtain professional and official review before relying on or submitting materials.
+
+26. Third-Party Services
+
+Trade82 may use Clerk, Supabase, Vercel, Stripe, Resend, Google, GitHub, banks, and financial institutions. Their separate terms, privacy practices, restrictions, and availability apply.
+
+Trade82 does not fully control third-party outages, account restrictions, policy changes, price changes, or service termination. If Stripe or a financial provider does not support a product, country, User, or Transaction, Trade82 has no obligation to process it.
+
+27. Privacy
+
+The Trade82 Privacy Policy is incorporated into these Terms.
+
+Users may use Counterparty personal information only for legitimate Transaction purposes and not for spam, sale, profiling, or unauthorized marketing.
+
+28. Availability, Security, and Backups
+
+The Service is provided “as is” and “as available.” Trade82 does not promise a particular uptime, uninterrupted operation, error-free service, permanent storage, or availability in every country.
+
+Users must maintain independent copies of contracts, invoices, certificates, shipping records, and other business-critical information. Trade82 storage and messages do not replace independent backups.
+
+File type, size, and access controls may be used, but complete malware scanning of every file is not guaranteed.
+
+29. Suspension and Termination
+
+Trade82 may restrict, suspend, or terminate content, accounts, messaging, payments, orders, or payouts for:
+
+• breach of these Terms or policy;
+• false company, product, or payout information;
+• fraud, money laundering, abusive chargebacks, or security risk;
+• prohibited or sanctioned goods;
+• fee circumvention;
+• third-party rights violations;
+• provider, bank, or government requirements;
+• unpaid fees or reimbursement obligations; or
+• discontinuation or inability to provide the Service.
+
+Termination does not eliminate prior Transactions, fees, refunds, chargebacks, payouts, indemnity, or legal liability.
+
+30. Disclaimer of Warranties
+
+To the fullest extent permitted by law, the Service and all information, recommendations, templates, translations, and content are provided “as is” and “as available” without express, implied, or statutory warranties.
+
+Trade82 disclaims warranties of merchantability, fitness for a particular purpose, title, non-infringement, accuracy, completeness, security, reliability, and availability.
+
+Trade82 does not warrant User identity or solvency, product quality or compliance, document authenticity, payment or payout results, delivery or customs clearance, matching or exposure performance, or continued availability of third-party providers.
+
+Non-waivable warranties are not excluded.
+
+31. Limitation of Liability
+
+To the fullest extent permitted by law, Trade82 and its agents, contractors, and service providers are not liable for:
+
+• indirect, incidental, special, punitive, exemplary, or consequential damages;
+• lost revenue, profit, opportunity, goodwill, data, or use;
+• business interruption;
+• product loss, recall, disposal, seizure, detention, or customs refusal;
+• production, shipping, customs, or delivery delay;
+• fraud, stolen cards, identity theft, or account compromise;
+• regulatory penalties or certification withdrawal;
+• acts of Users, carriers, banks, or external providers;
+• off-platform Transactions; or
+• failure to maintain backups, conduct due diligence, obtain insurance, or review contracts.
+
+Trade82’s total aggregate liability for direct damages relating to these Terms or the Service will not exceed the greater of:
+
+1. USD 100; or
+2. the total Trade82 Fees actually paid by the claimant and finally retained by Trade82 during the six months before the event first giving rise to the claim.
+
+Product and shipping Transaction Principal, Seller payable amounts, refundable amounts, and taxes are not Trade82 Fees for this cap.
+
+The cap does not apply to non-waivable liability, Trade82 fraud, willful misconduct, or gross negligence finally determined by a tribunal, or undisputed funds actually held by Trade82 that Trade82 is legally obligated to return or pay.
+
+32. Indemnification
+
+To the extent permitted by law, you will defend, indemnify, and hold harmless Trade82 and its providers, contractors, and agents from third-party claims, losses, penalties, judgments, settlements, costs, and reasonable attorneys’ fees arising from:
+
+• your company, products, User Content, documents, or messages;
+• product defect, injury, property damage, or recall;
+• false, infringing, or noncompliant information;
+• breach of a Buyer-Seller agreement;
+• tax, customs, sanctions, export, import, labeling, or certification violations;
+• intellectual property, privacy, or confidentiality violations;
+• payments, refunds, chargebacks, or money laundering;
+• circumvention or fee avoidance;
+• breach of these Terms or Applicable Law; or
+• activity through your account.
+
+This does not apply to the portion finally determined to result from Trade82’s fraud, willful misconduct, or gross negligence.
+
+33. User Disputes
+
+Buyer and Seller are primarily responsible for resolving product, contract, quality, shipment, refund, and payment disputes.
+
+Trade82 may review records, request information, facilitate communication, or take account action, but has no obligation to resolve a dispute or guarantee a result.
+
+34. Force Majeure
+
+Trade82 is not responsible for delay or failure caused by events outside reasonable control, including natural disaster, war, sanctions, export restrictions, epidemic, strike, power or telecom failure, cyberattack, government action, legal change, or failure of Stripe, banks, Vercel, Supabase, Clerk, Resend, or another critical provider.
+
+35. Electronic Notices and Records
+
+You consent to electronic legal, Transaction, account, and security notices by email, account notice, dashboard, website, or message.
+
+Click acceptance, server timestamps, User identifiers, Terms versions, checkbox text, IP, and device metadata may be used as evidence to the extent permitted by law.
+
+36. Changes to These Terms
+
+Trade82 may change these Terms to reflect changes in the Service, payments, law, providers, or risk.
+
+Material changes will generally be announced at least 30 days before effectiveness by email, account notice, or website. Urgent security, legal, or provider-required changes may take effect sooner.
+
+Renewed acceptance will be obtained when legally required. A material arbitration or class-waiver change will not apply retroactively to an existing claim without separate acceptance.
+
+37. Governing Law and Disputes
+
+37.1 Informal Resolution
+
+Before arbitration or litigation, the claimant must send written notice to contact@trade82.com and the Section 2 address, identifying the person and company, account email, relevant order or RFQ, facts, legal basis, and requested relief. The parties will attempt good-faith resolution for 30 days.
+
+37.2 Governing Law
+
+Unless mandatory law requires otherwise, New York law and applicable United States federal law govern. The United Nations Convention on Contracts for the International Sale of Goods does not govern the platform-service relationship between Trade82 and User.
+
+37.3 Individual Arbitration
+
+To the extent governed by the Federal Arbitration Act, unresolved disputes will be resolved through final and binding individual arbitration under the American Arbitration Association’s then-current Commercial Arbitration Rules before one arbitrator.
+
+The seat is New York County, New York. Remote proceedings may be allowed. The language is English, and Korean translation or interpretation may be permitted when appropriate.
+
+37.4 Exceptions
+
+Arbitration does not apply to an individual small-claims matter, temporary injunctive relief for intellectual property, unauthorized access, a data incident, or security threat, or legally required government and financial procedures.
+
+Court proceedings permitted under this Section must be brought in state or federal courts in New York County, New York, unless mandatory law requires otherwise.
+
+37.5 Class and Jury Waivers
+
+To the fullest extent permitted by law, disputes may proceed only individually. Each party waives class, collective, representative, consolidated, and class-arbitration proceedings and waives a jury trial for matters proceeding in court.
+
+37.6 Arbitration Opt-Out
+
+You may opt out of arbitration within 30 days after first acceptance by emailing contact@trade82.com with:
+
+• subject: Arbitration Opt-Out;
+• your name and company;
+• account email;
+• a clear statement rejecting arbitration; and
+• an electronic or physical signature.
+
+Only arbitration is rejected; the remainder of the Terms remains effective.
+
+37.7 Claim Deadline
+
+To the fullest extent permitted by law, a Service-related claim must begin within one year after accrual. This does not apply to fraud, deliberate concealment, or a period that cannot legally be shortened.
+
+38. Miscellaneous
+
+• Trade82 and User are independent contractors. No employment, partnership, joint venture, general agency, trust, or fiduciary relationship is created.
+• User may not assign the Terms or account without Trade82’s consent.
+• Transaction-specific written or checkout terms take priority over feature policies, these Terms, and general guidance.
+• An invalid provision will be narrowed to the minimum lawful extent, and the remainder remains effective.
+• Failure to enforce is not a waiver.
+• Headings are for convenience.
+
+39. Languages
+
+The English and Korean versions are intended to have materially the same meaning. If they differ, the interpretation required by mandatory law applicable to the relevant User and dispute controls.
+
+40. Contact
+
+William Zun Park / Trade82 Legal Contact
+37-34 33rd ST
+Long Island City, New York 11101
+United States
+Email: contact@trade82.com
+Phone: +1 (929) 994-4473
