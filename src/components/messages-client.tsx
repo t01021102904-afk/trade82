@@ -951,7 +951,6 @@ export function MessagesClient({
             <MessageTradeActionBar
               thread={selected}
               pending={dealPending}
-              error={dealError}
               onReview={() => setCompletionDialogThread(selected)}
             />
             <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
@@ -1079,6 +1078,7 @@ export function MessagesClient({
         <CompletionConfirmationDialog
           thread={completionDialogThread}
           pending={dealPending}
+          error={dealError}
           onClose={() => setCompletionDialogThread(null)}
           onConfirm={async () => {
             const deal = getActiveDeal(completionDialogThread);
@@ -1349,9 +1349,7 @@ function MobileChatDetail({
       <MessageTradeActionBar
         thread={thread}
         pending={dealPending}
-        error={dealError}
         onReview={onReviewCompletion}
-        mobile
       />
 
       <footer className="shrink-0 border-t border-zinc-100 bg-white px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2">
@@ -1838,8 +1836,7 @@ type TimelineEntry =
       key: string;
       createdAt: string;
       item: PaymentRequestSummary["events"][number];
-    }
-  | { kind: "deal-event"; key: string; createdAt: string; state: "waiting_for_counterparty" | "completed" };
+    };
 
 function MessageTimeline({
   thread,
@@ -1853,21 +1850,6 @@ function MessageTimeline({
   onPaymentUpdated: () => void;
 }) {
   const { locale } = useI18n();
-  const deal = getActiveDeal(thread);
-  const dealState = getMessageTradeDealState(deal, {
-    viewerCompanyId: getViewerCompanyId(thread),
-    buyerCompanyId: thread.buyerCompany.id,
-    sellerCompanyId: thread.sellerCompany.id,
-  });
-  const dealTimelineEvent =
-    dealState === "waiting_for_counterparty" || dealState === "completed"
-      ? {
-          kind: "deal-event" as const,
-          key: `deal-${thread.id}-${dealState}`,
-          createdAt: thread.updatedAt,
-          state: dealState,
-        }
-      : null;
   const messages: TimelineMessage[] = [
     ...(thread.message.trim()
       ? [
@@ -1910,11 +1892,10 @@ function MessageTimeline({
         item: event,
       })),
     ]),
-    ...(dealTimelineEvent ? [dealTimelineEvent] : []),
   ].sort((left, right) => {
     const dateDifference = new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
     if (dateDifference !== 0) return dateDifference;
-    const order = { message: 0, payment: 1, "payment-event": 2, "deal-event": 3 } as const;
+    const order = { message: 0, payment: 1, "payment-event": 2 } as const;
     return order[left.kind] - order[right.kind] || left.key.localeCompare(right.key);
   });
   return (
@@ -1947,24 +1928,13 @@ function MessageTimeline({
                 onUpdated={onPaymentUpdated}
               />
             ) : (
-              entry.kind === "payment-event" ? (
-                <PaymentRequestTimelineEvent event={entry.item} locale={locale} />
-              ) : (
-                <DealTimelineEvent state={entry.state} />
-              )
+              <PaymentRequestTimelineEvent event={entry.item} locale={locale} />
             )}
           </Fragment>
         );
       })}
     </>
   );
-}
-
-function DealTimelineEvent({ state }: { state: "waiting_for_counterparty" | "completed" }) {
-  const { t } = useI18n();
-  const label = state === "completed" ? t("deals.compactCompletedDeal") : t("deals.completionRequestSent");
-
-  return <p className="mx-auto my-3 w-fit max-w-full px-3 text-center text-xs text-zinc-500">{label}</p>;
 }
 
 function PaymentRequestTimelineEvent({
@@ -2759,15 +2729,11 @@ function paymentRequestStatusTone(status: PaymentRequestSummary["status"]) {
 function MessageTradeActionBar({
   thread,
   pending,
-  error,
   onReview,
-  mobile = false,
 }: {
   thread: InquiryThread;
   pending: boolean;
-  error: string;
   onReview: () => void;
-  mobile?: boolean;
 }) {
   const { t } = useI18n();
   const deal = getActiveDeal(thread);
@@ -2777,34 +2743,22 @@ function MessageTradeActionBar({
     sellerCompanyId: thread.sellerCompany.id,
   });
 
-  if (state !== "review_completion" && state !== "completed") return null;
-
-  const isCompleted = state === "completed";
+  if (state !== "review_completion") return null;
 
   return (
-    <div className={cx("shrink-0 border-y border-emerald-100 bg-emerald-50/70 px-3 py-1.5", mobile ? "" : "mx-0")}>
-      <div className="mx-auto max-w-4xl">
-        <div className="flex min-h-8 flex-wrap items-center gap-x-2 gap-y-1 text-xs text-zinc-600">
-          <span>{t("messages.productInquiry")}</span>
-          <span aria-hidden="true">·</span>
-          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 font-medium text-emerald-800">
-            {isCompleted ? t("deals.compactCompletedDeal") : t("deals.completionRequested")}
-          </span>
-          {!isCompleted ? (
-            <button
-              type="button"
-              onClick={onReview}
-              disabled={pending}
-              aria-busy={pending || undefined}
-              className="ml-auto inline-flex h-8 shrink-0 items-center rounded-md border border-emerald-200 bg-white px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100 disabled:cursor-wait disabled:opacity-60"
-            >
-              {t("deals.reviewCompletion")}
-            </button>
-          ) : null}
-        </div>
-        {!isCompleted ? <p className="mt-0.5 text-xs text-zinc-500">{t("deals.otherRequestedCompletion")}</p> : null}
+    <div className="shrink-0 border-y border-emerald-100 bg-emerald-50/70 px-3 py-1.5">
+      <div className="mx-auto flex min-h-8 max-w-4xl items-center justify-between gap-3 text-sm">
+        <p className="min-w-0 flex-1 leading-5 text-zinc-700">{t("deals.otherRequestedCompletion")}</p>
+        <button
+          type="button"
+          onClick={onReview}
+          disabled={pending}
+          aria-busy={pending || undefined}
+          className="inline-flex h-8 shrink-0 items-center rounded-md border border-emerald-200 bg-white px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100 disabled:cursor-wait disabled:opacity-60"
+        >
+          {t("deals.reviewCompletion")}
+        </button>
       </div>
-      {error ? <p role="alert" className="mx-auto max-w-4xl text-xs font-medium text-red-700">{error}</p> : null}
     </div>
   );
 }
@@ -2964,11 +2918,13 @@ function TradeDetailsAction({
 function CompletionConfirmationDialog({
   thread,
   pending,
+  error,
   onClose,
   onConfirm,
 }: {
   thread: InquiryThread;
   pending: boolean;
+  error: string;
   onClose: () => void;
   onConfirm: () => Promise<boolean>;
 }) {
@@ -3053,6 +3009,7 @@ function CompletionConfirmationDialog({
         <p id="completion-confirmation-description" className="mt-1 text-sm leading-6 text-zinc-600">
           {t("deals.completionDialogPrompt")}
         </p>
+        {error ? <p role="alert" className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
         <div className="mt-4 flex gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
           <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-zinc-200 bg-white">
             <Image src={productImageUrl} alt="" fill sizes="48px" unoptimized className="object-cover" />
