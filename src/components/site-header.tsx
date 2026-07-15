@@ -9,12 +9,8 @@ import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
+import { publicNavigationLinks } from "@/lib/public-navigation";
 import { cx } from "@/lib/utils";
-
-const navLinks = [
-  { href: "/marketplace", labelKey: "nav.marketplace" },
-  { href: "/sellers", labelKey: "nav.sellers" },
-];
 
 const appLinks = [
   { href: "/dashboard", labelKey: "nav.dashboard" },
@@ -38,13 +34,13 @@ export function SiteHeader() {
   const visibleNavLinks =
     isSignedIn && hasRole
       ? [
-          ...navLinks,
+          ...publicNavigationLinks,
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
           ...appLinks,
         ]
-      : navLinks;
+      : publicNavigationLinks;
 
   return (
     <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">

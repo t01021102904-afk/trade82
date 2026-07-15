@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
+import { canonicalPublicPath } from "@/lib/english-canonical-path";
 import type { Locale } from "@/lib/i18n";
 import { localizedText } from "@/lib/multilingual-content";
 import { normalizeProductFieldVisibility } from "@/lib/product-field-visibility";
@@ -92,7 +93,9 @@ export async function getProductShareMetadata(
   productId: string,
   localePrefix = "",
 ): Promise<Metadata> {
-  const canonicalPath = `${localePrefix}/products/${encodeURIComponent(productId)}`;
+  const canonicalPath = canonicalPublicPath(
+    `${localePrefix}/products/${encodeURIComponent(productId)}`,
+  );
   const url = absoluteUrl(canonicalPath);
   const locale: Locale = localePrefix.startsWith("/ko") ? "ko" : "en";
 
@@ -153,7 +156,7 @@ export async function getProductShareMetadata(
       alternates: {
         canonical: url,
         languages: {
-          en: absoluteUrl(`/en/products/${encodeURIComponent(productId)}`),
+          en: absoluteUrl(`/products/${encodeURIComponent(productId)}`),
           ko: absoluteUrl(`/ko/products/${encodeURIComponent(productId)}`),
           "x-default": absoluteUrl(`/products/${encodeURIComponent(productId)}`),
         },
@@ -188,7 +191,9 @@ export async function getProductStructuredData(
   localePrefix = "",
 ) {
   const locale: Locale = localePrefix.startsWith("/ko") ? "ko" : "en";
-  const url = absoluteUrl(`${localePrefix}/products/${encodeURIComponent(productId)}`);
+  const url = absoluteUrl(
+    canonicalPublicPath(`${localePrefix}/products/${encodeURIComponent(productId)}`),
+  );
 
   try {
     const product = await getDb().product.findFirst({

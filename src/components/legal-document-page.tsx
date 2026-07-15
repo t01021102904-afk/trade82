@@ -8,6 +8,7 @@ import {
   type LegalDocumentKey,
 } from "@/lib/legal-content";
 import { withLocale, type Locale } from "@/lib/i18n";
+import { publicPageMetadata } from "@/lib/seo";
 
 const documentOrder: LegalDocumentKey[] = [
   "terms",
@@ -134,8 +135,9 @@ function TextWithContactLink({ text }: { text: string }) {
 
 export function getLegalMetadata(locale: Locale, documentKey: LegalDocumentKey) {
   const document = legalDocuments[locale][documentKey];
-  return {
+  return publicPageMetadata({
     title: `${document.title} | Trade82`,
     description: document.description,
-  };
+    path: withLocale(legalPathByDocument[documentKey], locale),
+  });
 }

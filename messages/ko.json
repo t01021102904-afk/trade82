@@ -65,7 +65,7 @@
     "sellers": "셀러",
     "sell": "상품 등록",
     "buyers": "바이어",
-    "pricing": "요금",
+    "pricing": "요금 안내",
     "dashboard": "대시보드",
     "messages": "메시지",
     "menu": "메뉴",
@@ -84,7 +84,8 @@
         "href": "/ko/privacy"
       }
     ],
-    "copyright": "© Trade82. All rights reserved."
+    "copyright": "© Trade82. All rights reserved.",
+    "advertisingPartnerships": "광고·제휴 문의"
   },
   "home": {
     "categorySection": {

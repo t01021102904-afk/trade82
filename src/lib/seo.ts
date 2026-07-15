@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 
+import {
+  canonicalPublicPath,
+  publicLocaleAlternatePaths,
+} from "@/lib/english-canonical-path";
+
 export const SITE_URL = "https://trade82.com";
 export const DEFAULT_OG_IMAGE_URL = `${SITE_URL}/og/linkpicture-v2.png`;
 export const SITE_NAME = "Trade82";
@@ -20,7 +25,12 @@ const defaultImage = {
 };
 
 export function absoluteSiteUrl(path = "/") {
+  if (path === "/") return SITE_URL;
   return new URL(path, SITE_URL).toString();
+}
+
+export function publicLocaleAlternates(path: string) {
+  return publicLocaleAlternatePaths(path);
 }
 
 export function publicPageMetadata({
@@ -34,23 +44,31 @@ export function publicPageMetadata({
   path: string;
   languages?: Record<string, string>;
 }): Metadata {
-  const url = absoluteSiteUrl(path);
+  const canonicalPath = canonicalPublicPath(path);
+  const url = absoluteSiteUrl(canonicalPath);
+  const normalizedLanguages = {
+    ...publicLocaleAlternates(canonicalPath),
+    ...Object.fromEntries(
+      Object.entries(languages ?? {}).map(([locale, href]) => [
+        locale,
+        (locale === "en" || locale === "x-default")
+          ? canonicalPublicPath(href)
+          : href,
+      ]),
+    ),
+  };
 
   return {
     title,
     description,
     alternates: {
       canonical: url,
-      ...(languages
-        ? {
-            languages: Object.fromEntries(
-              Object.entries(languages).map(([locale, href]) => [
-                locale,
-                absoluteSiteUrl(href),
-              ]),
-            ),
-          }
-        : {}),
+      languages: Object.fromEntries(
+        Object.entries(normalizedLanguages).map(([locale, href]) => [
+          locale,
+          absoluteSiteUrl(href),
+        ]),
+      ),
     },
     robots: {
       index: true,
@@ -88,10 +106,11 @@ export function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     url: SITE_URL,
     logo: absoluteSiteUrl("/trade82-logo.png"),
-    sameAs: [],
+    email: "contact@trade82.com",
   };
 }
 
@@ -99,7 +118,9 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
     name: SITE_NAME,
+    alternateName: "trade82.com",
     url: SITE_URL,
   };
 }
@@ -112,8 +133,8 @@ export function siteNavigationJsonLd() {
     itemListElement: [
       navigationElement(1, "Marketplace", "/marketplace"),
       navigationElement(2, "Sellers", "/sellers"),
-      navigationElement(3, "Login", "/login"),
-      navigationElement(4, "Sign up", "/signup"),
+      navigationElement(3, "Buyers", "/buyers"),
+      navigationElement(4, "Pricing", "/pricing"),
     ],
   };
 }
