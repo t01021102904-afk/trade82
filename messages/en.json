@@ -73,20 +73,6 @@
     "language": "Language"
   },
   "footer": {
-    "businessTitle": "Trade82 Business Information",
-    "businessParagraphs": [
-      "Each seller and buyer is responsible for product information, pricing, lead times, export/import requirements, submitted documents, payment terms, shipping terms, and transaction outcomes. Users should conduct their own due diligence, contract review, legal review, and payment-safety checks before entering into any transaction.",
-      "Unless separately stated, Trade82 does not provide payment protection, escrow services, import approval, product compliance review, customs clearance support, or any promise that a transaction will be completed."
-    ],
-    "importantLinksTitle": "Important links",
-    "importantLinks": {
-      "login": "Login",
-      "signup": "Sign up",
-      "marketplace": "Marketplace",
-      "sellers": "Sellers",
-      "buyers": "Buyers",
-      "pricing": "Pricing"
-    },
     "legalLinksTitle": "Legal documents",
     "legalLinks": [
       {
@@ -94,16 +80,8 @@
         "href": "/terms"
       },
       {
-        "label": "Sourcing and Transaction Support Service Terms",
-        "href": "/sourcing-terms"
-      },
-      {
         "label": "Privacy Policy",
         "href": "/privacy"
-      },
-      {
-        "label": "Business Information",
-        "href": "/business"
       }
     ],
     "copyright": "© Trade82. All rights reserved."
