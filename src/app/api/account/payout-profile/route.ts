@@ -12,6 +12,13 @@ import {
   sellerPayoutProfileSafeSelect,
   type SellerPayoutProfileInput,
 } from "@/lib/seller-payout-profiles";
+import {
+  findActiveKoreanSellerPayoutBank,
+} from "@/lib/seller-payout-bank-directory";
+import {
+  assertKoreanPayoutConfiguration,
+  normalizeKoreanAccountNumber,
+} from "@/lib/seller-payout-profile-rules";
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
@@ -20,24 +27,14 @@ const manualPayoutMaintenanceMessage =
 const payoutProfileFields = new Set([
   "country",
   "bankDirectoryId",
-  "bankName",
-  "branchName",
   "accountHolder",
   "accountNumber",
   "accountType",
-  "bankCode",
-  "swiftBic",
-  "bankAddress",
-  "beneficiaryAddress",
   "payoutCurrency",
   "supportedCurrencies",
-  "intermediaryBankName",
-  "intermediaryBankSwift",
-  "intermediaryBankAddress",
-  "payoutMemo",
   "accountBelongsToCompany",
-  "manualBankOverride",
-  "manualOverrideReason",
+  "termsAccepted",
+  "privacyAccepted",
 ]);
 
 function text(body: Record<string, unknown>, key: string, required = false, max = 500) {
@@ -53,64 +50,38 @@ function text(body: Record<string, unknown>, key: string, required = false, max 
   return result || null;
 }
 
-function list(
+async function payoutInput(
   body: Record<string, unknown>,
-  key: string,
-  maxItems = 12,
-  fallback: string[] = [],
-) {
-  const value = body[key];
-  if (value === undefined) return fallback;
-  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
-    throw new Error(`${key} must be a list of text values.`);
-  }
-  if (value.length > maxItems) throw new Error(`${key} has too many values.`);
-  return value.map((item) => item.trim()).filter(Boolean);
-}
-
-function payoutInput(body: Record<string, unknown>): SellerPayoutProfileInput {
+  db: ReturnType<typeof getDb>,
+): Promise<SellerPayoutProfileInput> {
   rejectUnexpectedFields(body, payoutProfileFields);
-  const accountType = text(body, "accountType", true, 30);
-  if (!accountType || !["LOCAL", "FOREIGN_CURRENCY", "IBAN", "OTHER"].includes(accountType)) {
-    throw new Error("accountType is invalid.");
-  }
-  if (typeof body.accountBelongsToCompany !== "boolean") {
+  if (body.accountBelongsToCompany !== true) {
     throw new Error("accountBelongsToCompany must be confirmed.");
   }
-  if (typeof body.manualBankOverride !== "boolean") {
-    throw new Error("manualBankOverride must be true or false.");
+  if (body.termsAccepted !== true || body.privacyAccepted !== true) {
+    throw new Error("Terms of Service and Privacy Policy acknowledgement are required.");
   }
-  const country = text(body, "country", true, 2);
-  if (!country || !/^[A-Za-z]{2}$/.test(country)) {
-    throw new Error("country must be a two-letter ISO country code.");
-  }
-  const payoutCurrency = text(body, "payoutCurrency", true, 3);
-  if (!payoutCurrency || !/^[A-Za-z]{3}$/.test(payoutCurrency)) {
-    throw new Error("payoutCurrency must be a three-letter currency code.");
-  }
-  const accountNumber = text(body, "accountNumber", false, 64);
-  const supportedCurrencies = list(body, "supportedCurrencies", 12, [payoutCurrency]);
+  assertKoreanPayoutConfiguration({
+    country: body.country,
+    accountType: body.accountType,
+    payoutCurrency: body.payoutCurrency,
+    supportedCurrencies: body.supportedCurrencies,
+  });
+  const bankDirectoryId = text(body, "bankDirectoryId", true, 128) as string;
+  const bank = await findActiveKoreanSellerPayoutBank(db, bankDirectoryId);
+  if (!bank) throw new Error("Selected Korean bank is not available.");
+  const rawAccountNumber = text(body, "accountNumber", false, 128);
   return {
-    country: country.toUpperCase(),
-    bankDirectoryId: text(body, "bankDirectoryId", false, 128),
-    bankName: text(body, "bankName", true, 240) as string,
-    branchName: text(body, "branchName", false, 240),
+    country: "KR",
+    bankDirectoryId: bank.id,
+    bankName: bank.bankNameEnglish,
     accountHolder: text(body, "accountHolder", true, 240) as string,
-    ...(accountNumber ? { accountNumber } : {}),
-    accountType: accountType as SellerPayoutProfileInput["accountType"],
-    bankCode: text(body, "bankCode", false, 80),
-    swiftBic: text(body, "swiftBic", false, 80),
-    bankAddress: text(body, "bankAddress", false, 600),
-    beneficiaryAddress: text(body, "beneficiaryAddress", false, 600),
-    payoutCurrency: payoutCurrency.toLowerCase(),
-    supportedCurrencies,
-    intermediaryBankName: text(body, "intermediaryBankName", false, 240),
-    intermediaryBankSwift: text(body, "intermediaryBankSwift", false, 80),
-    intermediaryBankAddress: text(body, "intermediaryBankAddress", false, 600),
-    payoutMemo: text(body, "payoutMemo", false, 600),
-    accountBelongsToCompany: body.accountBelongsToCompany,
-    manualBankOverride: body.manualBankOverride,
-    manualOverrideReason: text(body, "manualOverrideReason", false, 600),
+    ...(rawAccountNumber ? { accountNumber: normalizeKoreanAccountNumber(rawAccountNumber) } : {}),
+    accountType: "LOCAL",
+    payoutCurrency: "krw",
+    supportedCurrencies: ["krw"],
+    accountBelongsToCompany: true,
+    manualBankOverride: false,
   };
 }
 
@@ -148,10 +119,11 @@ export async function PUT(request: Request) {
       message: "Too many payout profile updates. Please wait before trying again.",
     });
     if (rateLimited) return rateLimited;
+    const db = getDb();
     const profile = await saveSellerPayoutProfile({
-      db: getDb(),
+      db,
       companyId: company.id,
-      input: payoutInput(await readJsonObject(request)),
+      input: await payoutInput(await readJsonObject(request), db),
     });
     return Response.json({ profile }, { headers: noStore });
   } catch (error) {

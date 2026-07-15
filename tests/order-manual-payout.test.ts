@@ -353,15 +353,18 @@ test("payout onboarding accepts only required safe fields and never renders full
   assert.doesNotMatch(source.sellerPayoutOnboarding, /localStorage|sessionStorage|document\.cookie|console\./);
   assert.match(source.sellerProfileRoute, /status: 503/);
   assert.match(source.sellerProfileRoute, /manualPayoutMaintenanceMessage/);
-  assert.match(source.sellerProfileRoute, /\^\[A-Za-z\]\{2\}\$/);
-  assert.match(source.sellerProfileRoute, /\^\[A-Za-z\]\{3\}\$/);
+  assert.match(source.sellerProfileRoute, /assertKoreanPayoutConfiguration/);
+  assert.match(source.sellerProfileRoute, /findActiveKoreanSellerPayoutBank/);
+  assert.match(source.sellerProfileRoute, /termsAccepted/);
+  assert.match(source.sellerProfileRoute, /privacyAccepted/);
   assert.match(source.payoutProfileService, /accountNumberCiphertext/);
+  assert.match(source.payoutProfileService, /normalizeKoreanAccountNumber/);
   assert.match(source.payoutProfileService, /PENDING_VERIFICATION/);
   assert.match(source.payoutProfileService, /existing\?\.status === SellerPayoutProfileStatus\.VERIFIED/);
   assert.doesNotMatch(source.payoutProfileService, /console\./);
   assert.doesNotMatch(source.sellerProfileRoute, /console\./);
   assert.match(source.apiSecurity, /export function assertSameOrigin/);
-  assert.match(source.payoutSettingsUi, /country: profile\.country/);
+  assert.match(source.payoutSettingsUi, /country: "KR"/);
   assert.doesNotMatch(source.payoutSettingsUi, /JSON\.stringify\(\{ \.\.\.profile/);
 });
 
