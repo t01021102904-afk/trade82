@@ -25,6 +25,7 @@ import {
   type Dispatch,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
+  type ReactNode,
   type RefObject,
   type SetStateAction,
 } from "react";
@@ -39,6 +40,7 @@ import {
   MESSAGE_ATTACHMENT_ALLOWED_EXTENSIONS,
   MESSAGE_ATTACHMENT_LIMITS,
 } from "@/lib/message-attachment-rules";
+import { getMessageTradeDealState } from "@/lib/message-trade-ui";
 import { safeExternalUrl } from "@/lib/url-security";
 import { cx, formatDate } from "@/lib/utils";
 import {
@@ -254,6 +256,7 @@ export function MessagesClient({
     initialInquiryId,
   );
   const [reply, setReply] = useState("");
+  const [threadSearch, setThreadSearch] = useState("");
   const [draftAttachments, setDraftAttachments] = useState<DraftAttachment[]>([]);
   const [composerError, setComposerError] = useState("");
   const [librarySearch, setLibrarySearch] = useState("");
@@ -270,6 +273,7 @@ export function MessagesClient({
   const [mobileChatOpen, setMobileChatOpen] = useState(Boolean(initialInquiryId));
   const [mobileAttachmentSheetOpen, setMobileAttachmentSheetOpen] = useState(false);
   const [mobileDealSheetOpen, setMobileDealSheetOpen] = useState(false);
+  const [completionDialogThread, setCompletionDialogThread] = useState<InquiryThread | null>(null);
   const [mobileFilter, setMobileFilter] = useState<MobileThreadFilter>("all");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const draftAttachmentsRef = useRef<DraftAttachment[]>([]);
@@ -351,6 +355,17 @@ export function MessagesClient({
     () => getCanonicalInquiryThreads(threads),
     [threads],
   );
+  const desktopVisibleThreads = useMemo(() => {
+    const query = threadSearch.trim().toLowerCase();
+    if (!query) return visibleThreads;
+    return visibleThreads.filter((thread) => {
+      const companyName = getCompanyDisplayName(getCounterparty(thread), t).toLowerCase();
+      return [companyName, thread.product?.name ?? "", getLatestThreadPreview(thread, t)]
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [t, threadSearch, visibleThreads]);
   const mobileVisibleThreads = useMemo(
     () =>
       mobileFilter === "all"
@@ -728,21 +743,26 @@ export function MessagesClient({
   async function createDeal(thread: InquiryThread) {
     setDealPending(true);
     setDealError("");
-    const response = await fetch("/api/deals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inquiryId: thread.id }),
-    });
-    const result = (await response.json().catch(() => null)) as
-      | DealSummary
-      | { error?: string }
-      | null;
-    setDealPending(false);
-    if (!response.ok || !isDealSummary(result)) {
-      setDealError(getDealError(result) ?? t("deals.actionFailed"));
-      return;
+    try {
+      const response = await fetch("/api/deals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inquiryId: thread.id }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | DealSummary
+        | { error?: string }
+        | null;
+      if (!response.ok || !isDealSummary(result)) {
+        setDealError(getDealError(result) ?? t("deals.actionFailed"));
+        return;
+      }
+      updateThreadDeal(thread.id, result);
+    } catch {
+      setDealError(t("deals.actionFailed"));
+    } finally {
+      setDealPending(false);
     }
-    updateThreadDeal(thread.id, result);
   }
 
   async function updateDeal(
@@ -752,21 +772,28 @@ export function MessagesClient({
   ) {
     setDealPending(true);
     setDealError("");
-    const response = await fetch(`/api/deals/${deal.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action }),
-    });
-    const result = (await response.json().catch(() => null)) as
-      | DealSummary
-      | { error?: string }
-      | null;
-    setDealPending(false);
-    if (!response.ok || !isDealSummary(result)) {
-      setDealError(getDealError(result) ?? t("deals.actionFailed"));
-      return;
+    try {
+      const response = await fetch(`/api/deals/${deal.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | DealSummary
+        | { error?: string }
+        | null;
+      if (!response.ok || !isDealSummary(result)) {
+        setDealError(getDealError(result) ?? t("deals.actionFailed"));
+        return false;
+      }
+      updateThreadDeal(thread.id, result);
+      return true;
+    } catch {
+      setDealError(t("deals.actionFailed"));
+      return false;
+    } finally {
+      setDealPending(false);
     }
-    updateThreadDeal(thread.id, result);
   }
 
   if (!visibleThreads.length) {
@@ -849,15 +876,28 @@ export function MessagesClient({
             dealError={dealError}
             onCreateDeal={() => void createDeal(selected)}
             onUpdateDeal={(deal, action) => void updateDeal(selected, deal, action)}
+            onReviewCompletion={() => setCompletionDialogThread(selected)}
             onPaymentUpdated={() => void load()}
             paymentFeatureEnabled={paymentFeatureEnabled}
           />
         ) : null}
       </div>
 
-      <div className="hidden min-h-0 flex-1 grid-rows-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,13rem)] overflow-hidden rounded-lg border theme-surface-elevated md:grid xl:grid-cols-[320px_minmax(0,1fr)_320px] xl:grid-rows-1">
-        <aside className="max-h-48 min-h-0 overflow-y-auto border-b theme-border xl:max-h-none xl:border-b-0 xl:border-r">
-          {visibleThreads.map((thread) => {
+      <div className="hidden min-h-0 flex-1 overflow-hidden rounded-lg border theme-surface-elevated md:grid md:grid-cols-[280px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)_300px]">
+        <aside className="flex min-h-0 flex-col border-r theme-border">
+          <div className="border-b p-3 theme-border">
+            <label className="flex h-9 items-center gap-2 rounded-md border border-zinc-200 bg-white px-2.5 text-sm text-zinc-500 focus-within:border-[#34B386] focus-within:ring-2 focus-within:ring-[#34B386]/10">
+              <Search className="size-4 shrink-0" />
+              <input
+                value={threadSearch}
+                onChange={(event) => setThreadSearch(event.target.value)}
+                placeholder={t("messages.searchConversations")}
+                className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-zinc-400"
+              />
+            </label>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+          {desktopVisibleThreads.map((thread) => {
             const company = getCounterparty(thread);
             const companyName = getCompanyDisplayName(company, t);
             const unreadCount = normalizeUnreadCount(thread.unreadCount);
@@ -875,7 +915,7 @@ export function MessagesClient({
                 onPointerUp={handleThreadPressEnd}
                 onPointerCancel={handleThreadPressEnd}
                 onPointerLeave={handleThreadPressEnd}
-                className={`relative flex w-full gap-3 border-b p-4 pr-10 text-left theme-border ${isSelected ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
+                className={`relative flex w-full gap-3 border-b px-3 py-3 pr-10 text-left theme-border ${isSelected ? "theme-surface-muted" : "hover:bg-[var(--muted)]"}`}
               >
                 <CompanyLogo companyName={companyName} logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined} useDefaultLogo={company.useDefaultLogo} size="sm" />
                 <div className="min-w-0">
@@ -884,27 +924,21 @@ export function MessagesClient({
                     {company.isTrade82Team ? <AdminBadge compact /> : null}
                   </p>
                   <p className="truncate text-xs theme-muted">{thread.product?.name || t("messages.sellerInquiry")}</p>
-                  <p className="mt-2 text-xs theme-muted">{formatDate(thread.updatedAt)}</p>
+                  <p className="mt-1 truncate text-xs theme-muted">{getLatestThreadPreview(thread, t)}</p>
+                  <p className="mt-1.5 text-[11px] theme-muted">{formatDate(thread.updatedAt)}</p>
                 </div>
                 <UnreadMessageBadge count={unreadCount} className="right-3 top-3" />
               </button>
             );
           })}
+          {!desktopVisibleThreads.length ? (
+            <p className="px-3 py-6 text-center text-sm text-zinc-500">{t("messages.noConversationsForFilter")}</p>
+          ) : null}
+          </div>
         </aside>
         {selected ? (
           <section className="flex min-h-0 flex-col">
-            <header className="shrink-0 border-b theme-border p-4">
-              {selected.product ? (
-                <ProductInquiryCard thread={selected} />
-              ) : (
-                <h2 className="text-lg font-semibold theme-foreground">{getInquiryLabel(selected, t)}</h2>
-              )}
-              <PaymentRequestControls
-                thread={selected}
-                paymentFeatureEnabled={paymentFeatureEnabled}
-                onUpdated={() => void load()}
-              />
-            </header>
+            <ConversationHeader thread={selected} />
             <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
               <MessageTimeline
                 thread={selected}
@@ -914,6 +948,11 @@ export function MessagesClient({
               />
               <div ref={messagesEndRef} aria-hidden="true" />
             </div>
+            <MessageTradeActionBar
+              thread={selected}
+              pending={dealPending}
+              onReview={() => setCompletionDialogThread(selected)}
+            />
             <footer className="shrink-0 border-t theme-border bg-[var(--card-elevated)] p-3">
               <div
                 onDragOver={(event) => {
@@ -966,14 +1005,6 @@ export function MessagesClient({
                   >
                     <Paperclip className="size-4" />
                   </button>
-                  <CompactDealControls
-                    thread={selected}
-                    pending={dealPending}
-                    error={dealError}
-                    onCreate={() => void createDeal(selected)}
-                    onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
-                    className="min-w-[13rem] flex-1"
-                  />
                   <div className="ml-auto flex shrink-0 items-center gap-1.5">
                     <span className="text-xs tabular-nums text-zinc-400">
                       {reply.length}/{MESSAGE_COMPOSER_MAX_LENGTH}
@@ -997,15 +1028,26 @@ export function MessagesClient({
           </section>
         ) : null}
         {selected ? (
-          <AttachmentLibrary
-            attachments={libraryAttachments}
-            filter={libraryFilter}
-            search={librarySearch}
-            onFilter={setLibraryFilter}
-            onSearch={setLibrarySearch}
-            onOpen={openAttachment}
-            onJump={jumpToMessage}
-          />
+          <aside className="hidden min-h-0 flex-col border-l bg-white theme-border lg:flex">
+            <TradeDetailsPanel
+              thread={selected}
+              pending={dealPending}
+              error={dealError}
+              onCreate={() => void createDeal(selected)}
+              onUpdate={(deal, action) => void updateDeal(selected, deal, action)}
+              paymentFeatureEnabled={paymentFeatureEnabled}
+              onPaymentUpdated={() => void load()}
+            />
+            <AttachmentLibrary
+              attachments={libraryAttachments}
+              filter={libraryFilter}
+              search={librarySearch}
+              onFilter={setLibraryFilter}
+              onSearch={setLibrarySearch}
+              onOpen={openAttachment}
+              onJump={jumpToMessage}
+            />
+          </aside>
         ) : null}
       </div>
 
@@ -1030,6 +1072,19 @@ export function MessagesClient({
           notificationsEnabled={!mutedThreadIds.has(contextMenu.threadId)}
           onClose={() => setContextMenu(null)}
           onAction={handleContextMenuAction}
+        />
+      ) : null}
+      {completionDialogThread ? (
+        <CompletionConfirmationDialog
+          thread={completionDialogThread}
+          pending={dealPending}
+          error={dealError}
+          onClose={() => setCompletionDialogThread(null)}
+          onConfirm={async () => {
+            const deal = getActiveDeal(completionDialogThread);
+            if (!deal) return false;
+            return updateDeal(completionDialogThread, deal, "confirm_completion");
+          }}
         />
       ) : null}
     </>
@@ -1198,6 +1253,7 @@ function MobileChatDetail({
   dealError,
   onCreateDeal,
   onUpdateDeal,
+  onReviewCompletion,
   onPaymentUpdated,
   paymentFeatureEnabled,
 }: {
@@ -1235,6 +1291,7 @@ function MobileChatDetail({
     deal: DealSummary,
     action: "mark_in_progress" | "request_completion" | "confirm_completion",
   ) => void;
+  onReviewCompletion: () => void;
   onPaymentUpdated: () => void;
   paymentFeatureEnabled: boolean;
 }) {
@@ -1242,9 +1299,6 @@ function MobileChatDetail({
   const company = getCounterparty(thread);
   const companyName = getCompanyDisplayName(company, t);
   const subtitle = thread.product?.name || getInquiryLabel(thread, t);
-  const canRequestPayment =
-    paymentFeatureEnabled && getViewerCompanyId(thread) === thread.sellerCompany.id;
-
   return (
     <section className="fixed inset-0 z-40 flex h-[100dvh] flex-col overflow-hidden bg-white text-zinc-950 md:hidden">
       <header className="shrink-0 border-b border-zinc-100 bg-white px-3 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))]">
@@ -1271,16 +1325,14 @@ function MobileChatDetail({
             </p>
             <p className="truncate text-xs text-zinc-500">{subtitle}</p>
           </div>
-          {canRequestPayment ? (
-            <button
-              type="button"
-              onClick={onOpenDealSheet}
-              aria-label={t("messages.mobileDealActions")}
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-600 active:bg-zinc-100"
-            >
-              <MoreVertical className="size-5" />
-            </button>
-          ) : null}
+          <button
+            type="button"
+            onClick={onOpenDealSheet}
+            aria-label={t("messages.mobileDealActions")}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-full text-zinc-600 active:bg-zinc-100"
+          >
+            <MoreVertical className="size-5" />
+          </button>
         </div>
       </header>
 
@@ -1293,6 +1345,12 @@ function MobileChatDetail({
         />
         <div ref={messagesEndRef} aria-hidden="true" />
       </div>
+
+      <MessageTradeActionBar
+        thread={thread}
+        pending={dealPending}
+        onReview={onReviewCompletion}
+      />
 
       <footer className="shrink-0 border-t border-zinc-100 bg-white px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2">
         <AttachmentDraftList
@@ -1322,14 +1380,6 @@ function MobileChatDetail({
             rows={1}
             placeholder={t("messages.mobileReplyPlaceholder")}
             className="max-h-28 min-h-9 w-full resize-none border-0 bg-transparent px-1 py-2 text-sm leading-5 text-zinc-950 outline-none placeholder:text-zinc-400"
-          />
-          <CompactDealControls
-            thread={thread}
-            pending={dealPending}
-            error={dealError}
-            onCreate={onCreateDeal}
-            onUpdate={onUpdateDeal}
-            className="border-t border-zinc-200 px-0.5 pt-2"
           />
           <div className="mt-2 flex items-center gap-1.5 border-t border-zinc-200 pt-2">
             <button
@@ -1378,12 +1428,20 @@ function MobileChatDetail({
         />
       ) : null}
 
-      {dealSheetOpen && canRequestPayment ? (
-        <MobileDealSheet
+      {dealSheetOpen ? (
+        <MobileTradeDetailsSheet
           thread={thread}
           onClose={onCloseDealSheet}
           onPaymentUpdated={onPaymentUpdated}
           paymentFeatureEnabled={paymentFeatureEnabled}
+          pending={dealPending}
+          error={dealError}
+          onCreate={onCreateDeal}
+          onUpdate={onUpdateDeal}
+          onOpenFiles={() => {
+            onCloseDealSheet();
+            onOpenAttachmentSheet();
+          }}
         />
       ) : null}
     </section>
@@ -1504,16 +1562,29 @@ function MobileAttachmentSheet({
   );
 }
 
-function MobileDealSheet({
+function MobileTradeDetailsSheet({
   thread,
   onClose,
   onPaymentUpdated,
   paymentFeatureEnabled,
+  pending,
+  error,
+  onCreate,
+  onUpdate,
+  onOpenFiles,
 }: {
   thread: InquiryThread;
   onClose: () => void;
   onPaymentUpdated: () => void;
   paymentFeatureEnabled: boolean;
+  pending: boolean;
+  error: string;
+  onCreate: () => void;
+  onUpdate: (
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) => void;
+  onOpenFiles: () => void;
 }) {
   const { t } = useI18n();
 
@@ -1521,17 +1592,30 @@ function MobileDealSheet({
     <div className="fixed inset-x-0 bottom-0 z-50 overflow-hidden rounded-t-3xl border border-zinc-200 bg-white shadow-2xl md:hidden">
       <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-zinc-200" />
       <div className="flex items-center justify-between gap-3 border-b border-zinc-100 px-4 py-3">
-        <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileDealActions")}</h3>
+        <h3 className="text-sm font-semibold text-zinc-950">{t("messages.mobileTradeDetails")}</h3>
         <button type="button" onClick={onClose} className="rounded-full p-2 text-zinc-500 active:bg-zinc-100">
           <X className="size-5" />
         </button>
       </div>
-      <div className="px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
-        <PaymentRequestControls
+      <div className="grid max-h-[72dvh] gap-4 overflow-y-auto px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3">
+        <TradeDetailsPanel
           thread={thread}
+          pending={pending}
+          error={error}
+          onCreate={onCreate}
+          onUpdate={onUpdate}
           paymentFeatureEnabled={paymentFeatureEnabled}
-          onUpdated={onPaymentUpdated}
+          onPaymentUpdated={onPaymentUpdated}
+          compact
         />
+        <button
+          type="button"
+          onClick={onOpenFiles}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-700"
+        >
+          <FolderOpen className="size-4" />
+          {t("messages.mobileViewFiles")}
+        </button>
       </div>
     </div>
   );
@@ -1680,46 +1764,58 @@ function ChatRoomContextMenuItem({
   );
 }
 
-function ProductInquiryCard({ thread }: { thread: InquiryThread }) {
+function ConversationHeader({ thread }: { thread: InquiryThread }) {
   const { locale, t } = useI18n();
   const product = thread.product;
-  const sellerName = getCompanyDisplayName(thread.sellerCompany, t);
+  const company = getCounterparty(thread);
+  const companyName = getCompanyDisplayName(company, t);
   const productHref = product?.id ? withLocale(`/products/${product.id}`, locale) : "";
   const imageUrl = safeExternalUrl(product?.imageUrl) || "/window.svg";
 
-  if (!product) return null;
-
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-xl border p-3 text-sm theme-surface-muted">
-      <div className="relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border theme-border theme-surface">
-        <Image
-          src={imageUrl}
-          alt=""
-          fill
-          sizes="56px"
-          unoptimized
-          className="object-cover"
+    <header className="shrink-0 border-b bg-white px-4 py-3 theme-border">
+      <div className="flex min-w-0 items-center gap-3">
+        <CompanyLogo
+          companyName={companyName}
+          logoUrl={company.logoThumbnailUrl || company.logoUrl || undefined}
+          useDefaultLogo={company.useDefaultLogo}
+          size="sm"
+          shape="circle"
         />
-      </div>
-      <div className="min-w-0 flex-1">
-        <h2 className="truncate text-sm font-semibold theme-foreground">{product.name}</h2>
-        <p className="mt-1 flex min-w-0 items-center gap-1.5 text-xs theme-muted">
-          <span className="truncate">{sellerName}</span>
-          {thread.sellerCompany.isTrade82Team ? <AdminBadge compact /> : null}
-        </p>
-        {product.category ? (
-          <p className="mt-1 truncate text-xs theme-muted">{product.category}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <h2 className="truncate text-sm font-semibold theme-foreground">{companyName}</h2>
+            {company.verificationStatus === "verified" ? (
+              <span className="shrink-0 text-[11px] font-medium text-[#23825e]">{t("messages.verifiedCompany")}</span>
+            ) : null}
+            {company.isTrade82Team ? <AdminBadge compact /> : null}
+          </div>
+          <p className="mt-0.5 truncate text-xs theme-muted">
+            {product?.name || getInquiryLabel(thread, t)}
+          </p>
+        </div>
+        {product ? (
+          <div className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border theme-border theme-surface">
+            <Image
+              src={imageUrl}
+              alt=""
+              fill
+              sizes="40px"
+              unoptimized
+              className="object-cover"
+            />
+          </div>
+        ) : null}
+        {productHref ? (
+          <Link
+            href={productHref}
+            className="shrink-0 rounded-md border px-2.5 py-1.5 text-xs font-medium transition theme-secondary-button"
+          >
+            {t("common.viewProduct")}
+          </Link>
         ) : null}
       </div>
-      {productHref ? (
-        <Link
-          href={productHref}
-          className="shrink-0 rounded-md border px-2.5 py-1.5 text-xs font-medium transition theme-secondary-button"
-        >
-          {t("common.viewProduct")}
-        </Link>
-      ) : null}
-    </div>
+    </header>
   );
 }
 
@@ -2116,7 +2212,7 @@ function AttachmentLibrary({
   ] as const;
 
   return (
-    <aside className="flex max-h-56 min-h-0 flex-col overflow-hidden border-t border-zinc-200 bg-white p-4 xl:max-h-none xl:border-l xl:border-t-0">
+    <section className="flex min-h-0 flex-1 flex-col overflow-hidden border-t border-zinc-200 bg-white p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-zinc-950">{t("messages.files")}</h3>
         <span className="text-xs text-zinc-500">{attachments.length}</span>
@@ -2172,7 +2268,7 @@ function AttachmentLibrary({
           </p>
         )}
       </div>
-    </aside>
+    </section>
   );
 }
 
@@ -2534,7 +2630,7 @@ function PaymentRequestCard({
   }
 
   return (
-    <article className="mx-auto my-4 w-full max-w-xl rounded-xl border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm">
+    <article className="mx-auto my-4 w-full max-w-2xl rounded-xl border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-500">
@@ -2630,13 +2726,52 @@ function paymentRequestStatusTone(status: PaymentRequestSummary["status"]) {
   return "border-blue-200 bg-blue-50 text-blue-800";
 }
 
-function CompactDealControls({
+function MessageTradeActionBar({
+  thread,
+  pending,
+  onReview,
+}: {
+  thread: InquiryThread;
+  pending: boolean;
+  onReview: () => void;
+}) {
+  const { t } = useI18n();
+  const deal = getActiveDeal(thread);
+  const state = getMessageTradeDealState(deal, {
+    viewerCompanyId: getViewerCompanyId(thread),
+    buyerCompanyId: thread.buyerCompany.id,
+    sellerCompanyId: thread.sellerCompany.id,
+  });
+
+  if (state !== "review_completion") return null;
+
+  return (
+    <div className="shrink-0 border-y border-emerald-100 bg-emerald-50/70 px-3 py-1.5">
+      <div className="mx-auto flex min-h-8 max-w-4xl items-center justify-between gap-3 text-sm">
+        <p className="min-w-0 flex-1 leading-5 text-zinc-700">{t("deals.otherRequestedCompletion")}</p>
+        <button
+          type="button"
+          onClick={onReview}
+          disabled={pending}
+          aria-busy={pending || undefined}
+          className="inline-flex h-8 shrink-0 items-center rounded-md border border-emerald-200 bg-white px-3 text-xs font-semibold text-emerald-800 transition hover:border-emerald-300 hover:bg-emerald-100 disabled:cursor-wait disabled:opacity-60"
+        >
+          {t("deals.reviewCompletion")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function TradeDetailsPanel({
   thread,
   pending,
   error,
   onCreate,
   onUpdate,
-  className,
+  paymentFeatureEnabled,
+  onPaymentUpdated,
+  compact = false,
 }: {
   thread: InquiryThread;
   pending: boolean;
@@ -2646,84 +2781,124 @@ function CompactDealControls({
     deal: DealSummary,
     action: "mark_in_progress" | "request_completion" | "confirm_completion",
   ) => void;
-  className?: string;
+  paymentFeatureEnabled: boolean;
+  onPaymentUpdated: () => void;
+  compact?: boolean;
 }) {
   const { locale, t } = useI18n();
   const deal = getActiveDeal(thread);
   const viewerCompanyId = getViewerCompanyId(thread);
-  const isBuyer = viewerCompanyId === thread.buyerCompany.id;
-  const currentSideConfirmed = deal
-    ? isBuyer
-      ? deal.confirmedByBuyer
-      : deal.confirmedBySeller
-    : false;
-  const hasReviewed = Boolean(
-    deal?.reviews.some((review) => review.reviewerCompanyId === viewerCompanyId),
-  );
+  const hasReviewed = Boolean(deal?.reviews.some((review) => review.reviewerCompanyId === viewerCompanyId));
+  const latestPayment = thread.paymentRequests?.at(-1) ?? null;
+  const productHref = thread.product?.id ? withLocale(`/products/${thread.product.id}`, locale) : "";
   const statusLabel = deal
     ? deal.dealStatus === "completed"
       ? t("deals.compactCompletedDeal")
       : dealStatusLabel(deal.dealStatus, t)
-    : null;
-  const inquiryLabel = thread.product ? t("messages.productInquiry") : getInquiryLabel(thread, t);
-  const otherCompanyRequestedCompletion =
-    deal?.dealStatus === "completion_requested" && !currentSideConfirmed;
-  const helperText = otherCompanyRequestedCompletion
-    ? t("deals.otherRequestedCompletion")
-    : deal?.dealStatus === "completed" && !hasReviewed
-      ? t("deals.completeReviewPrompt")
-      : "";
+    : t("messages.tradeNotStarted");
 
   return (
-    <div className={cx("min-w-0", className)}>
-      <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-        <span className="shrink-0 text-[11px] font-medium text-zinc-500">{inquiryLabel}</span>
-        {statusLabel ? (
-          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-600">
-            {statusLabel}
-          </span>
-        ) : null}
-        {!deal ? (
-          <CompactDealAction disabled={pending} onClick={onCreate}>
-            {t("deals.markInProgress")}
-          </CompactDealAction>
-        ) : null}
-        {deal && (deal.dealStatus === "proposed" || deal.dealStatus === "in_progress") ? (
-          <CompactDealAction disabled={pending} onClick={() => onUpdate(deal, "request_completion")}>
-            {t("deals.requestCompletion")}
-          </CompactDealAction>
-        ) : null}
-        {deal && deal.dealStatus === "completion_requested" && !currentSideConfirmed ? (
-          <CompactDealAction disabled={pending} onClick={() => onUpdate(deal, "confirm_completion")}>
-            {t("deals.confirmCompletion")}
-          </CompactDealAction>
-        ) : null}
-        {deal && deal.dealStatus === "completed" && !hasReviewed ? (
-          <Link
-            href={withLocale(`/deals/${deal.id}/review`, locale)}
-            className="inline-flex h-7 items-center rounded-md border border-zinc-200 bg-white px-2 text-[11px] font-medium text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950"
-          >
-            {t("deals.writeReview")}
+    <section className={cx("shrink-0 border-b border-zinc-200 p-4", compact ? "rounded-xl border bg-zinc-50 p-3" : "")}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-zinc-950">{t("messages.tradeDetails")}</h3>
+          <p className="mt-1 truncate text-xs text-zinc-500">{thread.product?.name || getInquiryLabel(thread, t)}</p>
+        </div>
+        {productHref ? (
+          <Link href={productHref} className="shrink-0 text-xs font-semibold text-[#23825e] hover:underline">
+            {t("common.viewProduct")}
           </Link>
         ) : null}
-        {deal && deal.dealStatus === "completed" && hasReviewed ? (
-          <span className="text-[11px] font-medium text-emerald-700">{t("deals.alreadyReviewed")}</span>
-        ) : null}
       </div>
-      {helperText ? (
-        <p className="mt-0.5 text-[11px] leading-4 text-zinc-500">{helperText}</p>
+      <dl className="mt-3 grid gap-2 text-xs">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-zinc-500">{t("messages.dealStatus")}</dt>
+          <dd className="font-medium text-zinc-800">{statusLabel}</dd>
+        </div>
+        {thread.quantity ? (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-zinc-500">{t("messages.orderQuantity")}</dt>
+            <dd className="font-medium text-zinc-800">{thread.quantity}</dd>
+          </div>
+        ) : null}
+        {latestPayment ? (
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-zinc-500">{t("payments.paymentRequest")}</dt>
+            <dd className="font-medium text-zinc-800">{paymentRequestStatusLabel(latestPayment.status, t)}</dd>
+          </div>
+        ) : null}
+      </dl>
+      <TradeDetailsActions
+        deal={deal}
+        viewerCompanyId={viewerCompanyId}
+        pending={pending}
+        hasReviewed={hasReviewed}
+        onCreate={onCreate}
+        onUpdate={onUpdate}
+      />
+      {paymentFeatureEnabled ? (
+        <PaymentRequestControls
+          thread={thread}
+          paymentFeatureEnabled={paymentFeatureEnabled}
+          onUpdated={onPaymentUpdated}
+        />
       ) : null}
-      {error ? <p role="alert" className="mt-0.5 text-[11px] font-medium leading-4 text-red-700">{error}</p> : null}
-    </div>
+      {error ? <p role="alert" className="mt-2 text-xs font-medium text-red-700">{error}</p> : null}
+    </section>
   );
 }
 
-function CompactDealAction({
+function TradeDetailsActions({
+  deal,
+  viewerCompanyId,
+  pending,
+  hasReviewed,
+  onCreate,
+  onUpdate,
+}: {
+  deal: DealSummary | null;
+  viewerCompanyId: string | null;
+  pending: boolean;
+  hasReviewed: boolean;
+  onCreate: () => void;
+  onUpdate: (
+    deal: DealSummary,
+    action: "mark_in_progress" | "request_completion" | "confirm_completion",
+  ) => void;
+}) {
+  const { locale, t } = useI18n();
+  if (!deal) {
+    return <TradeDetailsAction disabled={pending} onClick={onCreate}>{t("deals.markInProgress")}</TradeDetailsAction>;
+  }
+
+  if (deal.dealStatus === "proposed" || deal.dealStatus === "in_progress") {
+    return (
+      <TradeDetailsAction disabled={pending} onClick={() => onUpdate(deal, "request_completion")}>
+        {t("deals.requestCompletion")}
+      </TradeDetailsAction>
+    );
+  }
+
+  if (deal.dealStatus === "completed" && !hasReviewed && viewerCompanyId) {
+    return (
+      <Link
+        href={withLocale(`/deals/${deal.id}/review`, locale)}
+        className="mt-3 inline-flex h-8 items-center rounded-md border border-zinc-200 bg-white px-2.5 text-xs font-semibold text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950"
+      >
+        {t("deals.writeReview")}
+      </Link>
+    );
+  }
+
+  return null;
+}
+
+function TradeDetailsAction({
   children,
   disabled,
   onClick,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   disabled: boolean;
   onClick: () => void;
 }) {
@@ -2733,10 +2908,147 @@ function CompactDealAction({
       disabled={disabled}
       aria-busy={disabled || undefined}
       onClick={onClick}
-      className="inline-flex h-7 items-center rounded-md border border-zinc-200 bg-white px-2 text-[11px] font-medium text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950 disabled:cursor-wait disabled:opacity-60"
+      className="mt-3 inline-flex h-8 items-center rounded-md border border-zinc-200 bg-white px-2.5 text-xs font-semibold text-zinc-700 transition hover:border-zinc-400 hover:text-zinc-950 disabled:cursor-wait disabled:opacity-60"
     >
       {children}
     </button>
+  );
+}
+
+function CompletionConfirmationDialog({
+  thread,
+  pending,
+  error,
+  onClose,
+  onConfirm,
+}: {
+  thread: InquiryThread;
+  pending: boolean;
+  error: string;
+  onClose: () => void;
+  onConfirm: () => Promise<boolean>;
+}) {
+  const { locale, t } = useI18n();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const paymentRequest = thread.paymentRequests?.at(-1) ?? null;
+  const productImageUrl = safeExternalUrl(thread.product?.imageUrl) || "/window.svg";
+  const busy = pending || submitting;
+  const busyRef = useRef(busy);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    busyRef.current = busy;
+  }, [busy]);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    confirmButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !busyRef.current) {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable.at(-1) as HTMLElement;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, []);
+
+  async function confirm() {
+    if (busy) return;
+    setSubmitting(true);
+    const succeeded = await onConfirm();
+    setSubmitting(false);
+    if (succeeded) onClose();
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/45 p-4"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !busy) onClose();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="completion-confirmation-title"
+        aria-describedby="completion-confirmation-description"
+        className="w-full max-w-lg rounded-xl border border-zinc-200 bg-white p-5 text-zinc-950 shadow-xl sm:p-6"
+      >
+        <h2 id="completion-confirmation-title" className="text-lg font-semibold">{t("deals.completionDialogTitle")}</h2>
+        <p id="completion-confirmation-description" className="mt-1 text-sm leading-6 text-zinc-600">
+          {t("deals.completionDialogPrompt")}
+        </p>
+        {error ? <p role="alert" className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
+        <div className="mt-4 flex gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+          <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-zinc-200 bg-white">
+            <Image src={productImageUrl} alt="" fill sizes="48px" unoptimized className="object-cover" />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-zinc-900">{paymentRequest?.productName || thread.product?.name || getInquiryLabel(thread, t)}</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              {paymentRequest ? `${paymentRequest.quantity} ${paymentRequest.unit}` : thread.quantity || t("common.notProvided")}
+            </p>
+          </div>
+        </div>
+        {paymentRequest ? (
+          <dl className="mt-4 grid gap-2 rounded-lg border border-zinc-200 p-3 text-sm sm:grid-cols-2">
+            <DialogMetric label={t("payments.productAmount")} value={formatPaymentMoney(paymentRequest.productAmount, paymentRequest.currency)} />
+            <DialogMetric label={t("payments.shippingAmount")} value={formatPaymentMoney(paymentRequest.shippingAmount, paymentRequest.currency)} />
+            <DialogMetric label={t("payments.grossAmount")} value={formatPaymentMoney(paymentRequest.grossAmount, paymentRequest.currency)} strong />
+            <DialogMetric label={t("payments.paymentRequest")} value={paymentRequestStatusLabel(paymentRequest.status, t)} />
+          </dl>
+        ) : null}
+        <p className="mt-4 text-xs text-zinc-500">{new Date(thread.updatedAt).toLocaleString(locale)}</p>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} disabled={busy} className="h-9 rounded-md border border-zinc-200 px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-60">
+            {t("common.cancel")}
+          </button>
+          <button ref={confirmButtonRef} type="button" onClick={() => void confirm()} disabled={busy} aria-busy={busy || undefined} className="h-9 rounded-md bg-[#23825e] px-3 text-sm font-semibold text-white hover:bg-[#1e6e50] disabled:cursor-wait disabled:opacity-60">
+            {t("deals.confirmCompletion")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DialogMetric({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 sm:block">
+      <dt className="text-xs text-zinc-500">{label}</dt>
+      <dd className={cx("mt-0.5 text-sm", strong ? "font-semibold text-zinc-950" : "font-medium text-zinc-700")}>{value}</dd>
+    </div>
   );
 }
 
