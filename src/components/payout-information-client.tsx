@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
 import { withLocale } from "@/lib/i18n";
 import {
   formatTradeDateTime,
@@ -154,6 +155,7 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
   }
 
   return (
+    <>
     <section className="mx-auto grid max-w-4xl gap-5 px-4 py-8 sm:px-6">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[.18em] theme-success-text">{t("payouts.sellerSettings")}</p>
@@ -209,6 +211,8 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
         </div>
       </form>
     </section>
+    <StripeConnectOnboardingPanel ownerType="seller" />
+    </>
   );
 }
 
