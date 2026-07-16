@@ -314,6 +314,7 @@ export type UserProfileWhereInput = {
   settlementEvents?: Prisma.SettlementEventListRelationFilter
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   referredReferralAttribution?: Prisma.XOR<Prisma.ReferralAttributionNullableScalarRelationFilter, Prisma.ReferralAttributionWhereInput> | null
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   settlementLegRecipientUsers?: Prisma.SettlementLegListRelationFilter
 }
 
@@ -364,6 +365,7 @@ export type UserProfileOrderByWithRelationInput = {
   settlementEvents?: Prisma.SettlementEventOrderByRelationAggregateInput
   partnerProfile?: Prisma.PartnerProfileOrderByWithRelationInput
   referredReferralAttribution?: Prisma.ReferralAttributionOrderByWithRelationInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenOrderByRelationAggregateInput
   settlementLegRecipientUsers?: Prisma.SettlementLegOrderByRelationAggregateInput
 }
 
@@ -417,6 +419,7 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   settlementEvents?: Prisma.SettlementEventListRelationFilter
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   referredReferralAttribution?: Prisma.XOR<Prisma.ReferralAttributionNullableScalarRelationFilter, Prisma.ReferralAttributionWhereInput> | null
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   settlementLegRecipientUsers?: Prisma.SettlementLegListRelationFilter
 }, "id" | "clerkUserId" | "email">
 
@@ -515,6 +518,7 @@ export type UserProfileCreateInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -565,6 +569,7 @@ export type UserProfileUncheckedCreateInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -615,6 +620,7 @@ export type UserProfileUpdateInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -665,6 +671,7 @@ export type UserProfileUncheckedUpdateInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -986,6 +993,22 @@ export type UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutPartnerProfileInput, Prisma.UserProfileUpdateWithoutPartnerProfileInput>, Prisma.UserProfileUncheckedUpdateWithoutPartnerProfileInput>
 }
 
+export type UserProfileCreateNestedOneWithoutConsumedReferralClaimTokensInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutConsumedReferralClaimTokensInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneWithoutConsumedReferralClaimTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutConsumedReferralClaimTokensInput
+  upsert?: Prisma.UserProfileUpsertWithoutConsumedReferralClaimTokensInput
+  disconnect?: Prisma.UserProfileWhereInput | boolean
+  delete?: Prisma.UserProfileWhereInput | boolean
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUpdateWithoutConsumedReferralClaimTokensInput>, Prisma.UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput>
+}
+
 export type UserProfileCreateNestedOneWithoutReferredReferralAttributionInput = {
   create?: Prisma.XOR<Prisma.UserProfileCreateWithoutReferredReferralAttributionInput, Prisma.UserProfileUncheckedCreateWithoutReferredReferralAttributionInput>
   connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutReferredReferralAttributionInput
@@ -1302,6 +1325,7 @@ export type UserProfileCreateWithoutCompaniesInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1351,6 +1375,7 @@ export type UserProfileUncheckedCreateWithoutCompaniesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1416,6 +1441,7 @@ export type UserProfileUpdateWithoutCompaniesInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1465,6 +1491,7 @@ export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1514,6 +1541,7 @@ export type UserProfileCreateWithoutRequestedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1563,6 +1591,7 @@ export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1617,6 +1646,7 @@ export type UserProfileCreateWithoutReviewedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1666,6 +1696,7 @@ export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1731,6 +1762,7 @@ export type UserProfileUpdateWithoutRequestedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1780,6 +1812,7 @@ export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1840,6 +1873,7 @@ export type UserProfileUpdateWithoutReviewedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1889,6 +1923,7 @@ export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -1938,6 +1973,7 @@ export type UserProfileCreateWithoutSentInquiriesInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -1987,6 +2023,7 @@ export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2052,6 +2089,7 @@ export type UserProfileUpdateWithoutSentInquiriesInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2101,6 +2139,7 @@ export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2150,6 +2189,7 @@ export type UserProfileCreateWithoutBuyerRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2199,6 +2239,7 @@ export type UserProfileUncheckedCreateWithoutBuyerRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2253,6 +2294,7 @@ export type UserProfileCreateWithoutReviewedRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2302,6 +2344,7 @@ export type UserProfileUncheckedCreateWithoutReviewedRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2367,6 +2410,7 @@ export type UserProfileUpdateWithoutBuyerRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2416,6 +2460,7 @@ export type UserProfileUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2476,6 +2521,7 @@ export type UserProfileUpdateWithoutReviewedRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2525,6 +2571,7 @@ export type UserProfileUncheckedUpdateWithoutReviewedRfqRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2574,6 +2621,7 @@ export type UserProfileCreateWithoutMarketingExposuresInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2623,6 +2671,7 @@ export type UserProfileUncheckedCreateWithoutMarketingExposuresInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2688,6 +2737,7 @@ export type UserProfileUpdateWithoutMarketingExposuresInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2737,6 +2787,7 @@ export type UserProfileUncheckedUpdateWithoutMarketingExposuresInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -2786,6 +2837,7 @@ export type UserProfileCreateWithoutCreatedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2835,6 +2887,7 @@ export type UserProfileUncheckedCreateWithoutCreatedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2889,6 +2942,7 @@ export type UserProfileCreateWithoutReleasedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -2938,6 +2992,7 @@ export type UserProfileUncheckedCreateWithoutReleasedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3003,6 +3058,7 @@ export type UserProfileUpdateWithoutCreatedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3052,6 +3108,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3112,6 +3169,7 @@ export type UserProfileUpdateWithoutReleasedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3161,6 +3219,7 @@ export type UserProfileUncheckedUpdateWithoutReleasedPaymentRequestsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3210,6 +3269,7 @@ export type UserProfileCreateWithoutPaymentRequestEventsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3259,6 +3319,7 @@ export type UserProfileUncheckedCreateWithoutPaymentRequestEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3324,6 +3385,7 @@ export type UserProfileUpdateWithoutPaymentRequestEventsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3373,6 +3435,7 @@ export type UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3422,6 +3485,7 @@ export type UserProfileCreateWithoutPartnerProfileInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3471,6 +3535,7 @@ export type UserProfileUncheckedCreateWithoutPartnerProfileInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3536,6 +3601,7 @@ export type UserProfileUpdateWithoutPartnerProfileInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3584,6 +3650,223 @@ export type UserProfileUncheckedUpdateWithoutPartnerProfileInput = {
   verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
+}
+
+export type UserProfileCreateWithoutConsumedReferralClaimTokensInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+  settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
+  referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
+  partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutConsumedReferralClaimTokensInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput>
+}
+
+export type UserProfileUpsertWithoutConsumedReferralClaimTokensInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutConsumedReferralClaimTokensInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutConsumedReferralClaimTokensInput, Prisma.UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput>
+}
+
+export type UserProfileUpdateWithoutConsumedReferralClaimTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+  settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
+  partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
@@ -3634,6 +3917,7 @@ export type UserProfileCreateWithoutReferredReferralAttributionInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3683,6 +3967,7 @@ export type UserProfileUncheckedCreateWithoutReferredReferralAttributionInput = 
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -3748,6 +4033,7 @@ export type UserProfileUpdateWithoutReferredReferralAttributionInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3797,6 +4083,7 @@ export type UserProfileUncheckedUpdateWithoutReferredReferralAttributionInput = 
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -3847,6 +4134,7 @@ export type UserProfileCreateWithoutSettlementLegRecipientUsersInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
 }
 
 export type UserProfileUncheckedCreateWithoutSettlementLegRecipientUsersInput = {
@@ -3896,6 +4184,7 @@ export type UserProfileUncheckedCreateWithoutSettlementLegRecipientUsersInput = 
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
 }
 
 export type UserProfileCreateOrConnectWithoutSettlementLegRecipientUsersInput = {
@@ -3961,6 +4250,7 @@ export type UserProfileUpdateWithoutSettlementLegRecipientUsersInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutSettlementLegRecipientUsersInput = {
@@ -4010,6 +4300,7 @@ export type UserProfileUncheckedUpdateWithoutSettlementLegRecipientUsersInput = 
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
 }
 
 export type UserProfileCreateWithoutSettlementEventsInput = {
@@ -4058,6 +4349,7 @@ export type UserProfileCreateWithoutSettlementEventsInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4107,6 +4399,7 @@ export type UserProfileUncheckedCreateWithoutSettlementEventsInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4172,6 +4465,7 @@ export type UserProfileUpdateWithoutSettlementEventsInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4221,6 +4515,7 @@ export type UserProfileUncheckedUpdateWithoutSettlementEventsInput = {
   sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4270,6 +4565,7 @@ export type UserProfileCreateWithoutTradeOrderEventsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4319,6 +4615,7 @@ export type UserProfileUncheckedCreateWithoutTradeOrderEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4384,6 +4681,7 @@ export type UserProfileUpdateWithoutTradeOrderEventsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4433,6 +4731,7 @@ export type UserProfileUncheckedUpdateWithoutTradeOrderEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4482,6 +4781,7 @@ export type UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4531,6 +4831,7 @@ export type UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput =
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4596,6 +4897,7 @@ export type UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4645,6 +4947,7 @@ export type UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput =
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4694,6 +4997,7 @@ export type UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4743,6 +5047,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4808,6 +5113,7 @@ export type UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4857,6 +5163,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -4906,6 +5213,7 @@ export type UserProfileCreateWithoutPreparedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -4955,6 +5263,7 @@ export type UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5009,6 +5318,7 @@ export type UserProfileCreateWithoutApprovedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5058,6 +5368,7 @@ export type UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5112,6 +5423,7 @@ export type UserProfileCreateWithoutSentSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5161,6 +5473,7 @@ export type UserProfileUncheckedCreateWithoutSentSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5226,6 +5539,7 @@ export type UserProfileUpdateWithoutPreparedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5275,6 +5589,7 @@ export type UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5335,6 +5650,7 @@ export type UserProfileUpdateWithoutApprovedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5384,6 +5700,7 @@ export type UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5444,6 +5761,7 @@ export type UserProfileUpdateWithoutSentSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5493,6 +5811,7 @@ export type UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5542,6 +5861,7 @@ export type UserProfileCreateWithoutSellerPayoutEventsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5591,6 +5911,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5656,6 +5977,7 @@ export type UserProfileUpdateWithoutSellerPayoutEventsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5705,6 +6027,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5754,6 +6077,7 @@ export type UserProfileCreateWithoutSellerPayoutAdjustmentsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5803,6 +6127,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -5868,6 +6193,7 @@ export type UserProfileUpdateWithoutSellerPayoutAdjustmentsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5917,6 +6243,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -5966,6 +6293,7 @@ export type UserProfileCreateWithoutSavedItemsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6015,6 +6343,7 @@ export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6080,6 +6409,7 @@ export type UserProfileUpdateWithoutSavedItemsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6129,6 +6459,7 @@ export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6178,6 +6509,7 @@ export type UserProfileCreateWithoutSentMessagesInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6227,6 +6559,7 @@ export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6281,6 +6614,7 @@ export type UserProfileCreateWithoutReceivedMessagesInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6330,6 +6664,7 @@ export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6395,6 +6730,7 @@ export type UserProfileUpdateWithoutSentMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6444,6 +6780,7 @@ export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6504,6 +6841,7 @@ export type UserProfileUpdateWithoutReceivedMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6553,6 +6891,7 @@ export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6602,6 +6941,7 @@ export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6651,6 +6991,7 @@ export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6716,6 +7057,7 @@ export type UserProfileUpdateWithoutUploadedMessageAttachmentsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6765,6 +7107,7 @@ export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6814,6 +7157,7 @@ export type UserProfileCreateWithoutCreatedDocumentFoldersInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6863,6 +7207,7 @@ export type UserProfileUncheckedCreateWithoutCreatedDocumentFoldersInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -6928,6 +7273,7 @@ export type UserProfileUpdateWithoutCreatedDocumentFoldersInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -6977,6 +7323,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedDocumentFoldersInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -7026,6 +7373,7 @@ export type UserProfileCreateWithoutUploadedTradeDocumentsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -7075,6 +7423,7 @@ export type UserProfileUncheckedCreateWithoutUploadedTradeDocumentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -7140,6 +7489,7 @@ export type UserProfileUpdateWithoutUploadedTradeDocumentsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -7189,6 +7539,7 @@ export type UserProfileUncheckedUpdateWithoutUploadedTradeDocumentsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -7238,6 +7589,7 @@ export type UserProfileCreateWithoutCreatedDealsInput = {
   settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -7287,6 +7639,7 @@ export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
   partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
 }
 
@@ -7352,6 +7705,7 @@ export type UserProfileUpdateWithoutCreatedDealsInput = {
   settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -7401,6 +7755,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
   settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
   partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
   referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
   settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
 }
 
@@ -7436,6 +7791,7 @@ export type UserProfileCountOutputType = {
   verifiedSellerPayoutProfiles: number
   sellerPayoutProfileAuditEvents: number
   settlementEvents: number
+  consumedReferralClaimTokens: number
   settlementLegRecipientUsers: number
 }
 
@@ -7466,6 +7822,7 @@ export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   verifiedSellerPayoutProfiles?: boolean | UserProfileCountOutputTypeCountVerifiedSellerPayoutProfilesArgs
   sellerPayoutProfileAuditEvents?: boolean | UserProfileCountOutputTypeCountSellerPayoutProfileAuditEventsArgs
   settlementEvents?: boolean | UserProfileCountOutputTypeCountSettlementEventsArgs
+  consumedReferralClaimTokens?: boolean | UserProfileCountOutputTypeCountConsumedReferralClaimTokensArgs
   settlementLegRecipientUsers?: boolean | UserProfileCountOutputTypeCountSettlementLegRecipientUsersArgs
 }
 
@@ -7664,6 +8021,13 @@ export type UserProfileCountOutputTypeCountSettlementEventsArgs<ExtArgs extends 
 /**
  * UserProfileCountOutputType without action
  */
+export type UserProfileCountOutputTypeCountConsumedReferralClaimTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralClaimTokenWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
 export type UserProfileCountOutputTypeCountSettlementLegRecipientUsersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SettlementLegWhereInput
 }
@@ -7716,6 +8080,7 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   settlementEvents?: boolean | Prisma.UserProfile$settlementEventsArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.UserProfile$partnerProfileArgs<ExtArgs>
   referredReferralAttribution?: boolean | Prisma.UserProfile$referredReferralAttributionArgs<ExtArgs>
+  consumedReferralClaimTokens?: boolean | Prisma.UserProfile$consumedReferralClaimTokensArgs<ExtArgs>
   settlementLegRecipientUsers?: boolean | Prisma.UserProfile$settlementLegRecipientUsersArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userProfile"]>
@@ -7813,6 +8178,7 @@ export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.Internal
   settlementEvents?: boolean | Prisma.UserProfile$settlementEventsArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.UserProfile$partnerProfileArgs<ExtArgs>
   referredReferralAttribution?: boolean | Prisma.UserProfile$referredReferralAttributionArgs<ExtArgs>
+  consumedReferralClaimTokens?: boolean | Prisma.UserProfile$consumedReferralClaimTokensArgs<ExtArgs>
   settlementLegRecipientUsers?: boolean | Prisma.UserProfile$settlementLegRecipientUsersArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -7850,6 +8216,7 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     settlementEvents: Prisma.$SettlementEventPayload<ExtArgs>[]
     partnerProfile: Prisma.$PartnerProfilePayload<ExtArgs> | null
     referredReferralAttribution: Prisma.$ReferralAttributionPayload<ExtArgs> | null
+    consumedReferralClaimTokens: Prisma.$ReferralClaimTokenPayload<ExtArgs>[]
     settlementLegRecipientUsers: Prisma.$SettlementLegPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -8293,6 +8660,7 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
   settlementEvents<T extends Prisma.UserProfile$settlementEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$settlementEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   partnerProfile<T extends Prisma.UserProfile$partnerProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$partnerProfileArgs<ExtArgs>>): Prisma.Prisma__PartnerProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   referredReferralAttribution<T extends Prisma.UserProfile$referredReferralAttributionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$referredReferralAttributionArgs<ExtArgs>>): Prisma.Prisma__ReferralAttributionClient<runtime.Types.Result.GetResult<Prisma.$ReferralAttributionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  consumedReferralClaimTokens<T extends Prisma.UserProfile$consumedReferralClaimTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$consumedReferralClaimTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralClaimTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlementLegRecipientUsers<T extends Prisma.UserProfile$settlementLegRecipientUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$settlementLegRecipientUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -9393,6 +9761,30 @@ export type UserProfile$referredReferralAttributionArgs<ExtArgs extends runtime.
    */
   include?: Prisma.ReferralAttributionInclude<ExtArgs> | null
   where?: Prisma.ReferralAttributionWhereInput
+}
+
+/**
+ * UserProfile.consumedReferralClaimTokens
+ */
+export type UserProfile$consumedReferralClaimTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralClaimToken
+   */
+  select?: Prisma.ReferralClaimTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralClaimToken
+   */
+  omit?: Prisma.ReferralClaimTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralClaimTokenInclude<ExtArgs> | null
+  where?: Prisma.ReferralClaimTokenWhereInput
+  orderBy?: Prisma.ReferralClaimTokenOrderByWithRelationInput | Prisma.ReferralClaimTokenOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralClaimTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralClaimTokenScalarFieldEnum | Prisma.ReferralClaimTokenScalarFieldEnum[]
 }
 
 /**

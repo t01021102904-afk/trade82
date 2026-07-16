@@ -1,6 +1,7 @@
 import "server-only";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 
 import type {
   AccountRole,
@@ -11,6 +12,10 @@ import type {
 } from "@/generated/prisma/client";
 import { Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
+import {
+  consumeReferralClaimForNewUser,
+  REFERRAL_CLAIM_COOKIE,
+} from "@/lib/partner-referrals";
 import {
   getOnboardingCompanyState,
   inferRoleFromCompanyState,
@@ -129,14 +134,24 @@ export async function getCurrentUserProfile() {
       return await updateExistingProfile(existingByEmail);
     }
 
-    return await db.userProfile.create({
-      data: {
-        clerkUserId: userId,
-        email,
-        displayName,
-        role: createRole,
-        preferredLanguage,
-      },
+    // Referral evidence can only be consumed while this identity receives its
+    // first local profile. Existing and relinked profiles never enter here.
+    const referralClaimToken = (await cookies()).get(REFERRAL_CLAIM_COOKIE)?.value;
+    return await db.$transaction(async (tx) => {
+      const profile = await tx.userProfile.create({
+        data: {
+          clerkUserId: userId,
+          email,
+          displayName,
+          role: createRole,
+          preferredLanguage,
+        },
+      });
+      await consumeReferralClaimForNewUser(tx, {
+        rawToken: referralClaimToken,
+        referredUserId: profile.id,
+      });
+      return profile;
     });
   } catch (error) {
     if (!isEmailUniqueConflict(error)) throw error;

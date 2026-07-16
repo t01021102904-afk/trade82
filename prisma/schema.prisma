@@ -456,6 +456,7 @@ model UserProfile {
   settlementEvents               SettlementEvent[]               @relation("SettlementEventActor")
   partnerProfile                 PartnerProfile?                 @relation("UserPartnerProfile")
   referredReferralAttribution    ReferralAttribution?            @relation("ReferredUserAttribution")
+  consumedReferralClaimTokens    ReferralClaimToken[]            @relation("ReferralClaimConsumedByUser")
   settlementLegRecipientUsers    SettlementLeg[]                 @relation("SettlementLegRecipientUser")
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
@@ -957,6 +958,7 @@ model PartnerProfile {
   referralCode           String                  @unique
   status                 PartnerProfileStatus    @default(ACTIVE)
   attributions           ReferralAttribution[]
+  referralClaimTokens    ReferralClaimToken[]
   stripeConnectedAccount StripeConnectedAccount? @relation("PartnerProfileStripeConnectedAccount")
   settlementLegs         SettlementLeg[]         @relation("SettlementLegPartnerProfile")
   settlements            Settlement[]            @relation("SettlementReferralPartnerProfile")
@@ -964,6 +966,23 @@ model PartnerProfile {
   updatedAt              DateTime                @updatedAt
 
   @@index([status, createdAt])
+}
+
+// Opaque, short-lived referral evidence. The browser only ever receives the
+// raw token; the database stores its SHA-256 hash.
+model ReferralClaimToken {
+  id               String         @id @default(cuid())
+  tokenHash        String         @unique
+  partnerProfileId String
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  expiresAt        DateTime
+  consumedAt       DateTime?
+  consumedByUserId String?
+  consumedByUser   UserProfile?   @relation("ReferralClaimConsumedByUser", fields: [consumedByUserId], references: [id], onDelete: Restrict)
+  createdAt        DateTime       @default(now())
+
+  @@index([partnerProfileId, expiresAt])
+  @@index([consumedByUserId, createdAt])
 }
 
 // The first valid attribution for a referred user is immutable. Later
