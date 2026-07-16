@@ -117,7 +117,7 @@ export function StripeConnectOnboardingPanel({ ownerType }: { ownerType: OwnerTy
           <button
             type="button"
             onClick={() => void start()}
-            disabled={starting || account?.onboardingComplete}
+            disabled={starting || account?.onboardingComplete || account?.status === "DISABLED"}
             className="mt-4 inline-flex h-10 items-center gap-2 rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {starting ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}

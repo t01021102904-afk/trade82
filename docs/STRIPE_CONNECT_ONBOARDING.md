@@ -23,3 +23,9 @@ not create transfers, payouts, reversal records, or alter settlement release.
 
 `STRIPE_CONNECT_ONBOARDING_MODE` is disabled unless its raw value is exactly
 `on`. The separate `STRIPE_CONNECT_SETTLEMENT_MODE` flag remains unchanged.
+
+`STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES` is a separate, fail-closed,
+comma-separated ISO alpha-2 allowlist. Missing or empty configuration approves
+no country, and the general Stripe availability list is never a fallback.
+`KR` must be added only after Stripe confirms that Trade82's US platform may
+use the US-to-Korea connected-account transfer corridor.

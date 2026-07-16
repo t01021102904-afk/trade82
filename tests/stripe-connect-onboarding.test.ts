@@ -3,6 +3,9 @@ import { test } from "node:test";
 
 import {
   assertStripeConnectCountry,
+  canContinueStripeConnectOnboarding,
+  classifyStripeConnectDisabledReason,
+  getApprovedStripeConnectAccountCountries,
   getStripeConnectOnboardingStatus,
   mapStripeConnectedAccount,
   normalizeStripeConnectCountry,
@@ -63,15 +66,24 @@ function createFakeDb({ ownerType = "seller", activePartner = true }: { ownerTyp
   return { db, rows };
 }
 
-async function withOnboardingMode<T>(value: string | undefined, run: () => Promise<T> | T) {
+async function withOnboardingMode<T>(
+  value: string | undefined,
+  run: () => Promise<T> | T,
+  approvedCountries: string | null = "KR",
+) {
   const previous = process.env.STRIPE_CONNECT_ONBOARDING_MODE;
+  const previousApprovedCountries = process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
   if (value === undefined) delete process.env.STRIPE_CONNECT_ONBOARDING_MODE;
   else process.env.STRIPE_CONNECT_ONBOARDING_MODE = value;
+  if (approvedCountries === null) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
+  else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = approvedCountries;
   try {
     return await run();
   } finally {
     if (previous === undefined) delete process.env.STRIPE_CONNECT_ONBOARDING_MODE;
     else process.env.STRIPE_CONNECT_ONBOARDING_MODE = previous;
+    if (previousApprovedCountries === undefined) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
+    else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = previousApprovedCountries;
   }
 }
 
@@ -88,6 +100,13 @@ test("country normalization is centralized and unsupported country values fail c
   assert.equal(normalizeStripeConnectCountry("not-a-country"), null);
   assert.equal(assertStripeConnectCountry("KR"), "KR");
   assert.throws(() => assertStripeConnectCountry("not-a-country"));
+});
+
+test("approved account-country configuration is explicit, normalized, and fail-closed", () => {
+  assert.deepEqual([...getApprovedStripeConnectAccountCountries(" us , kr ")].sort(), ["KR", "US"]);
+  assert.deepEqual([...getApprovedStripeConnectAccountCountries(undefined)], []);
+  assert.throws(() => getApprovedStripeConnectAccountCountries("KR, not-a-country"));
+  assert.throws(() => getApprovedStripeConnectAccountCountries("KR, "));
 });
 
 test("seller onboarding creates one configured Connect account and never invokes money movement APIs", async () => {
@@ -149,6 +168,26 @@ test("off mode does not call Stripe account or Account Link APIs", async () => {
   assert.equal(calls, 0);
 });
 
+test("Stripe account creation requires both exact-on mode and explicit platform country approval", async () => {
+  const { db } = createFakeDb();
+  const calls = { accounts: 0, links: 0 };
+  const stripe = {
+    accounts: { create: async () => { calls.accounts += 1; return fakeAccount("acct_never"); }, retrieve: async () => fakeAccount("acct_never") },
+    accountLinks: { create: async () => { calls.links += 1; return { url: "https://connect.stripe.test/link" }; } },
+  };
+  const start = () => startStripeConnectOnboarding({
+    userId: "seller-owner", ownerType: "seller", db: db as never, stripe: stripe as never,
+  });
+
+  await assert.rejects(() => withOnboardingMode("on", start, null));
+  await assert.rejects(() => withOnboardingMode("on", start, "US"));
+  await assert.rejects(() => withOnboardingMode("on", start, "KR, invalid"));
+  assert.deepEqual(calls, { accounts: 0, links: 0 });
+
+  await withOnboardingMode("on", start, " kr ");
+  assert.deepEqual(calls, { accounts: 1, links: 1 });
+});
+
 test("owner checks deny buyers, non-owners, and inactive partners", async () => {
   const sellerOnly = createFakeDb({ ownerType: "seller" });
   await assert.rejects(() => getStripeConnectOnboardingStatus({ userId: "buyer", ownerType: "partner", db: sellerOnly.db as never }));
@@ -174,24 +213,63 @@ test("an active partner can start onboarding without a seller or buyer company",
     ownerType: "partner",
     db: db as never,
     stripe: stripe as never,
-  }));
+  }), "US");
   assert.equal(rows.length, 1);
   assert.equal(rows[0]?.partnerProfileId, "partner-profile");
   assert.equal(rows[0]?.companyId, undefined);
 });
 
-test("account status mapping requires submitted details and active transfer capability", () => {
-  assert.equal(mapStripeConnectedAccount(fakeAccount("acct_pending") as never).status, "PENDING");
-  const restricted = mapStripeConnectedAccount(fakeAccount("acct_restricted", {
-    details_submitted: true, payouts_enabled: true, capabilities: { transfers: "inactive" }, requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: null },
+test("Stripe-shaped account states classify temporary restrictions without blocking onboarding", () => {
+  const requirements = (overrides: Record<string, unknown> = {}) => ({
+    currently_due: [], past_due: [], pending_verification: [], disabled_reason: null, ...overrides,
+  });
+  const pending = mapStripeConnectedAccount(fakeAccount("acct_pending", {
+    requirements: requirements({ disabled_reason: "requirements.past_due", past_due: ["external_account"] }),
   }) as never);
-  assert.equal(restricted.status, "RESTRICTED");
+  assert.equal(pending.status, "PENDING");
+  assert.equal(canContinueStripeConnectOnboarding(pending), true);
+
+  const submittedOutstanding = mapStripeConnectedAccount(fakeAccount("acct_outstanding", {
+    details_submitted: true, requirements: requirements({ currently_due: ["business_profile.url"] }),
+  }) as never);
+  assert.equal(submittedOutstanding.status, "RESTRICTED");
+  assert.equal(canContinueStripeConnectOnboarding(submittedOutstanding), true);
+
+  const pendingVerification = mapStripeConnectedAccount(fakeAccount("acct_verification", {
+    details_submitted: true, requirements: requirements({ pending_verification: ["individual.verification.document"] }),
+  }) as never);
+  assert.equal(pendingVerification.status, "RESTRICTED");
+
+  const inactiveTransfers = mapStripeConnectedAccount(fakeAccount("acct_transfer", {
+    details_submitted: true, payouts_enabled: true, requirements: requirements(),
+  }) as never);
+  assert.equal(inactiveTransfers.status, "RESTRICTED");
+
+  const payoutsUnavailable = mapStripeConnectedAccount(fakeAccount("acct_payout", {
+    details_submitted: true, capabilities: { transfers: "active" }, requirements: requirements(),
+  }) as never);
+  assert.equal(payoutsUnavailable.status, "RESTRICTED");
+
+  const permanentlyRejected = mapStripeConnectedAccount(fakeAccount("acct_rejected", {
+    details_submitted: true, requirements: requirements({ disabled_reason: "rejected.fraud" }),
+  }) as never);
+  assert.equal(permanentlyRejected.status, "DISABLED");
+  assert.equal(canContinueStripeConnectOnboarding(permanentlyRejected), false);
+
+  const unknownDisabledReason = mapStripeConnectedAccount(fakeAccount("acct_unknown", {
+    details_submitted: true, requirements: requirements({ disabled_reason: "platform_new_reason" }),
+  }) as never);
+  assert.equal(unknownDisabledReason.status, "RESTRICTED");
+  assert.equal(classifyStripeConnectDisabledReason("requirements.past_due"), "temporary");
+  assert.equal(classifyStripeConnectDisabledReason("rejected.fraud"), "terminal");
+  assert.equal(classifyStripeConnectDisabledReason("platform_new_reason"), "unknown");
+
   const enabled = mapStripeConnectedAccount(fakeAccount("acct_enabled", {
-    details_submitted: true, payouts_enabled: true, capabilities: { transfers: "active" }, requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: null },
+    details_submitted: true, payouts_enabled: true, capabilities: { transfers: "active" }, requirements: requirements(),
   }) as never);
   assert.equal(enabled.status, "ENABLED");
   assert.equal(enabled.onboardingComplete, true);
-  assert.equal(mapStripeConnectedAccount(fakeAccount("acct_disabled", { requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: "rejected.fraud" } }) as never).status, "DISABLED");
+  assert.equal(canContinueStripeConnectOnboarding(enabled), false);
 });
 
 test("Connect account.updated webhooks ignore unknown accounts and idempotently update known accounts", async () => {

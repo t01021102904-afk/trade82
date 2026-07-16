@@ -43,8 +43,8 @@ export class StripeConnectOnboardingError extends Error {
   }
 }
 
-// These are the countries Trade82 currently permits for its Stripe-hosted
-// Connect flow. Keep eligibility in one place so routes cannot drift.
+// This is only a secondary Stripe availability check. It is not Trade82's
+// platform approval for a future transfer corridor.
 const stripeConnectOnboardingCountries = new Set([
   "AL", "AM", "AU", "AT", "BS", "BH", "BE", "BJ", "BO", "BA", "BW", "BN",
   "BG", "KH", "CA", "CL", "CO", "CR", "CI", "CY", "CZ", "DK", "DO", "EC",
@@ -97,8 +97,57 @@ export function assertStripeConnectCountry(country: string | null | undefined) {
   return normalized;
 }
 
+export function getApprovedStripeConnectAccountCountries(
+  value = process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES,
+) {
+  const raw = value?.trim();
+  if (!raw) return new Set<string>();
+
+  const countries = new Set<string>();
+  for (const entry of raw.split(",")) {
+    const country = entry.trim().toUpperCase();
+    if (!/^[A-Z]{2}$/.test(country) || !stripeConnectOnboardingCountries.has(country)) {
+      throw new StripeConnectOnboardingError(
+        "Stripe Connect approved-country configuration is invalid.",
+        503,
+      );
+    }
+    countries.add(country);
+  }
+  return countries;
+}
+
+export function assertStripeConnectApprovedCountry(country: string) {
+  const approvedCountries = getApprovedStripeConnectAccountCountries();
+  if (!approvedCountries.has(country)) {
+    throw new StripeConnectOnboardingError(
+      "Stripe payout onboarding is not approved for this country.",
+      403,
+    );
+  }
+  return country;
+}
+
 export function stripeConnectOwnerIdempotencyKey(owner: OnboardingOwner) {
   return `trade82-connect-onboarding:${owner.type}:${owner.id}`;
+}
+
+const terminalDisabledReasonPrefixes = ["rejected.", "listed."];
+const terminalDisabledReasons = new Set(["rejected", "listed", "platform_paused"]);
+const temporaryDisabledReasonPrefixes = ["requirements."];
+
+export function classifyStripeConnectDisabledReason(disabledReason: string | null | undefined) {
+  if (!disabledReason) return "none" as const;
+  if (
+    terminalDisabledReasons.has(disabledReason) ||
+    terminalDisabledReasonPrefixes.some((prefix) => disabledReason.startsWith(prefix))
+  ) {
+    return "terminal" as const;
+  }
+  if (temporaryDisabledReasonPrefixes.some((prefix) => disabledReason.startsWith(prefix))) {
+    return "temporary" as const;
+  }
+  return "unknown" as const;
 }
 
 export function mapStripeConnectedAccount(account: Pick<
@@ -108,19 +157,20 @@ export function mapStripeConnectedAccount(account: Pick<
   | "details_submitted"
   | "capabilities"
   | "requirements"
->) : StripeConnectedAccountState {
+>): StripeConnectedAccountState {
   const requirements = account.requirements;
   const hasOpenRequirements = Boolean(
     requirements?.currently_due?.length ||
       requirements?.past_due?.length ||
       requirements?.pending_verification?.length,
   );
-  const disabled = Boolean(requirements?.disabled_reason);
+  const disabledReason = requirements?.disabled_reason;
+  const disabledReasonKind = classifyStripeConnectDisabledReason(disabledReason);
   const detailsSubmitted = Boolean(account.details_submitted);
   const payoutsEnabled = Boolean(account.payouts_enabled);
   const transfersEnabled = account.capabilities?.transfers === "active";
   const onboardingComplete =
-    !disabled &&
+    !disabledReason &&
     !hasOpenRequirements &&
     detailsSubmitted &&
     payoutsEnabled &&
@@ -132,14 +182,23 @@ export function mapStripeConnectedAccount(account: Pick<
     transfersEnabled,
     detailsSubmitted,
     onboardingComplete,
-    status: disabled
-      ? "DISABLED"
-      : !detailsSubmitted
-        ? "PENDING"
-        : onboardingComplete
-          ? "ENABLED"
-          : "RESTRICTED",
+    status:
+      disabledReasonKind === "terminal"
+        ? "DISABLED"
+        : disabledReasonKind === "unknown"
+          ? "RESTRICTED"
+          : !detailsSubmitted
+            ? "PENDING"
+            : onboardingComplete
+              ? "ENABLED"
+              : "RESTRICTED",
   };
+}
+
+export function canContinueStripeConnectOnboarding(
+  account: Pick<StripeConnectedAccountState, "status" | "onboardingComplete"> | null,
+) {
+  return !account?.onboardingComplete && account?.status !== "DISABLED";
 }
 
 function safeState(account: StripeConnectedAccount | null): SafeStripeConnectedAccount {
@@ -366,8 +425,9 @@ export async function startStripeConnectOnboarding({
   stripe?: StripeConnectClient;
 }) {
   assertOnboardingEnabled();
-  const stripeClient = stripe ?? getStripe();
   const owner = await resolveOwner({ db, userId, ownerType });
+  assertStripeConnectApprovedCountry(owner.country);
+  const stripeClient = stripe ?? getStripe();
   const connectedAccount = await createOrReuseConnectedAccount({ db, stripe: stripeClient, owner });
   const link = await createOnboardingLink(stripeClient, owner.type, connectedAccount.stripeAccountId);
 

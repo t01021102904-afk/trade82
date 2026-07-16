@@ -52,7 +52,9 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
   ]);
 
   const previous = process.env.STRIPE_CONNECT_ONBOARDING_MODE;
+  const previousApprovedCountries = process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
   process.env.STRIPE_CONNECT_ONBOARDING_MODE = "on";
+  process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = "KR";
   const idempotencyKeys: string[] = [];
   const stripe = {
     accounts: {
@@ -91,5 +93,7 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
   } finally {
     if (previous === undefined) delete process.env.STRIPE_CONNECT_ONBOARDING_MODE;
     else process.env.STRIPE_CONNECT_ONBOARDING_MODE = previous;
+    if (previousApprovedCountries === undefined) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
+    else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = previousApprovedCountries;
   }
 });
