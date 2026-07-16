@@ -14,6 +14,7 @@ import {
 import { getDb } from "@/lib/db";
 import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
 import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
+import { selectLockedReferralAttribution } from "@/lib/stripe-connect-settlement-referral";
 import {
   calculateSettlementHoldUntil,
   settlementIdempotencyKey,
@@ -82,6 +83,58 @@ type PendingSettlementInput = {
   paidAt?: Date;
 };
 
+export type VerifiedSettlementPaymentEvidence = {
+  paymentRequestId: string | null | undefined;
+  paymentIntentId: string | null;
+  checkoutSessionId: string | null;
+  grossAmount: number | null;
+  currency: string | null;
+  confirmationSource: "checkout_session" | "payment_intent";
+};
+
+async function selectLockedReferralAttributionForPaymentRequest(
+  tx: Tx,
+  paymentRequestId: string,
+  paidAt: Date,
+) {
+  const paymentRequest = await tx.paymentRequest.findUnique({
+    where: { id: paymentRequestId },
+    select: {
+      buyerCompany: { select: { ownerUserId: true } },
+      sellerCompany: { select: { ownerUserId: true } },
+    },
+  });
+  if (!paymentRequest) return null;
+
+  const candidates = await tx.referralAttribution.findMany({
+    where: {
+      status: ReferralAttributionStatus.LOCKED,
+      referredUserId: {
+        in: [
+          paymentRequest.buyerCompany.ownerUserId,
+          paymentRequest.sellerCompany.ownerUserId,
+        ],
+      },
+      lockedAt: { lte: paidAt },
+    },
+    select: { id: true, referredUserId: true, lockedAt: true },
+  });
+
+  return selectLockedReferralAttribution(
+    candidates.flatMap((attribution) => {
+      const subjects = [
+        ...(attribution.referredUserId === paymentRequest.buyerCompany.ownerUserId
+          ? [ReferralSubjectType.BUYER]
+          : []),
+        ...(attribution.referredUserId === paymentRequest.sellerCompany.ownerUserId
+          ? [ReferralSubjectType.SELLER]
+          : []),
+      ];
+      return subjects.map((subjectType) => ({ ...attribution, subjectType }));
+    }),
+  );
+}
+
 // This service creates accounting records only. It deliberately has no Stripe
 // client dependency and never creates Transfers, TransfersReversals, or payouts.
 export async function createPendingSettlementForVerifiedPayment(
@@ -114,10 +167,13 @@ export async function createPendingSettlementForVerifiedPayment(
   if (paymentRequest.status !== PaymentRequestStatus.PAID) {
     throw new Error("A settlement can only be created for a Stripe-confirmed paid payment request.");
   }
-  const paymentConfirmedAt = paidAt ?? paymentRequest.paidAt;
-  if (!paymentConfirmedAt) {
+  if (!paymentRequest.paidAt) {
     throw new Error("A paid payment request must include its verified payment timestamp.");
   }
+  if (paidAt && paidAt.getTime() !== paymentRequest.paidAt.getTime()) {
+    throw new Error("Settlement hold time must use the verified payment timestamp.");
+  }
+  const paymentConfirmedAt = paymentRequest.paidAt;
   if (!paymentRequest.tradeOrderByPaymentRequest) {
     throw new Error("A trade order is required before creating a settlement ledger.");
   }
@@ -137,6 +193,9 @@ export async function createPendingSettlementForVerifiedPayment(
     const refersSeller = attribution.referredUserId === paymentRequest.sellerCompany.ownerUserId;
     if (refersBuyer === refersSeller) {
       throw new Error("The selected referral attribution must belong to exactly one transaction party.");
+    }
+    if (attribution.lockedAt.getTime() > paymentConfirmedAt.getTime()) {
+      throw new Error("The selected referral attribution must have been locked by the verified payment time.");
     }
     referralSubjectType = refersBuyer ? ReferralSubjectType.BUYER : ReferralSubjectType.SELLER;
   }
@@ -235,13 +294,62 @@ export async function createPendingSettlementForVerifiedPayment(
   }
 }
 
-// A later webhook integration can call this wrapper only after its existing
-// verified payment path succeeds. With the default mode off it is a no-op, so
-// normal checkout, manual payouts, refunds, and disputes remain unchanged.
-export async function maybeCreatePendingSettlementForVerifiedPayment(input: PendingSettlementInput) {
+// This wrapper is called only after the existing Stripe verification path has
+// succeeded. It independently binds the current Stripe webhook evidence to the
+// persisted verified payment before it can create or backfill a settlement.
+// With the default mode off it returns before opening a database transaction.
+export async function createPendingSettlementForVerifiedWebhookPayment(
+  evidence: VerifiedSettlementPaymentEvidence,
+) {
   if (!isStripeConnectSettlementLedgerEnabled()) return null;
+
+  const paymentRequestId = evidence.paymentRequestId;
+  if (!paymentRequestId || !evidence.paymentIntentId) return null;
+
   return getDb().$transaction(
-    (tx) => createPendingSettlementForVerifiedPayment(tx, input),
+    async (tx) => {
+      const paymentRequest = await tx.paymentRequest.findUnique({
+        where: { id: paymentRequestId },
+        select: {
+          id: true,
+          status: true,
+          paidAt: true,
+          grossAmount: true,
+          currency: true,
+          stripePaymentIntentId: true,
+          stripeCheckoutSessionId: true,
+          requiresManualReconciliation: true,
+          tradeOrderByPaymentRequest: { select: { id: true } },
+        },
+      });
+      if (
+        !paymentRequest
+        || paymentRequest.id !== paymentRequestId
+        || paymentRequest.status !== PaymentRequestStatus.PAID
+        || !paymentRequest.paidAt
+        || paymentRequest.requiresManualReconciliation
+        || !paymentRequest.tradeOrderByPaymentRequest
+        || paymentRequest.stripePaymentIntentId !== evidence.paymentIntentId
+        || evidence.grossAmount !== paymentRequest.grossAmount
+        || evidence.currency !== "usd"
+        || paymentRequest.currency !== "usd"
+        || (evidence.confirmationSource === "checkout_session"
+          && paymentRequest.stripeCheckoutSessionId !== evidence.checkoutSessionId)
+      ) {
+        return null;
+      }
+
+      const attribution = await selectLockedReferralAttributionForPaymentRequest(
+        tx,
+        paymentRequestId,
+        paymentRequest.paidAt,
+      );
+      return createPendingSettlementForVerifiedPayment(tx, {
+        paymentRequestId,
+        referralAttributionId: attribution?.id,
+        paidAt: paymentRequest.paidAt,
+      });
+    },
     { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
   );
 }

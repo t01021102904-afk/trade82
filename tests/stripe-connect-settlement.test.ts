@@ -9,6 +9,10 @@ import {
 } from "../src/lib/stripe-connect-settlement-financials.ts";
 import { getStripeConnectSettlementMode } from "../src/lib/stripe-connect-settlement-feature.ts";
 import {
+  selectLockedReferralAttribution,
+} from "../src/lib/stripe-connect-settlement-referral.ts";
+import { ReferralSubjectType } from "../src/generated/prisma/client.ts";
+import {
   calculateSettlementHoldUntil,
   settlementIdempotencyKey,
   settlementLegIdempotencyKey,
@@ -82,7 +86,30 @@ test("settlement idempotency keys are deterministic per payment request and leg"
 test("missing and invalid settlement modes fail closed", () => {
   assert.equal(getStripeConnectSettlementMode({}), "off");
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "unexpected" }), "off");
+  assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "ON" }), "off");
+  assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: " on " }), "off");
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "on" }), "on");
+});
+
+test("settlement referral selection uses the earliest lock then a stable attribution ID", () => {
+  const buyer = {
+    id: "attribution-buyer",
+    referredUserId: "buyer-user",
+    lockedAt: new Date("2026-07-16T10:00:00.000Z"),
+    subjectType: ReferralSubjectType.BUYER,
+  };
+  const seller = {
+    id: "attribution-seller",
+    referredUserId: "seller-user",
+    lockedAt: new Date("2026-07-16T09:00:00.000Z"),
+    subjectType: ReferralSubjectType.SELLER,
+  };
+  assert.deepEqual(selectLockedReferralAttribution([buyer, seller]), seller);
+
+  const laterId = { ...buyer, id: "z-attribution", lockedAt: seller.lockedAt };
+  const earlierId = { ...seller, id: "a-attribution" };
+  assert.deepEqual(selectLockedReferralAttribution([laterId, earlierId]), earlierId);
+  assert.equal(selectLockedReferralAttribution([]), null);
 });
 
 test("the additive migration creates a restricted ledger without Stripe transfer operations", async () => {
@@ -136,7 +163,7 @@ test("the settlement reversal hardening migration fixes the trigger search path 
   assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
 });
 
-test("settlement creation snapshots only an explicitly selected referral attribution", async () => {
+test("settlement creation snapshots a validated referral attribution", async () => {
   const service = await readFile(
     new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url),
     "utf8",
@@ -152,4 +179,16 @@ test("settlement creation snapshots only an explicitly selected referral attribu
   assert.match(service, /referralSubjectType = refersBuyer \? ReferralSubjectType\.BUYER : ReferralSubjectType\.SELLER/);
   assert.match(service, /referredUserIdSnapshot: attribution!\.referredUserId/);
   assert.doesNotMatch(service, /referredCompanyId/);
+});
+
+test("settlement ledger code has no Stripe money-movement API dependency", async () => {
+  const [webhookRoute, settlementService, settlementBridge] = await Promise.all([
+    readFile(new URL("../src/app/api/stripe/webhook/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url), "utf8"),
+  ]);
+
+  for (const source of [webhookRoute, settlementService, settlementBridge]) {
+    assert.doesNotMatch(source, /\.transfers\.(create|createReversal)|\.accounts\.create|accountLinks\.create/);
+  }
 });

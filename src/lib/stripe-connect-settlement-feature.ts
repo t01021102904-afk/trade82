@@ -18,7 +18,7 @@ function runtimeEnvironment(): SettlementEnvironment {
 export function getStripeConnectSettlementMode(
   env: SettlementEnvironment = runtimeEnvironment(),
 ): StripeConnectSettlementMode {
-  return env.STRIPE_CONNECT_SETTLEMENT_MODE?.trim().toLowerCase() === "on"
+  return env.STRIPE_CONNECT_SETTLEMENT_MODE === "on"
     ? "on"
     : "off";
 }
