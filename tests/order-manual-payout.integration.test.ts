@@ -223,6 +223,23 @@ async function createReadyPayout(prefix = "ready-payout") {
   return { fixture, order, payout };
 }
 
+async function withStripeConnectSettlementMode<T>(
+  mode: "off" | "on",
+  run: () => Promise<T>,
+) {
+  const previous = process.env.STRIPE_CONNECT_SETTLEMENT_MODE;
+  process.env.STRIPE_CONNECT_SETTLEMENT_MODE = mode;
+  try {
+    return await run();
+  } finally {
+    if (previous === undefined) {
+      delete process.env.STRIPE_CONNECT_SETTLEMENT_MODE;
+    } else {
+      process.env.STRIPE_CONNECT_SETTLEMENT_MODE = previous;
+    }
+  }
+}
+
 test("settlement reversal trigger uses an explicit search path and its composite foreign key index", async () => {
   const functionResult = await directPool.query<{ proconfig: string[] | null }>(
     `SELECT p.proconfig
@@ -325,6 +342,188 @@ test("verified payments create one fourteen-day pending settlement ledger with f
   assert.equal(
     first.settlement.holdUntil.getTime() - paymentRequest.paidAt!.getTime(),
     14 * 24 * 60 * 60 * 1_000,
+  );
+});
+
+test("verified-payment settlement ledger is off by default, backfills safely, and remains idempotent", async () => {
+  const pendingFixture = await createFixture("settlement-webhook-pending");
+  const pendingOrder = await createOrder(pendingFixture);
+  const pendingSettlement = await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({
+      paymentRequestId: pendingOrder.paymentRequestId,
+    }),
+  );
+  assert.equal(pendingSettlement, null);
+  assert.equal(
+    await db.settlement.count({ where: { paymentRequestId: pendingOrder.paymentRequestId } }),
+    0,
+  );
+
+  const fixture = await createFixture("settlement-webhook-backfill");
+  const order = await createOrder(fixture);
+  const payment = await markOrderPaid(order.id);
+
+  const featureOff = await withStripeConnectSettlementMode("off", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: payment.id }),
+  );
+  assert.equal(featureOff, null);
+  assert.equal(await db.settlement.count({ where: { paymentRequestId: payment.id } }), 0);
+
+  const checkoutDelivery = await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: payment.id }),
+  ) as { created: boolean; settlement: { id: string; legs: Array<{ type: string; status: string; amount: number; holdUntil: Date }> } };
+  const paymentIntentDelivery = await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: payment.id }),
+  ) as { created: boolean; settlement: { id: string } };
+
+  assert.equal(checkoutDelivery.created, true);
+  assert.equal(paymentIntentDelivery.created, false);
+  assert.equal(paymentIntentDelivery.settlement.id, checkoutDelivery.settlement.id);
+  assert.equal(await db.settlement.count({ where: { paymentRequestId: payment.id } }), 1);
+  assert.deepEqual(
+    checkoutDelivery.settlement.legs.map((leg) => [leg.type, leg.amount, leg.status]).sort(),
+    [
+      ["PLATFORM_FEE", 550, "HOLD"],
+      ["SELLER_PAYABLE", 10_450, "HOLD"],
+    ],
+  );
+  for (const leg of checkoutDelivery.settlement.legs) {
+    assert.equal(
+      leg.holdUntil.getTime() - payment.paidAt!.getTime(),
+      14 * 24 * 60 * 60 * 1_000,
+    );
+  }
+});
+
+test("verified-payment settlement ledger snapshots the selected buyer or seller referral once", async () => {
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `user_test_order_partner_${unique("settlement-webhook-referral")}`,
+      email: `${unique("partner")}@example.test`,
+      displayName: "Webhook Settlement Partner",
+      country: "US",
+      role: "buyer",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: { userId: partnerUser.id, referralCode: unique("settlement-webhook-partner") },
+  });
+
+  const buyerFixture = await createFixture("settlement-webhook-buyer");
+  const buyerOrder = await createOrder(buyerFixture);
+  const buyerPayment = await markOrderPaid(buyerOrder.id);
+  const buyerAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: buyerFixture.buyer.id,
+    partnerProfileId: partner.id,
+  }))) as { attribution: { id: string } };
+  const buyerSettlement = (await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: buyerPayment.id }),
+  )) as {
+    settlement: {
+      referralAttributionId: string | null;
+      referralSubjectType: "BUYER" | "SELLER" | null;
+      referredUserIdSnapshot: string | null;
+      partnerReferralAmount: number;
+      trade82RetainedAmountBeforeStripeFees: number;
+      legs: Array<{ type: string; amount: number; status: string }>;
+    };
+  };
+  assert.equal(buyerSettlement.settlement.referralAttributionId, buyerAttribution.attribution.id);
+  assert.equal(buyerSettlement.settlement.referralSubjectType, "BUYER");
+  assert.equal(buyerSettlement.settlement.referredUserIdSnapshot, buyerFixture.buyer.id);
+  assert.equal(buyerSettlement.settlement.partnerReferralAmount, 55);
+  assert.equal(buyerSettlement.settlement.trade82RetainedAmountBeforeStripeFees, 495);
+  assert.deepEqual(
+    buyerSettlement.settlement.legs.map((leg) => [leg.type, leg.amount, leg.status]).sort(),
+    [
+      ["PARTNER_REFERRAL", 55, "HOLD"],
+      ["PLATFORM_FEE", 495, "HOLD"],
+      ["SELLER_PAYABLE", 10_450, "HOLD"],
+    ],
+  );
+
+  const sellerFixture = await createFixture("settlement-webhook-seller");
+  const sellerOrder = await createOrder(sellerFixture);
+  const sellerPayment = await markOrderPaid(sellerOrder.id);
+  const sellerAttribution = (await db.$transaction((tx) =>
+    settlements.lockReferralAttribution(tx, {
+      referredUserId: sellerFixture.seller.id,
+      partnerProfileId: partner.id,
+    }),
+  )) as { attribution: { id: string } };
+  const sellerSettlement = (await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({
+      paymentRequestId: sellerPayment.id,
+    }),
+  )) as {
+    settlement: {
+      referralAttributionId: string | null;
+      referralSubjectType: "BUYER" | "SELLER" | null;
+      referredUserIdSnapshot: string | null;
+      legs: Array<{ type: string; amount: number; status: string }>;
+    };
+  };
+  assert.equal(sellerSettlement.settlement.referralAttributionId, sellerAttribution.attribution.id);
+  assert.equal(sellerSettlement.settlement.referralSubjectType, "SELLER");
+  assert.equal(sellerSettlement.settlement.referredUserIdSnapshot, sellerFixture.seller.id);
+  assert.deepEqual(
+    sellerSettlement.settlement.legs.map((leg) => [leg.type, leg.amount, leg.status]).sort(),
+    [
+      ["PARTNER_REFERRAL", 55, "HOLD"],
+      ["PLATFORM_FEE", 495, "HOLD"],
+      ["SELLER_PAYABLE", 10_450, "HOLD"],
+    ],
+  );
+
+  const bothFixture = await createFixture("settlement-webhook-both");
+  const bothOrder = await createOrder(bothFixture);
+  const bothPayment = await markOrderPaid(bothOrder.id);
+  const [buyerLocked, sellerLocked] = await Promise.all([
+    db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+      referredUserId: bothFixture.buyer.id,
+      partnerProfileId: partner.id,
+    })),
+    db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+      referredUserId: bothFixture.seller.id,
+      partnerProfileId: partner.id,
+    })),
+  ]) as Array<{ attribution: { id: string } }>;
+  const earlierSellerLock = new Date("2026-07-14T12:00:00.000Z");
+  const laterBuyerLock = new Date("2026-07-15T12:00:00.000Z");
+  await Promise.all([
+    db.referralAttribution.update({ where: { id: buyerLocked.attribution.id }, data: { lockedAt: laterBuyerLock } }),
+    db.referralAttribution.update({ where: { id: sellerLocked.attribution.id }, data: { lockedAt: earlierSellerLock } }),
+  ]);
+  const bothSettlement = (await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: bothPayment.id }),
+  )) as { settlement: { referralAttributionId: string | null; referralSubjectType: "BUYER" | "SELLER" | null } };
+  assert.equal(bothSettlement.settlement.referralAttributionId, sellerLocked.attribution.id);
+  assert.equal(bothSettlement.settlement.referralSubjectType, "SELLER");
+
+  const tieFixture = await createFixture("settlement-webhook-tie");
+  const tieOrder = await createOrder(tieFixture);
+  const tiePayment = await markOrderPaid(tieOrder.id);
+  const [tieBuyerLocked, tieSellerLocked] = await Promise.all([
+    db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+      referredUserId: tieFixture.buyer.id,
+      partnerProfileId: partner.id,
+    })),
+    db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+      referredUserId: tieFixture.seller.id,
+      partnerProfileId: partner.id,
+    })),
+  ]) as Array<{ attribution: { id: string } }>;
+  const tiedLock = new Date("2026-07-16T12:00:00.000Z");
+  await db.referralAttribution.updateMany({
+    where: { id: { in: [tieBuyerLocked.attribution.id, tieSellerLocked.attribution.id] } },
+    data: { lockedAt: tiedLock },
+  });
+  const tieSettlement = (await withStripeConnectSettlementMode("on", () =>
+    settlements.maybeCreatePendingSettlementForVerifiedPayment({ paymentRequestId: tiePayment.id }),
+  )) as { settlement: { referralAttributionId: string | null } };
+  assert.equal(
+    tieSettlement.settlement.referralAttributionId,
+    [tieBuyerLocked.attribution.id, tieSellerLocked.attribution.id].sort()[0],
   );
 });
 

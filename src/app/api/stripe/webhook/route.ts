@@ -13,6 +13,7 @@ import {
   syncPaymentRequestDispute,
   syncPaymentRequestRefund,
 } from "@/lib/payment-requests";
+import { createSettlementLedgerAfterVerifiedPayment } from "@/lib/stripe-connect-settlement-webhook";
 import {
   SELLER_SUPPORT_PRODUCT_TYPE,
   isActiveSellerSupportSubscription,
@@ -203,6 +204,30 @@ async function activateMarketingExposureFromSession(
   return true;
 }
 
+async function recordSettlementLedgerAfterVerifiedPayment({
+  paymentRequestId,
+  stripeEventId,
+  stripeEventType,
+}: {
+  paymentRequestId: string | null | undefined;
+  stripeEventId: string;
+  stripeEventType: string;
+}) {
+  if (!paymentRequestId) return;
+
+  try {
+    await createSettlementLedgerAfterVerifiedPayment(paymentRequestId);
+  } catch (error) {
+    console.error("Stripe Connect settlement ledger recording failed.", {
+      paymentRequestId,
+      stripeEventId,
+      stripeEventType,
+      errorName: error instanceof Error ? error.name : "UnknownError",
+    });
+    throw error;
+  }
+}
+
 export async function POST(request: Request) {
   const stripe = getStripe();
   const signature = request.headers.get("stripe-signature");
@@ -240,6 +265,11 @@ export async function POST(request: Request) {
             stripeEventType: event.type,
           })
         ) {
+          await recordSettlementLedgerAfterVerifiedPayment({
+            paymentRequestId: session.metadata?.paymentRequestId,
+            stripeEventId: event.id,
+            stripeEventType: event.type,
+          });
           break;
         }
         await updateFromSubscriptionId(idOf(session.subscription));
@@ -247,17 +277,32 @@ export async function POST(request: Request) {
       }
       case "checkout.session.async_payment_succeeded": {
         const session = event.data.object as Stripe.Checkout.Session;
-        await markPaymentRequestPaidFromCheckoutSession(session, {
+        const paymentVerified = await markPaymentRequestPaidFromCheckoutSession(session, {
           stripeEventId: event.id,
           stripeEventType: event.type,
         });
+        if (paymentVerified) {
+          await recordSettlementLedgerAfterVerifiedPayment({
+            paymentRequestId: session.metadata?.paymentRequestId,
+            stripeEventId: event.id,
+            stripeEventType: event.type,
+          });
+        }
         break;
       }
       case "payment_intent.succeeded": {
-        await markPaymentRequestPaidFromPaymentIntent(event.data.object as Stripe.PaymentIntent, {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const paymentVerified = await markPaymentRequestPaidFromPaymentIntent(paymentIntent, {
           stripeEventId: event.id,
           stripeEventType: event.type,
         });
+        if (paymentVerified) {
+          await recordSettlementLedgerAfterVerifiedPayment({
+            paymentRequestId: paymentIntent.metadata.paymentRequestId,
+            stripeEventId: event.id,
+            stripeEventType: event.type,
+          });
+        }
         break;
       }
       case "refund.created":
