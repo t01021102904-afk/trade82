@@ -20,6 +20,20 @@ type ReconciliationSource = {
   stripeSourceId: string;
   stripeEventId: string;
   stripeEventType: string;
+  stripeEventCreatedAt: Date;
+};
+
+type DisputeReconciliationSource = ReconciliationSource & {
+  disputeStatus: string;
+  disputeAmount: number;
+  disputeCurrency: string;
+};
+
+type EconomicLossSource = ReconciliationSource & {
+  reason: SettlementReversalReason;
+  disputeStatus?: string;
+  disputeAmount?: number;
+  disputeCurrency?: string;
 };
 
 function isInFlightOrTransferred(status: SettlementLegStatus) {
@@ -44,6 +58,25 @@ function disputeIsLoss(status: string) {
 
 function disputeRestoresEligibility(status: string) {
   return ["won", "prevented", "warning_closed"].includes(status);
+}
+
+function disputeAuditMetadata(source: DisputeReconciliationSource): Prisma.JsonObject {
+  return {
+    stripeDisputeId: source.stripeSourceId,
+    disputeStatus: source.disputeStatus,
+    stripeEventId: source.stripeEventId,
+    stripeEventType: source.stripeEventType,
+    stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
+    amount: source.disputeAmount,
+    currency: source.disputeCurrency.toLowerCase(),
+  };
+}
+
+function isDisputeEconomicLossSource(source: EconomicLossSource): source is EconomicLossSource & DisputeReconciliationSource {
+  return source.reason === SettlementReversalReason.DISPUTE
+    && typeof source.disputeStatus === "string"
+    && typeof source.disputeAmount === "number"
+    && typeof source.disputeCurrency === "string";
 }
 
 async function createSettlementEvent(
@@ -153,7 +186,7 @@ export function calculateCumulativeSettlementReversalTargets({
 
 async function reconcileEconomicLoss(
   tx: Tx,
-  source: ReconciliationSource & { reason: SettlementReversalReason },
+  source: EconomicLossSource,
 ) {
   const context = await loadReconciliationContext(tx, source.paymentRequestId);
   if (!context) return null;
@@ -205,9 +238,14 @@ async function reconcileEconomicLoss(
     metadata: {
       source: source.reason.toLowerCase(),
       stripeSourceId: source.stripeSourceId,
+      stripeEventId: source.stripeEventId,
       stripeEventType: source.stripeEventType,
+      stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
       refundAmount,
       currency: "usd",
+      ...(isDisputeEconomicLossSource(source)
+        ? disputeAuditMetadata(source)
+        : {}),
     },
     idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:started`,
   });
@@ -229,7 +267,9 @@ async function reconcileEconomicLoss(
           amount: delta,
           currency: "usd",
           reason: source.reason,
-          status: SettlementReversalStatus.PENDING,
+          status: transferredLegIds.has(leg.id)
+            ? SettlementReversalStatus.PENDING
+            : SettlementReversalStatus.ACCOUNTING_APPLIED,
           idempotencyKey,
           ...(source.reason === SettlementReversalReason.REFUND
             ? { stripeRefundId: source.stripeSourceId }
@@ -243,12 +283,21 @@ async function reconcileEconomicLoss(
         settlementId: settlement.id,
         settlementLegId: leg.id,
         eventType: SettlementEventType.REVERSAL_CREATED,
-        message: "A pending internal settlement reversal was recorded without a Stripe transfer reversal.",
+        message: transferredLegIds.has(leg.id)
+          ? "A pending internal settlement reversal was recorded for a transferred settlement leg."
+          : "An accounting-only settlement reversal was recorded before any transfer occurred.",
         metadata: {
           source: source.reason.toLowerCase(),
           stripeSourceId: source.stripeSourceId,
+          stripeEventId: source.stripeEventId,
+          stripeEventType: source.stripeEventType,
+          stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
           amount: delta,
           currency: "usd",
+          reversalStatus: transferredLegIds.has(leg.id) ? "PENDING" : "ACCOUNTING_APPLIED",
+          ...(isDisputeEconomicLossSource(source)
+            ? disputeAuditMetadata(source)
+            : {}),
         },
         idempotencyKey: `settlement:${settlement.id}:reversal:${source.reason}:${source.stripeSourceId}:leg:${leg.type}:event`,
       });
@@ -301,24 +350,51 @@ async function reconcileEconomicLoss(
       metadata: {
         source: source.reason.toLowerCase(),
         stripeSourceId: source.stripeSourceId,
+        stripeEventId: source.stripeEventId,
+        stripeEventType: source.stripeEventType,
+        stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
         refundAmount,
         grossAmount: paymentRequest.grossAmount,
         currency: "usd",
+        ...(isDisputeEconomicLossSource(source)
+          ? disputeAuditMetadata(source)
+          : {}),
       },
       idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:${fullLoss ? "full" : "partial"}`,
     });
   }
 
+  if (
+    source.reason === SettlementReversalReason.REFUND
+    && fullLoss
+    && !hasTransferredReversal
+  ) {
+    await createSettlementEvent(tx, {
+      settlementId: settlement.id,
+      eventType: SettlementEventType.CANCELLED,
+      message: "A full refund cancelled the unreleased settlement ledger.",
+      metadata: {
+        source: "refund",
+        stripeRefundId: source.stripeSourceId,
+        stripeEventId: source.stripeEventId,
+        stripeEventType: source.stripeEventType,
+        stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
+        amount: refundAmount,
+        currency: "usd",
+      },
+      idempotencyKey: `settlement:${settlement.id}:cancelled:refund:${source.stripeSourceId}`,
+    });
+  }
+
   if (source.reason === SettlementReversalReason.DISPUTE) {
+    if (!isDisputeEconomicLossSource(source)) {
+      throw new Error("Dispute settlement reconciliation requires dispute audit evidence.");
+    }
     await createSettlementEvent(tx, {
       settlementId: settlement.id,
       eventType: SettlementEventType.DISPUTE_LOST,
       message: "A lost dispute reduced future settlement availability without moving money.",
-      metadata: {
-        stripeDisputeId: source.stripeSourceId,
-        refundAmount,
-        currency: "usd",
-      },
+      metadata: { ...disputeAuditMetadata(source), refundAmount },
       idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:lost`,
     });
   }
@@ -331,7 +407,13 @@ async function reconcileEconomicLoss(
       metadata: {
         source: source.reason.toLowerCase(),
         stripeSourceId: source.stripeSourceId,
+        stripeEventId: source.stripeEventId,
+        stripeEventType: source.stripeEventType,
+        stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
         currency: "usd",
+        ...(isDisputeEconomicLossSource(source)
+          ? disputeAuditMetadata(source)
+          : {}),
       },
       idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:post-transfer`,
     });
@@ -340,7 +422,7 @@ async function reconcileEconomicLoss(
   return { settlementId: settlement.id, fullLoss, hasTransferredReversal };
 }
 
-async function blockSettlementForOpenDispute(tx: Tx, source: ReconciliationSource) {
+async function blockSettlementForOpenDispute(tx: Tx, source: DisputeReconciliationSource) {
   const context = await loadReconciliationContext(tx, source.paymentRequestId);
   if (!context) return null;
   const { settlement } = context;
@@ -369,39 +451,49 @@ async function blockSettlementForOpenDispute(tx: Tx, source: ReconciliationSourc
       ? SettlementEventType.DISPUTE_OPENED
       : SettlementEventType.DISPUTE_UPDATED,
     message: "An open dispute blocks future settlement release eligibility.",
-    metadata: { stripeDisputeId: source.stripeSourceId, stripeEventType: source.stripeEventType },
-    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:${source.stripeEventType}`,
+    metadata: disputeAuditMetadata(source),
+    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:${source.stripeEventType === "charge.dispute.created" ? "opened" : "updated"}:status:${source.disputeStatus}`,
   });
   return { settlementId: settlement.id };
 }
 
-async function restoreSettlementAfterWonDispute(tx: Tx, source: ReconciliationSource) {
+async function restoreSettlementAfterWonDispute(tx: Tx, source: DisputeReconciliationSource) {
   const context = await loadReconciliationContext(tx, source.paymentRequestId);
   if (!context) return null;
   const { settlement } = context;
+  const anotherOpenDispute = await tx.paymentDispute.findFirst({
+    where: {
+      paymentRequestId: source.paymentRequestId,
+      stripeDisputeId: { not: source.stripeSourceId },
+      status: { notIn: ["won", "lost", "prevented", "warning_closed", "charge_refunded"] },
+    },
+    select: { id: true },
+  });
+
   if (
-    settlement.status === SettlementStatus.CANCELLED
-    || settlement.status === SettlementStatus.REVERSAL_PENDING
-    || settlement.status === SettlementStatus.TRANSFERRED
+    settlement.status !== SettlementStatus.CANCELLED
+    && settlement.status !== SettlementStatus.REVERSAL_PENDING
+    && settlement.status !== SettlementStatus.TRANSFERRED
   ) {
-    return { settlementId: settlement.id };
+    await tx.settlement.update({
+      where: { id: settlement.id },
+      data: { status: SettlementStatus.HOLD },
+    });
   }
-  const status = settlement.holdUntil.getTime() > Date.now()
-    ? SettlementStatus.HOLD
-    : SettlementStatus.READY;
-  const legStatus = status === SettlementStatus.HOLD ? SettlementLegStatus.HOLD : SettlementLegStatus.READY;
-  await tx.settlement.update({ where: { id: settlement.id }, data: { status } });
   for (const leg of settlement.legs) {
     if (!isInFlightOrTransferred(leg.status) && leg.status !== SettlementLegStatus.CANCELLED) {
-      await tx.settlementLeg.update({ where: { id: leg.id }, data: { status: legStatus } });
+      await tx.settlementLeg.update({
+        where: { id: leg.id },
+        data: { status: SettlementLegStatus.HOLD },
+      });
     }
   }
   await createSettlementEvent(tx, {
     settlementId: settlement.id,
     eventType: SettlementEventType.DISPUTE_WON,
-    message: "A favorable dispute outcome restored future settlement eligibility without releasing funds.",
-    metadata: { stripeDisputeId: source.stripeSourceId, stripeEventType: source.stripeEventType },
-    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:won`,
+    message: "A favorable dispute outcome retained settlement funds on hold without releasing funds.",
+    metadata: { ...disputeAuditMetadata(source), anotherOpenDispute: Boolean(anotherOpenDispute) },
+    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:won:status:${source.disputeStatus}`,
   });
   return { settlementId: settlement.id };
 }
@@ -423,7 +515,7 @@ export async function reconcileSettlementAfterVerifiedRefund(
 
 export async function reconcileSettlementAfterVerifiedDispute(
   tx: Tx,
-  source: ReconciliationSource,
+  source: DisputeReconciliationSource,
 ) {
   if (!isStripeConnectSettlementLedgerEnabled()) return null;
   const dispute = await tx.paymentDispute.findUnique({ where: { stripeDisputeId: source.stripeSourceId } });

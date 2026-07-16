@@ -4128,6 +4128,8 @@ export const PaymentDisputeScalarFieldEnum = {
   amount: 'amount',
   status: 'status',
   reason: 'reason',
+  lastStripeEventCreatedAt: 'lastStripeEventCreatedAt',
+  lastStripeEventId: 'lastStripeEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

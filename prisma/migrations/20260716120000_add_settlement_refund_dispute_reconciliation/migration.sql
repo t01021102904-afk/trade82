@@ -13,11 +13,32 @@ ALTER TYPE "SettlementEventType" ADD VALUE IF NOT EXISTS 'DISPUTE_WON';
 ALTER TYPE "SettlementEventType" ADD VALUE IF NOT EXISTS 'DISPUTE_LOST';
 ALTER TYPE "SettlementEventType" ADD VALUE IF NOT EXISTS 'POST_TRANSFER_REVERSAL_REQUIRED';
 
-CREATE TYPE "SettlementReversalStatus" AS ENUM ('PENDING', 'COMPLETED');
+CREATE TYPE "SettlementReversalStatus" AS ENUM ('ACCOUNTING_APPLIED', 'PENDING', 'COMPLETED');
 
 ALTER TABLE "SettlementReversal"
-  ADD COLUMN "status" "SettlementReversalStatus" NOT NULL DEFAULT 'PENDING',
+  ADD COLUMN "status" "SettlementReversalStatus" NOT NULL DEFAULT 'ACCOUNTING_APPLIED',
   ADD COLUMN "stripeDisputeId" TEXT;
+
+ALTER TABLE "SettlementReversal" ADD CONSTRAINT "SettlementReversal_stripeTransferReversalId_status_check"
+  CHECK (
+    ("status" = 'COMPLETED' AND "stripeTransferReversalId" IS NOT NULL)
+    OR ("status" IN ('ACCOUNTING_APPLIED', 'PENDING') AND "stripeTransferReversalId" IS NULL)
+  );
+
+ALTER TABLE "PaymentDispute"
+  ADD COLUMN "lastStripeEventCreatedAt" TIMESTAMP(3),
+  ADD COLUMN "lastStripeEventId" TEXT;
+
+UPDATE "PaymentDispute"
+SET
+  "lastStripeEventCreatedAt" = "createdAt",
+  "lastStripeEventId" = "stripeDisputeId"
+WHERE "lastStripeEventCreatedAt" IS NULL
+   OR "lastStripeEventId" IS NULL;
+
+ALTER TABLE "PaymentDispute"
+  ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL,
+  ALTER COLUMN "lastStripeEventId" SET NOT NULL;
 
 CREATE UNIQUE INDEX "SettlementReversal_stripeDisputeId_settlementLegId_key"
   ON "SettlementReversal"("stripeDisputeId", "settlementLegId");

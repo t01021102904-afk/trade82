@@ -211,8 +211,18 @@ test("the reconciliation migration adds pending reversal states and auditable re
   ]) {
     assert.match(migration, new RegExp(`ADD VALUE IF NOT EXISTS '${value}'`));
   }
-  assert.match(migration, /CREATE TYPE "SettlementReversalStatus" AS ENUM \('PENDING', 'COMPLETED'\)/);
+  assert.match(
+    migration,
+    /CREATE TYPE "SettlementReversalStatus" AS ENUM \('ACCOUNTING_APPLIED', 'PENDING', 'COMPLETED'\)/,
+  );
   assert.match(migration, /ADD COLUMN "stripeDisputeId" TEXT/);
+  assert.match(migration, /ADD COLUMN "lastStripeEventCreatedAt" TIMESTAMP\(3\)/);
+  assert.match(migration, /ADD COLUMN "lastStripeEventId" TEXT/);
+  assert.match(migration, /SET\s+"lastStripeEventCreatedAt" = "createdAt"/);
+  assert.match(migration, /"lastStripeEventId" = "stripeDisputeId"/);
+  assert.match(migration, /ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL/);
+  assert.match(migration, /ALTER COLUMN "lastStripeEventId" SET NOT NULL/);
+  assert.match(migration, /SettlementReversal_stripeTransferReversalId_status_check/);
   assert.match(migration, /SettlementReversal_stripeDisputeId_settlementLegId_key/);
   assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
 });

@@ -540,6 +540,7 @@ export type SettlementReversalReason = (typeof SettlementReversalReason)[keyof t
 
 
 export const SettlementReversalStatus = {
+  ACCOUNTING_APPLIED: 'ACCOUNTING_APPLIED',
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED'
 } as const

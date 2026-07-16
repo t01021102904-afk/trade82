@@ -406,6 +406,7 @@ enum SettlementReversalReason {
 }
 
 enum SettlementReversalStatus {
+  ACCOUNTING_APPLIED
   PENDING
   COMPLETED
 }
@@ -902,15 +903,17 @@ model PaymentRefund {
 }
 
 model PaymentDispute {
-  id               String         @id @default(cuid())
-  paymentRequestId String
-  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  stripeDisputeId  String         @unique
-  amount           Int
-  status           String
-  reason           String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id                       String         @id @default(cuid())
+  paymentRequestId         String
+  paymentRequest           PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeDisputeId          String         @unique
+  amount                   Int
+  status                   String
+  reason                   String?
+  lastStripeEventCreatedAt DateTime
+  lastStripeEventId        String
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   @@index([paymentRequestId, createdAt])
 }
@@ -1087,7 +1090,7 @@ model SettlementReversal {
   amount                   Int
   currency                 String                   @default("usd")
   reason                   SettlementReversalReason
-  status                   SettlementReversalStatus @default(PENDING)
+  status                   SettlementReversalStatus @default(ACCOUNTING_APPLIED)
   idempotencyKey           String                   @unique
   stripeRefundId           String?
   stripeDisputeId          String?

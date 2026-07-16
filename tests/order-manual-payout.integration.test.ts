@@ -355,9 +355,18 @@ function stripeDispute({
     id,
     payment_intent: paymentIntentId,
     amount,
+    currency: "usd",
     status,
     reason: "fraudulent",
   } as Stripe.Dispute;
+}
+
+function stripeWebhookEvent(stripeEventType: string, stripeEventCreatedAt = new Date()) {
+  return {
+    stripeEventId: `evt_${unique("settlement-webhook")}`,
+    stripeEventType,
+    stripeEventCreatedAt,
+  };
 }
 
 test("settlement reversal trigger uses an explicit search path and its composite foreign key index", async () => {
@@ -925,6 +934,36 @@ test("settlement referral ownership and reversal legs are constrained by the led
     db.settlementReversal.create({
       data: {
         settlementId: sellerResult.settlement.id,
+        settlementLegId: sellerPayableLeg.id,
+        amount: 1,
+        reason: "REFUND",
+        status: "COMPLETED",
+        idempotencyKey: unique("completed-without-stripe-reversal"),
+        stripeRefundId: `re_${unique("completed-without-stripe-reversal")}`,
+      },
+    }),
+    /SettlementReversal_stripeTransferReversalId_status_check/i,
+  );
+  await assert.rejects(
+    db.settlementReversal.create({
+      data: {
+        settlementId: sellerResult.settlement.id,
+        settlementLegId: sellerPayableLeg.id,
+        amount: 1,
+        reason: "REFUND",
+        status: "ACCOUNTING_APPLIED",
+        stripeTransferReversalId: `trr_${unique("accounting-applied")}`,
+        idempotencyKey: unique("accounting-applied-with-stripe-reversal"),
+        stripeRefundId: `re_${unique("accounting-applied")}`,
+      },
+    }),
+    /SettlementReversal_stripeTransferReversalId_status_check/i,
+  );
+
+  await assert.rejects(
+    db.settlementReversal.create({
+      data: {
+        settlementId: sellerResult.settlement.id,
         settlementLegId: platformFeeLeg.id,
         amount: 100,
         reason: "REFUND",
@@ -976,6 +1015,7 @@ test("verified refunds reconcile cumulative seller and partner ledger reductions
   await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestRefund(firstRefund, {
     stripeEventId: `evt_${unique("partial-refund")}`,
     stripeEventType: "refund.created",
+    stripeEventCreatedAt: new Date(),
   }));
 
   let current = await db.settlement.findUniqueOrThrow({
@@ -1000,10 +1040,15 @@ test("verified refunds reconcile cumulative seller and partner ledger reductions
     current.reversals.some((reversal) => reversal.settlementLegId === current.legs.find((leg) => leg.type === "PLATFORM_FEE")?.id),
     false,
   );
+  assert.equal(
+    current.reversals.every((reversal) => reversal.status === "ACCOUNTING_APPLIED" && reversal.stripeTransferReversalId === null),
+    true,
+  );
 
   await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestRefund(firstRefund, {
     stripeEventId: `evt_${unique("duplicate-partial-refund")}`,
     stripeEventType: "refund.updated",
+    stripeEventCreatedAt: new Date(),
   }));
   assert.equal(
     await db.settlementReversal.count({ where: { settlementId: settlement.id } }),
@@ -1018,6 +1063,7 @@ test("verified refunds reconcile cumulative seller and partner ledger reductions
   await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestRefund(finalRefund, {
     stripeEventId: `evt_${unique("full-refund")}`,
     stripeEventType: "refund.created",
+    stripeEventCreatedAt: new Date(),
   }));
 
   current = await db.settlement.findUniqueOrThrow({
@@ -1044,6 +1090,16 @@ test("verified refunds reconcile cumulative seller and partner ledger reductions
     }),
     1,
   );
+  assert.equal(
+    await db.settlementEvent.count({
+      where: { settlementId: settlement.id, eventType: "CANCELLED" },
+    }),
+    1,
+  );
+  assert.equal(
+    current.reversals.every((reversal) => reversal.status === "ACCOUNTING_APPLIED"),
+    true,
+  );
 });
 
 test("concurrent verified refunds serialize settlement allocation without duplicate reversal amounts", async () => {
@@ -1068,10 +1124,12 @@ test("concurrent verified refunds serialize settlement allocation without duplic
     paymentRequests.syncPaymentRequestRefund(partialRefund, {
       stripeEventId: `evt_${unique("concurrent-partial-refund")}`,
       stripeEventType: "refund.created",
+      stripeEventCreatedAt: new Date(),
     }),
     paymentRequests.syncPaymentRequestRefund(fullRefund, {
       stripeEventId: `evt_${unique("concurrent-final-refund")}`,
       stripeEventType: "refund.created",
+      stripeEventCreatedAt: new Date(),
     }),
   ]));
 
@@ -1119,6 +1177,7 @@ test("open, won, and lost disputes block or restore settlement eligibility witho
   }), {
     stripeEventId: `evt_${unique("open-dispute")}`,
     stripeEventType: "charge.dispute.created",
+    stripeEventCreatedAt: new Date("2026-07-16T12:00:00.000Z"),
   }));
   assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: settlement.id } })).status, "HOLD");
   assert.equal(
@@ -1134,8 +1193,9 @@ test("open, won, and lost disputes block or restore settlement eligibility witho
   }), {
     stripeEventId: `evt_${unique("won-dispute")}`,
     stripeEventType: "charge.dispute.closed",
+    stripeEventCreatedAt: new Date("2026-07-16T12:01:00.000Z"),
   }));
-  assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: settlement.id } })).status, "READY");
+  assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: settlement.id } })).status, "HOLD");
 
   const lostFixture = await createReconciliableSettlement("settlement-dispute-loss", { withReferral: true });
   const lostPaymentIntentId = lostFixture.evidence.paymentIntentId;
@@ -1149,6 +1209,7 @@ test("open, won, and lost disputes block or restore settlement eligibility witho
   }), {
     stripeEventId: `evt_${unique("lost-dispute")}`,
     stripeEventType: "charge.dispute.closed",
+    stripeEventCreatedAt: new Date("2026-07-16T12:00:00.000Z"),
   }));
   const lostSettlement = await db.settlement.findUniqueOrThrow({
     where: { id: lostFixture.settlement.id },
@@ -1156,12 +1217,31 @@ test("open, won, and lost disputes block or restore settlement eligibility witho
   });
   assert.equal(lostSettlement.status, "HOLD");
   assert.equal(lostSettlement.reversals.every((reversal) => reversal.stripeDisputeId === lostDisputeId), true);
-  assert.equal(lostSettlement.reversals.every((reversal) => reversal.status === "PENDING"), true);
+  assert.equal(lostSettlement.reversals.every((reversal) => reversal.status === "ACCOUNTING_APPLIED"), true);
   assert.equal(
     await db.settlementEvent.count({
       where: { settlementId: lostSettlement.id, eventType: "DISPUTE_LOST" },
     }),
     1,
+  );
+  const lostEvent = await db.settlementEvent.findFirstOrThrow({
+    where: { settlementId: lostSettlement.id, eventType: "DISPUTE_LOST" },
+  });
+  assert.deepEqual(
+    {
+      stripeDisputeId: (lostEvent.metadata as Record<string, unknown>).stripeDisputeId,
+      disputeStatus: (lostEvent.metadata as Record<string, unknown>).disputeStatus,
+      stripeEventType: (lostEvent.metadata as Record<string, unknown>).stripeEventType,
+      amount: (lostEvent.metadata as Record<string, unknown>).amount,
+      currency: (lostEvent.metadata as Record<string, unknown>).currency,
+    },
+    {
+      stripeDisputeId: lostDisputeId,
+      disputeStatus: "lost",
+      stripeEventType: "charge.dispute.closed",
+      amount: 2_750,
+      currency: "usd",
+    },
   );
 });
 
@@ -1185,6 +1265,7 @@ test("post-transfer losses remain pending for internal reversal reconciliation a
   }), {
     stripeEventId: `evt_${unique("post-transfer")}`,
     stripeEventType: "refund.created",
+    stripeEventCreatedAt: new Date(),
   }));
 
   const after = await db.settlement.findUniqueOrThrow({
@@ -1204,6 +1285,230 @@ test("post-transfer losses remain pending for internal reversal reconciliation a
   );
 });
 
+test("transferred seller and partner legs alone or together create only pending reversal work", async () => {
+  const cases = [
+    ["SELLER_PAYABLE"],
+    ["PARTNER_REFERRAL"],
+    ["SELLER_PAYABLE", "PARTNER_REFERRAL"],
+  ] as const;
+
+  for (const transferredTypes of cases) {
+    const transferredTypeSet = new Set<string>(transferredTypes);
+    const { paymentRequest, evidence, settlement } = await createReconciliableSettlement(
+      `settlement-transferred-${transferredTypes.join("-")}`,
+      { withReferral: true },
+    );
+    const paymentIntentId = evidence.paymentIntentId;
+    assert.ok(paymentIntentId);
+    await db.settlementLeg.updateMany({
+      where: { settlementId: settlement.id, type: { in: [...transferredTypes] } },
+      data: { status: "TRANSFERRED" },
+    });
+    await db.settlement.update({ where: { id: settlement.id }, data: { status: "TRANSFERRED" } });
+
+    await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestRefund(stripeRefund({
+      id: `re_${unique("transferred-leg")}`,
+      paymentIntentId,
+      amount: paymentRequest.grossAmount,
+    }), stripeWebhookEvent("refund.created")));
+
+    const after = await db.settlement.findUniqueOrThrow({
+      where: { id: settlement.id },
+      include: { legs: true, reversals: true },
+    });
+    assert.equal(after.status, "REVERSAL_PENDING");
+    for (const leg of after.legs.filter((candidate) => candidate.type !== "PLATFORM_FEE")) {
+      const reversal = after.reversals.find((candidate) => candidate.settlementLegId === leg.id);
+      assert.ok(reversal);
+      assert.equal(reversal.stripeTransferReversalId, null);
+      if (transferredTypeSet.has(leg.type)) {
+        assert.equal(leg.status, "REVERSAL_PENDING");
+        assert.equal(reversal.status, "PENDING");
+      } else {
+        assert.equal(reversal.status, "ACCOUNTING_APPLIED");
+      }
+    }
+    assert.equal(
+      after.reversals.some((reversal) => after.legs.find((leg) => leg.id === reversal.settlementLegId)?.type === "PLATFORM_FEE"),
+      false,
+    );
+  }
+});
+
+test("dispute reconciliation rejects stale Stripe events and retains favorable outcomes on hold", async () => {
+  const lostFixture = await createReconciliableSettlement("settlement-dispute-event-order-lost", { withReferral: true });
+  const lostIntentId = lostFixture.evidence.paymentIntentId;
+  assert.ok(lostIntentId);
+  const lostDisputeId = `dp_${unique("ordered-lost")}`;
+  const lostAt = new Date("2026-07-16T12:03:00.000Z");
+
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: lostDisputeId,
+    paymentIntentId: lostIntentId,
+    amount: 2_750,
+    status: "lost",
+  }), stripeWebhookEvent("charge.dispute.closed", lostAt)));
+  const reversalCountAfterLoss = await db.settlementReversal.count({ where: { settlementId: lostFixture.settlement.id } });
+
+  await withStripeConnectSettlementMode("on", () => Promise.all([
+    paymentRequests.syncPaymentRequestDispute(stripeDispute({
+      id: lostDisputeId,
+      paymentIntentId: lostIntentId,
+      amount: 2_750,
+      status: "won",
+    }), stripeWebhookEvent("charge.dispute.closed", new Date("2026-07-16T12:02:00.000Z"))),
+    paymentRequests.syncPaymentRequestDispute(stripeDispute({
+      id: lostDisputeId,
+      paymentIntentId: lostIntentId,
+      amount: 2_750,
+      status: "needs_response",
+    }), stripeWebhookEvent("charge.dispute.updated", new Date("2026-07-16T12:01:00.000Z"))),
+  ]));
+  const persistedLoss = await db.paymentDispute.findUniqueOrThrow({ where: { stripeDisputeId: lostDisputeId } });
+  assert.equal(persistedLoss.status, "lost");
+  assert.equal(await db.settlementReversal.count({ where: { settlementId: lostFixture.settlement.id } }), reversalCountAfterLoss);
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: lostDisputeId,
+    paymentIntentId: lostIntentId,
+    amount: 2_750,
+    status: "won",
+  }), stripeWebhookEvent("charge.dispute.closed", lostAt)));
+  assert.equal((await db.paymentDispute.findUniqueOrThrow({ where: { stripeDisputeId: lostDisputeId } })).status, "lost");
+
+  const wonFixture = await createReconciliableSettlement("settlement-dispute-event-order-won", { withReferral: true });
+  const wonIntentId = wonFixture.evidence.paymentIntentId;
+  assert.ok(wonIntentId);
+  const wonDisputeId = `dp_${unique("ordered-won")}`;
+  const wonAt = new Date("2026-07-16T12:05:00.000Z");
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: wonDisputeId,
+    paymentIntentId: wonIntentId,
+    amount: wonFixture.paymentRequest.grossAmount,
+    status: "won",
+  }), stripeWebhookEvent("charge.dispute.closed", wonAt)));
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: wonDisputeId,
+    paymentIntentId: wonIntentId,
+    amount: wonFixture.paymentRequest.grossAmount,
+    status: "needs_response",
+  }), stripeWebhookEvent("charge.dispute.updated", new Date("2026-07-16T12:04:00.000Z"))));
+  const persistedWin = await db.paymentDispute.findUniqueOrThrow({ where: { stripeDisputeId: wonDisputeId } });
+  assert.equal(persistedWin.status, "won");
+  assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: wonFixture.settlement.id } })).status, "HOLD");
+
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: wonDisputeId,
+    paymentIntentId: wonIntentId,
+    amount: wonFixture.paymentRequest.grossAmount,
+    status: "lost",
+  }), stripeWebhookEvent("charge.dispute.closed", wonAt)));
+  assert.equal((await db.paymentDispute.findUniqueOrThrow({ where: { stripeDisputeId: wonDisputeId } })).status, "lost");
+});
+
+test("dispute status transitions are auditable, idempotent, and cannot restore while another dispute is open", async () => {
+  const { paymentRequest, evidence, settlement } = await createReconciliableSettlement(
+    "settlement-dispute-audit-transitions",
+    { withReferral: true },
+  );
+  const paymentIntentId = evidence.paymentIntentId;
+  assert.ok(paymentIntentId);
+  const disputeId = `dp_${unique("audited-dispute")}`;
+  const openedEvent = stripeWebhookEvent("charge.dispute.created", new Date("2026-07-16T13:00:00.000Z"));
+  const updatedEvent = stripeWebhookEvent("charge.dispute.updated", new Date("2026-07-16T13:01:00.000Z"));
+
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId,
+    amount: paymentRequest.grossAmount,
+    status: "needs_response",
+  }), openedEvent));
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId,
+    amount: paymentRequest.grossAmount,
+    status: "under_review",
+  }), updatedEvent));
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId,
+    amount: paymentRequest.grossAmount,
+    status: "under_review",
+  }), updatedEvent));
+
+  await db.paymentDispute.create({
+    data: {
+      paymentRequestId: paymentRequest.id,
+      stripeDisputeId: `dp_${unique("still-open")}`,
+      amount: paymentRequest.grossAmount,
+      status: "needs_response",
+      lastStripeEventCreatedAt: new Date("2026-07-16T13:01:30.000Z"),
+      lastStripeEventId: `evt_${unique("still-open")}`,
+    },
+  });
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId,
+    amount: paymentRequest.grossAmount,
+    status: "won",
+  }), stripeWebhookEvent("charge.dispute.closed", new Date("2026-07-16T13:02:00.000Z"))));
+
+  const events = await db.settlementEvent.findMany({
+    where: { settlementId: settlement.id, eventType: { in: ["DISPUTE_OPENED", "DISPUTE_UPDATED", "DISPUTE_WON"] } },
+    orderBy: { createdAt: "asc" },
+  });
+  assert.equal(events.filter((event) => event.eventType === "DISPUTE_OPENED").length, 1);
+  assert.equal(events.filter((event) => event.eventType === "DISPUTE_UPDATED").length, 1);
+  assert.equal(events.filter((event) => event.eventType === "DISPUTE_WON").length, 1);
+  assert.equal((await db.paymentDispute.findUniqueOrThrow({ where: { stripeDisputeId: disputeId } })).status, "won");
+  assert.equal((await db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } })).status, "DISPUTED");
+  assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: settlement.id } })).status, "HOLD");
+  for (const event of events) {
+    const metadata = event.metadata as Record<string, unknown>;
+    assert.equal(metadata.stripeDisputeId, disputeId);
+    assert.equal(typeof metadata.stripeEventId, "string");
+    assert.equal(typeof metadata.stripeEventType, "string");
+    assert.equal(typeof metadata.stripeEventCreatedAt, "string");
+    assert.equal(metadata.amount, paymentRequest.grossAmount);
+    assert.equal(metadata.currency, "usd");
+  }
+});
+
+test("concurrent refund and dispute losses cap every transferable-leg reversal at its original amount", async () => {
+  const { evidence, settlement } = await createReconciliableSettlement(
+    "settlement-refund-dispute-concurrency",
+    { withReferral: true },
+  );
+  const paymentIntentId = evidence.paymentIntentId;
+  assert.ok(paymentIntentId);
+  await withStripeConnectSettlementMode("on", () => Promise.all([
+    paymentRequests.syncPaymentRequestRefund(stripeRefund({
+      id: `re_${unique("combined-refund")}`,
+      paymentIntentId,
+      amount: 2_750,
+    }), stripeWebhookEvent("refund.created")),
+    paymentRequests.syncPaymentRequestDispute(stripeDispute({
+      id: `dp_${unique("combined-dispute")}`,
+      paymentIntentId,
+      amount: 8_250,
+      status: "lost",
+    }), stripeWebhookEvent("charge.dispute.closed")),
+  ]));
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: settlement.id },
+    include: { legs: true, reversals: true },
+  });
+  for (const leg of after.legs.filter((candidate) => candidate.type !== "PLATFORM_FEE")) {
+    const total = after.reversals
+      .filter((reversal) => reversal.settlementLegId === leg.id)
+      .reduce((sum, reversal) => sum + reversal.amount, 0);
+    assert.ok(total <= leg.amount);
+  }
+  assert.equal(
+    after.reversals.some((reversal) => after.legs.find((leg) => leg.id === reversal.settlementLegId)?.type === "PLATFORM_FEE"),
+    false,
+  );
+});
+
 test("feature-off refund synchronization leaves existing settlement ledger records untouched", async () => {
   const { paymentRequest, evidence, settlement } = await createReconciliableSettlement("settlement-feature-off");
   const paymentIntentId = evidence.paymentIntentId;
@@ -1219,6 +1524,7 @@ test("feature-off refund synchronization leaves existing settlement ledger recor
   }), {
     stripeEventId: `evt_${unique("feature-off")}`,
     stripeEventType: "refund.created",
+    stripeEventCreatedAt: new Date(),
   }));
   const after = await db.settlement.findUniqueOrThrow({
     where: { id: settlement.id },
@@ -1397,6 +1703,8 @@ test("active disputes and reconciliation holds cannot enter processing", async (
       stripeDisputeId: `dp_${unique("processing-active")}`,
       amount: 11_000,
       status: "needs_response",
+      lastStripeEventCreatedAt: new Date(),
+      lastStripeEventId: `evt_${unique("processing-active")}`,
     },
   });
   await assertProcessingIsBlocked(activeDispute.payout.id, activeDispute.fixture.admin.id);
@@ -1462,7 +1770,14 @@ test("refunds, full refunds, disputes, and sent payouts hold or preserve payouts
   const dispute = await createReadyPayout("dispute");
   await db.$transaction(async (tx) => {
     await tx.paymentDispute.create({
-      data: { paymentRequestId: dispute.order.paymentRequestId, stripeDisputeId: `dp_${unique("dispute")}`, amount: 11_000, status: "needs_response" },
+      data: {
+        paymentRequestId: dispute.order.paymentRequestId,
+        stripeDisputeId: `dp_${unique("dispute")}`,
+        amount: 11_000,
+        status: "needs_response",
+        lastStripeEventCreatedAt: new Date(),
+        lastStripeEventId: `evt_${unique("dispute")}`,
+      },
     });
     const request = await tx.paymentRequest.update({ where: { id: dispute.order.paymentRequestId }, data: { status: "DISPUTED" } });
     await tradeOrders.syncTradeOrderFromPaymentRequest(tx, request, "dispute");
