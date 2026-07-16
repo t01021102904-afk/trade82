@@ -497,6 +497,14 @@ export const SettlementLegStatus = {
 export type SettlementLegStatus = (typeof SettlementLegStatus)[keyof typeof SettlementLegStatus]
 
 
+export const ReferralSubjectType = {
+  BUYER: 'BUYER',
+  SELLER: 'SELLER'
+} as const
+
+export type ReferralSubjectType = (typeof ReferralSubjectType)[keyof typeof ReferralSubjectType]
+
+
 export const SettlementEventType = {
   CREATED: 'CREATED',
   LEGS_CREATED: 'LEGS_CREATED',

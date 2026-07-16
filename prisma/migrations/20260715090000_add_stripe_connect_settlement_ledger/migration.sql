@@ -8,6 +8,7 @@ CREATE TYPE "StripeConnectedAccountStatus" AS ENUM ('PENDING', 'RESTRICTED', 'EN
 CREATE TYPE "SettlementStatus" AS ENUM ('PENDING', 'HOLD', 'READY', 'TRANSFER_PENDING', 'TRANSFERRED', 'REVERSED', 'CANCELLED');
 CREATE TYPE "SettlementLegType" AS ENUM ('SELLER_PAYABLE', 'PARTNER_REFERRAL', 'PLATFORM_FEE');
 CREATE TYPE "SettlementLegStatus" AS ENUM ('PENDING', 'HOLD', 'READY', 'TRANSFER_PENDING', 'TRANSFERRED', 'REVERSED', 'CANCELLED');
+CREATE TYPE "ReferralSubjectType" AS ENUM ('BUYER', 'SELLER');
 CREATE TYPE "SettlementEventType" AS ENUM ('CREATED', 'LEGS_CREATED', 'HOLD_STARTED', 'HOLD_RELEASED', 'TRANSFER_PENDING', 'TRANSFERRED', 'REVERSAL_CREATED', 'REVERSED', 'CANCELLED');
 CREATE TYPE "SettlementReversalReason" AS ENUM ('REFUND', 'DISPUTE', 'MANUAL');
 
@@ -56,6 +57,8 @@ CREATE TABLE "Settlement" (
   "referralAttributionId" TEXT,
   "referralPartnerProfileId" TEXT,
   "referralCodeSnapshot" TEXT,
+  "referralSubjectType" "ReferralSubjectType",
+  "referredUserIdSnapshot" TEXT,
   "grossAmount" INTEGER NOT NULL,
   "platformFeeAmount" INTEGER NOT NULL,
   "sellerPayableAmount" INTEGER NOT NULL,
@@ -104,7 +107,7 @@ CREATE TABLE "SettlementEvent" (
 CREATE TABLE "SettlementReversal" (
   "id" TEXT NOT NULL,
   "settlementId" TEXT NOT NULL,
-  "settlementLegId" TEXT,
+  "settlementLegId" TEXT NOT NULL,
   "amount" INTEGER NOT NULL,
   "currency" TEXT NOT NULL DEFAULT 'usd',
   "reason" "SettlementReversalReason" NOT NULL,
@@ -133,6 +136,7 @@ CREATE INDEX "Settlement_referralPartnerProfileId_idx" ON "Settlement"("referral
 CREATE UNIQUE INDEX "SettlementLeg_idempotencyKey_key" ON "SettlementLeg"("idempotencyKey");
 CREATE UNIQUE INDEX "SettlementLeg_stripeTransferId_key" ON "SettlementLeg"("stripeTransferId");
 CREATE UNIQUE INDEX "SettlementLeg_settlementId_type_key" ON "SettlementLeg"("settlementId", "type");
+CREATE UNIQUE INDEX "SettlementLeg_settlementId_id_key" ON "SettlementLeg"("settlementId", "id");
 CREATE INDEX "SettlementLeg_recipientCompanyId_status_holdUntil_idx" ON "SettlementLeg"("recipientCompanyId", "status", "holdUntil");
 CREATE INDEX "SettlementLeg_recipientUserId_status_holdUntil_idx" ON "SettlementLeg"("recipientUserId", "status", "holdUntil");
 CREATE INDEX "SettlementLeg_partnerProfileId_status_holdUntil_idx" ON "SettlementLeg"("partnerProfileId", "status", "holdUntil");
@@ -162,7 +166,7 @@ ALTER TABLE "SettlementEvent" ADD CONSTRAINT "SettlementEvent_settlementId_fkey"
 ALTER TABLE "SettlementEvent" ADD CONSTRAINT "SettlementEvent_settlementLegId_fkey" FOREIGN KEY ("settlementLegId") REFERENCES "SettlementLeg"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "SettlementEvent" ADD CONSTRAINT "SettlementEvent_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "UserProfile"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "SettlementReversal" ADD CONSTRAINT "SettlementReversal_settlementId_fkey" FOREIGN KEY ("settlementId") REFERENCES "Settlement"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-ALTER TABLE "SettlementReversal" ADD CONSTRAINT "SettlementReversal_settlementLegId_fkey" FOREIGN KEY ("settlementLegId") REFERENCES "SettlementLeg"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SettlementReversal" ADD CONSTRAINT "SettlementReversal_settlementId_settlementLegId_fkey" FOREIGN KEY ("settlementId", "settlementLegId") REFERENCES "SettlementLeg"("settlementId", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "StripeConnectedAccount" ADD CONSTRAINT "StripeConnectedAccount_owner_xor_check"
   CHECK (("companyId" IS NOT NULL AND "partnerProfileId" IS NULL) OR ("companyId" IS NULL AND "partnerProfileId" IS NOT NULL));
@@ -181,8 +185,8 @@ ALTER TABLE "Settlement" ADD CONSTRAINT "Settlement_amount_currency_check"
 
 ALTER TABLE "Settlement" ADD CONSTRAINT "Settlement_referral_snapshot_check"
   CHECK (
-    ("referralAttributionId" IS NULL AND "referralPartnerProfileId" IS NULL AND "referralCodeSnapshot" IS NULL AND "partnerReferralAmount" = 0)
-    OR ("referralAttributionId" IS NOT NULL AND "referralPartnerProfileId" IS NOT NULL AND "referralCodeSnapshot" IS NOT NULL AND "partnerReferralAmount" > 0)
+    ("referralAttributionId" IS NULL AND "referralPartnerProfileId" IS NULL AND "referralCodeSnapshot" IS NULL AND "referralSubjectType" IS NULL AND "referredUserIdSnapshot" IS NULL AND "partnerReferralAmount" = 0)
+    OR ("referralAttributionId" IS NOT NULL AND "referralPartnerProfileId" IS NOT NULL AND "referralCodeSnapshot" IS NOT NULL AND "referralSubjectType" IS NOT NULL AND "referredUserIdSnapshot" IS NOT NULL AND "partnerReferralAmount" > 0)
   );
 
 ALTER TABLE "SettlementLeg" ADD CONSTRAINT "SettlementLeg_amount_currency_recipient_check"
@@ -198,6 +202,25 @@ ALTER TABLE "SettlementLeg" ADD CONSTRAINT "SettlementLeg_amount_currency_recipi
 
 ALTER TABLE "SettlementReversal" ADD CONSTRAINT "SettlementReversal_amount_currency_check"
   CHECK ("amount" > 0 AND "currency" = 'usd');
+
+CREATE FUNCTION "checkSettlementReversalLeg"() RETURNS TRIGGER AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM "SettlementLeg"
+    WHERE "SettlementLeg"."id" = NEW."settlementLegId"
+      AND "SettlementLeg"."settlementId" = NEW."settlementId"
+      AND "SettlementLeg"."type" IN ('SELLER_PAYABLE', 'PARTNER_REFERRAL')
+  ) THEN
+    RAISE EXCEPTION 'Settlement reversals require a seller or partner settlement leg.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER "SettlementReversal_transferable_leg_trigger"
+  BEFORE INSERT OR UPDATE OF "settlementId", "settlementLegId" ON "SettlementReversal"
+  FOR EACH ROW EXECUTE FUNCTION "checkSettlementReversalLeg"();
 
 -- Financial ledgers are server-only. No browser role gets Data API access.
 ALTER TABLE "PartnerProfile" ENABLE ROW LEVEL SECURITY;

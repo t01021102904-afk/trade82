@@ -4211,6 +4211,8 @@ export const SettlementScalarFieldEnum = {
   referralAttributionId: 'referralAttributionId',
   referralPartnerProfileId: 'referralPartnerProfileId',
   referralCodeSnapshot: 'referralCodeSnapshot',
+  referralSubjectType: 'referralSubjectType',
+  referredUserIdSnapshot: 'referredUserIdSnapshot',
   grossAmount: 'grossAmount',
   platformFeeAmount: 'platformFeeAmount',
   sellerPayableAmount: 'sellerPayableAmount',
@@ -5068,6 +5070,20 @@ export type EnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = FieldR
  * Reference to a field of type 'StripeConnectedAccountStatus[]'
  */
 export type ListEnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeConnectedAccountStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ReferralSubjectType'
+ */
+export type EnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType'>
+    
+
+
+/**
+ * Reference to a field of type 'ReferralSubjectType[]'
+ */
+export type ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType[]'>
     
 
 

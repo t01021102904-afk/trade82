@@ -112,6 +112,11 @@ test("the additive migration creates a restricted ledger without Stripe transfer
   assert.match(migration, /"SettlementLeg_amount_currency_recipient_check"/);
   assert.match(migration, /"SettlementReversal_stripeRefundId_settlementLegId_key"/);
   assert.match(migration, /"stripeTransferReversalId"/);
+  assert.match(migration, /CREATE TYPE "ReferralSubjectType" AS ENUM \('BUYER', 'SELLER'\)/);
+  assert.match(migration, /"SettlementLeg_settlementId_id_key"/);
+  assert.match(migration, /"SettlementReversal_settlementId_settlementLegId_fkey"/);
+  assert.match(migration, /"SettlementReversal_transferable_leg_trigger"/);
+  assert.match(migration, /"settlementLegId" TEXT NOT NULL/);
 });
 
 test("settlement creation snapshots only an explicitly selected referral attribution", async () => {
@@ -123,5 +128,11 @@ test("settlement creation snapshots only an explicitly selected referral attribu
   assert.match(service, /referralAttributionId\?: string \| null/);
   assert.match(service, /where: \{ id: referralAttributionId \}/);
   assert.match(service, /referralPartnerProfileId: attribution!\.partnerProfileId/);
+  assert.match(service, /buyerCompany: \{ select: \{ ownerUserId: true \} \}/);
+  assert.match(service, /sellerCompany: \{ select: \{ ownerUserId: true \} \}/);
+  assert.match(service, /const refersBuyer = attribution\.referredUserId === paymentRequest\.buyerCompany\.ownerUserId/);
+  assert.match(service, /const refersSeller = attribution\.referredUserId === paymentRequest\.sellerCompany\.ownerUserId/);
+  assert.match(service, /referralSubjectType = refersBuyer \? ReferralSubjectType\.BUYER : ReferralSubjectType\.SELLER/);
+  assert.match(service, /referredUserIdSnapshot: attribution!\.referredUserId/);
   assert.doesNotMatch(service, /referredCompanyId/);
 });

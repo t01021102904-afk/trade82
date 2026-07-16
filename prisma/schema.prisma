@@ -372,6 +372,11 @@ enum SettlementLegStatus {
   CANCELLED
 }
 
+enum ReferralSubjectType {
+  BUYER
+  SELLER
+}
+
 enum SettlementEventType {
   CREATED
   LEGS_CREATED
@@ -989,6 +994,8 @@ model Settlement {
   referralPartnerProfileId              String?
   referralPartnerProfile                PartnerProfile?      @relation("SettlementReferralPartnerProfile", fields: [referralPartnerProfileId], references: [id], onDelete: Restrict)
   referralCodeSnapshot                  String?
+  referralSubjectType                   ReferralSubjectType?
+  referredUserIdSnapshot                String?
   grossAmount                           Int
   platformFeeAmount                     Int
   sellerPayableAmount                   Int
@@ -1027,11 +1034,12 @@ model SettlementLeg {
   idempotencyKey     String               @unique
   stripeTransferId   String?              @unique
   events             SettlementEvent[]
-  reversals          SettlementReversal[]
+  reversals          SettlementReversal[] @relation("SettlementReversalSettlementLeg")
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
 
   @@unique([settlementId, type])
+  @@unique([settlementId, id])
   @@index([recipientCompanyId, status, holdUntil])
   @@index([recipientUserId, status, holdUntil])
   @@index([partnerProfileId, status, holdUntil])
@@ -1059,8 +1067,8 @@ model SettlementReversal {
   id                       String                   @id @default(cuid())
   settlementId             String
   settlement               Settlement               @relation(fields: [settlementId], references: [id], onDelete: Restrict)
-  settlementLegId          String?
-  settlementLeg            SettlementLeg?           @relation(fields: [settlementLegId], references: [id], onDelete: Restrict)
+  settlementLegId          String
+  settlementLeg            SettlementLeg            @relation("SettlementReversalSettlementLeg", fields: [settlementId, settlementLegId], references: [settlementId, id], onDelete: Restrict)
   amount                   Int
   currency                 String                   @default("usd")
   reason                   SettlementReversalReason

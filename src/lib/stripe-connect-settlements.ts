@@ -5,6 +5,7 @@ import {
   PaymentRequestStatus,
   Prisma,
   ReferralAttributionStatus,
+  ReferralSubjectType,
   SettlementEventType,
   SettlementLegStatus,
   SettlementLegType,
@@ -104,6 +105,8 @@ export async function createPendingSettlementForVerifiedPayment(
       sellerPayableAmount: true,
       currency: true,
       sellerCompanyId: true,
+      buyerCompany: { select: { ownerUserId: true } },
+      sellerCompany: { select: { ownerUserId: true } },
       tradeOrderByPaymentRequest: { select: { id: true } },
     },
   });
@@ -127,6 +130,15 @@ export async function createPendingSettlementForVerifiedPayment(
     : null;
   if (referralAttributionId && (!attribution || attribution.status !== ReferralAttributionStatus.LOCKED)) {
     throw new Error("The selected referral attribution must be locked.");
+  }
+  let referralSubjectType: ReferralSubjectType | null = null;
+  if (attribution) {
+    const refersBuyer = attribution.referredUserId === paymentRequest.buyerCompany.ownerUserId;
+    const refersSeller = attribution.referredUserId === paymentRequest.sellerCompany.ownerUserId;
+    if (refersBuyer === refersSeller) {
+      throw new Error("The selected referral attribution must belong to exactly one transaction party.");
+    }
+    referralSubjectType = refersBuyer ? ReferralSubjectType.BUYER : ReferralSubjectType.SELLER;
   }
   const hasReferralAttribution = Boolean(attribution);
   const financials = calculateStripeConnectSettlementFinancials({
@@ -173,6 +185,8 @@ export async function createPendingSettlementForVerifiedPayment(
               referralAttributionId: attribution!.id,
               referralPartnerProfileId: attribution!.partnerProfileId,
               referralCodeSnapshot: attribution!.referralCode,
+              referralSubjectType,
+              referredUserIdSnapshot: attribution!.referredUserId,
             }
           : {}),
         ...financials,

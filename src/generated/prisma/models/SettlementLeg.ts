@@ -324,6 +324,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   idempotencyKey?: string
   stripeTransferId?: string
   settlementId_type?: Prisma.SettlementLegSettlementIdTypeCompoundUniqueInput
+  settlementId_id?: Prisma.SettlementLegSettlementIdIdCompoundUniqueInput
   AND?: Prisma.SettlementLegWhereInput | Prisma.SettlementLegWhereInput[]
   OR?: Prisma.SettlementLegWhereInput[]
   NOT?: Prisma.SettlementLegWhereInput | Prisma.SettlementLegWhereInput[]
@@ -344,7 +345,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
-}, "id" | "idempotencyKey" | "stripeTransferId" | "settlementId_type">
+}, "id" | "idempotencyKey" | "stripeTransferId" | "settlementId_type" | "settlementId_id">
 
 export type SettlementLegOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -526,6 +527,11 @@ export type SettlementLegSettlementIdTypeCompoundUniqueInput = {
   type: $Enums.SettlementLegType
 }
 
+export type SettlementLegSettlementIdIdCompoundUniqueInput = {
+  settlementId: string
+  id: string
+}
+
 export type SettlementLegCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   settlementId?: Prisma.SortOrder
@@ -588,6 +594,11 @@ export type SettlementLegSumOrderByAggregateInput = {
 export type SettlementLegNullableScalarRelationFilter = {
   is?: Prisma.SettlementLegWhereInput | null
   isNot?: Prisma.SettlementLegWhereInput | null
+}
+
+export type SettlementLegScalarRelationFilter = {
+  is?: Prisma.SettlementLegWhereInput
+  isNot?: Prisma.SettlementLegWhereInput
 }
 
 export type SettlementLegCreateNestedManyWithoutRecipientUserInput = {
@@ -788,12 +799,10 @@ export type SettlementLegCreateNestedOneWithoutReversalsInput = {
   connect?: Prisma.SettlementLegWhereUniqueInput
 }
 
-export type SettlementLegUpdateOneWithoutReversalsNestedInput = {
+export type SettlementLegUpdateOneRequiredWithoutReversalsNestedInput = {
   create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutReversalsInput, Prisma.SettlementLegUncheckedCreateWithoutReversalsInput>
   connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutReversalsInput
   upsert?: Prisma.SettlementLegUpsertWithoutReversalsInput
-  disconnect?: Prisma.SettlementLegWhereInput | boolean
-  delete?: Prisma.SettlementLegWhereInput | boolean
   connect?: Prisma.SettlementLegWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementLegUpdateToOneWithWhereWithoutReversalsInput, Prisma.SettlementLegUpdateWithoutReversalsInput>, Prisma.SettlementLegUncheckedUpdateWithoutReversalsInput>
 }

@@ -582,6 +582,8 @@ export const SettlementScalarFieldEnum = {
   referralAttributionId: 'referralAttributionId',
   referralPartnerProfileId: 'referralPartnerProfileId',
   referralCodeSnapshot: 'referralCodeSnapshot',
+  referralSubjectType: 'referralSubjectType',
+  referredUserIdSnapshot: 'referredUserIdSnapshot',
   grossAmount: 'grossAmount',
   platformFeeAmount: 'platformFeeAmount',
   sellerPayableAmount: 'sellerPayableAmount',
