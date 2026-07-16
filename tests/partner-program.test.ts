@@ -9,6 +9,8 @@ import {
   SettlementReversalStatus,
 } from "../src/generated/prisma/client.ts";
 import {
+  consumeReferralClaimForNewUser,
+  createOrGetPartnerProfile,
   createReferralClaimForCode,
   createReferralClaimSecret,
   hashReferralClaimToken,
@@ -121,6 +123,90 @@ test("inactive partner codes produce no claim token", async () => {
       "T82-PARTNER_123",
     );
     assert.equal(result, null);
+  } finally {
+    if (previous === undefined) delete process.env.PARTNER_PROGRAM_MODE;
+    else process.env.PARTNER_PROGRAM_MODE = previous;
+  }
+});
+
+test("partner enrollment is idempotent and allocates a distinct referral code per user", async () => {
+  const profiles = new Map<
+    string,
+    {
+      id: string;
+      userId: string;
+      referralCode: string;
+      status: PartnerProfileStatus;
+      createdAt: Date;
+    }
+  >();
+  const repository = {
+    partnerProfile: {
+      findUnique: async ({ where }: { where: { userId: string } }) =>
+        profiles.get(where.userId) ?? null,
+      create: async ({ data }: { data: { userId: string; referralCode: string } }) => {
+        const profile = {
+          id: `partner-${data.userId}`,
+          userId: data.userId,
+          referralCode: data.referralCode,
+          status: PartnerProfileStatus.ACTIVE,
+          createdAt: new Date("2026-07-16T00:00:00.000Z"),
+        };
+        profiles.set(data.userId, profile);
+        return profile;
+      },
+    },
+  };
+
+  const first = await createOrGetPartnerProfile(repository, "user-1");
+  const repeated = await createOrGetPartnerProfile(repository, "user-1");
+  const secondUser = await createOrGetPartnerProfile(repository, "user-2");
+
+  assert.equal(first.created, true);
+  assert.equal(repeated.created, false);
+  assert.equal(first.partnerProfile.id, repeated.partnerProfile.id);
+  assert.equal(profiles.size, 2);
+  assert.notEqual(first.partnerProfile.referralCode, secondUser.partnerProfile.referralCode);
+});
+
+test("a partner cannot consume their own referral claim", async () => {
+  const previous = process.env.PARTNER_PROGRAM_MODE;
+  process.env.PARTNER_PROGRAM_MODE = "on";
+  const rawToken = createReferralClaimSecret();
+  let claimUpdated = false;
+  try {
+    const result = await consumeReferralClaimForNewUser(
+      {
+        referralClaimToken: {
+          findUnique: async () => ({
+            id: "claim-1",
+            partnerProfileId: "partner-1",
+            consumedAt: null,
+            expiresAt: new Date("2026-07-17T00:00:00.000Z"),
+            partnerProfile: {
+              id: "partner-1",
+              status: PartnerProfileStatus.ACTIVE,
+              userId: "user-1",
+              referralCode: "T82-PARTNER_123",
+            },
+          }),
+          updateMany: async () => {
+            claimUpdated = true;
+            return { count: 1 };
+          },
+        },
+        referralAttribution: {
+          create: async () => assert.fail("self-referral must not be attributed"),
+        },
+      } as never,
+      {
+        rawToken,
+        referredUserId: "user-1",
+        now: new Date("2026-07-16T00:00:00.000Z"),
+      },
+    );
+    assert.deepEqual(result, { consumed: false, reason: "invalid" });
+    assert.equal(claimUpdated, false);
   } finally {
     if (previous === undefined) delete process.env.PARTNER_PROGRAM_MODE;
     else process.env.PARTNER_PROGRAM_MODE = previous;
@@ -240,6 +326,51 @@ test("feature-off dashboard access returns before any database query", async () 
   assert.equal(result, null);
 });
 
+test("partner pending earnings come from partner settlement legs without Stripe onboarding", async () => {
+  const holdUntil = new Date("2026-07-30T00:00:00.000Z");
+  const partnerLeg = {
+    id: "partner-leg-1",
+    amount: 500,
+    currency: "usd",
+    status: SettlementLegStatus.HOLD,
+    holdUntil,
+    settlement: {
+      createdAt: new Date("2026-07-16T00:00:00.000Z"),
+      grossAmount: 100_000,
+      tradeOrder: { orderNumber: "T82-ORDER-1" },
+    },
+    reversals: [],
+  };
+  const result = await getPartnerDashboardData({
+    partnerProfileId: "partner-1",
+    partnerProgramEnabled: true,
+    getDatabase: (() =>
+      ({
+        partnerProfile: {
+          findUniqueOrThrow: async () => ({
+            id: "partner-1",
+            status: PartnerProfileStatus.ACTIVE,
+            referralCode: "T82-PARTNER_123",
+            createdAt: new Date("2026-07-01T00:00:00.000Z"),
+            stripeConnectedAccount: null,
+          }),
+        },
+        referralAttribution: {
+          count: async () => 1,
+          findMany: async () => [],
+        },
+        settlement: { count: async () => 1 },
+        settlementLeg: { findMany: async () => [partnerLeg] },
+      }) as never) as never,
+  });
+
+  assert.ok(result);
+  assert.equal(result.partner.stripeAccount, null);
+  assert.equal(result.totals.pending, 500);
+  assert.equal(result.totals.available, 0);
+  assert.equal(result.commissionHistory[0]?.orderNumber, "T82-ORDER-1");
+});
+
 test("partner claim migration is additive, indexed, restrictive, and never stores raw claim evidence", async () => {
   const migration = await readFile(
     new URL(
@@ -285,6 +416,10 @@ test("partner routes clear stale claims and gate active functionality server-sid
     new URL("../src/lib/authz.ts", import.meta.url),
     "utf8",
   );
+  const enrollRoute = await readFile(
+    new URL("../src/app/api/partner/enroll/route.ts", import.meta.url),
+    "utf8",
+  );
 
   assert.match(referralRoute, /attemptAnonymousReferralClaim/);
   assert.match(referralRoute, /applyReferralClaimCookie/);
@@ -309,5 +444,10 @@ test("partner routes clear stale claims and gate active functionality server-sid
   assert.doesNotMatch(
     dashboardData,
     /paymentMethod|stripeSecret|bankAccount|email:/,
+  );
+  assert.doesNotMatch(enrollRoute, /request\.json\(/);
+  assert.doesNotMatch(
+    enrollRoute,
+    /stripeConnectedAccount|SettlementLeg|ReferralAttribution|transfers\.create/,
   );
 });

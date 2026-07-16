@@ -106,6 +106,61 @@ test("disposable PostgreSQL keeps raw referral secrets out of the database and e
   );
 });
 
+test("disposable PostgreSQL enforces one partner profile per user and rejects self-referral", async () => {
+  const id = suffix();
+  const user = await db.userProfile.create({
+    data: {
+      clerkUserId: `partner-self-${id}`,
+      email: `partner-self-${id}@example.test`,
+      displayName: "Partner",
+      role: "user",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: user.id,
+      referralCode: `T82-${id.toUpperCase()}`,
+      status: "ACTIVE",
+    },
+  });
+
+  await assert.rejects(() =>
+    db.partnerProfile.create({
+      data: {
+        userId: user.id,
+        referralCode: `T82-DUPLICATE-${id.toUpperCase()}`,
+        status: "ACTIVE",
+      },
+    }),
+  );
+
+  const rawToken = referrals.createReferralClaimSecret();
+  const claim = await db.referralClaimToken.create({
+    data: {
+      tokenHash: referrals.hashReferralClaimToken(rawToken),
+      partnerProfileId: partner.id,
+      expiresAt: new Date(Date.now() + 60_000),
+    },
+  });
+  const result = (await db.$transaction((tx) =>
+    referrals.consumeReferralClaimForNewUser(tx, {
+      rawToken,
+      referredUserId: user.id,
+    }),
+  )) as { consumed: boolean; reason?: string };
+
+  assert.deepEqual(result, { consumed: false, reason: "invalid" });
+  assert.equal(
+    (await db.referralClaimToken.findUniqueOrThrow({ where: { id: claim.id } }))
+      .consumedAt,
+    null,
+  );
+  assert.equal(
+    await db.referralAttribution.count({ where: { referredUserId: user.id } }),
+    0,
+  );
+});
+
 test("disposable PostgreSQL blocks claim references after partner deletion and keeps claim indexes available", async () => {
   const id = suffix();
   const user = await db.userProfile.create({
