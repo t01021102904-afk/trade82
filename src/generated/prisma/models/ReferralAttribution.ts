@@ -26,7 +26,7 @@ export type AggregateReferralAttribution = {
 
 export type ReferralAttributionMinAggregateOutputType = {
   id: string | null
-  referredCompanyId: string | null
+  referredUserId: string | null
   partnerProfileId: string | null
   referralCode: string | null
   status: $Enums.ReferralAttributionStatus | null
@@ -37,7 +37,7 @@ export type ReferralAttributionMinAggregateOutputType = {
 
 export type ReferralAttributionMaxAggregateOutputType = {
   id: string | null
-  referredCompanyId: string | null
+  referredUserId: string | null
   partnerProfileId: string | null
   referralCode: string | null
   status: $Enums.ReferralAttributionStatus | null
@@ -48,7 +48,7 @@ export type ReferralAttributionMaxAggregateOutputType = {
 
 export type ReferralAttributionCountAggregateOutputType = {
   id: number
-  referredCompanyId: number
+  referredUserId: number
   partnerProfileId: number
   referralCode: number
   status: number
@@ -61,7 +61,7 @@ export type ReferralAttributionCountAggregateOutputType = {
 
 export type ReferralAttributionMinAggregateInputType = {
   id?: true
-  referredCompanyId?: true
+  referredUserId?: true
   partnerProfileId?: true
   referralCode?: true
   status?: true
@@ -72,7 +72,7 @@ export type ReferralAttributionMinAggregateInputType = {
 
 export type ReferralAttributionMaxAggregateInputType = {
   id?: true
-  referredCompanyId?: true
+  referredUserId?: true
   partnerProfileId?: true
   referralCode?: true
   status?: true
@@ -83,7 +83,7 @@ export type ReferralAttributionMaxAggregateInputType = {
 
 export type ReferralAttributionCountAggregateInputType = {
   id?: true
-  referredCompanyId?: true
+  referredUserId?: true
   partnerProfileId?: true
   referralCode?: true
   status?: true
@@ -167,7 +167,7 @@ export type ReferralAttributionGroupByArgs<ExtArgs extends runtime.Types.Extensi
 
 export type ReferralAttributionGroupByOutputType = {
   id: string
-  referredCompanyId: string
+  referredUserId: string
   partnerProfileId: string
   referralCode: string
   status: $Enums.ReferralAttributionStatus
@@ -199,35 +199,35 @@ export type ReferralAttributionWhereInput = {
   OR?: Prisma.ReferralAttributionWhereInput[]
   NOT?: Prisma.ReferralAttributionWhereInput | Prisma.ReferralAttributionWhereInput[]
   id?: Prisma.StringFilter<"ReferralAttribution"> | string
-  referredCompanyId?: Prisma.StringFilter<"ReferralAttribution"> | string
+  referredUserId?: Prisma.StringFilter<"ReferralAttribution"> | string
   partnerProfileId?: Prisma.StringFilter<"ReferralAttribution"> | string
   referralCode?: Prisma.StringFilter<"ReferralAttribution"> | string
   status?: Prisma.EnumReferralAttributionStatusFilter<"ReferralAttribution"> | $Enums.ReferralAttributionStatus
   lockedAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
-  referredCompany?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  referredUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileScalarRelationFilter, Prisma.PartnerProfileWhereInput>
   settlements?: Prisma.SettlementListRelationFilter
 }
 
 export type ReferralAttributionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  referredCompanyId?: Prisma.SortOrder
+  referredUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   lockedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  referredCompany?: Prisma.CompanyOrderByWithRelationInput
+  referredUser?: Prisma.UserProfileOrderByWithRelationInput
   partnerProfile?: Prisma.PartnerProfileOrderByWithRelationInput
   settlements?: Prisma.SettlementOrderByRelationAggregateInput
 }
 
 export type ReferralAttributionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  referredCompanyId?: string
+  referredUserId?: string
   AND?: Prisma.ReferralAttributionWhereInput | Prisma.ReferralAttributionWhereInput[]
   OR?: Prisma.ReferralAttributionWhereInput[]
   NOT?: Prisma.ReferralAttributionWhereInput | Prisma.ReferralAttributionWhereInput[]
@@ -237,14 +237,14 @@ export type ReferralAttributionWhereUniqueInput = Prisma.AtLeast<{
   lockedAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ReferralAttribution"> | Date | string
-  referredCompany?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  referredUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileScalarRelationFilter, Prisma.PartnerProfileWhereInput>
   settlements?: Prisma.SettlementListRelationFilter
-}, "id" | "referredCompanyId">
+}, "id" | "referredUserId">
 
 export type ReferralAttributionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  referredCompanyId?: Prisma.SortOrder
+  referredUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -261,7 +261,7 @@ export type ReferralAttributionScalarWhereWithAggregatesInput = {
   OR?: Prisma.ReferralAttributionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ReferralAttributionScalarWhereWithAggregatesInput | Prisma.ReferralAttributionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"ReferralAttribution"> | string
-  referredCompanyId?: Prisma.StringWithAggregatesFilter<"ReferralAttribution"> | string
+  referredUserId?: Prisma.StringWithAggregatesFilter<"ReferralAttribution"> | string
   partnerProfileId?: Prisma.StringWithAggregatesFilter<"ReferralAttribution"> | string
   referralCode?: Prisma.StringWithAggregatesFilter<"ReferralAttribution"> | string
   status?: Prisma.EnumReferralAttributionStatusWithAggregatesFilter<"ReferralAttribution"> | $Enums.ReferralAttributionStatus
@@ -277,14 +277,14 @@ export type ReferralAttributionCreateInput = {
   lockedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  referredCompany: Prisma.CompanyCreateNestedOneWithoutReferralAttributionInput
+  referredUser: Prisma.UserProfileCreateNestedOneWithoutReferredReferralAttributionInput
   partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutAttributionsInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralAttributionInput
 }
 
 export type ReferralAttributionUncheckedCreateInput = {
   id?: string
-  referredCompanyId: string
+  referredUserId: string
   partnerProfileId: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
@@ -301,14 +301,14 @@ export type ReferralAttributionUpdateInput = {
   lockedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  referredCompany?: Prisma.CompanyUpdateOneRequiredWithoutReferralAttributionNestedInput
+  referredUser?: Prisma.UserProfileUpdateOneRequiredWithoutReferredReferralAttributionNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutAttributionsNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralAttributionNestedInput
 }
 
 export type ReferralAttributionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  referredCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  referredUserId?: Prisma.StringFieldUpdateOperationsInput | string
   partnerProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
@@ -320,7 +320,7 @@ export type ReferralAttributionUncheckedUpdateInput = {
 
 export type ReferralAttributionCreateManyInput = {
   id?: string
-  referredCompanyId: string
+  referredUserId: string
   partnerProfileId: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
@@ -340,7 +340,7 @@ export type ReferralAttributionUpdateManyMutationInput = {
 
 export type ReferralAttributionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  referredCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  referredUserId?: Prisma.StringFieldUpdateOperationsInput | string
   partnerProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
@@ -366,7 +366,7 @@ export type ReferralAttributionOrderByRelationAggregateInput = {
 
 export type ReferralAttributionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  referredCompanyId?: Prisma.SortOrder
+  referredUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -377,7 +377,7 @@ export type ReferralAttributionCountOrderByAggregateInput = {
 
 export type ReferralAttributionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  referredCompanyId?: Prisma.SortOrder
+  referredUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -388,7 +388,7 @@ export type ReferralAttributionMaxOrderByAggregateInput = {
 
 export type ReferralAttributionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  referredCompanyId?: Prisma.SortOrder
+  referredUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -397,36 +397,36 @@ export type ReferralAttributionMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type ReferralAttributionCreateNestedOneWithoutReferredCompanyInput = {
-  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
-  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredCompanyInput
+export type ReferralAttributionCreateNestedOneWithoutReferredUserInput = {
+  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
+  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredUserInput
   connect?: Prisma.ReferralAttributionWhereUniqueInput
 }
 
-export type ReferralAttributionUncheckedCreateNestedOneWithoutReferredCompanyInput = {
-  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
-  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredCompanyInput
+export type ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput = {
+  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
+  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredUserInput
   connect?: Prisma.ReferralAttributionWhereUniqueInput
 }
 
-export type ReferralAttributionUpdateOneWithoutReferredCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
-  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredCompanyInput
-  upsert?: Prisma.ReferralAttributionUpsertWithoutReferredCompanyInput
+export type ReferralAttributionUpdateOneWithoutReferredUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
+  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredUserInput
+  upsert?: Prisma.ReferralAttributionUpsertWithoutReferredUserInput
   disconnect?: Prisma.ReferralAttributionWhereInput | boolean
   delete?: Prisma.ReferralAttributionWhereInput | boolean
   connect?: Prisma.ReferralAttributionWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ReferralAttributionUpdateToOneWithWhereWithoutReferredCompanyInput, Prisma.ReferralAttributionUpdateWithoutReferredCompanyInput>, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredCompanyInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReferralAttributionUpdateToOneWithWhereWithoutReferredUserInput, Prisma.ReferralAttributionUpdateWithoutReferredUserInput>, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredUserInput>
 }
 
-export type ReferralAttributionUncheckedUpdateOneWithoutReferredCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
-  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredCompanyInput
-  upsert?: Prisma.ReferralAttributionUpsertWithoutReferredCompanyInput
+export type ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
+  connectOrCreate?: Prisma.ReferralAttributionCreateOrConnectWithoutReferredUserInput
+  upsert?: Prisma.ReferralAttributionUpsertWithoutReferredUserInput
   disconnect?: Prisma.ReferralAttributionWhereInput | boolean
   delete?: Prisma.ReferralAttributionWhereInput | boolean
   connect?: Prisma.ReferralAttributionWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.ReferralAttributionUpdateToOneWithWhereWithoutReferredCompanyInput, Prisma.ReferralAttributionUpdateWithoutReferredCompanyInput>, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredCompanyInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ReferralAttributionUpdateToOneWithWhereWithoutReferredUserInput, Prisma.ReferralAttributionUpdateWithoutReferredUserInput>, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredUserInput>
 }
 
 export type ReferralAttributionCreateNestedManyWithoutPartnerProfileInput = {
@@ -491,7 +491,7 @@ export type ReferralAttributionUpdateOneWithoutSettlementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ReferralAttributionUpdateToOneWithWhereWithoutSettlementsInput, Prisma.ReferralAttributionUpdateWithoutSettlementsInput>, Prisma.ReferralAttributionUncheckedUpdateWithoutSettlementsInput>
 }
 
-export type ReferralAttributionCreateWithoutReferredCompanyInput = {
+export type ReferralAttributionCreateWithoutReferredUserInput = {
   id?: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
@@ -502,7 +502,7 @@ export type ReferralAttributionCreateWithoutReferredCompanyInput = {
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralAttributionInput
 }
 
-export type ReferralAttributionUncheckedCreateWithoutReferredCompanyInput = {
+export type ReferralAttributionUncheckedCreateWithoutReferredUserInput = {
   id?: string
   partnerProfileId: string
   referralCode: string
@@ -513,23 +513,23 @@ export type ReferralAttributionUncheckedCreateWithoutReferredCompanyInput = {
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralAttributionInput
 }
 
-export type ReferralAttributionCreateOrConnectWithoutReferredCompanyInput = {
+export type ReferralAttributionCreateOrConnectWithoutReferredUserInput = {
   where: Prisma.ReferralAttributionWhereUniqueInput
-  create: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
+  create: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
 }
 
-export type ReferralAttributionUpsertWithoutReferredCompanyInput = {
-  update: Prisma.XOR<Prisma.ReferralAttributionUpdateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredCompanyInput>
-  create: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredCompanyInput>
+export type ReferralAttributionUpsertWithoutReferredUserInput = {
+  update: Prisma.XOR<Prisma.ReferralAttributionUpdateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredUserInput>
+  create: Prisma.XOR<Prisma.ReferralAttributionCreateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedCreateWithoutReferredUserInput>
   where?: Prisma.ReferralAttributionWhereInput
 }
 
-export type ReferralAttributionUpdateToOneWithWhereWithoutReferredCompanyInput = {
+export type ReferralAttributionUpdateToOneWithWhereWithoutReferredUserInput = {
   where?: Prisma.ReferralAttributionWhereInput
-  data: Prisma.XOR<Prisma.ReferralAttributionUpdateWithoutReferredCompanyInput, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredCompanyInput>
+  data: Prisma.XOR<Prisma.ReferralAttributionUpdateWithoutReferredUserInput, Prisma.ReferralAttributionUncheckedUpdateWithoutReferredUserInput>
 }
 
-export type ReferralAttributionUpdateWithoutReferredCompanyInput = {
+export type ReferralAttributionUpdateWithoutReferredUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
@@ -540,7 +540,7 @@ export type ReferralAttributionUpdateWithoutReferredCompanyInput = {
   settlements?: Prisma.SettlementUpdateManyWithoutReferralAttributionNestedInput
 }
 
-export type ReferralAttributionUncheckedUpdateWithoutReferredCompanyInput = {
+export type ReferralAttributionUncheckedUpdateWithoutReferredUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   partnerProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -558,13 +558,13 @@ export type ReferralAttributionCreateWithoutPartnerProfileInput = {
   lockedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  referredCompany: Prisma.CompanyCreateNestedOneWithoutReferralAttributionInput
+  referredUser: Prisma.UserProfileCreateNestedOneWithoutReferredReferralAttributionInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralAttributionInput
 }
 
 export type ReferralAttributionUncheckedCreateWithoutPartnerProfileInput = {
   id?: string
-  referredCompanyId: string
+  referredUserId: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
   lockedAt?: Date | string
@@ -604,7 +604,7 @@ export type ReferralAttributionScalarWhereInput = {
   OR?: Prisma.ReferralAttributionScalarWhereInput[]
   NOT?: Prisma.ReferralAttributionScalarWhereInput | Prisma.ReferralAttributionScalarWhereInput[]
   id?: Prisma.StringFilter<"ReferralAttribution"> | string
-  referredCompanyId?: Prisma.StringFilter<"ReferralAttribution"> | string
+  referredUserId?: Prisma.StringFilter<"ReferralAttribution"> | string
   partnerProfileId?: Prisma.StringFilter<"ReferralAttribution"> | string
   referralCode?: Prisma.StringFilter<"ReferralAttribution"> | string
   status?: Prisma.EnumReferralAttributionStatusFilter<"ReferralAttribution"> | $Enums.ReferralAttributionStatus
@@ -620,13 +620,13 @@ export type ReferralAttributionCreateWithoutSettlementsInput = {
   lockedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  referredCompany: Prisma.CompanyCreateNestedOneWithoutReferralAttributionInput
+  referredUser: Prisma.UserProfileCreateNestedOneWithoutReferredReferralAttributionInput
   partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutAttributionsInput
 }
 
 export type ReferralAttributionUncheckedCreateWithoutSettlementsInput = {
   id?: string
-  referredCompanyId: string
+  referredUserId: string
   partnerProfileId: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
@@ -658,13 +658,13 @@ export type ReferralAttributionUpdateWithoutSettlementsInput = {
   lockedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  referredCompany?: Prisma.CompanyUpdateOneRequiredWithoutReferralAttributionNestedInput
+  referredUser?: Prisma.UserProfileUpdateOneRequiredWithoutReferredReferralAttributionNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutAttributionsNestedInput
 }
 
 export type ReferralAttributionUncheckedUpdateWithoutSettlementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  referredCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  referredUserId?: Prisma.StringFieldUpdateOperationsInput | string
   partnerProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
@@ -675,7 +675,7 @@ export type ReferralAttributionUncheckedUpdateWithoutSettlementsInput = {
 
 export type ReferralAttributionCreateManyPartnerProfileInput = {
   id?: string
-  referredCompanyId: string
+  referredUserId: string
   referralCode: string
   status?: $Enums.ReferralAttributionStatus
   lockedAt?: Date | string
@@ -690,13 +690,13 @@ export type ReferralAttributionUpdateWithoutPartnerProfileInput = {
   lockedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  referredCompany?: Prisma.CompanyUpdateOneRequiredWithoutReferralAttributionNestedInput
+  referredUser?: Prisma.UserProfileUpdateOneRequiredWithoutReferredReferralAttributionNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralAttributionNestedInput
 }
 
 export type ReferralAttributionUncheckedUpdateWithoutPartnerProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  referredCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  referredUserId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
   lockedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -707,7 +707,7 @@ export type ReferralAttributionUncheckedUpdateWithoutPartnerProfileInput = {
 
 export type ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  referredCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  referredUserId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumReferralAttributionStatusFieldUpdateOperationsInput | $Enums.ReferralAttributionStatus
   lockedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -748,14 +748,14 @@ export type ReferralAttributionCountOutputTypeCountSettlementsArgs<ExtArgs exten
 
 export type ReferralAttributionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  referredCompanyId?: boolean
+  referredUserId?: boolean
   partnerProfileId?: boolean
   referralCode?: boolean
   status?: boolean
   lockedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
   settlements?: boolean | Prisma.ReferralAttribution$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.ReferralAttributionCountOutputTypeDefaultArgs<ExtArgs>
@@ -763,33 +763,33 @@ export type ReferralAttributionSelect<ExtArgs extends runtime.Types.Extensions.I
 
 export type ReferralAttributionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  referredCompanyId?: boolean
+  referredUserId?: boolean
   partnerProfileId?: boolean
   referralCode?: boolean
   status?: boolean
   lockedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["referralAttribution"]>
 
 export type ReferralAttributionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  referredCompanyId?: boolean
+  referredUserId?: boolean
   partnerProfileId?: boolean
   referralCode?: boolean
   status?: boolean
   lockedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["referralAttribution"]>
 
 export type ReferralAttributionSelectScalar = {
   id?: boolean
-  referredCompanyId?: boolean
+  referredUserId?: boolean
   partnerProfileId?: boolean
   referralCode?: boolean
   status?: boolean
@@ -798,32 +798,32 @@ export type ReferralAttributionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ReferralAttributionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "referredCompanyId" | "partnerProfileId" | "referralCode" | "status" | "lockedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["referralAttribution"]>
+export type ReferralAttributionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "referredUserId" | "partnerProfileId" | "referralCode" | "status" | "lockedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["referralAttribution"]>
 export type ReferralAttributionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
   settlements?: boolean | Prisma.ReferralAttribution$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.ReferralAttributionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ReferralAttributionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
 }
 export type ReferralAttributionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  referredCompany?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  referredUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.PartnerProfileDefaultArgs<ExtArgs>
 }
 
 export type $ReferralAttributionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "ReferralAttribution"
   objects: {
-    referredCompany: Prisma.$CompanyPayload<ExtArgs>
+    referredUser: Prisma.$UserProfilePayload<ExtArgs>
     partnerProfile: Prisma.$PartnerProfilePayload<ExtArgs>
     settlements: Prisma.$SettlementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    referredCompanyId: string
+    referredUserId: string
     partnerProfileId: string
     referralCode: string
     status: $Enums.ReferralAttributionStatus
@@ -1224,7 +1224,7 @@ readonly fields: ReferralAttributionFieldRefs;
  */
 export interface Prisma__ReferralAttributionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  referredCompany<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  referredUser<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   partnerProfile<T extends Prisma.PartnerProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__PartnerProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   settlements<T extends Prisma.ReferralAttribution$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ReferralAttribution$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1257,7 +1257,7 @@ export interface Prisma__ReferralAttributionClient<T, Null = never, ExtArgs exte
  */
 export interface ReferralAttributionFieldRefs {
   readonly id: Prisma.FieldRef<"ReferralAttribution", 'String'>
-  readonly referredCompanyId: Prisma.FieldRef<"ReferralAttribution", 'String'>
+  readonly referredUserId: Prisma.FieldRef<"ReferralAttribution", 'String'>
   readonly partnerProfileId: Prisma.FieldRef<"ReferralAttribution", 'String'>
   readonly referralCode: Prisma.FieldRef<"ReferralAttribution", 'String'>
   readonly status: Prisma.FieldRef<"ReferralAttribution", 'ReferralAttributionStatus'>

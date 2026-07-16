@@ -39,6 +39,7 @@ export type SettlementLegMinAggregateOutputType = {
   settlementId: string | null
   type: $Enums.SettlementLegType | null
   recipientCompanyId: string | null
+  recipientUserId: string | null
   partnerProfileId: string | null
   amount: number | null
   currency: string | null
@@ -55,6 +56,7 @@ export type SettlementLegMaxAggregateOutputType = {
   settlementId: string | null
   type: $Enums.SettlementLegType | null
   recipientCompanyId: string | null
+  recipientUserId: string | null
   partnerProfileId: string | null
   amount: number | null
   currency: string | null
@@ -71,6 +73,7 @@ export type SettlementLegCountAggregateOutputType = {
   settlementId: number
   type: number
   recipientCompanyId: number
+  recipientUserId: number
   partnerProfileId: number
   amount: number
   currency: number
@@ -97,6 +100,7 @@ export type SettlementLegMinAggregateInputType = {
   settlementId?: true
   type?: true
   recipientCompanyId?: true
+  recipientUserId?: true
   partnerProfileId?: true
   amount?: true
   currency?: true
@@ -113,6 +117,7 @@ export type SettlementLegMaxAggregateInputType = {
   settlementId?: true
   type?: true
   recipientCompanyId?: true
+  recipientUserId?: true
   partnerProfileId?: true
   amount?: true
   currency?: true
@@ -129,6 +134,7 @@ export type SettlementLegCountAggregateInputType = {
   settlementId?: true
   type?: true
   recipientCompanyId?: true
+  recipientUserId?: true
   partnerProfileId?: true
   amount?: true
   currency?: true
@@ -232,6 +238,7 @@ export type SettlementLegGroupByOutputType = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId: string | null
+  recipientUserId: string | null
   partnerProfileId: string | null
   amount: number
   currency: string
@@ -271,6 +278,7 @@ export type SettlementLegWhereInput = {
   settlementId?: Prisma.StringFilter<"SettlementLeg"> | string
   type?: Prisma.EnumSettlementLegTypeFilter<"SettlementLeg"> | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  recipientUserId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   partnerProfileId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   amount?: Prisma.IntFilter<"SettlementLeg"> | number
   currency?: Prisma.StringFilter<"SettlementLeg"> | string
@@ -282,6 +290,7 @@ export type SettlementLegWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
   recipientCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  recipientUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
@@ -292,6 +301,7 @@ export type SettlementLegOrderByWithRelationInput = {
   settlementId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   recipientCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recipientUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -303,6 +313,7 @@ export type SettlementLegOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   settlement?: Prisma.SettlementOrderByWithRelationInput
   recipientCompany?: Prisma.CompanyOrderByWithRelationInput
+  recipientUser?: Prisma.UserProfileOrderByWithRelationInput
   partnerProfile?: Prisma.PartnerProfileOrderByWithRelationInput
   events?: Prisma.SettlementEventOrderByRelationAggregateInput
   reversals?: Prisma.SettlementReversalOrderByRelationAggregateInput
@@ -319,6 +330,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   settlementId?: Prisma.StringFilter<"SettlementLeg"> | string
   type?: Prisma.EnumSettlementLegTypeFilter<"SettlementLeg"> | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  recipientUserId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   partnerProfileId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   amount?: Prisma.IntFilter<"SettlementLeg"> | number
   currency?: Prisma.StringFilter<"SettlementLeg"> | string
@@ -328,6 +340,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
   recipientCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  recipientUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
@@ -338,6 +351,7 @@ export type SettlementLegOrderByWithAggregationInput = {
   settlementId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   recipientCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recipientUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -362,6 +376,7 @@ export type SettlementLegScalarWhereWithAggregatesInput = {
   settlementId?: Prisma.StringWithAggregatesFilter<"SettlementLeg"> | string
   type?: Prisma.EnumSettlementLegTypeWithAggregatesFilter<"SettlementLeg"> | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.StringNullableWithAggregatesFilter<"SettlementLeg"> | string | null
+  recipientUserId?: Prisma.StringNullableWithAggregatesFilter<"SettlementLeg"> | string | null
   partnerProfileId?: Prisma.StringNullableWithAggregatesFilter<"SettlementLeg"> | string | null
   amount?: Prisma.IntWithAggregatesFilter<"SettlementLeg"> | number
   currency?: Prisma.StringWithAggregatesFilter<"SettlementLeg"> | string
@@ -386,6 +401,7 @@ export type SettlementLegCreateInput = {
   updatedAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
   recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
@@ -396,6 +412,7 @@ export type SettlementLegUncheckedCreateInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -422,6 +439,7 @@ export type SettlementLegUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
   recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
@@ -432,6 +450,7 @@ export type SettlementLegUncheckedUpdateInput = {
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -450,6 +469,7 @@ export type SettlementLegCreateManyInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -479,6 +499,7 @@ export type SettlementLegUncheckedUpdateManyInput = {
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -510,6 +531,7 @@ export type SettlementLegCountOrderByAggregateInput = {
   settlementId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   recipientCompanyId?: Prisma.SortOrder
+  recipientUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -530,6 +552,7 @@ export type SettlementLegMaxOrderByAggregateInput = {
   settlementId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   recipientCompanyId?: Prisma.SortOrder
+  recipientUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -546,6 +569,7 @@ export type SettlementLegMinOrderByAggregateInput = {
   settlementId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   recipientCompanyId?: Prisma.SortOrder
+  recipientUserId?: Prisma.SortOrder
   partnerProfileId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -564,6 +588,48 @@ export type SettlementLegSumOrderByAggregateInput = {
 export type SettlementLegNullableScalarRelationFilter = {
   is?: Prisma.SettlementLegWhereInput | null
   isNot?: Prisma.SettlementLegWhereInput | null
+}
+
+export type SettlementLegCreateNestedManyWithoutRecipientUserInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput> | Prisma.SettlementLegCreateWithoutRecipientUserInput[] | Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput[]
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput | Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput[]
+  createMany?: Prisma.SettlementLegCreateManyRecipientUserInputEnvelope
+  connect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+}
+
+export type SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput> | Prisma.SettlementLegCreateWithoutRecipientUserInput[] | Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput[]
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput | Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput[]
+  createMany?: Prisma.SettlementLegCreateManyRecipientUserInputEnvelope
+  connect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+}
+
+export type SettlementLegUpdateManyWithoutRecipientUserNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput> | Prisma.SettlementLegCreateWithoutRecipientUserInput[] | Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput[]
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput | Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput[]
+  upsert?: Prisma.SettlementLegUpsertWithWhereUniqueWithoutRecipientUserInput | Prisma.SettlementLegUpsertWithWhereUniqueWithoutRecipientUserInput[]
+  createMany?: Prisma.SettlementLegCreateManyRecipientUserInputEnvelope
+  set?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  disconnect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  delete?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  connect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  update?: Prisma.SettlementLegUpdateWithWhereUniqueWithoutRecipientUserInput | Prisma.SettlementLegUpdateWithWhereUniqueWithoutRecipientUserInput[]
+  updateMany?: Prisma.SettlementLegUpdateManyWithWhereWithoutRecipientUserInput | Prisma.SettlementLegUpdateManyWithWhereWithoutRecipientUserInput[]
+  deleteMany?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
+}
+
+export type SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput> | Prisma.SettlementLegCreateWithoutRecipientUserInput[] | Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput[]
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput | Prisma.SettlementLegCreateOrConnectWithoutRecipientUserInput[]
+  upsert?: Prisma.SettlementLegUpsertWithWhereUniqueWithoutRecipientUserInput | Prisma.SettlementLegUpsertWithWhereUniqueWithoutRecipientUserInput[]
+  createMany?: Prisma.SettlementLegCreateManyRecipientUserInputEnvelope
+  set?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  disconnect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  delete?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  connect?: Prisma.SettlementLegWhereUniqueInput | Prisma.SettlementLegWhereUniqueInput[]
+  update?: Prisma.SettlementLegUpdateWithWhereUniqueWithoutRecipientUserInput | Prisma.SettlementLegUpdateWithWhereUniqueWithoutRecipientUserInput[]
+  updateMany?: Prisma.SettlementLegUpdateManyWithWhereWithoutRecipientUserInput | Prisma.SettlementLegUpdateManyWithWhereWithoutRecipientUserInput[]
+  deleteMany?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
 }
 
 export type SettlementLegCreateNestedManyWithoutRecipientCompanyInput = {
@@ -732,6 +798,88 @@ export type SettlementLegUpdateOneWithoutReversalsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementLegUpdateToOneWithWhereWithoutReversalsInput, Prisma.SettlementLegUpdateWithoutReversalsInput>, Prisma.SettlementLegUncheckedUpdateWithoutReversalsInput>
 }
 
+export type SettlementLegCreateWithoutRecipientUserInput = {
+  id?: string
+  type: $Enums.SettlementLegType
+  amount: number
+  currency?: string
+  holdUntil: Date | string
+  status?: $Enums.SettlementLegStatus
+  idempotencyKey: string
+  stripeTransferId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
+  recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
+  events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
+  reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+}
+
+export type SettlementLegUncheckedCreateWithoutRecipientUserInput = {
+  id?: string
+  settlementId: string
+  type: $Enums.SettlementLegType
+  recipientCompanyId?: string | null
+  partnerProfileId?: string | null
+  amount: number
+  currency?: string
+  holdUntil: Date | string
+  status?: $Enums.SettlementLegStatus
+  idempotencyKey: string
+  stripeTransferId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
+  reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+}
+
+export type SettlementLegCreateOrConnectWithoutRecipientUserInput = {
+  where: Prisma.SettlementLegWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput>
+}
+
+export type SettlementLegCreateManyRecipientUserInputEnvelope = {
+  data: Prisma.SettlementLegCreateManyRecipientUserInput | Prisma.SettlementLegCreateManyRecipientUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type SettlementLegUpsertWithWhereUniqueWithoutRecipientUserInput = {
+  where: Prisma.SettlementLegWhereUniqueInput
+  update: Prisma.XOR<Prisma.SettlementLegUpdateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedUpdateWithoutRecipientUserInput>
+  create: Prisma.XOR<Prisma.SettlementLegCreateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedCreateWithoutRecipientUserInput>
+}
+
+export type SettlementLegUpdateWithWhereUniqueWithoutRecipientUserInput = {
+  where: Prisma.SettlementLegWhereUniqueInput
+  data: Prisma.XOR<Prisma.SettlementLegUpdateWithoutRecipientUserInput, Prisma.SettlementLegUncheckedUpdateWithoutRecipientUserInput>
+}
+
+export type SettlementLegUpdateManyWithWhereWithoutRecipientUserInput = {
+  where: Prisma.SettlementLegScalarWhereInput
+  data: Prisma.XOR<Prisma.SettlementLegUpdateManyMutationInput, Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserInput>
+}
+
+export type SettlementLegScalarWhereInput = {
+  AND?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
+  OR?: Prisma.SettlementLegScalarWhereInput[]
+  NOT?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
+  id?: Prisma.StringFilter<"SettlementLeg"> | string
+  settlementId?: Prisma.StringFilter<"SettlementLeg"> | string
+  type?: Prisma.EnumSettlementLegTypeFilter<"SettlementLeg"> | $Enums.SettlementLegType
+  recipientCompanyId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  recipientUserId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  partnerProfileId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  amount?: Prisma.IntFilter<"SettlementLeg"> | number
+  currency?: Prisma.StringFilter<"SettlementLeg"> | string
+  holdUntil?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
+  status?: Prisma.EnumSettlementLegStatusFilter<"SettlementLeg"> | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFilter<"SettlementLeg"> | string
+  stripeTransferId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
+}
+
 export type SettlementLegCreateWithoutRecipientCompanyInput = {
   id?: string
   type: $Enums.SettlementLegType
@@ -744,6 +892,7 @@ export type SettlementLegCreateWithoutRecipientCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
@@ -753,6 +902,7 @@ export type SettlementLegUncheckedCreateWithoutRecipientCompanyInput = {
   id?: string
   settlementId: string
   type: $Enums.SettlementLegType
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -792,25 +942,6 @@ export type SettlementLegUpdateManyWithWhereWithoutRecipientCompanyInput = {
   data: Prisma.XOR<Prisma.SettlementLegUpdateManyMutationInput, Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyInput>
 }
 
-export type SettlementLegScalarWhereInput = {
-  AND?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
-  OR?: Prisma.SettlementLegScalarWhereInput[]
-  NOT?: Prisma.SettlementLegScalarWhereInput | Prisma.SettlementLegScalarWhereInput[]
-  id?: Prisma.StringFilter<"SettlementLeg"> | string
-  settlementId?: Prisma.StringFilter<"SettlementLeg"> | string
-  type?: Prisma.EnumSettlementLegTypeFilter<"SettlementLeg"> | $Enums.SettlementLegType
-  recipientCompanyId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
-  partnerProfileId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
-  amount?: Prisma.IntFilter<"SettlementLeg"> | number
-  currency?: Prisma.StringFilter<"SettlementLeg"> | string
-  holdUntil?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
-  status?: Prisma.EnumSettlementLegStatusFilter<"SettlementLeg"> | $Enums.SettlementLegStatus
-  idempotencyKey?: Prisma.StringFilter<"SettlementLeg"> | string
-  stripeTransferId?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
-}
-
 export type SettlementLegCreateWithoutPartnerProfileInput = {
   id?: string
   type: $Enums.SettlementLegType
@@ -824,6 +955,7 @@ export type SettlementLegCreateWithoutPartnerProfileInput = {
   updatedAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
   recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
 }
@@ -833,6 +965,7 @@ export type SettlementLegUncheckedCreateWithoutPartnerProfileInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   amount: number
   currency?: string
   holdUntil: Date | string
@@ -883,6 +1016,7 @@ export type SettlementLegCreateWithoutSettlementInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
@@ -892,6 +1026,7 @@ export type SettlementLegUncheckedCreateWithoutSettlementInput = {
   id?: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -944,6 +1079,7 @@ export type SettlementLegCreateWithoutEventsInput = {
   updatedAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
   recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
 }
@@ -953,6 +1089,7 @@ export type SettlementLegUncheckedCreateWithoutEventsInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -994,6 +1131,7 @@ export type SettlementLegUpdateWithoutEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
   recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
 }
@@ -1003,6 +1141,7 @@ export type SettlementLegUncheckedUpdateWithoutEventsInput = {
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1028,6 +1167,7 @@ export type SettlementLegCreateWithoutReversalsInput = {
   updatedAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
   recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
 }
@@ -1037,6 +1177,7 @@ export type SettlementLegUncheckedCreateWithoutReversalsInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -1078,11 +1219,64 @@ export type SettlementLegUpdateWithoutReversalsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
   recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutReversalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  settlementId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementLegStatusFieldUpdateOperationsInput | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
+}
+
+export type SettlementLegCreateManyRecipientUserInput = {
+  id?: string
+  settlementId: string
+  type: $Enums.SettlementLegType
+  recipientCompanyId?: string | null
+  partnerProfileId?: string | null
+  amount: number
+  currency?: string
+  holdUntil: Date | string
+  status?: $Enums.SettlementLegStatus
+  idempotencyKey: string
+  stripeTransferId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SettlementLegUpdateWithoutRecipientUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementLegStatusFieldUpdateOperationsInput | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
+  recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
+  events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
+  reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+}
+
+export type SettlementLegUncheckedUpdateWithoutRecipientUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
@@ -1097,12 +1291,30 @@ export type SettlementLegUncheckedUpdateWithoutReversalsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
+  reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+}
+
+export type SettlementLegUncheckedUpdateManyWithoutRecipientUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  settlementId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementLegStatusFieldUpdateOperationsInput | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SettlementLegCreateManyRecipientCompanyInput = {
   id?: string
   settlementId: string
   type: $Enums.SettlementLegType
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -1126,6 +1338,7 @@ export type SettlementLegUpdateWithoutRecipientCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
@@ -1135,6 +1348,7 @@ export type SettlementLegUncheckedUpdateWithoutRecipientCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1152,6 +1366,7 @@ export type SettlementLegUncheckedUpdateManyWithoutRecipientCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1168,6 +1383,7 @@ export type SettlementLegCreateManyPartnerProfileInput = {
   settlementId: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   amount: number
   currency?: string
   holdUntil: Date | string
@@ -1191,6 +1407,7 @@ export type SettlementLegUpdateWithoutPartnerProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
   recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
 }
@@ -1200,6 +1417,7 @@ export type SettlementLegUncheckedUpdateWithoutPartnerProfileInput = {
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1217,6 +1435,7 @@ export type SettlementLegUncheckedUpdateManyWithoutPartnerProfileInput = {
   settlementId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1231,6 +1450,7 @@ export type SettlementLegCreateManySettlementInput = {
   id?: string
   type: $Enums.SettlementLegType
   recipientCompanyId?: string | null
+  recipientUserId?: string | null
   partnerProfileId?: string | null
   amount: number
   currency?: string
@@ -1254,6 +1474,7 @@ export type SettlementLegUpdateWithoutSettlementInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
@@ -1263,6 +1484,7 @@ export type SettlementLegUncheckedUpdateWithoutSettlementInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1280,6 +1502,7 @@ export type SettlementLegUncheckedUpdateManyWithoutSettlementInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
   recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1336,6 +1559,7 @@ export type SettlementLegSelect<ExtArgs extends runtime.Types.Extensions.Interna
   settlementId?: boolean
   type?: boolean
   recipientCompanyId?: boolean
+  recipientUserId?: boolean
   partnerProfileId?: boolean
   amount?: boolean
   currency?: boolean
@@ -1347,6 +1571,7 @@ export type SettlementLegSelect<ExtArgs extends runtime.Types.Extensions.Interna
   updatedAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
   events?: boolean | Prisma.SettlementLeg$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.SettlementLeg$reversalsArgs<ExtArgs>
@@ -1358,6 +1583,7 @@ export type SettlementLegSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   settlementId?: boolean
   type?: boolean
   recipientCompanyId?: boolean
+  recipientUserId?: boolean
   partnerProfileId?: boolean
   amount?: boolean
   currency?: boolean
@@ -1369,6 +1595,7 @@ export type SettlementLegSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   updatedAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
 }, ExtArgs["result"]["settlementLeg"]>
 
@@ -1377,6 +1604,7 @@ export type SettlementLegSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   settlementId?: boolean
   type?: boolean
   recipientCompanyId?: boolean
+  recipientUserId?: boolean
   partnerProfileId?: boolean
   amount?: boolean
   currency?: boolean
@@ -1388,6 +1616,7 @@ export type SettlementLegSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   updatedAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
 }, ExtArgs["result"]["settlementLeg"]>
 
@@ -1396,6 +1625,7 @@ export type SettlementLegSelectScalar = {
   settlementId?: boolean
   type?: boolean
   recipientCompanyId?: boolean
+  recipientUserId?: boolean
   partnerProfileId?: boolean
   amount?: boolean
   currency?: boolean
@@ -1407,10 +1637,11 @@ export type SettlementLegSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SettlementLegOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "type" | "recipientCompanyId" | "partnerProfileId" | "amount" | "currency" | "holdUntil" | "status" | "idempotencyKey" | "stripeTransferId" | "createdAt" | "updatedAt", ExtArgs["result"]["settlementLeg"]>
+export type SettlementLegOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "type" | "recipientCompanyId" | "recipientUserId" | "partnerProfileId" | "amount" | "currency" | "holdUntil" | "status" | "idempotencyKey" | "stripeTransferId" | "createdAt" | "updatedAt", ExtArgs["result"]["settlementLeg"]>
 export type SettlementLegInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
   events?: boolean | Prisma.SettlementLeg$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.SettlementLeg$reversalsArgs<ExtArgs>
@@ -1419,11 +1650,13 @@ export type SettlementLegInclude<ExtArgs extends runtime.Types.Extensions.Intern
 export type SettlementLegIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
 }
 export type SettlementLegIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
+  recipientUser?: boolean | Prisma.SettlementLeg$recipientUserArgs<ExtArgs>
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
 }
 
@@ -1432,6 +1665,7 @@ export type $SettlementLegPayload<ExtArgs extends runtime.Types.Extensions.Inter
   objects: {
     settlement: Prisma.$SettlementPayload<ExtArgs>
     recipientCompany: Prisma.$CompanyPayload<ExtArgs> | null
+    recipientUser: Prisma.$UserProfilePayload<ExtArgs> | null
     partnerProfile: Prisma.$PartnerProfilePayload<ExtArgs> | null
     events: Prisma.$SettlementEventPayload<ExtArgs>[]
     reversals: Prisma.$SettlementReversalPayload<ExtArgs>[]
@@ -1441,6 +1675,7 @@ export type $SettlementLegPayload<ExtArgs extends runtime.Types.Extensions.Inter
     settlementId: string
     type: $Enums.SettlementLegType
     recipientCompanyId: string | null
+    recipientUserId: string | null
     partnerProfileId: string | null
     amount: number
     currency: string
@@ -1846,6 +2081,7 @@ export interface Prisma__SettlementLegClient<T, Null = never, ExtArgs extends ru
   readonly [Symbol.toStringTag]: "PrismaPromise"
   settlement<T extends Prisma.SettlementDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementDefaultArgs<ExtArgs>>): Prisma.Prisma__SettlementClient<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   recipientCompany<T extends Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recipientUser<T extends Prisma.SettlementLeg$recipientUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$recipientUserArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   partnerProfile<T extends Prisma.SettlementLeg$partnerProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>>): Prisma.Prisma__PartnerProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   events<T extends Prisma.SettlementLeg$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reversals<T extends Prisma.SettlementLeg$reversalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$reversalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementReversalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1882,6 +2118,7 @@ export interface SettlementLegFieldRefs {
   readonly settlementId: Prisma.FieldRef<"SettlementLeg", 'String'>
   readonly type: Prisma.FieldRef<"SettlementLeg", 'SettlementLegType'>
   readonly recipientCompanyId: Prisma.FieldRef<"SettlementLeg", 'String'>
+  readonly recipientUserId: Prisma.FieldRef<"SettlementLeg", 'String'>
   readonly partnerProfileId: Prisma.FieldRef<"SettlementLeg", 'String'>
   readonly amount: Prisma.FieldRef<"SettlementLeg", 'Int'>
   readonly currency: Prisma.FieldRef<"SettlementLeg", 'String'>
@@ -2308,6 +2545,25 @@ export type SettlementLeg$recipientCompanyArgs<ExtArgs extends runtime.Types.Ext
    */
   include?: Prisma.CompanyInclude<ExtArgs> | null
   where?: Prisma.CompanyWhereInput
+}
+
+/**
+ * SettlementLeg.recipientUser
+ */
+export type SettlementLeg$recipientUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserProfile
+   */
+  select?: Prisma.UserProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserProfile
+   */
+  omit?: Prisma.UserProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserProfileInclude<ExtArgs> | null
+  where?: Prisma.UserProfileWhereInput
 }
 
 /**

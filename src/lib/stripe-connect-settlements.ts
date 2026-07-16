@@ -34,15 +34,15 @@ function isUniqueConstraintError(error: unknown) {
 export async function lockReferralAttribution(
   tx: Tx,
   {
-    referredCompanyId,
+    referredUserId,
     partnerProfileId,
   }: {
-    referredCompanyId: string;
+    referredUserId: string;
     partnerProfileId: string;
   },
 ) {
   const existing = await tx.referralAttribution.findUnique({
-    where: { referredCompanyId },
+    where: { referredUserId },
   });
   if (existing) return { attribution: existing, created: false };
 
@@ -52,14 +52,14 @@ export async function lockReferralAttribution(
   if (!partner || partner.status !== PartnerProfileStatus.ACTIVE) {
     throw new Error("An active partner profile is required for referral attribution.");
   }
-  if (partner.companyId === referredCompanyId) {
-    throw new Error("A company cannot refer itself.");
+  if (partner.userId === referredUserId) {
+    throw new Error("A user cannot refer themselves.");
   }
 
   try {
     const attribution = await tx.referralAttribution.create({
       data: {
-        referredCompanyId,
+        referredUserId,
         partnerProfileId: partner.id,
         referralCode: partner.referralCode,
         status: ReferralAttributionStatus.LOCKED,
@@ -69,7 +69,7 @@ export async function lockReferralAttribution(
   } catch (error) {
     if (!isUniqueConstraintError(error)) throw error;
     const attribution = await tx.referralAttribution.findUniqueOrThrow({
-      where: { referredCompanyId },
+      where: { referredUserId },
     });
     return { attribution, created: false };
   }
@@ -77,6 +77,7 @@ export async function lockReferralAttribution(
 
 type PendingSettlementInput = {
   paymentRequestId: string;
+  referralAttributionId?: string | null;
   paidAt?: Date;
 };
 
@@ -84,7 +85,7 @@ type PendingSettlementInput = {
 // client dependency and never creates Transfers, TransfersReversals, or payouts.
 export async function createPendingSettlementForVerifiedPayment(
   tx: Tx,
-  { paymentRequestId, paidAt }: PendingSettlementInput,
+  { paymentRequestId, referralAttributionId, paidAt }: PendingSettlementInput,
 ) {
   const existing = await tx.settlement.findUnique({
     where: { paymentRequestId },
@@ -118,13 +119,16 @@ export async function createPendingSettlementForVerifiedPayment(
     throw new Error("A trade order is required before creating a settlement ledger.");
   }
 
-  const attribution = await tx.referralAttribution.findUnique({
-    where: { referredCompanyId: paymentRequest.sellerCompanyId },
-    include: { partnerProfile: true },
-  });
-  const hasReferralAttribution = Boolean(
-    attribution && attribution.status === ReferralAttributionStatus.LOCKED,
-  );
+  const attribution = referralAttributionId
+    ? await tx.referralAttribution.findUnique({
+        where: { id: referralAttributionId },
+        include: { partnerProfile: true },
+      })
+    : null;
+  if (referralAttributionId && (!attribution || attribution.status !== ReferralAttributionStatus.LOCKED)) {
+    throw new Error("The selected referral attribution must be locked.");
+  }
+  const hasReferralAttribution = Boolean(attribution);
   const financials = calculateStripeConnectSettlementFinancials({
     grossAmount: paymentRequest.grossAmount,
     currency: paymentRequest.currency,
@@ -147,12 +151,12 @@ export async function createPendingSettlementForVerifiedPayment(
     },
     {
       type: SettlementLegType.PLATFORM_FEE,
-      amount: financials.trade82NetAmount,
+      amount: financials.trade82RetainedAmountBeforeStripeFees,
     },
     ...(hasReferralAttribution
       ? [{
           type: SettlementLegType.PARTNER_REFERRAL,
-          recipientCompanyId: attribution!.partnerProfile.companyId,
+          recipientUserId: attribution!.partnerProfile.userId,
           partnerProfileId: attribution!.partnerProfileId,
           amount: financials.partnerReferralAmount,
         }]
@@ -164,7 +168,13 @@ export async function createPendingSettlementForVerifiedPayment(
       data: {
         paymentRequestId: paymentRequest.id,
         tradeOrderId: paymentRequest.tradeOrderByPaymentRequest.id,
-        ...(hasReferralAttribution ? { referralAttributionId: attribution!.id } : {}),
+        ...(hasReferralAttribution
+          ? {
+              referralAttributionId: attribution!.id,
+              referralPartnerProfileId: attribution!.partnerProfileId,
+              referralCodeSnapshot: attribution!.referralCode,
+            }
+          : {}),
         ...financials,
         holdUntil,
         status: SettlementStatus.HOLD,

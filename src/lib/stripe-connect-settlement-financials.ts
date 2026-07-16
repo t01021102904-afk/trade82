@@ -9,7 +9,7 @@ export type StripeConnectSettlementFinancials = {
   platformFeeAmount: number;
   sellerPayableAmount: number;
   partnerReferralAmount: number;
-  trade82NetAmount: number;
+  trade82RetainedAmountBeforeStripeFees: number;
   currency: "usd";
 };
 
@@ -50,9 +50,12 @@ export function calculateStripeConnectSettlementFinancials({
   const partnerReferralAmount = hasReferralAttribution
     ? calculateBasisPointShare(platformFeeAmount, REFERRAL_PARTNER_SHARE_OF_PLATFORM_FEE_BPS)
     : 0;
-  const trade82NetAmount = platformFeeAmount - partnerReferralAmount;
+  const trade82RetainedAmountBeforeStripeFees = platformFeeAmount - partnerReferralAmount;
 
-  if (trade82NetAmount < 0 || sellerPayableAmount + partnerReferralAmount + trade82NetAmount !== grossAmount) {
+  if (
+    trade82RetainedAmountBeforeStripeFees < 0
+    || sellerPayableAmount + partnerReferralAmount + trade82RetainedAmountBeforeStripeFees !== grossAmount
+  ) {
     throw new Error("Settlement financials do not balance.");
   }
 
@@ -61,7 +64,7 @@ export function calculateStripeConnectSettlementFinancials({
     platformFeeAmount,
     sellerPayableAmount,
     partnerReferralAmount,
-    trade82NetAmount,
+    trade82RetainedAmountBeforeStripeFees,
     currency: "usd",
   };
 }

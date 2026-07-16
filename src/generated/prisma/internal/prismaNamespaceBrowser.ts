@@ -533,7 +533,7 @@ export type PaymentRequestWebhookEventScalarFieldEnum = (typeof PaymentRequestWe
 
 export const PartnerProfileScalarFieldEnum = {
   id: 'id',
-  companyId: 'companyId',
+  userId: 'userId',
   referralCode: 'referralCode',
   status: 'status',
   createdAt: 'createdAt',
@@ -545,7 +545,7 @@ export type PartnerProfileScalarFieldEnum = (typeof PartnerProfileScalarFieldEnu
 
 export const ReferralAttributionScalarFieldEnum = {
   id: 'id',
-  referredCompanyId: 'referredCompanyId',
+  referredUserId: 'referredUserId',
   partnerProfileId: 'partnerProfileId',
   referralCode: 'referralCode',
   status: 'status',
@@ -560,10 +560,12 @@ export type ReferralAttributionScalarFieldEnum = (typeof ReferralAttributionScal
 export const StripeConnectedAccountScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
+  partnerProfileId: 'partnerProfileId',
   stripeAccountId: 'stripeAccountId',
   status: 'status',
   chargesEnabled: 'chargesEnabled',
   payoutsEnabled: 'payoutsEnabled',
+  transfersEnabled: 'transfersEnabled',
   detailsSubmitted: 'detailsSubmitted',
   onboardingComplete: 'onboardingComplete',
   createdAt: 'createdAt',
@@ -578,11 +580,13 @@ export const SettlementScalarFieldEnum = {
   paymentRequestId: 'paymentRequestId',
   tradeOrderId: 'tradeOrderId',
   referralAttributionId: 'referralAttributionId',
+  referralPartnerProfileId: 'referralPartnerProfileId',
+  referralCodeSnapshot: 'referralCodeSnapshot',
   grossAmount: 'grossAmount',
   platformFeeAmount: 'platformFeeAmount',
   sellerPayableAmount: 'sellerPayableAmount',
   partnerReferralAmount: 'partnerReferralAmount',
-  trade82NetAmount: 'trade82NetAmount',
+  trade82RetainedAmountBeforeStripeFees: 'trade82RetainedAmountBeforeStripeFees',
   currency: 'currency',
   holdUntil: 'holdUntil',
   status: 'status',
@@ -599,6 +603,7 @@ export const SettlementLegScalarFieldEnum = {
   settlementId: 'settlementId',
   type: 'type',
   recipientCompanyId: 'recipientCompanyId',
+  recipientUserId: 'recipientUserId',
   partnerProfileId: 'partnerProfileId',
   amount: 'amount',
   currency: 'currency',
@@ -637,6 +642,7 @@ export const SettlementReversalScalarFieldEnum = {
   reason: 'reason',
   idempotencyKey: 'idempotencyKey',
   stripeRefundId: 'stripeRefundId',
+  stripeTransferReversalId: 'stripeTransferReversalId',
   createdAt: 'createdAt'
 } as const
 

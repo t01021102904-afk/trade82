@@ -433,6 +433,9 @@ model UserProfile {
   verifiedSellerPayoutProfiles   SellerPayoutProfile[]           @relation("SellerPayoutProfileVerifiedBy")
   sellerPayoutProfileAuditEvents SellerPayoutProfileAuditEvent[] @relation("SellerPayoutProfileAuditActor")
   settlementEvents               SettlementEvent[]               @relation("SettlementEventActor")
+  partnerProfile                 PartnerProfile?                 @relation("UserPartnerProfile")
+  referredReferralAttribution    ReferralAttribution?            @relation("ReferredUserAttribution")
+  settlementLegRecipientUsers    SettlementLeg[]                 @relation("SettlementLegRecipientUser")
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
 }
@@ -497,8 +500,6 @@ model Company {
   sellerTradeOrders                 TradeOrder[]              @relation("SellerCompanyTradeOrders")
   sellerPayoutProfile               SellerPayoutProfile?      @relation("SellerCompanyPayoutProfile")
   sellerPayouts                     SellerPayout[]            @relation("SellerCompanyPayouts")
-  partnerProfile                    PartnerProfile?           @relation("CompanyPartnerProfile")
-  referralAttribution               ReferralAttribution?      @relation("ReferredCompanyAttribution")
   stripeConnectedAccount            StripeConnectedAccount?   @relation("CompanyStripeConnectedAccount")
   settlementLegRecipients           SettlementLeg[]           @relation("SettlementLegRecipientCompany")
   reviewsWritten                    Review[]                  @relation("ReviewWriter")
@@ -925,45 +926,50 @@ model PaymentRequestWebhookEvent {
 // system. They reserve future Stripe Connect accounting without changing the
 // current PaymentRequest, TradeOrder, or SellerPayout lifecycle.
 model PartnerProfile {
-  id             String                @id @default(cuid())
-  companyId      String                @unique
-  company        Company               @relation("CompanyPartnerProfile", fields: [companyId], references: [id], onDelete: Restrict)
-  referralCode   String                @unique
-  status         PartnerProfileStatus  @default(ACTIVE)
-  attributions   ReferralAttribution[]
-  settlementLegs SettlementLeg[]       @relation("SettlementLegPartnerProfile")
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
+  id                     String                  @id @default(cuid())
+  userId                 String                  @unique
+  user                   UserProfile             @relation("UserPartnerProfile", fields: [userId], references: [id], onDelete: Restrict)
+  referralCode           String                  @unique
+  status                 PartnerProfileStatus    @default(ACTIVE)
+  attributions           ReferralAttribution[]
+  stripeConnectedAccount StripeConnectedAccount? @relation("PartnerProfileStripeConnectedAccount")
+  settlementLegs         SettlementLeg[]         @relation("SettlementLegPartnerProfile")
+  settlements            Settlement[]            @relation("SettlementReferralPartnerProfile")
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 
   @@index([status, createdAt])
 }
 
-// The first valid attribution for a referred company is immutable. Later
+// The first valid attribution for a referred user is immutable. Later
 // referrals are ignored by the service layer rather than replacing history.
 model ReferralAttribution {
-  id                String                    @id @default(cuid())
-  referredCompanyId String                    @unique
-  referredCompany   Company                   @relation("ReferredCompanyAttribution", fields: [referredCompanyId], references: [id], onDelete: Restrict)
-  partnerProfileId  String
-  partnerProfile    PartnerProfile            @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
-  referralCode      String
-  status            ReferralAttributionStatus @default(LOCKED)
-  lockedAt          DateTime                  @default(now())
-  settlements       Settlement[]
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
+  id               String                    @id @default(cuid())
+  referredUserId   String                    @unique
+  referredUser     UserProfile               @relation("ReferredUserAttribution", fields: [referredUserId], references: [id], onDelete: Restrict)
+  partnerProfileId String
+  partnerProfile   PartnerProfile            @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  referralCode     String
+  status           ReferralAttributionStatus @default(LOCKED)
+  lockedAt         DateTime                  @default(now())
+  settlements      Settlement[]
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
 
   @@index([partnerProfileId, lockedAt])
 }
 
 model StripeConnectedAccount {
   id                 String                       @id @default(cuid())
-  companyId          String                       @unique
-  company            Company                      @relation("CompanyStripeConnectedAccount", fields: [companyId], references: [id], onDelete: Restrict)
+  companyId          String?                      @unique
+  company            Company?                     @relation("CompanyStripeConnectedAccount", fields: [companyId], references: [id], onDelete: Restrict)
+  partnerProfileId   String?                      @unique
+  partnerProfile     PartnerProfile?              @relation("PartnerProfileStripeConnectedAccount", fields: [partnerProfileId], references: [id], onDelete: Restrict)
   stripeAccountId    String                       @unique
   status             StripeConnectedAccountStatus @default(PENDING)
   chargesEnabled     Boolean                      @default(false)
   payoutsEnabled     Boolean                      @default(false)
+  transfersEnabled   Boolean                      @default(false)
   detailsSubmitted   Boolean                      @default(false)
   onboardingComplete Boolean                      @default(false)
   createdAt          DateTime                     @default(now())
@@ -973,30 +979,34 @@ model StripeConnectedAccount {
 }
 
 model Settlement {
-  id                    String               @id @default(cuid())
-  paymentRequestId      String               @unique
-  paymentRequest        PaymentRequest       @relation("PaymentRequestConnectSettlement", fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  tradeOrderId          String               @unique
-  tradeOrder            TradeOrder           @relation("TradeOrderConnectSettlement", fields: [tradeOrderId], references: [id], onDelete: Restrict)
-  referralAttributionId String?
-  referralAttribution   ReferralAttribution? @relation(fields: [referralAttributionId], references: [id], onDelete: Restrict)
-  grossAmount           Int
-  platformFeeAmount     Int
-  sellerPayableAmount   Int
-  partnerReferralAmount Int                  @default(0)
-  trade82NetAmount      Int
-  currency              String               @default("usd")
-  holdUntil             DateTime
-  status                SettlementStatus     @default(HOLD)
-  idempotencyKey        String               @unique
-  legs                  SettlementLeg[]
-  events                SettlementEvent[]
-  reversals             SettlementReversal[]
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
+  id                                    String               @id @default(cuid())
+  paymentRequestId                      String               @unique
+  paymentRequest                        PaymentRequest       @relation("PaymentRequestConnectSettlement", fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  tradeOrderId                          String               @unique
+  tradeOrder                            TradeOrder           @relation("TradeOrderConnectSettlement", fields: [tradeOrderId], references: [id], onDelete: Restrict)
+  referralAttributionId                 String?
+  referralAttribution                   ReferralAttribution? @relation(fields: [referralAttributionId], references: [id], onDelete: Restrict)
+  referralPartnerProfileId              String?
+  referralPartnerProfile                PartnerProfile?      @relation("SettlementReferralPartnerProfile", fields: [referralPartnerProfileId], references: [id], onDelete: Restrict)
+  referralCodeSnapshot                  String?
+  grossAmount                           Int
+  platformFeeAmount                     Int
+  sellerPayableAmount                   Int
+  partnerReferralAmount                 Int                  @default(0)
+  trade82RetainedAmountBeforeStripeFees Int
+  currency                              String               @default("usd")
+  holdUntil                             DateTime
+  status                                SettlementStatus     @default(HOLD)
+  idempotencyKey                        String               @unique
+  legs                                  SettlementLeg[]
+  events                                SettlementEvent[]
+  reversals                             SettlementReversal[]
+  createdAt                             DateTime             @default(now())
+  updatedAt                             DateTime             @updatedAt
 
   @@index([status, holdUntil])
   @@index([referralAttributionId])
+  @@index([referralPartnerProfileId])
 }
 
 model SettlementLeg {
@@ -1006,6 +1016,8 @@ model SettlementLeg {
   type               SettlementLegType
   recipientCompanyId String?
   recipientCompany   Company?             @relation("SettlementLegRecipientCompany", fields: [recipientCompanyId], references: [id], onDelete: Restrict)
+  recipientUserId    String?
+  recipientUser      UserProfile?         @relation("SettlementLegRecipientUser", fields: [recipientUserId], references: [id], onDelete: Restrict)
   partnerProfileId   String?
   partnerProfile     PartnerProfile?      @relation("SettlementLegPartnerProfile", fields: [partnerProfileId], references: [id], onDelete: Restrict)
   amount             Int
@@ -1021,6 +1033,7 @@ model SettlementLeg {
 
   @@unique([settlementId, type])
   @@index([recipientCompanyId, status, holdUntil])
+  @@index([recipientUserId, status, holdUntil])
   @@index([partnerProfileId, status, holdUntil])
 }
 
@@ -1043,18 +1056,20 @@ model SettlementEvent {
 }
 
 model SettlementReversal {
-  id              String                   @id @default(cuid())
-  settlementId    String
-  settlement      Settlement               @relation(fields: [settlementId], references: [id], onDelete: Restrict)
-  settlementLegId String?
-  settlementLeg   SettlementLeg?           @relation(fields: [settlementLegId], references: [id], onDelete: Restrict)
-  amount          Int
-  currency        String                   @default("usd")
-  reason          SettlementReversalReason
-  idempotencyKey  String                   @unique
-  stripeRefundId  String?                  @unique
-  createdAt       DateTime                 @default(now())
+  id                       String                   @id @default(cuid())
+  settlementId             String
+  settlement               Settlement               @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  settlementLegId          String?
+  settlementLeg            SettlementLeg?           @relation(fields: [settlementLegId], references: [id], onDelete: Restrict)
+  amount                   Int
+  currency                 String                   @default("usd")
+  reason                   SettlementReversalReason
+  idempotencyKey           String                   @unique
+  stripeRefundId           String?
+  stripeTransferReversalId String?                  @unique
+  createdAt                DateTime                 @default(now())
 
+  @@unique([stripeRefundId, settlementLegId])
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])
 }

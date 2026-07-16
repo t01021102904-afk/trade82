@@ -26,7 +26,7 @@ test("settlement financials preserve the exact 95 / 4.5 / 0.5 gross split", () =
     platformFeeAmount: 5_000,
     sellerPayableAmount: 95_000,
     partnerReferralAmount: 500,
-    trade82NetAmount: 4_500,
+    trade82RetainedAmountBeforeStripeFees: 4_500,
     currency: "usd",
   });
   assert.equal(
@@ -42,9 +42,12 @@ test("settlement financials omit only the referral leg when no attribution is lo
     hasReferralAttribution: false,
   });
 
-  assert.equal(financials.sellerPayableAmount + financials.trade82NetAmount, financials.grossAmount);
+  assert.equal(
+    financials.sellerPayableAmount + financials.trade82RetainedAmountBeforeStripeFees,
+    financials.grossAmount,
+  );
   assert.equal(financials.partnerReferralAmount, 0);
-  assert.equal(financials.trade82NetAmount, financials.platformFeeAmount);
+  assert.equal(financials.trade82RetainedAmountBeforeStripeFees, financials.platformFeeAmount);
 });
 
 test("settlement calculations reject non-USD or non-integer minor units", () => {
@@ -102,4 +105,23 @@ test("the additive migration creates a restricted ledger without Stripe transfer
   }
   assert.doesNotMatch(migration, /^\s*(DROP|DELETE FROM|TRUNCATE)\b/m);
   assert.doesNotMatch(migration, /stripe\.transfers/i);
+  assert.match(migration, /"PartnerProfile_userId_fkey"/);
+  assert.match(migration, /"ReferralAttribution_referredUserId_fkey"/);
+  assert.match(migration, /"StripeConnectedAccount_owner_xor_check"/);
+  assert.match(migration, /"Settlement_amount_currency_check"/);
+  assert.match(migration, /"SettlementLeg_amount_currency_recipient_check"/);
+  assert.match(migration, /"SettlementReversal_stripeRefundId_settlementLegId_key"/);
+  assert.match(migration, /"stripeTransferReversalId"/);
+});
+
+test("settlement creation snapshots only an explicitly selected referral attribution", async () => {
+  const service = await readFile(
+    new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(service, /referralAttributionId\?: string \| null/);
+  assert.match(service, /where: \{ id: referralAttributionId \}/);
+  assert.match(service, /referralPartnerProfileId: attribution!\.partnerProfileId/);
+  assert.doesNotMatch(service, /referredCompanyId/);
 });

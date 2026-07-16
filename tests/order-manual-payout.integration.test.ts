@@ -227,19 +227,28 @@ test("verified payments create one fourteen-day pending settlement ledger with f
   const fixture = await createFixture("connect-settlement");
   const order = await createOrder(fixture);
   const paymentRequest = await markOrderPaid(order.id);
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `user_test_order_partner_${unique("connect-settlement")}`,
+      email: `${unique("partner")}@example.test`,
+      displayName: "Partner Test",
+      country: "US",
+      role: "buyer",
+    },
+  });
   const partner = await db.partnerProfile.create({
     data: {
-      companyId: fixture.buyerCompany.id,
+      userId: partnerUser.id,
       referralCode: unique("partner"),
     },
   });
 
   const attribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
-    referredCompanyId: fixture.sellerCompany.id,
+    referredUserId: fixture.seller.id,
     partnerProfileId: partner.id,
   }))) as { created: boolean; attribution: { id: string } };
   const duplicateAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
-    referredCompanyId: fixture.sellerCompany.id,
+    referredUserId: fixture.seller.id,
     partnerProfileId: partner.id,
   }))) as { created: boolean; attribution: { id: string } };
   assert.equal(attribution.created, true);
@@ -247,30 +256,42 @@ test("verified payments create one fourteen-day pending settlement ledger with f
   assert.equal(duplicateAttribution.attribution.id, attribution.attribution.id);
 
   const first = (await db.$transaction((tx) =>
-    settlements.createPendingSettlementForVerifiedPayment(tx, { paymentRequestId: paymentRequest.id }),
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: paymentRequest.id,
+      referralAttributionId: attribution.attribution.id,
+    }),
   )) as {
     created: boolean;
     settlement: {
       id: string;
       legs: unknown[];
+      referralAttributionId: string | null;
+      referralPartnerProfileId: string | null;
+      referralCodeSnapshot: string | null;
       sellerPayableAmount: number;
       platformFeeAmount: number;
       partnerReferralAmount: number;
-      trade82NetAmount: number;
+      trade82RetainedAmountBeforeStripeFees: number;
       holdUntil: Date;
     };
   };
   const duplicate = (await db.$transaction((tx) =>
-    settlements.createPendingSettlementForVerifiedPayment(tx, { paymentRequestId: paymentRequest.id }),
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: paymentRequest.id,
+      referralAttributionId: attribution.attribution.id,
+    }),
   )) as { created: boolean; settlement: { id: string } };
   assert.equal(first.created, true);
   assert.equal(duplicate.created, false);
   assert.equal(duplicate.settlement.id, first.settlement.id);
   assert.equal(first.settlement.legs.length, 3);
+  assert.equal(first.settlement.referralAttributionId, attribution.attribution.id);
+  assert.equal(first.settlement.referralPartnerProfileId, partner.id);
+  assert.equal(first.settlement.referralCodeSnapshot, partner.referralCode);
   assert.equal(first.settlement.sellerPayableAmount, 104_500);
   assert.equal(first.settlement.platformFeeAmount, 5_500);
   assert.equal(first.settlement.partnerReferralAmount, 550);
-  assert.equal(first.settlement.trade82NetAmount, 4_950);
+  assert.equal(first.settlement.trade82RetainedAmountBeforeStripeFees, 4_950);
   assert.equal(
     first.settlement.holdUntil.getTime() - paymentRequest.paidAt!.getTime(),
     14 * 24 * 60 * 60 * 1_000,

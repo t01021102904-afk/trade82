@@ -27,10 +27,12 @@ export type AggregateStripeConnectedAccount = {
 export type StripeConnectedAccountMinAggregateOutputType = {
   id: string | null
   companyId: string | null
+  partnerProfileId: string | null
   stripeAccountId: string | null
   status: $Enums.StripeConnectedAccountStatus | null
   chargesEnabled: boolean | null
   payoutsEnabled: boolean | null
+  transfersEnabled: boolean | null
   detailsSubmitted: boolean | null
   onboardingComplete: boolean | null
   createdAt: Date | null
@@ -40,10 +42,12 @@ export type StripeConnectedAccountMinAggregateOutputType = {
 export type StripeConnectedAccountMaxAggregateOutputType = {
   id: string | null
   companyId: string | null
+  partnerProfileId: string | null
   stripeAccountId: string | null
   status: $Enums.StripeConnectedAccountStatus | null
   chargesEnabled: boolean | null
   payoutsEnabled: boolean | null
+  transfersEnabled: boolean | null
   detailsSubmitted: boolean | null
   onboardingComplete: boolean | null
   createdAt: Date | null
@@ -53,10 +57,12 @@ export type StripeConnectedAccountMaxAggregateOutputType = {
 export type StripeConnectedAccountCountAggregateOutputType = {
   id: number
   companyId: number
+  partnerProfileId: number
   stripeAccountId: number
   status: number
   chargesEnabled: number
   payoutsEnabled: number
+  transfersEnabled: number
   detailsSubmitted: number
   onboardingComplete: number
   createdAt: number
@@ -68,10 +74,12 @@ export type StripeConnectedAccountCountAggregateOutputType = {
 export type StripeConnectedAccountMinAggregateInputType = {
   id?: true
   companyId?: true
+  partnerProfileId?: true
   stripeAccountId?: true
   status?: true
   chargesEnabled?: true
   payoutsEnabled?: true
+  transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
   createdAt?: true
@@ -81,10 +89,12 @@ export type StripeConnectedAccountMinAggregateInputType = {
 export type StripeConnectedAccountMaxAggregateInputType = {
   id?: true
   companyId?: true
+  partnerProfileId?: true
   stripeAccountId?: true
   status?: true
   chargesEnabled?: true
   payoutsEnabled?: true
+  transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
   createdAt?: true
@@ -94,10 +104,12 @@ export type StripeConnectedAccountMaxAggregateInputType = {
 export type StripeConnectedAccountCountAggregateInputType = {
   id?: true
   companyId?: true
+  partnerProfileId?: true
   stripeAccountId?: true
   status?: true
   chargesEnabled?: true
   payoutsEnabled?: true
+  transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
   createdAt?: true
@@ -179,11 +191,13 @@ export type StripeConnectedAccountGroupByArgs<ExtArgs extends runtime.Types.Exte
 
 export type StripeConnectedAccountGroupByOutputType = {
   id: string
-  companyId: string
+  companyId: string | null
+  partnerProfileId: string | null
   stripeAccountId: string
   status: $Enums.StripeConnectedAccountStatus
   chargesEnabled: boolean
   payoutsEnabled: boolean
+  transfersEnabled: boolean
   detailsSubmitted: boolean
   onboardingComplete: boolean
   createdAt: Date
@@ -213,35 +227,42 @@ export type StripeConnectedAccountWhereInput = {
   OR?: Prisma.StripeConnectedAccountWhereInput[]
   NOT?: Prisma.StripeConnectedAccountWhereInput | Prisma.StripeConnectedAccountWhereInput[]
   id?: Prisma.StringFilter<"StripeConnectedAccount"> | string
-  companyId?: Prisma.StringFilter<"StripeConnectedAccount"> | string
+  companyId?: Prisma.StringNullableFilter<"StripeConnectedAccount"> | string | null
+  partnerProfileId?: Prisma.StringNullableFilter<"StripeConnectedAccount"> | string | null
   stripeAccountId?: Prisma.StringFilter<"StripeConnectedAccount"> | string
   status?: Prisma.EnumStripeConnectedAccountStatusFilter<"StripeConnectedAccount"> | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   payoutsEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
+  transfersEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   detailsSubmitted?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   onboardingComplete?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StripeConnectedAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StripeConnectedAccount"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
 }
 
 export type StripeConnectedAccountOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partnerProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   chargesEnabled?: Prisma.SortOrder
   payoutsEnabled?: Prisma.SortOrder
+  transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
+  partnerProfile?: Prisma.PartnerProfileOrderByWithRelationInput
 }
 
 export type StripeConnectedAccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   companyId?: string
+  partnerProfileId?: string
   stripeAccountId?: string
   AND?: Prisma.StripeConnectedAccountWhereInput | Prisma.StripeConnectedAccountWhereInput[]
   OR?: Prisma.StripeConnectedAccountWhereInput[]
@@ -249,20 +270,24 @@ export type StripeConnectedAccountWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumStripeConnectedAccountStatusFilter<"StripeConnectedAccount"> | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   payoutsEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
+  transfersEnabled?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   detailsSubmitted?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   onboardingComplete?: Prisma.BoolFilter<"StripeConnectedAccount"> | boolean
   createdAt?: Prisma.DateTimeFilter<"StripeConnectedAccount"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"StripeConnectedAccount"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
-}, "id" | "companyId" | "stripeAccountId">
+  company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
+  partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
+}, "id" | "companyId" | "partnerProfileId" | "stripeAccountId">
 
 export type StripeConnectedAccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  partnerProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   chargesEnabled?: Prisma.SortOrder
   payoutsEnabled?: Prisma.SortOrder
+  transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -277,11 +302,13 @@ export type StripeConnectedAccountScalarWhereWithAggregatesInput = {
   OR?: Prisma.StripeConnectedAccountScalarWhereWithAggregatesInput[]
   NOT?: Prisma.StripeConnectedAccountScalarWhereWithAggregatesInput | Prisma.StripeConnectedAccountScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"StripeConnectedAccount"> | string
-  companyId?: Prisma.StringWithAggregatesFilter<"StripeConnectedAccount"> | string
+  companyId?: Prisma.StringNullableWithAggregatesFilter<"StripeConnectedAccount"> | string | null
+  partnerProfileId?: Prisma.StringNullableWithAggregatesFilter<"StripeConnectedAccount"> | string | null
   stripeAccountId?: Prisma.StringWithAggregatesFilter<"StripeConnectedAccount"> | string
   status?: Prisma.EnumStripeConnectedAccountStatusWithAggregatesFilter<"StripeConnectedAccount"> | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolWithAggregatesFilter<"StripeConnectedAccount"> | boolean
   payoutsEnabled?: Prisma.BoolWithAggregatesFilter<"StripeConnectedAccount"> | boolean
+  transfersEnabled?: Prisma.BoolWithAggregatesFilter<"StripeConnectedAccount"> | boolean
   detailsSubmitted?: Prisma.BoolWithAggregatesFilter<"StripeConnectedAccount"> | boolean
   onboardingComplete?: Prisma.BoolWithAggregatesFilter<"StripeConnectedAccount"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"StripeConnectedAccount"> | Date | string
@@ -294,20 +321,24 @@ export type StripeConnectedAccountCreateInput = {
   status?: $Enums.StripeConnectedAccountStatus
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutStripeConnectedAccountInput
+  company?: Prisma.CompanyCreateNestedOneWithoutStripeConnectedAccountInput
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutStripeConnectedAccountInput
 }
 
 export type StripeConnectedAccountUncheckedCreateInput = {
   id?: string
-  companyId: string
+  companyId?: string | null
+  partnerProfileId?: string | null
   stripeAccountId: string
   status?: $Enums.StripeConnectedAccountStatus
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: Date | string
@@ -320,20 +351,24 @@ export type StripeConnectedAccountUpdateInput = {
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutStripeConnectedAccountNestedInput
+  company?: Prisma.CompanyUpdateOneWithoutStripeConnectedAccountNestedInput
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutStripeConnectedAccountNestedInput
 }
 
 export type StripeConnectedAccountUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -342,11 +377,13 @@ export type StripeConnectedAccountUncheckedUpdateInput = {
 
 export type StripeConnectedAccountCreateManyInput = {
   id?: string
-  companyId: string
+  companyId?: string | null
+  partnerProfileId?: string | null
   stripeAccountId: string
   status?: $Enums.StripeConnectedAccountStatus
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: Date | string
@@ -359,6 +396,7 @@ export type StripeConnectedAccountUpdateManyMutationInput = {
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,11 +405,13 @@ export type StripeConnectedAccountUpdateManyMutationInput = {
 
 export type StripeConnectedAccountUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -386,10 +426,12 @@ export type StripeConnectedAccountNullableScalarRelationFilter = {
 export type StripeConnectedAccountCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  partnerProfileId?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   chargesEnabled?: Prisma.SortOrder
   payoutsEnabled?: Prisma.SortOrder
+  transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -399,10 +441,12 @@ export type StripeConnectedAccountCountOrderByAggregateInput = {
 export type StripeConnectedAccountMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  partnerProfileId?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   chargesEnabled?: Prisma.SortOrder
   payoutsEnabled?: Prisma.SortOrder
+  transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -412,10 +456,12 @@ export type StripeConnectedAccountMaxOrderByAggregateInput = {
 export type StripeConnectedAccountMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
+  partnerProfileId?: Prisma.SortOrder
   stripeAccountId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   chargesEnabled?: Prisma.SortOrder
   payoutsEnabled?: Prisma.SortOrder
+  transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -454,6 +500,38 @@ export type StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.StripeConnectedAccountUpdateToOneWithWhereWithoutCompanyInput, Prisma.StripeConnectedAccountUpdateWithoutCompanyInput>, Prisma.StripeConnectedAccountUncheckedUpdateWithoutCompanyInput>
 }
 
+export type StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput = {
+  create?: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+  connectOrCreate?: Prisma.StripeConnectedAccountCreateOrConnectWithoutPartnerProfileInput
+  connect?: Prisma.StripeConnectedAccountWhereUniqueInput
+}
+
+export type StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput = {
+  create?: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+  connectOrCreate?: Prisma.StripeConnectedAccountCreateOrConnectWithoutPartnerProfileInput
+  connect?: Prisma.StripeConnectedAccountWhereUniqueInput
+}
+
+export type StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+  connectOrCreate?: Prisma.StripeConnectedAccountCreateOrConnectWithoutPartnerProfileInput
+  upsert?: Prisma.StripeConnectedAccountUpsertWithoutPartnerProfileInput
+  disconnect?: Prisma.StripeConnectedAccountWhereInput | boolean
+  delete?: Prisma.StripeConnectedAccountWhereInput | boolean
+  connect?: Prisma.StripeConnectedAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StripeConnectedAccountUpdateToOneWithWhereWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUpdateWithoutPartnerProfileInput>, Prisma.StripeConnectedAccountUncheckedUpdateWithoutPartnerProfileInput>
+}
+
+export type StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+  connectOrCreate?: Prisma.StripeConnectedAccountCreateOrConnectWithoutPartnerProfileInput
+  upsert?: Prisma.StripeConnectedAccountUpsertWithoutPartnerProfileInput
+  disconnect?: Prisma.StripeConnectedAccountWhereInput | boolean
+  delete?: Prisma.StripeConnectedAccountWhereInput | boolean
+  connect?: Prisma.StripeConnectedAccountWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StripeConnectedAccountUpdateToOneWithWhereWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUpdateWithoutPartnerProfileInput>, Prisma.StripeConnectedAccountUncheckedUpdateWithoutPartnerProfileInput>
+}
+
 export type EnumStripeConnectedAccountStatusFieldUpdateOperationsInput = {
   set?: $Enums.StripeConnectedAccountStatus
 }
@@ -464,18 +542,22 @@ export type StripeConnectedAccountCreateWithoutCompanyInput = {
   status?: $Enums.StripeConnectedAccountStatus
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutStripeConnectedAccountInput
 }
 
 export type StripeConnectedAccountUncheckedCreateWithoutCompanyInput = {
   id?: string
+  partnerProfileId?: string | null
   stripeAccountId: string
   status?: $Enums.StripeConnectedAccountStatus
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: Date | string
@@ -504,18 +586,94 @@ export type StripeConnectedAccountUpdateWithoutCompanyInput = {
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutStripeConnectedAccountNestedInput
+}
+
+export type StripeConnectedAccountUncheckedUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
+  chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type StripeConnectedAccountUncheckedUpdateWithoutCompanyInput = {
+export type StripeConnectedAccountCreateWithoutPartnerProfileInput = {
+  id?: string
+  stripeAccountId: string
+  status?: $Enums.StripeConnectedAccountStatus
+  chargesEnabled?: boolean
+  payoutsEnabled?: boolean
+  transfersEnabled?: boolean
+  detailsSubmitted?: boolean
+  onboardingComplete?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  company?: Prisma.CompanyCreateNestedOneWithoutStripeConnectedAccountInput
+}
+
+export type StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput = {
+  id?: string
+  companyId?: string | null
+  stripeAccountId: string
+  status?: $Enums.StripeConnectedAccountStatus
+  chargesEnabled?: boolean
+  payoutsEnabled?: boolean
+  transfersEnabled?: boolean
+  detailsSubmitted?: boolean
+  onboardingComplete?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StripeConnectedAccountCreateOrConnectWithoutPartnerProfileInput = {
+  where: Prisma.StripeConnectedAccountWhereUniqueInput
+  create: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+}
+
+export type StripeConnectedAccountUpsertWithoutPartnerProfileInput = {
+  update: Prisma.XOR<Prisma.StripeConnectedAccountUpdateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedUpdateWithoutPartnerProfileInput>
+  create: Prisma.XOR<Prisma.StripeConnectedAccountCreateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedCreateWithoutPartnerProfileInput>
+  where?: Prisma.StripeConnectedAccountWhereInput
+}
+
+export type StripeConnectedAccountUpdateToOneWithWhereWithoutPartnerProfileInput = {
+  where?: Prisma.StripeConnectedAccountWhereInput
+  data: Prisma.XOR<Prisma.StripeConnectedAccountUpdateWithoutPartnerProfileInput, Prisma.StripeConnectedAccountUncheckedUpdateWithoutPartnerProfileInput>
+}
+
+export type StripeConnectedAccountUpdateWithoutPartnerProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   stripeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
   chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneWithoutStripeConnectedAccountNestedInput
+}
+
+export type StripeConnectedAccountUncheckedUpdateWithoutPartnerProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeAccountId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumStripeConnectedAccountStatusFieldUpdateOperationsInput | $Enums.StripeConnectedAccountStatus
+  chargesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  payoutsEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -527,81 +685,98 @@ export type StripeConnectedAccountUncheckedUpdateWithoutCompanyInput = {
 export type StripeConnectedAccountSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   companyId?: boolean
+  partnerProfileId?: boolean
   stripeAccountId?: boolean
   status?: boolean
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }, ExtArgs["result"]["stripeConnectedAccount"]>
 
 export type StripeConnectedAccountSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   companyId?: boolean
+  partnerProfileId?: boolean
   stripeAccountId?: boolean
   status?: boolean
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }, ExtArgs["result"]["stripeConnectedAccount"]>
 
 export type StripeConnectedAccountSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   companyId?: boolean
+  partnerProfileId?: boolean
   stripeAccountId?: boolean
   status?: boolean
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }, ExtArgs["result"]["stripeConnectedAccount"]>
 
 export type StripeConnectedAccountSelectScalar = {
   id?: boolean
   companyId?: boolean
+  partnerProfileId?: boolean
   stripeAccountId?: boolean
   status?: boolean
   chargesEnabled?: boolean
   payoutsEnabled?: boolean
+  transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type StripeConnectedAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "stripeAccountId" | "status" | "chargesEnabled" | "payoutsEnabled" | "detailsSubmitted" | "onboardingComplete" | "createdAt" | "updatedAt", ExtArgs["result"]["stripeConnectedAccount"]>
+export type StripeConnectedAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "partnerProfileId" | "stripeAccountId" | "status" | "chargesEnabled" | "payoutsEnabled" | "transfersEnabled" | "detailsSubmitted" | "onboardingComplete" | "createdAt" | "updatedAt", ExtArgs["result"]["stripeConnectedAccount"]>
 export type StripeConnectedAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }
 export type StripeConnectedAccountIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }
 export type StripeConnectedAccountIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.StripeConnectedAccount$companyArgs<ExtArgs>
+  partnerProfile?: boolean | Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>
 }
 
 export type $StripeConnectedAccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "StripeConnectedAccount"
   objects: {
-    company: Prisma.$CompanyPayload<ExtArgs>
+    company: Prisma.$CompanyPayload<ExtArgs> | null
+    partnerProfile: Prisma.$PartnerProfilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    companyId: string
+    companyId: string | null
+    partnerProfileId: string | null
     stripeAccountId: string
     status: $Enums.StripeConnectedAccountStatus
     chargesEnabled: boolean
     payoutsEnabled: boolean
+    transfersEnabled: boolean
     detailsSubmitted: boolean
     onboardingComplete: boolean
     createdAt: Date
@@ -1000,7 +1175,8 @@ readonly fields: StripeConnectedAccountFieldRefs;
  */
 export interface Prisma__StripeConnectedAccountClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  company<T extends Prisma.StripeConnectedAccount$companyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StripeConnectedAccount$companyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  partnerProfile<T extends Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StripeConnectedAccount$partnerProfileArgs<ExtArgs>>): Prisma.Prisma__PartnerProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1032,10 +1208,12 @@ export interface Prisma__StripeConnectedAccountClient<T, Null = never, ExtArgs e
 export interface StripeConnectedAccountFieldRefs {
   readonly id: Prisma.FieldRef<"StripeConnectedAccount", 'String'>
   readonly companyId: Prisma.FieldRef<"StripeConnectedAccount", 'String'>
+  readonly partnerProfileId: Prisma.FieldRef<"StripeConnectedAccount", 'String'>
   readonly stripeAccountId: Prisma.FieldRef<"StripeConnectedAccount", 'String'>
   readonly status: Prisma.FieldRef<"StripeConnectedAccount", 'StripeConnectedAccountStatus'>
   readonly chargesEnabled: Prisma.FieldRef<"StripeConnectedAccount", 'Boolean'>
   readonly payoutsEnabled: Prisma.FieldRef<"StripeConnectedAccount", 'Boolean'>
+  readonly transfersEnabled: Prisma.FieldRef<"StripeConnectedAccount", 'Boolean'>
   readonly detailsSubmitted: Prisma.FieldRef<"StripeConnectedAccount", 'Boolean'>
   readonly onboardingComplete: Prisma.FieldRef<"StripeConnectedAccount", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"StripeConnectedAccount", 'DateTime'>
@@ -1438,6 +1616,44 @@ export type StripeConnectedAccountDeleteManyArgs<ExtArgs extends runtime.Types.E
    * Limit how many StripeConnectedAccounts to delete.
    */
   limit?: number
+}
+
+/**
+ * StripeConnectedAccount.company
+ */
+export type StripeConnectedAccount$companyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Company
+   */
+  select?: Prisma.CompanySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Company
+   */
+  omit?: Prisma.CompanyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanyInclude<ExtArgs> | null
+  where?: Prisma.CompanyWhereInput
+}
+
+/**
+ * StripeConnectedAccount.partnerProfile
+ */
+export type StripeConnectedAccount$partnerProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartnerProfile
+   */
+  select?: Prisma.PartnerProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartnerProfile
+   */
+  omit?: Prisma.PartnerProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerProfileInclude<ExtArgs> | null
+  where?: Prisma.PartnerProfileWhereInput
 }
 
 /**

@@ -26,7 +26,7 @@ export type AggregatePartnerProfile = {
 
 export type PartnerProfileMinAggregateOutputType = {
   id: string | null
-  companyId: string | null
+  userId: string | null
   referralCode: string | null
   status: $Enums.PartnerProfileStatus | null
   createdAt: Date | null
@@ -35,7 +35,7 @@ export type PartnerProfileMinAggregateOutputType = {
 
 export type PartnerProfileMaxAggregateOutputType = {
   id: string | null
-  companyId: string | null
+  userId: string | null
   referralCode: string | null
   status: $Enums.PartnerProfileStatus | null
   createdAt: Date | null
@@ -44,7 +44,7 @@ export type PartnerProfileMaxAggregateOutputType = {
 
 export type PartnerProfileCountAggregateOutputType = {
   id: number
-  companyId: number
+  userId: number
   referralCode: number
   status: number
   createdAt: number
@@ -55,7 +55,7 @@ export type PartnerProfileCountAggregateOutputType = {
 
 export type PartnerProfileMinAggregateInputType = {
   id?: true
-  companyId?: true
+  userId?: true
   referralCode?: true
   status?: true
   createdAt?: true
@@ -64,7 +64,7 @@ export type PartnerProfileMinAggregateInputType = {
 
 export type PartnerProfileMaxAggregateInputType = {
   id?: true
-  companyId?: true
+  userId?: true
   referralCode?: true
   status?: true
   createdAt?: true
@@ -73,7 +73,7 @@ export type PartnerProfileMaxAggregateInputType = {
 
 export type PartnerProfileCountAggregateInputType = {
   id?: true
-  companyId?: true
+  userId?: true
   referralCode?: true
   status?: true
   createdAt?: true
@@ -155,7 +155,7 @@ export type PartnerProfileGroupByArgs<ExtArgs extends runtime.Types.Extensions.I
 
 export type PartnerProfileGroupByOutputType = {
   id: string
-  companyId: string
+  userId: string
   referralCode: string
   status: $Enums.PartnerProfileStatus
   createdAt: Date
@@ -185,31 +185,35 @@ export type PartnerProfileWhereInput = {
   OR?: Prisma.PartnerProfileWhereInput[]
   NOT?: Prisma.PartnerProfileWhereInput | Prisma.PartnerProfileWhereInput[]
   id?: Prisma.StringFilter<"PartnerProfile"> | string
-  companyId?: Prisma.StringFilter<"PartnerProfile"> | string
+  userId?: Prisma.StringFilter<"PartnerProfile"> | string
   referralCode?: Prisma.StringFilter<"PartnerProfile"> | string
   status?: Prisma.EnumPartnerProfileStatusFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   attributions?: Prisma.ReferralAttributionListRelationFilter
+  stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
   settlementLegs?: Prisma.SettlementLegListRelationFilter
+  settlements?: Prisma.SettlementListRelationFilter
 }
 
 export type PartnerProfileOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  company?: Prisma.CompanyOrderByWithRelationInput
+  user?: Prisma.UserProfileOrderByWithRelationInput
   attributions?: Prisma.ReferralAttributionOrderByRelationAggregateInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountOrderByWithRelationInput
   settlementLegs?: Prisma.SettlementLegOrderByRelationAggregateInput
+  settlements?: Prisma.SettlementOrderByRelationAggregateInput
 }
 
 export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  companyId?: string
+  userId?: string
   referralCode?: string
   AND?: Prisma.PartnerProfileWhereInput | Prisma.PartnerProfileWhereInput[]
   OR?: Prisma.PartnerProfileWhereInput[]
@@ -217,14 +221,16 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumPartnerProfileStatusFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   attributions?: Prisma.ReferralAttributionListRelationFilter
+  stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
   settlementLegs?: Prisma.SettlementLegListRelationFilter
-}, "id" | "companyId" | "referralCode">
+  settlements?: Prisma.SettlementListRelationFilter
+}, "id" | "userId" | "referralCode">
 
 export type PartnerProfileOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -239,7 +245,7 @@ export type PartnerProfileScalarWhereWithAggregatesInput = {
   OR?: Prisma.PartnerProfileScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PartnerProfileScalarWhereWithAggregatesInput | Prisma.PartnerProfileScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
-  companyId?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
+  userId?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
   referralCode?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
   status?: Prisma.EnumPartnerProfileStatusWithAggregatesFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerProfile"> | Date | string
@@ -252,20 +258,24 @@ export type PartnerProfileCreateInput = {
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutPartnerProfileInput
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileUncheckedCreateInput = {
   id?: string
-  companyId: string
+  userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileUpdateInput = {
@@ -274,25 +284,29 @@ export type PartnerProfileUpdateInput = {
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutPartnerProfileNestedInput
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 export type PartnerProfileUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 export type PartnerProfileCreateManyInput = {
   id?: string
-  companyId: string
+  userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
@@ -309,7 +323,7 @@ export type PartnerProfileUpdateManyMutationInput = {
 
 export type PartnerProfileUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -323,7 +337,7 @@ export type PartnerProfileNullableScalarRelationFilter = {
 
 export type PartnerProfileCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -332,7 +346,7 @@ export type PartnerProfileCountOrderByAggregateInput = {
 
 export type PartnerProfileMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -341,7 +355,7 @@ export type PartnerProfileMaxOrderByAggregateInput = {
 
 export type PartnerProfileMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  companyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -353,36 +367,36 @@ export type PartnerProfileScalarRelationFilter = {
   isNot?: Prisma.PartnerProfileWhereInput
 }
 
-export type PartnerProfileCreateNestedOneWithoutCompanyInput = {
-  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
-  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutCompanyInput
+export type PartnerProfileCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutUserInput
   connect?: Prisma.PartnerProfileWhereUniqueInput
 }
 
-export type PartnerProfileUncheckedCreateNestedOneWithoutCompanyInput = {
-  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
-  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutCompanyInput
+export type PartnerProfileUncheckedCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutUserInput
   connect?: Prisma.PartnerProfileWhereUniqueInput
 }
 
-export type PartnerProfileUpdateOneWithoutCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
-  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutCompanyInput
-  upsert?: Prisma.PartnerProfileUpsertWithoutCompanyInput
+export type PartnerProfileUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutUserInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutUserInput
   disconnect?: Prisma.PartnerProfileWhereInput | boolean
   delete?: Prisma.PartnerProfileWhereInput | boolean
   connect?: Prisma.PartnerProfileWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutCompanyInput, Prisma.PartnerProfileUpdateWithoutCompanyInput>, Prisma.PartnerProfileUncheckedUpdateWithoutCompanyInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutUserInput, Prisma.PartnerProfileUpdateWithoutUserInput>, Prisma.PartnerProfileUncheckedUpdateWithoutUserInput>
 }
 
-export type PartnerProfileUncheckedUpdateOneWithoutCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
-  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutCompanyInput
-  upsert?: Prisma.PartnerProfileUpsertWithoutCompanyInput
+export type PartnerProfileUncheckedUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutUserInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutUserInput
   disconnect?: Prisma.PartnerProfileWhereInput | boolean
   delete?: Prisma.PartnerProfileWhereInput | boolean
   connect?: Prisma.PartnerProfileWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutCompanyInput, Prisma.PartnerProfileUpdateWithoutCompanyInput>, Prisma.PartnerProfileUncheckedUpdateWithoutCompanyInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutUserInput, Prisma.PartnerProfileUpdateWithoutUserInput>, Prisma.PartnerProfileUncheckedUpdateWithoutUserInput>
 }
 
 export type EnumPartnerProfileStatusFieldUpdateOperationsInput = {
@@ -403,6 +417,38 @@ export type PartnerProfileUpdateOneRequiredWithoutAttributionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutAttributionsInput, Prisma.PartnerProfileUpdateWithoutAttributionsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutAttributionsInput>
 }
 
+export type PartnerProfileCreateNestedOneWithoutStripeConnectedAccountInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutStripeConnectedAccountInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneWithoutStripeConnectedAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutStripeConnectedAccountInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutStripeConnectedAccountInput
+  disconnect?: Prisma.PartnerProfileWhereInput | boolean
+  delete?: Prisma.PartnerProfileWhereInput | boolean
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUpdateWithoutStripeConnectedAccountInput>, Prisma.PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput>
+}
+
+export type PartnerProfileCreateNestedOneWithoutSettlementsInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutSettlementsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneWithoutSettlementsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedCreateWithoutSettlementsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutSettlementsInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutSettlementsInput
+  disconnect?: Prisma.PartnerProfileWhereInput | boolean
+  delete?: Prisma.PartnerProfileWhereInput | boolean
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutSettlementsInput, Prisma.PartnerProfileUpdateWithoutSettlementsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutSettlementsInput>
+}
+
 export type PartnerProfileCreateNestedOneWithoutSettlementLegsInput = {
   create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutSettlementLegsInput, Prisma.PartnerProfileUncheckedCreateWithoutSettlementLegsInput>
   connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutSettlementLegsInput
@@ -419,60 +465,68 @@ export type PartnerProfileUpdateOneWithoutSettlementLegsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutSettlementLegsInput, Prisma.PartnerProfileUpdateWithoutSettlementLegsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutSettlementLegsInput>
 }
 
-export type PartnerProfileCreateWithoutCompanyInput = {
+export type PartnerProfileCreateWithoutUserInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
-export type PartnerProfileUncheckedCreateWithoutCompanyInput = {
+export type PartnerProfileUncheckedCreateWithoutUserInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
-export type PartnerProfileCreateOrConnectWithoutCompanyInput = {
+export type PartnerProfileCreateOrConnectWithoutUserInput = {
   where: Prisma.PartnerProfileWhereUniqueInput
-  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
 }
 
-export type PartnerProfileUpsertWithoutCompanyInput = {
-  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutCompanyInput, Prisma.PartnerProfileUncheckedUpdateWithoutCompanyInput>
-  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutCompanyInput, Prisma.PartnerProfileUncheckedCreateWithoutCompanyInput>
+export type PartnerProfileUpsertWithoutUserInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutUserInput, Prisma.PartnerProfileUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutUserInput, Prisma.PartnerProfileUncheckedCreateWithoutUserInput>
   where?: Prisma.PartnerProfileWhereInput
 }
 
-export type PartnerProfileUpdateToOneWithWhereWithoutCompanyInput = {
+export type PartnerProfileUpdateToOneWithWhereWithoutUserInput = {
   where?: Prisma.PartnerProfileWhereInput
-  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutCompanyInput, Prisma.PartnerProfileUncheckedUpdateWithoutCompanyInput>
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutUserInput, Prisma.PartnerProfileUncheckedUpdateWithoutUserInput>
 }
 
-export type PartnerProfileUpdateWithoutCompanyInput = {
+export type PartnerProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
-export type PartnerProfileUncheckedUpdateWithoutCompanyInput = {
+export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 export type PartnerProfileCreateWithoutAttributionsInput = {
@@ -481,18 +535,22 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutPartnerProfileInput
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   id?: string
-  companyId: string
+  userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileCreateOrConnectWithoutAttributionsInput = {
@@ -517,17 +575,149 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutPartnerProfileNestedInput
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutStripeConnectedAccountInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput>
+}
+
+export type PartnerProfileUpsertWithoutStripeConnectedAccountInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutStripeConnectedAccountInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput>
+}
+
+export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutSettlementsInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutSettlementsInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedCreateWithoutSettlementsInput>
+}
+
+export type PartnerProfileUpsertWithoutSettlementsInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedUpdateWithoutSettlementsInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedCreateWithoutSettlementsInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutSettlementsInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutSettlementsInput, Prisma.PartnerProfileUncheckedUpdateWithoutSettlementsInput>
+}
+
+export type PartnerProfileUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
 }
 
@@ -537,18 +727,22 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutPartnerProfileInput
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   id?: string
-  companyId: string
+  userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
 export type PartnerProfileCreateOrConnectWithoutSettlementLegsInput = {
@@ -573,18 +767,22 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutPartnerProfileNestedInput
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
 
@@ -595,11 +793,13 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
 export type PartnerProfileCountOutputType = {
   attributions: number
   settlementLegs: number
+  settlements: number
 }
 
 export type PartnerProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attributions?: boolean | PartnerProfileCountOutputTypeCountAttributionsArgs
   settlementLegs?: boolean | PartnerProfileCountOutputTypeCountSettlementLegsArgs
+  settlements?: boolean | PartnerProfileCountOutputTypeCountSettlementsArgs
 }
 
 /**
@@ -626,73 +826,86 @@ export type PartnerProfileCountOutputTypeCountSettlementLegsArgs<ExtArgs extends
   where?: Prisma.SettlementLegWhereInput
 }
 
+/**
+ * PartnerProfileCountOutputType without action
+ */
+export type PartnerProfileCountOutputTypeCountSettlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SettlementWhereInput
+}
+
 
 export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  companyId?: boolean
+  userId?: boolean
   referralCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
+  stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
+  settlements?: boolean | Prisma.PartnerProfile$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerProfile"]>
 
 export type PartnerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  companyId?: boolean
+  userId?: boolean
   referralCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerProfile"]>
 
 export type PartnerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  companyId?: boolean
+  userId?: boolean
   referralCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerProfile"]>
 
 export type PartnerProfileSelectScalar = {
   id?: boolean
-  companyId?: boolean
+  userId?: boolean
   referralCode?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "referralCode" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
+export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
 export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
+  stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
+  settlements?: boolean | Prisma.PartnerProfile$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartnerProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
 }
 export type PartnerProfileIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
 }
 
 export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PartnerProfile"
   objects: {
-    company: Prisma.$CompanyPayload<ExtArgs>
+    user: Prisma.$UserProfilePayload<ExtArgs>
     attributions: Prisma.$ReferralAttributionPayload<ExtArgs>[]
+    stripeConnectedAccount: Prisma.$StripeConnectedAccountPayload<ExtArgs> | null
     settlementLegs: Prisma.$SettlementLegPayload<ExtArgs>[]
+    settlements: Prisma.$SettlementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    companyId: string
+    userId: string
     referralCode: string
     status: $Enums.PartnerProfileStatus
     createdAt: Date
@@ -1091,9 +1304,11 @@ readonly fields: PartnerProfileFieldRefs;
  */
 export interface Prisma__PartnerProfileClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   attributions<T extends Prisma.PartnerProfile$attributionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$attributionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralAttributionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stripeConnectedAccount<T extends Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>>): Prisma.Prisma__StripeConnectedAccountClient<runtime.Types.Result.GetResult<Prisma.$StripeConnectedAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settlementLegs<T extends Prisma.PartnerProfile$settlementLegsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  settlements<T extends Prisma.PartnerProfile$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1124,7 +1339,7 @@ export interface Prisma__PartnerProfileClient<T, Null = never, ExtArgs extends r
  */
 export interface PartnerProfileFieldRefs {
   readonly id: Prisma.FieldRef<"PartnerProfile", 'String'>
-  readonly companyId: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly userId: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly referralCode: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly status: Prisma.FieldRef<"PartnerProfile", 'PartnerProfileStatus'>
   readonly createdAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
@@ -1554,6 +1769,25 @@ export type PartnerProfile$attributionsArgs<ExtArgs extends runtime.Types.Extens
 }
 
 /**
+ * PartnerProfile.stripeConnectedAccount
+ */
+export type PartnerProfile$stripeConnectedAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StripeConnectedAccount
+   */
+  select?: Prisma.StripeConnectedAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StripeConnectedAccount
+   */
+  omit?: Prisma.StripeConnectedAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StripeConnectedAccountInclude<ExtArgs> | null
+  where?: Prisma.StripeConnectedAccountWhereInput
+}
+
+/**
  * PartnerProfile.settlementLegs
  */
 export type PartnerProfile$settlementLegsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1575,6 +1809,30 @@ export type PartnerProfile$settlementLegsArgs<ExtArgs extends runtime.Types.Exte
   take?: number
   skip?: number
   distinct?: Prisma.SettlementLegScalarFieldEnum | Prisma.SettlementLegScalarFieldEnum[]
+}
+
+/**
+ * PartnerProfile.settlements
+ */
+export type PartnerProfile$settlementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Settlement
+   */
+  select?: Prisma.SettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Settlement
+   */
+  omit?: Prisma.SettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementInclude<ExtArgs> | null
+  where?: Prisma.SettlementWhereInput
+  orderBy?: Prisma.SettlementOrderByWithRelationInput | Prisma.SettlementOrderByWithRelationInput[]
+  cursor?: Prisma.SettlementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SettlementScalarFieldEnum | Prisma.SettlementScalarFieldEnum[]
 }
 
 /**
