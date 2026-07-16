@@ -10,15 +10,15 @@ import {
   SettlementLegStatus,
   SettlementLegType,
   SettlementStatus,
-} from "../generated/prisma/client";
-import { getDb } from "./db";
-import { isStripeConnectSettlementLedgerEnabled } from "./stripe-connect-settlement-feature";
-import { calculateStripeConnectSettlementFinancials } from "./stripe-connect-settlement-financials";
+} from "@/generated/prisma/client";
+import { getDb } from "@/lib/db";
+import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
+import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
 import {
   calculateSettlementHoldUntil,
   settlementIdempotencyKey,
   settlementLegIdempotencyKey,
-} from "./stripe-connect-settlement-rules";
+} from "@/lib/stripe-connect-settlement-rules";
 
 type Tx = Prisma.TransactionClient;
 
@@ -26,7 +26,7 @@ export {
   calculateSettlementHoldUntil,
   settlementIdempotencyKey,
   settlementLegIdempotencyKey,
-} from "./stripe-connect-settlement-rules";
+} from "@/lib/stripe-connect-settlement-rules";
 
 function isUniqueConstraintError(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";

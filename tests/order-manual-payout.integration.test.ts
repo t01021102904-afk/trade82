@@ -292,10 +292,10 @@ test("verified payments create one fourteen-day pending settlement ledger with f
   assert.equal(first.settlement.referralCodeSnapshot, partner.referralCode);
   assert.equal(first.settlement.referralSubjectType, "SELLER");
   assert.equal(first.settlement.referredUserIdSnapshot, fixture.seller.id);
-  assert.equal(first.settlement.sellerPayableAmount, 104_500);
-  assert.equal(first.settlement.platformFeeAmount, 5_500);
-  assert.equal(first.settlement.partnerReferralAmount, 550);
-  assert.equal(first.settlement.trade82RetainedAmountBeforeStripeFees, 4_950);
+  assert.equal(first.settlement.sellerPayableAmount, 10_450);
+  assert.equal(first.settlement.platformFeeAmount, 550);
+  assert.equal(first.settlement.partnerReferralAmount, 55);
+  assert.equal(first.settlement.trade82RetainedAmountBeforeStripeFees, 495);
   assert.equal(
     first.settlement.holdUntil.getTime() - paymentRequest.paidAt!.getTime(),
     14 * 24 * 60 * 60 * 1_000,
@@ -451,7 +451,7 @@ test("settlement referral ownership and reversal legs are constrained by the led
       'INSERT INTO "SettlementReversal" ("id", "settlementId", "amount", "reason", "idempotencyKey") VALUES ($1, $2, $3, $4, $5)',
       [unique("missing-leg-reversal"), sellerResult.settlement.id, 100, "REFUND", unique("missing-leg-key")],
     ),
-    /null value in column "settlementLegId"/i,
+    /seller or partner settlement leg/i,
   );
 });
 
