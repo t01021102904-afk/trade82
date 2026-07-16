@@ -223,6 +223,32 @@ async function createReadyPayout(prefix = "ready-payout") {
   return { fixture, order, payout };
 }
 
+test("settlement reversal trigger uses an explicit search path and its composite foreign key index", async () => {
+  const functionResult = await directPool.query<{ proconfig: string[] | null }>(
+    `SELECT p.proconfig
+     FROM pg_proc p
+     JOIN pg_namespace n ON n.oid = p.pronamespace
+     WHERE n.nspname = 'public'
+       AND p.proname = 'checkSettlementReversalLeg'
+       AND p.pronargs = 0`,
+  );
+  assert.equal(functionResult.rowCount, 1);
+  assert.match(functionResult.rows[0]?.proconfig?.join("\n") ?? "", /search_path=pg_catalog, public/);
+
+  const indexResult = await directPool.query<{ indexdef: string }>(
+    `SELECT indexdef
+     FROM pg_indexes
+     WHERE schemaname = 'public'
+       AND tablename = 'SettlementReversal'
+       AND indexname = 'SettlementReversal_settlementId_settlementLegId_idx'`,
+  );
+  assert.equal(indexResult.rowCount, 1);
+  assert.match(
+    indexResult.rows[0]?.indexdef ?? "",
+    /\("settlementId", "settlementLegId"\)/,
+  );
+});
+
 test("verified payments create one fourteen-day pending settlement ledger with fixed referral attribution", async () => {
   const fixture = await createFixture("connect-settlement");
   const order = await createOrder(fixture);
