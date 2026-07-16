@@ -998,6 +998,26 @@
       "ADMIN_NOTE": "Admin note"
     }
   },
+  "stripeConnectOnboarding": {
+    "sellerTitle": "Stripe payout account",
+    "sellerDescription": "Complete Stripe verification to receive future Trade82 transfers.",
+    "partnerTitle": "Partner payout account",
+    "partnerDescription": "Your referral account remains active while verification is incomplete. Pending earnings are retained.",
+    "setup": "Set up Stripe payout account",
+    "continue": "Continue verification",
+    "loading": "Loading Stripe verification status...",
+    "loadError": "Unable to load Stripe verification status.",
+    "startError": "Unable to start Stripe verification right now.",
+    "maintenance": "Stripe payout onboarding is currently unavailable.",
+    "completeDescription": "Stripe verification is complete. Future transfer capability is recorded, but no payout is initiated here.",
+    "incompleteDescription": "Complete Stripe-hosted verification to enable future transfer capability.",
+    "status": {
+      "PENDING": "Not started",
+      "RESTRICTED": "Verification needed",
+      "ENABLED": "Verified",
+      "DISABLED": "Unavailable"
+    }
+  },
   "payouts": {
     "adminLabel": "Admin",
     "adminTitle": "Manual payouts",
