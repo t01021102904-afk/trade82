@@ -132,6 +132,41 @@ export type PaymentRequestEvent = Prisma.PaymentRequestEventModel
  */
 export type PaymentRequestWebhookEvent = Prisma.PaymentRequestWebhookEventModel
 /**
+ * Model PartnerProfile
+ * 
+ */
+export type PartnerProfile = Prisma.PartnerProfileModel
+/**
+ * Model ReferralAttribution
+ * 
+ */
+export type ReferralAttribution = Prisma.ReferralAttributionModel
+/**
+ * Model StripeConnectedAccount
+ * 
+ */
+export type StripeConnectedAccount = Prisma.StripeConnectedAccountModel
+/**
+ * Model Settlement
+ * 
+ */
+export type Settlement = Prisma.SettlementModel
+/**
+ * Model SettlementLeg
+ * 
+ */
+export type SettlementLeg = Prisma.SettlementLegModel
+/**
+ * Model SettlementEvent
+ * 
+ */
+export type SettlementEvent = Prisma.SettlementEventModel
+/**
+ * Model SettlementReversal
+ * 
+ */
+export type SettlementReversal = Prisma.SettlementReversalModel
+/**
  * Model OrderNumberCounter
  * 
  */

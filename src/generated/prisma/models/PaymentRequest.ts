@@ -547,6 +547,7 @@ export type PaymentRequestWhereInput = {
   disputes?: Prisma.PaymentDisputeListRelationFilter
   events?: Prisma.PaymentRequestEventListRelationFilter
   webhookEvents?: Prisma.PaymentRequestWebhookEventListRelationFilter
+  connectSettlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }
 
 export type PaymentRequestOrderByWithRelationInput = {
@@ -602,6 +603,7 @@ export type PaymentRequestOrderByWithRelationInput = {
   disputes?: Prisma.PaymentDisputeOrderByRelationAggregateInput
   events?: Prisma.PaymentRequestEventOrderByRelationAggregateInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventOrderByRelationAggregateInput
+  connectSettlement?: Prisma.SettlementOrderByWithRelationInput
 }
 
 export type PaymentRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -660,6 +662,7 @@ export type PaymentRequestWhereUniqueInput = Prisma.AtLeast<{
   disputes?: Prisma.PaymentDisputeListRelationFilter
   events?: Prisma.PaymentRequestEventListRelationFilter
   webhookEvents?: Prisma.PaymentRequestWebhookEventListRelationFilter
+  connectSettlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }, "id" | "stripeCheckoutSessionId" | "stripePaymentIntentId" | "stripeChargeId" | "orderId">
 
 export type PaymentRequestOrderByWithAggregationInput = {
@@ -805,6 +808,7 @@ export type PaymentRequestCreateInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateInput = {
@@ -854,6 +858,7 @@ export type PaymentRequestUncheckedCreateInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUpdateInput = {
@@ -903,6 +908,7 @@ export type PaymentRequestUpdateInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateInput = {
@@ -952,6 +958,7 @@ export type PaymentRequestUncheckedUpdateInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateManyInput = {
@@ -1530,6 +1537,20 @@ export type PaymentRequestUpdateOneRequiredWithoutWebhookEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutWebhookEventsInput, Prisma.PaymentRequestUpdateWithoutWebhookEventsInput>, Prisma.PaymentRequestUncheckedUpdateWithoutWebhookEventsInput>
 }
 
+export type PaymentRequestCreateNestedOneWithoutConnectSettlementInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedCreateWithoutConnectSettlementInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutConnectSettlementInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+}
+
+export type PaymentRequestUpdateOneRequiredWithoutConnectSettlementNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedCreateWithoutConnectSettlementInput>
+  connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutConnectSettlementInput
+  upsert?: Prisma.PaymentRequestUpsertWithoutConnectSettlementInput
+  connect?: Prisma.PaymentRequestWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PaymentRequestUpdateToOneWithWhereWithoutConnectSettlementInput, Prisma.PaymentRequestUpdateWithoutConnectSettlementInput>, Prisma.PaymentRequestUncheckedUpdateWithoutConnectSettlementInput>
+}
+
 export type PaymentRequestCreateNestedOneWithoutTradeOrderByPaymentRequestInput = {
   create?: Prisma.XOR<Prisma.PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput, Prisma.PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput>
   connectOrCreate?: Prisma.PaymentRequestCreateOrConnectWithoutTradeOrderByPaymentRequestInput
@@ -1622,6 +1643,7 @@ export type PaymentRequestCreateWithoutCreatedByUserInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutCreatedByUserInput = {
@@ -1670,6 +1692,7 @@ export type PaymentRequestUncheckedCreateWithoutCreatedByUserInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutCreatedByUserInput = {
@@ -1728,6 +1751,7 @@ export type PaymentRequestCreateWithoutReleasedByUserInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutReleasedByUserInput = {
@@ -1776,6 +1800,7 @@ export type PaymentRequestUncheckedCreateWithoutReleasedByUserInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutReleasedByUserInput = {
@@ -1913,6 +1938,7 @@ export type PaymentRequestCreateWithoutBuyerCompanyInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutBuyerCompanyInput = {
@@ -1961,6 +1987,7 @@ export type PaymentRequestUncheckedCreateWithoutBuyerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutBuyerCompanyInput = {
@@ -2019,6 +2046,7 @@ export type PaymentRequestCreateWithoutSellerCompanyInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutSellerCompanyInput = {
@@ -2067,6 +2095,7 @@ export type PaymentRequestUncheckedCreateWithoutSellerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutSellerCompanyInput = {
@@ -2157,6 +2186,7 @@ export type PaymentRequestCreateWithoutInquiryInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutInquiryInput = {
@@ -2205,6 +2235,7 @@ export type PaymentRequestUncheckedCreateWithoutInquiryInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutInquiryInput = {
@@ -2279,6 +2310,7 @@ export type PaymentRequestCreateWithoutRefundsInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutRefundsInput = {
@@ -2327,6 +2359,7 @@ export type PaymentRequestUncheckedCreateWithoutRefundsInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutRefundsInput = {
@@ -2391,6 +2424,7 @@ export type PaymentRequestUpdateWithoutRefundsInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutRefundsInput = {
@@ -2439,6 +2473,7 @@ export type PaymentRequestUncheckedUpdateWithoutRefundsInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateWithoutDisputesInput = {
@@ -2487,6 +2522,7 @@ export type PaymentRequestCreateWithoutDisputesInput = {
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutDisputesInput = {
@@ -2535,6 +2571,7 @@ export type PaymentRequestUncheckedCreateWithoutDisputesInput = {
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutDisputesInput = {
@@ -2599,6 +2636,7 @@ export type PaymentRequestUpdateWithoutDisputesInput = {
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutDisputesInput = {
@@ -2647,6 +2685,7 @@ export type PaymentRequestUncheckedUpdateWithoutDisputesInput = {
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateWithoutEventsInput = {
@@ -2695,6 +2734,7 @@ export type PaymentRequestCreateWithoutEventsInput = {
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutEventsInput = {
@@ -2743,6 +2783,7 @@ export type PaymentRequestUncheckedCreateWithoutEventsInput = {
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutEventsInput = {
@@ -2807,6 +2848,7 @@ export type PaymentRequestUpdateWithoutEventsInput = {
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutEventsInput = {
@@ -2855,6 +2897,7 @@ export type PaymentRequestUncheckedUpdateWithoutEventsInput = {
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateWithoutWebhookEventsInput = {
@@ -2903,6 +2946,7 @@ export type PaymentRequestCreateWithoutWebhookEventsInput = {
   refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutWebhookEventsInput = {
@@ -2951,6 +2995,7 @@ export type PaymentRequestUncheckedCreateWithoutWebhookEventsInput = {
   refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutWebhookEventsInput = {
@@ -3015,6 +3060,7 @@ export type PaymentRequestUpdateWithoutWebhookEventsInput = {
   refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutWebhookEventsInput = {
@@ -3063,6 +3109,219 @@ export type PaymentRequestUncheckedUpdateWithoutWebhookEventsInput = {
   refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestCreateWithoutConnectSettlementInput = {
+  id?: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inquiry: Prisma.InquiryCreateNestedOneWithoutPaymentRequestsInput
+  buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerPaymentRequestsInput
+  sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerPaymentRequestsInput
+  createdByUser: Prisma.UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput
+  releasedByUser?: Prisma.UserProfileCreateNestedOneWithoutReleasedPaymentRequestsInput
+  order?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestByOrderIdInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderCreateNestedOneWithoutPaymentRequestInput
+  refunds?: Prisma.PaymentRefundCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestUncheckedCreateWithoutConnectSettlementInput = {
+  id?: string
+  inquiryId: string
+  buyerCompanyId: string
+  sellerCompanyId: string
+  createdByUserId: string
+  productName: string
+  quantity: string
+  unit: string
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  stripeFeeSyncStatus?: $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: string | null
+  stripeFeeSyncedAt?: Date | string | null
+  refundAmount?: number
+  currency?: string
+  paymentDueDate: Date | string
+  orderTerms: string
+  status?: $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: string | null
+  stripePaymentIntentId?: string | null
+  stripeChargeId?: string | null
+  checkoutAttempt?: number
+  checkoutLockToken?: string | null
+  checkoutLockExpiresAt?: Date | string | null
+  paidAt?: Date | string | null
+  cancelledAt?: Date | string | null
+  releasedAt?: Date | string | null
+  manualPayoutReference?: string | null
+  manualPayoutDate?: Date | string | null
+  manualPayoutNote?: string | null
+  sellerReleasedAmount?: number | null
+  releasedByUserId?: string | null
+  requiresManualReconciliation?: boolean
+  reconciliationNote?: string | null
+  orderId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedCreateNestedOneWithoutPaymentRequestInput
+  refunds?: Prisma.PaymentRefundUncheckedCreateNestedManyWithoutPaymentRequestInput
+  disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
+  events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+}
+
+export type PaymentRequestCreateOrConnectWithoutConnectSettlementInput = {
+  where: Prisma.PaymentRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedCreateWithoutConnectSettlementInput>
+}
+
+export type PaymentRequestUpsertWithoutConnectSettlementInput = {
+  update: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedUpdateWithoutConnectSettlementInput>
+  create: Prisma.XOR<Prisma.PaymentRequestCreateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedCreateWithoutConnectSettlementInput>
+  where?: Prisma.PaymentRequestWhereInput
+}
+
+export type PaymentRequestUpdateToOneWithWhereWithoutConnectSettlementInput = {
+  where?: Prisma.PaymentRequestWhereInput
+  data: Prisma.XOR<Prisma.PaymentRequestUpdateWithoutConnectSettlementInput, Prisma.PaymentRequestUncheckedUpdateWithoutConnectSettlementInput>
+}
+
+export type PaymentRequestUpdateWithoutConnectSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inquiry?: Prisma.InquiryUpdateOneRequiredWithoutPaymentRequestsNestedInput
+  buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerPaymentRequestsNestedInput
+  sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerPaymentRequestsNestedInput
+  createdByUser?: Prisma.UserProfileUpdateOneRequiredWithoutCreatedPaymentRequestsNestedInput
+  releasedByUser?: Prisma.UserProfileUpdateOneWithoutReleasedPaymentRequestsNestedInput
+  order?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestByOrderIdNestedInput
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUpdateOneWithoutPaymentRequestNestedInput
+  refunds?: Prisma.PaymentRefundUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+}
+
+export type PaymentRequestUncheckedUpdateWithoutConnectSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  inquiryId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  productName?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.StringFieldUpdateOperationsInput | string
+  unit?: Prisma.StringFieldUpdateOperationsInput | string
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  stripeFeeSyncStatus?: Prisma.EnumStripeFeeSyncStatusFieldUpdateOperationsInput | $Enums.StripeFeeSyncStatus
+  stripeFeeSyncError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeFeeSyncedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentDueDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orderTerms?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPaymentRequestStatusFieldUpdateOperationsInput | $Enums.PaymentRequestStatus
+  stripeCheckoutSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripePaymentIntentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeChargeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutAttempt?: Prisma.IntFieldUpdateOperationsInput | number
+  checkoutLockToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkoutLockExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  releasedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  manualPayoutDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualPayoutNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerReleasedAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  releasedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  requiresManualReconciliation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  reconciliationNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrderByPaymentRequest?: Prisma.TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput
+  refunds?: Prisma.PaymentRefundUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput = {
@@ -3111,6 +3370,7 @@ export type PaymentRequestCreateWithoutTradeOrderByPaymentRequestInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput = {
@@ -3159,6 +3419,7 @@ export type PaymentRequestUncheckedCreateWithoutTradeOrderByPaymentRequestInput 
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutTradeOrderByPaymentRequestInput = {
@@ -3212,6 +3473,7 @@ export type PaymentRequestCreateWithoutOrderInput = {
   disputes?: Prisma.PaymentDisputeCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestUncheckedCreateWithoutOrderInput = {
@@ -3260,6 +3522,7 @@ export type PaymentRequestUncheckedCreateWithoutOrderInput = {
   disputes?: Prisma.PaymentDisputeUncheckedCreateNestedManyWithoutPaymentRequestInput
   events?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutPaymentRequestInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedCreateNestedManyWithoutPaymentRequestInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutPaymentRequestInput
 }
 
 export type PaymentRequestCreateOrConnectWithoutOrderInput = {
@@ -3324,6 +3587,7 @@ export type PaymentRequestUpdateWithoutTradeOrderByPaymentRequestInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput = {
@@ -3372,6 +3636,7 @@ export type PaymentRequestUncheckedUpdateWithoutTradeOrderByPaymentRequestInput 
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUpsertWithoutOrderInput = {
@@ -3431,6 +3696,7 @@ export type PaymentRequestUpdateWithoutOrderInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutOrderInput = {
@@ -3479,6 +3745,7 @@ export type PaymentRequestUncheckedUpdateWithoutOrderInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestCreateManyCreatedByUserInput = {
@@ -3613,6 +3880,7 @@ export type PaymentRequestUpdateWithoutCreatedByUserInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutCreatedByUserInput = {
@@ -3661,6 +3929,7 @@ export type PaymentRequestUncheckedUpdateWithoutCreatedByUserInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateManyWithoutCreatedByUserInput = {
@@ -3752,6 +4021,7 @@ export type PaymentRequestUpdateWithoutReleasedByUserInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutReleasedByUserInput = {
@@ -3800,6 +4070,7 @@ export type PaymentRequestUncheckedUpdateWithoutReleasedByUserInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateManyWithoutReleasedByUserInput = {
@@ -3977,6 +4248,7 @@ export type PaymentRequestUpdateWithoutBuyerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutBuyerCompanyInput = {
@@ -4025,6 +4297,7 @@ export type PaymentRequestUncheckedUpdateWithoutBuyerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateManyWithoutBuyerCompanyInput = {
@@ -4116,6 +4389,7 @@ export type PaymentRequestUpdateWithoutSellerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutSellerCompanyInput = {
@@ -4164,6 +4438,7 @@ export type PaymentRequestUncheckedUpdateWithoutSellerCompanyInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateManyWithoutSellerCompanyInput = {
@@ -4298,6 +4573,7 @@ export type PaymentRequestUpdateWithoutInquiryInput = {
   disputes?: Prisma.PaymentDisputeUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateWithoutInquiryInput = {
@@ -4346,6 +4622,7 @@ export type PaymentRequestUncheckedUpdateWithoutInquiryInput = {
   disputes?: Prisma.PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestNestedInput
   events?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
   webhookEvents?: Prisma.PaymentRequestWebhookEventUncheckedUpdateManyWithoutPaymentRequestNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutPaymentRequestNestedInput
 }
 
 export type PaymentRequestUncheckedUpdateManyWithoutInquiryInput = {
@@ -4502,6 +4779,7 @@ export type PaymentRequestSelect<ExtArgs extends runtime.Types.Extensions.Intern
   disputes?: boolean | Prisma.PaymentRequest$disputesArgs<ExtArgs>
   events?: boolean | Prisma.PaymentRequest$eventsArgs<ExtArgs>
   webhookEvents?: boolean | Prisma.PaymentRequest$webhookEventsArgs<ExtArgs>
+  connectSettlement?: boolean | Prisma.PaymentRequest$connectSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["paymentRequest"]>
 
@@ -4662,6 +4940,7 @@ export type PaymentRequestInclude<ExtArgs extends runtime.Types.Extensions.Inter
   disputes?: boolean | Prisma.PaymentRequest$disputesArgs<ExtArgs>
   events?: boolean | Prisma.PaymentRequest$eventsArgs<ExtArgs>
   webhookEvents?: boolean | Prisma.PaymentRequest$webhookEventsArgs<ExtArgs>
+  connectSettlement?: boolean | Prisma.PaymentRequest$connectSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.PaymentRequestCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PaymentRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4695,6 +4974,7 @@ export type $PaymentRequestPayload<ExtArgs extends runtime.Types.Extensions.Inte
     disputes: Prisma.$PaymentDisputePayload<ExtArgs>[]
     events: Prisma.$PaymentRequestEventPayload<ExtArgs>[]
     webhookEvents: Prisma.$PaymentRequestWebhookEventPayload<ExtArgs>[]
+    connectSettlement: Prisma.$SettlementPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5143,6 +5423,7 @@ export interface Prisma__PaymentRequestClient<T, Null = never, ExtArgs extends r
   disputes<T extends Prisma.PaymentRequest$disputesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$disputesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentDisputePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.PaymentRequest$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   webhookEvents<T extends Prisma.PaymentRequest$webhookEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$webhookEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestWebhookEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  connectSettlement<T extends Prisma.PaymentRequest$connectSettlementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PaymentRequest$connectSettlementArgs<ExtArgs>>): Prisma.Prisma__SettlementClient<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5764,6 +6045,25 @@ export type PaymentRequest$webhookEventsArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.PaymentRequestWebhookEventScalarFieldEnum | Prisma.PaymentRequestWebhookEventScalarFieldEnum[]
+}
+
+/**
+ * PaymentRequest.connectSettlement
+ */
+export type PaymentRequest$connectSettlementArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Settlement
+   */
+  select?: Prisma.SettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Settlement
+   */
+  omit?: Prisma.SettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementInclude<ExtArgs> | null
+  where?: Prisma.SettlementWhereInput
 }
 
 /**

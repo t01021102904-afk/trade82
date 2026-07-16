@@ -29,6 +29,7 @@ const profiles = await import(new URL("../src/lib/seller-payout-profiles.ts", im
 const financials = await import(new URL("../src/lib/order-financials.ts", import.meta.url).href);
 const crypto = await import(new URL("../src/lib/payout-crypto.ts", import.meta.url).href);
 const flags = await import(new URL("../src/lib/trade-order-feature.ts", import.meta.url).href);
+const settlements = await import(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href);
 const csv = await import(new URL("../src/lib/csv-security.ts", import.meta.url).href);
 const orderTable = await import(new URL("../src/lib/admin-order-table.ts", import.meta.url).href);
 const bankSeed = await import(new URL("../src/lib/south-korea-bank-directory.ts", import.meta.url).href);
@@ -221,6 +222,238 @@ async function createReadyPayout(prefix = "ready-payout") {
   const payout = await payouts.prepareSellerPayout({ orderId: order.id, actorUserId: fixture.admin.id });
   return { fixture, order, payout };
 }
+
+test("verified payments create one fourteen-day pending settlement ledger with fixed referral attribution", async () => {
+  const fixture = await createFixture("connect-settlement");
+  const order = await createOrder(fixture);
+  const paymentRequest = await markOrderPaid(order.id);
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `user_test_order_partner_${unique("connect-settlement")}`,
+      email: `${unique("partner")}@example.test`,
+      displayName: "Partner Test",
+      country: "US",
+      role: "buyer",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: partnerUser.id,
+      referralCode: unique("partner"),
+    },
+  });
+
+  const attribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: fixture.seller.id,
+    partnerProfileId: partner.id,
+  }))) as { created: boolean; attribution: { id: string } };
+  const duplicateAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: fixture.seller.id,
+    partnerProfileId: partner.id,
+  }))) as { created: boolean; attribution: { id: string } };
+  assert.equal(attribution.created, true);
+  assert.equal(duplicateAttribution.created, false);
+  assert.equal(duplicateAttribution.attribution.id, attribution.attribution.id);
+
+  const first = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: paymentRequest.id,
+      referralAttributionId: attribution.attribution.id,
+    }),
+  )) as {
+    created: boolean;
+    settlement: {
+      id: string;
+      legs: unknown[];
+      referralAttributionId: string | null;
+      referralPartnerProfileId: string | null;
+      referralCodeSnapshot: string | null;
+      referralSubjectType: "BUYER" | "SELLER" | null;
+      referredUserIdSnapshot: string | null;
+      sellerPayableAmount: number;
+      platformFeeAmount: number;
+      partnerReferralAmount: number;
+      trade82RetainedAmountBeforeStripeFees: number;
+      holdUntil: Date;
+    };
+  };
+  const duplicate = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: paymentRequest.id,
+      referralAttributionId: attribution.attribution.id,
+    }),
+  )) as { created: boolean; settlement: { id: string } };
+  assert.equal(first.created, true);
+  assert.equal(duplicate.created, false);
+  assert.equal(duplicate.settlement.id, first.settlement.id);
+  assert.equal(first.settlement.legs.length, 3);
+  assert.equal(first.settlement.referralAttributionId, attribution.attribution.id);
+  assert.equal(first.settlement.referralPartnerProfileId, partner.id);
+  assert.equal(first.settlement.referralCodeSnapshot, partner.referralCode);
+  assert.equal(first.settlement.referralSubjectType, "SELLER");
+  assert.equal(first.settlement.referredUserIdSnapshot, fixture.seller.id);
+  assert.equal(first.settlement.sellerPayableAmount, 10_450);
+  assert.equal(first.settlement.platformFeeAmount, 550);
+  assert.equal(first.settlement.partnerReferralAmount, 55);
+  assert.equal(first.settlement.trade82RetainedAmountBeforeStripeFees, 495);
+  assert.equal(
+    first.settlement.holdUntil.getTime() - paymentRequest.paidAt!.getTime(),
+    14 * 24 * 60 * 60 * 1_000,
+  );
+});
+
+test("settlement referral ownership and reversal legs are constrained by the ledger", async () => {
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `user_test_order_partner_${unique("settlement-constraints")}`,
+      email: `${unique("partner")}@example.test`,
+      displayName: "Settlement Partner",
+      country: "US",
+      role: "buyer",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: { userId: partnerUser.id, referralCode: unique("settlement-partner") },
+  });
+
+  const sellerFixture = await createFixture("settlement-seller-referral");
+  const sellerOrder = await createOrder(sellerFixture);
+  const sellerPayment = await markOrderPaid(sellerOrder.id);
+  const sellerAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: sellerFixture.seller.id,
+    partnerProfileId: partner.id,
+  }))) as { attribution: { id: string } };
+  const sellerResult = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: sellerPayment.id,
+      referralAttributionId: sellerAttribution.attribution.id,
+    }),
+  )) as {
+    settlement: {
+      id: string;
+      referralSubjectType: "BUYER" | "SELLER" | null;
+      referredUserIdSnapshot: string | null;
+    };
+  };
+  assert.equal(sellerResult.settlement.referralSubjectType, "SELLER");
+  assert.equal(sellerResult.settlement.referredUserIdSnapshot, sellerFixture.seller.id);
+
+  const buyerFixture = await createFixture("settlement-buyer-referral");
+  const buyerOrder = await createOrder(buyerFixture);
+  const buyerPayment = await markOrderPaid(buyerOrder.id);
+  const buyerAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: buyerFixture.buyer.id,
+    partnerProfileId: partner.id,
+  }))) as { attribution: { id: string } };
+  const buyerResult = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: buyerPayment.id,
+      referralAttributionId: buyerAttribution.attribution.id,
+    }),
+  )) as {
+    settlement: {
+      id: string;
+      referralSubjectType: "BUYER" | "SELLER" | null;
+      referredUserIdSnapshot: string | null;
+    };
+  };
+  assert.equal(buyerResult.settlement.referralSubjectType, "BUYER");
+  assert.equal(buyerResult.settlement.referredUserIdSnapshot, buyerFixture.buyer.id);
+
+  const unrelatedUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `user_test_order_unrelated_${unique("settlement-constraints")}`,
+      email: `${unique("unrelated")}@example.test`,
+      displayName: "Unrelated User",
+      country: "US",
+      role: "buyer",
+    },
+  });
+  const unrelatedFixture = await createFixture("settlement-unrelated-referral");
+  const unrelatedOrder = await createOrder(unrelatedFixture);
+  const unrelatedPayment = await markOrderPaid(unrelatedOrder.id);
+  const unrelatedAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredUserId: unrelatedUser.id,
+    partnerProfileId: partner.id,
+  }))) as { attribution: { id: string } };
+  await assert.rejects(
+    db.$transaction((tx) => settlements.createPendingSettlementForVerifiedPayment(tx, {
+      paymentRequestId: unrelatedPayment.id,
+      referralAttributionId: unrelatedAttribution.attribution.id,
+    })),
+    /exactly one transaction party/i,
+  );
+  assert.equal(await db.settlement.count({ where: { paymentRequestId: unrelatedPayment.id } }), 0);
+
+  const sellerLegs = await db.settlementLeg.findMany({ where: { settlementId: sellerResult.settlement.id } });
+  const sellerPayableLeg = sellerLegs.find((leg) => leg.type === "SELLER_PAYABLE");
+  const partnerLeg = sellerLegs.find((leg) => leg.type === "PARTNER_REFERRAL");
+  const platformFeeLeg = sellerLegs.find((leg) => leg.type === "PLATFORM_FEE");
+  assert.ok(sellerPayableLeg);
+  assert.ok(partnerLeg);
+  assert.ok(platformFeeLeg);
+
+  const stripeRefundId = `re_${unique("multi-leg-refund")}`;
+  await db.settlementReversal.create({
+    data: {
+      settlementId: sellerResult.settlement.id,
+      settlementLegId: sellerPayableLeg.id,
+      amount: 100,
+      reason: "REFUND",
+      idempotencyKey: unique("seller-reversal"),
+      stripeRefundId,
+    },
+  });
+  await db.settlementReversal.create({
+    data: {
+      settlementId: sellerResult.settlement.id,
+      settlementLegId: partnerLeg.id,
+      amount: 10,
+      reason: "REFUND",
+      idempotencyKey: unique("partner-reversal"),
+      stripeRefundId,
+    },
+  });
+  assert.equal(await db.settlementReversal.count({ where: { stripeRefundId } }), 2);
+
+  await assert.rejects(
+    db.settlementReversal.create({
+      data: {
+        settlementId: sellerResult.settlement.id,
+        settlementLegId: platformFeeLeg.id,
+        amount: 100,
+        reason: "REFUND",
+        idempotencyKey: unique("platform-reversal"),
+        stripeRefundId: `re_${unique("platform")}`,
+      },
+    }),
+    /seller or partner settlement leg/i,
+  );
+
+  const buyerSellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: buyerResult.settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await assert.rejects(
+    db.settlementReversal.create({
+      data: {
+        settlementId: sellerResult.settlement.id,
+        settlementLegId: buyerSellerLeg.id,
+        amount: 100,
+        reason: "REFUND",
+        idempotencyKey: unique("cross-settlement-reversal"),
+        stripeRefundId: `re_${unique("cross-settlement")}`,
+      },
+    }),
+  );
+
+  await assert.rejects(
+    directPool.query(
+      'INSERT INTO "SettlementReversal" ("id", "settlementId", "amount", "reason", "idempotencyKey") VALUES ($1, $2, $3, $4, $5)',
+      [unique("missing-leg-reversal"), sellerResult.settlement.id, 100, "REFUND", unique("missing-leg-key")],
+    ),
+    /seller or partner settlement leg/i,
+  );
+});
 
 async function assertProcessingIsBlocked(payoutId: string, actorUserId: string) {
   const before = await db.sellerPayout.findUniqueOrThrow({

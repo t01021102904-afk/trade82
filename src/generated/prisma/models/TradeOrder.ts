@@ -501,6 +501,7 @@ export type TradeOrderWhereInput = {
   shipment?: Prisma.XOR<Prisma.TradeOrderShipmentNullableScalarRelationFilter, Prisma.TradeOrderShipmentWhereInput> | null
   events?: Prisma.TradeOrderEventListRelationFilter
   payout?: Prisma.XOR<Prisma.SellerPayoutNullableScalarRelationFilter, Prisma.SellerPayoutWhereInput> | null
+  connectSettlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }
 
 export type TradeOrderOrderByWithRelationInput = {
@@ -549,6 +550,7 @@ export type TradeOrderOrderByWithRelationInput = {
   shipment?: Prisma.TradeOrderShipmentOrderByWithRelationInput
   events?: Prisma.TradeOrderEventOrderByRelationAggregateInput
   payout?: Prisma.SellerPayoutOrderByWithRelationInput
+  connectSettlement?: Prisma.SettlementOrderByWithRelationInput
 }
 
 export type TradeOrderWhereUniqueInput = Prisma.AtLeast<{
@@ -600,6 +602,7 @@ export type TradeOrderWhereUniqueInput = Prisma.AtLeast<{
   shipment?: Prisma.XOR<Prisma.TradeOrderShipmentNullableScalarRelationFilter, Prisma.TradeOrderShipmentWhereInput> | null
   events?: Prisma.TradeOrderEventListRelationFilter
   payout?: Prisma.XOR<Prisma.SellerPayoutNullableScalarRelationFilter, Prisma.SellerPayoutWhereInput> | null
+  connectSettlement?: Prisma.XOR<Prisma.SettlementNullableScalarRelationFilter, Prisma.SettlementWhereInput> | null
 }, "id" | "orderNumber" | "paymentRequestId">
 
 export type TradeOrderOrderByWithAggregationInput = {
@@ -730,6 +733,7 @@ export type TradeOrderCreateInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateInput = {
@@ -774,6 +778,7 @@ export type TradeOrderUncheckedCreateInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUpdateInput = {
@@ -818,6 +823,7 @@ export type TradeOrderUpdateInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateInput = {
@@ -862,6 +868,7 @@ export type TradeOrderUncheckedUpdateInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderCreateManyInput = {
@@ -990,6 +997,11 @@ export type TradeOrderOrderByRelationAggregateInput = {
 export type TradeOrderNullableScalarRelationFilter = {
   is?: Prisma.TradeOrderWhereInput | null
   isNot?: Prisma.TradeOrderWhereInput | null
+}
+
+export type TradeOrderScalarRelationFilter = {
+  is?: Prisma.TradeOrderWhereInput
+  isNot?: Prisma.TradeOrderWhereInput
 }
 
 export type TradeOrderCountOrderByAggregateInput = {
@@ -1129,11 +1141,6 @@ export type TradeOrderSumOrderByAggregateInput = {
   sellerPayableAmount?: Prisma.SortOrder
   stripeProcessingFeeAmount?: Prisma.SortOrder
   refundAmount?: Prisma.SortOrder
-}
-
-export type TradeOrderScalarRelationFilter = {
-  is?: Prisma.TradeOrderWhereInput
-  isNot?: Prisma.TradeOrderWhereInput
 }
 
 export type TradeOrderCreateNestedManyWithoutBuyerCompanyInput = {
@@ -1310,6 +1317,20 @@ export type TradeOrderUncheckedUpdateOneWithoutPaymentRequestNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TradeOrderUpdateToOneWithWhereWithoutPaymentRequestInput, Prisma.TradeOrderUpdateWithoutPaymentRequestInput>, Prisma.TradeOrderUncheckedUpdateWithoutPaymentRequestInput>
 }
 
+export type TradeOrderCreateNestedOneWithoutConnectSettlementInput = {
+  create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedCreateWithoutConnectSettlementInput>
+  connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutConnectSettlementInput
+  connect?: Prisma.TradeOrderWhereUniqueInput
+}
+
+export type TradeOrderUpdateOneRequiredWithoutConnectSettlementNestedInput = {
+  create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedCreateWithoutConnectSettlementInput>
+  connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutConnectSettlementInput
+  upsert?: Prisma.TradeOrderUpsertWithoutConnectSettlementInput
+  connect?: Prisma.TradeOrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TradeOrderUpdateToOneWithWhereWithoutConnectSettlementInput, Prisma.TradeOrderUpdateWithoutConnectSettlementInput>, Prisma.TradeOrderUncheckedUpdateWithoutConnectSettlementInput>
+}
+
 export type EnumTradeOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.TradeOrderStatus
 }
@@ -1423,6 +1444,7 @@ export type TradeOrderCreateWithoutBuyerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutBuyerCompanyInput = {
@@ -1466,6 +1488,7 @@ export type TradeOrderUncheckedCreateWithoutBuyerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutBuyerCompanyInput = {
@@ -1519,6 +1542,7 @@ export type TradeOrderCreateWithoutSellerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutSellerCompanyInput = {
@@ -1562,6 +1586,7 @@ export type TradeOrderUncheckedCreateWithoutSellerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutSellerCompanyInput = {
@@ -1689,6 +1714,7 @@ export type TradeOrderCreateWithoutInquiryInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutInquiryInput = {
@@ -1732,6 +1758,7 @@ export type TradeOrderUncheckedCreateWithoutInquiryInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutInquiryInput = {
@@ -1801,6 +1828,7 @@ export type TradeOrderCreateWithoutPaymentRequestByOrderIdInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutPaymentRequestByOrderIdInput = {
@@ -1844,6 +1872,7 @@ export type TradeOrderUncheckedCreateWithoutPaymentRequestByOrderIdInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutPaymentRequestByOrderIdInput = {
@@ -1892,6 +1921,7 @@ export type TradeOrderCreateWithoutPaymentRequestInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutPaymentRequestInput = {
@@ -1935,6 +1965,7 @@ export type TradeOrderUncheckedCreateWithoutPaymentRequestInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutPaymentRequestInput = {
@@ -1994,6 +2025,7 @@ export type TradeOrderUpdateWithoutPaymentRequestByOrderIdInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutPaymentRequestByOrderIdInput = {
@@ -2037,6 +2069,7 @@ export type TradeOrderUncheckedUpdateWithoutPaymentRequestByOrderIdInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUpsertWithoutPaymentRequestInput = {
@@ -2091,12 +2124,206 @@ export type TradeOrderUpdateWithoutPaymentRequestInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutPaymentRequestInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
   inquiryId?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderStatus?: Prisma.EnumTradeOrderStatusFieldUpdateOperationsInput | $Enums.TradeOrderStatus
+  paymentStatus?: Prisma.EnumOrderPaymentStatusFieldUpdateOperationsInput | $Enums.OrderPaymentStatus
+  shipmentStatus?: Prisma.EnumOrderShipmentStatusFieldUpdateOperationsInput | $Enums.OrderShipmentStatus
+  payoutStatus?: Prisma.EnumOrderPayoutStatusFieldUpdateOperationsInput | $Enums.OrderPayoutStatus
+  buyerCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeRateBps?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentRequestByOrderId?: Prisma.PaymentRequestUncheckedUpdateOneWithoutOrderNestedInput
+  items?: Prisma.TradeOrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
+  events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
+  payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
+}
+
+export type TradeOrderCreateWithoutConnectSettlementInput = {
+  id?: string
+  orderNumber: string
+  orderStatus?: $Enums.TradeOrderStatus
+  paymentStatus?: $Enums.OrderPaymentStatus
+  shipmentStatus?: $Enums.OrderShipmentStatus
+  payoutStatus?: $Enums.OrderPayoutStatus
+  buyerCompanyName: string
+  buyerContactName?: string | null
+  buyerEmail: string
+  buyerPhone?: string | null
+  buyerCountry: string
+  buyerAddress?: string | null
+  sellerCompanyName: string
+  sellerContactName?: string | null
+  sellerEmail: string
+  sellerPhone?: string | null
+  sellerCountry: string
+  sellerAddress?: string | null
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeRateBps?: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  refundAmount?: number
+  currency?: string
+  paidAt?: Date | string | null
+  refundedAt?: Date | string | null
+  disputedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inquiry: Prisma.InquiryCreateNestedOneWithoutTradeOrdersInput
+  paymentRequest: Prisma.PaymentRequestCreateNestedOneWithoutTradeOrderByPaymentRequestInput
+  paymentRequestByOrderId?: Prisma.PaymentRequestCreateNestedOneWithoutOrderInput
+  buyerCompany: Prisma.CompanyCreateNestedOneWithoutBuyerTradeOrdersInput
+  sellerCompany: Prisma.CompanyCreateNestedOneWithoutSellerTradeOrdersInput
+  items?: Prisma.TradeOrderItemCreateNestedManyWithoutOrderInput
+  shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
+  events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
+  payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+}
+
+export type TradeOrderUncheckedCreateWithoutConnectSettlementInput = {
+  id?: string
+  orderNumber: string
+  inquiryId: string
+  paymentRequestId: string
+  buyerCompanyId: string
+  sellerCompanyId: string
+  orderStatus?: $Enums.TradeOrderStatus
+  paymentStatus?: $Enums.OrderPaymentStatus
+  shipmentStatus?: $Enums.OrderShipmentStatus
+  payoutStatus?: $Enums.OrderPayoutStatus
+  buyerCompanyName: string
+  buyerContactName?: string | null
+  buyerEmail: string
+  buyerPhone?: string | null
+  buyerCountry: string
+  buyerAddress?: string | null
+  sellerCompanyName: string
+  sellerContactName?: string | null
+  sellerEmail: string
+  sellerPhone?: string | null
+  sellerCountry: string
+  sellerAddress?: string | null
+  productAmount: number
+  shippingAmount: number
+  grossAmount: number
+  platformFeeRateBps?: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  stripeProcessingFeeAmount?: number | null
+  refundAmount?: number
+  currency?: string
+  paidAt?: Date | string | null
+  refundedAt?: Date | string | null
+  disputedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  paymentRequestByOrderId?: Prisma.PaymentRequestUncheckedCreateNestedOneWithoutOrderInput
+  items?: Prisma.TradeOrderItemUncheckedCreateNestedManyWithoutOrderInput
+  shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
+  events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
+  payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+}
+
+export type TradeOrderCreateOrConnectWithoutConnectSettlementInput = {
+  where: Prisma.TradeOrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.TradeOrderCreateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedCreateWithoutConnectSettlementInput>
+}
+
+export type TradeOrderUpsertWithoutConnectSettlementInput = {
+  update: Prisma.XOR<Prisma.TradeOrderUpdateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedUpdateWithoutConnectSettlementInput>
+  create: Prisma.XOR<Prisma.TradeOrderCreateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedCreateWithoutConnectSettlementInput>
+  where?: Prisma.TradeOrderWhereInput
+}
+
+export type TradeOrderUpdateToOneWithWhereWithoutConnectSettlementInput = {
+  where?: Prisma.TradeOrderWhereInput
+  data: Prisma.XOR<Prisma.TradeOrderUpdateWithoutConnectSettlementInput, Prisma.TradeOrderUncheckedUpdateWithoutConnectSettlementInput>
+}
+
+export type TradeOrderUpdateWithoutConnectSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  orderStatus?: Prisma.EnumTradeOrderStatusFieldUpdateOperationsInput | $Enums.TradeOrderStatus
+  paymentStatus?: Prisma.EnumOrderPaymentStatusFieldUpdateOperationsInput | $Enums.OrderPaymentStatus
+  shipmentStatus?: Prisma.EnumOrderShipmentStatusFieldUpdateOperationsInput | $Enums.OrderShipmentStatus
+  payoutStatus?: Prisma.EnumOrderPayoutStatusFieldUpdateOperationsInput | $Enums.OrderPayoutStatus
+  buyerCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  buyerCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  buyerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  sellerAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  productAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  shippingAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeRateBps?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stripeProcessingFeeAmount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  refundAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  refundedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  disputedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inquiry?: Prisma.InquiryUpdateOneRequiredWithoutTradeOrdersNestedInput
+  paymentRequest?: Prisma.PaymentRequestUpdateOneRequiredWithoutTradeOrderByPaymentRequestNestedInput
+  paymentRequestByOrderId?: Prisma.PaymentRequestUpdateOneWithoutOrderNestedInput
+  buyerCompany?: Prisma.CompanyUpdateOneRequiredWithoutBuyerTradeOrdersNestedInput
+  sellerCompany?: Prisma.CompanyUpdateOneRequiredWithoutSellerTradeOrdersNestedInput
+  items?: Prisma.TradeOrderItemUpdateManyWithoutOrderNestedInput
+  shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
+  events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
+  payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+}
+
+export type TradeOrderUncheckedUpdateWithoutConnectSettlementInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  inquiryId?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentRequestId?: Prisma.StringFieldUpdateOperationsInput | string
   buyerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   sellerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   orderStatus?: Prisma.EnumTradeOrderStatusFieldUpdateOperationsInput | $Enums.TradeOrderStatus
@@ -2177,6 +2404,7 @@ export type TradeOrderCreateWithoutItemsInput = {
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutItemsInput = {
@@ -2220,6 +2448,7 @@ export type TradeOrderUncheckedCreateWithoutItemsInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutItemsInput = {
@@ -2279,6 +2508,7 @@ export type TradeOrderUpdateWithoutItemsInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutItemsInput = {
@@ -2322,6 +2552,7 @@ export type TradeOrderUncheckedUpdateWithoutItemsInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderCreateWithoutShipmentInput = {
@@ -2365,6 +2596,7 @@ export type TradeOrderCreateWithoutShipmentInput = {
   items?: Prisma.TradeOrderItemCreateNestedManyWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutShipmentInput = {
@@ -2408,6 +2640,7 @@ export type TradeOrderUncheckedCreateWithoutShipmentInput = {
   items?: Prisma.TradeOrderItemUncheckedCreateNestedManyWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutShipmentInput = {
@@ -2467,6 +2700,7 @@ export type TradeOrderUpdateWithoutShipmentInput = {
   items?: Prisma.TradeOrderItemUpdateManyWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutShipmentInput = {
@@ -2510,6 +2744,7 @@ export type TradeOrderUncheckedUpdateWithoutShipmentInput = {
   items?: Prisma.TradeOrderItemUncheckedUpdateManyWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderCreateWithoutEventsInput = {
@@ -2553,6 +2788,7 @@ export type TradeOrderCreateWithoutEventsInput = {
   items?: Prisma.TradeOrderItemCreateNestedManyWithoutOrderInput
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   payout?: Prisma.SellerPayoutCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutEventsInput = {
@@ -2596,6 +2832,7 @@ export type TradeOrderUncheckedCreateWithoutEventsInput = {
   items?: Prisma.TradeOrderItemUncheckedCreateNestedManyWithoutOrderInput
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   payout?: Prisma.SellerPayoutUncheckedCreateNestedOneWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutEventsInput = {
@@ -2655,6 +2892,7 @@ export type TradeOrderUpdateWithoutEventsInput = {
   items?: Prisma.TradeOrderItemUpdateManyWithoutOrderNestedInput
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutEventsInput = {
@@ -2698,6 +2936,7 @@ export type TradeOrderUncheckedUpdateWithoutEventsInput = {
   items?: Prisma.TradeOrderItemUncheckedUpdateManyWithoutOrderNestedInput
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderCreateWithoutPayoutInput = {
@@ -2741,6 +2980,7 @@ export type TradeOrderCreateWithoutPayoutInput = {
   items?: Prisma.TradeOrderItemCreateNestedManyWithoutOrderInput
   shipment?: Prisma.TradeOrderShipmentCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventCreateNestedManyWithoutOrderInput
+  connectSettlement?: Prisma.SettlementCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutPayoutInput = {
@@ -2784,6 +3024,7 @@ export type TradeOrderUncheckedCreateWithoutPayoutInput = {
   items?: Prisma.TradeOrderItemUncheckedCreateNestedManyWithoutOrderInput
   shipment?: Prisma.TradeOrderShipmentUncheckedCreateNestedOneWithoutOrderInput
   events?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutOrderInput
+  connectSettlement?: Prisma.SettlementUncheckedCreateNestedOneWithoutTradeOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutPayoutInput = {
@@ -2843,6 +3084,7 @@ export type TradeOrderUpdateWithoutPayoutInput = {
   items?: Prisma.TradeOrderItemUpdateManyWithoutOrderNestedInput
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutPayoutInput = {
@@ -2886,6 +3128,7 @@ export type TradeOrderUncheckedUpdateWithoutPayoutInput = {
   items?: Prisma.TradeOrderItemUncheckedUpdateManyWithoutOrderNestedInput
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderCreateManyBuyerCompanyInput = {
@@ -3005,6 +3248,7 @@ export type TradeOrderUpdateWithoutBuyerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutBuyerCompanyInput = {
@@ -3048,6 +3292,7 @@ export type TradeOrderUncheckedUpdateWithoutBuyerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateManyWithoutBuyerCompanyInput = {
@@ -3129,6 +3374,7 @@ export type TradeOrderUpdateWithoutSellerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutSellerCompanyInput = {
@@ -3172,6 +3418,7 @@ export type TradeOrderUncheckedUpdateWithoutSellerCompanyInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateManyWithoutSellerCompanyInput = {
@@ -3291,6 +3538,7 @@ export type TradeOrderUpdateWithoutInquiryInput = {
   shipment?: Prisma.TradeOrderShipmentUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutInquiryInput = {
@@ -3334,6 +3582,7 @@ export type TradeOrderUncheckedUpdateWithoutInquiryInput = {
   shipment?: Prisma.TradeOrderShipmentUncheckedUpdateOneWithoutOrderNestedInput
   events?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutOrderNestedInput
   payout?: Prisma.SellerPayoutUncheckedUpdateOneWithoutOrderNestedInput
+  connectSettlement?: Prisma.SettlementUncheckedUpdateOneWithoutTradeOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateManyWithoutInquiryInput = {
@@ -3460,6 +3709,7 @@ export type TradeOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   shipment?: boolean | Prisma.TradeOrder$shipmentArgs<ExtArgs>
   events?: boolean | Prisma.TradeOrder$eventsArgs<ExtArgs>
   payout?: boolean | Prisma.TradeOrder$payoutArgs<ExtArgs>
+  connectSettlement?: boolean | Prisma.TradeOrder$connectSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.TradeOrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tradeOrder"]>
 
@@ -3599,6 +3849,7 @@ export type TradeOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   shipment?: boolean | Prisma.TradeOrder$shipmentArgs<ExtArgs>
   events?: boolean | Prisma.TradeOrder$eventsArgs<ExtArgs>
   payout?: boolean | Prisma.TradeOrder$payoutArgs<ExtArgs>
+  connectSettlement?: boolean | Prisma.TradeOrder$connectSettlementArgs<ExtArgs>
   _count?: boolean | Prisma.TradeOrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TradeOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3626,6 +3877,7 @@ export type $TradeOrderPayload<ExtArgs extends runtime.Types.Extensions.Internal
     shipment: Prisma.$TradeOrderShipmentPayload<ExtArgs> | null
     events: Prisma.$TradeOrderEventPayload<ExtArgs>[]
     payout: Prisma.$SellerPayoutPayload<ExtArgs> | null
+    connectSettlement: Prisma.$SettlementPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4067,6 +4319,7 @@ export interface Prisma__TradeOrderClient<T, Null = never, ExtArgs extends runti
   shipment<T extends Prisma.TradeOrder$shipmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$shipmentArgs<ExtArgs>>): Prisma.Prisma__TradeOrderShipmentClient<runtime.Types.Result.GetResult<Prisma.$TradeOrderShipmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   events<T extends Prisma.TradeOrder$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeOrderEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payout<T extends Prisma.TradeOrder$payoutArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$payoutArgs<ExtArgs>>): Prisma.Prisma__SellerPayoutClient<runtime.Types.Result.GetResult<Prisma.$SellerPayoutPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  connectSettlement<T extends Prisma.TradeOrder$connectSettlementArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$connectSettlementArgs<ExtArgs>>): Prisma.Prisma__SettlementClient<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4635,6 +4888,25 @@ export type TradeOrder$payoutArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   include?: Prisma.SellerPayoutInclude<ExtArgs> | null
   where?: Prisma.SellerPayoutWhereInput
+}
+
+/**
+ * TradeOrder.connectSettlement
+ */
+export type TradeOrder$connectSettlementArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Settlement
+   */
+  select?: Prisma.SettlementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Settlement
+   */
+  omit?: Prisma.SettlementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementInclude<ExtArgs> | null
+  where?: Prisma.SettlementWhereInput
 }
 
 /**
