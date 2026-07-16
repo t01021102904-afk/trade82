@@ -13,7 +13,10 @@ import {
   syncPaymentRequestDispute,
   syncPaymentRequestRefund,
 } from "@/lib/payment-requests";
-import { createSettlementLedgerAfterVerifiedPayment } from "@/lib/stripe-connect-settlement-webhook";
+import {
+  createSettlementLedgerAfterVerifiedPayment,
+  type VerifiedSettlementPaymentEvidence,
+} from "@/lib/stripe-connect-settlement-webhook";
 import {
   SELLER_SUPPORT_PRODUCT_TYPE,
   isActiveSellerSupportSubscription,
@@ -205,21 +208,21 @@ async function activateMarketingExposureFromSession(
 }
 
 async function recordSettlementLedgerAfterVerifiedPayment({
-  paymentRequestId,
+  evidence,
   stripeEventId,
   stripeEventType,
 }: {
-  paymentRequestId: string | null | undefined;
+  evidence: VerifiedSettlementPaymentEvidence;
   stripeEventId: string;
   stripeEventType: string;
 }) {
-  if (!paymentRequestId) return;
+  if (!evidence.paymentRequestId) return;
 
   try {
-    await createSettlementLedgerAfterVerifiedPayment(paymentRequestId);
+    await createSettlementLedgerAfterVerifiedPayment(evidence);
   } catch (error) {
     console.error("Stripe Connect settlement ledger recording failed.", {
-      paymentRequestId,
+      paymentRequestId: evidence.paymentRequestId,
       stripeEventId,
       stripeEventType,
       errorName: error instanceof Error ? error.name : "UnknownError",
@@ -266,7 +269,14 @@ export async function POST(request: Request) {
           })
         ) {
           await recordSettlementLedgerAfterVerifiedPayment({
-            paymentRequestId: session.metadata?.paymentRequestId,
+            evidence: {
+              paymentRequestId: session.metadata?.paymentRequestId,
+              paymentIntentId: idOf(session.payment_intent),
+              checkoutSessionId: session.id,
+              grossAmount: session.amount_total,
+              currency: session.currency,
+              confirmationSource: "checkout_session",
+            },
             stripeEventId: event.id,
             stripeEventType: event.type,
           });
@@ -283,7 +293,14 @@ export async function POST(request: Request) {
         });
         if (paymentVerified) {
           await recordSettlementLedgerAfterVerifiedPayment({
-            paymentRequestId: session.metadata?.paymentRequestId,
+            evidence: {
+              paymentRequestId: session.metadata?.paymentRequestId,
+              paymentIntentId: idOf(session.payment_intent),
+              checkoutSessionId: session.id,
+              grossAmount: session.amount_total,
+              currency: session.currency,
+              confirmationSource: "checkout_session",
+            },
             stripeEventId: event.id,
             stripeEventType: event.type,
           });
@@ -298,7 +315,14 @@ export async function POST(request: Request) {
         });
         if (paymentVerified) {
           await recordSettlementLedgerAfterVerifiedPayment({
-            paymentRequestId: paymentIntent.metadata.paymentRequestId,
+            evidence: {
+              paymentRequestId: paymentIntent.metadata.paymentRequestId,
+              paymentIntentId: paymentIntent.id,
+              checkoutSessionId: null,
+              grossAmount: paymentIntent.amount_received || paymentIntent.amount,
+              currency: paymentIntent.currency,
+              confirmationSource: "payment_intent",
+            },
             stripeEventId: event.id,
             stripeEventType: event.type,
           });

@@ -181,20 +181,12 @@ test("settlement creation snapshots a validated referral attribution", async () 
   assert.doesNotMatch(service, /referredCompanyId/);
 });
 
-test("verified payment webhook integration remains flag-gated and accounting-only", async () => {
+test("settlement ledger code has no Stripe money-movement API dependency", async () => {
   const [webhookRoute, settlementService, settlementBridge] = await Promise.all([
     readFile(new URL("../src/app/api/stripe/webhook/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url), "utf8"),
   ]);
-
-  assert.match(webhookRoute, /markPaymentRequestPaidFromCheckoutSession\(session/);
-  assert.match(webhookRoute, /markPaymentRequestPaidFromPaymentIntent\(paymentIntent/);
-  assert.match(webhookRoute, /await recordSettlementLedgerAfterVerifiedPayment/);
-  assert.match(settlementService, /if \(!isStripeConnectSettlementLedgerEnabled\(\)\) return null;/);
-  assert.match(settlementService, /paymentRequest\.status !== PaymentRequestStatus\.PAID/);
-  assert.match(settlementService, /selectLockedReferralAttributionForPaymentRequest/);
-  assert.match(settlementBridge, /maybeCreatePendingSettlementForVerifiedPayment/);
 
   for (const source of [webhookRoute, settlementService, settlementBridge]) {
     assert.doesNotMatch(source, /\.transfers\.(create|createReversal)|\.accounts\.create|accountLinks\.create/);

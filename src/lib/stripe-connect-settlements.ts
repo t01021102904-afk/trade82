@@ -83,9 +83,19 @@ type PendingSettlementInput = {
   paidAt?: Date;
 };
 
+export type VerifiedSettlementPaymentEvidence = {
+  paymentRequestId: string | null | undefined;
+  paymentIntentId: string | null;
+  checkoutSessionId: string | null;
+  grossAmount: number | null;
+  currency: string | null;
+  confirmationSource: "checkout_session" | "payment_intent";
+};
+
 async function selectLockedReferralAttributionForPaymentRequest(
   tx: Tx,
   paymentRequestId: string,
+  paidAt: Date,
 ) {
   const paymentRequest = await tx.paymentRequest.findUnique({
     where: { id: paymentRequestId },
@@ -105,6 +115,7 @@ async function selectLockedReferralAttributionForPaymentRequest(
           paymentRequest.sellerCompany.ownerUserId,
         ],
       },
+      lockedAt: { lte: paidAt },
     },
     select: { id: true, referredUserId: true, lockedAt: true },
   });
@@ -182,6 +193,9 @@ export async function createPendingSettlementForVerifiedPayment(
     const refersSeller = attribution.referredUserId === paymentRequest.sellerCompany.ownerUserId;
     if (refersBuyer === refersSeller) {
       throw new Error("The selected referral attribution must belong to exactly one transaction party.");
+    }
+    if (attribution.lockedAt.getTime() > paymentConfirmedAt.getTime()) {
+      throw new Error("The selected referral attribution must have been locked by the verified payment time.");
     }
     referralSubjectType = refersBuyer ? ReferralSubjectType.BUYER : ReferralSubjectType.SELLER;
   }
@@ -281,22 +295,46 @@ export async function createPendingSettlementForVerifiedPayment(
 }
 
 // This wrapper is called only after the existing Stripe verification path has
-// succeeded. With the default mode off it returns before opening a database
-// transaction, preserving normal checkout, manual payouts, refunds, and disputes.
-export async function maybeCreatePendingSettlementForVerifiedPayment({
-  paymentRequestId,
-}: Pick<PendingSettlementInput, "paymentRequestId">) {
+// succeeded. It independently binds the current Stripe webhook evidence to the
+// persisted verified payment before it can create or backfill a settlement.
+// With the default mode off it returns before opening a database transaction.
+export async function createPendingSettlementForVerifiedWebhookPayment(
+  evidence: VerifiedSettlementPaymentEvidence,
+) {
   if (!isStripeConnectSettlementLedgerEnabled()) return null;
+
+  const paymentRequestId = evidence.paymentRequestId;
+  if (!paymentRequestId || !evidence.paymentIntentId) return null;
+
   return getDb().$transaction(
     async (tx) => {
       const paymentRequest = await tx.paymentRequest.findUnique({
         where: { id: paymentRequestId },
-        select: { status: true, paidAt: true },
+        select: {
+          id: true,
+          status: true,
+          paidAt: true,
+          grossAmount: true,
+          currency: true,
+          stripePaymentIntentId: true,
+          stripeCheckoutSessionId: true,
+          requiresManualReconciliation: true,
+          tradeOrderByPaymentRequest: { select: { id: true } },
+        },
       });
       if (
         !paymentRequest
+        || paymentRequest.id !== paymentRequestId
         || paymentRequest.status !== PaymentRequestStatus.PAID
         || !paymentRequest.paidAt
+        || paymentRequest.requiresManualReconciliation
+        || !paymentRequest.tradeOrderByPaymentRequest
+        || paymentRequest.stripePaymentIntentId !== evidence.paymentIntentId
+        || evidence.grossAmount !== paymentRequest.grossAmount
+        || evidence.currency !== "usd"
+        || paymentRequest.currency !== "usd"
+        || (evidence.confirmationSource === "checkout_session"
+          && paymentRequest.stripeCheckoutSessionId !== evidence.checkoutSessionId)
       ) {
         return null;
       }
@@ -304,6 +342,7 @@ export async function maybeCreatePendingSettlementForVerifiedPayment({
       const attribution = await selectLockedReferralAttributionForPaymentRequest(
         tx,
         paymentRequestId,
+        paymentRequest.paidAt,
       );
       return createPendingSettlementForVerifiedPayment(tx, {
         paymentRequestId,
