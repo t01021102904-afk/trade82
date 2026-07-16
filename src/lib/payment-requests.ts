@@ -29,6 +29,10 @@ import {
   claimPaymentRequestWebhookEvent,
   claimPendingPaymentRequestPaid,
 } from "@/lib/payment-request-webhook";
+import {
+  reconcileSettlementAfterVerifiedDispute,
+  reconcileSettlementAfterVerifiedRefund,
+} from "@/lib/stripe-connect-settlement-reconciliation";
 import { syncTradeOrderFromPaymentRequest } from "@/lib/trade-orders";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
 
@@ -225,6 +229,17 @@ async function findPaymentRequestFromPaymentIntent(paymentIntentId: string) {
     paymentRequestId: paymentRequestIdFromMetadata(intent.metadata),
     paymentIntentId,
   });
+}
+
+async function loadPaymentRequestForUpdate(
+  tx: Prisma.TransactionClient,
+  paymentRequestId: string,
+) {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>(
+    Prisma.sql`SELECT "id" FROM "PaymentRequest" WHERE "id" = ${paymentRequestId} FOR UPDATE`,
+  );
+  if (rows.length === 0) throw new Error("Payment request was not found.");
+  return tx.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequestId } });
 }
 
 type StripePaymentDetails = {
@@ -885,7 +900,7 @@ export async function syncPaymentRequestRefund(
       ...stripeEvent,
     }))) return;
 
-    const current = await tx.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } });
+    const current = await loadPaymentRequestForUpdate(tx, paymentRequest.id);
     if (current.stripePaymentIntentId && current.stripePaymentIntentId !== paymentIntentId) {
       await markReconciliationRequired(tx, {
         paymentRequestId: current.id,
@@ -945,6 +960,12 @@ export async function syncPaymentRequestRefund(
         metadata: { source: stripeEvent.stripeEventType, reason: "refund_after_release" },
       });
     }
+    await reconcileSettlementAfterVerifiedRefund(tx, {
+      paymentRequestId: current.id,
+      stripeSourceId: refund.id,
+      stripeEventId: stripeEvent.stripeEventId,
+      stripeEventType: stripeEvent.stripeEventType,
+    });
   });
   if (payoutHoldOrderId && payoutHoldRequired) {
     try {
@@ -985,7 +1006,7 @@ export async function syncPaymentRequestDispute(
       ...stripeEvent,
     }))) return;
 
-    const current = await tx.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } });
+    const current = await loadPaymentRequestForUpdate(tx, paymentRequest.id);
     if (current.stripePaymentIntentId && current.stripePaymentIntentId !== paymentIntentId) {
       await markReconciliationRequired(tx, {
         paymentRequestId: current.id,
@@ -1062,6 +1083,12 @@ export async function syncPaymentRequestDispute(
         metadata: { source: stripeEvent.stripeEventType, reason: "dispute_after_release" },
       });
     }
+    await reconcileSettlementAfterVerifiedDispute(tx, {
+      paymentRequestId: current.id,
+      stripeSourceId: dispute.id,
+      stripeEventId: stripeEvent.stripeEventId,
+      stripeEventType: stripeEvent.stripeEventType,
+    });
   });
   if (payoutHoldOrderId && payoutHoldRequired) {
     try {

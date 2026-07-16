@@ -642,8 +642,10 @@ export const SettlementReversalScalarFieldEnum = {
   amount: 'amount',
   currency: 'currency',
   reason: 'reason',
+  status: 'status',
   idempotencyKey: 'idempotencyKey',
   stripeRefundId: 'stripeRefundId',
+  stripeDisputeId: 'stripeDisputeId',
   stripeTransferReversalId: 'stripeTransferReversalId',
   createdAt: 'createdAt'
 } as const

@@ -17,6 +17,9 @@ import {
   settlementIdempotencyKey,
   settlementLegIdempotencyKey,
 } from "../src/lib/stripe-connect-settlement-rules.ts";
+import {
+  calculateCumulativeSettlementReversalTargets,
+} from "../src/lib/stripe-connect-settlement-reconciliation.ts";
 
 test("settlement financials preserve the exact 95 / 4.5 / 0.5 gross split", () => {
   const financials = calculateStripeConnectSettlementFinancials({
@@ -64,6 +67,32 @@ test("settlement calculations reject non-USD or non-integer minor units", () => 
     grossAmount: 100_000,
     currency: "krw",
     hasReferralAttribution: false,
+  }));
+});
+
+test("cumulative refund allocation uses the original settlement split without rounding drift", () => {
+  const first = calculateCumulativeSettlementReversalTargets({
+    grossAmount: 11_000,
+    currency: "usd",
+    hasReferralAttribution: true,
+    cumulativeRefundAmount: 2_750,
+  });
+  const final = calculateCumulativeSettlementReversalTargets({
+    grossAmount: 11_000,
+    currency: "usd",
+    hasReferralAttribution: true,
+    cumulativeRefundAmount: 11_000,
+  });
+
+  assert.equal(first.get("SELLER_PAYABLE"), 2_612);
+  assert.equal(first.get("PARTNER_REFERRAL"), 14);
+  assert.equal(final.get("SELLER_PAYABLE"), 10_450);
+  assert.equal(final.get("PARTNER_REFERRAL"), 55);
+  assert.throws(() => calculateCumulativeSettlementReversalTargets({
+    grossAmount: 11_000,
+    currency: "usd",
+    hasReferralAttribution: false,
+    cumulativeRefundAmount: 0,
   }));
 });
 
@@ -163,6 +192,31 @@ test("the settlement reversal hardening migration fixes the trigger search path 
   assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
 });
 
+test("the reconciliation migration adds pending reversal states and auditable refund and dispute events", async () => {
+  const migration = await readFile(
+    new URL("../prisma/migrations/20260716120000_add_settlement_refund_dispute_reconciliation/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  for (const value of [
+    "REVERSAL_PENDING",
+    "REFUND_RECONCILIATION_STARTED",
+    "PARTIAL_REFUND_RECONCILED",
+    "FULL_REFUND_CANCELLED",
+    "DISPUTE_OPENED",
+    "DISPUTE_UPDATED",
+    "DISPUTE_WON",
+    "DISPUTE_LOST",
+    "POST_TRANSFER_REVERSAL_REQUIRED",
+  ]) {
+    assert.match(migration, new RegExp(`ADD VALUE IF NOT EXISTS '${value}'`));
+  }
+  assert.match(migration, /CREATE TYPE "SettlementReversalStatus" AS ENUM \('PENDING', 'COMPLETED'\)/);
+  assert.match(migration, /ADD COLUMN "stripeDisputeId" TEXT/);
+  assert.match(migration, /SettlementReversal_stripeDisputeId_settlementLegId_key/);
+  assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
+});
+
 test("settlement creation snapshots a validated referral attribution", async () => {
   const service = await readFile(
     new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url),
@@ -182,13 +236,17 @@ test("settlement creation snapshots a validated referral attribution", async () 
 });
 
 test("settlement ledger code has no Stripe money-movement API dependency", async () => {
-  const [webhookRoute, settlementService, settlementBridge] = await Promise.all([
+  const [webhookRoute, settlementService, settlementBridge, reconciliationService] = await Promise.all([
     readFile(new URL("../src/app/api/stripe/webhook/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/lib/stripe-connect-settlement-reconciliation.ts", import.meta.url), "utf8"),
   ]);
 
-  for (const source of [webhookRoute, settlementService, settlementBridge]) {
-    assert.doesNotMatch(source, /\.transfers\.(create|createReversal)|\.accounts\.create|accountLinks\.create/);
+  for (const source of [webhookRoute, settlementService, settlementBridge, reconciliationService]) {
+    assert.doesNotMatch(
+      source,
+      /\.transfers\.(create|createReversal)|\.accounts\.create|accountLinks\.create|\.payouts\.create/,
+    );
   }
 });

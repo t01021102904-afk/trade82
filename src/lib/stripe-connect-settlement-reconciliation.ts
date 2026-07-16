@@ -1,0 +1,439 @@
+import "server-only";
+
+import {
+  PaymentRequestStatus,
+  Prisma,
+  SettlementEventType,
+  SettlementLegStatus,
+  SettlementLegType,
+  SettlementReversalReason,
+  SettlementReversalStatus,
+  SettlementStatus,
+} from "@/generated/prisma/client";
+import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
+import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
+
+type Tx = Prisma.TransactionClient;
+
+type ReconciliationSource = {
+  paymentRequestId: string;
+  stripeSourceId: string;
+  stripeEventId: string;
+  stripeEventType: string;
+};
+
+function isInFlightOrTransferred(status: SettlementLegStatus) {
+  return (
+    status === SettlementLegStatus.TRANSFER_PENDING
+    || status === SettlementLegStatus.TRANSFERRED
+    || status === SettlementLegStatus.REVERSAL_PENDING
+  );
+}
+
+function isTransferableLeg(type: SettlementLegType) {
+  return type === SettlementLegType.SELLER_PAYABLE || type === SettlementLegType.PARTNER_REFERRAL;
+}
+
+function isFullEconomicLoss(refundAmount: number, grossAmount: number) {
+  return refundAmount >= grossAmount;
+}
+
+function disputeIsLoss(status: string) {
+  return status === "lost" || status === "charge_refunded";
+}
+
+function disputeRestoresEligibility(status: string) {
+  return ["won", "prevented", "warning_closed"].includes(status);
+}
+
+async function createSettlementEvent(
+  tx: Tx,
+  {
+    settlementId,
+    settlementLegId,
+    eventType,
+    message,
+    metadata,
+    idempotencyKey,
+  }: {
+    settlementId: string;
+    settlementLegId?: string;
+    eventType: SettlementEventType;
+    message: string;
+    metadata: Prisma.InputJsonValue;
+    idempotencyKey: string;
+  },
+) {
+  const existingEvent = await tx.settlementEvent.findUnique({
+    where: { idempotencyKey },
+    select: { id: true },
+  });
+  if (existingEvent) return;
+  await tx.settlementEvent.create({
+    data: {
+      settlementId,
+      ...(settlementLegId ? { settlementLegId } : {}),
+      eventType,
+      message,
+      metadata,
+      idempotencyKey,
+    },
+  });
+}
+
+async function loadLockedSettlement(tx: Tx, paymentRequestId: string) {
+  const rows = await tx.$queryRaw<Array<{ id: string }>>(
+    Prisma.sql`SELECT "id" FROM "Settlement" WHERE "paymentRequestId" = ${paymentRequestId} FOR UPDATE`,
+  );
+  if (rows.length === 0) return null;
+
+  return tx.settlement.findUniqueOrThrow({
+    where: { id: rows[0].id },
+    include: {
+      legs: { orderBy: { type: "asc" } },
+      reversals: {
+        select: { settlementLegId: true, amount: true },
+      },
+    },
+  });
+}
+
+async function loadReconciliationContext(tx: Tx, paymentRequestId: string) {
+  const settlement = await loadLockedSettlement(tx, paymentRequestId);
+  if (!settlement) return null;
+
+  const paymentRequest = await tx.paymentRequest.findUniqueOrThrow({
+    where: { id: paymentRequestId },
+    select: {
+      id: true,
+      status: true,
+      paidAt: true,
+      refundAmount: true,
+      grossAmount: true,
+      currency: true,
+      requiresManualReconciliation: true,
+    },
+  });
+  if (
+    !paymentRequest.paidAt
+    || paymentRequest.currency !== "usd"
+    || paymentRequest.grossAmount !== settlement.grossAmount
+    || settlement.currency !== "usd"
+  ) {
+    throw new Error("Settlement reconciliation requires a verified USD payment snapshot.");
+  }
+
+  return { settlement, paymentRequest };
+}
+
+export function calculateCumulativeSettlementReversalTargets({
+  grossAmount,
+  currency,
+  hasReferralAttribution,
+  cumulativeRefundAmount,
+}: {
+  grossAmount: number;
+  currency: string;
+  hasReferralAttribution: boolean;
+  cumulativeRefundAmount: number;
+}) {
+  if (!Number.isSafeInteger(cumulativeRefundAmount) || cumulativeRefundAmount < 1 || cumulativeRefundAmount > grossAmount) {
+    throw new Error("Cumulative settlement reconciliation amount is invalid.");
+  }
+  const financials = calculateStripeConnectSettlementFinancials({
+    grossAmount: cumulativeRefundAmount,
+    currency,
+    hasReferralAttribution,
+  });
+  return new Map<SettlementLegType, number>([
+    [SettlementLegType.SELLER_PAYABLE, financials.sellerPayableAmount],
+    [SettlementLegType.PARTNER_REFERRAL, financials.partnerReferralAmount],
+  ]);
+}
+
+async function reconcileEconomicLoss(
+  tx: Tx,
+  source: ReconciliationSource & { reason: SettlementReversalReason },
+) {
+  const context = await loadReconciliationContext(tx, source.paymentRequestId);
+  if (!context) return null;
+
+  const { paymentRequest, settlement } = context;
+  if (
+    (paymentRequest.status !== PaymentRequestStatus.PARTIALLY_REFUNDED
+      && paymentRequest.status !== PaymentRequestStatus.REFUNDED)
+    || paymentRequest.refundAmount <= 0
+  ) {
+    return null;
+  }
+
+  const refundAmount = Math.min(paymentRequest.refundAmount, paymentRequest.grossAmount);
+  const fullLoss = isFullEconomicLoss(refundAmount, paymentRequest.grossAmount);
+  const targets = calculateCumulativeSettlementReversalTargets({
+    grossAmount: paymentRequest.grossAmount,
+    currency: settlement.currency,
+    hasReferralAttribution: settlement.partnerReferralAmount > 0,
+    cumulativeRefundAmount: refundAmount,
+  });
+  const priorAmounts = new Map<string, number>();
+  for (const reversal of settlement.reversals) {
+    priorAmounts.set(
+      reversal.settlementLegId,
+      (priorAmounts.get(reversal.settlementLegId) ?? 0) + reversal.amount,
+    );
+  }
+
+  const reversalLegs = settlement.legs.filter((leg) => isTransferableLeg(leg.type));
+  const deltaByLegId = new Map<string, number>();
+  for (const leg of reversalLegs) {
+    const target = targets.get(leg.type) ?? 0;
+    const prior = priorAmounts.get(leg.id) ?? 0;
+    const delta = Math.max(0, target - prior);
+    if (delta > 0) deltaByLegId.set(leg.id, delta);
+  }
+
+  const transferredLegIds = new Set(
+    reversalLegs
+      .filter((leg) => isInFlightOrTransferred(leg.status) && (deltaByLegId.get(leg.id) ?? 0) > 0)
+      .map((leg) => leg.id),
+  );
+
+  await createSettlementEvent(tx, {
+    settlementId: settlement.id,
+    eventType: SettlementEventType.REFUND_RECONCILIATION_STARTED,
+    message: "Settlement reconciliation started after a verified refund or dispute loss.",
+    metadata: {
+      source: source.reason.toLowerCase(),
+      stripeSourceId: source.stripeSourceId,
+      stripeEventType: source.stripeEventType,
+      refundAmount,
+      currency: "usd",
+    },
+    idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:started`,
+  });
+
+  for (const leg of reversalLegs) {
+    const delta = deltaByLegId.get(leg.id) ?? 0;
+    if (delta <= 0) continue;
+    const idempotencyKey = `settlement:${settlement.id}:reversal:${source.reason}:${source.stripeSourceId}:leg:${leg.type}`;
+    let reversalCreated = false;
+    const existingReversal = await tx.settlementReversal.findUnique({
+      where: { idempotencyKey },
+      select: { id: true },
+    });
+    if (!existingReversal) {
+      await tx.settlementReversal.create({
+        data: {
+          settlementId: settlement.id,
+          settlementLegId: leg.id,
+          amount: delta,
+          currency: "usd",
+          reason: source.reason,
+          status: SettlementReversalStatus.PENDING,
+          idempotencyKey,
+          ...(source.reason === SettlementReversalReason.REFUND
+            ? { stripeRefundId: source.stripeSourceId }
+            : { stripeDisputeId: source.stripeSourceId }),
+        },
+      });
+      reversalCreated = true;
+    }
+    if (reversalCreated) {
+      await createSettlementEvent(tx, {
+        settlementId: settlement.id,
+        settlementLegId: leg.id,
+        eventType: SettlementEventType.REVERSAL_CREATED,
+        message: "A pending internal settlement reversal was recorded without a Stripe transfer reversal.",
+        metadata: {
+          source: source.reason.toLowerCase(),
+          stripeSourceId: source.stripeSourceId,
+          amount: delta,
+          currency: "usd",
+        },
+        idempotencyKey: `settlement:${settlement.id}:reversal:${source.reason}:${source.stripeSourceId}:leg:${leg.type}:event`,
+      });
+    }
+  }
+
+  for (const leg of settlement.legs) {
+    if (transferredLegIds.has(leg.id)) {
+      await tx.settlementLeg.update({
+        where: { id: leg.id },
+        data: { status: SettlementLegStatus.REVERSAL_PENDING },
+      });
+      continue;
+    }
+    if (isInFlightOrTransferred(leg.status)) continue;
+    if (fullLoss) {
+      await tx.settlementLeg.update({
+        where: { id: leg.id },
+        data: { status: SettlementLegStatus.CANCELLED },
+      });
+    } else if (leg.status !== SettlementLegStatus.CANCELLED) {
+      await tx.settlementLeg.update({
+        where: { id: leg.id },
+        data: { status: SettlementLegStatus.HOLD },
+      });
+    }
+  }
+
+  const hasTransferredReversal = transferredLegIds.size > 0;
+  await tx.settlement.update({
+    where: { id: settlement.id },
+    data: {
+      status: hasTransferredReversal
+        ? SettlementStatus.REVERSAL_PENDING
+        : fullLoss
+          ? SettlementStatus.CANCELLED
+          : SettlementStatus.HOLD,
+    },
+  });
+
+  if (fullLoss || source.reason === SettlementReversalReason.REFUND) {
+    await createSettlementEvent(tx, {
+      settlementId: settlement.id,
+      eventType: fullLoss
+        ? SettlementEventType.FULL_REFUND_CANCELLED
+        : SettlementEventType.PARTIAL_REFUND_RECONCILED,
+      message: fullLoss
+        ? "A full economic loss cancelled unreleased settlement amounts."
+        : "A partial refund reduced future settlement availability proportionally.",
+      metadata: {
+        source: source.reason.toLowerCase(),
+        stripeSourceId: source.stripeSourceId,
+        refundAmount,
+        grossAmount: paymentRequest.grossAmount,
+        currency: "usd",
+      },
+      idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:${fullLoss ? "full" : "partial"}`,
+    });
+  }
+
+  if (source.reason === SettlementReversalReason.DISPUTE) {
+    await createSettlementEvent(tx, {
+      settlementId: settlement.id,
+      eventType: SettlementEventType.DISPUTE_LOST,
+      message: "A lost dispute reduced future settlement availability without moving money.",
+      metadata: {
+        stripeDisputeId: source.stripeSourceId,
+        refundAmount,
+        currency: "usd",
+      },
+      idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:lost`,
+    });
+  }
+
+  if (hasTransferredReversal) {
+    await createSettlementEvent(tx, {
+      settlementId: settlement.id,
+      eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+      message: "A transferred settlement leg requires later internal transfer-reversal reconciliation.",
+      metadata: {
+        source: source.reason.toLowerCase(),
+        stripeSourceId: source.stripeSourceId,
+        currency: "usd",
+      },
+      idempotencyKey: `settlement:${settlement.id}:reconciliation:${source.reason}:${source.stripeSourceId}:post-transfer`,
+    });
+  }
+
+  return { settlementId: settlement.id, fullLoss, hasTransferredReversal };
+}
+
+async function blockSettlementForOpenDispute(tx: Tx, source: ReconciliationSource) {
+  const context = await loadReconciliationContext(tx, source.paymentRequestId);
+  if (!context) return null;
+  const { settlement } = context;
+
+  for (const leg of settlement.legs) {
+    if (!isInFlightOrTransferred(leg.status) && leg.status !== SettlementLegStatus.CANCELLED) {
+      await tx.settlementLeg.update({
+        where: { id: leg.id },
+        data: { status: SettlementLegStatus.HOLD },
+      });
+    }
+  }
+  if (
+    settlement.status !== SettlementStatus.CANCELLED
+    && settlement.status !== SettlementStatus.REVERSAL_PENDING
+    && settlement.status !== SettlementStatus.TRANSFERRED
+  ) {
+    await tx.settlement.update({
+      where: { id: settlement.id },
+      data: { status: SettlementStatus.HOLD },
+    });
+  }
+  await createSettlementEvent(tx, {
+    settlementId: settlement.id,
+    eventType: source.stripeEventType === "charge.dispute.created"
+      ? SettlementEventType.DISPUTE_OPENED
+      : SettlementEventType.DISPUTE_UPDATED,
+    message: "An open dispute blocks future settlement release eligibility.",
+    metadata: { stripeDisputeId: source.stripeSourceId, stripeEventType: source.stripeEventType },
+    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:${source.stripeEventType}`,
+  });
+  return { settlementId: settlement.id };
+}
+
+async function restoreSettlementAfterWonDispute(tx: Tx, source: ReconciliationSource) {
+  const context = await loadReconciliationContext(tx, source.paymentRequestId);
+  if (!context) return null;
+  const { settlement } = context;
+  if (
+    settlement.status === SettlementStatus.CANCELLED
+    || settlement.status === SettlementStatus.REVERSAL_PENDING
+    || settlement.status === SettlementStatus.TRANSFERRED
+  ) {
+    return { settlementId: settlement.id };
+  }
+  const status = settlement.holdUntil.getTime() > Date.now()
+    ? SettlementStatus.HOLD
+    : SettlementStatus.READY;
+  const legStatus = status === SettlementStatus.HOLD ? SettlementLegStatus.HOLD : SettlementLegStatus.READY;
+  await tx.settlement.update({ where: { id: settlement.id }, data: { status } });
+  for (const leg of settlement.legs) {
+    if (!isInFlightOrTransferred(leg.status) && leg.status !== SettlementLegStatus.CANCELLED) {
+      await tx.settlementLeg.update({ where: { id: leg.id }, data: { status: legStatus } });
+    }
+  }
+  await createSettlementEvent(tx, {
+    settlementId: settlement.id,
+    eventType: SettlementEventType.DISPUTE_WON,
+    message: "A favorable dispute outcome restored future settlement eligibility without releasing funds.",
+    metadata: { stripeDisputeId: source.stripeSourceId, stripeEventType: source.stripeEventType },
+    idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:won`,
+  });
+  return { settlementId: settlement.id };
+}
+
+// These functions are called only after the existing webhook synchronizers have
+// persisted and validated the Stripe refund or dispute. The default feature mode
+// exits before reading or writing any settlement ledger records.
+export async function reconcileSettlementAfterVerifiedRefund(
+  tx: Tx,
+  source: ReconciliationSource,
+) {
+  if (!isStripeConnectSettlementLedgerEnabled()) return null;
+  const refund = await tx.paymentRefund.findUnique({ where: { stripeRefundId: source.stripeSourceId } });
+  if (!refund || refund.paymentRequestId !== source.paymentRequestId || refund.status !== "succeeded") {
+    return null;
+  }
+  return reconcileEconomicLoss(tx, { ...source, reason: SettlementReversalReason.REFUND });
+}
+
+export async function reconcileSettlementAfterVerifiedDispute(
+  tx: Tx,
+  source: ReconciliationSource,
+) {
+  if (!isStripeConnectSettlementLedgerEnabled()) return null;
+  const dispute = await tx.paymentDispute.findUnique({ where: { stripeDisputeId: source.stripeSourceId } });
+  if (!dispute || dispute.paymentRequestId !== source.paymentRequestId) return null;
+
+  if (disputeIsLoss(dispute.status)) {
+    return reconcileEconomicLoss(tx, { ...source, reason: SettlementReversalReason.DISPUTE });
+  }
+  if (disputeRestoresEligibility(dispute.status)) {
+    return restoreSettlementAfterWonDispute(tx, source);
+  }
+  return blockSettlementForOpenDispute(tx, source);
+}

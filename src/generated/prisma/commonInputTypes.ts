@@ -691,6 +691,13 @@ export type EnumSettlementReversalReasonFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel> | $Enums.SettlementReversalReason
 }
 
+export type EnumSettlementReversalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementReversalStatus | Prisma.EnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel> | $Enums.SettlementReversalStatus
+}
+
 export type EnumSettlementReversalReasonWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.SettlementReversalReason | Prisma.EnumSettlementReversalReasonFieldRefInput<$PrismaModel>
   in?: $Enums.SettlementReversalReason[] | Prisma.ListEnumSettlementReversalReasonFieldRefInput<$PrismaModel>
@@ -699,6 +706,16 @@ export type EnumSettlementReversalReasonWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel>
+}
+
+export type EnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementReversalStatus | Prisma.EnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementReversalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
 }
 
 export type EnumTradeOrderStatusFilter<$PrismaModel = never> = {
@@ -1833,6 +1850,13 @@ export type NestedEnumSettlementReversalReasonFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel> | $Enums.SettlementReversalReason
 }
 
+export type NestedEnumSettlementReversalStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementReversalStatus | Prisma.EnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel> | $Enums.SettlementReversalStatus
+}
+
 export type NestedEnumSettlementReversalReasonWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.SettlementReversalReason | Prisma.EnumSettlementReversalReasonFieldRefInput<$PrismaModel>
   in?: $Enums.SettlementReversalReason[] | Prisma.ListEnumSettlementReversalReasonFieldRefInput<$PrismaModel>
@@ -1841,6 +1865,16 @@ export type NestedEnumSettlementReversalReasonWithAggregatesFilter<$PrismaModel 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSettlementReversalReasonFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementReversalStatus | Prisma.EnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementReversalStatus[] | Prisma.ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementReversalStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumTradeOrderStatusFilter<$PrismaModel = never> = {

@@ -4271,8 +4271,10 @@ export const SettlementReversalScalarFieldEnum = {
   amount: 'amount',
   currency: 'currency',
   reason: 'reason',
+  status: 'status',
   idempotencyKey: 'idempotencyKey',
   stripeRefundId: 'stripeRefundId',
+  stripeDisputeId: 'stripeDisputeId',
   stripeTransferReversalId: 'stripeTransferReversalId',
   createdAt: 'createdAt'
 } as const
@@ -5154,6 +5156,20 @@ export type EnumSettlementReversalReasonFieldRefInput<$PrismaModel> = FieldRefIn
  * Reference to a field of type 'SettlementReversalReason[]'
  */
 export type ListEnumSettlementReversalReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalReason[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementReversalStatus'
+ */
+export type EnumSettlementReversalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementReversalStatus[]'
+ */
+export type ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalStatus[]'>
     
 
 

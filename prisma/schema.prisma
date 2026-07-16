@@ -352,6 +352,7 @@ enum SettlementStatus {
   READY
   TRANSFER_PENDING
   TRANSFERRED
+  REVERSAL_PENDING
   REVERSED
   CANCELLED
 }
@@ -368,6 +369,7 @@ enum SettlementLegStatus {
   READY
   TRANSFER_PENDING
   TRANSFERRED
+  REVERSAL_PENDING
   REVERSED
   CANCELLED
 }
@@ -387,12 +389,25 @@ enum SettlementEventType {
   REVERSAL_CREATED
   REVERSED
   CANCELLED
+  REFUND_RECONCILIATION_STARTED
+  PARTIAL_REFUND_RECONCILED
+  FULL_REFUND_CANCELLED
+  DISPUTE_OPENED
+  DISPUTE_UPDATED
+  DISPUTE_WON
+  DISPUTE_LOST
+  POST_TRANSFER_REVERSAL_REQUIRED
 }
 
 enum SettlementReversalReason {
   REFUND
   DISPUTE
   MANUAL
+}
+
+enum SettlementReversalStatus {
+  PENDING
+  COMPLETED
 }
 
 model UserProfile {
@@ -1072,12 +1087,15 @@ model SettlementReversal {
   amount                   Int
   currency                 String                   @default("usd")
   reason                   SettlementReversalReason
+  status                   SettlementReversalStatus @default(PENDING)
   idempotencyKey           String                   @unique
   stripeRefundId           String?
+  stripeDisputeId          String?
   stripeTransferReversalId String?                  @unique
   createdAt                DateTime                 @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
+  @@unique([stripeDisputeId, settlementLegId])
   @@index([settlementId, settlementLegId])
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])

@@ -468,6 +468,7 @@ export const SettlementStatus = {
   READY: 'READY',
   TRANSFER_PENDING: 'TRANSFER_PENDING',
   TRANSFERRED: 'TRANSFERRED',
+  REVERSAL_PENDING: 'REVERSAL_PENDING',
   REVERSED: 'REVERSED',
   CANCELLED: 'CANCELLED'
 } as const
@@ -490,6 +491,7 @@ export const SettlementLegStatus = {
   READY: 'READY',
   TRANSFER_PENDING: 'TRANSFER_PENDING',
   TRANSFERRED: 'TRANSFERRED',
+  REVERSAL_PENDING: 'REVERSAL_PENDING',
   REVERSED: 'REVERSED',
   CANCELLED: 'CANCELLED'
 } as const
@@ -514,7 +516,15 @@ export const SettlementEventType = {
   TRANSFERRED: 'TRANSFERRED',
   REVERSAL_CREATED: 'REVERSAL_CREATED',
   REVERSED: 'REVERSED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  REFUND_RECONCILIATION_STARTED: 'REFUND_RECONCILIATION_STARTED',
+  PARTIAL_REFUND_RECONCILED: 'PARTIAL_REFUND_RECONCILED',
+  FULL_REFUND_CANCELLED: 'FULL_REFUND_CANCELLED',
+  DISPUTE_OPENED: 'DISPUTE_OPENED',
+  DISPUTE_UPDATED: 'DISPUTE_UPDATED',
+  DISPUTE_WON: 'DISPUTE_WON',
+  DISPUTE_LOST: 'DISPUTE_LOST',
+  POST_TRANSFER_REVERSAL_REQUIRED: 'POST_TRANSFER_REVERSAL_REQUIRED'
 } as const
 
 export type SettlementEventType = (typeof SettlementEventType)[keyof typeof SettlementEventType]
@@ -527,3 +537,11 @@ export const SettlementReversalReason = {
 } as const
 
 export type SettlementReversalReason = (typeof SettlementReversalReason)[keyof typeof SettlementReversalReason]
+
+
+export const SettlementReversalStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type SettlementReversalStatus = (typeof SettlementReversalStatus)[keyof typeof SettlementReversalStatus]
