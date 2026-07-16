@@ -119,6 +119,23 @@ test("the additive migration creates a restricted ledger without Stripe transfer
   assert.match(migration, /"settlementLegId" TEXT NOT NULL/);
 });
 
+test("the settlement reversal hardening migration fixes the trigger search path and adds the composite foreign key index", async () => {
+  const migration = await readFile(
+    new URL("../prisma/migrations/20260715110000_harden_settlement_reversal_function_and_index/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    migration,
+    /ALTER FUNCTION public\."checkSettlementReversalLeg"\(\) SET search_path = pg_catalog, public;/,
+  );
+  assert.match(
+    migration,
+    /CREATE INDEX "SettlementReversal_settlementId_settlementLegId_idx"\s+ON "SettlementReversal"\("settlementId", "settlementLegId"\);/,
+  );
+  assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
+});
+
 test("settlement creation snapshots only an explicitly selected referral attribution", async () => {
   const service = await readFile(
     new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url),

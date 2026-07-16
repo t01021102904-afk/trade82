@@ -1078,6 +1078,7 @@ model SettlementReversal {
   createdAt                DateTime                 @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
+  @@index([settlementId, settlementLegId])
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])
 }
