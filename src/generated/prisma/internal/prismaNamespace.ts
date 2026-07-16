@@ -402,6 +402,13 @@ export const ModelName = {
   PaymentDispute: 'PaymentDispute',
   PaymentRequestEvent: 'PaymentRequestEvent',
   PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
+  PartnerProfile: 'PartnerProfile',
+  ReferralAttribution: 'ReferralAttribution',
+  StripeConnectedAccount: 'StripeConnectedAccount',
+  Settlement: 'Settlement',
+  SettlementLeg: 'SettlementLeg',
+  SettlementEvent: 'SettlementEvent',
+  SettlementReversal: 'SettlementReversal',
   OrderNumberCounter: 'OrderNumberCounter',
   TradeOrder: 'TradeOrder',
   TradeOrderItem: 'TradeOrderItem',
@@ -436,7 +443,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralAttribution" | "stripeConnectedAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1769,6 +1776,524 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PaymentRequestWebhookEventCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PaymentRequestWebhookEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartnerProfile: {
+      payload: Prisma.$PartnerProfilePayload<ExtArgs>
+      fields: Prisma.PartnerProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        findMany: {
+          args: Prisma.PartnerProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>[]
+        }
+        create: {
+          args: Prisma.PartnerProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        createMany: {
+          args: Prisma.PartnerProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        update: {
+          args: Prisma.PartnerProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerProfile>
+        }
+        groupBy: {
+          args: Prisma.PartnerProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReferralAttribution: {
+      payload: Prisma.$ReferralAttributionPayload<ExtArgs>
+      fields: Prisma.ReferralAttributionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReferralAttributionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReferralAttributionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        findFirst: {
+          args: Prisma.ReferralAttributionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReferralAttributionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        findMany: {
+          args: Prisma.ReferralAttributionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>[]
+        }
+        create: {
+          args: Prisma.ReferralAttributionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        createMany: {
+          args: Prisma.ReferralAttributionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReferralAttributionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>[]
+        }
+        delete: {
+          args: Prisma.ReferralAttributionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        update: {
+          args: Prisma.ReferralAttributionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReferralAttributionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReferralAttributionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReferralAttributionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReferralAttributionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralAttributionPayload>
+        }
+        aggregate: {
+          args: Prisma.ReferralAttributionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReferralAttribution>
+        }
+        groupBy: {
+          args: Prisma.ReferralAttributionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralAttributionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReferralAttributionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralAttributionCountAggregateOutputType> | number
+        }
+      }
+    }
+    StripeConnectedAccount: {
+      payload: Prisma.$StripeConnectedAccountPayload<ExtArgs>
+      fields: Prisma.StripeConnectedAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StripeConnectedAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StripeConnectedAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.StripeConnectedAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StripeConnectedAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        findMany: {
+          args: Prisma.StripeConnectedAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>[]
+        }
+        create: {
+          args: Prisma.StripeConnectedAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        createMany: {
+          args: Prisma.StripeConnectedAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StripeConnectedAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.StripeConnectedAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        update: {
+          args: Prisma.StripeConnectedAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.StripeConnectedAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StripeConnectedAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StripeConnectedAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.StripeConnectedAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StripeConnectedAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.StripeConnectedAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStripeConnectedAccount>
+        }
+        groupBy: {
+          args: Prisma.StripeConnectedAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StripeConnectedAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StripeConnectedAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StripeConnectedAccountCountAggregateOutputType> | number
+        }
+      }
+    }
+    Settlement: {
+      payload: Prisma.$SettlementPayload<ExtArgs>
+      fields: Prisma.SettlementFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        update: {
+          args: Prisma.SettlementUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlement>
+        }
+        groupBy: {
+          args: Prisma.SettlementGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementCountAggregateOutputType> | number
+        }
+      }
+    }
+    SettlementLeg: {
+      payload: Prisma.$SettlementLegPayload<ExtArgs>
+      fields: Prisma.SettlementLegFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementLegFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementLegFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementLegFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementLegFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementLegFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementLegCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementLegCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementLegCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementLegDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        update: {
+          args: Prisma.SettlementLegUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementLegDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementLegUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementLegUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementLegUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementLegPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementLegAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementLeg>
+        }
+        groupBy: {
+          args: Prisma.SettlementLegGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementLegGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementLegCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementLegCountAggregateOutputType> | number
+        }
+      }
+    }
+    SettlementEvent: {
+      payload: Prisma.$SettlementEventPayload<ExtArgs>
+      fields: Prisma.SettlementEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        update: {
+          args: Prisma.SettlementEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementEventPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementEvent>
+        }
+        groupBy: {
+          args: Prisma.SettlementEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    SettlementReversal: {
+      payload: Prisma.$SettlementReversalPayload<ExtArgs>
+      fields: Prisma.SettlementReversalFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementReversalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementReversalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementReversalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementReversalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementReversalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementReversalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementReversalCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementReversalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementReversalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        update: {
+          args: Prisma.SettlementReversalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementReversalDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementReversalUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementReversalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementReversalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementReversalPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementReversalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementReversal>
+        }
+        groupBy: {
+          args: Prisma.SettlementReversalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementReversalGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementReversalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementReversalCountAggregateOutputType> | number
         }
       }
     }
@@ -3635,6 +4160,118 @@ export const PaymentRequestWebhookEventScalarFieldEnum = {
 export type PaymentRequestWebhookEventScalarFieldEnum = (typeof PaymentRequestWebhookEventScalarFieldEnum)[keyof typeof PaymentRequestWebhookEventScalarFieldEnum]
 
 
+export const PartnerProfileScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  referralCode: 'referralCode',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerProfileScalarFieldEnum = (typeof PartnerProfileScalarFieldEnum)[keyof typeof PartnerProfileScalarFieldEnum]
+
+
+export const ReferralAttributionScalarFieldEnum = {
+  id: 'id',
+  referredCompanyId: 'referredCompanyId',
+  partnerProfileId: 'partnerProfileId',
+  referralCode: 'referralCode',
+  status: 'status',
+  lockedAt: 'lockedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralAttributionScalarFieldEnum = (typeof ReferralAttributionScalarFieldEnum)[keyof typeof ReferralAttributionScalarFieldEnum]
+
+
+export const StripeConnectedAccountScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  stripeAccountId: 'stripeAccountId',
+  status: 'status',
+  chargesEnabled: 'chargesEnabled',
+  payoutsEnabled: 'payoutsEnabled',
+  detailsSubmitted: 'detailsSubmitted',
+  onboardingComplete: 'onboardingComplete',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StripeConnectedAccountScalarFieldEnum = (typeof StripeConnectedAccountScalarFieldEnum)[keyof typeof StripeConnectedAccountScalarFieldEnum]
+
+
+export const SettlementScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  tradeOrderId: 'tradeOrderId',
+  referralAttributionId: 'referralAttributionId',
+  grossAmount: 'grossAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  partnerReferralAmount: 'partnerReferralAmount',
+  trade82NetAmount: 'trade82NetAmount',
+  currency: 'currency',
+  holdUntil: 'holdUntil',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const SettlementLegScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  type: 'type',
+  recipientCompanyId: 'recipientCompanyId',
+  partnerProfileId: 'partnerProfileId',
+  amount: 'amount',
+  currency: 'currency',
+  holdUntil: 'holdUntil',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  stripeTransferId: 'stripeTransferId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementLegScalarFieldEnum = (typeof SettlementLegScalarFieldEnum)[keyof typeof SettlementLegScalarFieldEnum]
+
+
+export const SettlementEventScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  eventType: 'eventType',
+  actorUserId: 'actorUserId',
+  message: 'message',
+  metadata: 'metadata',
+  idempotencyKey: 'idempotencyKey',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementEventScalarFieldEnum = (typeof SettlementEventScalarFieldEnum)[keyof typeof SettlementEventScalarFieldEnum]
+
+
+export const SettlementReversalScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  amount: 'amount',
+  currency: 'currency',
+  reason: 'reason',
+  idempotencyKey: 'idempotencyKey',
+  stripeRefundId: 'stripeRefundId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementReversalScalarFieldEnum = (typeof SettlementReversalScalarFieldEnum)[keyof typeof SettlementReversalScalarFieldEnum]
+
+
 export const OrderNumberCounterScalarFieldEnum = {
   year: 'year',
   lastOrderSequence: 'lastOrderSequence',
@@ -4387,6 +5024,118 @@ export type ListEnumPaymentRequestEventTypeFieldRefInput<$PrismaModel> = FieldRe
 
 
 /**
+ * Reference to a field of type 'PartnerProfileStatus'
+ */
+export type EnumPartnerProfileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerProfileStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PartnerProfileStatus[]'
+ */
+export type ListEnumPartnerProfileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerProfileStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ReferralAttributionStatus'
+ */
+export type EnumReferralAttributionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralAttributionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'ReferralAttributionStatus[]'
+ */
+export type ListEnumReferralAttributionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralAttributionStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StripeConnectedAccountStatus'
+ */
+export type EnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeConnectedAccountStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'StripeConnectedAccountStatus[]'
+ */
+export type ListEnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeConnectedAccountStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementStatus'
+ */
+export type EnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementStatus[]'
+ */
+export type ListEnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementLegType'
+ */
+export type EnumSettlementLegTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementLegType'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementLegType[]'
+ */
+export type ListEnumSettlementLegTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementLegType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementLegStatus'
+ */
+export type EnumSettlementLegStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementLegStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementLegStatus[]'
+ */
+export type ListEnumSettlementLegStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementLegStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementEventType'
+ */
+export type EnumSettlementEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementEventType'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementEventType[]'
+ */
+export type ListEnumSettlementEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementEventType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementReversalReason'
+ */
+export type EnumSettlementReversalReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalReason'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementReversalReason[]'
+ */
+export type ListEnumSettlementReversalReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalReason[]'>
+    
+
+
+/**
  * Reference to a field of type 'TradeOrderStatus'
  */
 export type EnumTradeOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradeOrderStatus'>
@@ -4835,6 +5584,13 @@ export type GlobalOmitConfig = {
   paymentDispute?: Prisma.PaymentDisputeOmit
   paymentRequestEvent?: Prisma.PaymentRequestEventOmit
   paymentRequestWebhookEvent?: Prisma.PaymentRequestWebhookEventOmit
+  partnerProfile?: Prisma.PartnerProfileOmit
+  referralAttribution?: Prisma.ReferralAttributionOmit
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountOmit
+  settlement?: Prisma.SettlementOmit
+  settlementLeg?: Prisma.SettlementLegOmit
+  settlementEvent?: Prisma.SettlementEventOmit
+  settlementReversal?: Prisma.SettlementReversalOmit
   orderNumberCounter?: Prisma.OrderNumberCounterOmit
   tradeOrder?: Prisma.TradeOrderOmit
   tradeOrderItem?: Prisma.TradeOrderItemOmit

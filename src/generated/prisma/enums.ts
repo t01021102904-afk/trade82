@@ -434,3 +434,88 @@ export const BankDirectorySourceType = {
 } as const
 
 export type BankDirectorySourceType = (typeof BankDirectorySourceType)[keyof typeof BankDirectorySourceType]
+
+
+export const PartnerProfileStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type PartnerProfileStatus = (typeof PartnerProfileStatus)[keyof typeof PartnerProfileStatus]
+
+
+export const ReferralAttributionStatus = {
+  LOCKED: 'LOCKED',
+  VOIDED: 'VOIDED'
+} as const
+
+export type ReferralAttributionStatus = (typeof ReferralAttributionStatus)[keyof typeof ReferralAttributionStatus]
+
+
+export const StripeConnectedAccountStatus = {
+  PENDING: 'PENDING',
+  RESTRICTED: 'RESTRICTED',
+  ENABLED: 'ENABLED',
+  DISABLED: 'DISABLED'
+} as const
+
+export type StripeConnectedAccountStatus = (typeof StripeConnectedAccountStatus)[keyof typeof StripeConnectedAccountStatus]
+
+
+export const SettlementStatus = {
+  PENDING: 'PENDING',
+  HOLD: 'HOLD',
+  READY: 'READY',
+  TRANSFER_PENDING: 'TRANSFER_PENDING',
+  TRANSFERRED: 'TRANSFERRED',
+  REVERSED: 'REVERSED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SettlementStatus = (typeof SettlementStatus)[keyof typeof SettlementStatus]
+
+
+export const SettlementLegType = {
+  SELLER_PAYABLE: 'SELLER_PAYABLE',
+  PARTNER_REFERRAL: 'PARTNER_REFERRAL',
+  PLATFORM_FEE: 'PLATFORM_FEE'
+} as const
+
+export type SettlementLegType = (typeof SettlementLegType)[keyof typeof SettlementLegType]
+
+
+export const SettlementLegStatus = {
+  PENDING: 'PENDING',
+  HOLD: 'HOLD',
+  READY: 'READY',
+  TRANSFER_PENDING: 'TRANSFER_PENDING',
+  TRANSFERRED: 'TRANSFERRED',
+  REVERSED: 'REVERSED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SettlementLegStatus = (typeof SettlementLegStatus)[keyof typeof SettlementLegStatus]
+
+
+export const SettlementEventType = {
+  CREATED: 'CREATED',
+  LEGS_CREATED: 'LEGS_CREATED',
+  HOLD_STARTED: 'HOLD_STARTED',
+  HOLD_RELEASED: 'HOLD_RELEASED',
+  TRANSFER_PENDING: 'TRANSFER_PENDING',
+  TRANSFERRED: 'TRANSFERRED',
+  REVERSAL_CREATED: 'REVERSAL_CREATED',
+  REVERSED: 'REVERSED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type SettlementEventType = (typeof SettlementEventType)[keyof typeof SettlementEventType]
+
+
+export const SettlementReversalReason = {
+  REFUND: 'REFUND',
+  DISPUTE: 'DISPUTE',
+  MANUAL: 'MANUAL'
+} as const
+
+export type SettlementReversalReason = (typeof SettlementReversalReason)[keyof typeof SettlementReversalReason]

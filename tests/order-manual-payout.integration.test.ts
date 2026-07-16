@@ -29,6 +29,7 @@ const profiles = await import(new URL("../src/lib/seller-payout-profiles.ts", im
 const financials = await import(new URL("../src/lib/order-financials.ts", import.meta.url).href);
 const crypto = await import(new URL("../src/lib/payout-crypto.ts", import.meta.url).href);
 const flags = await import(new URL("../src/lib/trade-order-feature.ts", import.meta.url).href);
+const settlements = await import(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href);
 const csv = await import(new URL("../src/lib/csv-security.ts", import.meta.url).href);
 const orderTable = await import(new URL("../src/lib/admin-order-table.ts", import.meta.url).href);
 const bankSeed = await import(new URL("../src/lib/south-korea-bank-directory.ts", import.meta.url).href);
@@ -221,6 +222,60 @@ async function createReadyPayout(prefix = "ready-payout") {
   const payout = await payouts.prepareSellerPayout({ orderId: order.id, actorUserId: fixture.admin.id });
   return { fixture, order, payout };
 }
+
+test("verified payments create one fourteen-day pending settlement ledger with fixed referral attribution", async () => {
+  const fixture = await createFixture("connect-settlement");
+  const order = await createOrder(fixture);
+  const paymentRequest = await markOrderPaid(order.id);
+  const partner = await db.partnerProfile.create({
+    data: {
+      companyId: fixture.buyerCompany.id,
+      referralCode: unique("partner"),
+    },
+  });
+
+  const attribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredCompanyId: fixture.sellerCompany.id,
+    partnerProfileId: partner.id,
+  }))) as { created: boolean; attribution: { id: string } };
+  const duplicateAttribution = (await db.$transaction((tx) => settlements.lockReferralAttribution(tx, {
+    referredCompanyId: fixture.sellerCompany.id,
+    partnerProfileId: partner.id,
+  }))) as { created: boolean; attribution: { id: string } };
+  assert.equal(attribution.created, true);
+  assert.equal(duplicateAttribution.created, false);
+  assert.equal(duplicateAttribution.attribution.id, attribution.attribution.id);
+
+  const first = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, { paymentRequestId: paymentRequest.id }),
+  )) as {
+    created: boolean;
+    settlement: {
+      id: string;
+      legs: unknown[];
+      sellerPayableAmount: number;
+      platformFeeAmount: number;
+      partnerReferralAmount: number;
+      trade82NetAmount: number;
+      holdUntil: Date;
+    };
+  };
+  const duplicate = (await db.$transaction((tx) =>
+    settlements.createPendingSettlementForVerifiedPayment(tx, { paymentRequestId: paymentRequest.id }),
+  )) as { created: boolean; settlement: { id: string } };
+  assert.equal(first.created, true);
+  assert.equal(duplicate.created, false);
+  assert.equal(duplicate.settlement.id, first.settlement.id);
+  assert.equal(first.settlement.legs.length, 3);
+  assert.equal(first.settlement.sellerPayableAmount, 104_500);
+  assert.equal(first.settlement.platformFeeAmount, 5_500);
+  assert.equal(first.settlement.partnerReferralAmount, 550);
+  assert.equal(first.settlement.trade82NetAmount, 4_950);
+  assert.equal(
+    first.settlement.holdUntil.getTime() - paymentRequest.paidAt!.getTime(),
+    14 * 24 * 60 * 60 * 1_000,
+  );
+});
 
 async function assertProcessingIsBlocked(payoutId: string, actorUserId: string) {
   const before = await db.sellerPayout.findUniqueOrThrow({

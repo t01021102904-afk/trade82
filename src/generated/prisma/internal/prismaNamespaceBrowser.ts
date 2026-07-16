@@ -69,6 +69,13 @@ export const ModelName = {
   PaymentDispute: 'PaymentDispute',
   PaymentRequestEvent: 'PaymentRequestEvent',
   PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
+  PartnerProfile: 'PartnerProfile',
+  ReferralAttribution: 'ReferralAttribution',
+  StripeConnectedAccount: 'StripeConnectedAccount',
+  Settlement: 'Settlement',
+  SettlementLeg: 'SettlementLeg',
+  SettlementEvent: 'SettlementEvent',
+  SettlementReversal: 'SettlementReversal',
   OrderNumberCounter: 'OrderNumberCounter',
   TradeOrder: 'TradeOrder',
   TradeOrderItem: 'TradeOrderItem',
@@ -522,6 +529,118 @@ export const PaymentRequestWebhookEventScalarFieldEnum = {
 } as const
 
 export type PaymentRequestWebhookEventScalarFieldEnum = (typeof PaymentRequestWebhookEventScalarFieldEnum)[keyof typeof PaymentRequestWebhookEventScalarFieldEnum]
+
+
+export const PartnerProfileScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  referralCode: 'referralCode',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerProfileScalarFieldEnum = (typeof PartnerProfileScalarFieldEnum)[keyof typeof PartnerProfileScalarFieldEnum]
+
+
+export const ReferralAttributionScalarFieldEnum = {
+  id: 'id',
+  referredCompanyId: 'referredCompanyId',
+  partnerProfileId: 'partnerProfileId',
+  referralCode: 'referralCode',
+  status: 'status',
+  lockedAt: 'lockedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralAttributionScalarFieldEnum = (typeof ReferralAttributionScalarFieldEnum)[keyof typeof ReferralAttributionScalarFieldEnum]
+
+
+export const StripeConnectedAccountScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  stripeAccountId: 'stripeAccountId',
+  status: 'status',
+  chargesEnabled: 'chargesEnabled',
+  payoutsEnabled: 'payoutsEnabled',
+  detailsSubmitted: 'detailsSubmitted',
+  onboardingComplete: 'onboardingComplete',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StripeConnectedAccountScalarFieldEnum = (typeof StripeConnectedAccountScalarFieldEnum)[keyof typeof StripeConnectedAccountScalarFieldEnum]
+
+
+export const SettlementScalarFieldEnum = {
+  id: 'id',
+  paymentRequestId: 'paymentRequestId',
+  tradeOrderId: 'tradeOrderId',
+  referralAttributionId: 'referralAttributionId',
+  grossAmount: 'grossAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  sellerPayableAmount: 'sellerPayableAmount',
+  partnerReferralAmount: 'partnerReferralAmount',
+  trade82NetAmount: 'trade82NetAmount',
+  currency: 'currency',
+  holdUntil: 'holdUntil',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementScalarFieldEnum = (typeof SettlementScalarFieldEnum)[keyof typeof SettlementScalarFieldEnum]
+
+
+export const SettlementLegScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  type: 'type',
+  recipientCompanyId: 'recipientCompanyId',
+  partnerProfileId: 'partnerProfileId',
+  amount: 'amount',
+  currency: 'currency',
+  holdUntil: 'holdUntil',
+  status: 'status',
+  idempotencyKey: 'idempotencyKey',
+  stripeTransferId: 'stripeTransferId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementLegScalarFieldEnum = (typeof SettlementLegScalarFieldEnum)[keyof typeof SettlementLegScalarFieldEnum]
+
+
+export const SettlementEventScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  eventType: 'eventType',
+  actorUserId: 'actorUserId',
+  message: 'message',
+  metadata: 'metadata',
+  idempotencyKey: 'idempotencyKey',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementEventScalarFieldEnum = (typeof SettlementEventScalarFieldEnum)[keyof typeof SettlementEventScalarFieldEnum]
+
+
+export const SettlementReversalScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  amount: 'amount',
+  currency: 'currency',
+  reason: 'reason',
+  idempotencyKey: 'idempotencyKey',
+  stripeRefundId: 'stripeRefundId',
+  createdAt: 'createdAt'
+} as const
+
+export type SettlementReversalScalarFieldEnum = (typeof SettlementReversalScalarFieldEnum)[keyof typeof SettlementReversalScalarFieldEnum]
 
 
 export const OrderNumberCounterScalarFieldEnum = {
