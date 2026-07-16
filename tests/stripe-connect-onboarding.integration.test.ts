@@ -53,8 +53,12 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
 
   const previous = process.env.STRIPE_CONNECT_ONBOARDING_MODE;
   const previousApprovedCountries = process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
+  const previousRuntimeMode = process.env.STRIPE_CONNECT_RUNTIME_MODE;
+  const previousStripeSecretKey = process.env.STRIPE_SECRET_KEY;
   process.env.STRIPE_CONNECT_ONBOARDING_MODE = "on";
   process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = "KR";
+  process.env.STRIPE_CONNECT_RUNTIME_MODE = "test";
+  process.env.STRIPE_SECRET_KEY = "sk_test_connect_integration";
   const idempotencyKeys: string[] = [];
   const stripe = {
     accounts: {
@@ -95,5 +99,9 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
     else process.env.STRIPE_CONNECT_ONBOARDING_MODE = previous;
     if (previousApprovedCountries === undefined) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
     else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = previousApprovedCountries;
+    if (previousRuntimeMode === undefined) delete process.env.STRIPE_CONNECT_RUNTIME_MODE;
+    else process.env.STRIPE_CONNECT_RUNTIME_MODE = previousRuntimeMode;
+    if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
   }
 });
