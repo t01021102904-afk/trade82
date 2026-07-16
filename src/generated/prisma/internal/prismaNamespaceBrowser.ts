@@ -485,6 +485,8 @@ export const PaymentRefundScalarFieldEnum = {
   stripeRefundId: 'stripeRefundId',
   amount: 'amount',
   status: 'status',
+  lastStripeEventCreatedAt: 'lastStripeEventCreatedAt',
+  lastStripeEventId: 'lastStripeEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -222,6 +222,10 @@ test("the reconciliation migration adds pending reversal states and auditable re
   assert.match(migration, /"lastStripeEventId" = "stripeDisputeId"/);
   assert.match(migration, /ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL/);
   assert.match(migration, /ALTER COLUMN "lastStripeEventId" SET NOT NULL/);
+  assert.match(migration, /ALTER TABLE "PaymentRefund"[\s\S]*ADD COLUMN "lastStripeEventCreatedAt" TIMESTAMP\(3\)/);
+  assert.match(migration, /UPDATE "PaymentRefund"[\s\S]*"lastStripeEventId" = "stripeRefundId"/);
+  assert.match(migration, /ALTER TABLE "PaymentRefund"[\s\S]*ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL/);
+  assert.match(migration, /ALTER TABLE "PaymentRefund"[\s\S]*ALTER COLUMN "lastStripeEventId" SET NOT NULL/);
   assert.match(migration, /SettlementReversal_stripeTransferReversalId_status_check/);
   assert.match(migration, /SettlementReversal_stripeDisputeId_settlementLegId_key/);
   assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);

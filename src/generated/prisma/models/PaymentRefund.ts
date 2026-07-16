@@ -40,6 +40,8 @@ export type PaymentRefundMinAggregateOutputType = {
   stripeRefundId: string | null
   amount: number | null
   status: string | null
+  lastStripeEventCreatedAt: Date | null
+  lastStripeEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +52,8 @@ export type PaymentRefundMaxAggregateOutputType = {
   stripeRefundId: string | null
   amount: number | null
   status: string | null
+  lastStripeEventCreatedAt: Date | null
+  lastStripeEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +64,8 @@ export type PaymentRefundCountAggregateOutputType = {
   stripeRefundId: number
   amount: number
   status: number
+  lastStripeEventCreatedAt: number
+  lastStripeEventId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -80,6 +86,8 @@ export type PaymentRefundMinAggregateInputType = {
   stripeRefundId?: true
   amount?: true
   status?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -90,6 +98,8 @@ export type PaymentRefundMaxAggregateInputType = {
   stripeRefundId?: true
   amount?: true
   status?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +110,8 @@ export type PaymentRefundCountAggregateInputType = {
   stripeRefundId?: true
   amount?: true
   status?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -197,6 +209,8 @@ export type PaymentRefundGroupByOutputType = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date
+  lastStripeEventId: string
   createdAt: Date
   updatedAt: Date
   _count: PaymentRefundCountAggregateOutputType | null
@@ -230,6 +244,8 @@ export type PaymentRefundWhereInput = {
   stripeRefundId?: Prisma.StringFilter<"PaymentRefund"> | string
   amount?: Prisma.IntFilter<"PaymentRefund"> | number
   status?: Prisma.StringFilter<"PaymentRefund"> | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentRefund"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
   paymentRequest?: Prisma.XOR<Prisma.PaymentRequestScalarRelationFilter, Prisma.PaymentRequestWhereInput>
@@ -241,6 +257,8 @@ export type PaymentRefundOrderByWithRelationInput = {
   stripeRefundId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   paymentRequest?: Prisma.PaymentRequestOrderByWithRelationInput
@@ -255,6 +273,8 @@ export type PaymentRefundWhereUniqueInput = Prisma.AtLeast<{
   paymentRequestId?: Prisma.StringFilter<"PaymentRefund"> | string
   amount?: Prisma.IntFilter<"PaymentRefund"> | number
   status?: Prisma.StringFilter<"PaymentRefund"> | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentRefund"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
   paymentRequest?: Prisma.XOR<Prisma.PaymentRequestScalarRelationFilter, Prisma.PaymentRequestWhereInput>
@@ -266,6 +286,8 @@ export type PaymentRefundOrderByWithAggregationInput = {
   stripeRefundId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentRefundCountOrderByAggregateInput
@@ -284,6 +306,8 @@ export type PaymentRefundScalarWhereWithAggregatesInput = {
   stripeRefundId?: Prisma.StringWithAggregatesFilter<"PaymentRefund"> | string
   amount?: Prisma.IntWithAggregatesFilter<"PaymentRefund"> | number
   status?: Prisma.StringWithAggregatesFilter<"PaymentRefund"> | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentRefund"> | Date | string
+  lastStripeEventId?: Prisma.StringWithAggregatesFilter<"PaymentRefund"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentRefund"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentRefund"> | Date | string
 }
@@ -293,6 +317,8 @@ export type PaymentRefundCreateInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   paymentRequest: Prisma.PaymentRequestCreateNestedOneWithoutRefundsInput
@@ -304,6 +330,8 @@ export type PaymentRefundUncheckedCreateInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -313,6 +341,8 @@ export type PaymentRefundUpdateInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentRequest?: Prisma.PaymentRequestUpdateOneRequiredWithoutRefundsNestedInput
@@ -324,6 +354,8 @@ export type PaymentRefundUncheckedUpdateInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -334,6 +366,8 @@ export type PaymentRefundCreateManyInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -343,6 +377,8 @@ export type PaymentRefundUpdateManyMutationInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -353,6 +389,8 @@ export type PaymentRefundUncheckedUpdateManyInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -373,6 +411,8 @@ export type PaymentRefundCountOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -387,6 +427,8 @@ export type PaymentRefundMaxOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -397,6 +439,8 @@ export type PaymentRefundMinOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -452,6 +496,8 @@ export type PaymentRefundCreateWithoutPaymentRequestInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -461,6 +507,8 @@ export type PaymentRefundUncheckedCreateWithoutPaymentRequestInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -500,6 +548,8 @@ export type PaymentRefundScalarWhereInput = {
   stripeRefundId?: Prisma.StringFilter<"PaymentRefund"> | string
   amount?: Prisma.IntFilter<"PaymentRefund"> | number
   status?: Prisma.StringFilter<"PaymentRefund"> | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentRefund"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentRefund"> | Date | string
 }
@@ -509,6 +559,8 @@ export type PaymentRefundCreateManyPaymentRequestInput = {
   stripeRefundId: string
   amount: number
   status: string
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -518,6 +570,8 @@ export type PaymentRefundUpdateWithoutPaymentRequestInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -527,6 +581,8 @@ export type PaymentRefundUncheckedUpdateWithoutPaymentRequestInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -536,6 +592,8 @@ export type PaymentRefundUncheckedUpdateManyWithoutPaymentRequestInput = {
   stripeRefundId?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -548,6 +606,8 @@ export type PaymentRefundSelect<ExtArgs extends runtime.Types.Extensions.Interna
   stripeRefundId?: boolean
   amount?: boolean
   status?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -559,6 +619,8 @@ export type PaymentRefundSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   stripeRefundId?: boolean
   amount?: boolean
   status?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -570,6 +632,8 @@ export type PaymentRefundSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   stripeRefundId?: boolean
   amount?: boolean
   status?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -581,11 +645,13 @@ export type PaymentRefundSelectScalar = {
   stripeRefundId?: boolean
   amount?: boolean
   status?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentRefundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "stripeRefundId" | "amount" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentRefund"]>
+export type PaymentRefundOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "stripeRefundId" | "amount" | "status" | "lastStripeEventCreatedAt" | "lastStripeEventId" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentRefund"]>
 export type PaymentRefundInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
 }
@@ -607,6 +673,8 @@ export type $PaymentRefundPayload<ExtArgs extends runtime.Types.Extensions.Inter
     stripeRefundId: string
     amount: number
     status: string
+    lastStripeEventCreatedAt: Date
+    lastStripeEventId: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["paymentRefund"]>
@@ -1038,6 +1106,8 @@ export interface PaymentRefundFieldRefs {
   readonly stripeRefundId: Prisma.FieldRef<"PaymentRefund", 'String'>
   readonly amount: Prisma.FieldRef<"PaymentRefund", 'Int'>
   readonly status: Prisma.FieldRef<"PaymentRefund", 'String'>
+  readonly lastStripeEventCreatedAt: Prisma.FieldRef<"PaymentRefund", 'DateTime'>
+  readonly lastStripeEventId: Prisma.FieldRef<"PaymentRefund", 'String'>
   readonly createdAt: Prisma.FieldRef<"PaymentRefund", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PaymentRefund", 'DateTime'>
 }

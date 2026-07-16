@@ -890,14 +890,16 @@ model PaymentRequest {
 }
 
 model PaymentRefund {
-  id               String         @id @default(cuid())
-  paymentRequestId String
-  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  stripeRefundId   String         @unique
-  amount           Int
-  status           String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id                       String         @id @default(cuid())
+  paymentRequestId         String
+  paymentRequest           PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeRefundId           String         @unique
+  amount                   Int
+  status                   String
+  lastStripeEventCreatedAt DateTime
+  lastStripeEventId        String
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   @@index([paymentRequestId, createdAt])
 }

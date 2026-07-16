@@ -40,6 +40,21 @@ ALTER TABLE "PaymentDispute"
   ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL,
   ALTER COLUMN "lastStripeEventId" SET NOT NULL;
 
+ALTER TABLE "PaymentRefund"
+  ADD COLUMN "lastStripeEventCreatedAt" TIMESTAMP(3),
+  ADD COLUMN "lastStripeEventId" TEXT;
+
+UPDATE "PaymentRefund"
+SET
+  "lastStripeEventCreatedAt" = "createdAt",
+  "lastStripeEventId" = "stripeRefundId"
+WHERE "lastStripeEventCreatedAt" IS NULL
+   OR "lastStripeEventId" IS NULL;
+
+ALTER TABLE "PaymentRefund"
+  ALTER COLUMN "lastStripeEventCreatedAt" SET NOT NULL,
+  ALTER COLUMN "lastStripeEventId" SET NOT NULL;
+
 CREATE UNIQUE INDEX "SettlementReversal_stripeDisputeId_settlementLegId_key"
   ON "SettlementReversal"("stripeDisputeId", "settlementLegId");
 

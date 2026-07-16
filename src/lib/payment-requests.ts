@@ -882,6 +882,44 @@ export async function markPaymentRequestPaidFromPaymentIntent(
   });
 }
 
+function refundStatusPriority(status: string) {
+  switch (status) {
+    case "succeeded":
+      return 4;
+    case "pending":
+    case "requires_action":
+      return 2;
+    case "failed":
+    case "canceled":
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function shouldApplyRefundStripeEvent(
+  existing: {
+    status: string;
+    lastStripeEventCreatedAt: Date;
+    lastStripeEventId: string;
+  },
+  incoming: StripeEventContext & { refundStatus: string },
+) {
+  if (existing.status === "succeeded" && incoming.refundStatus !== "succeeded") {
+    return false;
+  }
+
+  const existingTime = existing.lastStripeEventCreatedAt.getTime();
+  const incomingTime = incoming.stripeEventCreatedAt.getTime();
+  if (incomingTime !== existingTime) return incomingTime > existingTime;
+
+  const incomingPriority = refundStatusPriority(incoming.refundStatus);
+  const existingPriority = refundStatusPriority(existing.status);
+  if (incomingPriority !== existingPriority) return incomingPriority > existingPriority;
+
+  return incoming.stripeEventId.localeCompare(existing.lastStripeEventId) > 0;
+}
+
 export async function syncPaymentRequestRefund(
   refund: Stripe.Refund,
   stripeEvent: StripeEventContext,
@@ -892,6 +930,7 @@ export async function syncPaymentRequestRefund(
 
   const paymentRequest = await findPaymentRequestFromPaymentIntent(paymentIntentId);
   if (!paymentRequest) return false;
+  const refundStatus = (refund.status ?? "unknown").toLowerCase();
 
   let payoutHoldOrderId: string | null = null;
   let payoutHoldRequired = false;
@@ -916,24 +955,78 @@ export async function syncPaymentRequestRefund(
       return;
     }
 
-    await tx.paymentRefund.upsert({
+    const existingRefund = await tx.paymentRefund.findUnique({
       where: { stripeRefundId: refund.id },
-      create: {
-        paymentRequestId: current.id,
-        stripeRefundId: refund.id,
-        amount: refund.amount,
-        status: refund.status ?? "unknown",
+      select: {
+        paymentRequestId: true,
+        amount: true,
+        status: true,
+        lastStripeEventCreatedAt: true,
+        lastStripeEventId: true,
       },
-      update: { amount: refund.amount, status: refund.status ?? "unknown" },
     });
-    if (refund.status !== "succeeded") return;
+    if (existingRefund && existingRefund.paymentRequestId !== current.id) {
+      await markReconciliationRequired(tx, {
+        paymentRequestId: current.id,
+        stripeEventId: stripeEvent.stripeEventId,
+        message: "Stripe refund is already associated with another payment request.",
+        metadata: { source: stripeEvent.stripeEventType, reason: "refund_payment_request_mismatch" },
+      });
+      return;
+    }
+    if (
+      existingRefund
+      && !shouldApplyRefundStripeEvent(existingRefund, { ...stripeEvent, refundStatus })
+    ) {
+      return;
+    }
+
+    const persistedRefundAmount = existingRefund?.status === "succeeded" && refundStatus === "succeeded"
+      ? Math.max(existingRefund.amount, refund.amount)
+      : refund.amount;
+    const refundEconomicChange = refundStatus === "succeeded"
+      && (
+        !existingRefund
+        || existingRefund.status !== "succeeded"
+        || persistedRefundAmount > existingRefund.amount
+      );
+
+    if (existingRefund) {
+      await tx.paymentRefund.update({
+        where: { stripeRefundId: refund.id },
+        data: {
+          amount: persistedRefundAmount,
+          status: refundStatus,
+          lastStripeEventCreatedAt: stripeEvent.stripeEventCreatedAt,
+          lastStripeEventId: stripeEvent.stripeEventId,
+        },
+      });
+    } else {
+      await tx.paymentRefund.create({
+        data: {
+          paymentRequestId: current.id,
+          stripeRefundId: refund.id,
+          amount: persistedRefundAmount,
+          status: refundStatus,
+          lastStripeEventCreatedAt: stripeEvent.stripeEventCreatedAt,
+          lastStripeEventId: stripeEvent.stripeEventId,
+        },
+      });
+    }
+    if (!refundEconomicChange) return;
 
     const total = await tx.paymentRefund.aggregate({
       where: { paymentRequestId: current.id, status: "succeeded" },
       _sum: { amount: true },
     });
-    const refundAmount = cappedCumulativeRefundAmount(total._sum.amount ?? 0, current.grossAmount);
-    const status = statusAfterRefund(refundAmount, current.grossAmount) as PaymentRequestStatus;
+    const observedRefundAmount = cappedCumulativeRefundAmount(total._sum.amount ?? 0, current.grossAmount);
+    const refundAmount = Math.min(
+      Math.max(current.refundAmount, observedRefundAmount),
+      current.grossAmount,
+    );
+    const status = current.status === PaymentRequestStatus.REFUNDED || refundAmount >= current.grossAmount
+      ? PaymentRequestStatus.REFUNDED
+      : statusAfterRefund(refundAmount, current.grossAmount) as PaymentRequestStatus;
     await tx.paymentRequest.update({ where: { id: current.id }, data: { refundAmount, status } });
     await appendEvent(tx, {
       paymentRequestId: current.id,

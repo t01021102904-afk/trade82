@@ -125,10 +125,37 @@ async function loadLockedSettlement(tx: Tx, paymentRequestId: string) {
     include: {
       legs: { orderBy: { type: "asc" } },
       reversals: {
-        select: { settlementLegId: true, amount: true },
+        select: { settlementLegId: true, amount: true, status: true },
       },
     },
   });
+}
+
+type LockedSettlement = NonNullable<Awaited<ReturnType<typeof loadLockedSettlement>>>;
+
+function hasExternalReversalPending(settlement: LockedSettlement) {
+  return (
+    settlement.status === SettlementStatus.REVERSAL_PENDING
+    || settlement.legs.some((leg) => leg.status === SettlementLegStatus.REVERSAL_PENDING)
+    || settlement.reversals.some((reversal) => reversal.status === SettlementReversalStatus.PENDING)
+  );
+}
+
+function settlementStatusAfterEconomicLoss({
+  settlement,
+  fullLoss,
+  hasNewExternalReversal,
+}: {
+  settlement: LockedSettlement;
+  fullLoss: boolean;
+  hasNewExternalReversal: boolean;
+}) {
+  if (settlement.status === SettlementStatus.REVERSED) return SettlementStatus.REVERSED;
+  if (hasNewExternalReversal || hasExternalReversalPending(settlement)) {
+    return SettlementStatus.REVERSAL_PENDING;
+  }
+  if (settlement.status === SettlementStatus.CANCELLED) return SettlementStatus.CANCELLED;
+  return fullLoss ? SettlementStatus.CANCELLED : SettlementStatus.HOLD;
 }
 
 async function loadReconciliationContext(tx: Tx, paymentRequestId: string) {
@@ -225,11 +252,23 @@ async function reconcileEconomicLoss(
     if (delta > 0) deltaByLegId.set(leg.id, delta);
   }
 
-  const transferredLegIds = new Set(
+  const newlyAffectedExternalReversalLegIds = new Set(
     reversalLegs
       .filter((leg) => isInFlightOrTransferred(leg.status) && (deltaByLegId.get(leg.id) ?? 0) > 0)
       .map((leg) => leg.id),
   );
+  const existingPendingReversalLegIds = new Set(
+    settlement.reversals
+      .filter((reversal) => reversal.status === SettlementReversalStatus.PENDING)
+      .map((reversal) => reversal.settlementLegId),
+  );
+  const externalReversalLegIds = new Set([
+    ...newlyAffectedExternalReversalLegIds,
+    ...existingPendingReversalLegIds,
+    ...reversalLegs
+      .filter((leg) => leg.status === SettlementLegStatus.REVERSAL_PENDING)
+      .map((leg) => leg.id),
+  ]);
 
   await createSettlementEvent(tx, {
     settlementId: settlement.id,
@@ -267,7 +306,7 @@ async function reconcileEconomicLoss(
           amount: delta,
           currency: "usd",
           reason: source.reason,
-          status: transferredLegIds.has(leg.id)
+          status: newlyAffectedExternalReversalLegIds.has(leg.id)
             ? SettlementReversalStatus.PENDING
             : SettlementReversalStatus.ACCOUNTING_APPLIED,
           idempotencyKey,
@@ -283,7 +322,7 @@ async function reconcileEconomicLoss(
         settlementId: settlement.id,
         settlementLegId: leg.id,
         eventType: SettlementEventType.REVERSAL_CREATED,
-        message: transferredLegIds.has(leg.id)
+        message: newlyAffectedExternalReversalLegIds.has(leg.id)
           ? "A pending internal settlement reversal was recorded for a transferred settlement leg."
           : "An accounting-only settlement reversal was recorded before any transfer occurred.",
         metadata: {
@@ -294,7 +333,7 @@ async function reconcileEconomicLoss(
           stripeEventCreatedAt: source.stripeEventCreatedAt.toISOString(),
           amount: delta,
           currency: "usd",
-          reversalStatus: transferredLegIds.has(leg.id) ? "PENDING" : "ACCOUNTING_APPLIED",
+          reversalStatus: newlyAffectedExternalReversalLegIds.has(leg.id) ? "PENDING" : "ACCOUNTING_APPLIED",
           ...(isDisputeEconomicLossSource(source)
             ? disputeAuditMetadata(source)
             : {}),
@@ -305,13 +344,14 @@ async function reconcileEconomicLoss(
   }
 
   for (const leg of settlement.legs) {
-    if (transferredLegIds.has(leg.id)) {
+    if (externalReversalLegIds.has(leg.id) && leg.status !== SettlementLegStatus.REVERSED) {
       await tx.settlementLeg.update({
         where: { id: leg.id },
         data: { status: SettlementLegStatus.REVERSAL_PENDING },
       });
       continue;
     }
+    if (leg.status === SettlementLegStatus.REVERSED) continue;
     if (isInFlightOrTransferred(leg.status)) continue;
     if (fullLoss) {
       await tx.settlementLeg.update({
@@ -326,25 +366,29 @@ async function reconcileEconomicLoss(
     }
   }
 
-  const hasTransferredReversal = transferredLegIds.size > 0;
+  const nextSettlementStatus = settlementStatusAfterEconomicLoss({
+    settlement,
+    fullLoss,
+    hasNewExternalReversal: newlyAffectedExternalReversalLegIds.size > 0,
+  });
   await tx.settlement.update({
     where: { id: settlement.id },
-    data: {
-      status: hasTransferredReversal
-        ? SettlementStatus.REVERSAL_PENDING
-        : fullLoss
-          ? SettlementStatus.CANCELLED
-          : SettlementStatus.HOLD,
-    },
+    data: { status: nextSettlementStatus },
   });
 
-  if (fullLoss || source.reason === SettlementReversalReason.REFUND) {
+  const refundReconciliationEventType = fullLoss
+    ? nextSettlementStatus === SettlementStatus.CANCELLED
+      ? SettlementEventType.FULL_REFUND_CANCELLED
+      : null
+    : source.reason === SettlementReversalReason.REFUND
+      ? SettlementEventType.PARTIAL_REFUND_RECONCILED
+      : null;
+
+  if (refundReconciliationEventType) {
     await createSettlementEvent(tx, {
       settlementId: settlement.id,
-      eventType: fullLoss
-        ? SettlementEventType.FULL_REFUND_CANCELLED
-        : SettlementEventType.PARTIAL_REFUND_RECONCILED,
-      message: fullLoss
+      eventType: refundReconciliationEventType,
+      message: refundReconciliationEventType === SettlementEventType.FULL_REFUND_CANCELLED
         ? "A full economic loss cancelled unreleased settlement amounts."
         : "A partial refund reduced future settlement availability proportionally.",
       metadata: {
@@ -367,7 +411,7 @@ async function reconcileEconomicLoss(
   if (
     source.reason === SettlementReversalReason.REFUND
     && fullLoss
-    && !hasTransferredReversal
+    && nextSettlementStatus === SettlementStatus.CANCELLED
   ) {
     await createSettlementEvent(tx, {
       settlementId: settlement.id,
@@ -399,7 +443,7 @@ async function reconcileEconomicLoss(
     });
   }
 
-  if (hasTransferredReversal) {
+  if (nextSettlementStatus === SettlementStatus.REVERSAL_PENDING) {
     await createSettlementEvent(tx, {
       settlementId: settlement.id,
       eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
@@ -419,7 +463,11 @@ async function reconcileEconomicLoss(
     });
   }
 
-  return { settlementId: settlement.id, fullLoss, hasTransferredReversal };
+  return {
+    settlementId: settlement.id,
+    fullLoss,
+    hasTransferredReversal: nextSettlementStatus === SettlementStatus.REVERSAL_PENDING,
+  };
 }
 
 async function blockSettlementForOpenDispute(tx: Tx, source: DisputeReconciliationSource) {
@@ -439,6 +487,7 @@ async function blockSettlementForOpenDispute(tx: Tx, source: DisputeReconciliati
     settlement.status !== SettlementStatus.CANCELLED
     && settlement.status !== SettlementStatus.REVERSAL_PENDING
     && settlement.status !== SettlementStatus.TRANSFERRED
+    && settlement.status !== SettlementStatus.REVERSED
   ) {
     await tx.settlement.update({
       where: { id: settlement.id },
@@ -474,6 +523,7 @@ async function restoreSettlementAfterWonDispute(tx: Tx, source: DisputeReconcili
     settlement.status !== SettlementStatus.CANCELLED
     && settlement.status !== SettlementStatus.REVERSAL_PENDING
     && settlement.status !== SettlementStatus.TRANSFERRED
+    && settlement.status !== SettlementStatus.REVERSED
   ) {
     await tx.settlement.update({
       where: { id: settlement.id },
