@@ -1,12 +1,10 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-import {
-  createReferralClaimForCode,
-  REFERRAL_CLAIM_COOKIE,
-  REFERRAL_CLAIM_MAX_AGE_SECONDS,
-} from "@/lib/partner-referrals";
+import { createReferralClaimForCode } from "@/lib/partner-referrals";
 import { getDb } from "@/lib/db";
+import { attemptAnonymousReferralClaim } from "@/lib/referral-claim-request";
+import { applyReferralClaimCookie } from "@/lib/referral-claim-response";
 import { getAppUrl } from "@/lib/stripe";
 
 function safeReferralRedirect(request: Request) {
@@ -15,7 +13,8 @@ function safeReferralRedirect(request: Request) {
   const origin = new URL(getAppUrl()).origin;
   const destination = new URL("/signup", origin);
   const requestUrl = new URL(request.url);
-  if (requestUrl.pathname.startsWith("/ko/")) destination.pathname = "/ko/signup";
+  if (requestUrl.pathname.startsWith("/ko/"))
+    destination.pathname = "/ko/signup";
   return destination;
 }
 
@@ -29,22 +28,19 @@ export async function GET(
     // Existing accounts cannot receive a late first-attribution. Clear any
     // stale evidence while we have a response that can mutate cookies.
     const response = NextResponse.redirect(destination, 302);
-    response.cookies.set({ name: REFERRAL_CLAIM_COOKIE, value: "", path: "/", maxAge: 0 });
+    applyReferralClaimCookie({ response, rawToken: null });
     return response;
   }
 
-  const rawToken = await createReferralClaimForCode(getDb(), (await params).referralCode);
+  const { rawToken } = await attemptAnonymousReferralClaim({
+    request,
+    referralCode: (await params).referralCode,
+    createClaim: (referralCode) =>
+      createReferralClaimForCode(getDb(), referralCode),
+  });
+  // Invalid, suspended, disabled, and rate-limited referrals must not leave
+  // an older referral cookie attached to a future new-user signup.
   const response = NextResponse.redirect(destination, 302);
-  if (rawToken) {
-    response.cookies.set({
-      name: REFERRAL_CLAIM_COOKIE,
-      value: rawToken,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: REFERRAL_CLAIM_MAX_AGE_SECONDS,
-    });
-  }
+  applyReferralClaimCookie({ response, rawToken });
   return response;
 }

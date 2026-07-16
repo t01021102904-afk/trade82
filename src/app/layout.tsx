@@ -12,6 +12,7 @@ import {
   siteNavigationJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
+import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
 import "./globals.css";
 
 const structuredData = [
@@ -58,7 +59,9 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "any" },
       { url: "/icon.png", type: "image/png", sizes: "512x512" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
+    apple: [
+      { url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" },
+    ],
     shortcut: "/favicon.ico",
   },
 };
@@ -68,8 +71,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const partnerProgramEnabled = isPartnerProgramEnabled();
+
   return (
-    <html lang="en" className="h-full" data-theme="light" data-theme-preference="light">
+    <html
+      lang="en"
+      className="h-full"
+      data-theme="light"
+      data-theme-preference="light"
+    >
       <body className="flex min-h-full flex-col overflow-x-hidden antialiased theme-bg">
         <script
           type="application/ld+json"
@@ -79,7 +89,7 @@ export default function RootLayout({
         />
         <ClerkProvider>
           <I18nProvider>
-            <SiteHeader />
+            <SiteHeader partnerProgramEnabled={partnerProgramEnabled} />
             <main className="min-w-0 flex-1">{children}</main>
             <SiteFooter />
           </I18nProvider>

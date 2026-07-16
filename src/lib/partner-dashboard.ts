@@ -6,6 +6,7 @@ import {
   SettlementReversalStatus,
 } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
+import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
 
 const adjustmentStatuses = [
   SettlementReversalStatus.ACCOUNTING_APPLIED,
@@ -69,6 +70,21 @@ export function partnerLegStatus(status: SettlementLegStatus) {
   }
 }
 
+export function partnerProfileStatus(status: string) {
+  return status === "ACTIVE" ? ("active" as const) : ("suspended" as const);
+}
+
+export function partnerPayoutSetupStatus(
+  account: { status: string; onboardingComplete: boolean } | null,
+) {
+  if (!account) return "notStarted" as const;
+  if (account.status === "DISABLED") return "disabled" as const;
+  if (account.status === "ENABLED" && account.onboardingComplete)
+    return "enabled" as const;
+  if (account.status === "PENDING") return "pending" as const;
+  return "restricted" as const;
+}
+
 export function anonymizePartnerMember(name: string) {
   const trimmed = name.trim();
   if (!trimmed) return "Member";
@@ -81,13 +97,21 @@ export async function getPartnerDashboardData({
   commissionPage = 1,
   memberPage = 1,
   pageSize = 20,
+  partnerProgramEnabled = isPartnerProgramEnabled(),
+  getDatabase = getDb,
 }: {
   partnerProfileId: string;
   commissionPage?: number;
   memberPage?: number;
   pageSize?: number;
+  partnerProgramEnabled?: boolean;
+  getDatabase?: typeof getDb;
 }) {
-  const db = getDb();
+  // This guard is intentionally before getDb() so feature-off requests never
+  // execute financial, member, or connected-account queries.
+  if (!partnerProgramEnabled) return null;
+
+  const db = getDatabase();
   const safeCommissionPage = Math.max(1, Math.floor(commissionPage));
   const safeMemberPage = Math.max(1, Math.floor(memberPage));
   const safePageSize = Math.min(50, Math.max(1, Math.floor(pageSize)));
@@ -96,13 +120,22 @@ export async function getPartnerDashboardData({
     type: SettlementLegType.PARTNER_REFERRAL,
   };
 
-  const [partner, referralCount, qualifyingTransactions, allLegs, commissionLegs, referredMembers] = await Promise.all([
+  const [
+    partner,
+    referralCount,
+    qualifyingTransactions,
+    allLegs,
+    commissionLegs,
+    referredMembers,
+  ] = await Promise.all([
     db.partnerProfile.findUniqueOrThrow({
       where: { id: partnerProfileId },
       include: { stripeConnectedAccount: true },
     }),
     db.referralAttribution.count({ where: { partnerProfileId } }),
-    db.settlement.count({ where: { referralPartnerProfileId: partnerProfileId } }),
+    db.settlement.count({
+      where: { referralPartnerProfileId: partnerProfileId },
+    }),
     db.settlementLeg.findMany({
       where: legWhere,
       select: {
@@ -111,7 +144,13 @@ export async function getPartnerDashboardData({
         currency: true,
         status: true,
         holdUntil: true,
-        settlement: { select: { createdAt: true, grossAmount: true, tradeOrder: { select: { orderNumber: true } } } },
+        settlement: {
+          select: {
+            createdAt: true,
+            grossAmount: true,
+            tradeOrder: { select: { orderNumber: true } },
+          },
+        },
         reversals: { select: { amount: true, status: true } },
       },
     }),
@@ -126,7 +165,13 @@ export async function getPartnerDashboardData({
         currency: true,
         status: true,
         holdUntil: true,
-        settlement: { select: { createdAt: true, grossAmount: true, tradeOrder: { select: { orderNumber: true } } } },
+        settlement: {
+          select: {
+            createdAt: true,
+            grossAmount: true,
+            tradeOrder: { select: { orderNumber: true } },
+          },
+        },
         reversals: { select: { amount: true, status: true } },
       },
     }),
@@ -147,21 +192,37 @@ export async function getPartnerDashboardData({
   // Unknown currencies are intentionally excluded from USD totals rather than
   // silently combining different money units. The history still exposes its
   // own currency for a future explicit currency-specific presentation.
-  const usdLegs = allLegs.filter((leg) => leg.currency === "usd") as PartnerLeg[];
+  const usdLegs = allLegs.filter(
+    (leg) => leg.currency === "usd",
+  ) as PartnerLeg[];
   const totals = usdLegs.reduce(
     (summary, leg) => {
       const presentation = partnerCommissionPresentation(leg);
       summary.gross += presentation.grossAmount;
       summary.adjustments += presentation.adjustmentAmount;
       summary.net += presentation.netAmount;
-      if (presentation.status === "pending") summary.pending += presentation.netAmount;
-      if (presentation.status === "available") summary.available += presentation.usableAmount;
-      if (presentation.status === "processing") summary.processing += presentation.netAmount;
-      if (presentation.status === "paid") summary.paid += presentation.netAmount;
-      if (presentation.status === "under_review") summary.underReview += presentation.netAmount;
+      if (presentation.status === "pending")
+        summary.pending += presentation.netAmount;
+      if (presentation.status === "available")
+        summary.available += presentation.usableAmount;
+      if (presentation.status === "processing")
+        summary.processing += presentation.netAmount;
+      if (presentation.status === "paid")
+        summary.paid += presentation.netAmount;
+      if (presentation.status === "under_review")
+        summary.underReview += presentation.netAmount;
       return summary;
     },
-    { gross: 0, adjustments: 0, net: 0, pending: 0, available: 0, processing: 0, paid: 0, underReview: 0 },
+    {
+      gross: 0,
+      adjustments: 0,
+      net: 0,
+      pending: 0,
+      available: 0,
+      processing: 0,
+      paid: 0,
+      underReview: 0,
+    },
   );
 
   return {
@@ -172,7 +233,8 @@ export async function getPartnerDashboardData({
       stripeAccount: partner.stripeConnectedAccount
         ? {
             status: partner.stripeConnectedAccount.status,
-            onboardingComplete: partner.stripeConnectedAccount.onboardingComplete,
+            onboardingComplete:
+              partner.stripeConnectedAccount.onboardingComplete,
           }
         : null,
     },
