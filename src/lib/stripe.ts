@@ -7,13 +7,18 @@ import {
 
 let stripeClient: Stripe | null = null;
 
-export function getStripe() {
-  if (stripeClient) return stripeClient;
-
+export function getStripeSecretKey() {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
     throw new Error("Stripe secret key is not configured.");
   }
+  return secretKey;
+}
+
+export function getStripe() {
+  if (stripeClient) return stripeClient;
+
+  const secretKey = getStripeSecretKey();
 
   stripeClient = new Stripe(secretKey, {
     apiVersion: "2026-06-24.dahlia",

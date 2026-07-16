@@ -9,10 +9,19 @@ import {
   getStripeConnectOnboardingStatus,
   mapStripeConnectedAccount,
   normalizeStripeConnectCountry,
+  returnFromStripeConnectOnboarding,
   startStripeConnectOnboarding,
 } from "../src/lib/stripe-connect-onboarding.ts";
 import { getStripeConnectOnboardingMode } from "../src/lib/stripe-connect-onboarding-feature.ts";
-import { processStripeConnectWebhookEvent } from "../src/lib/stripe-connect-onboarding-webhook.ts";
+import {
+  handleStripeConnectWebhookRequest,
+  processStripeConnectWebhookEvent,
+} from "../src/lib/stripe-connect-onboarding-webhook.ts";
+import {
+  assertStripeConnectRuntimeMode,
+  assertStripeCredentialMatchesRuntime,
+  getStripeConnectRuntimeMode,
+} from "../src/lib/stripe-connect-runtime-mode.ts";
 
 type Row = Record<string, unknown>;
 
@@ -70,13 +79,21 @@ async function withOnboardingMode<T>(
   value: string | undefined,
   run: () => Promise<T> | T,
   approvedCountries: string | null = "KR",
+  runtimeMode: string | null = "test",
+  stripeSecretKey: string | null = "sk_test_connect_unit",
 ) {
   const previous = process.env.STRIPE_CONNECT_ONBOARDING_MODE;
   const previousApprovedCountries = process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
+  const previousRuntimeMode = process.env.STRIPE_CONNECT_RUNTIME_MODE;
+  const previousStripeSecretKey = process.env.STRIPE_SECRET_KEY;
   if (value === undefined) delete process.env.STRIPE_CONNECT_ONBOARDING_MODE;
   else process.env.STRIPE_CONNECT_ONBOARDING_MODE = value;
   if (approvedCountries === null) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
   else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = approvedCountries;
+  if (runtimeMode === null) delete process.env.STRIPE_CONNECT_RUNTIME_MODE;
+  else process.env.STRIPE_CONNECT_RUNTIME_MODE = runtimeMode;
+  if (stripeSecretKey === null) delete process.env.STRIPE_SECRET_KEY;
+  else process.env.STRIPE_SECRET_KEY = stripeSecretKey;
   try {
     return await run();
   } finally {
@@ -84,6 +101,10 @@ async function withOnboardingMode<T>(
     else process.env.STRIPE_CONNECT_ONBOARDING_MODE = previous;
     if (previousApprovedCountries === undefined) delete process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES;
     else process.env.STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES = previousApprovedCountries;
+    if (previousRuntimeMode === undefined) delete process.env.STRIPE_CONNECT_RUNTIME_MODE;
+    else process.env.STRIPE_CONNECT_RUNTIME_MODE = previousRuntimeMode;
+    if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
   }
 }
 
@@ -92,6 +113,49 @@ test("Connect onboarding mode is fail-closed unless its raw value is exactly on"
   assert.equal(getStripeConnectOnboardingMode("ON"), "off");
   assert.equal(getStripeConnectOnboardingMode(" on "), "off");
   assert.equal(getStripeConnectOnboardingMode("on"), "on");
+});
+
+test("Stripe Connect runtime mode is exact and fails closed", () => {
+  assert.equal(getStripeConnectRuntimeMode(" live "), "live");
+  assert.equal(getStripeConnectRuntimeMode(" test "), "test");
+  for (const value of [undefined, "", "   ", "LIVE", "production", "sandbox", "on"]) {
+    assert.equal(getStripeConnectRuntimeMode(value), null);
+    assert.throws(() => assertStripeConnectRuntimeMode(value));
+  }
+});
+
+test("Stripe Connect credential mode validation is exact and never includes key fragments in errors", () => {
+  assert.equal(assertStripeCredentialMatchesRuntime({ runtimeMode: "live", secretKey: "sk_live_example" }), "live");
+  assert.equal(assertStripeCredentialMatchesRuntime({ runtimeMode: "live", secretKey: "rk_live_example" }), "live");
+  assert.equal(assertStripeCredentialMatchesRuntime({ runtimeMode: "test", secretKey: "sk_test_example" }), "test");
+  assert.equal(assertStripeCredentialMatchesRuntime({ runtimeMode: "test", secretKey: "rk_test_example" }), "test");
+
+  for (const [runtimeMode, secretKey] of [
+    ["live", "sk_test_secret_fragment"],
+    ["live", "rk_test_secret_fragment"],
+    ["test", "sk_live_secret_fragment"],
+    ["test", "rk_live_secret_fragment"],
+    ["live", "pk_live_secret_fragment"],
+    ["test", ""],
+  ] as const) {
+    assert.throws(
+      () => assertStripeCredentialMatchesRuntime({ runtimeMode, secretKey }),
+      (error: unknown) => {
+        assert.equal(error instanceof Error ? error.message : "", "Stripe Connect runtime configuration is invalid.");
+        assert.doesNotMatch(error instanceof Error ? error.message : "", /secret_fragment|sk_|rk_/);
+        return true;
+      },
+    );
+  }
+
+  const previousStripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  try {
+    delete process.env.STRIPE_SECRET_KEY;
+    assert.throws(() => assertStripeCredentialMatchesRuntime({ runtimeMode: "test" }));
+  } finally {
+    if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
+  }
 });
 
 test("country normalization is centralized and unsupported country values fail closed", () => {
@@ -188,6 +252,79 @@ test("Stripe account creation requires both exact-on mode and explicit platform 
   assert.deepEqual(calls, { accounts: 1, links: 1 });
 });
 
+test("Stripe onboarding requires matching runtime and credential gates before any Stripe API call", async () => {
+  const cases = [
+    { runtimeMode: null, stripeSecretKey: "sk_test_connect_unit" },
+    { runtimeMode: "LIVE", stripeSecretKey: "sk_live_connect_unit" },
+    { runtimeMode: "live", stripeSecretKey: "sk_test_connect_unit" },
+    { runtimeMode: "test", stripeSecretKey: "sk_live_connect_unit" },
+    { runtimeMode: "test", stripeSecretKey: null },
+  ] as const;
+
+  for (const config of cases) {
+    const { db } = createFakeDb();
+    const calls = { accounts: 0, links: 0 };
+    const stripe = {
+      accounts: { create: async () => { calls.accounts += 1; return fakeAccount("acct_never"); }, retrieve: async () => fakeAccount("acct_never") },
+      accountLinks: { create: async () => { calls.links += 1; return { url: "https://connect.stripe.test/link" }; } },
+    };
+    await assert.rejects(() => withOnboardingMode("on", () => startStripeConnectOnboarding({
+      userId: "seller-owner", ownerType: "seller", db: db as never, stripe: stripe as never,
+    }), "KR", config.runtimeMode, config.stripeSecretKey));
+    assert.deepEqual(calls, { accounts: 0, links: 0 });
+  }
+
+  const { db } = createFakeDb();
+  const calls = { accounts: 0, links: 0 };
+  const stripe = {
+    accounts: { create: async () => { calls.accounts += 1; return fakeAccount("acct_live"); }, retrieve: async () => fakeAccount("acct_live") },
+    accountLinks: { create: async () => { calls.links += 1; return { url: "https://connect.stripe.test/link" }; } },
+  };
+  await withOnboardingMode("on", () => startStripeConnectOnboarding({
+    userId: "seller-owner", ownerType: "seller", db: db as never, stripe: stripe as never,
+  }), "KR", "live", "sk_live_connect_unit");
+  assert.deepEqual(calls, { accounts: 1, links: 1 });
+});
+
+test("Stripe account retrieval requires matching runtime and credential gates before any Stripe API call", async () => {
+  const cases = [
+    { runtimeMode: null, stripeSecretKey: "sk_test_connect_unit" },
+    { runtimeMode: "test", stripeSecretKey: "sk_live_connect_unit" },
+    { runtimeMode: "live", stripeSecretKey: null },
+  ] as const;
+
+  for (const config of cases) {
+    const { db, rows } = createFakeDb();
+    rows.push({
+      id: "sca-existing",
+      companyId: "seller-company",
+      stripeAccountId: "acct_existing",
+      status: "PENDING",
+      chargesEnabled: false,
+      payoutsEnabled: false,
+      transfersEnabled: false,
+      detailsSubmitted: false,
+      onboardingComplete: false,
+    });
+    let retrieveCalls = 0;
+    const stripe = {
+      accounts: {
+        create: async () => fakeAccount("acct_never"),
+        retrieve: async () => {
+          retrieveCalls += 1;
+          return fakeAccount("acct_existing");
+        },
+      },
+      accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
+    };
+
+    await assert.rejects(() => withOnboardingMode("on", () => returnFromStripeConnectOnboarding({
+      userId: "seller-owner", ownerType: "seller", db: db as never, stripe: stripe as never,
+    }), "KR", config.runtimeMode, config.stripeSecretKey));
+    assert.equal(retrieveCalls, 0);
+  }
+});
+
 test("owner checks deny buyers, non-owners, and inactive partners", async () => {
   const sellerOnly = createFakeDb({ ownerType: "seller" });
   await assert.rejects(() => getStripeConnectOnboardingStatus({ userId: "buyer", ownerType: "partner", db: sellerOnly.db as never }));
@@ -279,8 +416,120 @@ test("Connect account.updated webhooks ignore unknown accounts and idempotently 
 
   const known = createFakeDb();
   known.rows.push({ id: "sca-known", companyId: "seller-company", stripeAccountId: "acct_known", status: "PENDING", chargesEnabled: false, payoutsEnabled: false, transfersEnabled: false, detailsSubmitted: false, onboardingComplete: false });
-  const event = { type: "account.updated", data: { object: fakeAccount("acct_known", { details_submitted: true, payouts_enabled: true, capabilities: { transfers: "active" }, requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: null } }) } } as never;
-  assert.equal((await processStripeConnectWebhookEvent(event, { db: known.db as never })).updated, true);
+  const event = { id: "evt_known", type: "account.updated", livemode: false, data: { object: fakeAccount("acct_known", { details_submitted: true, payouts_enabled: true, capabilities: { transfers: "active" }, requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: null } }) } } as never;
+  const stripe = { webhooks: { constructEvent: () => event } };
+  await withOnboardingMode("on", async () => {
+    const response = await handleStripeConnectWebhookRequest({
+      payload: "signed payload",
+      signature: "signature",
+      webhookSecret: "whsec_unit",
+      stripe: stripe as never,
+      processEvent: (incomingEvent) => processStripeConnectWebhookEvent(incomingEvent, { db: known.db as never }),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { received: true, handled: true });
+  });
   assert.equal((await processStripeConnectWebhookEvent(event, { db: known.db as never })).updated, false);
   assert.equal(known.rows[0]?.status, "ENABLED");
+});
+
+test("Connect webhook runtime isolation acknowledges mismatches without invoking processing", async () => {
+  const event = { id: "evt_test", type: "account.updated", livemode: false, data: { object: fakeAccount("acct_test") } } as never;
+  const stripe = { webhooks: { constructEvent: () => event } };
+  let processCalls = 0;
+  const logs: unknown[] = [];
+
+  await withOnboardingMode("on", async () => {
+    const response = await handleStripeConnectWebhookRequest({
+      payload: "signed payload",
+      signature: "signature",
+      webhookSecret: "whsec_unit",
+      stripe: stripe as never,
+      processEvent: async () => {
+        processCalls += 1;
+        return { handled: true, found: true, updated: true };
+      },
+      logRuntimeMismatch: (entry) => logs.push(entry),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { received: true, handled: false });
+  }, "KR", "live", "sk_live_connect_unit");
+  assert.equal(processCalls, 0);
+  assert.deepEqual(logs, [{
+    stripeEventId: "evt_test",
+    stripeEventType: "account.updated",
+    eventLivemode: false,
+    configuredRuntimeMode: "live",
+    reason: "stripe_connect_runtime_mismatch",
+  }]);
+});
+
+test("Connect webhook only processes matching runtime events and fails closed for invalid runtime configuration", async () => {
+  const event = { id: "evt_live", type: "account.updated", livemode: true, data: { object: fakeAccount("acct_live") } } as never;
+  const stripe = { webhooks: { constructEvent: () => event } };
+  let processCalls = 0;
+  const processEvent = async () => {
+    processCalls += 1;
+    return { handled: true, found: true, updated: true } as const;
+  };
+
+  await withOnboardingMode("on", async () => {
+    const response = await handleStripeConnectWebhookRequest({
+      payload: "signed payload", signature: "signature", webhookSecret: "whsec_unit", stripe: stripe as never, processEvent,
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { received: true, handled: true });
+  }, "KR", "live", "sk_live_connect_unit");
+  assert.equal(processCalls, 1);
+
+  for (const runtimeMode of [null, "LIVE"]) {
+    const response = await withOnboardingMode("on", () => handleStripeConnectWebhookRequest({
+      payload: "signed payload", signature: "signature", webhookSecret: "whsec_unit", stripe: stripe as never, processEvent,
+    }), "KR", runtimeMode, "sk_live_connect_unit");
+    assert.equal(response.status, 503);
+  }
+  assert.equal(processCalls, 1);
+});
+
+test("Connect webhook test runtime ignores live events without invoking processing", async () => {
+  const event = { id: "evt_live_in_test", type: "account.updated", livemode: true, data: { object: fakeAccount("acct_live") } } as never;
+  const stripe = { webhooks: { constructEvent: () => event } };
+  let processCalls = 0;
+
+  await withOnboardingMode("on", async () => {
+    const response = await handleStripeConnectWebhookRequest({
+      payload: "signed payload",
+      signature: "signature",
+      webhookSecret: "whsec_unit",
+      stripe: stripe as never,
+      processEvent: async () => {
+        processCalls += 1;
+        return { handled: true, found: true, updated: true };
+      },
+      logRuntimeMismatch: () => undefined,
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { received: true, handled: false });
+  });
+  assert.equal(processCalls, 0);
+});
+
+test("Connect webhook preserves invalid-signature handling and safely acknowledges unsupported matching events", async () => {
+  const signatureFailure = Object.assign(new Error("bad signature"), { name: "StripeSignatureVerificationError" });
+  const invalidSignature = await handleStripeConnectWebhookRequest({
+    payload: "invalid", signature: "signature", webhookSecret: "whsec_unit",
+    stripe: { webhooks: { constructEvent: () => { throw signatureFailure; } } } as never,
+  });
+  assert.equal(invalidSignature.status, 400);
+
+  const event = { id: "evt_unsupported", type: "account.external_account.created", livemode: false, data: { object: {} } } as never;
+  await withOnboardingMode("on", async () => {
+    const response = await handleStripeConnectWebhookRequest({
+      payload: "signed payload", signature: "signature", webhookSecret: "whsec_unit",
+      stripe: { webhooks: { constructEvent: () => event } } as never,
+      processEvent: async () => ({ handled: false, found: false, updated: false }),
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { received: true, handled: false });
+  });
 });

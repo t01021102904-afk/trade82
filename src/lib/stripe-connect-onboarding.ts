@@ -5,6 +5,7 @@ import { Prisma, type PrismaClient, type StripeConnectedAccount } from "@/genera
 import { getDb } from "@/lib/db";
 import { getAppUrl, getStripe } from "@/lib/stripe";
 import { isStripeConnectOnboardingEnabled } from "@/lib/stripe-connect-onboarding-feature";
+import { assertStripeConnectRuntimeConfiguration } from "@/lib/stripe-connect-runtime-mode";
 
 export const stripeConnectOwnerTypes = ["seller", "partner"] as const;
 export type StripeConnectOwnerType = (typeof stripeConnectOwnerTypes)[number];
@@ -427,6 +428,7 @@ export async function startStripeConnectOnboarding({
   assertOnboardingEnabled();
   const owner = await resolveOwner({ db, userId, ownerType });
   assertStripeConnectApprovedCountry(owner.country);
+  assertStripeConnectRuntimeConfiguration();
   const stripeClient = stripe ?? getStripe();
   const connectedAccount = await createOrReuseConnectedAccount({ db, stripe: stripeClient, owner });
   const link = await createOnboardingLink(stripeClient, owner.type, connectedAccount.stripeAccountId);
@@ -489,8 +491,10 @@ export async function returnFromStripeConnectOnboarding({
   stripe?: StripeConnectClient;
 }) {
   assertOnboardingEnabled();
-  const stripeClient = stripe ?? getStripe();
   const owner = await resolveOwner({ db, userId, ownerType });
+  assertStripeConnectApprovedCountry(owner.country);
+  assertStripeConnectRuntimeConfiguration();
+  const stripeClient = stripe ?? getStripe();
   const connectedAccount = await findOwnerAccount(db, owner);
   if (!connectedAccount) {
     throw new StripeConnectOnboardingError("Stripe payout onboarding was not started.", 404);

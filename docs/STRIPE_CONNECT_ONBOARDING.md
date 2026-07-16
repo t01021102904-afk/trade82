@@ -24,6 +24,21 @@ not create transfers, payouts, reversal records, or alter settlement release.
 `STRIPE_CONNECT_ONBOARDING_MODE` is disabled unless its raw value is exactly
 `on`. The separate `STRIPE_CONNECT_SETTLEMENT_MODE` flag remains unchanged.
 
+`STRIPE_CONNECT_RUNTIME_MODE` is required for every Connect onboarding API call
+and Connect webhook event. Use `test` for test or preview deployments and
+`live` for Production live onboarding. It is an exact, case-sensitive value
+after surrounding whitespace is trimmed; missing or malformed values fail
+closed. The runtime mode must match the mode of the server's existing Stripe
+secret key. It does not enable onboarding by itself:
+`STRIPE_CONNECT_ONBOARDING_MODE` must still be exactly `on`, and the separate
+`STRIPE_CONNECT_SETTLEMENT_MODE` remains independent.
+
+Production Connect webhook URLs can receive both live and test Stripe events.
+After signature verification, Trade82 processes an event only when its
+`event.livemode` matches `STRIPE_CONNECT_RUNTIME_MODE`; a mismatch is safely
+acknowledged without a database update. Never place Stripe credentials in
+documentation, logs, source code, or pull request descriptions.
+
 `STRIPE_CONNECT_APPROVED_ACCOUNT_COUNTRIES` is a separate, fail-closed,
 comma-separated ISO alpha-2 allowlist. Missing or empty configuration approves
 no country, and the general Stripe availability list is never a fallback.
