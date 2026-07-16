@@ -352,6 +352,7 @@ enum SettlementStatus {
   READY
   TRANSFER_PENDING
   TRANSFERRED
+  REVERSAL_PENDING
   REVERSED
   CANCELLED
 }
@@ -368,6 +369,7 @@ enum SettlementLegStatus {
   READY
   TRANSFER_PENDING
   TRANSFERRED
+  REVERSAL_PENDING
   REVERSED
   CANCELLED
 }
@@ -387,12 +389,26 @@ enum SettlementEventType {
   REVERSAL_CREATED
   REVERSED
   CANCELLED
+  REFUND_RECONCILIATION_STARTED
+  PARTIAL_REFUND_RECONCILED
+  FULL_REFUND_CANCELLED
+  DISPUTE_OPENED
+  DISPUTE_UPDATED
+  DISPUTE_WON
+  DISPUTE_LOST
+  POST_TRANSFER_REVERSAL_REQUIRED
 }
 
 enum SettlementReversalReason {
   REFUND
   DISPUTE
   MANUAL
+}
+
+enum SettlementReversalStatus {
+  ACCOUNTING_APPLIED
+  PENDING
+  COMPLETED
 }
 
 model UserProfile {
@@ -874,28 +890,32 @@ model PaymentRequest {
 }
 
 model PaymentRefund {
-  id               String         @id @default(cuid())
-  paymentRequestId String
-  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  stripeRefundId   String         @unique
-  amount           Int
-  status           String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id                       String         @id @default(cuid())
+  paymentRequestId         String
+  paymentRequest           PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeRefundId           String         @unique
+  amount                   Int
+  status                   String
+  lastStripeEventCreatedAt DateTime
+  lastStripeEventId        String
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   @@index([paymentRequestId, createdAt])
 }
 
 model PaymentDispute {
-  id               String         @id @default(cuid())
-  paymentRequestId String
-  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  stripeDisputeId  String         @unique
-  amount           Int
-  status           String
-  reason           String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  id                       String         @id @default(cuid())
+  paymentRequestId         String
+  paymentRequest           PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  stripeDisputeId          String         @unique
+  amount                   Int
+  status                   String
+  reason                   String?
+  lastStripeEventCreatedAt DateTime
+  lastStripeEventId        String
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
 
   @@index([paymentRequestId, createdAt])
 }
@@ -1072,12 +1092,15 @@ model SettlementReversal {
   amount                   Int
   currency                 String                   @default("usd")
   reason                   SettlementReversalReason
+  status                   SettlementReversalStatus @default(ACCOUNTING_APPLIED)
   idempotencyKey           String                   @unique
   stripeRefundId           String?
+  stripeDisputeId          String?
   stripeTransferReversalId String?                  @unique
   createdAt                DateTime                 @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
+  @@unique([stripeDisputeId, settlementLegId])
   @@index([settlementId, settlementLegId])
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])

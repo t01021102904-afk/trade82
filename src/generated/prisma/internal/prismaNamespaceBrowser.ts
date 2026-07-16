@@ -485,6 +485,8 @@ export const PaymentRefundScalarFieldEnum = {
   stripeRefundId: 'stripeRefundId',
   amount: 'amount',
   status: 'status',
+  lastStripeEventCreatedAt: 'lastStripeEventCreatedAt',
+  lastStripeEventId: 'lastStripeEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -499,6 +501,8 @@ export const PaymentDisputeScalarFieldEnum = {
   amount: 'amount',
   status: 'status',
   reason: 'reason',
+  lastStripeEventCreatedAt: 'lastStripeEventCreatedAt',
+  lastStripeEventId: 'lastStripeEventId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -642,8 +646,10 @@ export const SettlementReversalScalarFieldEnum = {
   amount: 'amount',
   currency: 'currency',
   reason: 'reason',
+  status: 'status',
   idempotencyKey: 'idempotencyKey',
   stripeRefundId: 'stripeRefundId',
+  stripeDisputeId: 'stripeDisputeId',
   stripeTransferReversalId: 'stripeTransferReversalId',
   createdAt: 'createdAt'
 } as const

@@ -41,8 +41,10 @@ export type SettlementReversalMinAggregateOutputType = {
   amount: number | null
   currency: string | null
   reason: $Enums.SettlementReversalReason | null
+  status: $Enums.SettlementReversalStatus | null
   idempotencyKey: string | null
   stripeRefundId: string | null
+  stripeDisputeId: string | null
   stripeTransferReversalId: string | null
   createdAt: Date | null
 }
@@ -54,8 +56,10 @@ export type SettlementReversalMaxAggregateOutputType = {
   amount: number | null
   currency: string | null
   reason: $Enums.SettlementReversalReason | null
+  status: $Enums.SettlementReversalStatus | null
   idempotencyKey: string | null
   stripeRefundId: string | null
+  stripeDisputeId: string | null
   stripeTransferReversalId: string | null
   createdAt: Date | null
 }
@@ -67,8 +71,10 @@ export type SettlementReversalCountAggregateOutputType = {
   amount: number
   currency: number
   reason: number
+  status: number
   idempotencyKey: number
   stripeRefundId: number
+  stripeDisputeId: number
   stripeTransferReversalId: number
   createdAt: number
   _all: number
@@ -90,8 +96,10 @@ export type SettlementReversalMinAggregateInputType = {
   amount?: true
   currency?: true
   reason?: true
+  status?: true
   idempotencyKey?: true
   stripeRefundId?: true
+  stripeDisputeId?: true
   stripeTransferReversalId?: true
   createdAt?: true
 }
@@ -103,8 +111,10 @@ export type SettlementReversalMaxAggregateInputType = {
   amount?: true
   currency?: true
   reason?: true
+  status?: true
   idempotencyKey?: true
   stripeRefundId?: true
+  stripeDisputeId?: true
   stripeTransferReversalId?: true
   createdAt?: true
 }
@@ -116,8 +126,10 @@ export type SettlementReversalCountAggregateInputType = {
   amount?: true
   currency?: true
   reason?: true
+  status?: true
   idempotencyKey?: true
   stripeRefundId?: true
+  stripeDisputeId?: true
   stripeTransferReversalId?: true
   createdAt?: true
   _all?: true
@@ -216,8 +228,10 @@ export type SettlementReversalGroupByOutputType = {
   amount: number
   currency: string
   reason: $Enums.SettlementReversalReason
+  status: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId: string | null
+  stripeDisputeId: string | null
   stripeTransferReversalId: string | null
   createdAt: Date
   _count: SettlementReversalCountAggregateOutputType | null
@@ -252,8 +266,10 @@ export type SettlementReversalWhereInput = {
   amount?: Prisma.IntFilter<"SettlementReversal"> | number
   currency?: Prisma.StringFilter<"SettlementReversal"> | string
   reason?: Prisma.EnumSettlementReversalReasonFilter<"SettlementReversal"> | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFilter<"SettlementReversal"> | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFilter<"SettlementReversal"> | string
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
@@ -267,8 +283,10 @@ export type SettlementReversalOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   stripeRefundId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeDisputeId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   settlement?: Prisma.SettlementOrderByWithRelationInput
@@ -280,6 +298,7 @@ export type SettlementReversalWhereUniqueInput = Prisma.AtLeast<{
   idempotencyKey?: string
   stripeTransferReversalId?: string
   stripeRefundId_settlementLegId?: Prisma.SettlementReversalStripeRefundIdSettlementLegIdCompoundUniqueInput
+  stripeDisputeId_settlementLegId?: Prisma.SettlementReversalStripeDisputeIdSettlementLegIdCompoundUniqueInput
   AND?: Prisma.SettlementReversalWhereInput | Prisma.SettlementReversalWhereInput[]
   OR?: Prisma.SettlementReversalWhereInput[]
   NOT?: Prisma.SettlementReversalWhereInput | Prisma.SettlementReversalWhereInput[]
@@ -288,11 +307,13 @@ export type SettlementReversalWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.IntFilter<"SettlementReversal"> | number
   currency?: Prisma.StringFilter<"SettlementReversal"> | string
   reason?: Prisma.EnumSettlementReversalReasonFilter<"SettlementReversal"> | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFilter<"SettlementReversal"> | $Enums.SettlementReversalStatus
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
   settlementLeg?: Prisma.XOR<Prisma.SettlementLegScalarRelationFilter, Prisma.SettlementLegWhereInput>
-}, "id" | "idempotencyKey" | "stripeTransferReversalId" | "stripeRefundId_settlementLegId">
+}, "id" | "idempotencyKey" | "stripeTransferReversalId" | "stripeRefundId_settlementLegId" | "stripeDisputeId_settlementLegId">
 
 export type SettlementReversalOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -301,8 +322,10 @@ export type SettlementReversalOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   stripeRefundId?: Prisma.SortOrderInput | Prisma.SortOrder
+  stripeDisputeId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.SettlementReversalCountOrderByAggregateInput
@@ -322,8 +345,10 @@ export type SettlementReversalScalarWhereWithAggregatesInput = {
   amount?: Prisma.IntWithAggregatesFilter<"SettlementReversal"> | number
   currency?: Prisma.StringWithAggregatesFilter<"SettlementReversal"> | string
   reason?: Prisma.EnumSettlementReversalReasonWithAggregatesFilter<"SettlementReversal"> | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusWithAggregatesFilter<"SettlementReversal"> | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"SettlementReversal"> | string
   stripeRefundId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
+  stripeDisputeId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SettlementReversal"> | Date | string
 }
@@ -333,8 +358,10 @@ export type SettlementReversalCreateInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutReversalsInput
@@ -348,8 +375,10 @@ export type SettlementReversalUncheckedCreateInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -359,8 +388,10 @@ export type SettlementReversalUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutReversalsNestedInput
@@ -374,8 +405,10 @@ export type SettlementReversalUncheckedUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -387,8 +420,10 @@ export type SettlementReversalCreateManyInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -398,8 +433,10 @@ export type SettlementReversalUpdateManyMutationInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -411,8 +448,10 @@ export type SettlementReversalUncheckedUpdateManyInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -432,6 +471,11 @@ export type SettlementReversalStripeRefundIdSettlementLegIdCompoundUniqueInput =
   settlementLegId: string
 }
 
+export type SettlementReversalStripeDisputeIdSettlementLegIdCompoundUniqueInput = {
+  stripeDisputeId: string
+  settlementLegId: string
+}
+
 export type SettlementReversalCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   settlementId?: Prisma.SortOrder
@@ -439,8 +483,10 @@ export type SettlementReversalCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   stripeRefundId?: Prisma.SortOrder
+  stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -456,8 +502,10 @@ export type SettlementReversalMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   stripeRefundId?: Prisma.SortOrder
+  stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -469,8 +517,10 @@ export type SettlementReversalMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   stripeRefundId?: Prisma.SortOrder
+  stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -567,13 +617,19 @@ export type EnumSettlementReversalReasonFieldUpdateOperationsInput = {
   set?: $Enums.SettlementReversalReason
 }
 
+export type EnumSettlementReversalStatusFieldUpdateOperationsInput = {
+  set?: $Enums.SettlementReversalStatus
+}
+
 export type SettlementReversalCreateWithoutSettlementInput = {
   id?: string
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
   settlementLeg: Prisma.SettlementLegCreateNestedOneWithoutReversalsInput
@@ -585,8 +641,10 @@ export type SettlementReversalUncheckedCreateWithoutSettlementInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -627,8 +685,10 @@ export type SettlementReversalScalarWhereInput = {
   amount?: Prisma.IntFilter<"SettlementReversal"> | number
   currency?: Prisma.StringFilter<"SettlementReversal"> | string
   reason?: Prisma.EnumSettlementReversalReasonFilter<"SettlementReversal"> | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFilter<"SettlementReversal"> | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFilter<"SettlementReversal"> | string
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
 }
@@ -638,8 +698,10 @@ export type SettlementReversalCreateWithoutSettlementLegInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutReversalsInput
@@ -650,8 +712,10 @@ export type SettlementReversalUncheckedCreateWithoutSettlementLegInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -688,8 +752,10 @@ export type SettlementReversalCreateManySettlementInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -699,8 +765,10 @@ export type SettlementReversalUpdateWithoutSettlementInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlementLeg?: Prisma.SettlementLegUpdateOneRequiredWithoutReversalsNestedInput
@@ -712,8 +780,10 @@ export type SettlementReversalUncheckedUpdateWithoutSettlementInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -724,8 +794,10 @@ export type SettlementReversalUncheckedUpdateManyWithoutSettlementInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -735,8 +807,10 @@ export type SettlementReversalCreateManySettlementLegInput = {
   amount: number
   currency?: string
   reason: $Enums.SettlementReversalReason
+  status?: $Enums.SettlementReversalStatus
   idempotencyKey: string
   stripeRefundId?: string | null
+  stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
   createdAt?: Date | string
 }
@@ -746,8 +820,10 @@ export type SettlementReversalUpdateWithoutSettlementLegInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutReversalsNestedInput
@@ -758,8 +834,10 @@ export type SettlementReversalUncheckedUpdateWithoutSettlementLegInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -769,8 +847,10 @@ export type SettlementReversalUncheckedUpdateManyWithoutSettlementLegInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.EnumSettlementReversalReasonFieldUpdateOperationsInput | $Enums.SettlementReversalReason
+  status?: Prisma.EnumSettlementReversalStatusFieldUpdateOperationsInput | $Enums.SettlementReversalStatus
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -784,8 +864,10 @@ export type SettlementReversalSelect<ExtArgs extends runtime.Types.Extensions.In
   amount?: boolean
   currency?: boolean
   reason?: boolean
+  status?: boolean
   idempotencyKey?: boolean
   stripeRefundId?: boolean
+  stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
@@ -799,8 +881,10 @@ export type SettlementReversalSelectCreateManyAndReturn<ExtArgs extends runtime.
   amount?: boolean
   currency?: boolean
   reason?: boolean
+  status?: boolean
   idempotencyKey?: boolean
   stripeRefundId?: boolean
+  stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
@@ -814,8 +898,10 @@ export type SettlementReversalSelectUpdateManyAndReturn<ExtArgs extends runtime.
   amount?: boolean
   currency?: boolean
   reason?: boolean
+  status?: boolean
   idempotencyKey?: boolean
   stripeRefundId?: boolean
+  stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
@@ -829,13 +915,15 @@ export type SettlementReversalSelectScalar = {
   amount?: boolean
   currency?: boolean
   reason?: boolean
+  status?: boolean
   idempotencyKey?: boolean
   stripeRefundId?: boolean
+  stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
   createdAt?: boolean
 }
 
-export type SettlementReversalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "amount" | "currency" | "reason" | "idempotencyKey" | "stripeRefundId" | "stripeTransferReversalId" | "createdAt", ExtArgs["result"]["settlementReversal"]>
+export type SettlementReversalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "amount" | "currency" | "reason" | "status" | "idempotencyKey" | "stripeRefundId" | "stripeDisputeId" | "stripeTransferReversalId" | "createdAt", ExtArgs["result"]["settlementReversal"]>
 export type SettlementReversalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -862,8 +950,10 @@ export type $SettlementReversalPayload<ExtArgs extends runtime.Types.Extensions.
     amount: number
     currency: string
     reason: $Enums.SettlementReversalReason
+    status: $Enums.SettlementReversalStatus
     idempotencyKey: string
     stripeRefundId: string | null
+    stripeDisputeId: string | null
     stripeTransferReversalId: string | null
     createdAt: Date
   }, ExtArgs["result"]["settlementReversal"]>
@@ -1297,8 +1387,10 @@ export interface SettlementReversalFieldRefs {
   readonly amount: Prisma.FieldRef<"SettlementReversal", 'Int'>
   readonly currency: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly reason: Prisma.FieldRef<"SettlementReversal", 'SettlementReversalReason'>
+  readonly status: Prisma.FieldRef<"SettlementReversal", 'SettlementReversalStatus'>
   readonly idempotencyKey: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly stripeRefundId: Prisma.FieldRef<"SettlementReversal", 'String'>
+  readonly stripeDisputeId: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly stripeTransferReversalId: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly createdAt: Prisma.FieldRef<"SettlementReversal", 'DateTime'>
 }

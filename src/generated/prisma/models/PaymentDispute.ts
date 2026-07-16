@@ -41,6 +41,8 @@ export type PaymentDisputeMinAggregateOutputType = {
   amount: number | null
   status: string | null
   reason: string | null
+  lastStripeEventCreatedAt: Date | null
+  lastStripeEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +54,8 @@ export type PaymentDisputeMaxAggregateOutputType = {
   amount: number | null
   status: string | null
   reason: string | null
+  lastStripeEventCreatedAt: Date | null
+  lastStripeEventId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +67,8 @@ export type PaymentDisputeCountAggregateOutputType = {
   amount: number
   status: number
   reason: number
+  lastStripeEventCreatedAt: number
+  lastStripeEventId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +90,8 @@ export type PaymentDisputeMinAggregateInputType = {
   amount?: true
   status?: true
   reason?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +103,8 @@ export type PaymentDisputeMaxAggregateInputType = {
   amount?: true
   status?: true
   reason?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +116,8 @@ export type PaymentDisputeCountAggregateInputType = {
   amount?: true
   status?: true
   reason?: true
+  lastStripeEventCreatedAt?: true
+  lastStripeEventId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +216,8 @@ export type PaymentDisputeGroupByOutputType = {
   amount: number
   status: string
   reason: string | null
+  lastStripeEventCreatedAt: Date
+  lastStripeEventId: string
   createdAt: Date
   updatedAt: Date
   _count: PaymentDisputeCountAggregateOutputType | null
@@ -238,6 +252,8 @@ export type PaymentDisputeWhereInput = {
   amount?: Prisma.IntFilter<"PaymentDispute"> | number
   status?: Prisma.StringFilter<"PaymentDispute"> | string
   reason?: Prisma.StringNullableFilter<"PaymentDispute"> | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentDispute"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
   paymentRequest?: Prisma.XOR<Prisma.PaymentRequestScalarRelationFilter, Prisma.PaymentRequestWhereInput>
@@ -250,6 +266,8 @@ export type PaymentDisputeOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   paymentRequest?: Prisma.PaymentRequestOrderByWithRelationInput
@@ -265,6 +283,8 @@ export type PaymentDisputeWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.IntFilter<"PaymentDispute"> | number
   status?: Prisma.StringFilter<"PaymentDispute"> | string
   reason?: Prisma.StringNullableFilter<"PaymentDispute"> | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentDispute"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
   paymentRequest?: Prisma.XOR<Prisma.PaymentRequestScalarRelationFilter, Prisma.PaymentRequestWhereInput>
@@ -277,6 +297,8 @@ export type PaymentDisputeOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reason?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PaymentDisputeCountOrderByAggregateInput
@@ -296,6 +318,8 @@ export type PaymentDisputeScalarWhereWithAggregatesInput = {
   amount?: Prisma.IntWithAggregatesFilter<"PaymentDispute"> | number
   status?: Prisma.StringWithAggregatesFilter<"PaymentDispute"> | string
   reason?: Prisma.StringNullableWithAggregatesFilter<"PaymentDispute"> | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentDispute"> | Date | string
+  lastStripeEventId?: Prisma.StringWithAggregatesFilter<"PaymentDispute"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentDispute"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PaymentDispute"> | Date | string
 }
@@ -306,6 +330,8 @@ export type PaymentDisputeCreateInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   paymentRequest: Prisma.PaymentRequestCreateNestedOneWithoutDisputesInput
@@ -318,6 +344,8 @@ export type PaymentDisputeUncheckedCreateInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -328,6 +356,8 @@ export type PaymentDisputeUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   paymentRequest?: Prisma.PaymentRequestUpdateOneRequiredWithoutDisputesNestedInput
@@ -340,6 +370,8 @@ export type PaymentDisputeUncheckedUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -351,6 +383,8 @@ export type PaymentDisputeCreateManyInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -361,6 +395,8 @@ export type PaymentDisputeUpdateManyMutationInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,6 +408,8 @@ export type PaymentDisputeUncheckedUpdateManyInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -393,6 +431,8 @@ export type PaymentDisputeCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -408,6 +448,8 @@ export type PaymentDisputeMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -419,6 +461,8 @@ export type PaymentDisputeMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   status?: Prisma.SortOrder
   reason?: Prisma.SortOrder
+  lastStripeEventCreatedAt?: Prisma.SortOrder
+  lastStripeEventId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -475,6 +519,8 @@ export type PaymentDisputeCreateWithoutPaymentRequestInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -485,6 +531,8 @@ export type PaymentDisputeUncheckedCreateWithoutPaymentRequestInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -525,6 +573,8 @@ export type PaymentDisputeScalarWhereInput = {
   amount?: Prisma.IntFilter<"PaymentDispute"> | number
   status?: Prisma.StringFilter<"PaymentDispute"> | string
   reason?: Prisma.StringNullableFilter<"PaymentDispute"> | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
+  lastStripeEventId?: Prisma.StringFilter<"PaymentDispute"> | string
   createdAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PaymentDispute"> | Date | string
 }
@@ -535,6 +585,8 @@ export type PaymentDisputeCreateManyPaymentRequestInput = {
   amount: number
   status: string
   reason?: string | null
+  lastStripeEventCreatedAt: Date | string
+  lastStripeEventId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -545,6 +597,8 @@ export type PaymentDisputeUpdateWithoutPaymentRequestInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -555,6 +609,8 @@ export type PaymentDisputeUncheckedUpdateWithoutPaymentRequestInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -565,6 +621,8 @@ export type PaymentDisputeUncheckedUpdateManyWithoutPaymentRequestInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   reason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastStripeEventCreatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  lastStripeEventId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -578,6 +636,8 @@ export type PaymentDisputeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   amount?: boolean
   status?: boolean
   reason?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -590,6 +650,8 @@ export type PaymentDisputeSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   amount?: boolean
   status?: boolean
   reason?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -602,6 +664,8 @@ export type PaymentDisputeSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   amount?: boolean
   status?: boolean
   reason?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
@@ -614,11 +678,13 @@ export type PaymentDisputeSelectScalar = {
   amount?: boolean
   status?: boolean
   reason?: boolean
+  lastStripeEventCreatedAt?: boolean
+  lastStripeEventId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PaymentDisputeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "stripeDisputeId" | "amount" | "status" | "reason" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentDispute"]>
+export type PaymentDisputeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "stripeDisputeId" | "amount" | "status" | "reason" | "lastStripeEventCreatedAt" | "lastStripeEventId" | "createdAt" | "updatedAt", ExtArgs["result"]["paymentDispute"]>
 export type PaymentDisputeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
 }
@@ -641,6 +707,8 @@ export type $PaymentDisputePayload<ExtArgs extends runtime.Types.Extensions.Inte
     amount: number
     status: string
     reason: string | null
+    lastStripeEventCreatedAt: Date
+    lastStripeEventId: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["paymentDispute"]>
@@ -1073,6 +1141,8 @@ export interface PaymentDisputeFieldRefs {
   readonly amount: Prisma.FieldRef<"PaymentDispute", 'Int'>
   readonly status: Prisma.FieldRef<"PaymentDispute", 'String'>
   readonly reason: Prisma.FieldRef<"PaymentDispute", 'String'>
+  readonly lastStripeEventCreatedAt: Prisma.FieldRef<"PaymentDispute", 'DateTime'>
+  readonly lastStripeEventId: Prisma.FieldRef<"PaymentDispute", 'String'>
   readonly createdAt: Prisma.FieldRef<"PaymentDispute", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PaymentDispute", 'DateTime'>
 }

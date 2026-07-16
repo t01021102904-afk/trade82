@@ -266,6 +266,7 @@ export async function POST(request: Request) {
           await markPaymentRequestPaidFromCheckoutSession(session, {
             stripeEventId: event.id,
             stripeEventType: event.type,
+            stripeEventCreatedAt: new Date(event.created * 1000),
           })
         ) {
           await recordSettlementLedgerAfterVerifiedPayment({
@@ -290,6 +291,7 @@ export async function POST(request: Request) {
         const paymentVerified = await markPaymentRequestPaidFromCheckoutSession(session, {
           stripeEventId: event.id,
           stripeEventType: event.type,
+          stripeEventCreatedAt: new Date(event.created * 1000),
         });
         if (paymentVerified) {
           await recordSettlementLedgerAfterVerifiedPayment({
@@ -312,6 +314,7 @@ export async function POST(request: Request) {
         const paymentVerified = await markPaymentRequestPaidFromPaymentIntent(paymentIntent, {
           stripeEventId: event.id,
           stripeEventType: event.type,
+          stripeEventCreatedAt: new Date(event.created * 1000),
         });
         if (paymentVerified) {
           await recordSettlementLedgerAfterVerifiedPayment({
@@ -334,6 +337,7 @@ export async function POST(request: Request) {
         await syncPaymentRequestRefund(event.data.object as Stripe.Refund, {
           stripeEventId: event.id,
           stripeEventType: event.type,
+          stripeEventCreatedAt: new Date(event.created * 1000),
         });
         break;
       }
@@ -343,6 +347,7 @@ export async function POST(request: Request) {
         await syncPaymentRequestDispute(event.data.object as Stripe.Dispute, {
           stripeEventId: event.id,
           stripeEventType: event.type,
+          stripeEventCreatedAt: new Date(event.created * 1000),
         });
         break;
       }
