@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/run-production-migrations.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "test:payments": "node --experimental-strip-types --test tests/payment-request-rules.test.ts tests/payment-request-safety.test.ts",
