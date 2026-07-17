@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   EXPECTED_SUPABASE_PROJECT,
   LEGACY_ZERO_STEP_MIGRATIONS,
+  PREREQUISITE_MIGRATION,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
   formatDiagnostic,
@@ -46,6 +47,62 @@ function legacySchemaEvidence(overrides = {}) {
   };
 }
 
+function prerequisitePreflight(overrides = {}) {
+  return {
+    partner_profile_table: true,
+    partner_profile_id_text: true,
+    user_profile_table: true,
+    user_profile_id_text: true,
+    anon_role: true,
+    authenticated_role: true,
+    referral_claim_token_relations_absent: true,
+    referral_claim_token_columns_absent: true,
+    referral_claim_token_indexes_absent: true,
+    referral_claim_token_constraints_absent: true,
+    ...overrides,
+  };
+}
+
+function prerequisiteSchema(overrides = {}) {
+  return {
+    referral_claim_token_table: true,
+    referral_claim_token_rls: true,
+    referral_claim_token_primary_key: true,
+    referral_claim_token_columns: true,
+    referral_claim_token_hash_index: true,
+    referral_claim_token_partner_index: true,
+    referral_claim_token_consumed_index: true,
+    referral_claim_token_partner_fk: true,
+    referral_claim_token_consumed_fk: true,
+    referral_claim_token_public_access_revoked: true,
+    ...overrides,
+  };
+}
+
+function targetPreflight(overrides = {}) {
+  return {
+    target_prerequisite_tables: true,
+    target_enum_values_absent: true,
+    target_columns_absent: true,
+    target_constraints_absent: true,
+    target_indexes_absent: true,
+    ...overrides,
+  };
+}
+
+function targetSchema(overrides = {}) {
+  return {
+    target_enum_values: true,
+    target_columns: true,
+    target_hold_reason_check: true,
+    target_leg_retry_check: true,
+    target_reversal_retry_check: true,
+    target_approval_fk: true,
+    target_indexes: true,
+    ...overrides,
+  };
+}
+
 function fakeClient(responses) {
   const calls = { connect: 0, query: 0, end: 0 };
   return {
@@ -65,8 +122,13 @@ function fakeClient(responses) {
   };
 }
 
-const localMigrations = ["20260717090000_previous_migration", TARGET_MIGRATION];
+const localMigrations = [
+  "20260717090000_previous_migration",
+  PREREQUISITE_MIGRATION,
+  TARGET_MIGRATION,
+];
 const previousMigration = record(localMigrations[0]);
+const appliedPrerequisite = record(PREREQUISITE_MIGRATION);
 const appliedTarget = record(TARGET_MIGRATION);
 
 async function assertDiagnostic(promise, expected) {
@@ -157,7 +219,14 @@ test("database connection failures identify the selected source without exposing
 });
 
 test("the target migration is the only pending migration before deploy", async () => {
-  const fake = fakeClient([[previousMigration], [previousMigration, appliedTarget]]);
+  const fake = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight()],
+    [previousMigration, appliedPrerequisite, appliedTarget],
+    [prerequisiteSchema()],
+    [targetSchema()],
+  ]);
   let deploys = 0;
   const result = await runProductionMigrations({
     environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
@@ -167,7 +236,165 @@ test("the target migration is the only pending migration before deploy", async (
   });
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.deepEqual(fake.calls, { connect: 1, query: 2, end: 1 });
+  assert.deepEqual(fake.calls, { connect: 1, query: 6, end: 1 });
+});
+
+test("the recovery state permits only the target migration to remain pending", async () => {
+  const fake = fakeClient([
+    [previousMigration, appliedPrerequisite],
+    [prerequisiteSchema()],
+    [targetPreflight()],
+    [previousMigration, appliedPrerequisite, appliedTarget],
+    [prerequisiteSchema()],
+    [targetSchema()],
+  ]);
+  let deploys = 0;
+  const result = await runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => fake.client,
+    localMigrationNames: localMigrations,
+    deploy: () => { deploys += 1; },
+  });
+  assert.equal(result, "deployed");
+  assert.equal(deploys, 1);
+  assert.deepEqual(fake.calls, { connect: 1, query: 6, end: 1 });
+});
+
+test("prerequisite-only and reversed pending states fail with a safe pending-set diagnostic", async () => {
+  const cases = [
+    {
+      records: [previousMigration, appliedTarget],
+      localNames: localMigrations,
+    },
+    {
+      records: [previousMigration, appliedPrerequisite],
+      localNames: [...localMigrations, "20260717130000_unapproved_migration"],
+    },
+    {
+      records: [previousMigration, appliedPrerequisite, appliedTarget],
+      localNames: [...localMigrations, "20260717130000_unapproved_migration"],
+    },
+    {
+      records: [previousMigration],
+      localNames: [localMigrations[0], TARGET_MIGRATION, PREREQUISITE_MIGRATION],
+    },
+    {
+      records: [previousMigration],
+      localNames: [...localMigrations, TARGET_MIGRATION],
+    },
+  ];
+
+  for (const { records, localNames } of cases) {
+    const fake = fakeClient([records]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: localNames,
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DATABASE_URL",
+      code: "pending_set_mismatch",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
+});
+
+test("prerequisite preflight fails closed for missing dependencies or partial objects", async () => {
+  for (const missingEvidence of [
+    { partner_profile_table: false },
+    { partner_profile_id_text: false },
+    { user_profile_table: false },
+    { user_profile_id_text: false },
+    { anon_role: false },
+    { authenticated_role: false },
+    { referral_claim_token_columns_absent: false },
+    { referral_claim_token_indexes_absent: false },
+    { referral_claim_token_constraints_absent: false },
+  ]) {
+    const fake = fakeClient([[previousMigration], [prerequisitePreflight(missingEvidence)]]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: localMigrations,
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DIRECT_URL",
+      code: "prerequisite_preflight_failed",
+    });
+  }
+});
+
+test("target preflight and post-verification fail closed on partial schema", async () => {
+  const preflightFailure = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight({ target_columns_absent: false })],
+  ]);
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => preflightFailure.client,
+    localMigrationNames: localMigrations,
+  }), {
+    stage: "migration_state_evaluation",
+    source: "DIRECT_URL",
+    code: "target_preflight_failed",
+  });
+
+  const prerequisitePostFailure = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight()],
+    [previousMigration, appliedPrerequisite, appliedTarget],
+    [prerequisiteSchema({ referral_claim_token_rls: false })],
+  ]);
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => prerequisitePostFailure.client,
+    localMigrationNames: localMigrations,
+    deploy: () => {},
+  }), {
+    stage: "target_verification",
+    source: "DIRECT_URL",
+    code: "prerequisite_postverify_failed",
+  });
+});
+
+test("both allowlisted migrations require exactly one applied step after deployment", async () => {
+  const prerequisiteStepsFailure = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight()],
+    [previousMigration, record(PREREQUISITE_MIGRATION, { applied_steps_count: 2 }), appliedTarget],
+    [prerequisiteSchema()],
+  ]);
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => prerequisiteStepsFailure.client,
+    localMigrationNames: localMigrations,
+    deploy: () => {},
+  }), {
+    stage: "target_verification",
+    source: "DIRECT_URL",
+    code: "prerequisite_postverify_failed",
+  });
+
+  const targetStepsFailure = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight()],
+    [previousMigration, appliedPrerequisite, zeroStepRecord(TARGET_MIGRATION)],
+    [prerequisiteSchema()],
+  ]);
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => targetStepsFailure.client,
+    localMigrationNames: localMigrations,
+    deploy: () => {},
+  }), {
+    stage: "target_verification",
+    source: "DIRECT_URL",
+    code: "target_postverify_failed",
+  });
 });
 
 test("the exact legacy zero-step allowlist is accepted with schema evidence", async () => {
@@ -182,18 +409,22 @@ test("the exact legacy zero-step allowlist is accepted with schema evidence", as
     const fake = fakeClient([
       [zeroStepRecord(legacyMigration)],
       [legacySchemaEvidence()],
-      [zeroStepRecord(legacyMigration), appliedTarget],
+      [prerequisitePreflight()],
+      [targetPreflight()],
+      [zeroStepRecord(legacyMigration), appliedPrerequisite, appliedTarget],
+      [prerequisiteSchema()],
+      [targetSchema()],
     ]);
     let deploys = 0;
     const result = await runProductionMigrations({
       environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
       createClient: () => fake.client,
-      localMigrationNames: [legacyMigration, TARGET_MIGRATION],
+      localMigrationNames: [legacyMigration, PREREQUISITE_MIGRATION, TARGET_MIGRATION],
       deploy: () => { deploys += 1; },
     });
     assert.equal(result, "deployed");
     assert.equal(deploys, 1);
-    assert.deepEqual(fake.calls, { connect: 1, query: 3, end: 1 });
+    assert.deepEqual(fake.calls, { connect: 1, query: 7, end: 1 });
   }
 });
 
@@ -235,7 +466,7 @@ test("unknown and target zero-step migrations fail closed", async () => {
     await assertDiagnostic(runProductionMigrations({
       environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
       createClient: () => fake.client,
-      localMigrationNames: [zeroStepMigration, TARGET_MIGRATION],
+      localMigrationNames: [zeroStepMigration],
     }), {
       stage: "migration_state_evaluation",
       source: "DIRECT_URL",
@@ -266,7 +497,7 @@ test("allowlisted zero-step records must be completed and not rolled back", asyn
 });
 
 test("Prisma subprocess failures identify prisma_migrate_deploy", async () => {
-  const fake = fakeClient([[previousMigration]]);
+  const fake = fakeClient([[previousMigration], [prerequisitePreflight()], [targetPreflight()]]);
   const subprocessError = new Error("subprocess output must not escape");
   subprocessError.code = "subprocess_exit_1";
   await assertDiagnostic(runProductionMigrations({
@@ -283,7 +514,11 @@ test("Prisma subprocess failures identify prisma_migrate_deploy", async () => {
 });
 
 test("an already-applied target migration skips Prisma", async () => {
-  const fake = fakeClient([[previousMigration, appliedTarget]]);
+  const fake = fakeClient([
+    [previousMigration, appliedPrerequisite, appliedTarget],
+    [prerequisiteSchema()],
+    [targetSchema()],
+  ]);
   let deploys = 0;
   const result = await runProductionMigrations({
     environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
@@ -322,7 +557,13 @@ test("unexpected pending migrations and failed records fail closed", async () =>
 });
 
 test("post-deploy verification failure fails closed and closes the connection", async () => {
-  const fake = fakeClient([[previousMigration], [previousMigration, record(TARGET_MIGRATION, { applied_steps_count: 2 })]]);
+  const fake = fakeClient([
+    [previousMigration],
+    [prerequisitePreflight()],
+    [targetPreflight()],
+    [previousMigration, appliedPrerequisite, record(TARGET_MIGRATION, { applied_steps_count: 2 })],
+    [prerequisiteSchema()],
+  ]);
   await assertDiagnostic(runProductionMigrations({
     environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
     createClient: () => fake.client,
@@ -331,6 +572,7 @@ test("post-deploy verification failure fails closed and closes the connection", 
   }), {
     stage: "target_verification",
     source: "DATABASE_URL",
+    code: "target_postverify_failed",
   });
   assert.equal(fake.calls.end, 1);
 });
