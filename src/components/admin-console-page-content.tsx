@@ -31,11 +31,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
   return (
     <div className="theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:px-8">
-        <SectionHeader
-          label={admin.label}
-          title={admin.consoleTitle}
-          description={admin.consoleDescription}
-        />
+        <SectionHeader label={admin.label} title={admin.consoleTitle} description={admin.consoleDescription} />
 
         <section>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.companyManagement}</h2>

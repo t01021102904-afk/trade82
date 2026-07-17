@@ -20,6 +20,13 @@ import {
 import {
   calculateCumulativeSettlementReversalTargets,
 } from "../src/lib/stripe-connect-settlement-reconciliation.ts";
+import {
+  calculateSettlementLegNetAmount,
+  isOpenSettlementDispute,
+  isTransferAccountReady,
+} from "../src/lib/stripe-connect-settlement-release.ts";
+import { getStripeConnectTransferExecutionMode } from "../src/lib/stripe-connect-transfer-execution-mode.ts";
+import { StripeConnectedAccountStatus } from "../src/generated/prisma/client.ts";
 
 test("settlement financials preserve the exact 95 / 4.5 / 0.5 gross split", () => {
   const financials = calculateStripeConnectSettlementFinancials({
@@ -118,6 +125,36 @@ test("missing and invalid settlement modes fail closed", () => {
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "ON" }), "off");
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: " on " }), "off");
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "on" }), "on");
+});
+
+test("transfer execution mode defaults to off and only accepts explicit manual or auto modes", () => {
+  assert.equal(getStripeConnectTransferExecutionMode({}), "off");
+  assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: "invalid" }), "off");
+  assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: " MANUAL " }), "manual");
+  assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: "auto" }), "auto");
+});
+
+test("release eligibility requires an enabled transfer account and uses reversal-adjusted net amounts", () => {
+  assert.equal(isTransferAccountReady(null), false);
+  assert.equal(isTransferAccountReady({
+    status: StripeConnectedAccountStatus.RESTRICTED,
+    payoutsEnabled: true,
+    transfersEnabled: true,
+  }), false);
+  assert.equal(isTransferAccountReady({
+    status: StripeConnectedAccountStatus.ENABLED,
+    payoutsEnabled: false,
+    transfersEnabled: true,
+  }), false);
+  assert.equal(isTransferAccountReady({
+    status: StripeConnectedAccountStatus.ENABLED,
+    payoutsEnabled: true,
+    transfersEnabled: true,
+  }), true);
+  assert.equal(calculateSettlementLegNetAmount({ amount: 9_500, reversalAmounts: [1_000, 500] }), 8_000);
+  assert.equal(calculateSettlementLegNetAmount({ amount: 500, reversalAmounts: [800] }), 0);
+  assert.equal(isOpenSettlementDispute("needs_response"), true);
+  assert.equal(isOpenSettlementDispute("won"), false);
 });
 
 test("settlement referral selection uses the earliest lock then a stable attribution ID", () => {
@@ -231,6 +268,38 @@ test("the reconciliation migration adds pending reversal states and auditable re
   assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
 });
 
+test("the release and approval migration adds only ledger metadata and no transfer execution", async () => {
+  const migration = await readFile(
+    new URL("../prisma/migrations/20260717120000_add_settlement_release_approval/migration.sql", import.meta.url),
+    "utf8",
+  );
+  for (const value of ["ADMIN_APPROVED", "ADMIN_HELD", "ADMIN_REEVALUATED"]) {
+    assert.match(migration, new RegExp(`ADD VALUE IF NOT EXISTS '${value}'`));
+  }
+  for (const column of [
+    "approvedAt",
+    "approvedByUserId",
+    "holdReason",
+    "transferAttemptCount",
+    "nextTransferAttemptAt",
+    "transferLastError",
+    "transferLockedAt",
+    "transferredAt",
+    "reversalAttemptCount",
+    "nextReversalAttemptAt",
+    "reversalLastError",
+    "reversalLockedAt",
+    "completedAt",
+  ]) {
+    assert.match(migration, new RegExp(`ADD COLUMN "${column}"`));
+  }
+  assert.match(migration, /SettlementLeg_status_holdUntil_idx/);
+  assert.match(migration, /SettlementLeg_status_nextTransferAttemptAt_idx/);
+  assert.match(migration, /SettlementReversal_status_nextReversalAttemptAt_idx/);
+  assert.doesNotMatch(migration, /(^|\n)\s*(DROP|TRUNCATE|DELETE)\b/im);
+  assert.doesNotMatch(migration, /stripe\.transfers|createReversal|stripe\.payouts/i);
+});
+
 test("settlement creation snapshots a validated referral attribution", async () => {
   const service = await readFile(
     new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url),
@@ -250,14 +319,15 @@ test("settlement creation snapshots a validated referral attribution", async () 
 });
 
 test("settlement ledger code has no Stripe money-movement API dependency", async () => {
-  const [webhookRoute, settlementService, settlementBridge, reconciliationService] = await Promise.all([
+  const [webhookRoute, settlementService, settlementBridge, reconciliationService, releaseService] = await Promise.all([
     readFile(new URL("../src/app/api/stripe/webhook/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url), "utf8"),
     readFile(new URL("../src/lib/stripe-connect-settlement-reconciliation.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/lib/stripe-connect-settlement-release.ts", import.meta.url), "utf8"),
   ]);
 
-  for (const source of [webhookRoute, settlementService, settlementBridge, reconciliationService]) {
+  for (const source of [webhookRoute, settlementService, settlementBridge, reconciliationService, releaseService]) {
     assert.doesNotMatch(
       source,
       /\.transfers\.(create|createReversal)|\.accounts\.create|accountLinks\.create|\.payouts\.create/,
