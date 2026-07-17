@@ -972,7 +972,6 @@ model PartnerProfile {
   user                   UserProfile             @relation("UserPartnerProfile", fields: [userId], references: [id], onDelete: Restrict)
   referralCode           String                  @unique
   status                 PartnerProfileStatus    @default(ACTIVE)
-<<<<<<< HEAD
   legalName              String?
   displayName            String?
   contactEmail           String?

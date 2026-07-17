@@ -3834,6 +3834,9 @@ export const UserProfileScalarFieldEnum = {
   city: 'city',
   role: 'role',
   preferredLanguage: 'preferredLanguage',
+  deletionStatus: 'deletionStatus',
+  deletionRequestedAt: 'deletionRequestedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3862,6 +3865,7 @@ export const CompanyScalarFieldEnum = {
   categories: 'categories',
   viewCount: 'viewCount',
   verificationStatus: 'verificationStatus',
+  deletedAt: 'deletedAt',
   stripeCustomerId: 'stripeCustomerId',
   stripeSubscriptionId: 'stripeSubscriptionId',
   subscriptionStatus: 'subscriptionStatus',
@@ -3972,6 +3976,7 @@ export const ProductScalarFieldEnum = {
   exportReadiness: 'exportReadiness',
   viewCount: 'viewCount',
   status: 'status',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4257,6 +4262,7 @@ export const PartnerProfileScalarFieldEnum = {
   termsConsentedAt: 'termsConsentedAt',
   privacyConsentVersion: 'privacyConsentVersion',
   privacyConsentedAt: 'privacyConsentedAt',
+  deletedAt: 'deletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -4890,6 +4896,20 @@ export type EnumPreferredLanguageFieldRefInput<$PrismaModel> = FieldRefInputType
  * Reference to a field of type 'PreferredLanguage[]'
  */
 export type ListEnumPreferredLanguageFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PreferredLanguage[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AccountDeletionStatus'
+ */
+export type EnumAccountDeletionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountDeletionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'AccountDeletionStatus[]'
+ */
+export type ListEnumAccountDeletionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AccountDeletionStatus[]'>
     
 
 

@@ -14,7 +14,6 @@ type Role = "buyer" | "seller";
 type RoleResponse = {
   role?: unknown;
   onboardingComplete?: unknown;
-  nextPath?: unknown;
 };
 
 const roleCards: Array<{
@@ -122,9 +121,6 @@ export function RoleSelection({
           ? payload.role
           : role;
       const nextRoute =
-        typeof payload?.nextPath === "string"
-          ? withLocale(payload.nextPath, locale)
-          :
         payload?.onboardingComplete === true
           ? withLocale("/dashboard", locale)
           : withLocale(`/onboarding/${savedRole}`, locale);
@@ -194,7 +190,7 @@ export function RoleSelection({
             {t("onboarding.pathPickerText")}
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           {roleCards.map((card) => {
             const loading = pendingRole === card.role;
 
