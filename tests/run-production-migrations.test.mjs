@@ -3,7 +3,10 @@ import { test } from "node:test";
 
 import {
   EXPECTED_SUPABASE_PROJECT,
+  ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
+  formatDiagnostic,
+  getConnectionSource,
   isExpectedSupabaseConnection,
   runProductionMigrations,
 } from "../scripts/run-production-migrations.mjs";
@@ -44,6 +47,16 @@ const localMigrations = ["20260717090000_previous_migration", TARGET_MIGRATION];
 const previousMigration = record(localMigrations[0]);
 const appliedTarget = record(TARGET_MIGRATION);
 
+async function assertDiagnostic(promise, expected) {
+  await assert.rejects(promise, (error) => {
+    assert.ok(error instanceof ProductionMigrationDiagnostic);
+    assert.equal(error.stage, expected.stage);
+    assert.equal(error.source, expected.source);
+    assert.equal(error.code, expected.code ?? "unknown");
+    return true;
+  });
+}
+
 test("local and Preview builds skip without opening a database connection", async () => {
   let connections = 0;
   const createClient = () => {
@@ -56,11 +69,17 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("missing or malformed Production URLs fail closed", async () => {
-  await assert.rejects(() => runProductionMigrations({ environment: { VERCEL_ENV: "production" } }));
-  await assert.rejects(() => runProductionMigrations({
+test("missing or malformed Production URLs identify environment or identity validation", async () => {
+  await assertDiagnostic(runProductionMigrations({ environment: { VERCEL_ENV: "production" } }), {
+    stage: "environment_validation",
+    source: "none",
+  });
+  await assertDiagnostic(runProductionMigrations({
     environment: { VERCEL_ENV: "production", DATABASE_URL: "not-a-database-url" },
-  }));
+  }), {
+    stage: "connection_identity_validation",
+    source: "DATABASE_URL",
+  });
 });
 
 test("Supabase verification accepts only the exact direct host or pooler username", () => {
@@ -69,6 +88,50 @@ test("Supabase verification accepts only the exact direct host or pooler usernam
   assert.equal(isExpectedSupabaseConnection("postgresql://postgres:credential-placeholder@db.other.supabase.co/postgres"), false);
   assert.equal(isExpectedSupabaseConnection("postgresql://postgres.cjryteuoyiiwsxarblfd.evil:credential-placeholder@host/postgres"), false);
   assert.equal(isExpectedSupabaseConnection("postgresql://postgres:credential-placeholder@db.cjryteuoyiiwsxarblfd.evil/postgres"), false);
+});
+
+test("connection source names are limited to DIRECT_URL, DATABASE_URL, or none", () => {
+  assert.equal(getConnectionSource({ DIRECT_URL: directUrl, DATABASE_URL: poolerUrl }), "DIRECT_URL");
+  assert.equal(getConnectionSource({ DATABASE_URL: poolerUrl }), "DATABASE_URL");
+  assert.equal(getConnectionSource({}), "none");
+});
+
+test("database connection failures identify the selected source without exposing connection data", async () => {
+  const directClient = {
+    async connect() {
+      const error = new Error("connection details must not escape");
+      error.code = "ECONNREFUSED";
+      throw error;
+    },
+    async end() {},
+  };
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => directClient,
+    localMigrationNames: localMigrations,
+  }), {
+    stage: "database_connection",
+    source: "DIRECT_URL",
+    code: "ECONNREFUSED",
+  });
+
+  const poolerClient = {
+    async connect() {
+      const error = new Error("pooler details must not escape");
+      error.code = "ETIMEDOUT";
+      throw error;
+    },
+    async end() {},
+  };
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DATABASE_URL: poolerUrl },
+    createClient: () => poolerClient,
+    localMigrationNames: localMigrations,
+  }), {
+    stage: "database_connection",
+    source: "DATABASE_URL",
+    code: "ETIMEDOUT",
+  });
 });
 
 test("the target migration is the only pending migration before deploy", async () => {
@@ -83,6 +146,23 @@ test("the target migration is the only pending migration before deploy", async (
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
   assert.deepEqual(fake.calls, { connect: 1, query: 2, end: 1 });
+});
+
+test("Prisma subprocess failures identify prisma_migrate_deploy", async () => {
+  const fake = fakeClient([[previousMigration]]);
+  const subprocessError = new Error("subprocess output must not escape");
+  subprocessError.code = "subprocess_exit_1";
+  await assertDiagnostic(runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => fake.client,
+    localMigrationNames: localMigrations,
+    deploy: () => { throw subprocessError; },
+  }), {
+    stage: "prisma_migrate_deploy",
+    source: "DIRECT_URL",
+    code: "subprocess_exit_1",
+  });
+  assert.equal(fake.calls.end, 1);
 });
 
 test("an already-applied target migration skips Prisma", async () => {
@@ -126,11 +206,31 @@ test("unexpected pending migrations and failed records fail closed", async () =>
 
 test("post-deploy verification failure fails closed and closes the connection", async () => {
   const fake = fakeClient([[previousMigration], [previousMigration, record(TARGET_MIGRATION, { applied_steps_count: 2 })]]);
-  await assert.rejects(() => runProductionMigrations({
+  await assertDiagnostic(runProductionMigrations({
     environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
     createClient: () => fake.client,
     localMigrationNames: localMigrations,
     deploy: () => {},
-  }));
+  }), {
+    stage: "target_verification",
+    source: "DATABASE_URL",
+  });
   assert.equal(fake.calls.end, 1);
+});
+
+test("diagnostic output contains only fixed fields and never test connection data", () => {
+  const secretUrl = directUrl;
+  const output = formatDiagnostic(new ProductionMigrationDiagnostic(
+    "database_connection",
+    "DIRECT_URL",
+    "ECONNRESET",
+  ));
+  assert.equal(output, [
+    "[production-migration] failed stage=database_connection",
+    "source=DIRECT_URL",
+    "code=ECONNRESET",
+  ].join("\n"));
+  assert.doesNotMatch(output, /cjryteuoyiiwsxarblfd\.supabase\.co/);
+  assert.doesNotMatch(output, /credential-placeholder|postgres|password|secret/i);
+  assert.doesNotMatch(output, new RegExp(secretUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });
