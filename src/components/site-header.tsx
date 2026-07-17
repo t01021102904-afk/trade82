@@ -9,7 +9,7 @@ import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
-import { publicNavigationLinks } from "@/lib/public-navigation";
+import { getPublicNavigationLinks } from "@/lib/public-navigation";
 import { cx } from "@/lib/utils";
 
 const appLinks = [
@@ -17,7 +17,11 @@ const appLinks = [
   { href: "/messages", labelKey: "nav.messages" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({
+  partnerProgramEnabled = false,
+}: {
+  partnerProgramEnabled?: boolean;
+}) {
   const pathname = usePathname();
   const { locale, t } = useI18n();
   const { context, isSignedIn, user } = useUserContext();
@@ -34,18 +38,21 @@ export function SiteHeader() {
   const visibleNavLinks =
     isSignedIn && hasRole
       ? [
-          ...publicNavigationLinks,
+          ...getPublicNavigationLinks(partnerProgramEnabled),
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
           ...appLinks,
         ]
-      : publicNavigationLinks;
+      : getPublicNavigationLinks(partnerProgramEnabled);
 
   return (
     <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
-        <Link href={withLocale("/", locale)} className="flex min-w-0 items-center gap-2 theme-foreground">
+        <Link
+          href={withLocale("/", locale)}
+          className="flex min-w-0 items-center gap-2 theme-foreground"
+        >
           <Image
             src="/trade82-logo.png"
             alt="Trade82"
@@ -54,7 +61,9 @@ export function SiteHeader() {
             priority
             className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9"
           />
-          <span className="truncate text-sm font-semibold tracking-tight">Trade82</span>
+          <span className="truncate text-sm font-semibold tracking-tight">
+            Trade82
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
@@ -71,7 +80,10 @@ export function SiteHeader() {
             >
               {t(link.labelKey)}
               {link.href === "/messages" ? (
-                <UnreadMessageBadge count={unreadMessageCount} className="-right-1 -top-1" />
+                <UnreadMessageBadge
+                  count={unreadMessageCount}
+                  className="-right-1 -top-1"
+                />
               ) : null}
             </Link>
           ))}
@@ -117,18 +129,18 @@ export function SiteHeader() {
             <ClerkUserButton />
           ) : (
             <>
-            <Link
-              href={withLocale("/login", locale)}
-              className="rounded-md border px-3.5 py-2 text-sm font-medium theme-border theme-muted hover:text-[var(--accent-foreground)]"
-            >
-              {t("common.signIn")}
-            </Link>
-            <Link
-              href={withLocale("/signup", locale)}
-              className="rounded-md px-3.5 py-2 text-sm font-medium theme-primary-button"
-            >
-              {t("common.signUp")}
-            </Link>
+              <Link
+                href={withLocale("/login", locale)}
+                className="rounded-md border px-3.5 py-2 text-sm font-medium theme-border theme-muted hover:text-[var(--accent-foreground)]"
+              >
+                {t("common.signIn")}
+              </Link>
+              <Link
+                href={withLocale("/signup", locale)}
+                className="rounded-md px-3.5 py-2 text-sm font-medium theme-primary-button"
+              >
+                {t("common.signUp")}
+              </Link>
             </>
           )}
         </div>
@@ -161,14 +173,23 @@ export function SiteHeader() {
               >
                 {t(link.labelKey)}
                 {link.href === "/messages" ? (
-                  <UnreadMessageBadge count={unreadMessageCount} className="right-2 top-2" />
+                  <UnreadMessageBadge
+                    count={unreadMessageCount}
+                    className="right-2 top-2"
+                  />
                 ) : null}
               </Link>
             ))}
-            <Link href={withLocale(pathWithoutLocale, "en")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
+            <Link
+              href={withLocale(pathWithoutLocale, "en")}
+              className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+            >
               {t("locale.english")}
             </Link>
-            <Link href={withLocale(pathWithoutLocale, "ko")} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
+            <Link
+              href={withLocale(pathWithoutLocale, "ko")}
+              className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+            >
               {t("locale.korean")}
             </Link>
             {isSignedIn && isAdmin ? (
@@ -186,12 +207,18 @@ export function SiteHeader() {
               </div>
             ) : (
               <>
-              <Link href={withLocale("/login", locale)} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
-                {t("common.signIn")}
-              </Link>
-              <Link href={withLocale("/signup", locale)} className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]">
-                {t("common.signUp")}
-              </Link>
+                <Link
+                  href={withLocale("/login", locale)}
+                  className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+                >
+                  {t("common.signIn")}
+                </Link>
+                <Link
+                  href={withLocale("/signup", locale)}
+                  className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+                >
+                  {t("common.signUp")}
+                </Link>
               </>
             )}
           </nav>

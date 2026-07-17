@@ -70,6 +70,7 @@ export const ModelName = {
   PaymentRequestEvent: 'PaymentRequestEvent',
   PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
   PartnerProfile: 'PartnerProfile',
+  ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
   StripeConnectedAccount: 'StripeConnectedAccount',
   Settlement: 'Settlement',
@@ -545,6 +546,19 @@ export const PartnerProfileScalarFieldEnum = {
 } as const
 
 export type PartnerProfileScalarFieldEnum = (typeof PartnerProfileScalarFieldEnum)[keyof typeof PartnerProfileScalarFieldEnum]
+
+
+export const ReferralClaimTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  partnerProfileId: 'partnerProfileId',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  consumedByUserId: 'consumedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type ReferralClaimTokenScalarFieldEnum = (typeof ReferralClaimTokenScalarFieldEnum)[keyof typeof ReferralClaimTokenScalarFieldEnum]
 
 
 export const ReferralAttributionScalarFieldEnum = {

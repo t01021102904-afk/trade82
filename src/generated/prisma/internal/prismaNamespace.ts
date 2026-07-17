@@ -403,6 +403,7 @@ export const ModelName = {
   PaymentRequestEvent: 'PaymentRequestEvent',
   PaymentRequestWebhookEvent: 'PaymentRequestWebhookEvent',
   PartnerProfile: 'PartnerProfile',
+  ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
   StripeConnectedAccount: 'StripeConnectedAccount',
   Settlement: 'Settlement',
@@ -443,7 +444,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralAttribution" | "stripeConnectedAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1850,6 +1851,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PartnerProfileCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PartnerProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReferralClaimToken: {
+      payload: Prisma.$ReferralClaimTokenPayload<ExtArgs>
+      fields: Prisma.ReferralClaimTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReferralClaimTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReferralClaimTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.ReferralClaimTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReferralClaimTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        findMany: {
+          args: Prisma.ReferralClaimTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>[]
+        }
+        create: {
+          args: Prisma.ReferralClaimTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        createMany: {
+          args: Prisma.ReferralClaimTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReferralClaimTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.ReferralClaimTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        update: {
+          args: Prisma.ReferralClaimTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReferralClaimTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReferralClaimTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReferralClaimTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReferralClaimTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClaimTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.ReferralClaimTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReferralClaimToken>
+        }
+        groupBy: {
+          args: Prisma.ReferralClaimTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralClaimTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReferralClaimTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralClaimTokenCountAggregateOutputType> | number
         }
       }
     }
@@ -4176,6 +4251,19 @@ export const PartnerProfileScalarFieldEnum = {
 export type PartnerProfileScalarFieldEnum = (typeof PartnerProfileScalarFieldEnum)[keyof typeof PartnerProfileScalarFieldEnum]
 
 
+export const ReferralClaimTokenScalarFieldEnum = {
+  id: 'id',
+  tokenHash: 'tokenHash',
+  partnerProfileId: 'partnerProfileId',
+  expiresAt: 'expiresAt',
+  consumedAt: 'consumedAt',
+  consumedByUserId: 'consumedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type ReferralClaimTokenScalarFieldEnum = (typeof ReferralClaimTokenScalarFieldEnum)[keyof typeof ReferralClaimTokenScalarFieldEnum]
+
+
 export const ReferralAttributionScalarFieldEnum = {
   id: 'id',
   referredUserId: 'referredUserId',
@@ -5627,6 +5715,7 @@ export type GlobalOmitConfig = {
   paymentRequestEvent?: Prisma.PaymentRequestEventOmit
   paymentRequestWebhookEvent?: Prisma.PaymentRequestWebhookEventOmit
   partnerProfile?: Prisma.PartnerProfileOmit
+  referralClaimToken?: Prisma.ReferralClaimTokenOmit
   referralAttribution?: Prisma.ReferralAttributionOmit
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOmit
   settlement?: Prisma.SettlementOmit

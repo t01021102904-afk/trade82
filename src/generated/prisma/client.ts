@@ -137,6 +137,11 @@ export type PaymentRequestWebhookEvent = Prisma.PaymentRequestWebhookEventModel
  */
 export type PartnerProfile = Prisma.PartnerProfileModel
 /**
+ * Model ReferralClaimToken
+ * 
+ */
+export type ReferralClaimToken = Prisma.ReferralClaimTokenModel
+/**
  * Model ReferralAttribution
  * 
  */
