@@ -41,6 +41,7 @@ export async function GET(request: Request) {
       getDb().company.findMany({
         where: {
           verificationStatus: "verified",
+          deletedAt: null,
           legalName: { not: DELETED_COMPANY_NAME },
         },
         include: {
@@ -71,8 +72,10 @@ export async function GET(request: Request) {
       getDb().product.findMany({
         where: {
           status: "active",
+          deletedAt: null,
           sellerCompany: {
             verificationStatus: "verified",
+            deletedAt: null,
             legalName: { not: DELETED_COMPANY_NAME },
           },
         },

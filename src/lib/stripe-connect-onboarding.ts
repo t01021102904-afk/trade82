@@ -243,7 +243,7 @@ async function resolveOwner({
 }): Promise<OnboardingOwner> {
   if (ownerType === "seller") {
     const company = await db.company.findFirst({
-      where: { ownerUserId: userId, companyRole: "seller" },
+      where: { ownerUserId: userId, companyRole: "seller", deletedAt: null },
       select: { id: true, country: true },
     });
     if (!company) {

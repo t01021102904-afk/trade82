@@ -10,10 +10,11 @@ import { withLocale } from "@/lib/i18n";
 import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
-type Role = "buyer" | "seller";
+type Role = "buyer" | "seller" | "partner";
 type RoleResponse = {
   role?: unknown;
   onboardingComplete?: unknown;
+  nextPath?: unknown;
 };
 
 const roleCards: Array<{
@@ -22,7 +23,7 @@ const roleCards: Array<{
   descriptionKey: string;
   buttonKey: string;
   eyebrowKey: string;
-  tone: "blue" | "emerald";
+  tone: "blue" | "emerald" | "violet";
 }> = [
   {
     role: "seller",
@@ -39,6 +40,14 @@ const roleCards: Array<{
     buttonKey: "onboarding.continueAsBuyer",
     eyebrowKey: "onboarding.roleBuyerEyebrow",
     tone: "blue",
+  },
+  {
+    role: "partner",
+    titleKey: "onboarding.rolePartnerCardTitle",
+    descriptionKey: "onboarding.rolePartnerDescription",
+    buttonKey: "onboarding.continueAsPartner",
+    eyebrowKey: "onboarding.rolePartnerEyebrow",
+    tone: "violet",
   },
 ];
 
@@ -121,6 +130,9 @@ export function RoleSelection({
           ? payload.role
           : role;
       const nextRoute =
+        typeof payload?.nextPath === "string"
+          ? withLocale(payload.nextPath, locale)
+          :
         payload?.onboardingComplete === true
           ? withLocale("/dashboard", locale)
           : withLocale(`/onboarding/${savedRole}`, locale);
@@ -190,7 +202,7 @@ export function RoleSelection({
             {t("onboarding.pathPickerText")}
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {roleCards.map((card) => {
             const loading = pendingRole === card.role;
 
@@ -216,10 +228,12 @@ export function RoleSelection({
                       "inline-flex size-9 items-center justify-center rounded-xl border text-sm font-semibold",
                       card.tone === "emerald"
                         ? "theme-success-badge"
-                        : "theme-info-badge",
+                    : card.tone === "violet"
+                      ? "border-violet-300 bg-violet-50 text-violet-700"
+                      : "theme-info-badge",
                     )}
                   >
-                    {card.role === "seller" ? "S" : "B"}
+                    {card.role === "seller" ? "S" : card.role === "buyer" ? "B" : "P"}
                   </span>
                   <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold theme-surface-muted">
                     {t(card.eyebrowKey)}

@@ -78,8 +78,8 @@ export async function createReferralClaimForCode(
     partnerProfile: {
       findUnique: (args: {
         where: { referralCode: string };
-        select: { id: true; status: true };
-      }) => Promise<{ id: string; status: PartnerProfileStatus } | null>;
+        select: { id: true; status: true; deletedAt: true };
+      }) => Promise<{ id: string; status: PartnerProfileStatus; deletedAt?: Date | null } | null>;
     };
     referralClaimToken: {
       create: (args: {
@@ -96,9 +96,9 @@ export async function createReferralClaimForCode(
 
   const partner = await db.partnerProfile.findUnique({
     where: { referralCode: normalizedCode },
-    select: { id: true, status: true },
+    select: { id: true, status: true, deletedAt: true },
   });
-  if (!partner || partner.status !== PartnerProfileStatus.ACTIVE) return null;
+  if (!partner || partner.deletedAt || partner.status !== PartnerProfileStatus.ACTIVE) return null;
 
   const rawToken = createReferralClaimSecret();
   await db.referralClaimToken.create({
@@ -133,12 +133,13 @@ export async function consumeReferralClaimForNewUser(
   const tokenHash = hashReferralClaimToken(rawToken);
   const claim = await tx.referralClaimToken.findUnique({
     where: { tokenHash },
-    include: { partnerProfile: { select: { id: true, status: true, userId: true, referralCode: true } } },
+    include: { partnerProfile: { select: { id: true, status: true, deletedAt: true, userId: true, referralCode: true } } },
   });
   if (
     !claim ||
     claim.consumedAt ||
     claim.expiresAt.getTime() <= now.getTime() ||
+    claim.partnerProfile.deletedAt ||
     claim.partnerProfile.status !== PartnerProfileStatus.ACTIVE ||
     claim.partnerProfile.userId === referredUserId
   ) {
@@ -150,7 +151,7 @@ export async function consumeReferralClaimForNewUser(
       id: claim.id,
       consumedAt: null,
       expiresAt: { gt: now },
-      partnerProfile: { status: PartnerProfileStatus.ACTIVE },
+      partnerProfile: { status: PartnerProfileStatus.ACTIVE, deletedAt: null },
     },
     data: { consumedAt: now, consumedByUserId: referredUserId },
   });

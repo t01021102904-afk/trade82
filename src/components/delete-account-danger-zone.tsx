@@ -19,16 +19,25 @@ export function DeleteAccountDangerZone() {
   const [confirmation, setConfirmation] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const requiredConfirmation =
     locale === "ko" ? "계정 탈퇴" : "DELETE MY ACCOUNT";
   const canDelete = confirmation.trim() === requiredConfirmation && !deleting;
+
+  function clearDeletedAccountBrowserState() {
+    document.cookie = "trade82_referral_claim=; Max-Age=0; Path=/; SameSite=Lax";
+    for (const storage of [window.localStorage, window.sessionStorage]) {
+      for (const key of Object.keys(storage)) {
+        if (key.startsWith("trade82_") || key.startsWith("onboarding")) {
+          storage.removeItem(key);
+        }
+      }
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (deleting) return;
     setError("");
-    setSuccess("");
 
     if (confirmation.trim() !== requiredConfirmation) {
       setError(t("settings.deleteAccountConfirmationMismatch"));
@@ -47,11 +56,12 @@ export function DeleteAccountDangerZone() {
         return;
       }
 
-      setSuccess(t("settings.deleteAccountSuccess"));
-      const redirectUrl = withLocale("/?accountDeleted=1", locale);
-      await signOut({ redirectUrl }).catch(() => {
-        window.location.assign(redirectUrl);
-      });
+      clearDeletedAccountBrowserState();
+      const onboardingPath = withLocale("/onboarding/role", locale);
+      const signupPath = withLocale("/signup", locale);
+      const redirectUrl = `${signupPath}?accountDeleted=1&redirect_url=${encodeURIComponent(onboardingPath)}`;
+      await signOut().catch(() => undefined);
+      window.location.replace(redirectUrl);
     } catch {
       setError(t("settings.deleteAccountError"));
     } finally {
@@ -87,7 +97,6 @@ export function DeleteAccountDangerZone() {
             onChange={(event) => {
               setConfirmation(event.target.value);
               setError("");
-              setSuccess("");
             }}
             placeholder={requiredConfirmation}
             autoComplete="off"
@@ -101,7 +110,6 @@ export function DeleteAccountDangerZone() {
           </span>
         </p>
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
-        {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
         <div>
           <button
             type="submit"

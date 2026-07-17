@@ -10,7 +10,7 @@ import type {
   Product,
   UserProfile,
 } from "@/generated/prisma/client";
-import { Prisma } from "@/generated/prisma/client";
+import { AccountDeletionStatus, Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
   consumeReferralClaimForNewUser,
@@ -123,6 +123,12 @@ export async function getCurrentUserProfile() {
       where: { clerkUserId: userId },
     });
     if (existingByClerkId) {
+      // A pending/deleted account is never allowed to reconnect to an active
+      // Clerk identity. Final deletion replaces the Clerk identifier, while a
+      // pending deletion stays blocked until the trusted deletion path finishes.
+      if (existingByClerkId.deletionStatus !== AccountDeletionStatus.ACTIVE) {
+        return null;
+      }
       return await updateExistingProfile(existingByClerkId);
     }
 
@@ -130,7 +136,10 @@ export async function getCurrentUserProfile() {
       where: { email },
     });
     if (existingByEmail) {
-      console.warn("Linking existing user profile to current auth identity.");
+      if (existingByEmail.deletionStatus !== AccountDeletionStatus.ACTIVE) {
+        return null;
+      }
+      console.warn("Linking an active user profile to the current auth identity.");
       return await updateExistingProfile(existingByEmail);
     }
 
@@ -161,8 +170,29 @@ export async function getCurrentUserProfile() {
       where: { email },
     });
     if (!existingByEmail) throw error;
+    if (existingByEmail.deletionStatus !== AccountDeletionStatus.ACTIVE) {
+      return null;
+    }
     return updateExistingProfile(existingByEmail);
   }
+}
+
+/**
+ * Used only by the delete-account endpoint. It intentionally does not fall
+ * back to email matching, so a different Clerk identity can never finalize or
+ * resume another person's deletion.
+ */
+export async function getCurrentDeletionProfile() {
+  const { userId } = await auth();
+  if (!userId) return null;
+
+  const profile = await getDb().userProfile.findUnique({
+    where: { clerkUserId: userId },
+  });
+  if (!profile || profile.deletionStatus === AccountDeletionStatus.DELETED) {
+    return null;
+  }
+  return profile;
 }
 
 export async function requireAuth() {
@@ -186,6 +216,7 @@ export async function getUserCompany(
   return getDb().company.findFirst({
     where: {
       ownerUserId: userId,
+      deletedAt: null,
       ...(companyRole ? { companyRole } : {}),
     },
     include: {
@@ -218,7 +249,7 @@ export async function requireBuyer() {
 export async function requireCompanyOwner(companyId: string) {
   const user = await requireAuth();
   const company = await getDb().company.findUnique({ where: { id: companyId } });
-  if (!company || company.ownerUserId !== user.id) {
+  if (!company || company.deletedAt || company.ownerUserId !== user.id) {
     throw new Response("Forbidden", { status: 403 });
   }
   return { user, company };
@@ -233,9 +264,12 @@ export async function requireVerifiedSeller() {
 }
 
 export function canViewPublicCompany(
-  company: Pick<Company, "verificationStatus"> | null | undefined,
+  company:
+    | (Pick<Company, "verificationStatus"> & { deletedAt?: Date | null })
+    | null
+    | undefined,
 ) {
-  return company?.verificationStatus === "verified";
+  return company?.verificationStatus === "verified" && !company.deletedAt;
 }
 
 export function canViewPublicProduct(

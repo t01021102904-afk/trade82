@@ -10,22 +10,29 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireCurrentAppUser } from "@/lib/current-app-user";
-import { cleanupTrade82AccountData } from "@/lib/account-deletion";
+import { requireCurrentDeletionAppUser } from "@/lib/current-app-user";
+import {
+  cleanupTrade82AccountData,
+  markAccountDeletionPending,
+} from "@/lib/account-deletion";
+import {
+  canReportAccountDeletionSuccess,
+  isAlreadyDeletedInClerk,
+} from "@/lib/account-deletion-rules";
 
 export const runtime = "nodejs";
 
 const CONFIRMATION_PHRASES = new Set(["DELETE MY ACCOUNT", "계정 탈퇴"]);
 
-function logSafeClerkDeletionFailure(error: unknown) {
-  console.warn("Clerk account deletion failed after Trade82 cleanup.", {
+function logSafeAccountDeletionFailure(error: unknown) {
+  console.warn("Trade82 account deletion could not be finalized.", {
     error: error instanceof Error ? error.name : typeof error,
   });
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await requireCurrentAppUser();
+    const user = await requireCurrentDeletionAppUser();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-delete",
@@ -46,23 +53,49 @@ export async function POST(request: Request) {
     }
 
     const clerkUserId = user.clerkUserId;
-    const cleanup = await cleanupTrade82AccountData({
-      userProfileId: user.id,
-      clerkUserId,
-    });
-
-    let clerkDeleted = false;
+    await markAccountDeletionPending(user.id);
     try {
       const client = await clerkClient();
       await client.users.deleteUser(clerkUserId);
-      clerkDeleted = true;
     } catch (error) {
-      logSafeClerkDeletionFailure(error);
+      if (!isAlreadyDeletedInClerk(error)) {
+        logSafeAccountDeletionFailure(error);
+        return Response.json(
+          { error: "Account deletion could not be completed. Please try again." },
+          { status: 503 },
+        );
+      }
+      // A verified 404 is idempotent: Clerk already removed this identity, so
+      // it is safe to finish the local tombstone cleanup.
+    }
+
+    let cleanup;
+    try {
+      cleanup = await cleanupTrade82AccountData({
+        userProfileId: user.id,
+        clerkUserId,
+      });
+    } catch (error) {
+      logSafeAccountDeletionFailure(error);
+      return Response.json(
+        { error: "Account deletion is being finalized. Please contact support if this persists." },
+        { status: 503 },
+      );
+    }
+
+    if (!canReportAccountDeletionSuccess({
+      clerkDeletionConfirmed: true,
+      deletionStatus: cleanup.deletionStatus,
+    })) {
+      return Response.json(
+        { error: "Account deletion is being finalized. Please contact support if this persists." },
+        { status: 503 },
+      );
     }
 
     return Response.json({
       ok: true,
-      clerkDeleted,
+      deletionStatus: "DELETED",
       cleanup: {
         companyCount: cleanup.companyCount,
         productCount: cleanup.productCount,

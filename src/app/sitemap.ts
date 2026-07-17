@@ -25,8 +25,10 @@ async function dynamicPublicRoutes(): Promise<MetadataRoute.Sitemap> {
       getDb().product.findMany({
         where: {
           status: "active",
+          deletedAt: null,
           sellerCompany: {
             verificationStatus: "verified",
+            deletedAt: null,
             legalName: { not: DELETED_COMPANY_NAME },
           },
         },
@@ -40,6 +42,7 @@ async function dynamicPublicRoutes(): Promise<MetadataRoute.Sitemap> {
       getDb().company.findMany({
         where: {
           verificationStatus: "verified",
+          deletedAt: null,
           legalName: { not: DELETED_COMPANY_NAME },
         },
         select: {

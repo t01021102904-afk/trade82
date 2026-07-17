@@ -58,6 +58,7 @@ export type CompanyMinAggregateOutputType = {
   descriptionEn: string | null
   viewCount: number | null
   verificationStatus: $Enums.CompanyVerificationStatus | null
+  deletedAt: Date | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
   subscriptionStatus: string | null
@@ -95,6 +96,7 @@ export type CompanyMaxAggregateOutputType = {
   descriptionEn: string | null
   viewCount: number | null
   verificationStatus: $Enums.CompanyVerificationStatus | null
+  deletedAt: Date | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
   subscriptionStatus: string | null
@@ -133,6 +135,7 @@ export type CompanyCountAggregateOutputType = {
   categories: number
   viewCount: number
   verificationStatus: number
+  deletedAt: number
   stripeCustomerId: number
   stripeSubscriptionId: number
   subscriptionStatus: number
@@ -184,6 +187,7 @@ export type CompanyMinAggregateInputType = {
   descriptionEn?: true
   viewCount?: true
   verificationStatus?: true
+  deletedAt?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
   subscriptionStatus?: true
@@ -221,6 +225,7 @@ export type CompanyMaxAggregateInputType = {
   descriptionEn?: true
   viewCount?: true
   verificationStatus?: true
+  deletedAt?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
   subscriptionStatus?: true
@@ -259,6 +264,7 @@ export type CompanyCountAggregateInputType = {
   categories?: true
   viewCount?: true
   verificationStatus?: true
+  deletedAt?: true
   stripeCustomerId?: true
   stripeSubscriptionId?: true
   subscriptionStatus?: true
@@ -384,6 +390,7 @@ export type CompanyGroupByOutputType = {
   categories: string[]
   viewCount: number
   verificationStatus: $Enums.CompanyVerificationStatus
+  deletedAt: Date | null
   stripeCustomerId: string | null
   stripeSubscriptionId: string | null
   subscriptionStatus: string | null
@@ -445,6 +452,7 @@ export type CompanyWhereInput = {
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   stripeCustomerId?: Prisma.StringNullableFilter<"Company"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableFilter<"Company"> | string | null
   subscriptionStatus?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -515,6 +523,7 @@ export type CompanyOrderByWithRelationInput = {
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -593,6 +602,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   subscriptionStatus?: Prisma.StringNullableFilter<"Company"> | string | null
   subscriptionPlan?: Prisma.StringNullableFilter<"Company"> | string | null
   subscriptionCurrentPeriodEnd?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
@@ -659,6 +669,7 @@ export type CompanyOrderByWithAggregationInput = {
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrderInput | Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -705,6 +716,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntWithAggregatesFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusWithAggregatesFilter<"Company"> | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Company"> | Date | string | null
   stripeCustomerId?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   subscriptionStatus?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
@@ -742,6 +754,7 @@ export type CompanyCreateInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -812,6 +825,7 @@ export type CompanyUncheckedCreateInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -880,6 +894,7 @@ export type CompanyUpdateInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -950,6 +965,7 @@ export type CompanyUncheckedUpdateInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1019,6 +1035,7 @@ export type CompanyCreateManyInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -1056,6 +1073,7 @@ export type CompanyUpdateManyMutationInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1094,6 +1112,7 @@ export type CompanyUncheckedUpdateManyInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1155,6 +1174,7 @@ export type CompanyCountOrderByAggregateInput = {
   categories?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
@@ -1198,6 +1218,7 @@ export type CompanyMaxOrderByAggregateInput = {
   descriptionEn?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
@@ -1235,6 +1256,7 @@ export type CompanyMinOrderByAggregateInput = {
   descriptionEn?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   stripeCustomerId?: Prisma.SortOrder
   stripeSubscriptionId?: Prisma.SortOrder
   subscriptionStatus?: Prisma.SortOrder
@@ -1337,10 +1359,6 @@ export type IntFieldUpdateOperationsInput = {
 
 export type EnumCompanyVerificationStatusFieldUpdateOperationsInput = {
   set?: $Enums.CompanyVerificationStatus
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
 }
 
 export type CompanyCreateNestedOneWithoutSellerProfileInput = {
@@ -1811,6 +1829,7 @@ export type CompanyCreateWithoutOwnerInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -1879,6 +1898,7 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -1977,6 +1997,7 @@ export type CompanyScalarWhereInput = {
   categories?: Prisma.StringNullableListFilter<"Company">
   viewCount?: Prisma.IntFilter<"Company"> | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFilter<"Company"> | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.DateTimeNullableFilter<"Company"> | Date | string | null
   stripeCustomerId?: Prisma.StringNullableFilter<"Company"> | string | null
   stripeSubscriptionId?: Prisma.StringNullableFilter<"Company"> | string | null
   subscriptionStatus?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -2014,6 +2035,7 @@ export type CompanyCreateWithoutSellerProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2083,6 +2105,7 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2166,6 +2189,7 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2235,6 +2259,7 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2302,6 +2327,7 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2371,6 +2397,7 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2454,6 +2481,7 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2523,6 +2551,7 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2590,6 +2619,7 @@ export type CompanyCreateWithoutProductsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2659,6 +2689,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2742,6 +2773,7 @@ export type CompanyUpdateWithoutProductsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2811,6 +2843,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2878,6 +2911,7 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -2947,6 +2981,7 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3030,6 +3065,7 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3099,6 +3135,7 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3166,6 +3203,7 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3235,6 +3273,7 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3307,6 +3346,7 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3376,6 +3416,7 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3448,6 +3489,7 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3517,6 +3559,7 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -3600,6 +3643,7 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3669,6 +3713,7 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3747,6 +3792,7 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3816,6 +3862,7 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3894,6 +3941,7 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3963,6 +4011,7 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4030,6 +4079,7 @@ export type CompanyCreateWithoutBuyerRfqRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4099,6 +4149,7 @@ export type CompanyUncheckedCreateWithoutBuyerRfqRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4182,6 +4233,7 @@ export type CompanyUpdateWithoutBuyerRfqRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4251,6 +4303,7 @@ export type CompanyUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4318,6 +4371,7 @@ export type CompanyCreateWithoutRfqSellerQuotesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4387,6 +4441,7 @@ export type CompanyUncheckedCreateWithoutRfqSellerQuotesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4470,6 +4525,7 @@ export type CompanyUpdateWithoutRfqSellerQuotesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4539,6 +4595,7 @@ export type CompanyUncheckedUpdateWithoutRfqSellerQuotesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4606,6 +4663,7 @@ export type CompanyCreateWithoutMarketingExposuresInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4675,6 +4733,7 @@ export type CompanyUncheckedCreateWithoutMarketingExposuresInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4758,6 +4817,7 @@ export type CompanyUpdateWithoutMarketingExposuresInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4827,6 +4887,7 @@ export type CompanyUncheckedUpdateWithoutMarketingExposuresInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4894,6 +4955,7 @@ export type CompanyCreateWithoutBuyerPaymentRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -4963,6 +5025,7 @@ export type CompanyUncheckedCreateWithoutBuyerPaymentRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5035,6 +5098,7 @@ export type CompanyCreateWithoutSellerPaymentRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5104,6 +5168,7 @@ export type CompanyUncheckedCreateWithoutSellerPaymentRequestsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5187,6 +5252,7 @@ export type CompanyUpdateWithoutBuyerPaymentRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5256,6 +5322,7 @@ export type CompanyUncheckedUpdateWithoutBuyerPaymentRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5334,6 +5401,7 @@ export type CompanyUpdateWithoutSellerPaymentRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5403,6 +5471,7 @@ export type CompanyUncheckedUpdateWithoutSellerPaymentRequestsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5470,6 +5539,7 @@ export type CompanyCreateWithoutStripeConnectedAccountInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5539,6 +5609,7 @@ export type CompanyUncheckedCreateWithoutStripeConnectedAccountInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5622,6 +5693,7 @@ export type CompanyUpdateWithoutStripeConnectedAccountInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5691,6 +5763,7 @@ export type CompanyUncheckedUpdateWithoutStripeConnectedAccountInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5758,6 +5831,7 @@ export type CompanyCreateWithoutSettlementLegRecipientsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5827,6 +5901,7 @@ export type CompanyUncheckedCreateWithoutSettlementLegRecipientsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -5910,6 +5985,7 @@ export type CompanyUpdateWithoutSettlementLegRecipientsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5979,6 +6055,7 @@ export type CompanyUncheckedUpdateWithoutSettlementLegRecipientsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6046,6 +6123,7 @@ export type CompanyCreateWithoutBuyerTradeOrdersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6115,6 +6193,7 @@ export type CompanyUncheckedCreateWithoutBuyerTradeOrdersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6187,6 +6266,7 @@ export type CompanyCreateWithoutSellerTradeOrdersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6256,6 +6336,7 @@ export type CompanyUncheckedCreateWithoutSellerTradeOrdersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6339,6 +6420,7 @@ export type CompanyUpdateWithoutBuyerTradeOrdersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6408,6 +6490,7 @@ export type CompanyUncheckedUpdateWithoutBuyerTradeOrdersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6486,6 +6569,7 @@ export type CompanyUpdateWithoutSellerTradeOrdersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6555,6 +6639,7 @@ export type CompanyUncheckedUpdateWithoutSellerTradeOrdersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6622,6 +6707,7 @@ export type CompanyCreateWithoutSellerPayoutProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6691,6 +6777,7 @@ export type CompanyUncheckedCreateWithoutSellerPayoutProfileInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6774,6 +6861,7 @@ export type CompanyUpdateWithoutSellerPayoutProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6843,6 +6931,7 @@ export type CompanyUncheckedUpdateWithoutSellerPayoutProfileInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6910,6 +6999,7 @@ export type CompanyCreateWithoutSellerPayoutsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -6979,6 +7069,7 @@ export type CompanyUncheckedCreateWithoutSellerPayoutsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7062,6 +7153,7 @@ export type CompanyUpdateWithoutSellerPayoutsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7131,6 +7223,7 @@ export type CompanyUncheckedUpdateWithoutSellerPayoutsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7198,6 +7291,7 @@ export type CompanyCreateWithoutSavedItemsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7267,6 +7361,7 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7350,6 +7445,7 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7419,6 +7515,7 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7486,6 +7583,7 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7555,6 +7653,7 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7627,6 +7726,7 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7696,6 +7796,7 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -7779,6 +7880,7 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7848,6 +7950,7 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7926,6 +8029,7 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7995,6 +8099,7 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8062,6 +8167,7 @@ export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8131,6 +8237,7 @@ export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8214,6 +8321,7 @@ export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8283,6 +8391,7 @@ export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8350,6 +8459,7 @@ export type CompanyCreateWithoutDocumentFoldersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8419,6 +8529,7 @@ export type CompanyUncheckedCreateWithoutDocumentFoldersInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8502,6 +8613,7 @@ export type CompanyUpdateWithoutDocumentFoldersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8571,6 +8683,7 @@ export type CompanyUncheckedUpdateWithoutDocumentFoldersInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8638,6 +8751,7 @@ export type CompanyCreateWithoutTradeDocumentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8707,6 +8821,7 @@ export type CompanyUncheckedCreateWithoutTradeDocumentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8779,6 +8894,7 @@ export type CompanyCreateWithoutSharedTradeDocumentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8848,6 +8964,7 @@ export type CompanyUncheckedCreateWithoutSharedTradeDocumentsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -8931,6 +9048,7 @@ export type CompanyUpdateWithoutTradeDocumentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9000,6 +9118,7 @@ export type CompanyUncheckedUpdateWithoutTradeDocumentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9078,6 +9197,7 @@ export type CompanyUpdateWithoutSharedTradeDocumentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9147,6 +9267,7 @@ export type CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9214,6 +9335,7 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9283,6 +9405,7 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9355,6 +9478,7 @@ export type CompanyCreateWithoutSellerDealsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9424,6 +9548,7 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9507,6 +9632,7 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9576,6 +9702,7 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9654,6 +9781,7 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9723,6 +9851,7 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -9790,6 +9919,7 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9859,6 +9989,7 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -9931,6 +10062,7 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10000,6 +10132,7 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10083,6 +10216,7 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10152,6 +10286,7 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10230,6 +10365,7 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10299,6 +10435,7 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10366,6 +10503,7 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10435,6 +10573,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10507,6 +10646,7 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10576,6 +10716,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10659,6 +10800,7 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10728,6 +10870,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10806,6 +10949,7 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10875,6 +11019,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -10942,6 +11087,7 @@ export type CompanyCreateManyOwnerInput = {
   categories?: Prisma.CompanyCreatecategoriesInput | string[]
   viewCount?: number
   verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
   stripeCustomerId?: string | null
   stripeSubscriptionId?: string | null
   subscriptionStatus?: string | null
@@ -10979,6 +11125,7 @@ export type CompanyUpdateWithoutOwnerInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11047,6 +11194,7 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11115,6 +11263,7 @@ export type CompanyUncheckedUpdateManyWithoutOwnerInput = {
   categories?: Prisma.CompanyUpdatecategoriesInput | string[]
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
   verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -11418,6 +11567,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
+  deletedAt?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
   subscriptionStatus?: boolean
@@ -11489,6 +11639,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
+  deletedAt?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
   subscriptionStatus?: boolean
@@ -11528,6 +11679,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
+  deletedAt?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
   subscriptionStatus?: boolean
@@ -11567,6 +11719,7 @@ export type CompanySelectScalar = {
   categories?: boolean
   viewCount?: boolean
   verificationStatus?: boolean
+  deletedAt?: boolean
   stripeCustomerId?: boolean
   stripeSubscriptionId?: boolean
   subscriptionStatus?: boolean
@@ -11584,7 +11737,7 @@ export type CompanySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "companyRole" | "legalName" | "tradeName" | "displayNameEn" | "logoOriginalUrl" | "logoThumbnailUrl" | "logoUrl" | "useDefaultLogo" | "website" | "country" | "city" | "stateOrProvince" | "businessAddress" | "description" | "descriptionEn" | "categories" | "viewCount" | "verificationStatus" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionStatus" | "subscriptionPlan" | "subscriptionCurrentPeriodEnd" | "verifiedSellerSince" | "sellerSupportPlan" | "sellerSupportStatus" | "sellerSupportStripeCustomerId" | "sellerSupportStripeSubscriptionId" | "sellerSupportCurrentPeriodEnd" | "sellerSupportMonthlyLimit" | "sellerSupportMonthlyUsed" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ownerUserId" | "companyRole" | "legalName" | "tradeName" | "displayNameEn" | "logoOriginalUrl" | "logoThumbnailUrl" | "logoUrl" | "useDefaultLogo" | "website" | "country" | "city" | "stateOrProvince" | "businessAddress" | "description" | "descriptionEn" | "categories" | "viewCount" | "verificationStatus" | "deletedAt" | "stripeCustomerId" | "stripeSubscriptionId" | "subscriptionStatus" | "subscriptionPlan" | "subscriptionCurrentPeriodEnd" | "verifiedSellerSince" | "sellerSupportPlan" | "sellerSupportStatus" | "sellerSupportStripeCustomerId" | "sellerSupportStripeSubscriptionId" | "sellerSupportCurrentPeriodEnd" | "sellerSupportMonthlyLimit" | "sellerSupportMonthlyUsed" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   owner?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   sellerProfile?: boolean | Prisma.Company$sellerProfileArgs<ExtArgs>
@@ -11684,6 +11837,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     categories: string[]
     viewCount: number
     verificationStatus: $Enums.CompanyVerificationStatus
+    deletedAt: Date | null
     stripeCustomerId: string | null
     stripeSubscriptionId: string | null
     subscriptionStatus: string | null
@@ -12174,6 +12328,7 @@ export interface CompanyFieldRefs {
   readonly categories: Prisma.FieldRef<"Company", 'String[]'>
   readonly viewCount: Prisma.FieldRef<"Company", 'Int'>
   readonly verificationStatus: Prisma.FieldRef<"Company", 'CompanyVerificationStatus'>
+  readonly deletedAt: Prisma.FieldRef<"Company", 'DateTime'>
   readonly stripeCustomerId: Prisma.FieldRef<"Company", 'String'>
   readonly stripeSubscriptionId: Prisma.FieldRef<"Company", 'String'>
   readonly subscriptionStatus: Prisma.FieldRef<"Company", 'String'>

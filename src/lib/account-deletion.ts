@@ -4,6 +4,7 @@ import {
   DELETED_COMPANY_NAME,
   DELETED_USER_NAME,
 } from "@/lib/deletion-markers";
+import { AccountDeletionStatus } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
   deleteStorageFile,
@@ -35,7 +36,24 @@ export type AccountDeletionCleanupResult = {
   publicStorageDeleteCount: number;
   privateStorageDeleteCount: number;
   failedStorageDeleteCount: number;
+  deletionStatus: AccountDeletionStatus | null;
 };
+
+export async function markAccountDeletionPending(userProfileId: string) {
+  const db = getDb();
+  const profile = await db.userProfile.findUnique({ where: { id: userProfileId } });
+  if (!profile) throw new Response("Account not found", { status: 404 });
+  if (profile.deletionStatus === AccountDeletionStatus.DELETED) return profile;
+  if (profile.deletionStatus === AccountDeletionStatus.DELETION_PENDING) return profile;
+
+  return db.userProfile.update({
+    where: { id: userProfileId },
+    data: {
+      deletionStatus: AccountDeletionStatus.DELETION_PENDING,
+      deletionRequestedAt: new Date(),
+    },
+  });
+}
 
 const PRODUCT_IMAGE_VARIANTS = [
   "original.webp",
@@ -150,6 +168,21 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
       publicStorageDeleteCount: 0,
       privateStorageDeleteCount: 0,
       failedStorageDeleteCount: 0,
+      deletionStatus: null,
+    } satisfies AccountDeletionCleanupResult;
+  }
+
+  if (profile.deletionStatus === AccountDeletionStatus.DELETED) {
+    return {
+      userProfileId: profile.id,
+      clerkUserId: target.clerkUserId ?? null,
+      companyCount: 0,
+      productCount: 0,
+      messageAttachmentCount: 0,
+      publicStorageDeleteCount: 0,
+      privateStorageDeleteCount: 0,
+      failedStorageDeleteCount: 0,
+      deletionStatus: AccountDeletionStatus.DELETED,
     } satisfies AccountDeletionCleanupResult;
   }
 
@@ -221,11 +254,30 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
       await tx.savedItem.deleteMany({
         where: { productId: { in: productIds } },
       });
-      await tx.productImage.deleteMany({
-        where: { productId: { in: productIds } },
-      });
-      await tx.product.deleteMany({
+      // Product rows can be referenced by historical order items. Keep their
+      // IDs for audit, remove all public media, and make them non-public.
+      await tx.productImage.deleteMany({ where: { productId: { in: productIds } } });
+      await tx.product.updateMany({
         where: { id: { in: productIds } },
+        data: {
+          status: "draft",
+          deletedAt: new Date(),
+          imageUrl: null,
+          name: "Deleted product",
+          nameEn: "",
+          shortDescription: "",
+          shortDescriptionEn: "",
+          detailedDescription: "",
+          detailedDescriptionEn: "",
+          tags: [],
+          tagsEn: [],
+          certifications: [],
+          documentsAvailable: [],
+          complianceClaims: [],
+          ingredientsOrMaterials: "",
+          buyerNotes: "",
+          buyerNotesEn: "",
+        },
       });
     }
 
@@ -299,8 +351,11 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
           stateOrProvince: "",
           businessAddress: "Deleted",
           description: "",
+          descriptionEn: "",
+          displayNameEn: "",
           categories: [],
           verificationStatus: "rejected",
+          deletedAt: new Date(),
         },
       });
     }
@@ -352,6 +407,59 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
       data: { reviewedByUserId: null },
     });
 
+    const partner = await tx.partnerProfile.findUnique({
+      where: { userId: profile.id },
+      select: { id: true },
+    });
+    if (partner) {
+      await tx.referralClaimToken.deleteMany({
+        where: { partnerProfileId: partner.id, consumedAt: null },
+      });
+      await tx.referralAttribution.updateMany({
+        where: {
+          partnerProfileId: partner.id,
+          settlements: { none: {} },
+        },
+        data: { status: "VOIDED" },
+      });
+      await tx.partnerProfile.update({
+        where: { id: partner.id },
+        data: { status: "SUSPENDED", deletedAt: new Date() },
+      });
+      await tx.stripeConnectedAccount.updateMany({
+        where: { partnerProfileId: partner.id },
+        data: {
+          status: "DISABLED",
+          transfersEnabled: false,
+          payoutsEnabled: false,
+          chargesEnabled: false,
+          onboardingComplete: false,
+        },
+      });
+    }
+
+    await tx.referralClaimToken.deleteMany({ where: { consumedByUserId: profile.id } });
+    await tx.referralAttribution.updateMany({
+      where: { referredUserId: profile.id, settlements: { none: {} } },
+      data: { status: "VOIDED" },
+    });
+    if (companyIds.length) {
+      await tx.sellerPayoutProfile.updateMany({
+        where: { companyId: { in: companyIds } },
+        data: { status: "DISABLED", verifiedAt: null, verifiedByUserId: null },
+      });
+      await tx.stripeConnectedAccount.updateMany({
+        where: { companyId: { in: companyIds } },
+        data: {
+          status: "DISABLED",
+          transfersEnabled: false,
+          payoutsEnabled: false,
+          chargesEnabled: false,
+          onboardingComplete: false,
+        },
+      });
+    }
+
     await tx.userProfile.update({
       where: { id: profile.id },
       data: {
@@ -370,6 +478,9 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
         city: "",
         role: "user",
         preferredLanguage: "en",
+        deletionStatus: AccountDeletionStatus.DELETED,
+        deletionRequestedAt: profile.deletionRequestedAt ?? new Date(),
+        deletedAt: new Date(),
       },
     });
   });
@@ -393,5 +504,6 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
     productCount: productIds.length,
     messageAttachmentCount: messageAttachments.length,
     ...storageResult,
+    deletionStatus: AccountDeletionStatus.DELETED,
   } satisfies AccountDeletionCleanupResult;
 }

@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 
 import {
+  getCurrentDeletionProfile,
   getCurrentUserProfile,
   isAdminEmail,
   requireAuth,
@@ -12,6 +13,12 @@ export async function getCurrentAppUser() {
 
 export async function requireCurrentAppUser() {
   return requireAuth();
+}
+
+export async function requireCurrentDeletionAppUser() {
+  const user = await getCurrentDeletionProfile();
+  if (!user) throw new Response("Unauthorized", { status: 401 });
+  return user;
 }
 
 export function getClerkEmails(

@@ -57,10 +57,12 @@ export async function findSellerOwnedListedProduct({
       id: productId,
       sellerCompanyId: companyId,
       status: "active",
+      deletedAt: null,
       sellerCompany: {
         companyRole: "seller",
         verificationStatus: "verified",
         legalName: { not: DELETED_COMPANY_NAME },
+        deletedAt: null,
       },
     },
     include: {
@@ -147,9 +149,11 @@ export async function activateMarketingExposure({
       id: productId,
       sellerCompanyId: companyId,
       status: "active",
+      deletedAt: null,
       sellerCompany: {
         companyRole: "seller",
         legalName: { not: DELETED_COMPANY_NAME },
+        deletedAt: null,
       },
     },
     select: {
@@ -241,9 +245,11 @@ export async function listActiveMarketingProductIds(limit = 100) {
       AND me."startsAt" <= ${now}
       AND me."endsAt" > ${now}
       AND p."status" = 'active'::"ProductStatus"
+      AND p."deletedAt" IS NULL
       AND p."sellerCompanyId" = me."companyId"
       AND c."companyRole" = 'seller'::"CompanyRole"
       AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
+      AND c."deletedAt" IS NULL
       AND c."legalName" <> ${DELETED_COMPANY_NAME}
     ORDER BY me."productId", me."endsAt" DESC
   `;

@@ -7,8 +7,8 @@ import { getDb } from "@/lib/db";
 export async function getCurrentPartnerProfile() {
   const user = await getCurrentUserProfile();
   if (!user) return null;
-  return getDb().partnerProfile.findUnique({
-    where: { userId: user.id },
+  return getDb().partnerProfile.findFirst({
+    where: { userId: user.id, deletedAt: null },
     include: { stripeConnectedAccount: true },
   });
 }
@@ -17,8 +17,8 @@ export async function requireActivePartnerProfile() {
   const user = await getCurrentUserProfile();
   if (!user) throw new Response("Unauthorized", { status: 401 });
 
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: user.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: user.id, deletedAt: null },
     include: { stripeConnectedAccount: true },
   });
   if (!partner) throw new Response("Partner profile required", { status: 403 });
