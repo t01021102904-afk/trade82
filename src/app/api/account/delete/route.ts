@@ -15,10 +15,7 @@ import {
   cleanupTrade82AccountData,
   markAccountDeletionPending,
 } from "@/lib/account-deletion";
-import {
-  canReportAccountDeletionSuccess,
-  isAlreadyDeletedInClerk,
-} from "@/lib/account-deletion-rules";
+import { deleteAccountAfterVerifiedClerk } from "@/lib/account-deletion-orchestration";
 
 export const runtime = "nodejs";
 
@@ -53,45 +50,30 @@ export async function POST(request: Request) {
     }
 
     const clerkUserId = user.clerkUserId;
-    await markAccountDeletionPending(user.id);
-    try {
-      const client = await clerkClient();
-      await client.users.deleteUser(clerkUserId);
-    } catch (error) {
-      if (!isAlreadyDeletedInClerk(error)) {
-        logSafeAccountDeletionFailure(error);
-        return Response.json(
-          { error: "Account deletion could not be completed. Please try again." },
-          { status: 503 },
-        );
-      }
-      // A verified 404 is idempotent: Clerk already removed this identity, so
-      // it is safe to finish the local tombstone cleanup.
-    }
-
-    let cleanup;
-    try {
-      cleanup = await cleanupTrade82AccountData({
+    const deletion = await deleteAccountAfterVerifiedClerk({
+      markPending: () => markAccountDeletionPending(user.id),
+      deleteClerkUser: async () => {
+        const client = await clerkClient();
+        await client.users.deleteUser(clerkUserId);
+      },
+      cleanup: () => cleanupTrade82AccountData({
         userProfileId: user.id,
         clerkUserId,
-      });
-    } catch (error) {
-      logSafeAccountDeletionFailure(error);
-      return Response.json(
-        { error: "Account deletion is being finalized. Please contact support if this persists." },
-        { status: 503 },
-      );
-    }
+      }),
+    });
 
-    if (!canReportAccountDeletionSuccess({
-      clerkDeletionConfirmed: true,
-      deletionStatus: cleanup.deletionStatus,
-    })) {
+    if (!deletion.ok) {
+      logSafeAccountDeletionFailure(deletion.error);
       return Response.json(
-        { error: "Account deletion is being finalized. Please contact support if this persists." },
+        {
+          error: deletion.stage === "clerk"
+            ? "Account deletion could not be completed. Please try again."
+            : "Account deletion is being finalized. Please contact support if this persists.",
+        },
         { status: 503 },
       );
     }
+    const { cleanup } = deletion;
 
     return Response.json({
       ok: true,

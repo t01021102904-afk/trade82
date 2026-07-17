@@ -5,6 +5,9 @@ import test from "node:test";
 const rules = await import(
   new URL("../src/lib/account-deletion-rules.ts", import.meta.url).href,
 );
+const orchestration = await import(
+  new URL("../src/lib/account-deletion-orchestration.ts", import.meta.url).href,
+);
 const [deleteRoute, authz, onboardingStatus, deletionUi] = await Promise.all([
   readFile(new URL("../src/app/api/account/delete/route.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/lib/authz.ts", import.meta.url), "utf8"),
@@ -25,11 +28,55 @@ test("only Clerk not-found responses are idempotent deletion evidence", () => {
   assert.equal(rules.isAlreadyDeletedInClerk({ errors: [{ code: "internal_error" }] }), false);
 });
 
-test("delete API never reports success before Clerk deletion is confirmed", () => {
-  assert.match(deleteRoute, /await client\.users\.deleteUser\(clerkUserId\)/);
-  assert.match(deleteRoute, /if \(!isAlreadyDeletedInClerk\(error\)\)/);
+function deletedCleanupResult() {
+  return {
+    userProfileId: "profile-1",
+    clerkUserId: "user_1",
+    companyCount: 0,
+    productCount: 0,
+    messageAttachmentCount: 0,
+    publicStorageDeleteCount: 0,
+    privateStorageDeleteCount: 0,
+    failedStorageDeleteCount: 0,
+    deletionStatus: "DELETED" as const,
+  };
+}
+
+test("Clerk deletion failure returns a non-success attempt without cleanup", async () => {
+  const calls: string[] = [];
+  const result = await orchestration.deleteAccountAfterVerifiedClerk({
+    markPending: async () => { calls.push("pending"); },
+    deleteClerkUser: async () => {
+      calls.push("clerk");
+      throw { status: 500 };
+    },
+    cleanup: async () => {
+      calls.push("cleanup");
+      return deletedCleanupResult();
+    },
+  });
+  assert.deepEqual(calls, ["pending", "clerk"]);
+  assert.deepEqual(result.ok, false);
+  if (!result.ok) assert.equal(result.stage, "clerk");
+});
+
+test("only verified Clerk deletion can run cleanup and report success", async () => {
+  const calls: string[] = [];
+  const result = await orchestration.deleteAccountAfterVerifiedClerk({
+    markPending: async () => { calls.push("pending"); },
+    deleteClerkUser: async () => { calls.push("clerk"); },
+    cleanup: async () => {
+      calls.push("cleanup");
+      return deletedCleanupResult();
+    },
+  });
+  assert.deepEqual(calls, ["pending", "clerk", "cleanup"]);
+  assert.equal(result.ok, true);
+});
+
+test("delete API returns a controlled non-2xx response for failed stages", () => {
+  assert.match(deleteRoute, /deleteAccountAfterVerifiedClerk/);
   assert.match(deleteRoute, /status: 503/);
-  assert.match(deleteRoute, /canReportAccountDeletionSuccess/);
 });
 
 test("deleted and pending profiles are never relinked by Clerk ID or email", () => {
