@@ -48,7 +48,11 @@ function debugRoleSelection(message: string, details: Record<string, unknown>) {
   }
 }
 
-export function RoleSelection() {
+export function RoleSelection({
+  partnerProgramEnabled = false,
+}: {
+  partnerProgramEnabled?: boolean;
+}) {
   const { isLoaded, isSignedIn, user } = useUser();
   const { locale, t } = useI18n();
   const pathname = usePathname();
@@ -67,6 +71,19 @@ export function RoleSelection() {
       `${withLocale("/login", locale)}?redirect_url=${encodeURIComponent(currentUrl)}`,
     );
   }, [locale, pathname]);
+
+  const joinAsPartner = useCallback(() => {
+    if (typeof window === "undefined" || redirecting.current) return;
+    const partnerJoinPath = withLocale("/partner/join", locale);
+    if (isLoaded && isSignedIn && user) {
+      router.push(partnerJoinPath);
+      return;
+    }
+    redirecting.current = true;
+    window.location.assign(
+      `${withLocale("/signup", locale)}?redirect_url=${encodeURIComponent(partnerJoinPath)}`,
+    );
+  }, [isLoaded, isSignedIn, locale, router, user]);
 
   const saveRole = useCallback(async (role: Role) => {
     setPendingRole(role);
@@ -223,6 +240,17 @@ export function RoleSelection() {
             );
           })}
         </div>
+        {partnerProgramEnabled ? (
+          <div className="flex justify-center pt-1">
+            <button
+              type="button"
+              onClick={joinAsPartner}
+              className="rounded px-2 py-1 text-sm font-medium theme-muted underline-offset-4 transition hover:text-[#25825f] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
+            >
+              {t("partnerProgram.joinAsPartner")}
+            </button>
+          </div>
+        ) : null}
       </section>
       {status || error ? (
         <div

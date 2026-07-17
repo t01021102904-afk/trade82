@@ -48,6 +48,7 @@ export default async function PartnerDashboardPage({
       locale="en"
       data={data}
       referralUrl={`${getAppUrl().replace(/\/$/, "")}/r/${partner.referralCode}`}
+      joined={params.joined === "1"}
     />
   );
 }

@@ -26,7 +26,7 @@ export async function GET(
     await returnFromStripeConnectOnboarding({ userId: user.id, ownerType });
     const destination = ownerType === "seller"
       ? "/settings/payout-information?stripe_connect=returned"
-      : "/settings/stripe-connect?stripe_connect=returned";
+      : "/partner/dashboard?stripe_connect=returned";
     return Response.redirect(new URL(destination, request.url), 303);
   } catch (error) {
     return onboardingError(error);

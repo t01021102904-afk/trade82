@@ -957,6 +957,19 @@ model PartnerProfile {
   user                   UserProfile             @relation("UserPartnerProfile", fields: [userId], references: [id], onDelete: Restrict)
   referralCode           String                  @unique
   status                 PartnerProfileStatus    @default(ACTIVE)
+  legalName              String?
+  displayName            String?
+  contactEmail           String?
+  contactPhone           String?
+  country                String?
+  preferredLanguage      PreferredLanguage?
+  organizationName       String?
+  websiteOrSocialUrl     String?
+  promotionDescription   String?
+  termsConsentVersion    String?
+  termsConsentedAt       DateTime?
+  privacyConsentVersion  String?
+  privacyConsentedAt     DateTime?
   attributions           ReferralAttribution[]
   referralClaimTokens    ReferralClaimToken[]
   stripeConnectedAccount StripeConnectedAccount? @relation("PartnerProfileStripeConnectedAccount")

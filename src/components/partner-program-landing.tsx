@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
@@ -12,37 +10,8 @@ type LandingState =
 
 export function PartnerProgramLanding({ state }: { state: LandingState }) {
   const { locale, t } = useI18n();
-  const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const partnerPath = withLocale("/partner", locale);
-  const signInPath = `${withLocale("/login", locale)}?redirect_url=${encodeURIComponent(partnerPath)}`;
-
-  async function enroll() {
-    if (submitting) return;
-    setSubmitting(true);
-    setError("");
-    try {
-      const response = await fetch("/api/partner/enroll", { method: "POST" });
-      const payload = (await response.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      if (!response.ok) {
-        setError(
-          response.status === 403
-            ? t("partnerProgram.unavailable")
-            : (payload?.error ?? t("partnerProgram.enrollError")),
-        );
-        return;
-      }
-      router.replace(withLocale("/partner/dashboard", locale));
-      router.refresh();
-    } catch {
-      setError(t("partnerProgram.enrollError"));
-    } finally {
-      setSubmitting(false);
-    }
-  }
+  const partnerJoinPath = withLocale("/partner/join", locale);
+  const signInPath = `${withLocale("/login", locale)}?redirect_url=${encodeURIComponent(partnerJoinPath)}`;
 
   return (
     <main className="bm-grid-surface min-h-[calc(100vh-4rem)] theme-bg">
@@ -69,16 +38,12 @@ export function PartnerProgramLanding({ state }: { state: LandingState }) {
             </Link>
           ) : null}
           {state === "eligible" ? (
-            <button
-              type="button"
-              onClick={() => void enroll()}
-              disabled={submitting}
-              className="rounded-md px-4 py-2.5 text-sm font-semibold theme-primary-button disabled:cursor-not-allowed disabled:opacity-60"
+            <Link
+              href={partnerJoinPath}
+              className="rounded-md px-4 py-2.5 text-sm font-semibold theme-primary-button"
             >
-              {submitting
-                ? t("partnerProgram.joining")
-                : t("partnerProgram.join")}
-            </button>
+              {t("partnerProgram.join")}
+            </Link>
           ) : null}
           {state === "active" ? (
             <Link
@@ -108,11 +73,6 @@ export function PartnerProgramLanding({ state }: { state: LandingState }) {
               {t("partnerProgram.unavailable")}
             </p>
           </div>
-        ) : null}
-        {error ? (
-          <p role="alert" className="text-sm text-red-700">
-            {error}
-          </p>
         ) : null}
         <p className="max-w-3xl text-sm leading-6 theme-muted">
           {t("partnerProgram.disclosure")}
