@@ -20,6 +20,15 @@ export const AccountRole = {
 export type AccountRole = (typeof AccountRole)[keyof typeof AccountRole]
 
 
+export const AccountDeletionStatus = {
+  ACTIVE: 'ACTIVE',
+  DELETION_PENDING: 'DELETION_PENDING',
+  DELETED: 'DELETED'
+} as const
+
+export type AccountDeletionStatus = (typeof AccountDeletionStatus)[keyof typeof AccountDeletionStatus]
+
+
 export const PreferredLanguage = {
   en: 'en',
   ko: 'ko'

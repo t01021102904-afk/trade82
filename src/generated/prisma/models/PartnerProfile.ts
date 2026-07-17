@@ -42,6 +42,7 @@ export type PartnerProfileMinAggregateOutputType = {
   termsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,6 +65,7 @@ export type PartnerProfileMaxAggregateOutputType = {
   termsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,6 +88,7 @@ export type PartnerProfileCountAggregateOutputType = {
   termsConsentedAt: number
   privacyConsentVersion: number
   privacyConsentedAt: number
+  deletedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -110,6 +113,7 @@ export type PartnerProfileMinAggregateInputType = {
   termsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -132,6 +136,7 @@ export type PartnerProfileMaxAggregateInputType = {
   termsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -154,6 +159,7 @@ export type PartnerProfileCountAggregateInputType = {
   termsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -249,6 +255,7 @@ export type PartnerProfileGroupByOutputType = {
   termsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: PartnerProfileCountAggregateOutputType | null
@@ -292,6 +299,7 @@ export type PartnerProfileWhereInput = {
   termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -320,6 +328,7 @@ export type PartnerProfileOrderByWithRelationInput = {
   termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserProfileOrderByWithRelationInput
@@ -351,6 +360,7 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -379,6 +389,7 @@ export type PartnerProfileOrderByWithAggregationInput = {
   termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PartnerProfileCountOrderByAggregateInput
@@ -407,6 +418,7 @@ export type PartnerProfileScalarWhereWithAggregatesInput = {
   termsConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerProfile"> | Date | string
 }
@@ -428,6 +440,7 @@ export type PartnerProfileCreateInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -456,6 +469,7 @@ export type PartnerProfileUncheckedCreateInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -482,6 +496,7 @@ export type PartnerProfileUpdateInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -510,6 +525,7 @@ export type PartnerProfileUncheckedUpdateInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -537,6 +553,7 @@ export type PartnerProfileCreateManyInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -558,6 +575,7 @@ export type PartnerProfileUpdateManyMutationInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -580,6 +598,7 @@ export type PartnerProfileUncheckedUpdateManyInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -607,6 +626,7 @@ export type PartnerProfileCountOrderByAggregateInput = {
   termsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -629,6 +649,7 @@ export type PartnerProfileMaxOrderByAggregateInput = {
   termsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -651,6 +672,7 @@ export type PartnerProfileMinOrderByAggregateInput = {
   termsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -793,6 +815,7 @@ export type PartnerProfileCreateWithoutUserInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
@@ -819,6 +842,7 @@ export type PartnerProfileUncheckedCreateWithoutUserInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -861,6 +885,7 @@ export type PartnerProfileUpdateWithoutUserInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
@@ -887,6 +912,7 @@ export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -913,6 +939,7 @@ export type PartnerProfileCreateWithoutReferralClaimTokensInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -940,6 +967,7 @@ export type PartnerProfileUncheckedCreateWithoutReferralClaimTokensInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -981,6 +1009,7 @@ export type PartnerProfileUpdateWithoutReferralClaimTokensInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -1008,6 +1037,7 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClaimTokensInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1033,6 +1063,7 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -1060,6 +1091,7 @@ export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1101,6 +1133,7 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -1128,6 +1161,7 @@ export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1153,6 +1187,7 @@ export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -1180,6 +1215,7 @@ export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1221,6 +1257,7 @@ export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -1248,6 +1285,7 @@ export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1273,6 +1311,7 @@ export type PartnerProfileCreateWithoutSettlementsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -1300,6 +1339,7 @@ export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1341,6 +1381,7 @@ export type PartnerProfileUpdateWithoutSettlementsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -1368,6 +1409,7 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1393,6 +1435,7 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -1420,6 +1463,7 @@ export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   termsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1461,6 +1505,7 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -1488,6 +1533,7 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1572,6 +1618,7 @@ export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   termsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1601,6 +1648,7 @@ export type PartnerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   termsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1624,6 +1672,7 @@ export type PartnerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   termsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1647,11 +1696,12 @@ export type PartnerProfileSelectScalar = {
   termsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "legalName" | "displayName" | "contactEmail" | "contactPhone" | "country" | "preferredLanguage" | "organizationName" | "websiteOrSocialUrl" | "promotionDescription" | "termsConsentVersion" | "termsConsentedAt" | "privacyConsentVersion" | "privacyConsentedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
+export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "legalName" | "displayName" | "contactEmail" | "contactPhone" | "country" | "preferredLanguage" | "organizationName" | "websiteOrSocialUrl" | "promotionDescription" | "termsConsentVersion" | "termsConsentedAt" | "privacyConsentVersion" | "privacyConsentedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
 export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
@@ -1696,6 +1746,7 @@ export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     termsConsentedAt: Date | null
     privacyConsentVersion: string | null
     privacyConsentedAt: Date | null
+    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["partnerProfile"]>
@@ -2144,6 +2195,7 @@ export interface PartnerProfileFieldRefs {
   readonly termsConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly privacyConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly privacyConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
 }

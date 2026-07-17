@@ -144,7 +144,9 @@ function buildProductQuery(searchParams: URLSearchParams) {
   const shipping = cleanQuery(searchParams.get("shipping"));
   const conditions: Prisma.Sql[] = [
     Prisma.sql`p."status" = 'active'::"ProductStatus"`,
+    Prisma.sql`p."deletedAt" IS NULL`,
     Prisma.sql`c."verificationStatus" = 'verified'::"CompanyVerificationStatus"`,
+    Prisma.sql`c."deletedAt" IS NULL`,
     Prisma.sql`c."legalName" <> ${DELETED_COMPANY_NAME}`,
   ];
 
@@ -202,7 +204,9 @@ async function getPublicMarketplaceProductFilterOptions(): Promise<MarketplacePr
       JOIN "Company" c ON c."id" = p."sellerCompanyId"
       CROSS JOIN LATERAL unnest(p."certifications") AS value
       WHERE p."status" = 'active'::"ProductStatus"
+        AND p."deletedAt" IS NULL
         AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
+        AND c."deletedAt" IS NULL
         AND c."legalName" <> ${DELETED_COMPANY_NAME}
         AND value <> ''
       ORDER BY value ASC
@@ -213,7 +217,9 @@ async function getPublicMarketplaceProductFilterOptions(): Promise<MarketplacePr
       JOIN "Company" c ON c."id" = p."sellerCompanyId"
       CROSS JOIN LATERAL unnest(p."incoterms") AS value
       WHERE p."status" = 'active'::"ProductStatus"
+        AND p."deletedAt" IS NULL
         AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
+        AND c."deletedAt" IS NULL
         AND c."legalName" <> ${DELETED_COMPANY_NAME}
         AND value <> ''
       ORDER BY value ASC

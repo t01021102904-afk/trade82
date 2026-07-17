@@ -41,6 +41,9 @@ export type UserProfileMinAggregateOutputType = {
   city: string | null
   role: $Enums.AccountRole | null
   preferredLanguage: $Enums.PreferredLanguage | null
+  deletionStatus: $Enums.AccountDeletionStatus | null
+  deletionRequestedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,6 +65,9 @@ export type UserProfileMaxAggregateOutputType = {
   city: string | null
   role: $Enums.AccountRole | null
   preferredLanguage: $Enums.PreferredLanguage | null
+  deletionStatus: $Enums.AccountDeletionStatus | null
+  deletionRequestedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -83,6 +89,9 @@ export type UserProfileCountAggregateOutputType = {
   city: number
   role: number
   preferredLanguage: number
+  deletionStatus: number
+  deletionRequestedAt: number
+  deletedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -106,6 +115,9 @@ export type UserProfileMinAggregateInputType = {
   city?: true
   role?: true
   preferredLanguage?: true
+  deletionStatus?: true
+  deletionRequestedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -127,6 +139,9 @@ export type UserProfileMaxAggregateInputType = {
   city?: true
   role?: true
   preferredLanguage?: true
+  deletionStatus?: true
+  deletionRequestedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -148,6 +163,9 @@ export type UserProfileCountAggregateInputType = {
   city?: true
   role?: true
   preferredLanguage?: true
+  deletionStatus?: true
+  deletionRequestedAt?: true
+  deletedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -242,6 +260,9 @@ export type UserProfileGroupByOutputType = {
   city: string
   role: $Enums.AccountRole
   preferredLanguage: $Enums.PreferredLanguage
+  deletionStatus: $Enums.AccountDeletionStatus
+  deletionRequestedAt: Date | null
+  deletedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserProfileCountAggregateOutputType | null
@@ -284,6 +305,9 @@ export type UserProfileWhereInput = {
   city?: Prisma.StringFilter<"UserProfile"> | string
   role?: Prisma.EnumAccountRoleFilter<"UserProfile"> | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFilter<"UserProfile"> | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFilter<"UserProfile"> | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   companies?: Prisma.CompanyListRelationFilter
@@ -335,6 +359,9 @@ export type UserProfileOrderByWithRelationInput = {
   city?: Prisma.SortOrder
   role?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
+  deletionStatus?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   companies?: Prisma.CompanyOrderByRelationAggregateInput
@@ -389,6 +416,9 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.StringFilter<"UserProfile"> | string
   role?: Prisma.EnumAccountRoleFilter<"UserProfile"> | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFilter<"UserProfile"> | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFilter<"UserProfile"> | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"UserProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   companies?: Prisma.CompanyListRelationFilter
@@ -440,6 +470,9 @@ export type UserProfileOrderByWithAggregationInput = {
   city?: Prisma.SortOrder
   role?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
+  deletionStatus?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserProfileCountOrderByAggregateInput
@@ -467,6 +500,9 @@ export type UserProfileScalarWhereWithAggregatesInput = {
   city?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string
   role?: Prisma.EnumAccountRoleWithAggregatesFilter<"UserProfile"> | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageWithAggregatesFilter<"UserProfile"> | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusWithAggregatesFilter<"UserProfile"> | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserProfile"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string
 }
@@ -488,6 +524,9 @@ export type UserProfileCreateInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -539,6 +578,9 @@ export type UserProfileUncheckedCreateInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -590,6 +632,9 @@ export type UserProfileUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -641,6 +686,9 @@ export type UserProfileUncheckedUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -692,6 +740,9 @@ export type UserProfileCreateManyInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -713,6 +764,9 @@ export type UserProfileUpdateManyMutationInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -734,6 +788,9 @@ export type UserProfileUncheckedUpdateManyInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -755,6 +812,9 @@ export type UserProfileCountOrderByAggregateInput = {
   city?: Prisma.SortOrder
   role?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
+  deletionStatus?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -776,6 +836,9 @@ export type UserProfileMaxOrderByAggregateInput = {
   city?: Prisma.SortOrder
   role?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
+  deletionStatus?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -797,6 +860,9 @@ export type UserProfileMinOrderByAggregateInput = {
   city?: Prisma.SortOrder
   role?: Prisma.SortOrder
   preferredLanguage?: Prisma.SortOrder
+  deletionStatus?: Prisma.SortOrder
+  deletionRequestedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -825,6 +891,14 @@ export type EnumAccountRoleFieldUpdateOperationsInput = {
 
 export type EnumPreferredLanguageFieldUpdateOperationsInput = {
   set?: $Enums.PreferredLanguage
+}
+
+export type EnumAccountDeletionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.AccountDeletionStatus
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1296,6 +1370,9 @@ export type UserProfileCreateWithoutCompaniesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
@@ -1346,6 +1423,9 @@ export type UserProfileUncheckedCreateWithoutCompaniesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
@@ -1412,6 +1492,9 @@ export type UserProfileUpdateWithoutCompaniesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
@@ -1462,6 +1545,9 @@ export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
@@ -1512,6 +1598,9 @@ export type UserProfileCreateWithoutRequestedVerificationsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -1562,6 +1651,9 @@ export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -1617,6 +1709,9 @@ export type UserProfileCreateWithoutReviewedVerificationsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -1667,6 +1762,9 @@ export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -1733,6 +1831,9 @@ export type UserProfileUpdateWithoutRequestedVerificationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -1783,6 +1884,9 @@ export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1844,6 +1948,9 @@ export type UserProfileUpdateWithoutReviewedVerificationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -1894,6 +2001,9 @@ export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1944,6 +2054,9 @@ export type UserProfileCreateWithoutSentInquiriesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -1994,6 +2107,9 @@ export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -2060,6 +2176,9 @@ export type UserProfileUpdateWithoutSentInquiriesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -2110,6 +2229,9 @@ export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2160,6 +2282,9 @@ export type UserProfileCreateWithoutBuyerRfqRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -2210,6 +2335,9 @@ export type UserProfileUncheckedCreateWithoutBuyerRfqRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -2265,6 +2393,9 @@ export type UserProfileCreateWithoutReviewedRfqRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -2315,6 +2446,9 @@ export type UserProfileUncheckedCreateWithoutReviewedRfqRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -2381,6 +2515,9 @@ export type UserProfileUpdateWithoutBuyerRfqRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -2431,6 +2568,9 @@ export type UserProfileUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2492,6 +2632,9 @@ export type UserProfileUpdateWithoutReviewedRfqRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -2542,6 +2685,9 @@ export type UserProfileUncheckedUpdateWithoutReviewedRfqRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2592,6 +2738,9 @@ export type UserProfileCreateWithoutMarketingExposuresInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -2642,6 +2791,9 @@ export type UserProfileUncheckedCreateWithoutMarketingExposuresInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -2708,6 +2860,9 @@ export type UserProfileUpdateWithoutMarketingExposuresInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -2758,6 +2913,9 @@ export type UserProfileUncheckedUpdateWithoutMarketingExposuresInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2808,6 +2966,9 @@ export type UserProfileCreateWithoutCreatedPaymentRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -2858,6 +3019,9 @@ export type UserProfileUncheckedCreateWithoutCreatedPaymentRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -2913,6 +3077,9 @@ export type UserProfileCreateWithoutReleasedPaymentRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -2963,6 +3130,9 @@ export type UserProfileUncheckedCreateWithoutReleasedPaymentRequestsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -3029,6 +3199,9 @@ export type UserProfileUpdateWithoutCreatedPaymentRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -3079,6 +3252,9 @@ export type UserProfileUncheckedUpdateWithoutCreatedPaymentRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3140,6 +3316,9 @@ export type UserProfileUpdateWithoutReleasedPaymentRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -3190,6 +3369,9 @@ export type UserProfileUncheckedUpdateWithoutReleasedPaymentRequestsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3240,6 +3422,9 @@ export type UserProfileCreateWithoutPaymentRequestEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -3290,6 +3475,9 @@ export type UserProfileUncheckedCreateWithoutPaymentRequestEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -3356,6 +3544,9 @@ export type UserProfileUpdateWithoutPaymentRequestEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -3406,6 +3597,9 @@ export type UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3456,6 +3650,9 @@ export type UserProfileCreateWithoutPartnerProfileInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -3506,6 +3703,9 @@ export type UserProfileUncheckedCreateWithoutPartnerProfileInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -3572,6 +3772,9 @@ export type UserProfileUpdateWithoutPartnerProfileInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -3622,6 +3825,9 @@ export type UserProfileUncheckedUpdateWithoutPartnerProfileInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3672,6 +3878,9 @@ export type UserProfileCreateWithoutConsumedReferralClaimTokensInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -3722,6 +3931,9 @@ export type UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput = 
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -3788,6 +4000,9 @@ export type UserProfileUpdateWithoutConsumedReferralClaimTokensInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -3838,6 +4053,9 @@ export type UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput = 
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3888,6 +4106,9 @@ export type UserProfileCreateWithoutReferredReferralAttributionInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -3938,6 +4159,9 @@ export type UserProfileUncheckedCreateWithoutReferredReferralAttributionInput = 
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -4004,6 +4228,9 @@ export type UserProfileUpdateWithoutReferredReferralAttributionInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -4054,6 +4281,9 @@ export type UserProfileUncheckedUpdateWithoutReferredReferralAttributionInput = 
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4104,6 +4334,9 @@ export type UserProfileCreateWithoutSettlementLegRecipientUsersInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -4154,6 +4387,9 @@ export type UserProfileUncheckedCreateWithoutSettlementLegRecipientUsersInput = 
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -4220,6 +4456,9 @@ export type UserProfileUpdateWithoutSettlementLegRecipientUsersInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -4270,6 +4509,9 @@ export type UserProfileUncheckedUpdateWithoutSettlementLegRecipientUsersInput = 
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4320,6 +4562,9 @@ export type UserProfileCreateWithoutSettlementEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -4370,6 +4615,9 @@ export type UserProfileUncheckedCreateWithoutSettlementEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -4436,6 +4684,9 @@ export type UserProfileUpdateWithoutSettlementEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -4486,6 +4737,9 @@ export type UserProfileUncheckedUpdateWithoutSettlementEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4536,6 +4790,9 @@ export type UserProfileCreateWithoutTradeOrderEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -4586,6 +4843,9 @@ export type UserProfileUncheckedCreateWithoutTradeOrderEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -4652,6 +4912,9 @@ export type UserProfileUpdateWithoutTradeOrderEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -4702,6 +4965,9 @@ export type UserProfileUncheckedUpdateWithoutTradeOrderEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4752,6 +5018,9 @@ export type UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -4802,6 +5071,9 @@ export type UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput =
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -4868,6 +5140,9 @@ export type UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -4918,6 +5193,9 @@ export type UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput =
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4968,6 +5246,9 @@ export type UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -5018,6 +5299,9 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -5084,6 +5368,9 @@ export type UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -5134,6 +5421,9 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5184,6 +5474,9 @@ export type UserProfileCreateWithoutPreparedSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -5234,6 +5527,9 @@ export type UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -5289,6 +5585,9 @@ export type UserProfileCreateWithoutApprovedSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -5339,6 +5638,9 @@ export type UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -5394,6 +5696,9 @@ export type UserProfileCreateWithoutSentSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -5444,6 +5749,9 @@ export type UserProfileUncheckedCreateWithoutSentSellerPayoutsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -5510,6 +5818,9 @@ export type UserProfileUpdateWithoutPreparedSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -5560,6 +5871,9 @@ export type UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5621,6 +5935,9 @@ export type UserProfileUpdateWithoutApprovedSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -5671,6 +5988,9 @@ export type UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5732,6 +6052,9 @@ export type UserProfileUpdateWithoutSentSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -5782,6 +6105,9 @@ export type UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5832,6 +6158,9 @@ export type UserProfileCreateWithoutSellerPayoutEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -5882,6 +6211,9 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutEventsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -5948,6 +6280,9 @@ export type UserProfileUpdateWithoutSellerPayoutEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -5998,6 +6333,9 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6048,6 +6386,9 @@ export type UserProfileCreateWithoutSellerPayoutAdjustmentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -6098,6 +6439,9 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -6164,6 +6508,9 @@ export type UserProfileUpdateWithoutSellerPayoutAdjustmentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -6214,6 +6561,9 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6264,6 +6614,9 @@ export type UserProfileCreateWithoutSavedItemsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -6314,6 +6667,9 @@ export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -6380,6 +6736,9 @@ export type UserProfileUpdateWithoutSavedItemsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -6430,6 +6789,9 @@ export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6480,6 +6842,9 @@ export type UserProfileCreateWithoutSentMessagesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -6530,6 +6895,9 @@ export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -6585,6 +6953,9 @@ export type UserProfileCreateWithoutReceivedMessagesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -6635,6 +7006,9 @@ export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -6701,6 +7075,9 @@ export type UserProfileUpdateWithoutSentMessagesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -6751,6 +7128,9 @@ export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6812,6 +7192,9 @@ export type UserProfileUpdateWithoutReceivedMessagesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -6862,6 +7245,9 @@ export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6912,6 +7298,9 @@ export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -6962,6 +7351,9 @@ export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -7028,6 +7420,9 @@ export type UserProfileUpdateWithoutUploadedMessageAttachmentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -7078,6 +7473,9 @@ export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -7128,6 +7526,9 @@ export type UserProfileCreateWithoutCreatedDocumentFoldersInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -7178,6 +7579,9 @@ export type UserProfileUncheckedCreateWithoutCreatedDocumentFoldersInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -7244,6 +7648,9 @@ export type UserProfileUpdateWithoutCreatedDocumentFoldersInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -7294,6 +7701,9 @@ export type UserProfileUncheckedUpdateWithoutCreatedDocumentFoldersInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -7344,6 +7754,9 @@ export type UserProfileCreateWithoutUploadedTradeDocumentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -7394,6 +7807,9 @@ export type UserProfileUncheckedCreateWithoutUploadedTradeDocumentsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -7460,6 +7876,9 @@ export type UserProfileUpdateWithoutUploadedTradeDocumentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -7510,6 +7929,9 @@ export type UserProfileUncheckedUpdateWithoutUploadedTradeDocumentsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -7560,6 +7982,9 @@ export type UserProfileCreateWithoutCreatedDealsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
@@ -7610,6 +8035,9 @@ export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
   city?: string
   role: $Enums.AccountRole
   preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
@@ -7676,6 +8104,9 @@ export type UserProfileUpdateWithoutCreatedDealsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
@@ -7726,6 +8157,9 @@ export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
   preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
@@ -8050,6 +8484,9 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   city?: boolean
   role?: boolean
   preferredLanguage?: boolean
+  deletionStatus?: boolean
+  deletionRequestedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   companies?: boolean | Prisma.UserProfile$companiesArgs<ExtArgs>
@@ -8102,6 +8539,9 @@ export type UserProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   city?: boolean
   role?: boolean
   preferredLanguage?: boolean
+  deletionStatus?: boolean
+  deletionRequestedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["userProfile"]>
@@ -8123,6 +8563,9 @@ export type UserProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   city?: boolean
   role?: boolean
   preferredLanguage?: boolean
+  deletionStatus?: boolean
+  deletionRequestedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["userProfile"]>
@@ -8144,11 +8587,14 @@ export type UserProfileSelectScalar = {
   city?: boolean
   role?: boolean
   preferredLanguage?: boolean
+  deletionStatus?: boolean
+  deletionRequestedAt?: boolean
+  deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkUserId" | "email" | "displayName" | "avatarOriginalUrl" | "avatarUrl" | "companyAffiliation" | "jobTitle" | "department" | "bio" | "phoneNumber" | "linkedinUrl" | "country" | "city" | "role" | "preferredLanguage" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
+export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clerkUserId" | "email" | "displayName" | "avatarOriginalUrl" | "avatarUrl" | "companyAffiliation" | "jobTitle" | "department" | "bio" | "phoneNumber" | "linkedinUrl" | "country" | "city" | "role" | "preferredLanguage" | "deletionStatus" | "deletionRequestedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
 export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   companies?: boolean | Prisma.UserProfile$companiesArgs<ExtArgs>
   requestedVerifications?: boolean | Prisma.UserProfile$requestedVerificationsArgs<ExtArgs>
@@ -8236,6 +8682,9 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     city: string
     role: $Enums.AccountRole
     preferredLanguage: $Enums.PreferredLanguage
+    deletionStatus: $Enums.AccountDeletionStatus
+    deletionRequestedAt: Date | null
+    deletedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userProfile"]>
@@ -8707,6 +9156,9 @@ export interface UserProfileFieldRefs {
   readonly city: Prisma.FieldRef<"UserProfile", 'String'>
   readonly role: Prisma.FieldRef<"UserProfile", 'AccountRole'>
   readonly preferredLanguage: Prisma.FieldRef<"UserProfile", 'PreferredLanguage'>
+  readonly deletionStatus: Prisma.FieldRef<"UserProfile", 'AccountDeletionStatus'>
+  readonly deletionRequestedAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
 }

@@ -10,22 +10,26 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireCurrentAppUser } from "@/lib/current-app-user";
-import { cleanupTrade82AccountData } from "@/lib/account-deletion";
+import { requireCurrentDeletionAppUser } from "@/lib/current-app-user";
+import {
+  cleanupTrade82AccountData,
+  markAccountDeletionPending,
+} from "@/lib/account-deletion";
+import { deleteAccountAfterVerifiedClerk } from "@/lib/account-deletion-orchestration";
 
 export const runtime = "nodejs";
 
 const CONFIRMATION_PHRASES = new Set(["DELETE MY ACCOUNT", "계정 탈퇴"]);
 
-function logSafeClerkDeletionFailure(error: unknown) {
-  console.warn("Clerk account deletion failed after Trade82 cleanup.", {
+function logSafeAccountDeletionFailure(error: unknown) {
+  console.warn("Trade82 account deletion could not be finalized.", {
     error: error instanceof Error ? error.name : typeof error,
   });
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await requireCurrentAppUser();
+    const user = await requireCurrentDeletionAppUser();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-delete",
@@ -46,23 +50,34 @@ export async function POST(request: Request) {
     }
 
     const clerkUserId = user.clerkUserId;
-    const cleanup = await cleanupTrade82AccountData({
-      userProfileId: user.id,
-      clerkUserId,
+    const deletion = await deleteAccountAfterVerifiedClerk({
+      markPending: () => markAccountDeletionPending(user.id),
+      deleteClerkUser: async () => {
+        const client = await clerkClient();
+        await client.users.deleteUser(clerkUserId);
+      },
+      cleanup: () => cleanupTrade82AccountData({
+        userProfileId: user.id,
+        clerkUserId,
+      }),
     });
 
-    let clerkDeleted = false;
-    try {
-      const client = await clerkClient();
-      await client.users.deleteUser(clerkUserId);
-      clerkDeleted = true;
-    } catch (error) {
-      logSafeClerkDeletionFailure(error);
+    if (!deletion.ok) {
+      logSafeAccountDeletionFailure(deletion.error);
+      return Response.json(
+        {
+          error: deletion.stage === "clerk"
+            ? "Account deletion could not be completed. Please try again."
+            : "Account deletion is being finalized. Please contact support if this persists.",
+        },
+        { status: 503 },
+      );
     }
+    const { cleanup } = deletion;
 
     return Response.json({
       ok: true,
-      clerkDeleted,
+      deletionStatus: "DELETED",
       cleanup: {
         companyCount: cleanup.companyCount,
         productCount: cleanup.productCount,

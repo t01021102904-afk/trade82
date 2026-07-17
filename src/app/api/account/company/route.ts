@@ -229,7 +229,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const companies = await getDb().company.findMany({
-      where: { ownerUserId: user.id },
+      where: { ownerUserId: user.id, deletedAt: null },
       include: {
         sellerProfile: true,
         buyerProfile: true,

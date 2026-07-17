@@ -15,6 +15,12 @@ enum AccountRole {
   admin
 }
 
+enum AccountDeletionStatus {
+  ACTIVE
+  DELETION_PENDING
+  DELETED
+}
+
 enum PreferredLanguage {
   en
   ko
@@ -428,6 +434,9 @@ model UserProfile {
   city                           String                          @default("")
   role                           AccountRole
   preferredLanguage              PreferredLanguage               @default(en)
+  deletionStatus                 AccountDeletionStatus           @default(ACTIVE)
+  deletionRequestedAt            DateTime?
+  deletedAt                      DateTime?
   companies                      Company[]
   requestedVerifications         VerificationRequest[]           @relation("RequestedVerification")
   reviewedVerifications          VerificationRequest[]           @relation("ReviewedVerification")
@@ -460,6 +469,8 @@ model UserProfile {
   settlementLegRecipientUsers    SettlementLeg[]                 @relation("SettlementLegRecipientUser")
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
+
+  @@index([deletionStatus, deletedAt])
 }
 
 model Company {
@@ -484,6 +495,7 @@ model Company {
   categories                        String[]                  @default([])
   viewCount                         Int                       @default(0)
   verificationStatus                CompanyVerificationStatus @default(unverified)
+  deletedAt                         DateTime?
   stripeCustomerId                  String?                   @unique
   stripeSubscriptionId              String?                   @unique
   subscriptionStatus                String?
@@ -533,6 +545,7 @@ model Company {
 
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
+  @@index([deletedAt, companyRole, verificationStatus])
   @@index([subscriptionStatus, subscriptionPlan])
   @@index([sellerSupportStatus, sellerSupportPlan])
 }
@@ -624,6 +637,7 @@ model Product {
   exportReadiness          Boolean             @default(false)
   viewCount                Int                 @default(0)
   status                   ProductStatus       @default(draft)
+  deletedAt                DateTime?
   images                   ProductImage[]
   inquiries                Inquiry[]
   savedItems               SavedItem[]
@@ -636,6 +650,7 @@ model Product {
   updatedAt                DateTime            @updatedAt
 
   @@index([sellerCompanyId, status])
+  @@index([deletedAt, sellerCompanyId, status])
   @@index([category])
 }
 
@@ -970,6 +985,7 @@ model PartnerProfile {
   termsConsentedAt       DateTime?
   privacyConsentVersion  String?
   privacyConsentedAt     DateTime?
+  deletedAt              DateTime?
   attributions           ReferralAttribution[]
   referralClaimTokens    ReferralClaimToken[]
   stripeConnectedAccount StripeConnectedAccount? @relation("PartnerProfileStripeConnectedAccount")
@@ -979,6 +995,7 @@ model PartnerProfile {
   updatedAt              DateTime                @updatedAt
 
   @@index([status, createdAt])
+  @@index([deletedAt, status])
 }
 
 // Opaque, short-lived referral evidence. The browser only ever receives the

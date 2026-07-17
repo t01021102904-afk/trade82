@@ -1,7 +1,12 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 import { rateLimitOrResponse } from "@/lib/api-security";
-import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
+import {
+  getCurrentDeletionProfile,
+  getCurrentUserProfile,
+  isAdminUser,
+} from "@/lib/authz";
+import { AccountDeletionStatus } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
   getOnboardingCompanyState,
@@ -10,7 +15,12 @@ import {
   ROLE_SELECTION_SOURCE,
 } from "@/lib/onboarding-status";
 
-const validRoles = new Set(["buyer", "seller"]);
+const validRoles = new Set(["buyer", "seller"] as const);
+type ValidRole = typeof validRoles extends Set<infer Role> ? Role : never;
+
+function isValidRole(role: unknown): role is ValidRole {
+  return typeof role === "string" && validRoles.has(role as ValidRole);
+}
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -30,11 +40,19 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { role?: unknown } | null;
   const role = body?.role;
 
-  if (typeof role !== "string" || !validRoles.has(role)) {
+  if (!isValidRole(role)) {
     return Response.json({ error: "Invalid role" }, { status: 400 });
   }
   if (await isAdminUser()) {
     return Response.json({ error: "Admin role is managed by ADMIN_EMAILS." }, { status: 403 });
+  }
+
+  const deletionProfile = await getCurrentDeletionProfile();
+  if (deletionProfile?.deletionStatus === AccountDeletionStatus.DELETION_PENDING) {
+    return Response.json(
+      { error: "Account deletion is pending and cannot be resumed." },
+      { status: 409 },
+    );
   }
 
   const profile = await getCurrentUserProfile();
@@ -96,9 +114,13 @@ export async function POST(request: Request) {
   if (profile) {
     await getDb().userProfile.update({
       where: { id: profile.id },
-      data: { role: role === "seller" ? "seller" : "buyer" },
+      data: { role },
     });
   }
 
-  return Response.json({ ok: true, role });
+  return Response.json({
+    ok: true,
+    role,
+    onboardingComplete: false,
+  });
 }

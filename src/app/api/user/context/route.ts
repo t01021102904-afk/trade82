@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     if (rateLimited) return rateLimited;
 
     const companies = await getDb().company.findMany({
-      where: { ownerUserId: profile.id },
+      where: { ownerUserId: profile.id, deletedAt: null },
       select: {
         id: true,
         companyRole: true,

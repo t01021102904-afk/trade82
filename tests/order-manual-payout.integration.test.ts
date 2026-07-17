@@ -32,6 +32,7 @@ const crypto = await import(new URL("../src/lib/payout-crypto.ts", import.meta.u
 const flags = await import(new URL("../src/lib/trade-order-feature.ts", import.meta.url).href);
 const settlements = await import(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href);
 const settlementWebhook = await import(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url).href);
+const accountDeletion = await import(new URL("../src/lib/account-deletion.ts", import.meta.url).href);
 const paymentRequests = await import(new URL("../src/lib/payment-requests.ts", import.meta.url).href);
 const csv = await import(new URL("../src/lib/csv-security.ts", import.meta.url).href);
 const orderTable = await import(new URL("../src/lib/admin-order-table.ts", import.meta.url).href);
@@ -147,6 +148,60 @@ async function createFixture(prefix = "fixture") {
   });
   return { buyer, seller, admin, buyerCompany, sellerCompany, product, inquiry, message };
 }
+
+test("account deletion tombstones public data without deleting financial identity rows", async () => {
+  const fixture = await createFixture("account-deletion");
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: fixture.seller.id,
+      referralCode: unique("deleted-partner").toUpperCase(),
+    },
+  });
+  await db.referralClaimToken.create({
+    data: {
+      tokenHash: unique("claim-token"),
+      partnerProfileId: partner.id,
+      expiresAt: new Date(Date.now() + 60_000),
+    },
+  });
+
+  await accountDeletion.markAccountDeletionPending(fixture.seller.id);
+  const result = await accountDeletion.cleanupTrade82AccountData({
+    userProfileId: fixture.seller.id,
+    clerkUserId: fixture.seller.clerkUserId,
+  });
+
+  assert.equal(result.productCount, 1);
+  const [deletedUser, deletedCompany, deletedProduct, deletedPartner, tokenCount] = await Promise.all([
+    db.userProfile.findUniqueOrThrow({ where: { id: fixture.seller.id } }),
+    db.company.findUniqueOrThrow({ where: { id: fixture.sellerCompany.id } }),
+    db.product.findUniqueOrThrow({ where: { id: fixture.product.id } }),
+    db.partnerProfile.findUniqueOrThrow({ where: { id: partner.id } }),
+    db.referralClaimToken.count({ where: { partnerProfileId: partner.id } }),
+  ]);
+  assert.equal(deletedUser.deletionStatus, "DELETED");
+  assert.ok(deletedUser.deletedAt);
+  assert.notEqual(deletedUser.email, fixture.seller.email);
+  assert.ok(deletedCompany.deletedAt);
+  assert.equal(deletedCompany.verificationStatus, "rejected");
+  assert.equal(deletedProduct.status, "draft");
+  assert.ok(deletedProduct.deletedAt);
+  assert.equal(deletedPartner.status, "SUSPENDED");
+  assert.ok(deletedPartner.deletedAt);
+  assert.equal(tokenCount, 0);
+
+  const freshProfile = await db.userProfile.create({
+    data: {
+      clerkUserId: unique("fresh-clerk"),
+      email: fixture.seller.email,
+      displayName: "Fresh seller identity",
+      role: "user",
+    },
+  });
+  assert.notEqual(freshProfile.id, deletedUser.id);
+  assert.equal(await db.company.count({ where: { ownerUserId: freshProfile.id } }), 0);
+  assert.equal(await db.partnerProfile.count({ where: { userId: freshProfile.id } }), 0);
+});
 
 async function createPaymentRequest(client: PaymentRequestClient, fixture: Fixture, suffix = unique("payment")) {
   const values = financials.calculateOrderFinancials(10_000, 1_000);

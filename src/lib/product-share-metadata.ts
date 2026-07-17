@@ -106,6 +106,7 @@ export async function getProductShareMetadata(
         status: "active",
         sellerCompany: {
           verificationStatus: "verified",
+          deletedAt: null,
           legalName: { not: DELETED_COMPANY_NAME },
         },
       },
@@ -202,6 +203,7 @@ export async function getProductStructuredData(
         status: "active",
         sellerCompany: {
           verificationStatus: "verified",
+          deletedAt: null,
           legalName: { not: DELETED_COMPANY_NAME },
         },
       },

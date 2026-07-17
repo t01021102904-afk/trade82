@@ -15,7 +15,7 @@ export async function getOnboardingCompanyState(
   userProfileId: string,
 ): Promise<CompanyRoleState> {
   const companies = await getDb().company.findMany({
-    where: { ownerUserId: userProfileId },
+    where: { ownerUserId: userProfileId, deletedAt: null },
     select: {
       companyRole: true,
       sellerPayoutProfile: { select: { id: true } },

@@ -59,6 +59,7 @@ export async function getPublicCompanyMetadata({
         id,
         companyRole: config.role,
         verificationStatus: "verified",
+        deletedAt: null,
         legalName: { not: DELETED_COMPANY_NAME },
       },
       select: {

@@ -20,8 +20,10 @@ export async function GET() {
       where: {
         id: { in: productIds },
         status: "active",
+        deletedAt: null,
         sellerCompany: {
           verificationStatus: "verified",
+          deletedAt: null,
           legalName: { not: DELETED_COMPANY_NAME },
         },
       },
