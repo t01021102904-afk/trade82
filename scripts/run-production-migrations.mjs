@@ -7,6 +7,12 @@ import { Client } from "pg";
 export const PRODUCTION_ENVIRONMENT = "production";
 export const EXPECTED_SUPABASE_PROJECT = "cjryteuoyiiwsxarblfd";
 export const TARGET_MIGRATION = "20260717120000_add_settlement_release_approval";
+export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
+  "20260626010000_add_deal_progress_statuses",
+  "20260627010000_add_buyer_preferred_supplier_type",
+  "20260627020000_add_message_attachments",
+  "20260627030000_add_rich_product_fields",
+]);
 
 const MIGRATION_DIRECTORY = fileURLToPath(new URL("../prisma/migrations/", import.meta.url));
 const SAFE_ERROR_CODES = new Set([
@@ -98,13 +104,49 @@ export function readLocalMigrationNames(directory = MIGRATION_DIRECTORY) {
     .sort();
 }
 
-function isSuccessfulMigrationRecord(record) {
-  return record.finished_at !== null
-    && record.rolled_back_at === null
-    && Number(record.applied_steps_count) >= 1;
+function hasLegacySchemaEvidence(migrationName, schemaEvidence) {
+  if (!schemaEvidence) return false;
+
+  const evidenceByMigration = {
+    "20260626010000_add_deal_progress_statuses": [
+      "deal_status_in_progress",
+      "deal_status_completion_requested",
+    ],
+    "20260627010000_add_buyer_preferred_supplier_type": [
+      "buyer_preferred_supplier_type",
+    ],
+    "20260627020000_add_message_attachments": [
+      "message_attachment_table",
+      "message_content_hash",
+      "message_attachment_file_type",
+      "message_attachment_status",
+    ],
+    "20260627030000_add_rich_product_fields": [
+      "product_price_unit",
+      "product_moq_quantity",
+      "product_incoterms",
+      "product_suggested_us_channels",
+    ],
+  };
+
+  return (evidenceByMigration[migrationName] ?? []).every(
+    (key) => schemaEvidence[key] === true,
+  );
 }
 
-function migrationState(localMigrationNames, databaseRecords) {
+function isSuccessfulMigrationRecord(record, schemaEvidence) {
+  if (record.finished_at === null || record.rolled_back_at !== null) {
+    return false;
+  }
+
+  const appliedSteps = Number(record.applied_steps_count);
+  return appliedSteps >= 1
+    || (appliedSteps === 0
+      && LEGACY_ZERO_STEP_MIGRATIONS.includes(record.migration_name)
+      && hasLegacySchemaEvidence(record.migration_name, schemaEvidence));
+}
+
+function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const localNames = new Set(localMigrationNames);
   const databaseNames = new Set();
 
@@ -114,7 +156,7 @@ function migrationState(localMigrationNames, databaseRecords) {
     }
     databaseNames.add(record.migration_name);
 
-    if (!isSuccessfulMigrationRecord(record)) {
+    if (!isSuccessfulMigrationRecord(record, schemaEvidence)) {
       throw new Error("Production migration history contains a failed migration.");
     }
     if (!localNames.has(record.migration_name)) {
@@ -161,6 +203,87 @@ async function queryMigrationRecords(client) {
     ORDER BY started_at, migration_name
   `);
   return result.rows;
+}
+
+async function queryLegacySchemaEvidence(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        WHERE pg_type.typname = 'DealStatus'
+          AND pg_enum.enumlabel = 'in_progress'
+      ) AS deal_status_in_progress,
+      EXISTS (
+        SELECT 1
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        WHERE pg_type.typname = 'DealStatus'
+          AND pg_enum.enumlabel = 'completion_requested'
+      ) AS deal_status_completion_requested,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'BuyerProfile'
+          AND column_name = 'preferredSupplierType'
+      ) AS buyer_preferred_supplier_type,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'MessageAttachment'
+      ) AS message_attachment_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Message'
+          AND column_name = 'contentHash'
+      ) AS message_content_hash,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        WHERE typnamespace = 'public'::regnamespace
+          AND typname = 'MessageAttachmentFileType'
+      ) AS message_attachment_file_type,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        WHERE typnamespace = 'public'::regnamespace
+          AND typname = 'MessageAttachmentStatus'
+      ) AS message_attachment_status,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Product'
+          AND column_name = 'priceUnit'
+      ) AS product_price_unit,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Product'
+          AND column_name = 'moqQuantity'
+      ) AS product_moq_quantity,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Product'
+          AND column_name = 'incoterms'
+      ) AS product_incoterms,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Product'
+          AND column_name = 'suggestedUsChannels'
+      ) AS product_suggested_us_channels
+  `);
+  return result.rows[0] ?? null;
 }
 
 function createProductionClient(connectionString) {
@@ -221,9 +344,30 @@ export async function runProductionMigrations({
       throw new ProductionMigrationDiagnostic("migration_history_before", source, getSafeErrorCode(error));
     }
 
+    let schemaEvidence = null;
+    if (beforeRecords.some((record) => (
+      record.finished_at !== null
+      && record.rolled_back_at === null
+      && Number(record.applied_steps_count) === 0
+    ))) {
+      try {
+        schemaEvidence = await queryLegacySchemaEvidence(client);
+      } catch (error) {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          getSafeErrorCode(error),
+        );
+      }
+    }
+
     let state;
     try {
-      state = migrationState(localMigrationNames ?? readLocalMigrationNames(), beforeRecords);
+      state = migrationState(
+        localMigrationNames ?? readLocalMigrationNames(),
+        beforeRecords,
+        schemaEvidence,
+      );
     } catch {
       throw new ProductionMigrationDiagnostic("migration_state_evaluation", source);
     }
