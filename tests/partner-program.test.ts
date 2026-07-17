@@ -30,6 +30,11 @@ import {
   partnerPayoutSetupStatus,
   partnerProfileStatus,
 } from "../src/lib/partner-dashboard.ts";
+import {
+  normalizePartnerEnrollment,
+  normalizePartnerPhone,
+  partnerConsentVersions,
+} from "../src/lib/partner-enrollment.ts";
 
 test("partner program mode is explicitly opt-in and otherwise fails closed", () => {
   assert.equal(getPartnerProgramMode(undefined), "off");
@@ -167,6 +172,45 @@ test("partner enrollment is idempotent and allocates a distinct referral code pe
   assert.equal(first.partnerProfile.id, repeated.partnerProfile.id);
   assert.equal(profiles.size, 2);
   assert.notEqual(first.partnerProfile.referralCode, secondUser.partnerProfile.referralCode);
+});
+
+test("partner enrollment normalizes private contact data and requires recorded consent", () => {
+  const enrollment = normalizePartnerEnrollment({
+    legalName: "  Partner Legal Name  ",
+    displayName: "  Partner Name ",
+    email: "  PARTNER@example.test ",
+    phone: "+1 (212) 555-0199",
+    country: " United States ",
+    preferredLanguage: "en",
+    organizationName: "  Partner Organization ",
+    websiteOrSocialUrl: "https://example.test/profile",
+    promotionDescription: "  Share Trade82 with qualified buyers. ",
+    agreeToTerms: true,
+    acknowledgePrivacy: true,
+  });
+
+  assert.deepEqual(enrollment, {
+    legalName: "Partner Legal Name",
+    displayName: "Partner Name",
+    email: "partner@example.test",
+    phone: "+12125550199",
+    country: "United States",
+    preferredLanguage: "en",
+    organizationName: "Partner Organization",
+    websiteOrSocialUrl: "https://example.test/profile",
+    promotionDescription: "Share Trade82 with qualified buyers.",
+  });
+  assert.equal(normalizePartnerPhone("82-10-1234-5678"), "821012345678");
+  assert.throws(() => normalizePartnerPhone("not-a-phone"));
+  assert.throws(() =>
+    normalizePartnerEnrollment({
+      ...enrollment,
+      agreeToTerms: false,
+      acknowledgePrivacy: true,
+    }),
+  );
+  assert.equal(partnerConsentVersions.terms, "partner-program-2026-07");
+  assert.equal(partnerConsentVersions.privacy, "privacy-2026-07");
 });
 
 test("a partner cannot consume their own referral claim", async () => {
@@ -395,6 +439,30 @@ test("partner claim migration is additive, indexed, restrictive, and never store
   assert.doesNotMatch(migration, /^\s*(DROP|DELETE FROM|TRUNCATE)\b/m);
 });
 
+test("partner enrollment migration only adds private profile and consent fields", async () => {
+  const migration = await readFile(
+    new URL(
+      "../prisma/migrations/20260717100000_add_partner_profile_enrollment_details/migration.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  for (const field of [
+    "legalName",
+    "contactEmail",
+    "contactPhone",
+    "termsConsentVersion",
+    "termsConsentedAt",
+    "privacyConsentVersion",
+    "privacyConsentedAt",
+  ]) {
+    assert.match(migration, new RegExp(`ADD COLUMN "${field}"`));
+  }
+  assert.match(migration, /PartnerProfile_contactEmail_length/);
+  assert.match(migration, /PartnerProfile_contactPhone_length/);
+  assert.doesNotMatch(migration, /^\s*(DROP|DELETE FROM|TRUNCATE)\b/m);
+});
+
 test("partner routes clear stale claims and gate active functionality server-side", async () => {
   const referralRoute = await readFile(
     new URL("../src/app/r/[referralCode]/route.ts", import.meta.url),
@@ -418,6 +486,18 @@ test("partner routes clear stale claims and gate active functionality server-sid
   );
   const enrollRoute = await readFile(
     new URL("../src/app/api/partner/enroll/route.ts", import.meta.url),
+    "utf8",
+  );
+  const enrollment = await readFile(
+    new URL("../src/lib/partner-enrollment.ts", import.meta.url),
+    "utf8",
+  );
+  const joinPage = await readFile(
+    new URL("../src/components/partner-join-page.tsx", import.meta.url),
+    "utf8",
+  );
+  const roleSelection = await readFile(
+    new URL("../src/components/role-selection.tsx", import.meta.url),
     "utf8",
   );
 
@@ -445,9 +525,17 @@ test("partner routes clear stale claims and gate active functionality server-sid
     dashboardData,
     /paymentMethod|stripeSecret|bankAccount|email:/,
   );
-  assert.doesNotMatch(enrollRoute, /request\.json\(/);
+  assert.match(enrollRoute, /readJsonObject\(request\)/);
+  assert.match(enrollRoute, /assertSameOrigin\(request\)/);
+  assert.doesNotMatch(enrollRoute, /ownerUserId/);
   assert.doesNotMatch(
     enrollRoute,
     /stripeConnectedAccount|SettlementLeg|ReferralAttribution|transfers\.create/,
   );
+  assert.match(enrollment, /user id comes exclusively from the authenticated server session/i);
+  assert.doesNotMatch(enrollment, /stripe\.accounts|bankAccount|routingNumber|swift/i);
+  assert.match(joinPage, /\/partner\/join/);
+  assert.match(joinPage, /partner\?\.status === "SUSPENDED"/);
+  assert.match(roleSelection, /partnerProgramEnabled/);
+  assert.match(roleSelection, /partnerProgram\.joinAsPartner/);
 });

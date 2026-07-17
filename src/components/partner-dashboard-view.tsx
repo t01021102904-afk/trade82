@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { PartnerReferralLink } from "@/components/partner-referral-link";
+import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
 import { createTranslator, getDictionary, type Locale } from "@/lib/i18n";
 import { withLocale } from "@/lib/i18n";
 import {
@@ -30,10 +31,12 @@ export function PartnerDashboardView({
   locale,
   data,
   referralUrl,
+  joined = false,
 }: {
   locale: Locale;
   data: DashboardData;
   referralUrl: string;
+  joined?: boolean;
 }) {
   const t = createTranslator(getDictionary(locale));
   const statusKey = (status: string) => {
@@ -82,6 +85,12 @@ export function PartnerDashboardView({
             )}
           </div>
         </div>
+
+        {joined ? (
+          <p role="status" className="text-sm text-emerald-700">
+            {t("partnerProgram.joinSuccess")}
+          </p>
+        ) : null}
 
         <section
           className="border p-5 theme-border theme-surface-elevated"
@@ -223,20 +232,16 @@ export function PartnerDashboardView({
           </div>
 
           <aside className="border p-5 theme-border theme-surface-elevated">
-            <h2 className="text-base font-semibold theme-foreground">
-              {t("partnerProgram.connectedAccount")}
-            </h2>
+            <h2 className="text-base font-semibold theme-foreground">{t("partnerProgram.payoutSetupTitle")}</h2>
             <p className="mt-3 text-sm theme-muted">
-              {t(
-                `partnerProgram.payout${payoutStatus[0].toUpperCase()}${payoutStatus.slice(1)}`,
-              )}
+              {payoutStatus === "notStarted"
+                ? t("partnerProgram.payoutSetupNotCompleted")
+                : t(`partnerProgram.payout${payoutStatus[0].toUpperCase()}${payoutStatus.slice(1)}`)}
             </p>
-            <Link
-              href={withLocale("/settings/stripe-connect", locale)}
-              className="mt-4 inline-flex text-sm font-semibold text-[#25825f] hover:underline"
-            >
-              {t("partnerProgram.managePayout")}
-            </Link>
+            <p className="mt-2 text-sm leading-6 theme-muted">{t("partnerProgram.payoutSetupDescription")}</p>
+            <div className="-mx-5 mt-4 border-t pt-4 theme-border">
+              <StripeConnectOnboardingPanel ownerType="partner" />
+            </div>
             <dl className="mt-7 grid gap-3 border-t pt-5 theme-border">
               <div>
                 <dt className="text-xs theme-muted">

@@ -29,6 +29,19 @@ export type PartnerProfileMinAggregateOutputType = {
   userId: string | null
   referralCode: string | null
   status: $Enums.PartnerProfileStatus | null
+  legalName: string | null
+  displayName: string | null
+  contactEmail: string | null
+  contactPhone: string | null
+  country: string | null
+  preferredLanguage: $Enums.PreferredLanguage | null
+  organizationName: string | null
+  websiteOrSocialUrl: string | null
+  promotionDescription: string | null
+  termsConsentVersion: string | null
+  termsConsentedAt: Date | null
+  privacyConsentVersion: string | null
+  privacyConsentedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +51,19 @@ export type PartnerProfileMaxAggregateOutputType = {
   userId: string | null
   referralCode: string | null
   status: $Enums.PartnerProfileStatus | null
+  legalName: string | null
+  displayName: string | null
+  contactEmail: string | null
+  contactPhone: string | null
+  country: string | null
+  preferredLanguage: $Enums.PreferredLanguage | null
+  organizationName: string | null
+  websiteOrSocialUrl: string | null
+  promotionDescription: string | null
+  termsConsentVersion: string | null
+  termsConsentedAt: Date | null
+  privacyConsentVersion: string | null
+  privacyConsentedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,6 +73,19 @@ export type PartnerProfileCountAggregateOutputType = {
   userId: number
   referralCode: number
   status: number
+  legalName: number
+  displayName: number
+  contactEmail: number
+  contactPhone: number
+  country: number
+  preferredLanguage: number
+  organizationName: number
+  websiteOrSocialUrl: number
+  promotionDescription: number
+  termsConsentVersion: number
+  termsConsentedAt: number
+  privacyConsentVersion: number
+  privacyConsentedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -58,6 +97,19 @@ export type PartnerProfileMinAggregateInputType = {
   userId?: true
   referralCode?: true
   status?: true
+  legalName?: true
+  displayName?: true
+  contactEmail?: true
+  contactPhone?: true
+  country?: true
+  preferredLanguage?: true
+  organizationName?: true
+  websiteOrSocialUrl?: true
+  promotionDescription?: true
+  termsConsentVersion?: true
+  termsConsentedAt?: true
+  privacyConsentVersion?: true
+  privacyConsentedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -67,6 +119,19 @@ export type PartnerProfileMaxAggregateInputType = {
   userId?: true
   referralCode?: true
   status?: true
+  legalName?: true
+  displayName?: true
+  contactEmail?: true
+  contactPhone?: true
+  country?: true
+  preferredLanguage?: true
+  organizationName?: true
+  websiteOrSocialUrl?: true
+  promotionDescription?: true
+  termsConsentVersion?: true
+  termsConsentedAt?: true
+  privacyConsentVersion?: true
+  privacyConsentedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -76,6 +141,19 @@ export type PartnerProfileCountAggregateInputType = {
   userId?: true
   referralCode?: true
   status?: true
+  legalName?: true
+  displayName?: true
+  contactEmail?: true
+  contactPhone?: true
+  country?: true
+  preferredLanguage?: true
+  organizationName?: true
+  websiteOrSocialUrl?: true
+  promotionDescription?: true
+  termsConsentVersion?: true
+  termsConsentedAt?: true
+  privacyConsentVersion?: true
+  privacyConsentedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -158,6 +236,19 @@ export type PartnerProfileGroupByOutputType = {
   userId: string
   referralCode: string
   status: $Enums.PartnerProfileStatus
+  legalName: string | null
+  displayName: string | null
+  contactEmail: string | null
+  contactPhone: string | null
+  country: string | null
+  preferredLanguage: $Enums.PreferredLanguage | null
+  organizationName: string | null
+  websiteOrSocialUrl: string | null
+  promotionDescription: string | null
+  termsConsentVersion: string | null
+  termsConsentedAt: Date | null
+  privacyConsentVersion: string | null
+  privacyConsentedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: PartnerProfileCountAggregateOutputType | null
@@ -188,6 +279,19 @@ export type PartnerProfileWhereInput = {
   userId?: Prisma.StringFilter<"PartnerProfile"> | string
   referralCode?: Prisma.StringFilter<"PartnerProfile"> | string
   status?: Prisma.EnumPartnerProfileStatusFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
+  legalName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  displayName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  contactEmail?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  contactPhone?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  country?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  preferredLanguage?: Prisma.EnumPreferredLanguageNullableFilter<"PartnerProfile"> | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  websiteOrSocialUrl?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  promotionDescription?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  termsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -203,6 +307,19 @@ export type PartnerProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  legalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayName?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationName?: Prisma.SortOrderInput | Prisma.SortOrder
+  websiteOrSocialUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  promotionDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserProfileOrderByWithRelationInput
@@ -221,6 +338,19 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PartnerProfileWhereInput[]
   NOT?: Prisma.PartnerProfileWhereInput | Prisma.PartnerProfileWhereInput[]
   status?: Prisma.EnumPartnerProfileStatusFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
+  legalName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  displayName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  contactEmail?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  contactPhone?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  country?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  preferredLanguage?: Prisma.EnumPreferredLanguageNullableFilter<"PartnerProfile"> | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  websiteOrSocialUrl?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  promotionDescription?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  termsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -236,6 +366,19 @@ export type PartnerProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  legalName?: Prisma.SortOrderInput | Prisma.SortOrder
+  displayName?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactEmail?: Prisma.SortOrderInput | Prisma.SortOrder
+  contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  country?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrderInput | Prisma.SortOrder
+  organizationName?: Prisma.SortOrderInput | Prisma.SortOrder
+  websiteOrSocialUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  promotionDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PartnerProfileCountOrderByAggregateInput
@@ -251,6 +394,19 @@ export type PartnerProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
   referralCode?: Prisma.StringWithAggregatesFilter<"PartnerProfile"> | string
   status?: Prisma.EnumPartnerProfileStatusWithAggregatesFilter<"PartnerProfile"> | $Enums.PartnerProfileStatus
+  legalName?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  displayName?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  contactEmail?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  contactPhone?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  country?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  preferredLanguage?: Prisma.EnumPreferredLanguageNullableWithAggregatesFilter<"PartnerProfile"> | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  websiteOrSocialUrl?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  promotionDescription?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  termsConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  termsConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
+  privacyConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  privacyConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerProfile"> | Date | string
 }
@@ -259,6 +415,19 @@ export type PartnerProfileCreateInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -274,6 +443,19 @@ export type PartnerProfileUncheckedCreateInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -287,6 +469,19 @@ export type PartnerProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -302,6 +497,19 @@ export type PartnerProfileUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -316,6 +524,19 @@ export type PartnerProfileCreateManyInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -324,6 +545,19 @@ export type PartnerProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -333,6 +567,19 @@ export type PartnerProfileUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -347,6 +594,19 @@ export type PartnerProfileCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  legalName?: Prisma.SortOrder
+  displayName?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
+  organizationName?: Prisma.SortOrder
+  websiteOrSocialUrl?: Prisma.SortOrder
+  promotionDescription?: Prisma.SortOrder
+  termsConsentVersion?: Prisma.SortOrder
+  termsConsentedAt?: Prisma.SortOrder
+  privacyConsentVersion?: Prisma.SortOrder
+  privacyConsentedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -356,6 +616,19 @@ export type PartnerProfileMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  legalName?: Prisma.SortOrder
+  displayName?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
+  organizationName?: Prisma.SortOrder
+  websiteOrSocialUrl?: Prisma.SortOrder
+  promotionDescription?: Prisma.SortOrder
+  termsConsentVersion?: Prisma.SortOrder
+  termsConsentedAt?: Prisma.SortOrder
+  privacyConsentVersion?: Prisma.SortOrder
+  privacyConsentedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -365,6 +638,19 @@ export type PartnerProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   referralCode?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  legalName?: Prisma.SortOrder
+  displayName?: Prisma.SortOrder
+  contactEmail?: Prisma.SortOrder
+  contactPhone?: Prisma.SortOrder
+  country?: Prisma.SortOrder
+  preferredLanguage?: Prisma.SortOrder
+  organizationName?: Prisma.SortOrder
+  websiteOrSocialUrl?: Prisma.SortOrder
+  promotionDescription?: Prisma.SortOrder
+  termsConsentVersion?: Prisma.SortOrder
+  termsConsentedAt?: Prisma.SortOrder
+  privacyConsentVersion?: Prisma.SortOrder
+  privacyConsentedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -408,6 +694,10 @@ export type PartnerProfileUncheckedUpdateOneWithoutUserNestedInput = {
 
 export type EnumPartnerProfileStatusFieldUpdateOperationsInput = {
   set?: $Enums.PartnerProfileStatus
+}
+
+export type NullableEnumPreferredLanguageFieldUpdateOperationsInput = {
+  set?: $Enums.PreferredLanguage | null
 }
 
 export type PartnerProfileCreateNestedOneWithoutReferralClaimTokensInput = {
@@ -490,6 +780,19 @@ export type PartnerProfileCreateWithoutUserInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
@@ -503,6 +806,19 @@ export type PartnerProfileUncheckedCreateWithoutUserInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -532,6 +848,19 @@ export type PartnerProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
@@ -545,6 +874,19 @@ export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -558,6 +900,19 @@ export type PartnerProfileCreateWithoutReferralClaimTokensInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -572,6 +927,19 @@ export type PartnerProfileUncheckedCreateWithoutReferralClaimTokensInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -600,6 +968,19 @@ export type PartnerProfileUpdateWithoutReferralClaimTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -614,6 +995,19 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClaimTokensInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -626,6 +1020,19 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -640,6 +1047,19 @@ export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -668,6 +1088,19 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -682,6 +1115,19 @@ export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -694,6 +1140,19 @@ export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -708,6 +1167,19 @@ export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -736,6 +1208,19 @@ export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -750,6 +1235,19 @@ export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -762,6 +1260,19 @@ export type PartnerProfileCreateWithoutSettlementsInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -776,6 +1287,19 @@ export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -804,6 +1328,19 @@ export type PartnerProfileUpdateWithoutSettlementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -818,6 +1355,19 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -830,6 +1380,19 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   id?: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
@@ -844,6 +1407,19 @@ export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   userId: string
   referralCode: string
   status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -872,6 +1448,19 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
@@ -886,6 +1475,19 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   referralCode?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -957,6 +1559,19 @@ export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   userId?: boolean
   referralCode?: boolean
   status?: boolean
+  legalName?: boolean
+  displayName?: boolean
+  contactEmail?: boolean
+  contactPhone?: boolean
+  country?: boolean
+  preferredLanguage?: boolean
+  organizationName?: boolean
+  websiteOrSocialUrl?: boolean
+  promotionDescription?: boolean
+  termsConsentVersion?: boolean
+  termsConsentedAt?: boolean
+  privacyConsentVersion?: boolean
+  privacyConsentedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -973,6 +1588,19 @@ export type PartnerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   userId?: boolean
   referralCode?: boolean
   status?: boolean
+  legalName?: boolean
+  displayName?: boolean
+  contactEmail?: boolean
+  contactPhone?: boolean
+  country?: boolean
+  preferredLanguage?: boolean
+  organizationName?: boolean
+  websiteOrSocialUrl?: boolean
+  promotionDescription?: boolean
+  termsConsentVersion?: boolean
+  termsConsentedAt?: boolean
+  privacyConsentVersion?: boolean
+  privacyConsentedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -983,6 +1611,19 @@ export type PartnerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   userId?: boolean
   referralCode?: boolean
   status?: boolean
+  legalName?: boolean
+  displayName?: boolean
+  contactEmail?: boolean
+  contactPhone?: boolean
+  country?: boolean
+  preferredLanguage?: boolean
+  organizationName?: boolean
+  websiteOrSocialUrl?: boolean
+  promotionDescription?: boolean
+  termsConsentVersion?: boolean
+  termsConsentedAt?: boolean
+  privacyConsentVersion?: boolean
+  privacyConsentedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -993,11 +1634,24 @@ export type PartnerProfileSelectScalar = {
   userId?: boolean
   referralCode?: boolean
   status?: boolean
+  legalName?: boolean
+  displayName?: boolean
+  contactEmail?: boolean
+  contactPhone?: boolean
+  country?: boolean
+  preferredLanguage?: boolean
+  organizationName?: boolean
+  websiteOrSocialUrl?: boolean
+  promotionDescription?: boolean
+  termsConsentVersion?: boolean
+  termsConsentedAt?: boolean
+  privacyConsentVersion?: boolean
+  privacyConsentedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
+export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "legalName" | "displayName" | "contactEmail" | "contactPhone" | "country" | "preferredLanguage" | "organizationName" | "websiteOrSocialUrl" | "promotionDescription" | "termsConsentVersion" | "termsConsentedAt" | "privacyConsentVersion" | "privacyConsentedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
 export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
@@ -1029,6 +1683,19 @@ export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     userId: string
     referralCode: string
     status: $Enums.PartnerProfileStatus
+    legalName: string | null
+    displayName: string | null
+    contactEmail: string | null
+    contactPhone: string | null
+    country: string | null
+    preferredLanguage: $Enums.PreferredLanguage | null
+    organizationName: string | null
+    websiteOrSocialUrl: string | null
+    promotionDescription: string | null
+    termsConsentVersion: string | null
+    termsConsentedAt: Date | null
+    privacyConsentVersion: string | null
+    privacyConsentedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["partnerProfile"]>
@@ -1464,6 +2131,19 @@ export interface PartnerProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly referralCode: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly status: Prisma.FieldRef<"PartnerProfile", 'PartnerProfileStatus'>
+  readonly legalName: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly displayName: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly contactEmail: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly contactPhone: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly country: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly preferredLanguage: Prisma.FieldRef<"PartnerProfile", 'PreferredLanguage'>
+  readonly organizationName: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly websiteOrSocialUrl: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly promotionDescription: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly termsConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly termsConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
+  readonly privacyConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly privacyConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
 }

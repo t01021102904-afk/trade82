@@ -555,6 +555,13 @@ export type EnumPartnerProfileStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel> | $Enums.PartnerProfileStatus
 }
 
+export type EnumPreferredLanguageNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferredLanguage | Prisma.EnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel> | $Enums.PreferredLanguage | null
+}
+
 export type EnumPartnerProfileStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.PartnerProfileStatus | Prisma.EnumPartnerProfileStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartnerProfileStatus[] | Prisma.ListEnumPartnerProfileStatusFieldRefInput<$PrismaModel>
@@ -563,6 +570,16 @@ export type EnumPartnerProfileStatusWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel>
+}
+
+export type EnumPreferredLanguageNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferredLanguage | Prisma.EnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPreferredLanguageNullableWithAggregatesFilter<$PrismaModel> | $Enums.PreferredLanguage | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel>
 }
 
 export type EnumReferralAttributionStatusFilter<$PrismaModel = never> = {
@@ -1714,6 +1731,13 @@ export type NestedEnumPartnerProfileStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel> | $Enums.PartnerProfileStatus
 }
 
+export type NestedEnumPreferredLanguageNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferredLanguage | Prisma.EnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel> | $Enums.PreferredLanguage | null
+}
+
 export type NestedEnumPartnerProfileStatusWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.PartnerProfileStatus | Prisma.EnumPartnerProfileStatusFieldRefInput<$PrismaModel>
   in?: $Enums.PartnerProfileStatus[] | Prisma.ListEnumPartnerProfileStatusFieldRefInput<$PrismaModel>
@@ -1722,6 +1746,16 @@ export type NestedEnumPartnerProfileStatusWithAggregatesFilter<$PrismaModel = ne
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPartnerProfileStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPreferredLanguageNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PreferredLanguage | Prisma.EnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PreferredLanguage[] | Prisma.ListEnumPreferredLanguageFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPreferredLanguageNullableWithAggregatesFilter<$PrismaModel> | $Enums.PreferredLanguage | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPreferredLanguageNullableFilter<$PrismaModel>
 }
 
 export type NestedEnumReferralAttributionStatusFilter<$PrismaModel = never> = {

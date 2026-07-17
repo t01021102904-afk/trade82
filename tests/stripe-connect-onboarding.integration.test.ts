@@ -17,6 +17,7 @@ process.env.DATABASE_POOL_MAX = "4";
 
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const onboarding = await import(new URL("../src/lib/stripe-connect-onboarding.ts", import.meta.url).href);
+const enrollment = await import(new URL("../src/lib/partner-enrollment.ts", import.meta.url).href);
 const webhook = await import(new URL("../src/lib/stripe-connect-onboarding-webhook.ts", import.meta.url).href);
 const db = getDb() as PrismaClient;
 
@@ -104,4 +105,47 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
     if (previousStripeSecretKey === undefined) delete process.env.STRIPE_SECRET_KEY;
     else process.env.STRIPE_SECRET_KEY = previousStripeSecretKey;
   }
+});
+
+test("disposable PostgreSQL stores one partner enrollment with private consent evidence", async () => {
+  const id = suffix();
+  const user = await db.userProfile.create({
+    data: {
+      clerkUserId: `partner-enrollment-${id}`,
+      email: `partner-enrollment-${id}@example.test`,
+      displayName: "Partner enrollment",
+      country: "US",
+      role: "user",
+    },
+  });
+  const input = {
+    legalName: "Partner Enrollment LLC",
+    displayName: "Partner Enrollment",
+    email: `partner-contact-${id}@example.test`,
+    phone: "+1 (212) 555-0199",
+    country: "United States",
+    preferredLanguage: "en" as const,
+    organizationName: "Partner Organization",
+    websiteOrSocialUrl: "https://example.test/partner",
+    promotionDescription: "Qualified B2B referral outreach.",
+    agreeToTerms: true,
+    acknowledgePrivacy: true,
+  };
+  const first = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
+  const repeated = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
+  const profile = await db.partnerProfile.findUniqueOrThrow({ where: { userId: user.id } });
+
+  assert.equal(first.created, true);
+  assert.equal(repeated.created, false);
+  assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
+  assert.equal(profile.contactEmail, input.email);
+  assert.equal(profile.contactPhone, "+12125550199");
+  assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
+  assert.ok(profile.termsConsentedAt);
+  assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);
+  assert.ok(profile.privacyConsentedAt);
+  assert.equal(
+    await db.stripeConnectedAccount.count({ where: { partnerProfileId: profile.id } }),
+    0,
+  );
 });

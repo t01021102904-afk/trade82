@@ -257,7 +257,7 @@ async function resolveOwner({
 
   const partner = await db.partnerProfile.findUnique({
     where: { userId },
-    select: { id: true, status: true, user: { select: { country: true } } },
+    select: { id: true, status: true, country: true, user: { select: { country: true } } },
   });
   if (!partner || partner.status !== "ACTIVE") {
     throw new StripeConnectOnboardingError(
@@ -268,7 +268,7 @@ async function resolveOwner({
   return {
     type: ownerType,
     id: partner.id,
-    country: assertStripeConnectCountry(partner.user.country),
+    country: assertStripeConnectCountry(partner.country ?? partner.user.country),
   };
 }
 
