@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   EXPECTED_SUPABASE_PROJECT,
+  LEGACY_ZERO_STEP_MIGRATIONS,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
   formatDiagnostic,
@@ -20,6 +21,27 @@ function record(migrationName, overrides = {}) {
     finished_at: new Date("2026-07-17T00:00:00.000Z"),
     rolled_back_at: null,
     applied_steps_count: 1,
+    ...overrides,
+  };
+}
+
+function zeroStepRecord(migrationName, overrides = {}) {
+  return record(migrationName, { applied_steps_count: 0, ...overrides });
+}
+
+function legacySchemaEvidence(overrides = {}) {
+  return {
+    deal_status_in_progress: true,
+    deal_status_completion_requested: true,
+    buyer_preferred_supplier_type: true,
+    message_attachment_table: true,
+    message_content_hash: true,
+    message_attachment_file_type: true,
+    message_attachment_status: true,
+    product_price_unit: true,
+    product_moq_quantity: true,
+    product_incoterms: true,
+    product_suggested_us_channels: true,
     ...overrides,
   };
 }
@@ -146,6 +168,101 @@ test("the target migration is the only pending migration before deploy", async (
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
   assert.deepEqual(fake.calls, { connect: 1, query: 2, end: 1 });
+});
+
+test("the exact legacy zero-step allowlist is accepted with schema evidence", async () => {
+  assert.deepEqual(LEGACY_ZERO_STEP_MIGRATIONS, [
+    "20260626010000_add_deal_progress_statuses",
+    "20260627010000_add_buyer_preferred_supplier_type",
+    "20260627020000_add_message_attachments",
+    "20260627030000_add_rich_product_fields",
+  ]);
+
+  for (const legacyMigration of LEGACY_ZERO_STEP_MIGRATIONS) {
+    const fake = fakeClient([
+      [zeroStepRecord(legacyMigration)],
+      [legacySchemaEvidence()],
+      [zeroStepRecord(legacyMigration), appliedTarget],
+    ]);
+    let deploys = 0;
+    const result = await runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: [legacyMigration, TARGET_MIGRATION],
+      deploy: () => { deploys += 1; },
+    });
+    assert.equal(result, "deployed");
+    assert.equal(deploys, 1);
+    assert.deepEqual(fake.calls, { connect: 1, query: 3, end: 1 });
+  }
+});
+
+test("an allowlisted zero-step migration fails when any required schema evidence is missing", async () => {
+  const missingEvidenceByMigration = {
+    "20260626010000_add_deal_progress_statuses": "deal_status_completion_requested",
+    "20260627010000_add_buyer_preferred_supplier_type": "buyer_preferred_supplier_type",
+    "20260627020000_add_message_attachments": "message_attachment_status",
+    "20260627030000_add_rich_product_fields": "product_suggested_us_channels",
+  };
+
+  for (const legacyMigration of LEGACY_ZERO_STEP_MIGRATIONS) {
+    const fake = fakeClient([
+      [zeroStepRecord(legacyMigration)],
+      [legacySchemaEvidence({ [missingEvidenceByMigration[legacyMigration]]: false })],
+    ]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: [legacyMigration, TARGET_MIGRATION],
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DATABASE_URL",
+    });
+    assert.equal(fake.calls.query, 2);
+    assert.equal(fake.calls.end, 1);
+  }
+});
+
+test("unknown and target zero-step migrations fail closed", async () => {
+  for (const zeroStepMigration of [
+    "20260628010000_unknown_zero_step_migration",
+    TARGET_MIGRATION,
+  ]) {
+    const fake = fakeClient([
+      [zeroStepRecord(zeroStepMigration)],
+      [legacySchemaEvidence()],
+    ]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: [zeroStepMigration, TARGET_MIGRATION],
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DIRECT_URL",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
+});
+
+test("allowlisted zero-step records must be completed and not rolled back", async () => {
+  for (const overrides of [
+    { finished_at: null },
+    { rolled_back_at: new Date("2026-07-17T00:00:00.000Z") },
+  ]) {
+    const fake = fakeClient([
+      [zeroStepRecord(LEGACY_ZERO_STEP_MIGRATIONS[0], overrides)],
+      [legacySchemaEvidence()],
+    ]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DATABASE_URL: directUrl },
+      createClient: () => fake.client,
+      localMigrationNames: [LEGACY_ZERO_STEP_MIGRATIONS[0], TARGET_MIGRATION],
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DATABASE_URL",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
 });
 
 test("Prisma subprocess failures identify prisma_migrate_deploy", async () => {
