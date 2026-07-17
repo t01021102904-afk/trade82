@@ -28,10 +28,12 @@ export type AggregateSettlementReversal = {
 
 export type SettlementReversalAvgAggregateOutputType = {
   amount: number | null
+  reversalAttemptCount: number | null
 }
 
 export type SettlementReversalSumAggregateOutputType = {
   amount: number | null
+  reversalAttemptCount: number | null
 }
 
 export type SettlementReversalMinAggregateOutputType = {
@@ -46,6 +48,11 @@ export type SettlementReversalMinAggregateOutputType = {
   stripeRefundId: string | null
   stripeDisputeId: string | null
   stripeTransferReversalId: string | null
+  reversalAttemptCount: number | null
+  nextReversalAttemptAt: Date | null
+  reversalLastError: string | null
+  reversalLockedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
 }
 
@@ -61,6 +68,11 @@ export type SettlementReversalMaxAggregateOutputType = {
   stripeRefundId: string | null
   stripeDisputeId: string | null
   stripeTransferReversalId: string | null
+  reversalAttemptCount: number | null
+  nextReversalAttemptAt: Date | null
+  reversalLastError: string | null
+  reversalLockedAt: Date | null
+  completedAt: Date | null
   createdAt: Date | null
 }
 
@@ -76,6 +88,11 @@ export type SettlementReversalCountAggregateOutputType = {
   stripeRefundId: number
   stripeDisputeId: number
   stripeTransferReversalId: number
+  reversalAttemptCount: number
+  nextReversalAttemptAt: number
+  reversalLastError: number
+  reversalLockedAt: number
+  completedAt: number
   createdAt: number
   _all: number
 }
@@ -83,10 +100,12 @@ export type SettlementReversalCountAggregateOutputType = {
 
 export type SettlementReversalAvgAggregateInputType = {
   amount?: true
+  reversalAttemptCount?: true
 }
 
 export type SettlementReversalSumAggregateInputType = {
   amount?: true
+  reversalAttemptCount?: true
 }
 
 export type SettlementReversalMinAggregateInputType = {
@@ -101,6 +120,11 @@ export type SettlementReversalMinAggregateInputType = {
   stripeRefundId?: true
   stripeDisputeId?: true
   stripeTransferReversalId?: true
+  reversalAttemptCount?: true
+  nextReversalAttemptAt?: true
+  reversalLastError?: true
+  reversalLockedAt?: true
+  completedAt?: true
   createdAt?: true
 }
 
@@ -116,6 +140,11 @@ export type SettlementReversalMaxAggregateInputType = {
   stripeRefundId?: true
   stripeDisputeId?: true
   stripeTransferReversalId?: true
+  reversalAttemptCount?: true
+  nextReversalAttemptAt?: true
+  reversalLastError?: true
+  reversalLockedAt?: true
+  completedAt?: true
   createdAt?: true
 }
 
@@ -131,6 +160,11 @@ export type SettlementReversalCountAggregateInputType = {
   stripeRefundId?: true
   stripeDisputeId?: true
   stripeTransferReversalId?: true
+  reversalAttemptCount?: true
+  nextReversalAttemptAt?: true
+  reversalLastError?: true
+  reversalLockedAt?: true
+  completedAt?: true
   createdAt?: true
   _all?: true
 }
@@ -233,6 +267,11 @@ export type SettlementReversalGroupByOutputType = {
   stripeRefundId: string | null
   stripeDisputeId: string | null
   stripeTransferReversalId: string | null
+  reversalAttemptCount: number
+  nextReversalAttemptAt: Date | null
+  reversalLastError: string | null
+  reversalLockedAt: Date | null
+  completedAt: Date | null
   createdAt: Date
   _count: SettlementReversalCountAggregateOutputType | null
   _avg: SettlementReversalAvgAggregateOutputType | null
@@ -271,6 +310,11 @@ export type SettlementReversalWhereInput = {
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalAttemptCount?: Prisma.IntFilter<"SettlementReversal"> | number
+  nextReversalAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  reversalLastError?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalLockedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
   settlementLeg?: Prisma.XOR<Prisma.SettlementLegScalarRelationFilter, Prisma.SettlementLegWhereInput>
@@ -288,6 +332,11 @@ export type SettlementReversalOrderByWithRelationInput = {
   stripeRefundId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeDisputeId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
+  nextReversalAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalLastError?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalLockedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   settlement?: Prisma.SettlementOrderByWithRelationInput
   settlementLeg?: Prisma.SettlementLegOrderByWithRelationInput
@@ -310,6 +359,11 @@ export type SettlementReversalWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumSettlementReversalStatusFilter<"SettlementReversal"> | $Enums.SettlementReversalStatus
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalAttemptCount?: Prisma.IntFilter<"SettlementReversal"> | number
+  nextReversalAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  reversalLastError?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalLockedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
   settlement?: Prisma.XOR<Prisma.SettlementScalarRelationFilter, Prisma.SettlementWhereInput>
   settlementLeg?: Prisma.XOR<Prisma.SettlementLegScalarRelationFilter, Prisma.SettlementLegWhereInput>
@@ -327,6 +381,11 @@ export type SettlementReversalOrderByWithAggregationInput = {
   stripeRefundId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeDisputeId?: Prisma.SortOrderInput | Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
+  nextReversalAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalLastError?: Prisma.SortOrderInput | Prisma.SortOrder
+  reversalLockedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.SettlementReversalCountOrderByAggregateInput
   _avg?: Prisma.SettlementReversalAvgOrderByAggregateInput
@@ -350,6 +409,11 @@ export type SettlementReversalScalarWhereWithAggregatesInput = {
   stripeRefundId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
   stripeDisputeId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
+  reversalAttemptCount?: Prisma.IntWithAggregatesFilter<"SettlementReversal"> | number
+  nextReversalAttemptAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementReversal"> | Date | string | null
+  reversalLastError?: Prisma.StringNullableWithAggregatesFilter<"SettlementReversal"> | string | null
+  reversalLockedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementReversal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementReversal"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SettlementReversal"> | Date | string
 }
 
@@ -363,6 +427,11 @@ export type SettlementReversalCreateInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutReversalsInput
   settlementLeg: Prisma.SettlementLegCreateNestedOneWithoutReversalsInput
@@ -380,6 +449,11 @@ export type SettlementReversalUncheckedCreateInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -393,6 +467,11 @@ export type SettlementReversalUpdateInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutReversalsNestedInput
   settlementLeg?: Prisma.SettlementLegUpdateOneRequiredWithoutReversalsNestedInput
@@ -410,6 +489,11 @@ export type SettlementReversalUncheckedUpdateInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -425,6 +509,11 @@ export type SettlementReversalCreateManyInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -438,6 +527,11 @@ export type SettlementReversalUpdateManyMutationInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -453,6 +547,11 @@ export type SettlementReversalUncheckedUpdateManyInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -488,11 +587,17 @@ export type SettlementReversalCountOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
+  nextReversalAttemptAt?: Prisma.SortOrder
+  reversalLastError?: Prisma.SortOrder
+  reversalLockedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type SettlementReversalAvgOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
 }
 
 export type SettlementReversalMaxOrderByAggregateInput = {
@@ -507,6 +612,11 @@ export type SettlementReversalMaxOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
+  nextReversalAttemptAt?: Prisma.SortOrder
+  reversalLastError?: Prisma.SortOrder
+  reversalLockedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -522,11 +632,17 @@ export type SettlementReversalMinOrderByAggregateInput = {
   stripeRefundId?: Prisma.SortOrder
   stripeDisputeId?: Prisma.SortOrder
   stripeTransferReversalId?: Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
+  nextReversalAttemptAt?: Prisma.SortOrder
+  reversalLastError?: Prisma.SortOrder
+  reversalLockedAt?: Prisma.SortOrder
+  completedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type SettlementReversalSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
+  reversalAttemptCount?: Prisma.SortOrder
 }
 
 export type SettlementReversalCreateNestedManyWithoutSettlementInput = {
@@ -631,6 +747,11 @@ export type SettlementReversalCreateWithoutSettlementInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   settlementLeg: Prisma.SettlementLegCreateNestedOneWithoutReversalsInput
 }
@@ -646,6 +767,11 @@ export type SettlementReversalUncheckedCreateWithoutSettlementInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -690,6 +816,11 @@ export type SettlementReversalScalarWhereInput = {
   stripeRefundId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeDisputeId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
   stripeTransferReversalId?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalAttemptCount?: Prisma.IntFilter<"SettlementReversal"> | number
+  nextReversalAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  reversalLastError?: Prisma.StringNullableFilter<"SettlementReversal"> | string | null
+  reversalLockedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
+  completedAt?: Prisma.DateTimeNullableFilter<"SettlementReversal"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementReversal"> | Date | string
 }
 
@@ -703,6 +834,11 @@ export type SettlementReversalCreateWithoutSettlementLegInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
   settlement: Prisma.SettlementCreateNestedOneWithoutReversalsInput
 }
@@ -717,6 +853,11 @@ export type SettlementReversalUncheckedCreateWithoutSettlementLegInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -757,6 +898,11 @@ export type SettlementReversalCreateManySettlementInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -770,6 +916,11 @@ export type SettlementReversalUpdateWithoutSettlementInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlementLeg?: Prisma.SettlementLegUpdateOneRequiredWithoutReversalsNestedInput
 }
@@ -785,6 +936,11 @@ export type SettlementReversalUncheckedUpdateWithoutSettlementInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -799,6 +955,11 @@ export type SettlementReversalUncheckedUpdateManyWithoutSettlementInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -812,6 +973,11 @@ export type SettlementReversalCreateManySettlementLegInput = {
   stripeRefundId?: string | null
   stripeDisputeId?: string | null
   stripeTransferReversalId?: string | null
+  reversalAttemptCount?: number
+  nextReversalAttemptAt?: Date | string | null
+  reversalLastError?: string | null
+  reversalLockedAt?: Date | string | null
+  completedAt?: Date | string | null
   createdAt?: Date | string
 }
 
@@ -825,6 +991,11 @@ export type SettlementReversalUpdateWithoutSettlementLegInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   settlement?: Prisma.SettlementUpdateOneRequiredWithoutReversalsNestedInput
 }
@@ -839,6 +1010,11 @@ export type SettlementReversalUncheckedUpdateWithoutSettlementLegInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -852,6 +1028,11 @@ export type SettlementReversalUncheckedUpdateManyWithoutSettlementLegInput = {
   stripeRefundId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeDisputeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   stripeTransferReversalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextReversalAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reversalLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  reversalLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -869,6 +1050,11 @@ export type SettlementReversalSelect<ExtArgs extends runtime.Types.Extensions.In
   stripeRefundId?: boolean
   stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
+  reversalAttemptCount?: boolean
+  nextReversalAttemptAt?: boolean
+  reversalLastError?: boolean
+  reversalLockedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -886,6 +1072,11 @@ export type SettlementReversalSelectCreateManyAndReturn<ExtArgs extends runtime.
   stripeRefundId?: boolean
   stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
+  reversalAttemptCount?: boolean
+  nextReversalAttemptAt?: boolean
+  reversalLastError?: boolean
+  reversalLockedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -903,6 +1094,11 @@ export type SettlementReversalSelectUpdateManyAndReturn<ExtArgs extends runtime.
   stripeRefundId?: boolean
   stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
+  reversalAttemptCount?: boolean
+  nextReversalAttemptAt?: boolean
+  reversalLastError?: boolean
+  reversalLockedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -920,10 +1116,15 @@ export type SettlementReversalSelectScalar = {
   stripeRefundId?: boolean
   stripeDisputeId?: boolean
   stripeTransferReversalId?: boolean
+  reversalAttemptCount?: boolean
+  nextReversalAttemptAt?: boolean
+  reversalLastError?: boolean
+  reversalLockedAt?: boolean
+  completedAt?: boolean
   createdAt?: boolean
 }
 
-export type SettlementReversalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "amount" | "currency" | "reason" | "status" | "idempotencyKey" | "stripeRefundId" | "stripeDisputeId" | "stripeTransferReversalId" | "createdAt", ExtArgs["result"]["settlementReversal"]>
+export type SettlementReversalOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "amount" | "currency" | "reason" | "status" | "idempotencyKey" | "stripeRefundId" | "stripeDisputeId" | "stripeTransferReversalId" | "reversalAttemptCount" | "nextReversalAttemptAt" | "reversalLastError" | "reversalLockedAt" | "completedAt" | "createdAt", ExtArgs["result"]["settlementReversal"]>
 export type SettlementReversalInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -955,6 +1156,11 @@ export type $SettlementReversalPayload<ExtArgs extends runtime.Types.Extensions.
     stripeRefundId: string | null
     stripeDisputeId: string | null
     stripeTransferReversalId: string | null
+    reversalAttemptCount: number
+    nextReversalAttemptAt: Date | null
+    reversalLastError: string | null
+    reversalLockedAt: Date | null
+    completedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["settlementReversal"]>
   composites: {}
@@ -1392,6 +1598,11 @@ export interface SettlementReversalFieldRefs {
   readonly stripeRefundId: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly stripeDisputeId: Prisma.FieldRef<"SettlementReversal", 'String'>
   readonly stripeTransferReversalId: Prisma.FieldRef<"SettlementReversal", 'String'>
+  readonly reversalAttemptCount: Prisma.FieldRef<"SettlementReversal", 'Int'>
+  readonly nextReversalAttemptAt: Prisma.FieldRef<"SettlementReversal", 'DateTime'>
+  readonly reversalLastError: Prisma.FieldRef<"SettlementReversal", 'String'>
+  readonly reversalLockedAt: Prisma.FieldRef<"SettlementReversal", 'DateTime'>
+  readonly completedAt: Prisma.FieldRef<"SettlementReversal", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"SettlementReversal", 'DateTime'>
 }
     

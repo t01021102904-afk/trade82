@@ -629,6 +629,9 @@ export const SettlementScalarFieldEnum = {
   currency: 'currency',
   holdUntil: 'holdUntil',
   status: 'status',
+  approvedAt: 'approvedAt',
+  approvedByUserId: 'approvedByUserId',
+  holdReason: 'holdReason',
   idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -650,6 +653,11 @@ export const SettlementLegScalarFieldEnum = {
   status: 'status',
   idempotencyKey: 'idempotencyKey',
   stripeTransferId: 'stripeTransferId',
+  transferAttemptCount: 'transferAttemptCount',
+  nextTransferAttemptAt: 'nextTransferAttemptAt',
+  transferLastError: 'transferLastError',
+  transferLockedAt: 'transferLockedAt',
+  transferredAt: 'transferredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -684,6 +692,11 @@ export const SettlementReversalScalarFieldEnum = {
   stripeRefundId: 'stripeRefundId',
   stripeDisputeId: 'stripeDisputeId',
   stripeTransferReversalId: 'stripeTransferReversalId',
+  reversalAttemptCount: 'reversalAttemptCount',
+  nextReversalAttemptAt: 'nextReversalAttemptAt',
+  reversalLastError: 'reversalLastError',
+  reversalLockedAt: 'reversalLockedAt',
+  completedAt: 'completedAt',
   createdAt: 'createdAt'
 } as const
 

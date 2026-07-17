@@ -31,8 +31,10 @@ const financials = await import(new URL("../src/lib/order-financials.ts", import
 const crypto = await import(new URL("../src/lib/payout-crypto.ts", import.meta.url).href);
 const flags = await import(new URL("../src/lib/trade-order-feature.ts", import.meta.url).href);
 const settlements = await import(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href);
+const settlementRelease = await import(new URL("../src/lib/stripe-connect-settlement-release.ts", import.meta.url).href);
 const settlementWebhook = await import(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url).href);
 const accountDeletion = await import(new URL("../src/lib/account-deletion.ts", import.meta.url).href);
+const settlementReleaseCron = await import(new URL("../src/app/api/cron/settlements/release/route.ts", import.meta.url).href);
 const paymentRequests = await import(new URL("../src/lib/payment-requests.ts", import.meta.url).href);
 const csv = await import(new URL("../src/lib/csv-security.ts", import.meta.url).href);
 const orderTable = await import(new URL("../src/lib/admin-order-table.ts", import.meta.url).href);
@@ -376,6 +378,30 @@ async function createReconciliableSettlement(
     referralAttributionId,
   }))) as { settlement: { id: string } };
   return { fixture, order, paymentRequest, evidence, settlement: result.settlement };
+}
+
+async function enableCompanyTransfers(companyId: string) {
+  return db.stripeConnectedAccount.create({
+    data: {
+      companyId,
+      stripeAccountId: `acct_${unique("seller-transfer")}`,
+      status: "ENABLED",
+      chargesEnabled: true,
+      payoutsEnabled: true,
+      transfersEnabled: true,
+      detailsSubmitted: true,
+      onboardingComplete: true,
+    },
+  });
+}
+
+async function expireSettlementHold(settlementId: string) {
+  const expiredAt = new Date(Date.now() - 60_000);
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlementId }, data: { holdUntil: expiredAt } }),
+    db.settlementLeg.updateMany({ where: { settlementId }, data: { holdUntil: expiredAt } }),
+  ]);
+  return expiredAt;
 }
 
 function stripeRefund({
@@ -2377,4 +2403,188 @@ test("authorized CSV output stays filtered, masked, and formula-safe", async () 
   assert.ok(output.includes("pi_..."));
   assert.ok(!output.includes(fullStripeId));
   assert.ok(output.includes("'=SUM(1,1)"));
+});
+
+test("settlement hold release evaluates transferable legs independently and records one release event", async () => {
+  const beforeHold = await createReconciliableSettlement("settlement-release-before-hold");
+  await enableCompanyTransfers(beforeHold.fixture.sellerCompany.id);
+  const beforeResult = await settlementRelease.evaluateSettlementReleaseEligibility({
+    settlementId: beforeHold.settlement.id,
+    now: new Date(),
+  });
+  assert.deepEqual(beforeResult.readyLegIds, []);
+
+  const { fixture, settlement } = await createReconciliableSettlement(
+    "settlement-release-independent",
+    { withReferral: true },
+  );
+  const current = await db.settlement.findUniqueOrThrow({
+    where: { id: settlement.id },
+    select: { referralPartnerProfileId: true },
+  });
+  assert.ok(current.referralPartnerProfileId);
+  await enableCompanyTransfers(fixture.sellerCompany.id);
+  await expireSettlementHold(settlement.id);
+
+  const [first, second] = await Promise.all([
+    settlementRelease.releaseEligibleSettlementLegs(),
+    settlementRelease.releaseEligibleSettlementLegs(),
+  ]);
+  assert.ok(first.length + second.length >= 1);
+
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: settlement.id },
+    include: { legs: true, events: true },
+  });
+  const sellerLeg = after.legs.find((leg) => leg.type === "SELLER_PAYABLE");
+  const partnerLeg = after.legs.find((leg) => leg.type === "PARTNER_REFERRAL");
+  const platformLeg = after.legs.find((leg) => leg.type === "PLATFORM_FEE");
+  assert.equal(sellerLeg?.status, "READY");
+  assert.equal(partnerLeg?.status, "HOLD");
+  assert.equal(platformLeg?.status, "HOLD");
+  assert.equal(after.status, "READY");
+  assert.equal(
+    after.events.filter((event) => event.eventType === "HOLD_RELEASED" && event.settlementLegId === sellerLeg?.id).length,
+    1,
+  );
+});
+
+test("settlement hold release excludes reconciliation, disputes, pending reversals, and full refunds while retaining partial net amounts", async () => {
+  const partial = await createReconciliableSettlement("settlement-release-partial");
+  await enableCompanyTransfers(partial.fixture.sellerCompany.id);
+  await expireSettlementHold(partial.settlement.id);
+  const partialSellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: partial.settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.settlementReversal.create({
+    data: {
+      settlementId: partial.settlement.id,
+      settlementLegId: partialSellerLeg.id,
+      amount: 500,
+      reason: "REFUND",
+      idempotencyKey: unique("partial-release-reversal"),
+      stripeRefundId: `re_${unique("partial-release")}`,
+    },
+  });
+  await settlementRelease.releaseEligibleSettlementLegs();
+  const partialEvent = await db.settlementEvent.findFirstOrThrow({
+    where: { settlementId: partial.settlement.id, settlementLegId: partialSellerLeg.id, eventType: "HOLD_RELEASED" },
+  });
+  assert.equal((partialEvent.metadata as { netAmount?: number }).netAmount, partialSellerLeg.amount - 500);
+
+  const pendingReversal = await createReconciliableSettlement("settlement-release-pending-reversal");
+  await enableCompanyTransfers(pendingReversal.fixture.sellerCompany.id);
+  await expireSettlementHold(pendingReversal.settlement.id);
+  const pendingReversalLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: pendingReversal.settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.settlementReversal.create({
+    data: {
+      settlementId: pendingReversal.settlement.id,
+      settlementLegId: pendingReversalLeg.id,
+      amount: 100,
+      reason: "REFUND",
+      status: "PENDING",
+      idempotencyKey: unique("pending-release-reversal"),
+      stripeRefundId: `re_${unique("pending-release")}`,
+    },
+  });
+  await settlementRelease.releaseEligibleSettlementLegs();
+  assert.equal(
+    (await db.settlementLeg.findUniqueOrThrow({ where: { id: pendingReversalLeg.id } })).status,
+    "HOLD",
+  );
+
+  const disputed = await createReconciliableSettlement("settlement-release-dispute");
+  await enableCompanyTransfers(disputed.fixture.sellerCompany.id);
+  await expireSettlementHold(disputed.settlement.id);
+  await db.paymentDispute.create({
+    data: {
+      paymentRequestId: disputed.paymentRequest.id,
+      stripeDisputeId: `dp_${unique("release-open")}`,
+      amount: disputed.paymentRequest.grossAmount,
+      status: "needs_response",
+      lastStripeEventCreatedAt: new Date(),
+      lastStripeEventId: `evt_${unique("release-open")}`,
+    },
+  });
+  await settlementRelease.releaseEligibleSettlementLegs();
+  assert.equal(
+    (await db.settlementLeg.findFirstOrThrow({ where: { settlementId: disputed.settlement.id, type: "SELLER_PAYABLE" } })).status,
+    "HOLD",
+  );
+
+  const reconciliation = await createReconciliableSettlement("settlement-release-reconciliation");
+  await enableCompanyTransfers(reconciliation.fixture.sellerCompany.id);
+  await expireSettlementHold(reconciliation.settlement.id);
+  await db.paymentRequest.update({
+    where: { id: reconciliation.paymentRequest.id },
+    data: { requiresManualReconciliation: true },
+  });
+  await settlementRelease.releaseEligibleSettlementLegs();
+  assert.equal(
+    (await db.settlementLeg.findFirstOrThrow({ where: { settlementId: reconciliation.settlement.id, type: "SELLER_PAYABLE" } })).status,
+    "HOLD",
+  );
+
+  const cancelled = await createReconciliableSettlement("settlement-release-full-refund");
+  await db.$transaction([
+    db.paymentRequest.update({
+      where: { id: cancelled.paymentRequest.id },
+      data: { status: "REFUNDED", refundAmount: cancelled.paymentRequest.grossAmount },
+    }),
+    db.settlement.update({ where: { id: cancelled.settlement.id }, data: { status: "CANCELLED" } }),
+    db.settlementLeg.updateMany({ where: { settlementId: cancelled.settlement.id }, data: { status: "CANCELLED" } }),
+  ]);
+  await settlementRelease.releaseEligibleSettlementLegs();
+  assert.equal((await db.settlement.findUniqueOrThrow({ where: { id: cancelled.settlement.id } })).status, "CANCELLED");
+});
+
+test("admin release actions preserve amounts and record approval, hold, and reevaluation events", async () => {
+  const release = await createReconciliableSettlement("settlement-release-admin");
+  await enableCompanyTransfers(release.fixture.sellerCompany.id);
+  await expireSettlementHold(release.settlement.id);
+
+  await settlementRelease.holdSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+    reason: "Awaiting internal compliance review.",
+  });
+  const held = await db.settlement.findUniqueOrThrow({ where: { id: release.settlement.id } });
+  assert.equal(held.holdReason, "Awaiting internal compliance review.");
+  assert.equal(held.status, "HOLD");
+
+  await settlementRelease.approveSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  });
+  const approved = await db.settlement.findUniqueOrThrow({ where: { id: release.settlement.id } });
+  assert.equal(approved.approvedByUserId, release.fixture.admin.id);
+  assert.ok(approved.approvedAt);
+  assert.equal(approved.holdReason, null);
+
+  await settlementRelease.reevaluateSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  });
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: release.settlement.id },
+    include: { events: true, legs: true },
+  });
+  assert.equal(after.legs.find((leg) => leg.type === "SELLER_PAYABLE")?.amount, 10_450);
+  assert.ok(after.events.some((event) => event.eventType === "ADMIN_HELD"));
+  assert.ok(after.events.some((event) => event.eventType === "ADMIN_APPROVED"));
+  assert.ok(after.events.some((event) => event.eventType === "ADMIN_REEVALUATED"));
+});
+
+test("settlement release cron rejects invalid CRON_SECRET without evaluating a batch", async () => {
+  const previous = process.env.CRON_SECRET;
+  process.env.CRON_SECRET = "local-cron-secret";
+  try {
+    const response = await settlementReleaseCron.GET(new Request("http://localhost/api/cron/settlements/release"));
+    assert.equal(response.status, 401);
+  } finally {
+    if (previous === undefined) delete process.env.CRON_SECRET;
+    else process.env.CRON_SECRET = previous;
+  }
 });

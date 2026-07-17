@@ -390,6 +390,9 @@ enum SettlementEventType {
   LEGS_CREATED
   HOLD_STARTED
   HOLD_RELEASED
+  ADMIN_APPROVED
+  ADMIN_HELD
+  ADMIN_REEVALUATED
   TRANSFER_PENDING
   TRANSFERRED
   REVERSAL_CREATED
@@ -463,6 +466,7 @@ model UserProfile {
   verifiedSellerPayoutProfiles   SellerPayoutProfile[]           @relation("SellerPayoutProfileVerifiedBy")
   sellerPayoutProfileAuditEvents SellerPayoutProfileAuditEvent[] @relation("SellerPayoutProfileAuditActor")
   settlementEvents               SettlementEvent[]               @relation("SettlementEventActor")
+  approvedSettlements            Settlement[]                    @relation("SettlementApprovedBy")
   partnerProfile                 PartnerProfile?                 @relation("UserPartnerProfile")
   referredReferralAttribution    ReferralAttribution?            @relation("ReferredUserAttribution")
   consumedReferralClaimTokens    ReferralClaimToken[]            @relation("ReferralClaimConsumedByUser")
@@ -1073,6 +1077,10 @@ model Settlement {
   currency                              String               @default("usd")
   holdUntil                             DateTime
   status                                SettlementStatus     @default(HOLD)
+  approvedAt                            DateTime?
+  approvedByUserId                      String?
+  approvedByUser                        UserProfile?         @relation("SettlementApprovedBy", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  holdReason                            String?              @db.VarChar(1000)
   idempotencyKey                        String               @unique
   legs                                  SettlementLeg[]
   events                                SettlementEvent[]
@@ -1081,37 +1089,45 @@ model Settlement {
   updatedAt                             DateTime             @updatedAt
 
   @@index([status, holdUntil])
+  @@index([approvedByUserId])
   @@index([referralAttributionId])
   @@index([referralPartnerProfileId])
 }
 
 model SettlementLeg {
-  id                 String               @id @default(cuid())
-  settlementId       String
-  settlement         Settlement           @relation(fields: [settlementId], references: [id], onDelete: Restrict)
-  type               SettlementLegType
-  recipientCompanyId String?
-  recipientCompany   Company?             @relation("SettlementLegRecipientCompany", fields: [recipientCompanyId], references: [id], onDelete: Restrict)
-  recipientUserId    String?
-  recipientUser      UserProfile?         @relation("SettlementLegRecipientUser", fields: [recipientUserId], references: [id], onDelete: Restrict)
-  partnerProfileId   String?
-  partnerProfile     PartnerProfile?      @relation("SettlementLegPartnerProfile", fields: [partnerProfileId], references: [id], onDelete: Restrict)
-  amount             Int
-  currency           String               @default("usd")
-  holdUntil          DateTime
-  status             SettlementLegStatus  @default(HOLD)
-  idempotencyKey     String               @unique
-  stripeTransferId   String?              @unique
-  events             SettlementEvent[]
-  reversals          SettlementReversal[] @relation("SettlementReversalSettlementLeg")
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
+  id                    String               @id @default(cuid())
+  settlementId          String
+  settlement            Settlement           @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  type                  SettlementLegType
+  recipientCompanyId    String?
+  recipientCompany      Company?             @relation("SettlementLegRecipientCompany", fields: [recipientCompanyId], references: [id], onDelete: Restrict)
+  recipientUserId       String?
+  recipientUser         UserProfile?         @relation("SettlementLegRecipientUser", fields: [recipientUserId], references: [id], onDelete: Restrict)
+  partnerProfileId      String?
+  partnerProfile        PartnerProfile?      @relation("SettlementLegPartnerProfile", fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  amount                Int
+  currency              String               @default("usd")
+  holdUntil             DateTime
+  status                SettlementLegStatus  @default(HOLD)
+  idempotencyKey        String               @unique
+  stripeTransferId      String?              @unique
+  transferAttemptCount  Int                  @default(0)
+  nextTransferAttemptAt DateTime?
+  transferLastError     String?              @db.VarChar(1000)
+  transferLockedAt      DateTime?
+  transferredAt         DateTime?
+  events                SettlementEvent[]
+  reversals             SettlementReversal[] @relation("SettlementReversalSettlementLeg")
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
 
   @@unique([settlementId, type])
   @@unique([settlementId, id])
   @@index([recipientCompanyId, status, holdUntil])
   @@index([recipientUserId, status, holdUntil])
   @@index([partnerProfileId, status, holdUntil])
+  @@index([status, holdUntil])
+  @@index([status, nextTransferAttemptAt])
 }
 
 model SettlementEvent {
@@ -1146,6 +1162,11 @@ model SettlementReversal {
   stripeRefundId           String?
   stripeDisputeId          String?
   stripeTransferReversalId String?                  @unique
+  reversalAttemptCount     Int                      @default(0)
+  nextReversalAttemptAt    DateTime?
+  reversalLastError        String?                  @db.VarChar(1000)
+  reversalLockedAt         DateTime?
+  completedAt              DateTime?
   createdAt                DateTime                 @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
@@ -1153,6 +1174,7 @@ model SettlementReversal {
   @@index([settlementId, settlementLegId])
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])
+  @@index([status, nextReversalAttemptAt])
 }
 
 // Financial order records deliberately use restrictive foreign keys. Historical
