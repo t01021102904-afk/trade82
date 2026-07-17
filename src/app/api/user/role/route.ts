@@ -15,7 +15,12 @@ import {
   ROLE_SELECTION_SOURCE,
 } from "@/lib/onboarding-status";
 
-const validRoles = new Set(["buyer", "seller", "partner"]);
+const validRoles = new Set(["buyer", "seller"] as const);
+type ValidRole = typeof validRoles extends Set<infer Role> ? Role : never;
+
+function isValidRole(role: unknown): role is ValidRole {
+  return typeof role === "string" && validRoles.has(role as ValidRole);
+}
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -35,7 +40,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { role?: unknown } | null;
   const role = body?.role;
 
-  if (typeof role !== "string" || !validRoles.has(role)) {
+  if (!isValidRole(role)) {
     return Response.json({ error: "Invalid role" }, { status: 400 });
   }
   if (await isAdminUser()) {
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
     }
   }
 
-  if (profile && role !== "partner" && profile.role !== "user" && profile.role !== role) {
+  if (profile && profile.role !== "user" && profile.role !== role) {
     const companyState = await getOnboardingCompanyState(profile.id);
     const onboardingComplete = isOnboardingCompleteForRole(
       profile.role,
@@ -99,10 +104,9 @@ export async function POST(request: Request) {
 
   const client = await clerkClient();
 
-  const isPartner = role === "partner";
   await client.users.updateUserMetadata(userId, {
     publicMetadata: {
-      role: isPartner ? "user" : role,
+      role,
       onboardingComplete: false,
       roleSelectionSource: ROLE_SELECTION_SOURCE,
     },
@@ -110,7 +114,7 @@ export async function POST(request: Request) {
   if (profile) {
     await getDb().userProfile.update({
       where: { id: profile.id },
-      data: { role: role === "seller" ? "seller" : role === "buyer" ? "buyer" : "user" },
+      data: { role },
     });
   }
 
@@ -118,6 +122,5 @@ export async function POST(request: Request) {
     ok: true,
     role,
     onboardingComplete: false,
-    ...(isPartner ? { nextPath: "/partner" } : {}),
   });
 }

@@ -10,7 +10,7 @@ import { withLocale } from "@/lib/i18n";
 import { safeInternalPath } from "@/lib/url-security";
 import { cx } from "@/lib/utils";
 
-type Role = "buyer" | "seller" | "partner";
+type Role = "buyer" | "seller";
 type RoleResponse = {
   role?: unknown;
   onboardingComplete?: unknown;
@@ -23,7 +23,7 @@ const roleCards: Array<{
   descriptionKey: string;
   buttonKey: string;
   eyebrowKey: string;
-  tone: "blue" | "emerald" | "violet";
+  tone: "blue" | "emerald";
 }> = [
   {
     role: "seller",
@@ -40,14 +40,6 @@ const roleCards: Array<{
     buttonKey: "onboarding.continueAsBuyer",
     eyebrowKey: "onboarding.roleBuyerEyebrow",
     tone: "blue",
-  },
-  {
-    role: "partner",
-    titleKey: "onboarding.rolePartnerCardTitle",
-    descriptionKey: "onboarding.rolePartnerDescription",
-    buttonKey: "onboarding.continueAsPartner",
-    eyebrowKey: "onboarding.rolePartnerEyebrow",
-    tone: "violet",
   },
 ];
 
@@ -228,12 +220,10 @@ export function RoleSelection({
                       "inline-flex size-9 items-center justify-center rounded-xl border text-sm font-semibold",
                       card.tone === "emerald"
                         ? "theme-success-badge"
-                    : card.tone === "violet"
-                      ? "border-violet-300 bg-violet-50 text-violet-700"
-                      : "theme-info-badge",
+                        : "theme-info-badge",
                     )}
                   >
-                    {card.role === "seller" ? "S" : card.role === "buyer" ? "B" : "P"}
+                    {card.role === "seller" ? "S" : "B"}
                   </span>
                   <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold theme-surface-muted">
                     {t(card.eyebrowKey)}
