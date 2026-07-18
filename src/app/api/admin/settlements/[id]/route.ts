@@ -11,6 +11,7 @@ import { requireAdmin } from "@/lib/authz";
 import {
   approveSettlementRelease,
   holdSettlementRelease,
+  markSettlementManualReconciliation,
   reevaluateSettlementRelease,
 } from "@/lib/stripe-connect-settlement-release";
 
@@ -33,6 +34,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
           actorUserId: user.id,
           reason: requiredStringField(body, "reason", 1000),
         })
+        : action === "mark_reconciliation"
+          ? await markSettlementManualReconciliation({
+            settlementId,
+            actorUserId: user.id,
+            reason: requiredStringField(body, "reason", 1000),
+          })
         : action === "reevaluate"
           ? await reevaluateSettlementRelease({ settlementId, actorUserId: user.id })
           : (() => { throw validationError("action is invalid."); })();

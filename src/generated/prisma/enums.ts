@@ -551,6 +551,15 @@ export const SettlementReversalReason = {
 export type SettlementReversalReason = (typeof SettlementReversalReason)[keyof typeof SettlementReversalReason]
 
 
+export const SettlementReversalSourceType = {
+  REFUND: 'REFUND',
+  DISPUTE_LOST: 'DISPUTE_LOST',
+  PAYMENT_FAILURE: 'PAYMENT_FAILURE'
+} as const
+
+export type SettlementReversalSourceType = (typeof SettlementReversalSourceType)[keyof typeof SettlementReversalSourceType]
+
+
 export const SettlementReversalStatus = {
   ACCOUNTING_APPLIED: 'ACCOUNTING_APPLIED',
   PENDING: 'PENDING',

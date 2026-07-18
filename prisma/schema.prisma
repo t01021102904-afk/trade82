@@ -414,6 +414,12 @@ enum SettlementReversalReason {
   MANUAL
 }
 
+enum SettlementReversalSourceType {
+  REFUND
+  DISPUTE_LOST
+  PAYMENT_FAILURE
+}
+
 enum SettlementReversalStatus {
   ACCOUNTING_APPLIED
   PENDING
@@ -1149,25 +1155,30 @@ model SettlementEvent {
 }
 
 model SettlementReversal {
-  id                       String                   @id @default(cuid())
-  settlementId             String
-  settlement               Settlement               @relation(fields: [settlementId], references: [id], onDelete: Restrict)
-  settlementLegId          String
-  settlementLeg            SettlementLeg            @relation("SettlementReversalSettlementLeg", fields: [settlementId, settlementLegId], references: [settlementId, id], onDelete: Restrict)
-  amount                   Int
-  currency                 String                   @default("usd")
-  reason                   SettlementReversalReason
-  status                   SettlementReversalStatus @default(ACCOUNTING_APPLIED)
-  idempotencyKey           String                   @unique
-  stripeRefundId           String?
-  stripeDisputeId          String?
-  stripeTransferReversalId String?                  @unique
-  reversalAttemptCount     Int                      @default(0)
-  nextReversalAttemptAt    DateTime?
-  reversalLastError        String?                  @db.VarChar(1000)
-  reversalLockedAt         DateTime?
-  completedAt              DateTime?
-  createdAt                DateTime                 @default(now())
+  id                         String                        @id @default(cuid())
+  settlementId               String
+  settlement                 Settlement                    @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  settlementLegId            String
+  settlementLeg              SettlementLeg                 @relation("SettlementReversalSettlementLeg", fields: [settlementId, settlementLegId], references: [settlementId, id], onDelete: Restrict)
+  amount                     Int
+  requestedAmount            Int?
+  successfullyReversedAmount Int                           @default(0)
+  currency                   String                        @default("usd")
+  reason                     SettlementReversalReason
+  sourceType                 SettlementReversalSourceType?
+  stripeSourceObjectId       String?
+  originalStripeTransferId   String?
+  status                     SettlementReversalStatus      @default(ACCOUNTING_APPLIED)
+  idempotencyKey             String                        @unique
+  stripeRefundId             String?
+  stripeDisputeId            String?
+  stripeTransferReversalId   String?                       @unique
+  reversalAttemptCount       Int                           @default(0)
+  nextReversalAttemptAt      DateTime?
+  reversalLastError          String?                       @db.VarChar(1000)
+  reversalLockedAt           DateTime?
+  completedAt                DateTime?
+  createdAt                  DateTime                      @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
   @@unique([stripeDisputeId, settlementLegId])
@@ -1175,6 +1186,7 @@ model SettlementReversal {
   @@index([settlementId, createdAt])
   @@index([settlementLegId, createdAt])
   @@index([status, nextReversalAttemptAt])
+  @@index([sourceType, stripeSourceObjectId, settlementLegId])
 }
 
 // Financial order records deliberately use restrictive foreign keys. Historical

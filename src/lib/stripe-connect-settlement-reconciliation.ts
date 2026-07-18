@@ -7,6 +7,7 @@ import {
   SettlementLegStatus,
   SettlementLegType,
   SettlementReversalReason,
+  SettlementReversalSourceType,
   SettlementReversalStatus,
   SettlementStatus,
 } from "@/generated/prisma/client";
@@ -125,7 +126,13 @@ async function loadLockedSettlement(tx: Tx, paymentRequestId: string) {
     include: {
       legs: { orderBy: { type: "asc" } },
       reversals: {
-        select: { settlementLegId: true, amount: true, status: true },
+        select: {
+          settlementLegId: true,
+          amount: true,
+          requestedAmount: true,
+          successfullyReversedAmount: true,
+          status: true,
+        },
       },
     },
   });
@@ -200,14 +207,17 @@ export function calculateCumulativeSettlementReversalTargets({
   if (!Number.isSafeInteger(cumulativeRefundAmount) || cumulativeRefundAmount < 1 || cumulativeRefundAmount > grossAmount) {
     throw new Error("Cumulative settlement reconciliation amount is invalid.");
   }
-  const financials = calculateStripeConnectSettlementFinancials({
-    grossAmount: cumulativeRefundAmount,
+  const originalFinancials = calculateStripeConnectSettlementFinancials({
+    grossAmount,
     currency,
     hasReferralAttribution,
   });
+  const roundProportionalAmount = (legAmount: number) => Number(
+    (BigInt(cumulativeRefundAmount) * BigInt(legAmount) + BigInt(grossAmount) / BigInt(2)) / BigInt(grossAmount),
+  );
   return new Map<SettlementLegType, number>([
-    [SettlementLegType.SELLER_PAYABLE, financials.sellerPayableAmount],
-    [SettlementLegType.PARTNER_REFERRAL, financials.partnerReferralAmount],
+    [SettlementLegType.SELLER_PAYABLE, roundProportionalAmount(originalFinancials.sellerPayableAmount)],
+    [SettlementLegType.PARTNER_REFERRAL, roundProportionalAmount(originalFinancials.partnerReferralAmount)],
   ]);
 }
 
@@ -227,6 +237,43 @@ async function reconcileEconomicLoss(
     return null;
   }
 
+  const [refundTotals, lostDisputeTotals] = await Promise.all([
+    tx.paymentRefund.aggregate({
+      where: { paymentRequestId: source.paymentRequestId, status: "succeeded" },
+      _sum: { amount: true },
+    }),
+    tx.paymentDispute.aggregate({
+      where: {
+        paymentRequestId: source.paymentRequestId,
+        status: { in: ["lost", "charge_refunded"] },
+      },
+      _sum: { amount: true },
+    }),
+  ]);
+  if ((refundTotals._sum.amount ?? 0) > 0 && (lostDisputeTotals._sum.amount ?? 0) > 0) {
+    await tx.paymentRequest.update({
+      where: { id: paymentRequest.id },
+      data: {
+        requiresManualReconciliation: true,
+        reconciliationNote: "Refund and dispute loss overlap requires manual reconciliation.",
+      },
+    });
+    await createSettlementEvent(tx, {
+      settlementId: settlement.id,
+      eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+      message: "Refund and dispute loss evidence overlaps and requires manual reconciliation.",
+      metadata: {
+        source: source.reason.toLowerCase(),
+        stripeSourceId: source.stripeSourceId,
+        refundAmount: refundTotals._sum.amount ?? 0,
+        disputeLossAmount: lostDisputeTotals._sum.amount ?? 0,
+        requiresManualReconciliation: true,
+      },
+      idempotencyKey: `settlement:${settlement.id}:reconciliation:overlap:${source.stripeSourceId}`,
+    });
+    return { settlementId: settlement.id, requiresManualReconciliation: true, hasTransferredReversal: false };
+  }
+
   const refundAmount = Math.min(paymentRequest.refundAmount, paymentRequest.grossAmount);
   const fullLoss = isFullEconomicLoss(refundAmount, paymentRequest.grossAmount);
   const targets = calculateCumulativeSettlementReversalTargets({
@@ -239,7 +286,7 @@ async function reconcileEconomicLoss(
   for (const reversal of settlement.reversals) {
     priorAmounts.set(
       reversal.settlementLegId,
-      (priorAmounts.get(reversal.settlementLegId) ?? 0) + reversal.amount,
+      (priorAmounts.get(reversal.settlementLegId) ?? 0) + (reversal.requestedAmount ?? reversal.amount),
     );
   }
 
@@ -304,8 +351,17 @@ async function reconcileEconomicLoss(
           settlementId: settlement.id,
           settlementLegId: leg.id,
           amount: delta,
+          requestedAmount: delta,
+          successfullyReversedAmount: 0,
           currency: "usd",
           reason: source.reason,
+          sourceType: source.reason === SettlementReversalReason.REFUND
+            ? SettlementReversalSourceType.REFUND
+            : SettlementReversalSourceType.DISPUTE_LOST,
+          stripeSourceObjectId: source.stripeSourceId,
+          ...(newlyAffectedExternalReversalLegIds.has(leg.id) && leg.stripeTransferId
+            ? { originalStripeTransferId: leg.stripeTransferId }
+            : {}),
           status: newlyAffectedExternalReversalLegIds.has(leg.id)
             ? SettlementReversalStatus.PENDING
             : SettlementReversalStatus.ACCOUNTING_APPLIED,
