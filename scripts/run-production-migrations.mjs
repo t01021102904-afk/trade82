@@ -7,7 +7,13 @@ import { Client } from "pg";
 export const PRODUCTION_ENVIRONMENT = "production";
 export const EXPECTED_SUPABASE_PROJECT = "cjryteuoyiiwsxarblfd";
 export const PREREQUISITE_MIGRATION = "20260716150000_add_partner_program_referral_claims";
-export const TARGET_MIGRATION = "20260717120000_add_settlement_release_approval";
+export const RELEASE_APPROVAL_MIGRATION = "20260717120000_add_settlement_release_approval";
+export const APPROVED_PRODUCTION_MIGRATION_BATCH = Object.freeze([
+  "20260718100000_add_settlement_transfer_reversals",
+  "20260718110000_harden_settlement_reversal_states",
+]);
+export const FIRST_APPROVED_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[0];
+export const TARGET_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[1];
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
   "20260627010000_add_buyer_preferred_supplier_type",
@@ -152,10 +158,7 @@ function isSuccessfulMigrationRecord(record, schemaEvidence) {
       && hasLegacySchemaEvidence(record.migration_name, schemaEvidence));
 }
 
-const INITIAL_PENDING_MIGRATIONS = Object.freeze([
-  PREREQUISITE_MIGRATION,
-  TARGET_MIGRATION,
-]);
+const INITIAL_PENDING_MIGRATIONS = APPROVED_PRODUCTION_MIGRATION_BATCH;
 const RECOVERY_PENDING_MIGRATIONS = Object.freeze([TARGET_MIGRATION]);
 
 function hasExactMigrationList(actual, expected) {
@@ -173,6 +176,22 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     throw error;
   }
 
+  if (!hasExactMigrationList(localMigrationNames, [...localMigrationNames].sort())) {
+    const error = new Error("Local migration history is not in canonical order.");
+    error.code = "pending_set_mismatch";
+    throw error;
+  }
+
+  const firstApprovedIndex = localMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
+  const targetIndex = localMigrationNames.indexOf(TARGET_MIGRATION);
+  if (firstApprovedIndex === -1
+    || targetIndex !== firstApprovedIndex + 1
+    || localMigrationNames.slice(targetIndex + 1).length > 0) {
+    const error = new Error("The approved migration batch is not the final local migration suffix.");
+    error.code = "pending_set_mismatch";
+    throw error;
+  }
+
   for (const record of databaseRecords) {
     if (typeof record.migration_name !== "string" || databaseNames.has(record.migration_name)) {
       throw new Error("Production migration history is invalid.");
@@ -185,10 +204,6 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     if (!localNames.has(record.migration_name)) {
       throw new Error("Production migration history diverges from the application.");
     }
-  }
-
-  if (!localNames.has(TARGET_MIGRATION)) {
-    throw new Error("The allowlisted production migration is missing locally.");
   }
 
   const pendingMigrations = localMigrationNames.filter((name) => !databaseNames.has(name));
@@ -517,144 +532,18 @@ async function queryPrerequisiteSchema(client) {
   return result.rows[0] ?? null;
 }
 
-async function queryTargetPreflight(client) {
-  const result = await client.query(`
-    SELECT
-      (
-        SELECT count(*) = 4
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-          AND table_name IN ('Settlement', 'SettlementLeg', 'SettlementReversal', 'SettlementEvent')
-          AND table_type = 'BASE TABLE'
-      ) AS target_prerequisite_tables,
-      EXISTS (
-        SELECT 1
-        FROM pg_type
-        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_type.typname = 'SettlementEventType'
-          AND pg_type.typtype = 'e'
-      ) AS target_event_type_enum,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_enum
-        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
-        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_type.typname = 'SettlementEventType'
-          AND pg_type.typtype = 'e'
-          AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
-      ) AS target_enum_values_absent,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.tables
-        WHERE table_schema = 'public'
-          AND table_name = 'UserProfile'
-          AND table_type = 'BASE TABLE'
-      ) AS target_user_profile_table,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'UserProfile'
-          AND column_name = 'id'
-          AND data_type = 'text'
-      ) AS target_user_profile_id_text,
-      EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
-        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_class.relname = 'UserProfile'
-          AND pg_constraint.contype IN ('p', 'u')
-          AND array_length(pg_constraint.conkey, 1) = 1
-          AND pg_constraint.conkey[1] = (
-            SELECT pg_attribute.attnum
-            FROM pg_attribute
-            WHERE pg_attribute.attrelid = pg_class.oid
-              AND pg_attribute.attname = 'id'
-              AND NOT pg_attribute.attisdropped
-          )
-      ) AS target_user_profile_id_key,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SettlementLeg'
-          AND column_name = 'status'
-      ) AS target_settlement_leg_status,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SettlementLeg'
-          AND column_name = 'holdUntil'
-      ) AS target_settlement_leg_hold_until,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SettlementReversal'
-          AND column_name = 'status'
-      ) AS target_settlement_reversal_status,
-      NOT EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND (
-            (table_name = 'Settlement' AND column_name IN ('approvedAt', 'approvedByUserId', 'holdReason'))
-            OR (table_name = 'SettlementLeg' AND column_name IN (
-              'transferAttemptCount', 'nextTransferAttemptAt', 'transferLastError',
-              'transferLockedAt', 'transferredAt'
-            ))
-            OR (table_name = 'SettlementReversal' AND column_name IN (
-              'reversalAttemptCount', 'nextReversalAttemptAt', 'reversalLastError',
-              'reversalLockedAt', 'completedAt'
-            ))
-          )
-      ) AS target_columns_absent,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        JOIN pg_namespace ON pg_namespace.oid = pg_constraint.connamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_constraint.conname IN (
-            'Settlement_approval_hold_reason_check',
-            'SettlementLeg_transfer_retry_check',
-            'SettlementReversal_retry_check',
-            'Settlement_approvedByUserId_fkey'
-          )
-      ) AS target_constraints_absent,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_class
-        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_class.relname IN (
-            'Settlement_approvedByUserId_idx',
-            'SettlementLeg_status_holdUntil_idx',
-            'SettlementLeg_status_nextTransferAttemptAt_idx',
-            'SettlementReversal_status_nextReversalAttemptAt_idx'
-          )
-          AND pg_class.relkind = 'i'
-      ) AS target_indexes_absent
-  `);
-  return result.rows[0] ?? null;
-}
-
 async function queryTargetSchema(client) {
   const result = await client.query(`
     SELECT
       (
         SELECT count(*) = 3
+          AND bool_and(pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED'))
         FROM pg_enum
         JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
         JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
         WHERE pg_namespace.nspname = 'public'
           AND pg_type.typname = 'SettlementEventType'
           AND pg_type.typtype = 'e'
-          AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
       ) AS target_enum_values,
       (
         SELECT count(*) = 13
@@ -721,6 +610,364 @@ async function queryTargetSchema(client) {
   return result.rows[0] ?? null;
 }
 
+async function queryFirstMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND table_type = 'BASE TABLE'
+      ) AS first_settlement_reversal_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND table_type = 'BASE TABLE'
+      ) AS first_settlement_leg_table,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class child_table ON child_table.oid = constraint_row.conrelid
+        JOIN pg_class parent_table ON parent_table.oid = constraint_row.confrelid
+        JOIN pg_namespace child_schema ON child_schema.oid = child_table.relnamespace
+        JOIN pg_namespace parent_schema ON parent_schema.oid = parent_table.relnamespace
+        WHERE child_schema.nspname = 'public'
+          AND parent_schema.nspname = 'public'
+          AND child_table.relname = 'SettlementReversal'
+          AND parent_table.relname = 'Settlement'
+          AND constraint_row.contype = 'f'
+          AND ARRAY(
+            SELECT attribute.attname::text
+            FROM unnest(constraint_row.conkey) WITH ORDINALITY AS key_columns(attnum, ordinal)
+            JOIN pg_attribute attribute
+              ON attribute.attrelid = child_table.oid
+             AND attribute.attnum = key_columns.attnum
+            ORDER BY key_columns.ordinal
+          ) = ARRAY['settlementId']::text[]
+          AND ARRAY(
+            SELECT attribute.attname::text
+            FROM unnest(constraint_row.confkey) WITH ORDINALITY AS key_columns(attnum, ordinal)
+            JOIN pg_attribute attribute
+              ON attribute.attrelid = parent_table.oid
+             AND attribute.attnum = key_columns.attnum
+            ORDER BY key_columns.ordinal
+          ) = ARRAY['id']::text[]
+      ) AS first_settlement_reversal_settlement_fk,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class child_table ON child_table.oid = constraint_row.conrelid
+        JOIN pg_class parent_table ON parent_table.oid = constraint_row.confrelid
+        JOIN pg_namespace child_schema ON child_schema.oid = child_table.relnamespace
+        JOIN pg_namespace parent_schema ON parent_schema.oid = parent_table.relnamespace
+        WHERE child_schema.nspname = 'public'
+          AND parent_schema.nspname = 'public'
+          AND child_table.relname = 'SettlementReversal'
+          AND parent_table.relname = 'SettlementLeg'
+          AND constraint_row.contype = 'f'
+          AND ARRAY(
+            SELECT attribute.attname::text
+            FROM unnest(constraint_row.conkey) WITH ORDINALITY AS key_columns(attnum, ordinal)
+            JOIN pg_attribute attribute
+              ON attribute.attrelid = child_table.oid
+             AND attribute.attnum = key_columns.attnum
+            ORDER BY key_columns.ordinal
+          ) = ARRAY['settlementId', 'settlementLegId']::text[]
+          AND ARRAY(
+            SELECT attribute.attname::text
+            FROM unnest(constraint_row.confkey) WITH ORDINALITY AS key_columns(attnum, ordinal)
+            JOIN pg_attribute attribute
+              ON attribute.attrelid = parent_table.oid
+             AND attribute.attnum = key_columns.attnum
+            ORDER BY key_columns.ordinal
+          ) = ARRAY['settlementId', 'id']::text[]
+      ) AS first_settlement_reversal_leg_fk,
+      (
+        SELECT count(*) = 8
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name IN (
+            'amount', 'status', 'reason', 'stripeRefundId', 'stripeDisputeId',
+            'stripeTransferReversalId', 'reversalAttemptCount', 'reversalLockedAt'
+          )
+      ) AS first_settlement_reversal_columns,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'stripeTransferId'
+      ) AS first_settlement_leg_transfer_id,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementReversalSourceType'
+      ) AS first_source_type_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name IN (
+            'requestedAmount', 'successfullyReversedAmount', 'sourceType',
+            'stripeSourceObjectId', 'originalStripeTransferId'
+          )
+      ) AS first_new_columns_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal_sourceType_stripeSourceObjectId_settlementLegId_idx'
+          AND pg_class.relkind = 'i'
+      ) AS first_source_index_absent,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') AS first_anon_role,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') AS first_authenticated_role
+  `);
+  return result.rows[0] ?? null;
+}
+
+async function queryFirstMigrationSchema(client) {
+  const result = await client.query(`
+    SELECT
+      (
+        SELECT count(*) = 3
+          AND bool_and(pg_enum.enumlabel IN ('REFUND', 'DISPUTE_LOST', 'PAYMENT_FAILURE'))
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementReversalSourceType'
+          AND pg_type.typtype = 'e'
+      ) AS first_source_type_enum,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'requestedAmount'
+      ) AS first_requested_amount,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'successfullyReversedAmount'
+          AND data_type = 'integer'
+          AND is_nullable = 'NO'
+          AND column_default = '0'
+      ) AS first_successfully_reversed_amount,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'sourceType'
+          AND udt_name = 'SettlementReversalSourceType'
+      ) AS first_source_type_column,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'stripeSourceObjectId'
+      ) AS first_stripe_source_object_id,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'originalStripeTransferId'
+      ) AS first_original_transfer_id,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_requested_amount_check'
+          AND pg_constraint.contype = 'c'
+      ) AS first_requested_amount_check,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_successfully_reversed_amount_check'
+          AND pg_constraint.contype = 'c'
+      ) AS first_successfully_reversed_amount_check,
+      EXISTS (
+        SELECT 1
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal_sourceType_stripeSourceObjectId_settlementLegId_idx'
+          AND pg_class.relkind = 'i'
+      ) AS first_source_index
+  `);
+  return result.rows[0] ?? null;
+}
+
+async function querySecondMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementReversalStatus'
+          AND pg_type.typtype = 'e'
+      ) AS second_status_enum,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementReversalStatus'
+          AND pg_type.typtype = 'e'
+          AND pg_enum.enumlabel IN ('FAILED', 'NEEDS_MANUAL_REVIEW')
+      ) AS second_status_values_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'manualRequeueCount'
+      ) AS second_manual_requeue_count_absent,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_stripeTransferReversalId_status_check'
+          AND pg_constraint.contype = 'c'
+      ) AS second_status_constraint,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'reversalLockedAt'
+      ) AS second_reversal_locked_at,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal_status_reversalLockedAt_idx'
+          AND pg_class.relkind = 'i'
+      ) AS second_status_index_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_manual_requeue_count_check'
+      ) AS second_manual_requeue_check_absent
+  `);
+  return result.rows[0] ?? null;
+}
+
+async function querySecondMigrationSchema(client) {
+  const result = await client.query(`
+    SELECT
+      (
+        SELECT count(*) = 2
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementReversalStatus'
+          AND pg_type.typtype = 'e'
+          AND pg_enum.enumlabel IN ('FAILED', 'NEEDS_MANUAL_REVIEW')
+      ) AS second_status_values,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'manualRequeueCount'
+          AND data_type = 'integer'
+          AND is_nullable = 'NO'
+          AND column_default = '0'
+      ) AS second_manual_requeue_count,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_manual_requeue_count_check'
+          AND pg_constraint.contype = 'c'
+      ) AS second_manual_requeue_check,
+      EXISTS (
+        SELECT 1
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal_status_reversalLockedAt_idx'
+          AND pg_class.relkind = 'i'
+      ) AS second_status_index,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_constraint.conname = 'SettlementReversal_stripeTransferReversalId_status_check'
+          AND pg_constraint.contype = 'c'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%completed%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%accounting_applied%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%pending%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%failed%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%needs_manual_review%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%stripetransferreversalid%is not null%'
+          AND lower(pg_get_constraintdef(pg_constraint.oid)) LIKE '%stripetransferreversalid%is null%'
+      ) AS second_status_constraint,
+      (
+        SELECT relrowsecurity
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SettlementReversal'
+          AND pg_class.relkind IN ('r', 'p')
+      ) IS TRUE AS second_rls,
+      NOT has_table_privilege('anon', 'public."SettlementReversal"', 'SELECT')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'INSERT')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'UPDATE')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'DELETE')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'TRUNCATE')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'REFERENCES')
+        AND NOT has_table_privilege('anon', 'public."SettlementReversal"', 'TRIGGER')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'SELECT')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'INSERT')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'UPDATE')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'DELETE')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'TRUNCATE')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'REFERENCES')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementReversal"', 'TRIGGER')
+        AS second_public_access_revoked
+  `);
+  return result.rows[0] ?? null;
+}
+
 function allEvidencePresent(evidence, keys) {
   return Boolean(evidence) && keys.every((key) => evidence[key] === true);
 }
@@ -753,21 +1000,6 @@ const PREREQUISITE_SCHEMA_KEYS = [
   "referral_claim_token_public_access_revoked",
 ];
 
-const TARGET_PREFLIGHT_KEYS = [
-  "target_prerequisite_tables",
-  "target_event_type_enum",
-  "target_enum_values_absent",
-  "target_user_profile_table",
-  "target_user_profile_id_text",
-  "target_user_profile_id_key",
-  "target_settlement_leg_status",
-  "target_settlement_leg_hold_until",
-  "target_settlement_reversal_status",
-  "target_columns_absent",
-  "target_constraints_absent",
-  "target_indexes_absent",
-];
-
 const TARGET_SCHEMA_KEYS = [
   "target_enum_values",
   "target_columns",
@@ -776,6 +1008,52 @@ const TARGET_SCHEMA_KEYS = [
   "target_reversal_retry_check",
   "target_approval_fk",
   "target_indexes",
+];
+
+const FIRST_MIGRATION_PREFLIGHT_KEYS = [
+  "first_settlement_reversal_table",
+  "first_settlement_leg_table",
+  "first_settlement_reversal_settlement_fk",
+  "first_settlement_reversal_leg_fk",
+  "first_settlement_reversal_columns",
+  "first_settlement_leg_transfer_id",
+  "first_source_type_absent",
+  "first_new_columns_absent",
+  "first_source_index_absent",
+  "first_anon_role",
+  "first_authenticated_role",
+];
+
+const FIRST_MIGRATION_SCHEMA_KEYS = [
+  "first_source_type_enum",
+  "first_requested_amount",
+  "first_successfully_reversed_amount",
+  "first_source_type_column",
+  "first_stripe_source_object_id",
+  "first_original_transfer_id",
+  "first_requested_amount_check",
+  "first_successfully_reversed_amount_check",
+  "first_source_index",
+];
+
+const SECOND_MIGRATION_PREFLIGHT_KEYS = [
+  "second_status_enum",
+  "second_status_values_absent",
+  "second_manual_requeue_count_absent",
+  "second_status_constraint",
+  "second_reversal_locked_at",
+  "second_status_index_absent",
+  "second_manual_requeue_check_absent",
+];
+
+const SECOND_MIGRATION_SCHEMA_KEYS = [
+  "second_status_values",
+  "second_manual_requeue_count",
+  "second_manual_requeue_check",
+  "second_status_index",
+  "second_status_constraint",
+  "second_rls",
+  "second_public_access_revoked",
 ];
 
 function createProductionClient(connectionString) {
@@ -885,10 +1163,38 @@ export async function runProductionMigrations({
       }
 
       try {
-        assertMigrationApplied(beforeRecords, TARGET_MIGRATION);
+        assertMigrationApplied(beforeRecords, RELEASE_APPROVAL_MIGRATION);
         const targetSchema = await queryTargetSchema(client);
         if (!allEvidencePresent(targetSchema, TARGET_SCHEMA_KEYS)) {
           throw new Error("Target schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+
+      try {
+        assertMigrationApplied(beforeRecords, FIRST_APPROVED_MIGRATION);
+        const firstSchema = await queryFirstMigrationSchema(client);
+        if (!allEvidencePresent(firstSchema, FIRST_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("First migration schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+
+      try {
+        assertMigrationApplied(beforeRecords, TARGET_MIGRATION);
+        const secondSchema = await querySecondMigrationSchema(client);
+        if (!allEvidencePresent(secondSchema, SECOND_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Second migration schema verification failed.");
         }
       } catch {
         throw new ProductionMigrationDiagnostic(
@@ -930,12 +1236,52 @@ export async function runProductionMigrations({
     }
 
     try {
-      if (beforeRecords.some((record) => record.migration_name === TARGET_MIGRATION)) {
-        throw new Error("Target migration record must be absent before deployment.");
+      assertMigrationApplied(beforeRecords, RELEASE_APPROVAL_MIGRATION);
+      const releaseApprovalSchema = await queryTargetSchema(client);
+      if (!allEvidencePresent(releaseApprovalSchema, TARGET_SCHEMA_KEYS)) {
+        throw new Error("Release approval schema preflight failed.");
       }
-      const targetPreflight = await queryTargetPreflight(client);
-      if (!allEvidencePresent(targetPreflight, TARGET_PREFLIGHT_KEYS)) {
-        throw new Error("Target preflight failed.");
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "migration_state_evaluation",
+        source,
+        "target_preflight_failed",
+      );
+    }
+
+    if (state.pendingMigrations.includes(FIRST_APPROVED_MIGRATION)) {
+      try {
+        const firstPreflight = await queryFirstMigrationPreflight(client);
+        if (!allEvidencePresent(firstPreflight, FIRST_MIGRATION_PREFLIGHT_KEYS)) {
+          throw new Error("First migration preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+    } else {
+      try {
+        assertMigrationApplied(beforeRecords, FIRST_APPROVED_MIGRATION);
+        const firstSchema = await queryFirstMigrationSchema(client);
+        if (!allEvidencePresent(firstSchema, FIRST_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("First migration recovery preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+    }
+
+    try {
+      const secondPreflight = await querySecondMigrationPreflight(client);
+      if (!allEvidencePresent(secondPreflight, SECOND_MIGRATION_PREFLIGHT_KEYS)) {
+        throw new Error("Second migration preflight failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(
@@ -974,10 +1320,38 @@ export async function runProductionMigrations({
     }
 
     try {
+      assertMigrationApplied(afterRecords, RELEASE_APPROVAL_MIGRATION);
+      const releaseApprovalSchema = await queryTargetSchema(client);
+      if (!allEvidencePresent(releaseApprovalSchema, TARGET_SCHEMA_KEYS)) {
+        throw new Error("Release approval post-verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "prerequisite_postverify_failed",
+      );
+    }
+
+    try {
+      assertMigrationApplied(afterRecords, FIRST_APPROVED_MIGRATION);
+      const firstSchema = await queryFirstMigrationSchema(client);
+      if (!allEvidencePresent(firstSchema, FIRST_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("First migration post-verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "target_postverify_failed",
+      );
+    }
+
+    try {
       assertMigrationApplied(afterRecords, TARGET_MIGRATION);
-      const targetSchema = await queryTargetSchema(client);
-      if (!allEvidencePresent(targetSchema, TARGET_SCHEMA_KEYS)) {
-        throw new Error("Target post-verification failed.");
+      const secondSchema = await querySecondMigrationSchema(client);
+      if (!allEvidencePresent(secondSchema, SECOND_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Second migration post-verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(
