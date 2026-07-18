@@ -82,8 +82,8 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
     assert.deepEqual(
       idempotencyKeys,
       [
-        "trade82-connect-onboarding:seller:" + company.id,
-        "trade82-connect-onboarding:seller:" + company.id,
+        "trade82-connect-onboarding:seller:" + company.id + ":v2",
+        "trade82-connect-onboarding:seller:" + company.id + ":v2",
       ],
     );
     const event = { type: "account.updated", data: { object: account(stored.stripeAccountId, true) } } as never;
