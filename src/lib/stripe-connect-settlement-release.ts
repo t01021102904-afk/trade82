@@ -72,7 +72,7 @@ const lockedSettlementInclude = {
       },
     },
   },
-  reversals: { select: { settlementLegId: true, amount: true, status: true } },
+  reversals: { select: { settlementLegId: true, amount: true, requestedAmount: true, status: true } },
 } satisfies Prisma.SettlementInclude;
 
 type LockedSettlement = Prisma.SettlementGetPayload<{ include: typeof lockedSettlementInclude }>;
@@ -187,7 +187,7 @@ function reversalAmountsByLeg(settlement: LockedSettlement) {
   const amounts = new Map<string, number[]>();
   for (const reversal of settlement.reversals) {
     const values = amounts.get(reversal.settlementLegId) ?? [];
-    values.push(reversal.amount);
+    values.push(reversal.requestedAmount ?? reversal.amount);
     amounts.set(reversal.settlementLegId, values);
   }
   return amounts;
@@ -289,6 +289,21 @@ async function evaluateLockedSettlement(
   return result;
 }
 
+export async function evaluateSettlementReleaseEligibilityInTransaction(
+  tx: Tx,
+  {
+    settlementId,
+    now,
+  }: {
+    settlementId: string;
+    now: Date;
+  },
+) {
+  const settlement = await loadLockedSettlement(tx, settlementId);
+  if (!settlement) throw new Error("Settlement not found.");
+  return evaluateLockedSettlement(tx, settlement, { now });
+}
+
 export async function evaluateSettlementReleaseEligibility({
   settlementId,
   now = new Date(),
@@ -296,11 +311,7 @@ export async function evaluateSettlementReleaseEligibility({
   settlementId: string;
   now?: Date;
 }) {
-  return getDb().$transaction(async (tx) => {
-    const settlement = await loadLockedSettlement(tx, settlementId);
-    if (!settlement) throw new Error("Settlement not found.");
-    return evaluateLockedSettlement(tx, settlement, { now });
-  });
+  return getDb().$transaction((tx) => evaluateSettlementReleaseEligibilityInTransaction(tx, { settlementId, now }));
 }
 
 export async function releaseEligibleSettlementLegs({
@@ -422,6 +433,46 @@ export async function holdSettlementRelease({
       metadata: { holdReason },
       idempotencyKey: `settlement:${settlement.id}:admin:held:${actorUserId}:${Date.now()}`,
     });
+  });
+}
+
+export async function markSettlementManualReconciliation({
+  settlementId,
+  actorUserId,
+  reason,
+}: {
+  settlementId: string;
+  actorUserId: string;
+  reason: string;
+}) {
+  const reconciliationNote = reason.trim();
+  if (reconciliationNote.length < 3 || reconciliationNote.length > 1000) {
+    throw new Error("Settlement reconciliation reason must be between 3 and 1000 characters.");
+  }
+
+  return getDb().$transaction(async (tx) => {
+    const settlement = await loadLockedSettlement(tx, settlementId);
+    if (!settlement) throw new Error("Settlement not found.");
+    if (hasTransferPendingLeg(settlement)) {
+      throw new Error("This settlement cannot be marked for reconciliation while a transfer is pending.");
+    }
+
+    const updated = await tx.paymentRequest.updateMany({
+      where: { id: settlement.paymentRequestId, requiresManualReconciliation: false },
+      data: { requiresManualReconciliation: true, reconciliationNote },
+    });
+    if (updated.count === 1) {
+      await createSettlementEvent(tx, {
+        settlementId: settlement.id,
+        actorUserId,
+        eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+        message: "An administrator marked this settlement for manual reconciliation.",
+        metadata: { reconciliationNote },
+        idempotencyKey: `settlement:${settlement.id}:admin:manual-reconciliation:${actorUserId}`,
+      });
+    }
+
+    return { settlementId: settlement.id, requiresManualReconciliation: true };
   });
 }
 

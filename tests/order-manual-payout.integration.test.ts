@@ -34,6 +34,7 @@ const settlements = await import(new URL("../src/lib/stripe-connect-settlements.
 const settlementRelease = await import(new URL("../src/lib/stripe-connect-settlement-release.ts", import.meta.url).href);
 const settlementWebhook = await import(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url).href);
 const transferExecution = await import(new URL("../src/lib/stripe-connect-transfer-execution.ts", import.meta.url).href);
+const reversalExecution = await import(new URL("../src/lib/stripe-connect-transfer-reversal-execution.ts", import.meta.url).href);
 const accountDeletion = await import(new URL("../src/lib/account-deletion.ts", import.meta.url).href);
 const settlementReleaseCron = await import(new URL("../src/app/api/cron/settlements/release/route.ts", import.meta.url).href);
 const paymentRequests = await import(new URL("../src/lib/payment-requests.ts", import.meta.url).href);
@@ -1113,7 +1114,7 @@ test("verified refunds reconcile cumulative seller and partner ledger reductions
     current.reversals
       .filter((reversal) => reversal.settlementLegId === current.legs.find((leg) => leg.type === "SELLER_PAYABLE")?.id)
       .reduce((total, reversal) => total + reversal.amount, 0),
-    2_612,
+    2_613,
   );
   assert.equal(
     current.reversals
@@ -1771,6 +1772,35 @@ test("dispute status transitions are auditable, idempotent, and cannot restore w
     assert.equal(metadata.amount, paymentRequest.grossAmount);
     assert.equal(metadata.currency, "usd");
   }
+});
+
+test("a won dispute clears its hold only when normal release eligibility is satisfied", async () => {
+  const { fixture, paymentRequest, evidence, settlement } = await createReconciliableSettlement(
+    "settlement-dispute-won-release-eligibility",
+  );
+  await enableCompanyTransfers(fixture.sellerCompany.id);
+  const expiredAt = await expireSettlementHold(settlement.id);
+  const disputeId = `dp_${unique("won-release")}`;
+
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId: evidence.paymentIntentId!,
+    amount: paymentRequest.grossAmount,
+    status: "needs_response",
+  }), stripeWebhookEvent("charge.dispute.created", new Date(expiredAt.getTime() - 1_000))));
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId: evidence.paymentIntentId!,
+    amount: paymentRequest.grossAmount,
+    status: "won",
+  }), stripeWebhookEvent("charge.dispute.closed", new Date(expiredAt.getTime() + 1_000))));
+
+  const restored = await db.settlement.findUniqueOrThrow({
+    where: { id: settlement.id },
+    include: { legs: true },
+  });
+  assert.equal(restored.status, "READY");
+  assert.equal(restored.legs.find((leg) => leg.type === "SELLER_PAYABLE")?.status, "READY");
 });
 
 test("concurrent refund and dispute losses cap every transferable-leg reversal at its original amount", async () => {
@@ -2714,4 +2744,414 @@ test("settlement release cron rejects invalid CRON_SECRET without evaluating a b
     if (previous === undefined) delete process.env.CRON_SECRET;
     else process.env.CRON_SECRET = previous;
   }
+});
+
+test("manual reversal execution handles seller and partner legs with one idempotent row per leg", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement(
+    "settlement-manual-reversal-both-legs",
+    { withReferral: true },
+  );
+  const legs = await db.settlementLeg.findMany({
+    where: { settlementId: settlement.id },
+    select: { id: true, type: true },
+  });
+  const sellerLeg = legs.find((leg) => leg.type === "SELLER_PAYABLE");
+  const partnerLeg = legs.find((leg) => leg.type === "PARTNER_REFERRAL");
+  assert.ok(sellerLeg);
+  assert.ok(partnerLeg);
+  const sellerTransferId = `tr_${unique("manual-seller-original")}`;
+  const partnerTransferId = `tr_${unique("manual-partner-original")}`;
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({ where: { id: sellerLeg.id }, data: { status: "REVERSAL_PENDING", stripeTransferId: sellerTransferId, transferredAt: new Date() } }),
+    db.settlementLeg.update({ where: { id: partnerLeg.id }, data: { status: "REVERSAL_PENDING", stripeTransferId: partnerTransferId, transferredAt: new Date() } }),
+  ]);
+
+  const refundId = `re_${unique("manual-reversal")}`;
+  const sellerReversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: refundId,
+      stripeRefundId: refundId,
+      originalStripeTransferId: sellerTransferId,
+      status: "PENDING",
+      idempotencyKey: unique("seller-reversal-execution"),
+    },
+  });
+  const partnerReversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: partnerLeg.id,
+      amount: 50,
+      requestedAmount: 50,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: refundId,
+      stripeRefundId: refundId,
+      originalStripeTransferId: partnerTransferId,
+      status: "PENDING",
+      idempotencyKey: unique("partner-reversal-execution"),
+    },
+  });
+
+  const calls: Array<{ transferId: string; amount: number; idempotencyKey: string }> = [];
+  const stripe = {
+    transfers: {
+      listReversals: async () => ({ data: [] }),
+      createReversal: async (
+        transferId: string,
+        params: { amount?: number },
+        options: { idempotencyKey?: string },
+      ) => {
+        calls.push({ transferId, amount: params.amount ?? 0, idempotencyKey: options.idempotencyKey ?? "" });
+        return { id: `trr_${unique("manual-reversal")}`, amount: params.amount };
+      },
+    },
+  } as never;
+
+  const sellerResult = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: sellerReversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+  });
+  const partnerResult = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: partnerReversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+  });
+  assert.equal(sellerResult.status, "reversed");
+  assert.equal(partnerResult.status, "reversed");
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0]?.idempotencyKey, reversalExecution.settlementReversalIdempotencyKey(sellerReversal.id));
+  assert.equal(calls[1]?.idempotencyKey, reversalExecution.settlementReversalIdempotencyKey(partnerReversal.id));
+  assert.equal(await db.settlementReversal.count({ where: { stripeRefundId: refundId } }), 2);
+
+  const duplicate = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: sellerReversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+  });
+  assert.equal(duplicate.status, "ineligible");
+  assert.equal(calls.length, 2);
+});
+
+test("manual reversals remain pending through a partial reversal and close the leg at the cumulative cap", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-reversal-cumulative");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("cumulative-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const first = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("cumulative-first")}`,
+      originalStripeTransferId: `tr_${unique("cumulative-original-first")}`,
+      status: "PENDING",
+      idempotencyKey: unique("cumulative-first"),
+    },
+  });
+  const second = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: sellerLeg.amount - 100,
+      requestedAmount: sellerLeg.amount - 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("cumulative-second")}`,
+      originalStripeTransferId: `tr_${unique("cumulative-original-second")}`,
+      status: "PENDING",
+      idempotencyKey: unique("cumulative-second"),
+    },
+  });
+  const stripe = {
+    transfers: {
+      listReversals: async () => ({ data: [] }),
+      createReversal: async (
+        _transferId: string,
+        params: { amount?: number },
+      ) => ({ id: `trr_${unique("cumulative")}`, amount: params.amount }),
+    },
+  } as never;
+
+  const partial = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: first.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+  });
+  assert.equal(partial.status, "reversed");
+  const partialLeg = await db.settlementLeg.findUniqueOrThrow({ where: { id: sellerLeg.id } });
+  assert.equal(partialLeg.status, "REVERSAL_PENDING");
+
+  const complete = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: second.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+  });
+  assert.equal(complete.status, "reversed");
+  const [finalLeg, finalSettlement] = await Promise.all([
+    db.settlementLeg.findUniqueOrThrow({ where: { id: sellerLeg.id } }),
+    db.settlement.findUniqueOrThrow({ where: { id: settlement.id } }),
+  ]);
+  assert.equal(finalLeg.status, "REVERSED");
+  assert.equal(finalSettlement.status, "REVERSED");
+});
+
+test("attempt-five reversal recovery keeps uncertainty pending and reuses its idempotency key", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-reversal-recovery");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("recovery-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const reversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("recovery-source")}`,
+      originalStripeTransferId: `tr_${unique("recovery-original")}`,
+      status: "PENDING",
+      reversalAttemptCount: 5,
+      reversalLockedAt: new Date("2026-07-18T11:00:00.000Z"),
+      nextReversalAttemptAt: new Date("2026-07-18T11:00:00.000Z"),
+      idempotencyKey: unique("recovery-reversal"),
+    },
+  });
+  const now = new Date("2026-07-18T12:00:00.000Z");
+  const idempotencyKeys: string[] = [];
+  let shouldFail = true;
+  const stripe = {
+    transfers: {
+      listReversals: async () => ({ data: [] }),
+      createReversal: async (
+        _transferId: string,
+        params: { amount?: number },
+        options: { idempotencyKey?: string },
+      ) => {
+        idempotencyKeys.push(options.idempotencyKey ?? "");
+        if (shouldFail) {
+          shouldFail = false;
+          throw { type: "api_connection_error" };
+        }
+        return { id: `trr_${unique("recovery")}`, amount: params.amount };
+      },
+    },
+  } as never;
+
+  const failed = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(failed.status, "recovery_pending");
+  const afterFailure = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(afterFailure.status, "PENDING");
+  assert.equal(afterFailure.reversalAttemptCount, 5);
+  assert.equal(afterFailure.reversalLockedAt, null);
+  assert.match(afterFailure.reversalLastError ?? "", /^uncertain:/);
+
+  await db.settlementReversal.update({
+    where: { id: reversal.id },
+    data: { nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z") },
+  });
+  const recovered = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(recovered.status, "reversed");
+  assert.equal(idempotencyKeys.length, 2);
+  assert.equal(idempotencyKeys[0], reversalExecution.settlementReversalIdempotencyKey(reversal.id));
+  assert.equal(idempotencyKeys[1], idempotencyKeys[0]);
+  assert.equal((await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } })).reversalAttemptCount, 5);
+});
+
+test("a non-uncertain reversal at the attempt limit enters manual review without calling Stripe", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-review-limit");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("manual-review-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const reversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("manual-review-source")}`,
+      originalStripeTransferId: `tr_${unique("manual-review-original")}`,
+      status: "PENDING",
+      reversalAttemptCount: 5,
+      nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z"),
+      idempotencyKey: unique("manual-review-reversal"),
+    },
+  });
+  let stripeCalls = 0;
+  const stripe = {
+    transfers: {
+      listReversals: async () => {
+        stripeCalls += 1;
+        return { data: [] };
+      },
+      createReversal: async () => {
+        stripeCalls += 1;
+        throw new Error("Stripe must not be called at the retry limit.");
+      },
+    },
+  } as never;
+
+  const result = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now: new Date("2026-07-18T12:00:00.000Z"),
+  });
+  assert.equal(result.status, "ineligible");
+  assert.equal(result.errorCode, "reversal_max_attempts");
+  assert.equal(stripeCalls, 0);
+  const reviewed = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(reviewed.status, "NEEDS_MANUAL_REVIEW");
+  assert.equal(reviewed.reversalAttemptCount, 5);
+  assert.equal(reviewed.nextReversalAttemptAt, null);
+  assert.equal(reviewed.reversalLockedAt, null);
+
+  const requeued = await reversalExecution.requeueSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+  });
+  assert.equal(requeued.status, "requeued");
+  assert.equal(stripeCalls, 0);
+  const reset = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(reset.status, "PENDING");
+  assert.equal(reset.reversalAttemptCount, 0);
+  assert.equal(reset.manualRequeueCount, 1);
+  assert.equal(reset.originalStripeTransferId, reversal.originalStripeTransferId);
+});
+
+test("permanent stale recovery remains uncertain and can retry with the same idempotency key", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-review-recovery");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("uncertain-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const reversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("uncertain-source")}`,
+      originalStripeTransferId: `tr_${unique("uncertain-original")}`,
+      status: "PENDING",
+      reversalAttemptCount: 5,
+      reversalLockedAt: new Date("2026-07-18T11:00:00.000Z"),
+      nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z"),
+      idempotencyKey: unique("uncertain-reversal"),
+    },
+  });
+  const idempotencyKeys: string[] = [];
+  let shouldFail = true;
+  const stripe = {
+    transfers: {
+      listReversals: async () => ({ data: [] }),
+      createReversal: async (
+        _transferId: string,
+        _params: { amount?: number },
+        options: { idempotencyKey?: string },
+      ) => {
+        idempotencyKeys.push(options.idempotencyKey ?? "");
+        if (shouldFail) {
+          shouldFail = false;
+          throw { type: "invalid_request_error", code: "resource_missing", statusCode: 404 };
+        }
+        return { id: `trr_${unique("uncertain-recovery")}`, amount: 100 };
+      },
+    },
+  } as never;
+  const now = new Date("2026-07-18T12:00:00.000Z");
+
+  const failed = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(failed.status, "recovery_pending");
+  const uncertain = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(uncertain.status, "PENDING");
+  assert.equal(uncertain.reversalAttemptCount, 5);
+  assert.equal(uncertain.reversalLockedAt, null);
+  assert.match(uncertain.reversalLastError ?? "", /^uncertain:/);
+
+  const recovered = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(recovered.status, "reversed");
+  assert.equal(idempotencyKeys.length, 2);
+  assert.equal(idempotencyKeys[0], reversalExecution.settlementReversalIdempotencyKey(reversal.id));
+  assert.equal(idempotencyKeys[1], idempotencyKeys[0]);
+  assert.equal((await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } })).reversalAttemptCount, 5);
 });

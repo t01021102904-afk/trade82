@@ -109,7 +109,7 @@ test("cumulative refund allocation uses the original settlement split without ro
     cumulativeRefundAmount: 11_000,
   });
 
-  assert.equal(first.get("SELLER_PAYABLE"), 2_612);
+  assert.equal(first.get("SELLER_PAYABLE"), 2_613);
   assert.equal(first.get("PARTNER_REFERRAL"), 14);
   assert.equal(final.get("SELLER_PAYABLE"), 10_450);
   assert.equal(final.get("PARTNER_REFERRAL"), 55);

@@ -8,7 +8,7 @@ import {
 import { getDb } from "@/lib/db";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
 
-const adjustmentStatuses = [
+const adjustmentStatuses: SettlementReversalStatus[] = [
   SettlementReversalStatus.ACCOUNTING_APPLIED,
   SettlementReversalStatus.PENDING,
   SettlementReversalStatus.COMPLETED,
