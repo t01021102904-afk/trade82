@@ -176,10 +176,13 @@ test("approved account-country configuration is explicit, normalized, and fail-c
 test("seller onboarding creates one configured Connect account and never invokes money movement APIs", async () => {
   const { db, rows } = createFakeDb();
   const calls = { accounts: 0, links: 0, transfers: 0, payouts: 0, reversals: 0 };
+  const idempotencyKeys: string[] = [];
+  const accountLinkRequests: Record<string, unknown>[] = [];
   const stripe = {
     accounts: {
       create: async (params: Record<string, unknown>, options: Record<string, unknown>) => {
         calls.accounts += 1;
+        idempotencyKeys.push(String(options.idempotencyKey));
         assert.deepEqual(params.controller, {
           fees: { payer: "application" },
           losses: { payments: "application" },
@@ -187,7 +190,7 @@ test("seller onboarding creates one configured Connect account and never invokes
           stripe_dashboard: { type: "express" },
         });
         assert.deepEqual(params.capabilities, { transfers: { requested: true } });
-        assert.equal(options.idempotencyKey, "trade82-connect-onboarding:seller:seller-company");
+        assert.equal(options.idempotencyKey, "trade82-connect-onboarding:seller:seller-company:v2");
         return fakeAccount("acct_seller");
       },
       retrieve: async () => fakeAccount("acct_seller"),
@@ -195,8 +198,10 @@ test("seller onboarding creates one configured Connect account and never invokes
     accountLinks: {
       create: async (params: Record<string, unknown>) => {
         calls.links += 1;
+        accountLinkRequests.push(params);
         assert.equal(params.type, "account_onboarding");
         assert.equal(params.account, "acct_seller");
+        assert.deepEqual(params.collection_options, { fields: "eventually_due" });
         return { url: "https://connect.stripe.test/link" };
       },
     },
@@ -214,6 +219,9 @@ test("seller onboarding creates one configured Connect account and never invokes
   assert.equal(calls.accounts, 1);
   assert.equal(calls.links, 2);
   assert.deepEqual(calls, { accounts: 1, links: 2, transfers: 0, payouts: 0, reversals: 0 });
+  assert.deepEqual(idempotencyKeys, ["trade82-connect-onboarding:seller:seller-company:v2"]);
+  assert.equal(accountLinkRequests.length, 2);
+  assert.deepEqual(accountLinkRequests.map((request) => request.account), ["acct_seller", "acct_seller"]);
   assert.equal(rows.length, 1);
   assert.equal(rows[0]?.companyId, "seller-company");
   assert.equal(rows[0]?.url, undefined);
@@ -337,7 +345,7 @@ test("an active partner can start onboarding without a seller or buyer company",
   const stripe = {
     accounts: {
       create: async (_params: Record<string, unknown>, options: Record<string, unknown>) => {
-        assert.equal(options.idempotencyKey, "trade82-connect-onboarding:partner:partner-profile");
+        assert.equal(options.idempotencyKey, "trade82-connect-onboarding:partner:partner-profile:v2");
         return fakeAccount("acct_partner");
       },
       retrieve: async () => fakeAccount("acct_partner"),

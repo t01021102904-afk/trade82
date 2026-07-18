@@ -130,7 +130,7 @@ export function assertStripeConnectApprovedCountry(country: string) {
 }
 
 export function stripeConnectOwnerIdempotencyKey(owner: OnboardingOwner) {
-  return `trade82-connect-onboarding:${owner.type}:${owner.id}`;
+  return `trade82-connect-onboarding:${owner.type}:${owner.id}:v2`;
 }
 
 const terminalDisabledReasonPrefixes = ["rejected.", "listed."];
@@ -392,6 +392,9 @@ async function createOnboardingLink(
     refresh_url: refreshUrl,
     return_url: returnUrl,
     type: "account_onboarding",
+    collection_options: {
+      fields: "eventually_due",
+    },
   });
 }
 
