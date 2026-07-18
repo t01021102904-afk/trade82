@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { isStaleTransferPending } from "@/lib/stripe-connect-transfer-recovery";
 
 type SettlementCopy = {
   loading: string;
@@ -10,12 +11,20 @@ type SettlementCopy = {
   hold: string;
   reevaluate: string;
   executeTransfer: string;
+  recoverTransfer: string;
   holdReason: string;
   holdReasonPlaceholder: string;
   saveHold: string;
   cancel: string;
   actionError: string;
   transferActionError: string;
+  transferCompleted: string;
+  transferRetryScheduled: string;
+  transferFailed: string;
+  transferClaimLost: string;
+  transferFinalizationFailed: string;
+  recoveryUnavailable: string;
+  runtimeConfigurationInvalid: string;
   approved: string;
   notApproved: string;
   holdUntil: string;
@@ -63,6 +72,7 @@ type Settlement = {
     transferAttemptCount: number;
     nextTransferAttemptAt: string | null;
     transferLastError: string | null;
+    transferLockedAt: string | null;
     recipientCompany: { legalName: string; tradeName: string | null } | null;
     partnerProfile: { referralCode: string } | null;
   }>;
@@ -90,10 +100,35 @@ function dateTime(value: string) {
   return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
 
+type TransferResponse = {
+  ok?: boolean;
+  status?: string;
+  errorCode?: string;
+  nextTransferAttemptAt?: string | null;
+};
+
+function transferOperatorMessage(payload: TransferResponse | null, copy: SettlementCopy) {
+  if (payload?.status === "retry_scheduled") {
+    const retryAt = payload.nextTransferAttemptAt;
+    if (retryAt && Number.isFinite(Date.parse(retryAt))) {
+      return `${copy.transferRetryScheduled} ${dateTime(retryAt)}`;
+    }
+    return copy.transferRetryScheduled;
+  }
+  if (payload?.status === "claim_lost") return copy.transferClaimLost;
+  if (payload?.status === "finalization_failed") return copy.transferFinalizationFailed;
+  if (payload?.errorCode === "runtime_configuration_invalid") return copy.runtimeConfigurationInvalid;
+  if (payload?.errorCode === "transfer_locked" || payload?.errorCode === "not_claimable") {
+    return copy.recoveryUnavailable;
+  }
+  return copy.transferFailed;
+}
+
 export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [transferNotice, setTransferNotice] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
   const [transferActionId, setTransferActionId] = useState<string | null>(null);
   const [holdTarget, setHoldTarget] = useState<string | null>(null);
@@ -158,15 +193,22 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
   async function runTransfer(legId: string) {
     setTransferActionId(legId);
     setError(null);
+    setTransferNotice(null);
     try {
       const response = await fetch(`/api/admin/settlements/legs/${legId}/transfer`, {
         method: "POST",
       });
-      const payload = await response.json().catch(() => null) as { error?: string; errorCode?: string } | null;
-      if (!response.ok) throw new Error(payload?.error || payload?.errorCode || copy.transferActionError);
+      const payload = await response.json().catch(() => null) as TransferResponse | null;
+      if (response.ok && payload?.ok === true && payload.status === "transferred") {
+        await load();
+        setTransferNotice(copy.transferCompleted);
+        return;
+      }
+      const message = transferOperatorMessage(payload, copy);
       await load();
-    } catch (transferError) {
-      setError(transferError instanceof Error ? transferError.message : copy.transferActionError);
+      setError(message);
+    } catch {
+      setError(copy.transferActionError);
     } finally {
       setTransferActionId(null);
     }
@@ -178,6 +220,7 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
   return (
     <section className="grid gap-4" aria-live="polite">
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {transferNotice ? <p className="text-sm text-emerald-700">{transferNotice}</p> : null}
       {settlements.length === 0 ? <p className="text-sm theme-muted">{copy.noSettlements}</p> : null}
       {settlements.map((settlement) => (
         <article key={settlement.id} className="border border-zinc-200 bg-white p-4 shadow-sm">
@@ -211,14 +254,15 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
                   <span>{leg.type} · {money(leg.amount, leg.currency)}</span>
                   <span className="inline-flex items-center gap-2 text-xs theme-muted">
                     <span>{leg.status}</span>
-                    {(leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL") && leg.status === "READY" ? (
+                    {(leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL")
+                      && (leg.status === "READY" || isStaleTransferPending(leg, new Date())) ? (
                       <button
                         type="button"
                         className="h-7 border border-zinc-300 px-2 text-xs text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
                         disabled={transferActionId === leg.id}
                         onClick={() => void runTransfer(leg.id)}
                       >
-                        {copy.executeTransfer}
+                        {leg.status === "READY" ? copy.executeTransfer : copy.recoverTransfer}
                       </button>
                     ) : null}
                   </span>

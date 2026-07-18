@@ -26,6 +26,8 @@ import {
   isTransferAccountReady,
 } from "../src/lib/stripe-connect-settlement-release.ts";
 import { getStripeConnectTransferExecutionMode } from "../src/lib/stripe-connect-transfer-execution-mode.ts";
+import { isStaleTransferPending } from "../src/lib/stripe-connect-transfer-recovery.ts";
+import { settlementTransferHttpStatus } from "../src/lib/stripe-connect-transfer-response.ts";
 import {
   executeSettlementLegTransfer,
   isActivelyTransferLocked,
@@ -33,6 +35,7 @@ import {
   sanitizeStripeTransferError,
   settlementTransferIdempotencyKey,
   validateClaimedTransferLeg,
+  validateTransferLegEligibility,
 } from "../src/lib/stripe-connect-transfer-execution.ts";
 import {
   PaymentRequestStatus,
@@ -548,6 +551,7 @@ test("active pending claims are rejected and stale pending claims are recovered"
 
   const staleState = createTransferExecutionDb(claimedTransferLeg({
     transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+    transferAttemptCount: 5,
   }));
   const idempotencyKeys: unknown[] = [];
   const staleResult = await executeSettlementLegTransfer({
@@ -568,8 +572,46 @@ test("active pending claims are rejected and stale pending claims are recovered"
   });
   assert.equal(staleResult.status, "transferred");
   assert.deepEqual(idempotencyKeys, [settlementTransferIdempotencyKey("leg_123")]);
-  assert.equal(staleState.getLeg().transferAttemptCount, 2);
+  assert.equal(staleState.getLeg().transferAttemptCount, 5);
   assert.equal(staleState.getLeg().status, SettlementLegStatus.TRANSFERRED);
+});
+
+test("a new READY execution cannot start after five attempts, but stale recovery preserves attempt five", async () => {
+  const now = new Date("2026-08-01T12:00:00.000Z");
+  assert.equal(validateTransferLegEligibility(readyTransferLeg({ transferAttemptCount: 5 }), now), "max_attempts");
+
+  const recoveryState = createTransferExecutionDb(claimedTransferLeg({
+    transferAttemptCount: 5,
+    transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+  }));
+  const idempotencyKeys: unknown[] = [];
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: recoveryState.db as never,
+    stripe: {
+      transfers: {
+        create: async (_params: Record<string, unknown>, options: Record<string, unknown>) => {
+          idempotencyKeys.push(options.idempotencyKey);
+          return { id: "tr_attempt_five" };
+        },
+      },
+    } as never,
+    now,
+    ...runtimeReady,
+  });
+  assert.equal(result.status, "transferred");
+  assert.equal(recoveryState.getLeg().transferAttemptCount, 5);
+  assert.deepEqual(idempotencyKeys, [settlementTransferIdempotencyKey("leg_123")]);
+});
+
+test("the admin transfer UI exposes recovery only after the lock timeout", () => {
+  const now = new Date("2026-08-01T12:00:00.000Z");
+  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: "2026-08-01T11:40:00.000Z" }, now), true);
+  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: "2026-08-01T11:55:00.000Z" }, now), false);
+  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: null }, now), false);
+  assert.equal(isStaleTransferPending({ status: "READY", transferLockedAt: "2026-08-01T11:00:00.000Z" }, now), false);
 });
 
 test("runtime configuration is checked before database or Stripe access", async () => {
@@ -656,7 +698,7 @@ test("stale recovery finalizes a Stripe transfer accepted before persistence fai
   });
   assert.equal(recovered.status, "transferred");
   assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFERRED);
-  assert.equal(state.getLeg().transferAttemptCount, 2);
+  assert.equal(state.getLeg().transferAttemptCount, 1);
   assert.deepEqual(idempotencyKeys, [
     settlementTransferIdempotencyKey("leg_123"),
     settlementTransferIdempotencyKey("leg_123"),
@@ -886,6 +928,23 @@ test("off mode returns before database or Stripe clients are touched", async () 
   });
 });
 
+test("manual transfer endpoint maps every unsuccessful result to a non-2xx status", async () => {
+  assert.deepEqual(
+    [
+      settlementTransferHttpStatus({ status: "transferred", retryable: false }),
+      settlementTransferHttpStatus({ status: "disabled", retryable: false }),
+      settlementTransferHttpStatus({ status: "ineligible", retryable: false }),
+      settlementTransferHttpStatus({ status: "claim_lost", retryable: false }),
+      settlementTransferHttpStatus({ status: "retry_scheduled", retryable: true }),
+      settlementTransferHttpStatus({ status: "failed", retryable: false }),
+      settlementTransferHttpStatus({ status: "failed", retryable: true }),
+      settlementTransferHttpStatus({ status: "persistence_failed", retryable: false }),
+      settlementTransferHttpStatus({ status: "finalization_failed", retryable: false }),
+    ],
+    [200, 403, 409, 409, 503, 422, 502, 500, 500],
+  );
+});
+
 test("manual transfer endpoint requires same-origin admin authorization and returns sanitized payloads", async () => {
   const route = await readFile(
     new URL("../src/app/api/admin/settlements/legs/[id]/transfer/route.ts", import.meta.url),
@@ -895,9 +954,20 @@ test("manual transfer endpoint requires same-origin admin authorization and retu
   assert.match(route, /assertSameOrigin\(request\)/);
   assert.match(route, /requireAdmin\(\)/);
   assert.match(route, /executeSettlementLegTransfer/);
-  assert.match(route, /status === "disabled"[\s\S]*403/);
-  assert.match(route, /status === "ineligible"[\s\S]*409/);
+  assert.match(route, /settlementTransferHttpStatus/);
   assert.doesNotMatch(route, /error\.message|error\.stack|console\.(error|log)/);
+});
+
+test("admin transfer UI requires an affirmative payload and does not expose raw error codes", async () => {
+  const ui = await readFile(
+    new URL("../src/components/admin-settlement-management.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(ui, /payload\?\.ok === true/);
+  assert.match(ui, /payload\.status === "transferred"/);
+  assert.match(ui, /transferOperatorMessage/);
+  assert.match(ui, /isStaleTransferPending/);
+  assert.doesNotMatch(ui, /payload\?\.errorCode\s*\|\|/);
 });
 
 test("settlement referral selection uses the earliest lock then a stable attribution ID", () => {

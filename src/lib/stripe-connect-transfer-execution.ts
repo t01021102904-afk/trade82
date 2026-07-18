@@ -17,13 +17,16 @@ import {
   type StripeConnectTransferExecutionMode,
 } from "@/lib/stripe-connect-transfer-execution-mode";
 import { assertStripeConnectRuntimeConfiguration } from "@/lib/stripe-connect-runtime-mode";
+import {
+  isTransferLockActive,
+  TRANSFER_LOCK_TIMEOUT_MS,
+} from "@/lib/stripe-connect-transfer-recovery";
 
 const transferableLegTypes = new Set<SettlementLegType>([
   SettlementLegType.SELLER_PAYABLE,
   SettlementLegType.PARTNER_REFERRAL,
 ]);
 
-const TRANSFER_LOCK_TIMEOUT_MS = 10 * 60 * 1000;
 const MAX_TRANSFER_ATTEMPTS = 5;
 
 const retryableErrorTypes = new Set([
@@ -125,7 +128,7 @@ export function settlementTransferIdempotencyKey(settlementLegId: string) {
 }
 
 export function isActivelyTransferLocked(lockedAt: Date | null | undefined, now: Date) {
-  return Boolean(lockedAt && now.getTime() - lockedAt.getTime() < TRANSFER_LOCK_TIMEOUT_MS);
+  return isTransferLockActive(lockedAt, now);
 }
 
 export function isTransferExecutionAccountReady(account: TransferAccount) {
@@ -215,13 +218,16 @@ export function validateTransferLegEligibility(
   if (leg.amount <= 0) return "invalid_amount";
   if (leg.currency !== "usd") return "invalid_currency";
   if (leg.holdUntil > now) return "hold_not_expired";
-  if (leg.transferAttemptCount >= MAX_TRANSFER_ATTEMPTS) return "max_attempts";
+  if (leg.status === SettlementLegStatus.READY && leg.transferAttemptCount >= MAX_TRANSFER_ATTEMPTS) {
+    return "max_attempts";
+  }
   if (leg.nextTransferAttemptAt && leg.nextTransferAttemptAt > now) return "retry_not_due";
   if (leg.stripeTransferId || leg.transferredAt) return "already_transferred";
   const canRecoverStalePendingSettlement = (
     !claimed
     && leg.status === SettlementLegStatus.TRANSFER_PENDING
     && leg.settlement.status === SettlementStatus.TRANSFER_PENDING
+    && Boolean(leg.transferLockedAt)
     && !isActivelyTransferLocked(leg.transferLockedAt, now)
   );
   if (leg.settlement.status !== SettlementStatus.READY && !canRecoverStalePendingSettlement) {
@@ -362,6 +368,7 @@ async function claimTransferLeg({
     const eligibility = validateTransferLegEligibility(currentLeg, now);
     if (eligibility) return { kind: "ineligible" as const, reason: eligibility };
 
+    const isStaleRecovery = currentLeg.status === SettlementLegStatus.TRANSFER_PENDING;
     const updated = await tx.settlementLeg.updateMany({
       where: {
         id: currentLeg.id,
@@ -389,7 +396,9 @@ async function claimTransferLeg({
       data: {
         status: SettlementLegStatus.TRANSFER_PENDING,
         transferLockedAt: now,
-        transferAttemptCount: { increment: 1 },
+        transferAttemptCount: isStaleRecovery
+          ? currentLeg.transferAttemptCount
+          : { increment: 1 },
         transferLastError: null,
       },
     });
