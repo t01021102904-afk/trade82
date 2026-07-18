@@ -532,18 +532,18 @@ async function queryPrerequisiteSchema(client) {
   return result.rows[0] ?? null;
 }
 
-async function queryTargetSchema(client) {
+export async function queryTargetSchema(client) {
   const result = await client.query(`
     SELECT
       (
         SELECT count(*) = 3
-          AND bool_and(pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED'))
         FROM pg_enum
         JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
         JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
         WHERE pg_namespace.nspname = 'public'
           AND pg_type.typname = 'SettlementEventType'
           AND pg_type.typtype = 'e'
+          AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
       ) AS target_enum_values,
       (
         SELECT count(*) = 13
