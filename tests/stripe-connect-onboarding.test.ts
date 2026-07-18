@@ -177,6 +177,7 @@ test("seller onboarding creates one configured Connect account and never invokes
   const { db, rows } = createFakeDb();
   const calls = { accounts: 0, links: 0, transfers: 0, payouts: 0, reversals: 0 };
   const idempotencyKeys: string[] = [];
+  const accountLinkRequests: Record<string, unknown>[] = [];
   const stripe = {
     accounts: {
       create: async (params: Record<string, unknown>, options: Record<string, unknown>) => {
@@ -197,8 +198,10 @@ test("seller onboarding creates one configured Connect account and never invokes
     accountLinks: {
       create: async (params: Record<string, unknown>) => {
         calls.links += 1;
+        accountLinkRequests.push(params);
         assert.equal(params.type, "account_onboarding");
         assert.equal(params.account, "acct_seller");
+        assert.deepEqual(params.collection_options, { fields: "eventually_due" });
         return { url: "https://connect.stripe.test/link" };
       },
     },
@@ -217,6 +220,8 @@ test("seller onboarding creates one configured Connect account and never invokes
   assert.equal(calls.links, 2);
   assert.deepEqual(calls, { accounts: 1, links: 2, transfers: 0, payouts: 0, reversals: 0 });
   assert.deepEqual(idempotencyKeys, ["trade82-connect-onboarding:seller:seller-company:v2"]);
+  assert.equal(accountLinkRequests.length, 2);
+  assert.deepEqual(accountLinkRequests.map((request) => request.account), ["acct_seller", "acct_seller"]);
   assert.equal(rows.length, 1);
   assert.equal(rows[0]?.companyId, "seller-company");
   assert.equal(rows[0]?.url, undefined);
