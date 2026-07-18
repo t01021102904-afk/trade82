@@ -1,6 +1,6 @@
 import "server-only";
 
-export type StripeConnectTransferExecutionMode = "off" | "manual" | "auto";
+export type StripeConnectTransferExecutionMode = "off" | "manual";
 
 type TransferExecutionEnvironment = {
   STRIPE_CONNECT_TRANSFER_EXECUTION_MODE?: string;
@@ -13,15 +13,13 @@ function runtimeEnvironment(): TransferExecutionEnvironment {
 }
 
 // This mode is intentionally separate from the ledger rollout. Missing or
-// malformed configuration never permits automatic transfer execution.
+// malformed configuration never permits transfer execution.
 export function getStripeConnectTransferExecutionMode(
   env: TransferExecutionEnvironment = runtimeEnvironment(),
 ): StripeConnectTransferExecutionMode {
   switch (env.STRIPE_CONNECT_TRANSFER_EXECUTION_MODE?.trim().toLowerCase()) {
     case "manual":
       return "manual";
-    case "auto":
-      return "auto";
     default:
       return "off";
   }

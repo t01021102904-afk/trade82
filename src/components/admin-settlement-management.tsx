@@ -9,11 +9,13 @@ type SettlementCopy = {
   approve: string;
   hold: string;
   reevaluate: string;
+  executeTransfer: string;
   holdReason: string;
   holdReasonPlaceholder: string;
   saveHold: string;
   cancel: string;
   actionError: string;
+  transferActionError: string;
   approved: string;
   notApproved: string;
   holdUntil: string;
@@ -93,6 +95,7 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [transferActionId, setTransferActionId] = useState<string | null>(null);
   const [holdTarget, setHoldTarget] = useState<string | null>(null);
   const [holdReason, setHoldReason] = useState("");
 
@@ -152,6 +155,23 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
     }
   }
 
+  async function runTransfer(legId: string) {
+    setTransferActionId(legId);
+    setError(null);
+    try {
+      const response = await fetch(`/api/admin/settlements/legs/${legId}/transfer`, {
+        method: "POST",
+      });
+      const payload = await response.json().catch(() => null) as { error?: string; errorCode?: string } | null;
+      if (!response.ok) throw new Error(payload?.error || payload?.errorCode || copy.transferActionError);
+      await load();
+    } catch (transferError) {
+      setError(transferError instanceof Error ? transferError.message : copy.transferActionError);
+    } finally {
+      setTransferActionId(null);
+    }
+  }
+
   if (loading) return <p className="text-sm theme-muted">{copy.loading}</p>;
   if (error && settlements.length === 0) return <p className="text-sm text-red-700">{error}</p>;
 
@@ -189,7 +209,19 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
               {settlement.legs.map((leg) => (
                 <div key={leg.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <span>{leg.type} · {money(leg.amount, leg.currency)}</span>
-                  <span className="text-xs theme-muted">{leg.status}</span>
+                  <span className="inline-flex items-center gap-2 text-xs theme-muted">
+                    <span>{leg.status}</span>
+                    {(leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL") && leg.status === "READY" ? (
+                      <button
+                        type="button"
+                        className="h-7 border border-zinc-300 px-2 text-xs text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+                        disabled={transferActionId === leg.id}
+                        onClick={() => void runTransfer(leg.id)}
+                      >
+                        {copy.executeTransfer}
+                      </button>
+                    ) : null}
+                  </span>
                 </div>
               ))}
             </div>
