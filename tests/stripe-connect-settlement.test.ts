@@ -289,31 +289,57 @@ function readyTransferLeg(overrides: Partial<Parameters<typeof validateClaimedTr
   });
 }
 
-function createTransferExecutionDb(initialLeg: Parameters<typeof validateClaimedTransferLeg>[0]) {
+const runtimeReady = { assertRuntime: () => undefined };
+
+function createTransferExecutionDb(
+  initialLeg: Parameters<typeof validateClaimedTransferLeg>[0],
+  {
+    failOnTransferredEvent = false,
+  }: { failOnTransferredEvent?: boolean } = {},
+) {
+  const options = { failOnTransferredEvent };
   let leg = structuredClone(initialLeg) as Parameters<typeof validateClaimedTransferLeg>[0];
   const events: Array<{ data: Record<string, unknown> }> = [];
   const settlementUpdates: Array<Record<string, unknown>> = [];
 
   const tx = {
+    $executeRaw: async () => 1,
     settlementLeg: {
-      updateMany: async () => {
-        if (
-          leg.status !== SettlementLegStatus.READY ||
-          leg.stripeTransferId ||
-          leg.transferredAt ||
-          leg.transferAttemptCount >= 5
-        ) {
+      updateMany: async ({
+        where,
+        data,
+      }: {
+        where: Record<string, unknown>;
+        data: Record<string, unknown>;
+      }) => {
+        const nestedLock = Array.isArray(where.AND)
+          ? where.AND.find((condition) => (
+            condition && typeof condition === "object" && "transferLockedAt" in condition
+          )) as { transferLockedAt?: unknown } | undefined
+          : undefined;
+        const expectedLock = where.transferLockedAt ?? nestedLock?.transferLockedAt;
+        const matchesOwner = where.status === SettlementLegStatus.TRANSFER_PENDING
+          && where.transferAttemptCount === leg.transferAttemptCount
+          && expectedLock instanceof Date
+          && leg.transferLockedAt instanceof Date
+          && expectedLock.getTime() === leg.transferLockedAt.getTime();
+        const matchesClaim = where.status === leg.status
+          && where.transferAttemptCount === leg.transferAttemptCount;
+        if (where.status === SettlementLegStatus.TRANSFER_PENDING ? !matchesOwner : !matchesClaim) {
           return { count: 0 };
         }
+        if (where.stripeTransferId === null && leg.stripeTransferId) return { count: 0 };
+        if (where.transferredAt === null && leg.transferredAt) return { count: 0 };
         leg = {
           ...leg,
-          status: SettlementLegStatus.TRANSFER_PENDING,
-          transferAttemptCount: leg.transferAttemptCount + 1,
-          transferLockedAt: new Date("2026-08-01T12:00:00.000Z"),
-          transferLastError: null,
+          ...data,
+          ...(data.transferAttemptCount && typeof data.transferAttemptCount === "object"
+            ? { transferAttemptCount: leg.transferAttemptCount + Number((data.transferAttemptCount as { increment: number }).increment) }
+            : {}),
         };
         return { count: 1 };
       },
+      findUnique: async () => leg,
       findUniqueOrThrow: async () => leg,
       update: async ({ data }: { data: Record<string, unknown> }) => {
         leg = { ...leg, ...data };
@@ -328,6 +354,9 @@ function createTransferExecutionDb(initialLeg: Parameters<typeof validateClaimed
           : null
       ),
       create: async ({ data }: { data: Record<string, unknown> }) => {
+        if (options.failOnTransferredEvent && data.eventType === SettlementEventType.TRANSFERRED) {
+          throw new Error("simulated persistence failure");
+        }
         events.push({ data });
         return data;
       },
@@ -349,11 +378,30 @@ function createTransferExecutionDb(initialLeg: Parameters<typeof validateClaimed
 
   return {
     db: {
-      $transaction: async (callback: (transaction: typeof tx) => Promise<unknown>) => callback(tx),
+      $transaction: async (callback: (transaction: typeof tx) => Promise<unknown>) => {
+        const snapshot = structuredClone(leg);
+        try {
+          return await callback(tx);
+        } catch (error) {
+          leg = snapshot as Parameters<typeof validateClaimedTransferLeg>[0];
+          throw error;
+        }
+      },
     },
     events,
     settlementUpdates,
     getLeg: () => leg,
+    setFailOnTransferredEvent: (value: boolean) => {
+      options.failOnTransferredEvent = value;
+    },
+    replaceClaim: (attempt: number, lockedAt: Date) => {
+      leg = {
+        ...leg,
+        status: SettlementLegStatus.TRANSFER_PENDING,
+        transferAttemptCount: attempt,
+        transferLockedAt: lockedAt,
+      };
+    },
   };
 }
 
@@ -374,6 +422,7 @@ test("manual seller transfer success claims once, sends source transaction, and 
       },
     } as never,
     now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
 
   assert.equal(result.status, "transferred");
@@ -436,11 +485,237 @@ test("manual partner transfer success uses the partner connected account", async
       },
     } as never,
     now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
 
   assert.equal(result.status, "transferred");
   assert.deepEqual(destinations, ["acct_partner"]);
   assert.equal(state.getLeg().stripeTransferId, "tr_partner_123");
+});
+
+test("ineligible transfer requests do not consume attempts or create claim events", async () => {
+  for (const leg of [
+    readyTransferLeg({ settlement: { ...readyTransferLeg().settlement, approvedAt: null } }),
+    readyTransferLeg({ holdUntil: new Date("2026-08-02T12:00:00.000Z") }),
+    readyTransferLeg({ recipientCompany: { stripeConnectedAccount: null } }),
+    readyTransferLeg({ settlement: {
+      ...readyTransferLeg().settlement,
+      paymentRequest: { ...readyTransferLeg().settlement.paymentRequest, status: PaymentRequestStatus.PENDING },
+    } }),
+  ]) {
+    const state = createTransferExecutionDb(leg);
+    let stripeCallCount = 0;
+    const result = await executeSettlementLegTransfer({
+      settlementLegId: "leg_123",
+      actorUserId: "admin_123",
+      mode: "manual",
+      db: state.db as never,
+      stripe: {
+        transfers: {
+          create: async () => {
+            stripeCallCount += 1;
+            return { id: "tr_should_not_create" };
+          },
+        },
+      } as never,
+      now: new Date("2026-08-01T12:00:00.000Z"),
+      ...runtimeReady,
+    });
+    assert.equal(result.status, "ineligible");
+    assert.equal(state.getLeg().status, SettlementLegStatus.READY);
+    assert.equal(state.getLeg().transferAttemptCount, 0);
+    assert.equal(state.getLeg().transferLockedAt, null);
+    assert.equal(state.events.length, 0);
+    assert.equal(stripeCallCount, 0);
+  }
+});
+
+test("active pending claims are rejected and stale pending claims are recovered", async () => {
+  const now = new Date("2026-08-01T12:00:00.000Z");
+  const activeState = createTransferExecutionDb(claimedTransferLeg());
+  const activeResult = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: activeState.db as never,
+    stripe: { transfers: { create: async () => ({ id: "tr_should_not_create" }) } } as never,
+    now,
+    ...runtimeReady,
+  });
+  assert.equal(activeResult.status, "ineligible");
+  assert.equal(activeResult.errorCode, "transfer_locked");
+  assert.equal(activeState.getLeg().transferAttemptCount, 1);
+
+  const staleState = createTransferExecutionDb(claimedTransferLeg({
+    transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+  }));
+  const idempotencyKeys: unknown[] = [];
+  const staleResult = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: staleState.db as never,
+    stripe: {
+      transfers: {
+        create: async (_params: Record<string, unknown>, options: Record<string, unknown>) => {
+          idempotencyKeys.push(options.idempotencyKey);
+          return { id: "tr_recovered" };
+        },
+      },
+    } as never,
+    now,
+    ...runtimeReady,
+  });
+  assert.equal(staleResult.status, "transferred");
+  assert.deepEqual(idempotencyKeys, [settlementTransferIdempotencyKey("leg_123")]);
+  assert.equal(staleState.getLeg().transferAttemptCount, 2);
+  assert.equal(staleState.getLeg().status, SettlementLegStatus.TRANSFERRED);
+});
+
+test("runtime configuration is checked before database or Stripe access", async () => {
+  let databaseTouched = false;
+  let stripeTouched = false;
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: {
+      $transaction: async () => {
+        databaseTouched = true;
+        throw new Error("database must not be touched");
+      },
+    } as never,
+    stripe: {
+      transfers: {
+        create: async () => {
+          stripeTouched = true;
+          return { id: "tr_should_not_create" };
+        },
+      },
+    } as never,
+    assertRuntime: () => {
+      throw new Error("runtime mismatch");
+    },
+  });
+  assert.equal(result.status, "ineligible");
+  assert.equal(result.errorCode, "runtime_configuration_invalid");
+  assert.equal(databaseTouched, false);
+  assert.equal(stripeTouched, false);
+});
+
+test("a successful Stripe transfer with failed finalization remains recoverable", async () => {
+  const state = createTransferExecutionDb(readyTransferLeg(), { failOnTransferredEvent: true });
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe: { transfers: { create: async () => ({ id: "tr_accepted" }) } } as never,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(result.status, "finalization_failed");
+  assert.equal(result.errorCode, "transfer_finalization_failed");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+  assert.equal(state.getLeg().transferLockedAt instanceof Date, true);
+  assert.equal(state.getLeg().stripeTransferId, null);
+  assert.equal(state.events.some((event) => event.data.eventType === SettlementEventType.TRANSFERRED), false);
+});
+
+test("stale recovery finalizes a Stripe transfer accepted before persistence failed", async () => {
+  const state = createTransferExecutionDb(readyTransferLeg(), { failOnTransferredEvent: true });
+  const idempotencyKeys: unknown[] = [];
+  const stripe = {
+    transfers: {
+      create: async (_params: Record<string, unknown>, options: Record<string, unknown>) => {
+        idempotencyKeys.push(options.idempotencyKey);
+        return { id: "tr_accepted" };
+      },
+    },
+  } as never;
+  const first = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(first.status, "finalization_failed");
+
+  state.setFailOnTransferredEvent(false);
+  const recovered = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe,
+    now: new Date("2026-08-01T12:11:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(recovered.status, "transferred");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFERRED);
+  assert.equal(state.getLeg().transferAttemptCount, 2);
+  assert.deepEqual(idempotencyKeys, [
+    settlementTransferIdempotencyKey("leg_123"),
+    settlementTransferIdempotencyKey("leg_123"),
+  ]);
+});
+
+test("a stale worker cannot finalize or release a newer claim", async () => {
+  const state = createTransferExecutionDb(readyTransferLeg());
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe: {
+      transfers: {
+        create: async () => {
+          state.replaceClaim(2, new Date("2026-08-01T12:00:01.000Z"));
+          return { id: "tr_old_worker" };
+        },
+      },
+    } as never,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(result.status, "claim_lost");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+  assert.equal(state.getLeg().transferAttemptCount, 2);
+  assert.equal(state.getLeg().transferLockedAt?.toISOString(), "2026-08-01T12:00:01.000Z");
+  assert.equal(state.getLeg().stripeTransferId, null);
+});
+
+test("Stripe failure persistence only releases the matching claim", async () => {
+  for (const failure of [
+    { type: "api_connection_error", code: "rate_limit" },
+    { type: "invalid_request_error", code: "account_invalid" },
+  ]) {
+    const state = createTransferExecutionDb(readyTransferLeg());
+    const result = await executeSettlementLegTransfer({
+      settlementLegId: "leg_123",
+      actorUserId: "admin_123",
+      mode: "manual",
+      db: state.db as never,
+      stripe: {
+        transfers: {
+          create: async () => {
+            state.replaceClaim(2, new Date("2026-08-01T12:00:01.000Z"));
+            throw failure;
+          },
+        },
+      } as never,
+      now: new Date("2026-08-01T12:00:00.000Z"),
+      ...runtimeReady,
+    });
+    assert.equal(result.status, "claim_lost");
+    assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+    assert.equal(state.getLeg().transferAttemptCount, 2);
+    assert.equal(state.getLeg().transferLastError, null);
+    assert.equal(state.events.filter((event) => event.data.eventType === SettlementEventType.TRANSFER_PENDING).length, 1);
+  }
 });
 
 test("manual transfer rejects duplicate and not-approved claims before Stripe is called", async () => {
@@ -462,9 +737,11 @@ test("manual transfer rejects duplicate and not-approved claims before Stripe is
         },
       },
     } as never,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
   assert.equal(duplicate.status, "ineligible");
-  assert.equal(duplicate.errorCode, "not_claimable");
+  assert.equal(duplicate.errorCode, "already_transferred");
 
   const notApproved = createTransferExecutionDb(readyTransferLeg({
     settlement: { ...readyTransferLeg().settlement, approvedAt: null },
@@ -483,9 +760,13 @@ test("manual transfer rejects duplicate and not-approved claims before Stripe is
       },
     } as never,
     now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
-  assert.equal(rejected.status, "failed");
+  assert.equal(rejected.status, "ineligible");
   assert.equal(rejected.errorCode, "not_approved");
+  assert.equal(notApproved.getLeg().status, SettlementLegStatus.READY);
+  assert.equal(notApproved.getLeg().transferAttemptCount, 0);
+  assert.equal(notApproved.events.length, 0);
   assert.equal(stripeCallCount, 0);
 });
 
@@ -504,6 +785,7 @@ test("manual transfer schedules retryable failures and keeps permanent failures 
       },
     } as never,
     now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
   assert.equal(retryable.status, "retry_scheduled");
   assert.equal(retryable.errorCode, "rate_limit");
@@ -526,6 +808,7 @@ test("manual transfer schedules retryable failures and keeps permanent failures 
       },
     } as never,
     now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
   });
   assert.equal(permanent.status, "failed");
   assert.equal(permanent.errorCode, "account_invalid");

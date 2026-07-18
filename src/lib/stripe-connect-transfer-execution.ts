@@ -16,6 +16,7 @@ import {
   getStripeConnectTransferExecutionMode,
   type StripeConnectTransferExecutionMode,
 } from "@/lib/stripe-connect-transfer-execution-mode";
+import { assertStripeConnectRuntimeConfiguration } from "@/lib/stripe-connect-runtime-mode";
 
 const transferableLegTypes = new Set<SettlementLegType>([
   SettlementLegType.SELLER_PAYABLE,
@@ -97,7 +98,16 @@ type ClaimedTransferLeg = Prisma.SettlementLegGetPayload<{
 export type SettlementTransferExecutionResult = {
   ok: boolean;
   settlementLegId: string;
-  status: "disabled" | "claimed" | "transferred" | "retry_scheduled" | "failed" | "ineligible";
+  status:
+    | "disabled"
+    | "claimed"
+    | "transferred"
+    | "retry_scheduled"
+    | "failed"
+    | "ineligible"
+    | "claim_lost"
+    | "persistence_failed"
+    | "finalization_failed";
   retryable: boolean;
   errorCode?: string;
   nextTransferAttemptAt?: string | null;
@@ -184,14 +194,39 @@ function ineligible(code: string, legId: string): SettlementTransferExecutionRes
 }
 
 export function validateClaimedTransferLeg(leg: ClaimedTransferLeg, now: Date) {
-  if (!transferableLegTypes.has(leg.type)) return "not_transferable";
   if (leg.status !== SettlementLegStatus.TRANSFER_PENDING) return "not_claimed";
+  return validateTransferLegEligibility(leg, now, { claimed: true });
+}
+
+export function validateTransferLegEligibility(
+  leg: ClaimedTransferLeg,
+  now: Date,
+  { claimed = false }: { claimed?: boolean } = {},
+) {
+  if (!transferableLegTypes.has(leg.type)) return "not_transferable";
+  if (
+    !claimed
+    && leg.status !== SettlementLegStatus.READY
+    && leg.status !== SettlementLegStatus.TRANSFER_PENDING
+  ) {
+    return "not_claimable";
+  }
+  if (!claimed && isActivelyTransferLocked(leg.transferLockedAt, now)) return "transfer_locked";
   if (leg.amount <= 0) return "invalid_amount";
   if (leg.currency !== "usd") return "invalid_currency";
   if (leg.holdUntil > now) return "hold_not_expired";
-  if (leg.transferAttemptCount > MAX_TRANSFER_ATTEMPTS) return "max_attempts";
+  if (leg.transferAttemptCount >= MAX_TRANSFER_ATTEMPTS) return "max_attempts";
+  if (leg.nextTransferAttemptAt && leg.nextTransferAttemptAt > now) return "retry_not_due";
   if (leg.stripeTransferId || leg.transferredAt) return "already_transferred";
-  if (leg.settlement.status !== SettlementStatus.READY) return "settlement_not_ready";
+  const canRecoverStalePendingSettlement = (
+    !claimed
+    && leg.status === SettlementLegStatus.TRANSFER_PENDING
+    && leg.settlement.status === SettlementStatus.TRANSFER_PENDING
+    && !isActivelyTransferLocked(leg.transferLockedAt, now)
+  );
+  if (leg.settlement.status !== SettlementStatus.READY && !canRecoverStalePendingSettlement) {
+    return "settlement_not_ready";
+  }
   if (!leg.settlement.approvedAt) return "not_approved";
   if (leg.settlement.holdReason) return "settlement_on_hold";
   if (leg.settlement.paymentRequest.status !== PaymentRequestStatus.PAID) return "payment_not_paid";
@@ -279,15 +314,61 @@ async function claimTransferLeg({
   actorUserId: string;
 }) {
   return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`trade82-settlement-transfer:${settlementLegId}`}, 0))`;
     const lockExpiresBefore = new Date(now.getTime() - TRANSFER_LOCK_TIMEOUT_MS);
+    const currentLeg = await tx.settlementLeg.findUnique({
+      where: { id: settlementLegId },
+      include: {
+        settlement: {
+          include: {
+            paymentRequest: {
+              select: {
+                id: true,
+                status: true,
+                stripeChargeId: true,
+                requiresManualReconciliation: true,
+              },
+            },
+          },
+        },
+        recipientCompany: {
+          select: {
+            stripeConnectedAccount: {
+              select: {
+                stripeAccountId: true,
+                status: true,
+                transfersEnabled: true,
+                payoutsEnabled: true,
+              },
+            },
+          },
+        },
+        partnerProfile: {
+          select: {
+            stripeConnectedAccount: {
+              select: {
+                stripeAccountId: true,
+                status: true,
+                transfersEnabled: true,
+                payoutsEnabled: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!currentLeg) return { kind: "not_claimable" as const };
+    const eligibility = validateTransferLegEligibility(currentLeg, now);
+    if (eligibility) return { kind: "ineligible" as const, reason: eligibility };
+
     const updated = await tx.settlementLeg.updateMany({
       where: {
-        id: settlementLegId,
-        type: { in: [SettlementLegType.SELLER_PAYABLE, SettlementLegType.PARTNER_REFERRAL] },
-        status: SettlementLegStatus.READY,
+        id: currentLeg.id,
+        status: currentLeg.status,
+        transferAttemptCount: currentLeg.transferAttemptCount,
         stripeTransferId: null,
         transferredAt: null,
-        transferAttemptCount: { lt: MAX_TRANSFER_ATTEMPTS },
         AND: [
           {
             OR: [
@@ -295,12 +376,14 @@ async function claimTransferLeg({
               { nextTransferAttemptAt: { lte: now } },
             ],
           },
-          {
-            OR: [
-              { transferLockedAt: null },
-              { transferLockedAt: { lt: lockExpiresBefore } },
-            ],
-          },
+          currentLeg.status === SettlementLegStatus.READY
+            ? {
+              OR: [
+                { transferLockedAt: null },
+                { transferLockedAt: { lt: lockExpiresBefore } },
+              ],
+            }
+            : { transferLockedAt: currentLeg.transferLockedAt },
         ],
       },
       data: {
@@ -310,7 +393,7 @@ async function claimTransferLeg({
         transferLastError: null,
       },
     });
-    if (updated.count !== 1) return null;
+    if (updated.count !== 1) return { kind: "not_claimable" as const };
 
     const leg = await tx.settlementLeg.findUniqueOrThrow({
       where: { id: settlementLegId },
@@ -367,8 +450,37 @@ async function claimTransferLeg({
       idempotencyKey: `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:claimed`,
     });
     await refreshSettlementStatus(tx, leg.settlementId);
-    return leg;
+    return { kind: "claimed" as const, leg };
   });
+}
+
+function claimOwnershipWhere(leg: ClaimedTransferLeg) {
+  return {
+    id: leg.id,
+    status: SettlementLegStatus.TRANSFER_PENDING,
+    transferLockedAt: leg.transferLockedAt,
+    transferAttemptCount: leg.transferAttemptCount,
+  };
+}
+
+function persistenceFailure(legId: string): SettlementTransferExecutionResult {
+  return {
+    ok: false,
+    settlementLegId: legId,
+    status: "persistence_failed",
+    retryable: false,
+    errorCode: "transfer_state_persistence_failed",
+  };
+}
+
+function claimLost(legId: string): SettlementTransferExecutionResult {
+  return {
+    ok: false,
+    settlementLegId: legId,
+    status: "claim_lost",
+    retryable: false,
+    errorCode: "transfer_claim_lost",
+  };
 }
 
 async function releaseFailedClaim({
@@ -390,9 +502,9 @@ async function releaseFailedClaim({
     retryable: failure.retryable,
   });
 
-  await db.$transaction(async (tx) => {
-    await tx.settlementLeg.update({
-      where: { id: leg.id },
+  const updated = await db.$transaction(async (tx) => {
+    const changed = await tx.settlementLeg.updateMany({
+      where: claimOwnershipWhere(leg),
       data: {
         status: SettlementLegStatus.READY,
         transferLockedAt: null,
@@ -400,6 +512,7 @@ async function releaseFailedClaim({
         nextTransferAttemptAt,
       },
     });
+    if (changed.count !== 1) return false;
     await createTransferEvent(tx, {
       settlementId: leg.settlementId,
       settlementLegId: leg.id,
@@ -417,7 +530,10 @@ async function releaseFailedClaim({
       idempotencyKey: `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:failed`,
     });
     await refreshSettlementStatus(tx, leg.settlementId);
+    return true;
   });
+
+  if (!updated) return claimLost(leg.id);
 
   return {
     ok: false,
@@ -442,9 +558,9 @@ async function finalizeSuccessfulTransfer({
   now: Date;
   actorUserId: string;
 }) {
-  await db.$transaction(async (tx) => {
-    await tx.settlementLeg.update({
-      where: { id: leg.id },
+  const updated = await db.$transaction(async (tx) => {
+    const changed = await tx.settlementLeg.updateMany({
+      where: claimOwnershipWhere(leg),
       data: {
         status: SettlementLegStatus.TRANSFERRED,
         stripeTransferId: transfer.id,
@@ -454,6 +570,7 @@ async function finalizeSuccessfulTransfer({
         transferLastError: null,
       },
     });
+    if (changed.count !== 1) return false;
     await createTransferEvent(tx, {
       settlementId: leg.settlementId,
       settlementLegId: leg.id,
@@ -468,7 +585,10 @@ async function finalizeSuccessfulTransfer({
       idempotencyKey: `settlement:${leg.settlementId}:leg:${leg.id}:transfer:${transfer.id}:completed`,
     });
     await refreshSettlementStatus(tx, leg.settlementId);
+    return true;
   });
+
+  if (!updated) return claimLost(leg.id);
 
   return {
     ok: true,
@@ -486,6 +606,7 @@ export async function executeSettlementLegTransfer({
   db,
   stripe,
   now = new Date(),
+  assertRuntime = assertStripeConnectRuntimeConfiguration,
 }: {
   settlementLegId: string;
   actorUserId: string;
@@ -493,6 +614,7 @@ export async function executeSettlementLegTransfer({
   db?: TransferExecutorDb;
   stripe?: Pick<Stripe, "transfers">;
   now?: Date;
+  assertRuntime?: () => unknown;
 }) {
   if (mode !== "manual") {
     return {
@@ -504,25 +626,18 @@ export async function executeSettlementLegTransfer({
     } satisfies SettlementTransferExecutionResult;
   }
 
-  const executorDb = db ?? getDb();
-  const stripeClient = stripe ?? getStripe();
-  const claimed = await claimTransferLeg({ db: executorDb, settlementLegId, now, actorUserId });
-  if (!claimed) return ineligible("not_claimable", settlementLegId);
-
-  const ineligibleReason = validateClaimedTransferLeg(claimed, now);
-  if (ineligibleReason) {
-    return releaseFailedClaim({
-      db: executorDb,
-      leg: claimed,
-      now,
-      actorUserId,
-      failure: {
-        retryable: false,
-        code: ineligibleReason,
-        sanitizedMessage: `permanent:${ineligibleReason}`,
-      },
-    });
+  try {
+    assertRuntime();
+  } catch {
+    return ineligible("runtime_configuration_invalid", settlementLegId);
   }
+
+  const executorDb = db ?? getDb();
+  const claimedResult = await claimTransferLeg({ db: executorDb, settlementLegId, now, actorUserId });
+  if (claimedResult.kind === "not_claimable") return ineligible("not_claimable", settlementLegId);
+  if (claimedResult.kind === "ineligible") return ineligible(claimedResult.reason, settlementLegId);
+  const claimed = claimedResult.leg;
+  const stripeClient = stripe ?? getStripe();
 
   const account = accountForLeg(claimed)!;
   const chargeId = claimed.settlement.paymentRequest.stripeChargeId!;
@@ -545,14 +660,26 @@ export async function executeSettlementLegTransfer({
       },
       { idempotencyKey },
     );
-    return finalizeSuccessfulTransfer({ db: executorDb, leg: claimed, transfer, now, actorUserId });
+    try {
+      return await finalizeSuccessfulTransfer({ db: executorDb, leg: claimed, transfer, now, actorUserId });
+    } catch {
+      return {
+        ...persistenceFailure(claimed.id),
+        status: "finalization_failed",
+        errorCode: "transfer_finalization_failed",
+      } satisfies SettlementTransferExecutionResult;
+    }
   } catch (error) {
-    return releaseFailedClaim({
-      db: executorDb,
-      leg: claimed,
-      now,
-      actorUserId,
-      failure: sanitizeStripeTransferError(error),
-    });
+    try {
+      return await releaseFailedClaim({
+        db: executorDb,
+        leg: claimed,
+        now,
+        actorUserId,
+        failure: sanitizeStripeTransferError(error),
+      });
+    } catch {
+      return persistenceFailure(claimed.id);
+    }
   }
 }
