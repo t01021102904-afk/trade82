@@ -33,6 +33,7 @@ const flags = await import(new URL("../src/lib/trade-order-feature.ts", import.m
 const settlements = await import(new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href);
 const settlementRelease = await import(new URL("../src/lib/stripe-connect-settlement-release.ts", import.meta.url).href);
 const settlementWebhook = await import(new URL("../src/lib/stripe-connect-settlement-webhook.ts", import.meta.url).href);
+const transferExecution = await import(new URL("../src/lib/stripe-connect-transfer-execution.ts", import.meta.url).href);
 const accountDeletion = await import(new URL("../src/lib/account-deletion.ts", import.meta.url).href);
 const settlementReleaseCron = await import(new URL("../src/app/api/cron/settlements/release/route.ts", import.meta.url).href);
 const paymentRequests = await import(new URL("../src/lib/payment-requests.ts", import.meta.url).href);
@@ -309,6 +310,7 @@ async function createVerifiedSettlementWebhookEvidence(
     data: {
       stripeCheckoutSessionId: `cs_${unique("settlement")}`,
       stripePaymentIntentId: `pi_${unique("settlement")}`,
+      stripeChargeId: `ch_${unique("settlement")}`,
     },
     select: {
       id: true,
@@ -2575,6 +2577,131 @@ test("admin release actions preserve amounts and record approval, hold, and reev
   assert.ok(after.events.some((event) => event.eventType === "ADMIN_HELD"));
   assert.ok(after.events.some((event) => event.eventType === "ADMIN_APPROVED"));
   assert.ok(after.events.some((event) => event.eventType === "ADMIN_REEVALUATED"));
+});
+
+test("a committed settlement hold prevents a later transfer claim", async () => {
+  const release = await createReconciliableSettlement("settlement-release-hold-before-claim");
+  await enableCompanyTransfers(release.fixture.sellerCompany.id);
+  await expireSettlementHold(release.settlement.id);
+  await settlementRelease.approveSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  });
+  await settlementRelease.holdSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+    reason: "Manual hold before transfer claim.",
+  });
+
+  let stripeCallCount = 0;
+  const result = await transferExecution.executeSettlementLegTransfer({
+    settlementLegId: (await db.settlementLeg.findFirstOrThrow({
+      where: { settlementId: release.settlement.id, type: "SELLER_PAYABLE" },
+      select: { id: true },
+    })).id,
+    actorUserId: release.fixture.admin.id,
+    mode: "manual",
+    stripe: {
+      transfers: {
+        create: async () => {
+          stripeCallCount += 1;
+          return { id: "tr_should_not_create" };
+        },
+      },
+    } as never,
+    assertRuntime: () => undefined,
+  });
+  assert.equal(result.status, "ineligible");
+  assert.equal(stripeCallCount, 0);
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: release.settlement.id },
+    include: { legs: true },
+  });
+  assert.equal(after.status, "HOLD");
+  assert.equal(after.legs.find((leg) => leg.type === "SELLER_PAYABLE")?.status, "HOLD");
+});
+
+test("a transfer claim blocks a later hold and keeps transfer pending until finalization", async () => {
+  const release = await createReconciliableSettlement("settlement-release-claim-before-hold");
+  await enableCompanyTransfers(release.fixture.sellerCompany.id);
+  await expireSettlementHold(release.settlement.id);
+  await settlementRelease.approveSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  });
+  const leg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: release.settlement.id, type: "SELLER_PAYABLE" },
+    select: { id: true },
+  });
+
+  let holdError: unknown;
+  const result = await transferExecution.executeSettlementLegTransfer({
+    settlementLegId: leg.id,
+    actorUserId: release.fixture.admin.id,
+    mode: "manual",
+    stripe: {
+      transfers: {
+        create: async () => {
+          try {
+            await settlementRelease.holdSettlementRelease({
+              settlementId: release.settlement.id,
+              actorUserId: release.fixture.admin.id,
+              reason: "Hold during transfer claim.",
+            });
+          } catch (error) {
+            holdError = error;
+          }
+          return { id: "tr_claimed_before_hold" };
+        },
+      },
+    } as never,
+    assertRuntime: () => undefined,
+  });
+
+  assert.match(String(holdError), /transfer is pending/i);
+  assert.equal(result.status, "transferred");
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: release.settlement.id },
+    include: { legs: true },
+  });
+  assert.equal(after.legs.find((item) => item.id === leg.id)?.status, "TRANSFERRED");
+});
+
+test("admin approval, hold, and reevaluation reject transferable pending settlements", async () => {
+  const release = await createReconciliableSettlement("settlement-release-pending-admin-actions");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: release.settlement.id, type: "SELLER_PAYABLE" },
+    select: { id: true },
+  });
+  const pendingAt = new Date();
+  await db.$transaction([
+    db.settlement.update({ where: { id: release.settlement.id }, data: { status: "TRANSFER_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "TRANSFER_PENDING", transferLockedAt: pendingAt },
+    }),
+  ]);
+
+  await assert.rejects(() => settlementRelease.approveSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  }), /cannot be approved/i);
+  await assert.rejects(() => settlementRelease.holdSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+    reason: "Pending transfer must remain untouched.",
+  }), /transfer is pending/i);
+  await assert.rejects(() => settlementRelease.reevaluateSettlementRelease({
+    settlementId: release.settlement.id,
+    actorUserId: release.fixture.admin.id,
+  }), /transfer is pending/i);
+
+  const after = await db.settlement.findUniqueOrThrow({
+    where: { id: release.settlement.id },
+    include: { legs: true },
+  });
+  assert.equal(after.status, "TRANSFER_PENDING");
+  assert.equal(after.legs.find((leg) => leg.id === sellerLeg.id)?.status, "TRANSFER_PENDING");
 });
 
 test("settlement release cron rejects invalid CRON_SECRET without evaluating a batch", async () => {

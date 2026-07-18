@@ -88,6 +88,13 @@ type Settlement = {
   }>;
 };
 
+function hasTransferPendingLeg(settlement: Settlement) {
+  return settlement.legs.some((leg) => (
+    (leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL")
+    && leg.status === "TRANSFER_PENDING"
+  ));
+}
+
 function money(amount: number, currency: string) {
   return new Intl.NumberFormat(undefined, {
     style: "currency",
@@ -222,7 +229,9 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
       {transferNotice ? <p className="text-sm text-emerald-700">{transferNotice}</p> : null}
       {settlements.length === 0 ? <p className="text-sm theme-muted">{copy.noSettlements}</p> : null}
-      {settlements.map((settlement) => (
+      {settlements.map((settlement) => {
+        const transferPending = hasTransferPendingLeg(settlement);
+        return (
         <article key={settlement.id} className="border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -272,9 +281,9 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" className="h-8 border border-zinc-300 px-3 text-sm hover:bg-zinc-50 disabled:opacity-50" disabled={actionId === settlement.id} onClick={() => void runAction(settlement.id, "approve")}>{copy.approve}</button>
-            <button type="button" className="h-8 border border-zinc-300 px-3 text-sm hover:bg-zinc-50 disabled:opacity-50" disabled={actionId === settlement.id} onClick={() => void runAction(settlement.id, "reevaluate")}>{copy.reevaluate}</button>
-            <button type="button" className="h-8 border border-amber-300 px-3 text-sm text-amber-800 hover:bg-amber-50 disabled:opacity-50" disabled={actionId === settlement.id} onClick={() => { setHoldTarget(settlement.id); setHoldReason(settlement.holdReason ?? ""); }}>{copy.hold}</button>
+            <button type="button" className="h-8 border border-zinc-300 px-3 text-sm hover:bg-zinc-50 disabled:opacity-50" disabled={actionId === settlement.id || transferPending} onClick={() => void runAction(settlement.id, "approve")}>{copy.approve}</button>
+            <button type="button" className="h-8 border border-zinc-300 px-3 text-sm hover:bg-zinc-50 disabled:opacity-50" disabled={actionId === settlement.id || transferPending} onClick={() => void runAction(settlement.id, "reevaluate")}>{copy.reevaluate}</button>
+            <button type="button" className="h-8 border border-amber-300 px-3 text-sm text-amber-800 hover:bg-amber-50 disabled:opacity-50" disabled={actionId === settlement.id || transferPending} onClick={() => { setHoldTarget(settlement.id); setHoldReason(settlement.holdReason ?? ""); }}>{copy.hold}</button>
           </div>
           {holdTarget === settlement.id ? (
             <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
@@ -284,7 +293,8 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
             </div>
           ) : null}
         </article>
-      ))}
+        );
+      })}
     </section>
   );
 }

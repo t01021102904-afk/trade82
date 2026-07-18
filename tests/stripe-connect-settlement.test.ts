@@ -307,6 +307,7 @@ function createTransferExecutionDb(
 
   const tx = {
     $executeRaw: async () => 1,
+    $queryRaw: async () => [{ id: leg.settlementId }],
     settlementLeg: {
       updateMany: async ({
         where,
@@ -321,11 +322,14 @@ function createTransferExecutionDb(
           )) as { transferLockedAt?: unknown } | undefined
           : undefined;
         const expectedLock = where.transferLockedAt ?? nestedLock?.transferLockedAt;
+        const lockMatches = expectedLock === null
+          ? leg.transferLockedAt === null
+          : expectedLock instanceof Date
+            && leg.transferLockedAt instanceof Date
+            && expectedLock.getTime() === leg.transferLockedAt.getTime();
         const matchesOwner = where.status === SettlementLegStatus.TRANSFER_PENDING
           && where.transferAttemptCount === leg.transferAttemptCount
-          && expectedLock instanceof Date
-          && leg.transferLockedAt instanceof Date
-          && expectedLock.getTime() === leg.transferLockedAt.getTime();
+          && lockMatches;
         const matchesClaim = where.status === leg.status
           && where.transferAttemptCount === leg.transferAttemptCount;
         if (where.status === SettlementLegStatus.TRANSFER_PENDING ? !matchesOwner : !matchesClaim) {
@@ -606,11 +610,12 @@ test("a new READY execution cannot start after five attempts, but stale recovery
   assert.deepEqual(idempotencyKeys, [settlementTransferIdempotencyKey("leg_123")]);
 });
 
-test("the admin transfer UI exposes recovery only after the lock timeout", () => {
+test("the recovery helper allows due unlocked or stale pending legs, but not active locks", () => {
   const now = new Date("2026-08-01T12:00:00.000Z");
   assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: "2026-08-01T11:40:00.000Z" }, now), true);
   assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: "2026-08-01T11:55:00.000Z" }, now), false);
-  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: null }, now), false);
+  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: null }, now), true);
+  assert.equal(isStaleTransferPending({ status: "TRANSFER_PENDING", transferLockedAt: null, nextTransferAttemptAt: "2026-08-01T12:15:00.000Z" }, now), false);
   assert.equal(isStaleTransferPending({ status: "READY", transferLockedAt: "2026-08-01T11:00:00.000Z" }, now), false);
 });
 
@@ -703,6 +708,113 @@ test("stale recovery finalizes a Stripe transfer accepted before persistence fai
     settlementTransferIdempotencyKey("leg_123"),
     settlementTransferIdempotencyKey("leg_123"),
   ]);
+});
+
+test("attempt-five stale recovery keeps uncertain transfers pending after Stripe errors and can retry", async () => {
+  const state = createTransferExecutionDb(claimedTransferLeg({
+    transferAttemptCount: 5,
+    transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+  }));
+  const idempotencyKeys: unknown[] = [];
+  let shouldFail = true;
+  const stripe = {
+    transfers: {
+      create: async (_params: Record<string, unknown>, options: Record<string, unknown>) => {
+        idempotencyKeys.push(options.idempotencyKey);
+        if (shouldFail) throw { type: "api_connection_error", code: "rate_limit" };
+        return { id: "tr_recovered_after_retry" };
+      },
+    },
+  } as never;
+
+  const first = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(first.status, "retry_scheduled");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+  assert.equal(state.getLeg().transferAttemptCount, 5);
+  assert.equal(state.getLeg().transferLockedAt, null);
+  assert.equal(state.getLeg().nextTransferAttemptAt?.toISOString(), "2026-08-01T12:15:00.000Z");
+  assert.equal(isStaleTransferPending(state.getLeg(), new Date("2026-08-01T12:16:00.000Z")), true);
+
+  shouldFail = false;
+  const second = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe,
+    now: new Date("2026-08-01T12:16:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(second.status, "transferred");
+  assert.equal(state.getLeg().transferAttemptCount, 5);
+  assert.deepEqual(idempotencyKeys, [
+    settlementTransferIdempotencyKey("leg_123"),
+    settlementTransferIdempotencyKey("leg_123"),
+  ]);
+});
+
+test("permanent stale recovery failures preserve pending uncertainty without automatic rescheduling", async () => {
+  const state = createTransferExecutionDb(claimedTransferLeg({
+    transferAttemptCount: 5,
+    transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+  }));
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe: {
+      transfers: {
+        create: async () => {
+          throw { type: "invalid_request_error", code: "account_invalid" };
+        },
+      },
+    } as never,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(result.status, "failed");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+  assert.equal(state.getLeg().transferAttemptCount, 5);
+  assert.equal(state.getLeg().nextTransferAttemptAt, null);
+  assert.equal(state.getLeg().transferLockedAt, null);
+  assert.equal(state.getLeg().transferLastError, "permanent:account_invalid");
+});
+
+test("a stale recovery worker cannot release a newer recovery claim", async () => {
+  const state = createTransferExecutionDb(claimedTransferLeg({
+    transferAttemptCount: 5,
+    transferLockedAt: new Date("2026-08-01T11:40:00.000Z"),
+  }));
+  const result = await executeSettlementLegTransfer({
+    settlementLegId: "leg_123",
+    actorUserId: "admin_123",
+    mode: "manual",
+    db: state.db as never,
+    stripe: {
+      transfers: {
+        create: async () => {
+          state.replaceClaim(5, new Date("2026-08-01T12:00:01.000Z"));
+          throw { type: "api_connection_error", code: "rate_limit" };
+        },
+      },
+    } as never,
+    now: new Date("2026-08-01T12:00:00.000Z"),
+    ...runtimeReady,
+  });
+  assert.equal(result.status, "claim_lost");
+  assert.equal(state.getLeg().status, SettlementLegStatus.TRANSFER_PENDING);
+  assert.equal(state.getLeg().transferAttemptCount, 5);
+  assert.equal(state.getLeg().transferLockedAt?.toISOString(), "2026-08-01T12:00:01.000Z");
+  assert.equal(state.getLeg().transferLastError, null);
 });
 
 test("a stale worker cannot finalize or release a newer claim", async () => {
@@ -967,6 +1079,7 @@ test("admin transfer UI requires an affirmative payload and does not expose raw 
   assert.match(ui, /payload\.status === "transferred"/);
   assert.match(ui, /transferOperatorMessage/);
   assert.match(ui, /isStaleTransferPending/);
+  assert.match(ui, /transferPending/);
   assert.doesNotMatch(ui, /payload\?\.errorCode\s*\|\|/);
 });
 

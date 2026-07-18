@@ -98,6 +98,8 @@ type ClaimedTransferLeg = Prisma.SettlementLegGetPayload<{
   };
 }>;
 
+type TransferExecutionKind = "new_execution" | "stale_recovery";
+
 export type SettlementTransferExecutionResult = {
   ok: boolean;
   settlementLegId: string;
@@ -227,7 +229,6 @@ export function validateTransferLegEligibility(
     !claimed
     && leg.status === SettlementLegStatus.TRANSFER_PENDING
     && leg.settlement.status === SettlementStatus.TRANSFER_PENDING
-    && Boolean(leg.transferLockedAt)
     && !isActivelyTransferLocked(leg.transferLockedAt, now)
   );
   if (leg.settlement.status !== SettlementStatus.READY && !canRecoverStalePendingSettlement) {
@@ -322,6 +323,17 @@ async function claimTransferLeg({
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`trade82-settlement-transfer:${settlementLegId}`}, 0))`;
     const lockExpiresBefore = new Date(now.getTime() - TRANSFER_LOCK_TIMEOUT_MS);
+    const legReference = await tx.settlementLeg.findUnique({
+      where: { id: settlementLegId },
+      select: { settlementId: true },
+    });
+    if (!legReference) return { kind: "not_claimable" as const };
+
+    const lockedSettlement = await tx.$queryRaw<Array<{ id: string }>>(
+      Prisma.sql`SELECT "id" FROM "Settlement" WHERE "id" = ${legReference.settlementId} FOR UPDATE`,
+    );
+    if (lockedSettlement.length === 0) return { kind: "not_claimable" as const };
+
     const currentLeg = await tx.settlementLeg.findUnique({
       where: { id: settlementLegId },
       include: {
@@ -459,7 +471,11 @@ async function claimTransferLeg({
       idempotencyKey: `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:claimed`,
     });
     await refreshSettlementStatus(tx, leg.settlementId);
-    return { kind: "claimed" as const, leg };
+    return {
+      kind: "claimed" as const,
+      leg,
+      executionKind: isStaleRecovery ? "stale_recovery" as const : "new_execution" as const,
+    };
   });
 }
 
@@ -498,24 +514,29 @@ async function releaseFailedClaim({
   now,
   failure,
   actorUserId,
+  executionKind,
 }: {
   db: TransferExecutorDb;
   leg: ClaimedTransferLeg;
   now: Date;
   failure: SettlementTransferFailure;
   actorUserId: string;
+  executionKind: TransferExecutionKind;
 }) {
-  const nextTransferAttemptAt = nextTransferRetryAt({
-    attemptCount: leg.transferAttemptCount,
-    now,
-    retryable: failure.retryable,
-  });
+  const isStaleRecovery = executionKind === "stale_recovery";
+  const nextTransferAttemptAt = isStaleRecovery
+    ? (failure.retryable ? new Date(now.getTime() + 15 * 60_000) : null)
+    : nextTransferRetryAt({
+      attemptCount: leg.transferAttemptCount,
+      now,
+      retryable: failure.retryable,
+    });
 
   const updated = await db.$transaction(async (tx) => {
     const changed = await tx.settlementLeg.updateMany({
       where: claimOwnershipWhere(leg),
       data: {
-        status: SettlementLegStatus.READY,
+        status: isStaleRecovery ? SettlementLegStatus.TRANSFER_PENDING : SettlementLegStatus.READY,
         transferLockedAt: null,
         transferLastError: failure.sanitizedMessage,
         nextTransferAttemptAt,
@@ -527,16 +548,23 @@ async function releaseFailedClaim({
       settlementLegId: leg.id,
       eventType: SettlementEventType.TRANSFER_PENDING,
       actorUserId,
-      message: failure.retryable
-        ? "Stripe transfer execution failed with a retryable error."
-        : "Stripe transfer execution failed with a permanent error.",
+      message: isStaleRecovery
+        ? failure.retryable
+          ? "Stale Stripe transfer recovery failed with a retryable error; the uncertain transfer remains pending."
+          : "Stale Stripe transfer recovery failed; the uncertain transfer remains pending."
+        : failure.retryable
+          ? "Stripe transfer execution failed with a retryable error."
+          : "Stripe transfer execution failed with a permanent error.",
       metadata: {
         attempt: leg.transferAttemptCount,
+        executionKind,
         code: failure.code,
         retryable: failure.retryable,
         nextTransferAttemptAt: nextTransferAttemptAt?.toISOString() ?? null,
       },
-      idempotencyKey: `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:failed`,
+      idempotencyKey: isStaleRecovery
+        ? `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:claim:${leg.transferLockedAt?.toISOString() ?? "unknown"}:recovery-failed`
+        : `settlement:${leg.settlementId}:leg:${leg.id}:transfer-attempt:${leg.transferAttemptCount}:failed`,
     });
     await refreshSettlementStatus(tx, leg.settlementId);
     return true;
@@ -685,6 +713,7 @@ export async function executeSettlementLegTransfer({
         leg: claimed,
         now,
         actorUserId,
+        executionKind: claimedResult.executionKind,
         failure: sanitizeStripeTransferError(error),
       });
     } catch {
