@@ -322,7 +322,9 @@ async function queryPrerequisitePreflight(client) {
       EXISTS (
         SELECT 1
         FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_name = 'PartnerProfile'
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND table_type = 'BASE TABLE'
       ) AS partner_profile_table,
       EXISTS (
         SELECT 1
@@ -335,7 +337,9 @@ async function queryPrerequisitePreflight(client) {
       EXISTS (
         SELECT 1
         FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_name = 'UserProfile'
+        WHERE table_schema = 'public'
+          AND table_name = 'UserProfile'
+          AND table_type = 'BASE TABLE'
       ) AS user_profile_table,
       EXISTS (
         SELECT 1
@@ -345,6 +349,40 @@ async function queryPrerequisitePreflight(client) {
           AND column_name = 'id'
           AND data_type = 'text'
       ) AS user_profile_id_text,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'PartnerProfile'
+          AND pg_constraint.contype IN ('p', 'u')
+          AND array_length(pg_constraint.conkey, 1) = 1
+          AND pg_constraint.conkey[1] = (
+            SELECT pg_attribute.attnum
+            FROM pg_attribute
+            WHERE pg_attribute.attrelid = pg_class.oid
+              AND pg_attribute.attname = 'id'
+              AND NOT pg_attribute.attisdropped
+          )
+      ) AS partner_profile_id_key,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'UserProfile'
+          AND pg_constraint.contype IN ('p', 'u')
+          AND array_length(pg_constraint.conkey, 1) = 1
+          AND pg_constraint.conkey[1] = (
+            SELECT pg_attribute.attnum
+            FROM pg_attribute
+            WHERE pg_attribute.attrelid = pg_class.oid
+              AND pg_attribute.attname = 'id'
+              AND NOT pg_attribute.attisdropped
+          )
+      ) AS user_profile_id_key,
       EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') AS anon_role,
       EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') AS authenticated_role,
       NOT EXISTS (
@@ -487,14 +525,79 @@ async function queryTargetPreflight(client) {
         FROM information_schema.tables
         WHERE table_schema = 'public'
           AND table_name IN ('Settlement', 'SettlementLeg', 'SettlementReversal', 'SettlementEvent')
+          AND table_type = 'BASE TABLE'
       ) AS target_prerequisite_tables,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementEventType'
+          AND pg_type.typtype = 'e'
+      ) AS target_event_type_enum,
       NOT EXISTS (
         SELECT 1
         FROM pg_enum
         JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
-        WHERE pg_type.typname = 'SettlementEventType'
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementEventType'
+          AND pg_type.typtype = 'e'
           AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
       ) AS target_enum_values_absent,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'UserProfile'
+          AND table_type = 'BASE TABLE'
+      ) AS target_user_profile_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'UserProfile'
+          AND column_name = 'id'
+          AND data_type = 'text'
+      ) AS target_user_profile_id_text,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'UserProfile'
+          AND pg_constraint.contype IN ('p', 'u')
+          AND array_length(pg_constraint.conkey, 1) = 1
+          AND pg_constraint.conkey[1] = (
+            SELECT pg_attribute.attnum
+            FROM pg_attribute
+            WHERE pg_attribute.attrelid = pg_class.oid
+              AND pg_attribute.attname = 'id'
+              AND NOT pg_attribute.attisdropped
+          )
+      ) AS target_user_profile_id_key,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'status'
+      ) AS target_settlement_leg_status,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'holdUntil'
+      ) AS target_settlement_leg_hold_until,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'status'
+      ) AS target_settlement_reversal_status,
       NOT EXISTS (
         SELECT 1
         FROM information_schema.columns
@@ -547,7 +650,10 @@ async function queryTargetSchema(client) {
         SELECT count(*) = 3
         FROM pg_enum
         JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
-        WHERE pg_type.typname = 'SettlementEventType'
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementEventType'
+          AND pg_type.typtype = 'e'
           AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
       ) AS target_enum_values,
       (
@@ -622,8 +728,10 @@ function allEvidencePresent(evidence, keys) {
 const PREREQUISITE_PREFLIGHT_KEYS = [
   "partner_profile_table",
   "partner_profile_id_text",
+  "partner_profile_id_key",
   "user_profile_table",
   "user_profile_id_text",
+  "user_profile_id_key",
   "anon_role",
   "authenticated_role",
   "referral_claim_token_relations_absent",
@@ -647,7 +755,14 @@ const PREREQUISITE_SCHEMA_KEYS = [
 
 const TARGET_PREFLIGHT_KEYS = [
   "target_prerequisite_tables",
+  "target_event_type_enum",
   "target_enum_values_absent",
+  "target_user_profile_table",
+  "target_user_profile_id_text",
+  "target_user_profile_id_key",
+  "target_settlement_leg_status",
+  "target_settlement_leg_hold_until",
+  "target_settlement_reversal_status",
   "target_columns_absent",
   "target_constraints_absent",
   "target_indexes_absent",

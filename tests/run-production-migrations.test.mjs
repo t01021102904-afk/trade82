@@ -51,8 +51,10 @@ function prerequisitePreflight(overrides = {}) {
   return {
     partner_profile_table: true,
     partner_profile_id_text: true,
+    partner_profile_id_key: true,
     user_profile_table: true,
     user_profile_id_text: true,
+    user_profile_id_key: true,
     anon_role: true,
     authenticated_role: true,
     referral_claim_token_relations_absent: true,
@@ -82,7 +84,14 @@ function prerequisiteSchema(overrides = {}) {
 function targetPreflight(overrides = {}) {
   return {
     target_prerequisite_tables: true,
+    target_event_type_enum: true,
     target_enum_values_absent: true,
+    target_user_profile_table: true,
+    target_user_profile_id_text: true,
+    target_user_profile_id_key: true,
+    target_settlement_leg_status: true,
+    target_settlement_leg_hold_until: true,
+    target_settlement_reversal_status: true,
     target_columns_absent: true,
     target_constraints_absent: true,
     target_indexes_absent: true,
@@ -303,8 +312,10 @@ test("prerequisite preflight fails closed for missing dependencies or partial ob
   for (const missingEvidence of [
     { partner_profile_table: false },
     { partner_profile_id_text: false },
+    { partner_profile_id_key: false },
     { user_profile_table: false },
     { user_profile_id_text: false },
+    { user_profile_id_key: false },
     { anon_role: false },
     { authenticated_role: false },
     { referral_claim_token_columns_absent: false },
@@ -325,20 +336,32 @@ test("prerequisite preflight fails closed for missing dependencies or partial ob
 });
 
 test("target preflight and post-verification fail closed on partial schema", async () => {
-  const preflightFailure = fakeClient([
-    [previousMigration],
-    [prerequisitePreflight()],
-    [targetPreflight({ target_columns_absent: false })],
-  ]);
-  await assertDiagnostic(runProductionMigrations({
-    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
-    createClient: () => preflightFailure.client,
-    localMigrationNames: localMigrations,
-  }), {
-    stage: "migration_state_evaluation",
-    source: "DIRECT_URL",
-    code: "target_preflight_failed",
-  });
+  for (const missingEvidence of [
+    { target_event_type_enum: false },
+    { target_user_profile_table: false },
+    { target_user_profile_id_text: false },
+    { target_user_profile_id_key: false },
+    { target_settlement_leg_status: false },
+    { target_settlement_leg_hold_until: false },
+    { target_settlement_reversal_status: false },
+    { target_columns_absent: false },
+  ]) {
+    const preflightFailure = fakeClient([
+      [previousMigration],
+      [prerequisitePreflight()],
+      [targetPreflight(missingEvidence)],
+    ]);
+    await assertDiagnostic(runProductionMigrations({
+      environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+      createClient: () => preflightFailure.client,
+      localMigrationNames: localMigrations,
+    }), {
+      stage: "migration_state_evaluation",
+      source: "DIRECT_URL",
+      code: "target_preflight_failed",
+    });
+    assert.equal(preflightFailure.calls.end, 1);
+  }
 
   const prerequisitePostFailure = fakeClient([
     [previousMigration],
