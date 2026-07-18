@@ -177,6 +177,12 @@ function hasOpenDispute(settlement: LockedSettlement) {
   return settlement.paymentRequest.disputes.some((dispute) => isOpenSettlementDispute(dispute.status));
 }
 
+function hasTransferPendingLeg(settlement: LockedSettlement) {
+  return settlement.legs.some((leg) => (
+    isTransferableLegType(leg.type) && leg.status === SettlementLegStatus.TRANSFER_PENDING
+  ));
+}
+
 function reversalAmountsByLeg(settlement: LockedSettlement) {
   const amounts = new Map<string, number[]>();
   for (const reversal of settlement.reversals) {
@@ -203,6 +209,7 @@ async function updateSettlementStatusFromLegs(tx: Tx, settlement: LockedSettleme
     || settlement.status === SettlementStatus.REVERSAL_PENDING
     || settlement.status === SettlementStatus.TRANSFERRED
     || settlement.status === SettlementStatus.REVERSED
+    || settlement.status === SettlementStatus.TRANSFER_PENDING
   ) {
     return;
   }
@@ -212,6 +219,7 @@ async function updateSettlementStatusFromLegs(tx: Tx, settlement: LockedSettleme
     select: { type: true, status: true },
   });
   const transferable = legs.filter((leg) => isTransferableLegType(leg.type));
+  if (transferable.some((leg) => leg.status === SettlementLegStatus.TRANSFER_PENDING)) return;
   const nextStatus = transferable.some((leg) => leg.status === SettlementLegStatus.READY)
     ? SettlementStatus.READY
     : SettlementStatus.HOLD;
@@ -351,7 +359,11 @@ export async function approveSettlementRelease({
   return getDb().$transaction(async (tx) => {
     const settlement = await loadLockedSettlement(tx, settlementId);
     if (!settlement) throw new Error("Settlement not found.");
-    if (settlement.status === SettlementStatus.CANCELLED || settlement.status === SettlementStatus.REVERSAL_PENDING) {
+    if (
+      settlement.status === SettlementStatus.CANCELLED
+      || settlement.status === SettlementStatus.REVERSAL_PENDING
+      || hasTransferPendingLeg(settlement)
+    ) {
       throw new Error("This settlement cannot be approved in its current state.");
     }
     await tx.settlement.update({
@@ -387,6 +399,9 @@ export async function holdSettlementRelease({
   return getDb().$transaction(async (tx) => {
     const settlement = await loadLockedSettlement(tx, settlementId);
     if (!settlement) throw new Error("Settlement not found.");
+    if (hasTransferPendingLeg(settlement)) {
+      throw new Error("This settlement cannot be placed on hold while a transfer is pending.");
+    }
     await tx.settlement.update({
       where: { id: settlement.id },
       data: { holdReason, status: SettlementStatus.HOLD },
@@ -422,6 +437,9 @@ export async function reevaluateSettlementRelease({
   return getDb().$transaction(async (tx) => {
     const settlement = await loadLockedSettlement(tx, settlementId);
     if (!settlement) throw new Error("Settlement not found.");
+    if (hasTransferPendingLeg(settlement)) {
+      throw new Error("This settlement cannot be reevaluated while a transfer is pending.");
+    }
     await createSettlementEvent(tx, {
       settlementId: settlement.id,
       eventType: SettlementEventType.ADMIN_REEVALUATED,

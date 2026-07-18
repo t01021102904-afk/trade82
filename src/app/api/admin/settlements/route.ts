@@ -48,6 +48,7 @@ export async function GET() {
             transferAttemptCount: true,
             nextTransferAttemptAt: true,
             transferLastError: true,
+            transferLockedAt: true,
             recipientCompany: { select: { legalName: true, tradeName: true } },
             partnerProfile: { select: { referralCode: true } },
           },
