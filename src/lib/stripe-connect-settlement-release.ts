@@ -289,6 +289,21 @@ async function evaluateLockedSettlement(
   return result;
 }
 
+export async function evaluateSettlementReleaseEligibilityInTransaction(
+  tx: Tx,
+  {
+    settlementId,
+    now,
+  }: {
+    settlementId: string;
+    now: Date;
+  },
+) {
+  const settlement = await loadLockedSettlement(tx, settlementId);
+  if (!settlement) throw new Error("Settlement not found.");
+  return evaluateLockedSettlement(tx, settlement, { now });
+}
+
 export async function evaluateSettlementReleaseEligibility({
   settlementId,
   now = new Date(),
@@ -296,11 +311,7 @@ export async function evaluateSettlementReleaseEligibility({
   settlementId: string;
   now?: Date;
 }) {
-  return getDb().$transaction(async (tx) => {
-    const settlement = await loadLockedSettlement(tx, settlementId);
-    if (!settlement) throw new Error("Settlement not found.");
-    return evaluateLockedSettlement(tx, settlement, { now });
-  });
+  return getDb().$transaction((tx) => evaluateSettlementReleaseEligibilityInTransaction(tx, { settlementId, now }));
 }
 
 export async function releaseEligibleSettlementLegs({

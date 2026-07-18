@@ -1774,6 +1774,35 @@ test("dispute status transitions are auditable, idempotent, and cannot restore w
   }
 });
 
+test("a won dispute clears its hold only when normal release eligibility is satisfied", async () => {
+  const { fixture, paymentRequest, evidence, settlement } = await createReconciliableSettlement(
+    "settlement-dispute-won-release-eligibility",
+  );
+  await enableCompanyTransfers(fixture.sellerCompany.id);
+  const expiredAt = await expireSettlementHold(settlement.id);
+  const disputeId = `dp_${unique("won-release")}`;
+
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId: evidence.paymentIntentId!,
+    amount: paymentRequest.grossAmount,
+    status: "needs_response",
+  }), stripeWebhookEvent("charge.dispute.created", new Date(expiredAt.getTime() - 1_000))));
+  await withStripeConnectSettlementMode("on", () => paymentRequests.syncPaymentRequestDispute(stripeDispute({
+    id: disputeId,
+    paymentIntentId: evidence.paymentIntentId!,
+    amount: paymentRequest.grossAmount,
+    status: "won",
+  }), stripeWebhookEvent("charge.dispute.closed", new Date(expiredAt.getTime() + 1_000))));
+
+  const restored = await db.settlement.findUniqueOrThrow({
+    where: { id: settlement.id },
+    include: { legs: true },
+  });
+  assert.equal(restored.status, "READY");
+  assert.equal(restored.legs.find((leg) => leg.type === "SELLER_PAYABLE")?.status, "READY");
+});
+
 test("concurrent refund and dispute losses cap every transferable-leg reversal at its original amount", async () => {
   const { evidence, settlement } = await createReconciliableSettlement(
     "settlement-refund-dispute-concurrency",

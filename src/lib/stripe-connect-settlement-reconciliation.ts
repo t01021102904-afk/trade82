@@ -13,6 +13,7 @@ import {
 } from "@/generated/prisma/client";
 import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
 import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
+import { evaluateSettlementReleaseEligibilityInTransaction } from "@/lib/stripe-connect-settlement-release";
 
 type Tx = Prisma.TransactionClient;
 
@@ -575,30 +576,45 @@ async function restoreSettlementAfterWonDispute(tx: Tx, source: DisputeReconcili
     select: { id: true },
   });
 
-  if (
-    settlement.status !== SettlementStatus.CANCELLED
-    && settlement.status !== SettlementStatus.REVERSAL_PENDING
-    && settlement.status !== SettlementStatus.TRANSFERRED
-    && settlement.status !== SettlementStatus.REVERSED
-  ) {
-    await tx.settlement.update({
-      where: { id: settlement.id },
-      data: { status: SettlementStatus.HOLD },
+  const releaseEvaluation = anotherOpenDispute
+    ? null
+    : await evaluateSettlementReleaseEligibilityInTransaction(tx, {
+      settlementId: settlement.id,
+      now: source.stripeEventCreatedAt,
     });
-  }
-  for (const leg of settlement.legs) {
-    if (!isInFlightOrTransferred(leg.status) && leg.status !== SettlementLegStatus.CANCELLED) {
-      await tx.settlementLeg.update({
-        where: { id: leg.id },
-        data: { status: SettlementLegStatus.HOLD },
+  if (anotherOpenDispute) {
+    if (
+      settlement.status !== SettlementStatus.CANCELLED
+      && settlement.status !== SettlementStatus.REVERSAL_PENDING
+      && settlement.status !== SettlementStatus.TRANSFERRED
+      && settlement.status !== SettlementStatus.REVERSED
+    ) {
+      await tx.settlement.update({
+        where: { id: settlement.id },
+        data: { status: SettlementStatus.HOLD },
       });
+    }
+    for (const leg of settlement.legs) {
+      if (!isInFlightOrTransferred(leg.status) && leg.status !== SettlementLegStatus.CANCELLED) {
+        await tx.settlementLeg.update({
+          where: { id: leg.id },
+          data: { status: SettlementLegStatus.HOLD },
+        });
+      }
     }
   }
   await createSettlementEvent(tx, {
     settlementId: settlement.id,
     eventType: SettlementEventType.DISPUTE_WON,
-    message: "A favorable dispute outcome retained settlement funds on hold without releasing funds.",
-    metadata: { ...disputeAuditMetadata(source), anotherOpenDispute: Boolean(anotherOpenDispute) },
+    message: anotherOpenDispute
+      ? "A favorable dispute outcome retained settlement funds on hold because another dispute remains open."
+      : "A favorable dispute outcome cleared the dispute hold where normal release eligibility was satisfied.",
+    metadata: {
+      ...disputeAuditMetadata(source),
+      anotherOpenDispute: Boolean(anotherOpenDispute),
+      readyLegIds: releaseEvaluation?.readyLegIds ?? [],
+      blockedLegIds: releaseEvaluation?.blockedLegIds ?? [],
+    },
     idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:won:status:${source.disputeStatus}`,
   });
   return { settlementId: settlement.id };
