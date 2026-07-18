@@ -61,6 +61,7 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
   process.env.STRIPE_CONNECT_RUNTIME_MODE = "test";
   process.env.STRIPE_SECRET_KEY = "sk_test_connect_integration";
   const idempotencyKeys: string[] = [];
+  const accountLinkRequests: Record<string, unknown>[] = [];
   const stripe = {
     accounts: {
       create: async (_params: unknown, options: { idempotencyKey?: string }) => {
@@ -69,7 +70,12 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
       },
       retrieve: async () => account(`acct_connect_${id}`, true),
     },
-    accountLinks: { create: async () => ({ url: "https://connect.stripe.test/onboarding" }) },
+    accountLinks: {
+      create: async (params: Record<string, unknown>) => {
+        accountLinkRequests.push(params);
+        return { url: "https://connect.stripe.test/onboarding" };
+      },
+    },
   };
   try {
     await Promise.all([
@@ -86,6 +92,14 @@ test("disposable PostgreSQL enforces connected-account owner XOR and supports id
         "trade82-connect-onboarding:seller:" + company.id + ":v2",
       ],
     );
+    assert.equal(accountLinkRequests.length, 2);
+    for (const request of accountLinkRequests) {
+      assert.equal(request.account, stored.stripeAccountId);
+      assert.equal(request.type, "account_onboarding");
+      assert.equal(typeof request.refresh_url, "string");
+      assert.equal(typeof request.return_url, "string");
+      assert.deepEqual(request.collection_options, { fields: "eventually_due" });
+    }
     const event = { type: "account.updated", data: { object: account(stored.stripeAccountId, true) } } as never;
     assert.equal((await webhook.processStripeConnectWebhookEvent(event, { db })).updated, true);
     assert.equal((await webhook.processStripeConnectWebhookEvent(event, { db })).updated, false);

@@ -392,6 +392,9 @@ async function createOnboardingLink(
     refresh_url: refreshUrl,
     return_url: returnUrl,
     type: "account_onboarding",
+    collection_options: {
+      fields: "eventually_due",
+    },
   });
 }
 
