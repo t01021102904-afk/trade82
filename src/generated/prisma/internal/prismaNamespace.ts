@@ -4401,6 +4401,7 @@ export const SettlementReversalScalarFieldEnum = {
   stripeDisputeId: 'stripeDisputeId',
   stripeTransferReversalId: 'stripeTransferReversalId',
   reversalAttemptCount: 'reversalAttemptCount',
+  manualRequeueCount: 'manualRequeueCount',
   nextReversalAttemptAt: 'nextReversalAttemptAt',
   reversalLastError: 'reversalLastError',
   reversalLockedAt: 'reversalLockedAt',

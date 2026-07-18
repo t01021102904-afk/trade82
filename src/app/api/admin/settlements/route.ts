@@ -69,6 +69,7 @@ export async function GET() {
             stripeSourceObjectId: true,
             originalStripeTransferId: true,
             reversalAttemptCount: true,
+            manualRequeueCount: true,
             nextReversalAttemptAt: true,
             reversalLockedAt: true,
             reversalLastError: true,

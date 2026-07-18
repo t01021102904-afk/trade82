@@ -563,7 +563,9 @@ export type SettlementReversalSourceType = (typeof SettlementReversalSourceType)
 export const SettlementReversalStatus = {
   ACCOUNTING_APPLIED: 'ACCOUNTING_APPLIED',
   PENDING: 'PENDING',
-  COMPLETED: 'COMPLETED'
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  NEEDS_MANUAL_REVIEW: 'NEEDS_MANUAL_REVIEW'
 } as const
 
 export type SettlementReversalStatus = (typeof SettlementReversalStatus)[keyof typeof SettlementReversalStatus]

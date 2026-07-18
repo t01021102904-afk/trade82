@@ -1,4 +1,3 @@
-const MAX_REVERSAL_ATTEMPTS = 5;
 const REVERSAL_LOCK_TIMEOUT_MS = 10 * 60 * 1000;
 
 export function isStaleSettlementReversal(
@@ -25,6 +24,5 @@ export function isStaleSettlementReversal(
     if (!Number.isFinite(lockedAt) || now.getTime() - lockedAt < REVERSAL_LOCK_TIMEOUT_MS) return false;
     return true;
   }
-  return reversal.reversalAttemptCount >= MAX_REVERSAL_ATTEMPTS
-    || reversal.reversalLastError?.startsWith("uncertain:") === true;
+  return reversal.reversalLastError?.startsWith("uncertain:") === true;
 }

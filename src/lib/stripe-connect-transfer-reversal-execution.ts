@@ -14,8 +14,9 @@ import { getDb } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
 import { getStripeConnectTransferReversalExecutionMode, type StripeConnectTransferReversalExecutionMode } from "@/lib/stripe-connect-transfer-reversal-mode";
 import { isTransferLockActive } from "@/lib/stripe-connect-transfer-recovery";
+import { isStaleSettlementReversal } from "@/lib/stripe-connect-transfer-reversal-recovery";
 
-const MAX_REVERSAL_ATTEMPTS = 5;
+export const MAX_REVERSAL_ATTEMPTS = 5;
 const reversalRetryableTypes = new Set([
   "api_connection_error",
   "api_error",
@@ -69,7 +70,10 @@ export type SettlementReversalExecutionResult = {
     | "ineligible"
     | "claim_lost"
     | "persistence_failed"
-    | "finalization_failed";
+    | "finalization_failed"
+    | "needs_manual_review"
+    | "recovery_pending"
+    | "requeued";
   retryable: boolean;
   errorCode?: string;
   nextReversalAttemptAt?: string | null;
@@ -89,7 +93,7 @@ export function nextReversalRetryAt({
   now: Date;
   retryable: boolean;
 }) {
-  if (!retryable) return null;
+  if (!retryable || attemptCount >= MAX_REVERSAL_ATTEMPTS) return null;
   const delayMinutes = [15, 60, 240, 720][Math.min(Math.max(attemptCount - 1, 0), 3)] ?? 720;
   return new Date(now.getTime() + delayMinutes * 60_000);
 }
@@ -117,7 +121,12 @@ export function sanitizeStripeTransferReversalError(error: unknown): SettlementR
     : type && reversalRetryableTypes.has(type)
       ? type
       : "stripe_transfer_reversal_failed";
-  const retryable = reversalRetryableTypes.has(type ?? "") || Boolean(statusCode && statusCode >= 500);
+  const retryable = code === "balance_insufficient"
+    || (
+      code !== "resource_missing"
+      && code !== "charge_already_refunded"
+      && (reversalRetryableTypes.has(type ?? "") || Boolean(statusCode && statusCode >= 500))
+    );
   return {
     retryable,
     code: safeCode,
@@ -165,12 +174,25 @@ async function findAcceptedStripeReversal(
   stripe: ReversalStripeClient,
   reversal: ClaimedReversal,
 ) {
-  if (reversal.executionKind !== "stale_recovery") return null;
-  const list = await stripe.transfers.listReversals(reversal.originalStripeTransferId, { limit: 100 });
-  return list.data.find((item) => (
-    item.metadata?.settlementReversalId === reversal.id
-    && item.amount === reversal.remainingAmount
-  )) ?? null;
+  if (reversal.executionKind !== "stale_recovery") return { reversal: null, complete: true };
+
+  let startingAfter: string | undefined;
+  for (let page = 0; page < 10; page += 1) {
+    const list = await stripe.transfers.listReversals(reversal.originalStripeTransferId, {
+      limit: 100,
+      ...(startingAfter ? { starting_after: startingAfter } : {}),
+    });
+    const accepted = list.data.find((item) => (
+      item.metadata?.settlementReversalId === reversal.id
+      && item.amount === reversal.remainingAmount
+    ));
+    if (accepted) return { reversal: accepted, complete: true };
+    if (!list.has_more || list.data.length === 0) return { reversal: null, complete: true };
+    startingAfter = list.data[list.data.length - 1]?.id;
+    if (!startingAfter) return { reversal: null, complete: true };
+  }
+
+  return { reversal: null, complete: false };
 }
 
 async function createReversalEvent(
@@ -305,15 +327,42 @@ async function claimReversal({
     if (reversal.nextReversalAttemptAt && reversal.nextReversalAttemptAt > now) return { kind: "ineligible", reason: "reversal_retry_not_due" };
     if (isTransferLockActive(reversal.reversalLockedAt, now)) return { kind: "ineligible", reason: "reversal_locked" };
 
-    const executionKind = reversal.reversalAttemptCount >= MAX_REVERSAL_ATTEMPTS
-      || reversal.reversalLockedAt !== null
-      || reversal.reversalLastError?.startsWith("uncertain:") === true
+    const executionKind = isStaleSettlementReversal(reversal, now)
       ? "stale_recovery"
       : "new_execution";
+    if (executionKind === "new_execution" && reversal.reversalAttemptCount >= MAX_REVERSAL_ATTEMPTS) {
+      const changed = await tx.settlementReversal.updateMany({
+        where: {
+          id: reversal.id,
+          status: SettlementReversalStatus.PENDING,
+          reversalAttemptCount: reversal.reversalAttemptCount,
+          reversalLockedAt: null,
+        },
+        data: {
+          status: SettlementReversalStatus.NEEDS_MANUAL_REVIEW,
+          nextReversalAttemptAt: null,
+          reversalLockedAt: null,
+        },
+      });
+      if (changed.count !== 1) return { kind: "claim_lost" };
+      await createReversalEvent(tx, {
+        settlementId: reversal.settlementId,
+        settlementLegId: reversal.settlementLegId,
+        actorUserId,
+        eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+        message: "A Stripe transfer reversal reached the retry limit and requires manual review.",
+        metadata: {
+          attempt: reversal.reversalAttemptCount,
+          status: SettlementReversalStatus.NEEDS_MANUAL_REVIEW,
+          reason: "max_attempts",
+        },
+        idempotencyKey: `settlement:${reversal.settlementId}:reversal:${reversal.id}:manual-review:${reversal.reversalAttemptCount}`,
+      });
+      return { kind: "ineligible", reason: "reversal_max_attempts" };
+    }
     const nextAttemptCount = executionKind === "stale_recovery"
       ? reversal.reversalAttemptCount
       : reversal.reversalAttemptCount + 1;
-    if (executionKind === "new_execution" && nextAttemptCount > MAX_REVERSAL_ATTEMPTS) return { kind: "ineligible", reason: "reversal_max_attempts" };
     const lockAt = now;
     const updated = await tx.settlementReversal.updateMany({
       where: {
@@ -477,6 +526,13 @@ async function persistFailure({
     now,
     retryable: failure.retryable,
   });
+  const status = !failure.retryable
+    ? reversal.executionKind === "stale_recovery"
+      ? SettlementReversalStatus.PENDING
+      : SettlementReversalStatus.FAILED
+    : nextAttempt || reversal.executionKind === "stale_recovery"
+      ? SettlementReversalStatus.PENDING
+      : SettlementReversalStatus.NEEDS_MANUAL_REVIEW;
   await db.$transaction(async (tx) => {
     const changed = await tx.settlementReversal.updateMany({
       where: {
@@ -486,6 +542,7 @@ async function persistFailure({
         reversalLockedAt: reversal.reversalLockedAt,
       },
       data: {
+        status,
         nextReversalAttemptAt: nextAttempt,
         reversalLastError: reversal.executionKind === "stale_recovery"
           ? `uncertain:${failure.sanitizedMessage}`
@@ -506,12 +563,59 @@ async function persistFailure({
         executionKind: reversal.executionKind,
         retryable: failure.retryable,
         errorCode: failure.code,
+        status,
         nextReversalAttemptAt: nextAttempt?.toISOString() ?? null,
       },
-      idempotencyKey: `settlement:${reversal.settlementId}:reversal:${reversal.id}:failure:${reversal.reversalAttemptCount}:${failure.code}`,
+      idempotencyKey: `settlement:${reversal.settlementId}:reversal:${reversal.id}:failure:${reversal.reversalAttemptCount}:${reversal.executionKind}:${failure.code}:${status}`,
     });
   });
-  return nextAttempt;
+  return { nextAttempt, status };
+}
+
+async function persistUncertainFinalization({
+  db,
+  reversal,
+  now,
+}: {
+  db: ReversalDb;
+  reversal: ClaimedReversal;
+  now: Date;
+}) {
+  try {
+    await db.$transaction(async (tx) => {
+      const changed = await tx.settlementReversal.updateMany({
+        where: {
+          id: reversal.id,
+          status: SettlementReversalStatus.PENDING,
+          reversalAttemptCount: reversal.reversalAttemptCount,
+          reversalLockedAt: reversal.reversalLockedAt,
+        },
+        data: {
+          status: SettlementReversalStatus.PENDING,
+          nextReversalAttemptAt: null,
+          reversalLastError: "uncertain:reversal_finalization_failed",
+        },
+      });
+      if (changed.count !== 1) return;
+      await createReversalEvent(tx, {
+        settlementId: reversal.settlementId,
+        settlementLegId: reversal.settlementLegId,
+        actorUserId: undefined,
+        eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+        message: "Stripe accepted a transfer reversal but local finalization failed; recovery is required.",
+        metadata: {
+          attempt: reversal.reversalAttemptCount,
+          executionKind: reversal.executionKind,
+          reason: "reversal_finalization_failed",
+          recordedAt: now.toISOString(),
+        },
+        idempotencyKey: `settlement:${reversal.settlementId}:reversal:${reversal.id}:finalization-failed:${reversal.reversalAttemptCount}`,
+      });
+    });
+  } catch {
+    // The provider request is already uncertain. The caller still returns a
+    // sanitized finalization failure without exposing persistence details.
+  }
 }
 
 export async function executeSettlementReversal({
@@ -558,22 +662,42 @@ export async function executeSettlementReversal({
 
   const claimed = claimedResult.reversal;
   try {
-    const transferReversal = await findAcceptedStripeReversal(stripeClient, claimed)
-      ?? await stripeClient.transfers.createReversal(
-        claimed.originalStripeTransferId,
-        {
-          amount: claimed.remainingAmount,
-          metadata: {
-            settlementId: claimed.settlementId,
-            settlementLegId: claimed.settlementLegId,
-            settlementReversalId: claimed.id,
-            paymentRequestId: claimed.settlement.paymentRequestId,
-            sourceType: claimed.sourceType ?? "UNKNOWN",
-            ...(claimed.stripeSourceObjectId ? { stripeSourceObjectId: claimed.stripeSourceObjectId } : {}),
-          },
+    const accepted = await findAcceptedStripeReversal(stripeClient, claimed);
+    if (!accepted.complete) {
+      const persisted = await persistFailure({
+        db: executorDb,
+        reversal: claimed,
+        failure: {
+          retryable: true,
+          code: "reversal_recovery_incomplete",
+          sanitizedMessage: "retryable:reversal_recovery_incomplete",
         },
-        { idempotencyKey: settlementReversalIdempotencyKey(claimed.id) },
-      );
+        now,
+      });
+      return {
+        ok: false,
+        settlementReversalId: claimed.id,
+        status: claimed.executionKind === "stale_recovery" ? "recovery_pending" : "retry_scheduled",
+        retryable: true,
+        errorCode: "reversal_recovery_incomplete",
+        nextReversalAttemptAt: persisted.nextAttempt?.toISOString() ?? null,
+      } satisfies SettlementReversalExecutionResult;
+    }
+    const transferReversal = accepted.reversal ?? await stripeClient.transfers.createReversal(
+      claimed.originalStripeTransferId,
+      {
+        amount: claimed.remainingAmount,
+        metadata: {
+          settlementId: claimed.settlementId,
+          settlementLegId: claimed.settlementLegId,
+          settlementReversalId: claimed.id,
+          paymentRequestId: claimed.settlement.paymentRequestId,
+          sourceType: claimed.sourceType ?? "UNKNOWN",
+          ...(claimed.stripeSourceObjectId ? { stripeSourceObjectId: claimed.stripeSourceObjectId } : {}),
+        },
+      },
+      { idempotencyKey: settlementReversalIdempotencyKey(claimed.id) },
+    );
     try {
       const finalized = await finalizeSuccessfulReversal({
         db: executorDb,
@@ -591,6 +715,7 @@ export async function executeSettlementReversal({
         stripeTransferReversalId: transferReversal.id,
       } satisfies SettlementReversalExecutionResult;
     } catch {
+      await persistUncertainFinalization({ db: executorDb, reversal: claimed, now });
       return {
         ok: false,
         settlementReversalId: claimed.id,
@@ -602,17 +727,134 @@ export async function executeSettlementReversal({
   } catch (error) {
     const failure = sanitizeStripeTransferReversalError(error);
     try {
-      const nextAttempt = await persistFailure({ db: executorDb, reversal: claimed, failure, now });
+      const persisted = await persistFailure({ db: executorDb, reversal: claimed, failure, now });
+      const status = persisted.status === SettlementReversalStatus.FAILED
+        ? "failed"
+        : persisted.status === SettlementReversalStatus.NEEDS_MANUAL_REVIEW
+          ? "needs_manual_review"
+          : claimed.executionKind === "stale_recovery" && !persisted.nextAttempt
+            ? "recovery_pending"
+            : "retry_scheduled";
       return {
         ok: false,
         settlementReversalId: claimed.id,
-        status: failure.retryable && nextAttempt ? "retry_scheduled" : "failed",
+        status,
         retryable: failure.retryable,
         errorCode: failure.code,
-        nextReversalAttemptAt: nextAttempt?.toISOString() ?? null,
+        nextReversalAttemptAt: persisted.nextAttempt?.toISOString() ?? null,
       } satisfies SettlementReversalExecutionResult;
     } catch {
       return persistenceFailure(claimed.id);
     }
+  }
+}
+
+export async function requeueSettlementReversal({
+  settlementReversalId,
+  actorUserId,
+  db,
+}: {
+  settlementReversalId: string;
+  actorUserId: string;
+  db?: ReversalDb;
+}) {
+  const executorDb = db ?? getDb();
+  try {
+    return await executorDb.$transaction(async (tx) => {
+      const advisory = await tx.$queryRaw<Array<{ acquired: boolean }>>(
+        Prisma.sql`SELECT pg_try_advisory_xact_lock(hashtextextended(${`trade82-settlement-reversal:${settlementReversalId}`}, 0)) AS acquired`,
+      );
+      if (!advisory[0]?.acquired) {
+        return { ok: false, settlementReversalId, status: "claim_lost", retryable: false, errorCode: "reversal_claim_lost" };
+      }
+
+      const before = await tx.settlementReversal.findUnique({
+        where: { id: settlementReversalId },
+        select: { settlementId: true },
+      });
+      if (!before) return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "reversal_not_found" };
+      await tx.$queryRaw(Prisma.sql`SELECT "id" FROM "Settlement" WHERE "id" = ${before.settlementId} FOR UPDATE`);
+
+      const reversal = await tx.settlementReversal.findUnique({
+        where: { id: settlementReversalId },
+        select: {
+          id: true,
+          settlementId: true,
+          settlementLegId: true,
+          amount: true,
+          requestedAmount: true,
+          successfullyReversedAmount: true,
+          status: true,
+          originalStripeTransferId: true,
+          stripeTransferReversalId: true,
+          reversalAttemptCount: true,
+          manualRequeueCount: true,
+        settlementLeg: { select: { type: true } },
+        },
+      });
+      if (!reversal) return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "reversal_not_found" };
+      if (
+        reversal.status !== SettlementReversalStatus.FAILED
+        && reversal.status !== SettlementReversalStatus.NEEDS_MANUAL_REVIEW
+      ) return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "reversal_not_requeueable" };
+      if (reversal.stripeTransferReversalId) return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "reversal_already_completed" };
+      if (reversal.settlementLeg.type === SettlementLegType.PLATFORM_FEE) return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "platform_fee_not_reversible" };
+
+      const requestedAmount = reversal.requestedAmount ?? reversal.amount;
+      const remainingAmount = requestedAmount - reversal.successfullyReversedAmount;
+      const originalStripeTransferId = reversal.originalStripeTransferId;
+      if (!Number.isSafeInteger(remainingAmount) || remainingAmount <= 0) {
+        return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "reversal_amount_invalid" };
+      }
+      if (!originalStripeTransferId?.startsWith("tr_")) {
+        return { ok: false, settlementReversalId, status: "ineligible", retryable: false, errorCode: "original_transfer_invalid" };
+      }
+
+      const manualRequeueCount = reversal.manualRequeueCount + 1;
+      const changed = await tx.settlementReversal.updateMany({
+        where: {
+          id: reversal.id,
+          status: reversal.status,
+          reversalAttemptCount: reversal.reversalAttemptCount,
+          manualRequeueCount: reversal.manualRequeueCount,
+        },
+        data: {
+          status: SettlementReversalStatus.PENDING,
+          reversalAttemptCount: 0,
+          manualRequeueCount,
+          nextReversalAttemptAt: null,
+          reversalLockedAt: null,
+          reversalLastError: null,
+          completedAt: null,
+        },
+      });
+      if (changed.count !== 1) return { ok: false, settlementReversalId, status: "claim_lost", retryable: false, errorCode: "reversal_claim_lost" };
+
+      await createReversalEvent(tx, {
+        settlementId: reversal.settlementId,
+        settlementLegId: reversal.settlementLegId,
+        actorUserId,
+        eventType: SettlementEventType.POST_TRANSFER_REVERSAL_REQUIRED,
+        message: "An administrator requeued a transfer reversal for separate manual execution.",
+        metadata: {
+          action: "requeue",
+          previousStatus: reversal.status,
+          previousAttemptCount: reversal.reversalAttemptCount,
+          manualRequeueCount,
+          requestedAmount,
+          remainingAmount,
+        },
+        idempotencyKey: `settlement:${reversal.settlementId}:reversal:${reversal.id}:requeue:${manualRequeueCount}`,
+      });
+      return {
+        ok: true,
+        settlementReversalId,
+        status: "requeued",
+        retryable: false,
+        nextReversalAttemptAt: null,
+      };
+    });
+  } catch {
+    return { ok: false, settlementReversalId, status: "persistence_failed", retryable: false, errorCode: "reversal_persistence_failed" };
   }
 }

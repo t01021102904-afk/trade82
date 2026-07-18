@@ -38,6 +38,15 @@ type SettlementCopy = {
   reversalClaimLost: string;
   reversalFinalizationFailed: string;
   reversalRecoveryUnavailable: string;
+  reversalNeedsManualReview: string;
+  reversalRecoveryPending: string;
+  reversalPendingStatus: string;
+  reversalRetryScheduledStatus: string;
+  reversalFailedStatus: string;
+  reversalManualReviewStatus: string;
+  reversalCompletedStatus: string;
+  requeueReversal: string;
+  reversalRequeued: string;
   originalTransfer: string;
   requestedReversal: string;
   reversedAmount: string;
@@ -112,6 +121,7 @@ type Settlement = {
     stripeSourceObjectId: string | null;
     originalStripeTransferId: string | null;
     reversalAttemptCount: number;
+    manualRequeueCount: number;
     nextReversalAttemptAt: string | null;
     reversalLockedAt: string | null;
     reversalLastError: string | null;
@@ -180,10 +190,32 @@ function reversalOperatorMessage(payload: ReversalResponse | null, copy: Settlem
   }
   if (payload?.status === "claim_lost") return copy.reversalClaimLost;
   if (payload?.status === "finalization_failed") return copy.reversalFinalizationFailed;
+  if (payload?.status === "needs_manual_review") return copy.reversalNeedsManualReview;
+  if (payload?.status === "recovery_pending") return copy.reversalRecoveryPending;
+  if (payload?.errorCode === "reversal_runtime_configuration_invalid") return copy.runtimeConfigurationInvalid;
   if (payload?.errorCode === "reversal_locked" || payload?.errorCode === "reversal_retry_not_due") {
     return copy.reversalRecoveryUnavailable;
   }
   return copy.reversalFailed;
+}
+
+function reversalStatusLabel(
+  reversal: { status: string; nextReversalAttemptAt: string | null; reversalLockedAt: string | null; reversalLastError: string | null; reversalAttemptCount: number },
+  copy: SettlementCopy,
+) {
+  if (isStaleSettlementReversal(reversal, new Date())) return copy.reversalRecoveryPending;
+  switch (reversal.status) {
+    case "COMPLETED":
+      return copy.reversalCompletedStatus;
+    case "FAILED":
+      return copy.reversalFailedStatus;
+    case "NEEDS_MANUAL_REVIEW":
+      return copy.reversalManualReviewStatus;
+    case "PENDING":
+      return reversal.nextReversalAttemptAt ? copy.reversalRetryScheduledStatus : copy.reversalPendingStatus;
+    default:
+      return copy.reversalPendingStatus;
+  }
 }
 
 export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
@@ -325,6 +357,28 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
     }
   }
 
+  async function runRequeue(reversalId: string) {
+    setReversalActionId(reversalId);
+    setError(null);
+    setReversalNotice(null);
+    try {
+      const response = await fetch(`/api/admin/settlements/reversals/${reversalId}/requeue`, { method: "POST" });
+      const payload = await response.json().catch(() => null) as ReversalResponse | null;
+      if (response.ok && payload?.ok === true && payload.status === "requeued") {
+        await load();
+        setReversalNotice(copy.reversalRequeued);
+        return;
+      }
+      const message = reversalOperatorMessage(payload, copy);
+      await load();
+      setError(message);
+    } catch {
+      setError(copy.reversalFailed);
+    } finally {
+      setReversalActionId(null);
+    }
+  }
+
   if (loading) return <p className="text-sm theme-muted">{copy.loading}</p>;
   if (error && settlements.length === 0) return <p className="text-sm text-red-700">{error}</p>;
 
@@ -396,24 +450,27 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
                   const retryDue = !reversal.nextReversalAttemptAt || Date.parse(reversal.nextReversalAttemptAt) <= Date.now();
                   const lockActive = Boolean(reversal.reversalLockedAt && Date.parse(reversal.reversalLockedAt) > Date.now() - 10 * 60 * 1000);
                   const canExecute = reversal.status === "PENDING" && remaining > 0 && retryDue && !lockActive;
+                  const canRequeue = (reversal.status === "FAILED" || reversal.status === "NEEDS_MANUAL_REVIEW")
+                    && remaining > 0
+                    && Boolean(reversal.originalStripeTransferId)
+                    && !lockActive;
                   return (
                     <div key={reversal.id} className="grid gap-1 text-xs theme-muted sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                       <div>
-                        <p>{reversal.reason} · {reversal.status}</p>
+                        <p>{reversal.reason} · {reversalStatusLabel(reversal, copy)}</p>
                         <p>{copy.originalTransfer}: {reversal.originalStripeTransferId ?? copy.none}</p>
                         <p>{copy.requestedReversal}: {money(requested, reversal.currency)} · {copy.reversedAmount}: {money(reversal.successfullyReversedAmount, reversal.currency)} · {copy.remainingAmount}: {money(remaining, reversal.currency)}</p>
-                        <p>{copy.reversalSource}: {reversal.sourceType ?? reversal.reason} · {copy.reversalAttempts}: {reversal.reversalAttemptCount}</p>
+                        <p>{copy.reversalSource}: {reversal.sourceType ?? reversal.reason} · {copy.reversalAttempts}: {reversal.reversalAttemptCount} · {copy.requeueReversal}: {reversal.manualRequeueCount}</p>
                         {reversal.nextReversalAttemptAt ? <p>{copy.nextReversalAttempt}: {dateTime(reversal.nextReversalAttemptAt)}</p> : null}
-                        {reversal.reversalLastError ? <p>{copy.reversalLastError}: {reversal.reversalLastError}</p> : null}
                       </div>
-                      {canExecute ? (
+                      {canExecute || canRequeue ? (
                         <button
                           type="button"
                           className="h-7 border border-zinc-300 px-2 text-xs text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
                           disabled={reversalActionId === reversal.id}
-                          onClick={() => void runReversal(reversal.id)}
+                          onClick={() => void (canRequeue ? runRequeue(reversal.id) : runReversal(reversal.id))}
                         >
-                          {stale ? copy.recoverReversal : copy.executeReversal}
+                          {canRequeue ? copy.requeueReversal : stale ? copy.recoverReversal : copy.executeReversal}
                         </button>
                       ) : null}
                     </div>

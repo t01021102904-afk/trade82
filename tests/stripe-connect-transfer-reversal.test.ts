@@ -77,8 +77,9 @@ test("reversal idempotency and stale recovery keys are deterministic", () => {
   );
 
   const now = new Date("2026-07-18T12:00:00.000Z");
-  const retryAt = nextReversalRetryAt({ attemptCount: 5, now, retryable: true });
+  const retryAt = nextReversalRetryAt({ attemptCount: 4, now, retryable: true });
   assert.ok(retryAt && retryAt > now);
+  assert.equal(nextReversalRetryAt({ attemptCount: 5, now, retryable: true }), null);
   assert.equal(nextReversalRetryAt({ attemptCount: 5, now, retryable: false }), null);
   assert.equal(isStaleSettlementReversal({
     status: "PENDING",
@@ -86,6 +87,13 @@ test("reversal idempotency and stale recovery keys are deterministic", () => {
     reversalLockedAt: new Date("2026-07-18T11:00:00.000Z"),
     nextReversalAttemptAt: new Date("2026-07-18T11:30:00.000Z"),
   }, now), true);
+  assert.equal(isStaleSettlementReversal({
+    status: "PENDING",
+    reversalAttemptCount: 5,
+    reversalLockedAt: null,
+    nextReversalAttemptAt: null,
+    reversalLastError: null,
+  }, now), false);
   assert.equal(isStaleSettlementReversal({
     status: "PENDING",
     reversalAttemptCount: 5,
@@ -127,4 +135,7 @@ test("reversal response statuses keep unsuccessful outcomes non-2xx", () => {
   assert.equal(settlementReversalHttpStatus({ status: "failed", retryable: false } as never), 422);
   assert.equal(settlementReversalHttpStatus({ status: "persistence_failed" } as never), 500);
   assert.equal(settlementReversalHttpStatus({ status: "finalization_failed" } as never), 500);
+  assert.equal(settlementReversalHttpStatus({ status: "needs_manual_review" } as never), 422);
+  assert.equal(settlementReversalHttpStatus({ status: "recovery_pending" } as never), 503);
+  assert.equal(settlementReversalHttpStatus({ status: "requeued" } as never), 200);
 });

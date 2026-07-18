@@ -424,6 +424,8 @@ enum SettlementReversalStatus {
   ACCOUNTING_APPLIED
   PENDING
   COMPLETED
+  FAILED
+  NEEDS_MANUAL_REVIEW
 }
 
 model UserProfile {
@@ -1174,6 +1176,7 @@ model SettlementReversal {
   stripeDisputeId            String?
   stripeTransferReversalId   String?                       @unique
   reversalAttemptCount       Int                           @default(0)
+  manualRequeueCount         Int                           @default(0)
   nextReversalAttemptAt      DateTime?
   reversalLastError          String?                       @db.VarChar(1000)
   reversalLockedAt           DateTime?

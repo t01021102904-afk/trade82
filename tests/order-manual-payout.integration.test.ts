@@ -2947,6 +2947,7 @@ test("attempt-five reversal recovery keeps uncertainty pending and reuses its id
       originalStripeTransferId: `tr_${unique("recovery-original")}`,
       status: "PENDING",
       reversalAttemptCount: 5,
+      reversalLockedAt: new Date("2026-07-18T11:00:00.000Z"),
       nextReversalAttemptAt: new Date("2026-07-18T11:00:00.000Z"),
       idempotencyKey: unique("recovery-reversal"),
     },
@@ -2979,7 +2980,7 @@ test("attempt-five reversal recovery keeps uncertainty pending and reuses its id
     stripe,
     now,
   });
-  assert.equal(failed.status, "retry_scheduled");
+  assert.equal(failed.status, "recovery_pending");
   const afterFailure = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
   assert.equal(afterFailure.status, "PENDING");
   assert.equal(afterFailure.reversalAttemptCount, 5);
@@ -2990,6 +2991,157 @@ test("attempt-five reversal recovery keeps uncertainty pending and reuses its id
     where: { id: reversal.id },
     data: { nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z") },
   });
+  const recovered = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(recovered.status, "reversed");
+  assert.equal(idempotencyKeys.length, 2);
+  assert.equal(idempotencyKeys[0], reversalExecution.settlementReversalIdempotencyKey(reversal.id));
+  assert.equal(idempotencyKeys[1], idempotencyKeys[0]);
+  assert.equal((await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } })).reversalAttemptCount, 5);
+});
+
+test("a non-uncertain reversal at the attempt limit enters manual review without calling Stripe", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-review-limit");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("manual-review-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const reversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("manual-review-source")}`,
+      originalStripeTransferId: `tr_${unique("manual-review-original")}`,
+      status: "PENDING",
+      reversalAttemptCount: 5,
+      nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z"),
+      idempotencyKey: unique("manual-review-reversal"),
+    },
+  });
+  let stripeCalls = 0;
+  const stripe = {
+    transfers: {
+      listReversals: async () => {
+        stripeCalls += 1;
+        return { data: [] };
+      },
+      createReversal: async () => {
+        stripeCalls += 1;
+        throw new Error("Stripe must not be called at the retry limit.");
+      },
+    },
+  } as never;
+
+  const result = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now: new Date("2026-07-18T12:00:00.000Z"),
+  });
+  assert.equal(result.status, "ineligible");
+  assert.equal(result.errorCode, "reversal_max_attempts");
+  assert.equal(stripeCalls, 0);
+  const reviewed = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(reviewed.status, "NEEDS_MANUAL_REVIEW");
+  assert.equal(reviewed.reversalAttemptCount, 5);
+  assert.equal(reviewed.nextReversalAttemptAt, null);
+  assert.equal(reviewed.reversalLockedAt, null);
+
+  const requeued = await reversalExecution.requeueSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+  });
+  assert.equal(requeued.status, "requeued");
+  assert.equal(stripeCalls, 0);
+  const reset = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(reset.status, "PENDING");
+  assert.equal(reset.reversalAttemptCount, 0);
+  assert.equal(reset.manualRequeueCount, 1);
+  assert.equal(reset.originalStripeTransferId, reversal.originalStripeTransferId);
+});
+
+test("permanent stale recovery remains uncertain and can retry with the same idempotency key", async () => {
+  const { fixture, settlement } = await createReconciliableSettlement("settlement-manual-review-recovery");
+  const sellerLeg = await db.settlementLeg.findFirstOrThrow({
+    where: { settlementId: settlement.id, type: "SELLER_PAYABLE" },
+  });
+  await db.$transaction([
+    db.settlement.update({ where: { id: settlement.id }, data: { status: "REVERSAL_PENDING" } }),
+    db.settlementLeg.update({
+      where: { id: sellerLeg.id },
+      data: { status: "REVERSAL_PENDING", stripeTransferId: `tr_${unique("uncertain-original")}`, transferredAt: new Date() },
+    }),
+  ]);
+  const reversal = await db.settlementReversal.create({
+    data: {
+      settlementId: settlement.id,
+      settlementLegId: sellerLeg.id,
+      amount: 100,
+      requestedAmount: 100,
+      currency: "usd",
+      reason: "REFUND",
+      sourceType: "REFUND",
+      stripeSourceObjectId: `re_${unique("uncertain-source")}`,
+      originalStripeTransferId: `tr_${unique("uncertain-original")}`,
+      status: "PENDING",
+      reversalAttemptCount: 5,
+      reversalLockedAt: new Date("2026-07-18T11:00:00.000Z"),
+      nextReversalAttemptAt: new Date("2026-07-18T11:59:00.000Z"),
+      idempotencyKey: unique("uncertain-reversal"),
+    },
+  });
+  const idempotencyKeys: string[] = [];
+  let shouldFail = true;
+  const stripe = {
+    transfers: {
+      listReversals: async () => ({ data: [] }),
+      createReversal: async (
+        _transferId: string,
+        _params: { amount?: number },
+        options: { idempotencyKey?: string },
+      ) => {
+        idempotencyKeys.push(options.idempotencyKey ?? "");
+        if (shouldFail) {
+          shouldFail = false;
+          throw { type: "invalid_request_error", code: "resource_missing", statusCode: 404 };
+        }
+        return { id: `trr_${unique("uncertain-recovery")}`, amount: 100 };
+      },
+    },
+  } as never;
+  const now = new Date("2026-07-18T12:00:00.000Z");
+
+  const failed = await reversalExecution.executeSettlementReversal({
+    settlementReversalId: reversal.id,
+    actorUserId: fixture.admin.id,
+    mode: "manual",
+    stripe,
+    now,
+  });
+  assert.equal(failed.status, "recovery_pending");
+  const uncertain = await db.settlementReversal.findUniqueOrThrow({ where: { id: reversal.id } });
+  assert.equal(uncertain.status, "PENDING");
+  assert.equal(uncertain.reversalAttemptCount, 5);
+  assert.equal(uncertain.reversalLockedAt, null);
+  assert.match(uncertain.reversalLastError ?? "", /^uncertain:/);
+
   const recovered = await reversalExecution.executeSettlementReversal({
     settlementReversalId: reversal.id,
     actorUserId: fixture.admin.id,
