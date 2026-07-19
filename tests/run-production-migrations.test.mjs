@@ -6,8 +6,8 @@ import {
   EXPECTED_SUPABASE_PROJECT,
   FIRST_APPROVED_MIGRATION,
   LEGACY_ZERO_STEP_MIGRATIONS,
+  MERCHANT_MIGRATION,
   ProductionMigrationDiagnostic,
-  RELEASE_APPROVAL_MIGRATION,
   TARGET_MIGRATION,
   formatDiagnostic,
   getConnectionSource,
@@ -18,6 +18,9 @@ import {
 
 const directUrl = `postgresql://postgres:credential-placeholder@db.${EXPECTED_SUPABASE_PROJECT}.supabase.co:5432/postgres`;
 const poolerUrl = `postgresql://postgres.${EXPECTED_SUPABASE_PROJECT}:credential-placeholder@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
+const localMigrations = readLocalMigrationNames();
+const approvedNames = new Set(APPROVED_PRODUCTION_MIGRATION_BATCH);
+const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
 function record(migrationName, overrides = {}) {
   return {
@@ -32,6 +35,13 @@ function record(migrationName, overrides = {}) {
 function zeroStepRecord(migrationName, overrides = {}) {
   return record(migrationName, { applied_steps_count: 0, ...overrides });
 }
+
+const historicalRecords = historicalMigrationNames.map((name) => (
+  LEGACY_ZERO_STEP_MIGRATIONS.includes(name) ? zeroStepRecord(name) : record(name)
+));
+const appliedFirst = record(FIRST_APPROVED_MIGRATION);
+const appliedTarget = record(TARGET_MIGRATION);
+const appliedMerchant = record(MERCHANT_MIGRATION);
 
 function legacySchemaEvidence(overrides = {}) {
   return {
@@ -66,7 +76,7 @@ function prerequisiteSchema(overrides = {}) {
   };
 }
 
-function releaseApprovalSchema(overrides = {}) {
+function targetSchema(overrides = {}) {
   return {
     target_enum_values: true,
     target_columns: true,
@@ -75,23 +85,6 @@ function releaseApprovalSchema(overrides = {}) {
     target_reversal_retry_check: true,
     target_approval_fk: true,
     target_indexes: true,
-    ...overrides,
-  };
-}
-
-function firstPreflight(overrides = {}) {
-  return {
-    first_settlement_reversal_table: true,
-    first_settlement_leg_table: true,
-    first_settlement_reversal_settlement_fk: true,
-    first_settlement_reversal_leg_fk: true,
-    first_settlement_reversal_columns: true,
-    first_settlement_leg_transfer_id: true,
-    first_source_type_absent: true,
-    first_new_columns_absent: true,
-    first_source_index_absent: true,
-    first_anon_role: true,
-    first_authenticated_role: true,
     ...overrides,
   };
 }
@@ -111,19 +104,6 @@ function firstSchema(overrides = {}) {
   };
 }
 
-function secondPreflight(overrides = {}) {
-  return {
-    second_status_enum: true,
-    second_status_values_absent: true,
-    second_manual_requeue_count_absent: true,
-    second_status_constraint: true,
-    second_reversal_locked_at: true,
-    second_status_index_absent: true,
-    second_manual_requeue_check_absent: true,
-    ...overrides,
-  };
-}
-
 function secondSchema(overrides = {}) {
   return {
     second_status_values: true,
@@ -133,6 +113,42 @@ function secondSchema(overrides = {}) {
     second_status_constraint: true,
     second_rls: true,
     second_public_access_revoked: true,
+    ...overrides,
+  };
+}
+
+function merchantPreflight(overrides = {}) {
+  return {
+    merchant_company_table: true,
+    merchant_company_id_text: true,
+    merchant_company_id_key: true,
+    merchant_table_absent: true,
+    merchant_status_enum_absent: true,
+    merchant_company_index_absent: true,
+    merchant_stripe_index_absent: true,
+    merchant_status_index_absent: true,
+    merchant_company_fk_absent: true,
+    merchant_anon_role: true,
+    merchant_authenticated_role: true,
+    ...overrides,
+  };
+}
+
+function merchantSchema(overrides = {}) {
+  return {
+    merchant_status_enum: true,
+    merchant_table: true,
+    merchant_columns: true,
+    merchant_primary_key: true,
+    merchant_company_unique: true,
+    merchant_stripe_unique: true,
+    merchant_status_index: true,
+    merchant_company_fk_restrict: true,
+    merchant_defaults: true,
+    merchant_nullability: true,
+    merchant_rls: true,
+    merchant_public_access_revoked: true,
+    merchant_zero_rows: true,
     ...overrides,
   };
 }
@@ -156,66 +172,47 @@ function fakeClient(responses) {
   };
 }
 
-const localMigrations = readLocalMigrationNames();
-const historicalMigrationNames = localMigrations.filter(
-  (migrationName) => ![FIRST_APPROVED_MIGRATION, TARGET_MIGRATION].includes(migrationName),
-);
-const historicalRecords = historicalMigrationNames.map((migrationName) => (
-  LEGACY_ZERO_STEP_MIGRATIONS.includes(migrationName)
-    ? zeroStepRecord(migrationName)
-    : record(migrationName)
-));
-const appliedFirst = record(FIRST_APPROVED_MIGRATION);
-const appliedTarget = record(TARGET_MIGRATION);
-
-function initialDeploymentResponses(afterRecords = [
-  ...historicalRecords,
-  appliedFirst,
-  appliedTarget,
-]) {
-  return [
-    historicalRecords,
-    [legacySchemaEvidence()],
-    [prerequisiteSchema()],
-    [releaseApprovalSchema()],
-    [firstPreflight()],
-    [secondPreflight()],
-    afterRecords,
-    [prerequisiteSchema()],
-    [releaseApprovalSchema()],
-    [firstSchema()],
-    [secondSchema()],
-  ];
+function productionOptions(fake, overrides = {}) {
+  return {
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => fake.client,
+    localMigrationNames: localMigrations,
+    ...overrides,
+  };
 }
 
-function recoveryResponses(afterRecords = [
+function deploymentResponses(afterRecords = [
   ...historicalRecords,
   appliedFirst,
   appliedTarget,
+  appliedMerchant,
 ]) {
   return [
-    [...historicalRecords, appliedFirst],
+    [...historicalRecords, appliedFirst, appliedTarget],
     [legacySchemaEvidence()],
     [prerequisiteSchema()],
-    [releaseApprovalSchema()],
-    [firstSchema()],
-    [secondPreflight()],
-    afterRecords,
-    [prerequisiteSchema()],
-    [releaseApprovalSchema()],
+    [targetSchema()],
     [firstSchema()],
     [secondSchema()],
+    [merchantPreflight()],
+    afterRecords,
+    [prerequisiteSchema()],
+    [targetSchema()],
+    [firstSchema()],
+    [secondSchema()],
+    [merchantSchema()],
   ];
 }
 
 function completedResponses() {
   return [
-    [...historicalRecords, appliedFirst, appliedTarget],
+    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant],
     [legacySchemaEvidence()],
     [prerequisiteSchema()],
-    [releaseApprovalSchema()],
+    [targetSchema()],
     [firstSchema()],
     [secondSchema()],
+    [merchantSchema()],
   ];
 }
 
@@ -227,15 +224,6 @@ async function assertDiagnostic(promise, expected) {
     assert.equal(error.code, expected.code ?? "unknown");
     return true;
   });
-}
-
-function productionOptions(fake, overrides = {}) {
-  return {
-    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
-    createClient: () => fake.client,
-    localMigrationNames: localMigrations,
-    ...overrides,
-  };
 }
 
 test("local and Preview builds skip without opening a database connection", async () => {
@@ -253,14 +241,16 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved migration batch is exact and the accepted pending states are explicit", () => {
+test("the approved batch is the final three-migration suffix", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
+    "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
+  assert.equal(localMigrations.at(-1), MERCHANT_MIGRATION);
 });
 
-test("missing or malformed Production URLs identify environment or identity validation", async () => {
+test("missing or malformed Production URLs fail closed without connecting", async () => {
   await assertDiagnostic(runProductionMigrations({
     environment: { VERCEL_ENV: "production" },
   }), { stage: "environment_validation", source: "none" });
@@ -299,31 +289,19 @@ test("database connection failures identify the selected source without exposing
   }), { stage: "database_connection", source: "DIRECT_URL", code: "ECONNREFUSED" });
 });
 
-test("both approved migrations pending deploy successfully with all post-checks", async () => {
-  const fake = fakeClient(initialDeploymentResponses());
+test("only old reversals applied with merchant pending runs the allowlisted migration", async () => {
+  const fake = fakeClient(deploymentResponses());
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
     deploy: () => { deploys += 1; },
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.end, 1);
-  assert.equal(fake.calls.query, 11);
-});
-
-test("only the second approved migration pending is a valid recovery state", async () => {
-  const fake = fakeClient(recoveryResponses());
-  let deploys = 0;
-  const result = await runProductionMigrations(productionOptions(fake, {
-    deploy: () => { deploys += 1; },
-  }));
-  assert.equal(result, "deployed");
-  assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 11);
+  assert.equal(fake.calls.query, 13);
   assert.equal(fake.calls.end, 1);
 });
 
-test("completed deployment verifies both migrations and skips Prisma", async () => {
+test("all three approved migrations applied skips Prisma after complete verification", async () => {
   const fake = fakeClient(completedResponses());
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
@@ -331,39 +309,21 @@ test("completed deployment verifies both migrations and skips Prisma", async () 
   }));
   assert.equal(result, "already-applied");
   assert.equal(deploys, 0);
-  assert.equal(fake.calls.query, 6);
+  assert.equal(fake.calls.query, 7);
   assert.equal(fake.calls.end, 1);
 });
 
-test("only the first pending, reversed order, extra, or missing historical migration is rejected", async () => {
+test("old reversal states, reordered batches, missing history, and future migrations fail closed", async () => {
   const cases = [
-    {
-      records: [...historicalRecords, appliedTarget],
-      localNames: localMigrations,
-    },
-    {
-      records: historicalRecords,
-      localNames: [...localMigrations].toSpliced(
-        localMigrations.indexOf(FIRST_APPROVED_MIGRATION),
-        2,
-        TARGET_MIGRATION,
-        FIRST_APPROVED_MIGRATION,
-      ),
-    },
-    {
-      records: historicalRecords,
-      localNames: [...localMigrations, "20260718120000_unapproved_migration"],
-    },
-    {
-      records: historicalRecords.filter((recordEntry) => recordEntry.migration_name !== RELEASE_APPROVAL_MIGRATION),
-      localNames: localMigrations,
-    },
+    [...historicalRecords],
+    [...historicalRecords, appliedFirst],
+    [...historicalRecords, appliedTarget],
+    [...historicalRecords, appliedFirst, appliedMerchant],
   ];
-
-  for (const { records, localNames } of cases) {
+  for (const records of cases) {
     const fake = fakeClient([records, [legacySchemaEvidence()]]);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
-      localMigrationNames: localNames,
+      deploy: () => {},
     })), {
       stage: "migration_state_evaluation",
       source: "DIRECT_URL",
@@ -371,138 +331,108 @@ test("only the first pending, reversed order, extra, or missing historical migra
     });
     assert.equal(fake.calls.end, 1);
   }
+
+  const reordered = [...localMigrations].toSpliced(
+    localMigrations.indexOf(FIRST_APPROVED_MIGRATION),
+    2,
+    TARGET_MIGRATION,
+    FIRST_APPROVED_MIGRATION,
+  );
+  const reorderedFake = fakeClient([[...historicalRecords], [legacySchemaEvidence()]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(reorderedFake, {
+    localMigrationNames: reordered,
+  })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
+
+  const futureNames = [...localMigrations, "20260718130000_future_migration"];
+  const futureFake = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant], [legacySchemaEvidence()]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(futureFake, {
+    localMigrationNames: futureNames,
+  })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
 });
 
-test("failed, rolled-back, duplicate, and unknown Production history fails closed", async () => {
+test("failed, rolled-back, duplicate, unknown, and target zero-step records fail closed", async () => {
   for (const invalidRecord of [
     record(FIRST_APPROVED_MIGRATION, { finished_at: null }),
-    record(FIRST_APPROVED_MIGRATION, { rolled_back_at: new Date("2026-07-17T00:00:00.000Z") }),
-    record(FIRST_APPROVED_MIGRATION, { applied_steps_count: 0 }),
+    record(FIRST_APPROVED_MIGRATION, { rolled_back_at: new Date() }),
+    zeroStepRecord(FIRST_APPROVED_MIGRATION),
+    zeroStepRecord(MERCHANT_MIGRATION),
   ]) {
-    const fake = fakeClient([[...historicalRecords, invalidRecord]]);
-    await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
-      deploy: () => {},
-    })), {
-      stage: "migration_state_evaluation",
-      source: "DIRECT_URL",
-      code: "unknown",
+    const fake = fakeClient([[...historicalRecords, invalidRecord], [legacySchemaEvidence()]]);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
     });
     assert.equal(fake.calls.end, 1);
   }
 
   const duplicate = fakeClient([[...historicalRecords, appliedFirst, appliedFirst]]);
   await assertDiagnostic(runProductionMigrations(productionOptions(duplicate)), {
-    stage: "migration_state_evaluation",
-    source: "DIRECT_URL",
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
   });
   assert.equal(duplicate.calls.end, 1);
+
+  const unknown = fakeClient([[zeroStepRecord("20260718130000_unknown")]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(unknown, {
+    localMigrationNames: [...localMigrations, "20260718130000_unknown"].sort(),
+  })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
 });
 
-test("first migration preflight fails closed for each required evidence field", async () => {
+test("merchant preflight fails closed for each fixed evidence field", async () => {
   const keys = [
-    "first_settlement_reversal_table",
-    "first_settlement_leg_table",
-    "first_settlement_reversal_settlement_fk",
-    "first_settlement_reversal_leg_fk",
-    "first_settlement_reversal_columns",
-    "first_settlement_leg_transfer_id",
-    "first_source_type_absent",
-    "first_new_columns_absent",
-    "first_source_index_absent",
-    "first_anon_role",
-    "first_authenticated_role",
+    "merchant_company_table",
+    "merchant_company_id_text",
+    "merchant_company_id_key",
+    "merchant_table_absent",
+    "merchant_status_enum_absent",
+    "merchant_company_index_absent",
+    "merchant_stripe_index_absent",
+    "merchant_status_index_absent",
+    "merchant_company_fk_absent",
+    "merchant_anon_role",
+    "merchant_authenticated_role",
   ];
-
   for (const key of keys) {
-    const responses = initialDeploymentResponses();
-    responses[4] = [firstPreflight({ [key]: false })];
-    const fake = fakeClient(responses);
-    await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
-      stage: "migration_state_evaluation",
-      source: "DIRECT_URL",
-      code: "target_preflight_failed",
-    });
-    assert.equal(fake.calls.end, 1);
-  }
-});
-
-test("second migration preflight fails closed for each required evidence field", async () => {
-  const keys = [
-    "second_status_enum",
-    "second_status_values_absent",
-    "second_manual_requeue_count_absent",
-    "second_status_constraint",
-    "second_reversal_locked_at",
-    "second_status_index_absent",
-    "second_manual_requeue_check_absent",
-  ];
-
-  for (const key of keys) {
-    const responses = initialDeploymentResponses();
-    responses[5] = [secondPreflight({ [key]: false })];
-    const fake = fakeClient(responses);
-    await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
-      stage: "migration_state_evaluation",
-      source: "DIRECT_URL",
-      code: "target_preflight_failed",
-    });
-    assert.equal(fake.calls.end, 1);
-  }
-});
-
-test("recovery preflight requires complete first-migration schema", async () => {
-  const responses = recoveryResponses();
-  responses[4] = [firstSchema({ first_source_index: false })];
-  const fake = fakeClient(responses);
-  await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
-    stage: "migration_state_evaluation",
-    source: "DIRECT_URL",
-    code: "target_preflight_failed",
-  });
-  assert.equal(fake.calls.end, 1);
-});
-
-test("first and second migration post-verification failures fail closed", async () => {
-  for (const [index, expectedCode] of [
-    [9, "target_postverify_failed"],
-    [10, "target_postverify_failed"],
-  ]) {
-    const responses = initialDeploymentResponses();
-    responses[index] = [index === 9
-      ? firstSchema({ first_successfully_reversed_amount_check: false })
-      : secondSchema({ second_status_index: false })];
+    const responses = deploymentResponses();
+    responses[6] = [merchantPreflight({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
     })), {
-      stage: "target_verification",
-      source: "DIRECT_URL",
-      code: expectedCode,
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "target_preflight_failed",
     });
     assert.equal(fake.calls.end, 1);
   }
 });
 
-test("both migration records require exactly one applied step", async () => {
-  for (const migrationName of [
-    FIRST_APPROVED_MIGRATION,
-    TARGET_MIGRATION,
-  ]) {
-    const afterRecords = [...historicalRecords, record(FIRST_APPROVED_MIGRATION), record(TARGET_MIGRATION)];
-    afterRecords[afterRecords.findIndex((entry) => entry.migration_name === migrationName)] = zeroStepRecord(migrationName);
-    const fake = fakeClient(initialDeploymentResponses(afterRecords));
+test("merchant post-verification fails closed for each schema field", async () => {
+  const keys = [
+    "merchant_status_enum",
+    "merchant_table",
+    "merchant_columns",
+    "merchant_primary_key",
+    "merchant_company_unique",
+    "merchant_stripe_unique",
+    "merchant_status_index",
+    "merchant_company_fk_restrict",
+    "merchant_defaults",
+    "merchant_nullability",
+    "merchant_rls",
+    "merchant_public_access_revoked",
+    "merchant_zero_rows",
+  ];
+  for (const key of keys) {
+    const responses = deploymentResponses();
+    responses[12] = [merchantSchema({ [key]: false })];
+    const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
     })), {
-      stage: "target_verification",
-      source: "DIRECT_URL",
-      code: "target_postverify_failed",
+      stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
     });
     assert.equal(fake.calls.end, 1);
   }
 });
 
-test("the exact legacy zero-step allowlist remains supported with evidence", async () => {
+test("legacy zero-step migrations remain accepted only with complete evidence", async () => {
   assert.deepEqual(LEGACY_ZERO_STEP_MIGRATIONS, [
     "20260626010000_add_deal_progress_statuses",
     "20260627010000_add_buyer_preferred_supplier_type",
@@ -510,68 +440,47 @@ test("the exact legacy zero-step allowlist remains supported with evidence", asy
     "20260627030000_add_rich_product_fields",
   ]);
 
-  for (const legacyMigration of LEGACY_ZERO_STEP_MIGRATIONS) {
-    const localNames = localMigrations;
-    const beforeRecords = historicalRecords;
-    assert.ok(beforeRecords.some((entry) => entry.migration_name === legacyMigration));
-    const responses = [
-      beforeRecords,
-      [legacySchemaEvidence()],
-      [prerequisiteSchema()],
-      [releaseApprovalSchema()],
-      [firstPreflight()],
-      [secondPreflight()],
-      [...beforeRecords, appliedFirst, appliedTarget],
-      [prerequisiteSchema()],
-      [releaseApprovalSchema()],
-      [firstSchema()],
-      [secondSchema()],
-    ];
-    const fake = fakeClient(responses);
-    const result = await runProductionMigrations(productionOptions(fake, {
-      localMigrationNames: localNames,
+  const completed = fakeClient(completedResponses());
+  assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
+
+  const missingEvidence = fakeClient([
+    [...historicalRecords, appliedFirst, appliedTarget],
+    [legacySchemaEvidence({ deal_status_in_progress: false })],
+  ]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(missingEvidence)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
+  });
+});
+
+test("approved migrations require exactly one applied step after deploy", async () => {
+  for (const migrationName of APPROVED_PRODUCTION_MIGRATION_BATCH) {
+    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant];
+    const index = afterRecords.findIndex((entry) => entry.migration_name === migrationName);
+    afterRecords[index] = zeroStepRecord(migrationName);
+    const fake = fakeClient(deploymentResponses(afterRecords));
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
-    }));
-    assert.equal(result, "deployed");
-    assert.equal(fake.calls.end, 1);
+    })), {
+      stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
+    });
   }
 });
 
-test("unknown zero-step migration and invalid legacy evidence fail closed", async () => {
-  const unknown = "20260628010000_unknown_zero_step_migration";
-  const unknownFake = fakeClient([[zeroStepRecord(unknown)]]);
-  await assertDiagnostic(runProductionMigrations(productionOptions(unknownFake, {
-    localMigrationNames: [...localMigrations, unknown].sort(),
-  })), { stage: "migration_state_evaluation", source: "DIRECT_URL" });
-
-  const evidenceFake = fakeClient([
-    historicalRecords,
-    [legacySchemaEvidence({ deal_status_in_progress: false })],
-  ]);
-  await assertDiagnostic(runProductionMigrations(productionOptions(evidenceFake, {
-    localMigrationNames: localMigrations,
-  })), { stage: "migration_state_evaluation", source: "DIRECT_URL" });
-});
-
 test("Prisma subprocess failures identify prisma_migrate_deploy", async () => {
-  const fake = fakeClient(initialDeploymentResponses());
+  const fake = fakeClient(deploymentResponses());
   const error = new Error("subprocess output must not escape");
   error.code = "subprocess_exit_1";
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => { throw error; },
   })), {
-    stage: "prisma_migrate_deploy",
-    source: "DIRECT_URL",
-    code: "subprocess_exit_1",
+    stage: "prisma_migrate_deploy", source: "DIRECT_URL", code: "subprocess_exit_1",
   });
   assert.equal(fake.calls.end, 1);
 });
 
 test("diagnostics contain only fixed fields and never connection data", () => {
   const output = formatDiagnostic(new ProductionMigrationDiagnostic(
-    "database_connection",
-    "DIRECT_URL",
-    "ECONNRESET",
+    "database_connection", "DIRECT_URL", "ECONNRESET",
   ));
   assert.equal(output, [
     "[production-migration] failed stage=database_connection",

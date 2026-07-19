@@ -11,9 +11,11 @@ export const RELEASE_APPROVAL_MIGRATION = "20260717120000_add_settlement_release
 export const APPROVED_PRODUCTION_MIGRATION_BATCH = Object.freeze([
   "20260718100000_add_settlement_transfer_reversals",
   "20260718110000_harden_settlement_reversal_states",
+  "20260718120000_add_seller_stripe_merchant_accounts",
 ]);
 export const FIRST_APPROVED_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[0];
 export const TARGET_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[1];
+export const MERCHANT_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[2];
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
   "20260627010000_add_buyer_preferred_supplier_type",
@@ -158,8 +160,7 @@ function isSuccessfulMigrationRecord(record, schemaEvidence) {
       && hasLegacySchemaEvidence(record.migration_name, schemaEvidence));
 }
 
-const INITIAL_PENDING_MIGRATIONS = APPROVED_PRODUCTION_MIGRATION_BATCH;
-const RECOVERY_PENDING_MIGRATIONS = Object.freeze([TARGET_MIGRATION]);
+const MERCHANT_PENDING_MIGRATIONS = Object.freeze([MERCHANT_MIGRATION]);
 
 function hasExactMigrationList(actual, expected) {
   return actual.length === expected.length
@@ -184,9 +185,11 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
 
   const firstApprovedIndex = localMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
   const targetIndex = localMigrationNames.indexOf(TARGET_MIGRATION);
+  const merchantIndex = localMigrationNames.indexOf(MERCHANT_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
-    || localMigrationNames.slice(targetIndex + 1).length > 0) {
+    || merchantIndex !== targetIndex + 1
+    || merchantIndex !== localMigrationNames.length - 1) {
     const error = new Error("The approved migration batch is not the final local migration suffix.");
     error.code = "pending_set_mismatch";
     throw error;
@@ -209,7 +212,10 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const pendingMigrations = localMigrationNames.filter((name) => !databaseNames.has(name));
 
   if (pendingMigrations.length === 0) {
-    if (!databaseNames.has(PREREQUISITE_MIGRATION) || !databaseNames.has(TARGET_MIGRATION)) {
+    if (!databaseNames.has(PREREQUISITE_MIGRATION)
+      || !databaseNames.has(FIRST_APPROVED_MIGRATION)
+      || !databaseNames.has(TARGET_MIGRATION)
+      || !databaseNames.has(MERCHANT_MIGRATION)) {
       const error = new Error("The allowlisted production migration is not recorded.");
       error.code = "pending_set_mismatch";
       throw error;
@@ -217,8 +223,9 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     return { action: "skip", pendingMigrations };
   }
 
-  if (!hasExactMigrationList(pendingMigrations, INITIAL_PENDING_MIGRATIONS)
-    && !hasExactMigrationList(pendingMigrations, RECOVERY_PENDING_MIGRATIONS)) {
+  if (!hasExactMigrationList(pendingMigrations, MERCHANT_PENDING_MIGRATIONS)
+    || !databaseNames.has(FIRST_APPROVED_MIGRATION)
+    || !databaseNames.has(TARGET_MIGRATION)) {
     const error = new Error("Production has an unexpected pending migration.");
     error.code = "pending_set_mismatch";
     throw error;
@@ -817,72 +824,6 @@ async function queryFirstMigrationSchema(client) {
   return result.rows[0] ?? null;
 }
 
-async function querySecondMigrationPreflight(client) {
-  const result = await client.query(`
-    SELECT
-      EXISTS (
-        SELECT 1
-        FROM pg_type
-        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_type.typname = 'SettlementReversalStatus'
-          AND pg_type.typtype = 'e'
-      ) AS second_status_enum,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_enum
-        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
-        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_type.typname = 'SettlementReversalStatus'
-          AND pg_type.typtype = 'e'
-          AND pg_enum.enumlabel IN ('FAILED', 'NEEDS_MANUAL_REVIEW')
-      ) AS second_status_values_absent,
-      NOT EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SettlementReversal'
-          AND column_name = 'manualRequeueCount'
-      ) AS second_manual_requeue_count_absent,
-      EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
-        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_class.relname = 'SettlementReversal'
-          AND pg_constraint.conname = 'SettlementReversal_stripeTransferReversalId_status_check'
-          AND pg_constraint.contype = 'c'
-      ) AS second_status_constraint,
-      EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SettlementReversal'
-          AND column_name = 'reversalLockedAt'
-      ) AS second_reversal_locked_at,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_class
-        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_class.relname = 'SettlementReversal_status_reversalLockedAt_idx'
-          AND pg_class.relkind = 'i'
-      ) AS second_status_index_absent,
-      NOT EXISTS (
-        SELECT 1
-        FROM pg_constraint
-        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
-        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_class.relname = 'SettlementReversal'
-          AND pg_constraint.conname = 'SettlementReversal_manual_requeue_count_check'
-      ) AS second_manual_requeue_check_absent
-  `);
-  return result.rows[0] ?? null;
-}
-
 async function querySecondMigrationSchema(client) {
   const result = await client.query(`
     SELECT
@@ -968,6 +909,236 @@ async function querySecondMigrationSchema(client) {
   return result.rows[0] ?? null;
 }
 
+async function queryMerchantMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'Company'
+          AND table_type = 'BASE TABLE'
+      ) AS merchant_company_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Company'
+          AND column_name = 'id'
+          AND data_type = 'text'
+      ) AS merchant_company_id_text,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'Company'
+          AND constraint_row.contype IN ('p', 'u')
+          AND array_length(constraint_row.conkey, 1) = 1
+          AND constraint_row.conkey[1] = (
+            SELECT attribute.attnum
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = table_row.oid
+              AND attribute.attname = 'id'
+              AND NOT attribute.attisdropped
+          )
+      ) AS merchant_company_id_key,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+      ) AS merchant_table_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_type type_row
+        JOIN pg_namespace schema_row ON schema_row.oid = type_row.typnamespace
+        WHERE schema_row.nspname = 'public'
+          AND type_row.typname = 'SellerStripeMerchantAccountStatus'
+      ) AS merchant_status_enum_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relkind = 'i'
+          AND index_row.relname = 'SellerStripeMerchantAccount_companyId_key'
+      ) AS merchant_company_index_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relkind = 'i'
+          AND index_row.relname = 'SellerStripeMerchantAccount_stripeAccountId_key'
+      ) AS merchant_stripe_index_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relkind = 'i'
+          AND index_row.relname = 'SellerStripeMerchantAccount_status_updatedAt_idx'
+      ) AS merchant_status_index_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
+          AND constraint_row.conname = 'SellerStripeMerchantAccount_companyId_fkey'
+      ) AS merchant_company_fk_absent,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') AS merchant_anon_role,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') AS merchant_authenticated_role
+  `);
+  return result.rows[0] ?? null;
+}
+
+async function queryMerchantMigrationSchema(client) {
+  const result = await client.query(`
+    SELECT
+      (
+        SELECT count(*) = 5
+          AND count(*) FILTER (WHERE enum_row.enumlabel IN (
+            'ONBOARDING_INCOMPLETE', 'UNDER_REVIEW', 'ENABLED', 'RESTRICTED', 'DISABLED'
+          )) = 5
+        FROM pg_enum enum_row
+        JOIN pg_type type_row ON type_row.oid = enum_row.enumtypid
+        JOIN pg_namespace schema_row ON schema_row.oid = type_row.typnamespace
+        WHERE schema_row.nspname = 'public'
+          AND type_row.typname = 'SellerStripeMerchantAccountStatus'
+          AND type_row.typtype = 'e'
+      ) AS merchant_status_enum,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+          AND table_type = 'BASE TABLE'
+      ) AS merchant_table,
+      (
+        SELECT count(*) = 17
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+          AND column_name IN (
+            'id', 'companyId', 'stripeAccountId', 'country', 'status',
+            'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled', 'transfersEnabled',
+            'detailsSubmitted', 'onboardingComplete', 'requirementsOutstanding',
+            'controllerFeesPayer', 'controllerLossesPayments', 'dashboardType',
+            'createdAt', 'updatedAt'
+          )
+      ) AS merchant_columns,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
+          AND constraint_row.conname = 'SellerStripeMerchantAccount_pkey'
+          AND constraint_row.contype = 'p'
+          AND array_length(constraint_row.conkey, 1) = 1
+          AND constraint_row.conkey[1] = (
+            SELECT attribute.attnum
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = table_row.oid
+              AND attribute.attname = 'id'
+              AND NOT attribute.attisdropped
+          )
+      ) AS merchant_primary_key,
+      EXISTS (
+        SELECT 1 FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relname = 'SellerStripeMerchantAccount_companyId_key'
+          AND index_row.relkind = 'i'
+      ) AS merchant_company_unique,
+      EXISTS (
+        SELECT 1 FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relname = 'SellerStripeMerchantAccount_stripeAccountId_key'
+          AND index_row.relkind = 'i'
+      ) AS merchant_stripe_unique,
+      EXISTS (
+        SELECT 1 FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relname = 'SellerStripeMerchantAccount_status_updatedAt_idx'
+          AND index_row.relkind = 'i'
+      ) AS merchant_status_index,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class child_row ON child_row.oid = constraint_row.conrelid
+        JOIN pg_class parent_row ON parent_row.oid = constraint_row.confrelid
+        JOIN pg_namespace child_schema ON child_schema.oid = child_row.relnamespace
+        JOIN pg_namespace parent_schema ON parent_schema.oid = parent_row.relnamespace
+        WHERE child_schema.nspname = 'public'
+          AND parent_schema.nspname = 'public'
+          AND child_row.relname = 'SellerStripeMerchantAccount'
+          AND parent_row.relname = 'Company'
+          AND constraint_row.conname = 'SellerStripeMerchantAccount_companyId_fkey'
+          AND constraint_row.contype = 'f'
+          AND constraint_row.confdeltype = 'r'
+      ) AS merchant_company_fk_restrict,
+      (
+        SELECT count(*) = 11
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+          AND (
+            (column_name = 'status' AND column_default LIKE '%ONBOARDING_INCOMPLETE%')
+            OR (column_name IN (
+              'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled', 'transfersEnabled',
+              'detailsSubmitted', 'onboardingComplete', 'requirementsOutstanding'
+            ) AND column_default = 'false')
+            OR (column_name = 'controllerFeesPayer' AND column_default LIKE '%account%')
+            OR (column_name = 'controllerLossesPayments' AND column_default LIKE '%stripe%')
+            OR (column_name = 'dashboardType' AND column_default LIKE '%full%')
+          )
+      ) AS merchant_defaults,
+      (
+        SELECT count(*) = 17
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+          AND is_nullable = 'NO'
+      ) AS merchant_nullability,
+      (
+        SELECT relrowsecurity
+        FROM pg_class table_row
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
+          AND table_row.relkind IN ('r', 'p')
+      ) IS TRUE AS merchant_rls,
+      NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'SELECT')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'INSERT')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'UPDATE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'DELETE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'TRUNCATE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'REFERENCES')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'TRIGGER')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'SELECT')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'INSERT')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'UPDATE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'DELETE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRUNCATE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'REFERENCES')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRIGGER')
+        AS merchant_public_access_revoked,
+      (
+        SELECT count(*) = 0
+        FROM "SellerStripeMerchantAccount"
+      ) AS merchant_zero_rows
+  `);
+  return result.rows[0] ?? null;
+}
+
 function allEvidencePresent(evidence, keys) {
   return Boolean(evidence) && keys.every((key) => evidence[key] === true);
 }
@@ -1036,16 +1207,6 @@ const FIRST_MIGRATION_SCHEMA_KEYS = [
   "first_source_index",
 ];
 
-const SECOND_MIGRATION_PREFLIGHT_KEYS = [
-  "second_status_enum",
-  "second_status_values_absent",
-  "second_manual_requeue_count_absent",
-  "second_status_constraint",
-  "second_reversal_locked_at",
-  "second_status_index_absent",
-  "second_manual_requeue_check_absent",
-];
-
 const SECOND_MIGRATION_SCHEMA_KEYS = [
   "second_status_values",
   "second_manual_requeue_count",
@@ -1054,6 +1215,36 @@ const SECOND_MIGRATION_SCHEMA_KEYS = [
   "second_status_constraint",
   "second_rls",
   "second_public_access_revoked",
+];
+
+const MERCHANT_MIGRATION_PREFLIGHT_KEYS = [
+  "merchant_company_table",
+  "merchant_company_id_text",
+  "merchant_company_id_key",
+  "merchant_table_absent",
+  "merchant_status_enum_absent",
+  "merchant_company_index_absent",
+  "merchant_stripe_index_absent",
+  "merchant_status_index_absent",
+  "merchant_company_fk_absent",
+  "merchant_anon_role",
+  "merchant_authenticated_role",
+];
+
+const MERCHANT_MIGRATION_SCHEMA_KEYS = [
+  "merchant_status_enum",
+  "merchant_table",
+  "merchant_columns",
+  "merchant_primary_key",
+  "merchant_company_unique",
+  "merchant_stripe_unique",
+  "merchant_status_index",
+  "merchant_company_fk_restrict",
+  "merchant_defaults",
+  "merchant_nullability",
+  "merchant_rls",
+  "merchant_public_access_revoked",
+  "merchant_zero_rows",
 ];
 
 function createProductionClient(connectionString) {
@@ -1203,6 +1394,20 @@ export async function runProductionMigrations({
           "target_preflight_failed",
         );
       }
+
+      try {
+        assertMigrationApplied(beforeRecords, MERCHANT_MIGRATION);
+        const merchantSchema = await queryMerchantMigrationSchema(client);
+        if (!allEvidencePresent(merchantSchema, MERCHANT_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Merchant schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
       return "already-applied";
     }
 
@@ -1279,9 +1484,23 @@ export async function runProductionMigrations({
     }
 
     try {
-      const secondPreflight = await querySecondMigrationPreflight(client);
-      if (!allEvidencePresent(secondPreflight, SECOND_MIGRATION_PREFLIGHT_KEYS)) {
-        throw new Error("Second migration preflight failed.");
+      assertMigrationApplied(beforeRecords, TARGET_MIGRATION);
+      const secondSchema = await querySecondMigrationSchema(client);
+      if (!allEvidencePresent(secondSchema, SECOND_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Second migration schema preflight failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "migration_state_evaluation",
+        source,
+        "target_preflight_failed",
+      );
+    }
+
+    try {
+      const merchantPreflight = await queryMerchantMigrationPreflight(client);
+      if (!allEvidencePresent(merchantPreflight, MERCHANT_MIGRATION_PREFLIGHT_KEYS)) {
+        throw new Error("Merchant migration preflight failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(
@@ -1352,6 +1571,20 @@ export async function runProductionMigrations({
       const secondSchema = await querySecondMigrationSchema(client);
       if (!allEvidencePresent(secondSchema, SECOND_MIGRATION_SCHEMA_KEYS)) {
         throw new Error("Second migration post-verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "target_postverify_failed",
+      );
+    }
+
+    try {
+      assertMigrationApplied(afterRecords, MERCHANT_MIGRATION);
+      const merchantSchema = await queryMerchantMigrationSchema(client);
+      if (!allEvidencePresent(merchantSchema, MERCHANT_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Merchant migration post-verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

@@ -97,6 +97,7 @@ test("disposable PostgreSQL reuses one direct-charge merchant account and refres
   });
 
   const envKeys = [
+    "STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE",
     "STRIPE_CONNECT_ONBOARDING_MODE",
     "STRIPE_CONNECT_RUNTIME_MODE",
     "STRIPE_SECRET_KEY",
@@ -106,6 +107,7 @@ test("disposable PostgreSQL reuses one direct-charge merchant account and refres
     envKeys.map((key) => [key, process.env[key]]),
   ) as Record<(typeof envKeys)[number], string | undefined>;
   Object.assign(process.env, {
+    STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE: "on",
     STRIPE_CONNECT_ONBOARDING_MODE: "on",
     STRIPE_CONNECT_RUNTIME_MODE: "test",
     STRIPE_SECRET_KEY: "sk_test_merchant_integration",
@@ -180,6 +182,7 @@ test("disposable PostgreSQL reuses one direct-charge merchant account and refres
     assert.equal(refreshed.payoutsEnabled, true);
     assert.equal(refreshed.transfersEnabled, true);
     assert.equal(refreshed.onboardingComplete, true);
+    assert.equal(refreshed.requirementsOutstanding, false);
   } finally {
     for (const key of envKeys) {
       const value = previous[key];
@@ -190,4 +193,66 @@ test("disposable PostgreSQL reuses one direct-charge merchant account and refres
     await db.company.delete({ where: { id: company.id } });
     await db.userProfile.delete({ where: { id: user.id } });
   }
+});
+
+test("merchant table keeps restrictive database security and empty initial state", async () => {
+  const [security] = (await db.$queryRawUnsafe(`
+    SELECT
+      (
+        SELECT relrowsecurity
+        FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SellerStripeMerchantAccount'
+      ) AS rls_enabled,
+      (
+        SELECT count(*) = 17
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+      ) AS exact_column_count,
+      (
+        SELECT count(*) = 0
+        FROM "SellerStripeMerchantAccount"
+      ) AS empty_table,
+      NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'SELECT')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'INSERT')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'UPDATE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'DELETE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'TRUNCATE')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'REFERENCES')
+        AND NOT has_table_privilege('anon', 'public."SellerStripeMerchantAccount"', 'TRIGGER')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'SELECT')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'INSERT')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'UPDATE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'DELETE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRUNCATE')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'REFERENCES')
+        AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRIGGER')
+        AS public_access_revoked,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        JOIN pg_class ON pg_class.oid = pg_constraint.conrelid
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SellerStripeMerchantAccount'
+          AND pg_constraint.conname = 'SellerStripeMerchantAccount_companyId_fkey'
+          AND pg_constraint.confdeltype = 'r'
+      ) AS restrictive_fk,
+      EXISTS (
+        SELECT 1 FROM pg_class
+        JOIN pg_namespace ON pg_namespace.oid = pg_class.relnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_class.relname = 'SellerStripeMerchantAccount_status_updatedAt_idx'
+          AND pg_class.relkind = 'i'
+      ) AS status_index
+  `)) as Array<Record<string, boolean>>;
+
+  assert.equal(security.rls_enabled, true);
+  assert.equal(security.exact_column_count, true);
+  assert.equal(security.empty_table, true);
+  assert.equal(security.public_access_revoked, true);
+  assert.equal(security.restrictive_fk, true);
+  assert.equal(security.status_index, true);
 });

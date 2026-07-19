@@ -45,7 +45,7 @@ function readyAccount(id: string) {
   });
 }
 
-function createFakeDb() {
+function createFakeDb(country = "South Korea") {
   const rows: Row[] = [];
   let nextId = 0;
   const lookup = (where: Row) =>
@@ -68,7 +68,7 @@ function createFakeDb() {
     company: {
       findFirst: async ({ where }: { where: Row }) =>
         where.ownerUserId === "seller-owner" && where.companyRole === "seller"
-          ? { id: "seller-company", country: "South Korea" }
+          ? { id: "seller-company", country }
           : null,
     },
     sellerStripeMerchantAccount: model,
@@ -80,6 +80,7 @@ function createFakeDb() {
 
 async function withMerchantMode<T>(run: () => Promise<T>) {
   const envKeys = [
+    "STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE",
     "STRIPE_CONNECT_ONBOARDING_MODE",
     "STRIPE_CONNECT_RUNTIME_MODE",
     "STRIPE_SECRET_KEY",
@@ -89,6 +90,7 @@ async function withMerchantMode<T>(run: () => Promise<T>) {
     envKeys.map((key) => [key, process.env[key]]),
   ) as Record<(typeof envKeys)[number], string | undefined>;
   const next = {
+    STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE: "on",
     STRIPE_CONNECT_ONBOARDING_MODE: "on",
     STRIPE_CONNECT_RUNTIME_MODE: "test",
     STRIPE_SECRET_KEY: "sk_test_merchant_unit",
@@ -112,6 +114,31 @@ test("merchant onboarding mode and idempotency are fail-closed and deterministic
   assert.equal(getStripeDirectChargeMerchantOnboardingMode("on"), "on");
   assert.equal(merchantAccountIdempotencyKey("company-1"), "trade82-direct-charge-merchant:company-1:v1");
   assert.equal(merchantAccountIdempotencyKey("company-1"), merchantAccountIdempotencyKey("company-1"));
+});
+
+test("the legacy Connect onboarding flag cannot enable merchant onboarding", async () => {
+  const { db } = createFakeDb();
+  let stripeCalls = 0;
+  const stripe = {
+    accounts: { create: async () => { stripeCalls += 1; return stripeAccount("acct_merchant"); } },
+    accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
+  };
+  const previous = process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE;
+  const previousLegacy = process.env.STRIPE_CONNECT_ONBOARDING_MODE;
+  process.env.STRIPE_CONNECT_ONBOARDING_MODE = "on";
+  delete process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE;
+  try {
+    await assert.rejects(
+      () => startSellerStripeMerchantOnboarding({ userId: "seller-owner", db: db as never, stripe: stripe as never }),
+      /not available/,
+    );
+  } finally {
+    if (previous === undefined) delete process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE;
+    else process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE = previous;
+    if (previousLegacy === undefined) delete process.env.STRIPE_CONNECT_ONBOARDING_MODE;
+    else process.env.STRIPE_CONNECT_ONBOARDING_MODE = previousLegacy;
+  }
+  assert.equal(stripeCalls, 0);
 });
 
 test("merchant account creation requests Direct Charge capabilities and reuses the account", async () => {
@@ -195,7 +222,15 @@ test("merchant onboarding is seller-owner only and does not reuse settlement acc
 
 test("merchant readiness requires both card payments and transfers and maps safe states", () => {
   assert.equal(mapSellerStripeMerchantAccount(readyAccount("acct_ready") as never).status, "ENABLED");
+  assert.equal(mapSellerStripeMerchantAccount(readyAccount("acct_ready") as never).requirementsOutstanding, false);
   assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_new") as never).status, "ONBOARDING_INCOMPLETE");
+  assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_new") as never).requirementsOutstanding, true);
+  assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_past_due", {
+    requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: "requirements.past_due" },
+  }) as never).status, "ONBOARDING_INCOMPLETE");
+  assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_past_due", {
+    requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: "requirements.past_due" },
+  }) as never).requirementsOutstanding, true);
   assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_review", {
     details_submitted: true,
     requirements: { currently_due: [], past_due: [], pending_verification: ["person.verification"], disabled_reason: null },
@@ -204,8 +239,29 @@ test("merchant readiness requires both card payments and transfers and maps safe
     details_submitted: true,
     requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: "platform_new_reason" },
   }) as never).status, "RESTRICTED");
+  assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_inactive", {
+    details_submitted: true,
+    capabilities: { card_payments: "inactive", transfers: "inactive" },
+    requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: null },
+  }) as never).requirementsOutstanding, false);
   assert.equal(mapSellerStripeMerchantAccount(stripeAccount("acct_disabled", {
     requirements: { currently_due: [], past_due: [], pending_verification: [], disabled_reason: "rejected.fraud" },
   }) as never).status, "DISABLED");
   assert.equal(canContinueSellerMerchantOnboarding({ status: "DISABLED", onboardingComplete: false }), false);
+});
+
+test("merchant country validation uses the shared allowlist and blocks malformed countries before Stripe", async () => {
+  const { db } = createFakeDb("ZZ");
+  let stripeCalls = 0;
+  const stripe = {
+    accounts: { create: async () => { stripeCalls += 1; return stripeAccount("acct_merchant"); } },
+    accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
+  };
+  await withMerchantMode(async () => {
+    await assert.rejects(
+      () => startSellerStripeMerchantOnboarding({ userId: "seller-owner", db: db as never, stripe: stripe as never }),
+      /valid account country|not configured/,
+    );
+  });
+  assert.equal(stripeCalls, 0);
 });

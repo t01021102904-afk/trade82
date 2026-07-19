@@ -10,10 +10,9 @@ import {
 import { getDb } from "@/lib/db";
 import { getAppUrl, getStripe } from "@/lib/stripe";
 import {
-  isStripeConnectOnboardingEnabled,
-  type StripeConnectOnboardingMode,
-} from "@/lib/stripe-connect-onboarding-feature";
-import { normalizeStripeConnectCountry } from "@/lib/stripe-connect-onboarding";
+  assertStripeConnectCountry,
+  StripeConnectOnboardingError,
+} from "@/lib/stripe-connect-onboarding";
 import { assertStripeConnectRuntimeConfiguration } from "@/lib/stripe-connect-runtime-mode";
 
 type Db = PrismaClient;
@@ -29,6 +28,7 @@ type MerchantAccountSnapshot = Pick<
   | "transfersEnabled"
   | "detailsSubmitted"
   | "onboardingComplete"
+  | "requirementsOutstanding"
   | "country"
 >;
 
@@ -50,13 +50,19 @@ export class StripeDirectChargeMerchantError extends Error {
 }
 
 export function getStripeDirectChargeMerchantOnboardingMode(
-  value = process.env.STRIPE_CONNECT_ONBOARDING_MODE,
-): StripeConnectOnboardingMode {
+  value = process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE,
+): "on" | "off" {
   return value === "on" ? "on" : "off";
 }
 
+export function isStripeDirectChargeMerchantOnboardingEnabled(
+  value = process.env.STRIPE_DIRECT_CHARGE_MERCHANT_ONBOARDING_MODE,
+) {
+  return getStripeDirectChargeMerchantOnboardingMode(value) === "on";
+}
+
 function assertMerchantOnboardingEnabled() {
-  if (!isStripeConnectOnboardingEnabled()) {
+  if (!isStripeDirectChargeMerchantOnboardingEnabled()) {
     throw new StripeDirectChargeMerchantError(
       "Stripe payment account onboarding is not available.",
       403,
@@ -105,6 +111,7 @@ export function mapSellerStripeMerchantAccount(
   | "transfersEnabled"
   | "detailsSubmitted"
   | "onboardingComplete"
+  | "requirementsOutstanding"
 > {
   const requirements = account.requirements;
   const currentlyDue = Boolean(requirements?.currently_due?.length);
@@ -116,6 +123,10 @@ export function mapSellerStripeMerchantAccount(
   const cardPaymentsEnabled = account.capabilities?.card_payments === "active";
   const transfersEnabled = account.capabilities?.transfers === "active";
   const disabledReasonKind = classifyDisabledReason(requirements?.disabled_reason);
+  const requirementsOutstanding = currentlyDue
+    || pastDue
+    || pendingVerification
+    || String(requirements?.disabled_reason ?? "").startsWith("requirements.");
   const onboardingComplete =
     chargesEnabled &&
     payoutsEnabled &&
@@ -149,6 +160,7 @@ export function mapSellerStripeMerchantAccount(
     transfersEnabled,
     detailsSubmitted,
     onboardingComplete,
+    requirementsOutstanding,
   };
 }
 
@@ -186,8 +198,22 @@ function safeAccount(
     transfersEnabled: account.transfersEnabled,
     detailsSubmitted: account.detailsSubmitted,
     onboardingComplete: account.onboardingComplete,
-    requirementsOutstanding: !account.onboardingComplete,
+    requirementsOutstanding: account.requirementsOutstanding,
   };
+}
+
+function assertMerchantCountry(country: string | null | undefined) {
+  try {
+    return assertStripeConnectCountry(country);
+  } catch (error) {
+    if (error instanceof StripeConnectOnboardingError) {
+      throw new StripeDirectChargeMerchantError(error.message, error.status);
+    }
+    throw new StripeDirectChargeMerchantError(
+      "A valid seller company country is required before onboarding can begin.",
+      400,
+    );
+  }
 }
 
 async function resolveSellerCompany({ db, userId }: { db: Db; userId: string }) {
@@ -202,13 +228,7 @@ async function resolveSellerCompany({ db, userId }: { db: Db; userId: string }) 
     );
   }
 
-  const country = normalizeStripeConnectCountry(company.country);
-  if (!country) {
-    throw new StripeDirectChargeMerchantError(
-      "A valid seller company country is required before onboarding can begin.",
-      400,
-    );
-  }
+  const country = assertMerchantCountry(company.country);
   return { ...company, country };
 }
 
@@ -410,7 +430,8 @@ export async function syncSellerStripeMerchantAccount({
     existing.cardPaymentsEnabled === next.cardPaymentsEnabled &&
     existing.transfersEnabled === next.transfersEnabled &&
     existing.detailsSubmitted === next.detailsSubmitted &&
-    existing.onboardingComplete === next.onboardingComplete;
+    existing.onboardingComplete === next.onboardingComplete &&
+    existing.requirementsOutstanding === next.requirementsOutstanding;
   if (unchanged) return { found: true, updated: false, account: existing } as const;
 
   const updated = await merchantModel.update({

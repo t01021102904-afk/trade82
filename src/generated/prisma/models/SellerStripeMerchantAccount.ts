@@ -36,6 +36,7 @@ export type SellerStripeMerchantAccountMinAggregateOutputType = {
   transfersEnabled: boolean | null
   detailsSubmitted: boolean | null
   onboardingComplete: boolean | null
+  requirementsOutstanding: boolean | null
   controllerFeesPayer: string | null
   controllerLossesPayments: string | null
   dashboardType: string | null
@@ -55,6 +56,7 @@ export type SellerStripeMerchantAccountMaxAggregateOutputType = {
   transfersEnabled: boolean | null
   detailsSubmitted: boolean | null
   onboardingComplete: boolean | null
+  requirementsOutstanding: boolean | null
   controllerFeesPayer: string | null
   controllerLossesPayments: string | null
   dashboardType: string | null
@@ -74,6 +76,7 @@ export type SellerStripeMerchantAccountCountAggregateOutputType = {
   transfersEnabled: number
   detailsSubmitted: number
   onboardingComplete: number
+  requirementsOutstanding: number
   controllerFeesPayer: number
   controllerLossesPayments: number
   dashboardType: number
@@ -95,6 +98,7 @@ export type SellerStripeMerchantAccountMinAggregateInputType = {
   transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
+  requirementsOutstanding?: true
   controllerFeesPayer?: true
   controllerLossesPayments?: true
   dashboardType?: true
@@ -114,6 +118,7 @@ export type SellerStripeMerchantAccountMaxAggregateInputType = {
   transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
+  requirementsOutstanding?: true
   controllerFeesPayer?: true
   controllerLossesPayments?: true
   dashboardType?: true
@@ -133,6 +138,7 @@ export type SellerStripeMerchantAccountCountAggregateInputType = {
   transfersEnabled?: true
   detailsSubmitted?: true
   onboardingComplete?: true
+  requirementsOutstanding?: true
   controllerFeesPayer?: true
   controllerLossesPayments?: true
   dashboardType?: true
@@ -225,6 +231,7 @@ export type SellerStripeMerchantAccountGroupByOutputType = {
   transfersEnabled: boolean
   detailsSubmitted: boolean
   onboardingComplete: boolean
+  requirementsOutstanding: boolean
   controllerFeesPayer: string
   controllerLossesPayments: string
   dashboardType: string
@@ -265,6 +272,7 @@ export type SellerStripeMerchantAccountWhereInput = {
   transfersEnabled?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   detailsSubmitted?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   onboardingComplete?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
+  requirementsOutstanding?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   controllerFeesPayer?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
   controllerLossesPayments?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
   dashboardType?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
@@ -285,6 +293,7 @@ export type SellerStripeMerchantAccountOrderByWithRelationInput = {
   transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
+  requirementsOutstanding?: Prisma.SortOrder
   controllerFeesPayer?: Prisma.SortOrder
   controllerLossesPayments?: Prisma.SortOrder
   dashboardType?: Prisma.SortOrder
@@ -308,6 +317,7 @@ export type SellerStripeMerchantAccountWhereUniqueInput = Prisma.AtLeast<{
   transfersEnabled?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   detailsSubmitted?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   onboardingComplete?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
+  requirementsOutstanding?: Prisma.BoolFilter<"SellerStripeMerchantAccount"> | boolean
   controllerFeesPayer?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
   controllerLossesPayments?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
   dashboardType?: Prisma.StringFilter<"SellerStripeMerchantAccount"> | string
@@ -328,6 +338,7 @@ export type SellerStripeMerchantAccountOrderByWithAggregationInput = {
   transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
+  requirementsOutstanding?: Prisma.SortOrder
   controllerFeesPayer?: Prisma.SortOrder
   controllerLossesPayments?: Prisma.SortOrder
   dashboardType?: Prisma.SortOrder
@@ -353,6 +364,7 @@ export type SellerStripeMerchantAccountScalarWhereWithAggregatesInput = {
   transfersEnabled?: Prisma.BoolWithAggregatesFilter<"SellerStripeMerchantAccount"> | boolean
   detailsSubmitted?: Prisma.BoolWithAggregatesFilter<"SellerStripeMerchantAccount"> | boolean
   onboardingComplete?: Prisma.BoolWithAggregatesFilter<"SellerStripeMerchantAccount"> | boolean
+  requirementsOutstanding?: Prisma.BoolWithAggregatesFilter<"SellerStripeMerchantAccount"> | boolean
   controllerFeesPayer?: Prisma.StringWithAggregatesFilter<"SellerStripeMerchantAccount"> | string
   controllerLossesPayments?: Prisma.StringWithAggregatesFilter<"SellerStripeMerchantAccount"> | string
   dashboardType?: Prisma.StringWithAggregatesFilter<"SellerStripeMerchantAccount"> | string
@@ -371,6 +383,7 @@ export type SellerStripeMerchantAccountCreateInput = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: string
   controllerLossesPayments?: string
   dashboardType?: string
@@ -391,6 +404,7 @@ export type SellerStripeMerchantAccountUncheckedCreateInput = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: string
   controllerLossesPayments?: string
   dashboardType?: string
@@ -409,6 +423,7 @@ export type SellerStripeMerchantAccountUpdateInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -429,6 +444,7 @@ export type SellerStripeMerchantAccountUncheckedUpdateInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -448,6 +464,7 @@ export type SellerStripeMerchantAccountCreateManyInput = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: string
   controllerLossesPayments?: string
   dashboardType?: string
@@ -466,6 +483,7 @@ export type SellerStripeMerchantAccountUpdateManyMutationInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -485,6 +503,7 @@ export type SellerStripeMerchantAccountUncheckedUpdateManyInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -509,6 +528,7 @@ export type SellerStripeMerchantAccountCountOrderByAggregateInput = {
   transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
+  requirementsOutstanding?: Prisma.SortOrder
   controllerFeesPayer?: Prisma.SortOrder
   controllerLossesPayments?: Prisma.SortOrder
   dashboardType?: Prisma.SortOrder
@@ -528,6 +548,7 @@ export type SellerStripeMerchantAccountMaxOrderByAggregateInput = {
   transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
+  requirementsOutstanding?: Prisma.SortOrder
   controllerFeesPayer?: Prisma.SortOrder
   controllerLossesPayments?: Prisma.SortOrder
   dashboardType?: Prisma.SortOrder
@@ -547,6 +568,7 @@ export type SellerStripeMerchantAccountMinOrderByAggregateInput = {
   transfersEnabled?: Prisma.SortOrder
   detailsSubmitted?: Prisma.SortOrder
   onboardingComplete?: Prisma.SortOrder
+  requirementsOutstanding?: Prisma.SortOrder
   controllerFeesPayer?: Prisma.SortOrder
   controllerLossesPayments?: Prisma.SortOrder
   dashboardType?: Prisma.SortOrder
@@ -601,6 +623,7 @@ export type SellerStripeMerchantAccountCreateWithoutCompanyInput = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: string
   controllerLossesPayments?: string
   dashboardType?: string
@@ -619,6 +642,7 @@ export type SellerStripeMerchantAccountUncheckedCreateWithoutCompanyInput = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: string
   controllerLossesPayments?: string
   dashboardType?: string
@@ -653,6 +677,7 @@ export type SellerStripeMerchantAccountUpdateWithoutCompanyInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -671,6 +696,7 @@ export type SellerStripeMerchantAccountUncheckedUpdateWithoutCompanyInput = {
   transfersEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   detailsSubmitted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   onboardingComplete?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requirementsOutstanding?: Prisma.BoolFieldUpdateOperationsInput | boolean
   controllerFeesPayer?: Prisma.StringFieldUpdateOperationsInput | string
   controllerLossesPayments?: Prisma.StringFieldUpdateOperationsInput | string
   dashboardType?: Prisma.StringFieldUpdateOperationsInput | string
@@ -692,6 +718,7 @@ export type SellerStripeMerchantAccountSelect<ExtArgs extends runtime.Types.Exte
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: boolean
   controllerLossesPayments?: boolean
   dashboardType?: boolean
@@ -712,6 +739,7 @@ export type SellerStripeMerchantAccountSelectCreateManyAndReturn<ExtArgs extends
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: boolean
   controllerLossesPayments?: boolean
   dashboardType?: boolean
@@ -732,6 +760,7 @@ export type SellerStripeMerchantAccountSelectUpdateManyAndReturn<ExtArgs extends
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: boolean
   controllerLossesPayments?: boolean
   dashboardType?: boolean
@@ -752,6 +781,7 @@ export type SellerStripeMerchantAccountSelectScalar = {
   transfersEnabled?: boolean
   detailsSubmitted?: boolean
   onboardingComplete?: boolean
+  requirementsOutstanding?: boolean
   controllerFeesPayer?: boolean
   controllerLossesPayments?: boolean
   dashboardType?: boolean
@@ -759,7 +789,7 @@ export type SellerStripeMerchantAccountSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SellerStripeMerchantAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "stripeAccountId" | "country" | "status" | "chargesEnabled" | "payoutsEnabled" | "cardPaymentsEnabled" | "transfersEnabled" | "detailsSubmitted" | "onboardingComplete" | "controllerFeesPayer" | "controllerLossesPayments" | "dashboardType" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerStripeMerchantAccount"]>
+export type SellerStripeMerchantAccountOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "stripeAccountId" | "country" | "status" | "chargesEnabled" | "payoutsEnabled" | "cardPaymentsEnabled" | "transfersEnabled" | "detailsSubmitted" | "onboardingComplete" | "requirementsOutstanding" | "controllerFeesPayer" | "controllerLossesPayments" | "dashboardType" | "createdAt" | "updatedAt", ExtArgs["result"]["sellerStripeMerchantAccount"]>
 export type SellerStripeMerchantAccountInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }
@@ -787,6 +817,7 @@ export type $SellerStripeMerchantAccountPayload<ExtArgs extends runtime.Types.Ex
     transfersEnabled: boolean
     detailsSubmitted: boolean
     onboardingComplete: boolean
+    requirementsOutstanding: boolean
     controllerFeesPayer: string
     controllerLossesPayments: string
     dashboardType: string
@@ -1227,6 +1258,7 @@ export interface SellerStripeMerchantAccountFieldRefs {
   readonly transfersEnabled: Prisma.FieldRef<"SellerStripeMerchantAccount", 'Boolean'>
   readonly detailsSubmitted: Prisma.FieldRef<"SellerStripeMerchantAccount", 'Boolean'>
   readonly onboardingComplete: Prisma.FieldRef<"SellerStripeMerchantAccount", 'Boolean'>
+  readonly requirementsOutstanding: Prisma.FieldRef<"SellerStripeMerchantAccount", 'Boolean'>
   readonly controllerFeesPayer: Prisma.FieldRef<"SellerStripeMerchantAccount", 'String'>
   readonly controllerLossesPayments: Prisma.FieldRef<"SellerStripeMerchantAccount", 'String'>
   readonly dashboardType: Prisma.FieldRef<"SellerStripeMerchantAccount", 'String'>

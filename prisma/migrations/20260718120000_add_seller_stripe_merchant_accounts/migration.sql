@@ -19,6 +19,7 @@ CREATE TABLE "SellerStripeMerchantAccount" (
   "transfersEnabled" BOOLEAN NOT NULL DEFAULT false,
   "detailsSubmitted" BOOLEAN NOT NULL DEFAULT false,
   "onboardingComplete" BOOLEAN NOT NULL DEFAULT false,
+  "requirementsOutstanding" BOOLEAN NOT NULL DEFAULT false,
   "controllerFeesPayer" TEXT NOT NULL DEFAULT 'account',
   "controllerLossesPayments" TEXT NOT NULL DEFAULT 'stripe',
   "dashboardType" TEXT NOT NULL DEFAULT 'full',
@@ -41,3 +42,7 @@ ALTER TABLE "SellerStripeMerchantAccount"
   ADD CONSTRAINT "SellerStripeMerchantAccount_companyId_fkey"
   FOREIGN KEY ("companyId") REFERENCES "Company"("id")
   ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "SellerStripeMerchantAccount" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL PRIVILEGES ON TABLE "SellerStripeMerchantAccount" FROM anon, authenticated;

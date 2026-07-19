@@ -16,13 +16,13 @@ function merchantError(error: unknown) {
 export async function GET() {
   try {
     const user = await requireAuth();
-    const account = await getSellerStripeMerchantAccountStatus({ userId: user.id });
     if (getStripeDirectChargeMerchantOnboardingMode() !== "on") {
       return Response.json(
         { enabled: false, account: null },
         { headers: { "Cache-Control": "no-store" } },
       );
     }
+    const account = await getSellerStripeMerchantAccountStatus({ userId: user.id });
     return Response.json(
       { enabled: true, account },
       { headers: { "Cache-Control": "no-store" } },

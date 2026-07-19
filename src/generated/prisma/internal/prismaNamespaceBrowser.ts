@@ -625,6 +625,7 @@ export const SellerStripeMerchantAccountScalarFieldEnum = {
   transfersEnabled: 'transfersEnabled',
   detailsSubmitted: 'detailsSubmitted',
   onboardingComplete: 'onboardingComplete',
+  requirementsOutstanding: 'requirementsOutstanding',
   controllerFeesPayer: 'controllerFeesPayer',
   controllerLossesPayments: 'controllerLossesPayments',
   dashboardType: 'dashboardType',

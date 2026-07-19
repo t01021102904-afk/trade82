@@ -1088,6 +1088,7 @@ model SellerStripeMerchantAccount {
   transfersEnabled         Boolean                           @default(false)
   detailsSubmitted         Boolean                           @default(false)
   onboardingComplete       Boolean                           @default(false)
+  requirementsOutstanding  Boolean                           @default(false)
   controllerFeesPayer      String                            @default("account")
   controllerLossesPayments String                            @default("stripe")
   dashboardType            String                            @default("full")
