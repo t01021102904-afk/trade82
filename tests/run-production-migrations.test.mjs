@@ -432,6 +432,34 @@ test("failed, rolled-back, duplicate, unknown, and target zero-step records fail
   })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
 });
 
+test("operations migration records are strict and legitimate operational rows do not alter the applied path", async () => {
+  for (const invalidRecord of [
+    zeroStepRecord(OPERATIONS_MIGRATION),
+    record(OPERATIONS_MIGRATION, { finished_at: null }),
+    record(OPERATIONS_MIGRATION, { rolled_back_at: new Date() }),
+  ]) {
+    const fake = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, invalidRecord], [legacySchemaEvidence()]]);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
+
+  const duplicate = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedOperations]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(duplicate)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
+  });
+
+  const reordered = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedOperations, appliedMerchant], [legacySchemaEvidence()]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(reordered)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch",
+  });
+
+  const completed = fakeClient(completedResponses());
+  assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
+  assert.equal(completed.calls.query, 8, "already-applied verification must not require an empty operational catalog");
+});
+
 test("merchant preflight fails closed for each fixed evidence field", async () => {
   const keys = [
     "merchant_company_table",

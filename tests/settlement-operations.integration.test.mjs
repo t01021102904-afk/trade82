@@ -178,6 +178,72 @@ test("operational catalog verification rejects malformed indexes, defaults, cons
       },
     },
     {
+      name: "worker primary key on wrong column",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_pkey"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_pkey" PRIMARY KEY ("startedAt")');
+      },
+    },
+    {
+      name: "alert primary key on wrong column",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementOperationalAlert" DROP CONSTRAINT "SettlementOperationalAlert_pkey"');
+        await client.query('ALTER TABLE "SettlementOperationalAlert" ADD CONSTRAINT "SettlementOperationalAlert_pkey" PRIMARY KEY ("createdAt")');
+      },
+    },
+    {
+      name: "weakened worker count check",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_counts_check"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_counts_check" CHECK ("scannedCount" >= 0)');
+      },
+    },
+    {
+      name: "changed worker count comparison operator",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_counts_check"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_counts_check" CHECK ("scannedCount" > 0 AND "claimedCount" >= 0 AND "succeededCount" >= 0 AND "failedCount" >= 0 AND "skippedCount" >= 0 AND "manualReviewCount" >= 0 AND "staleRecoveredCount" >= 0 AND ("durationMs" IS NULL OR "durationMs" >= 0))');
+      },
+    },
+    {
+      name: "omitted worker count condition",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_counts_check"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_counts_check" CHECK ("scannedCount" >= 0 AND "claimedCount" >= 0 AND "succeededCount" >= 0 AND "failedCount" >= 0 AND "skippedCount" >= 0 AND "manualReviewCount" >= 0 AND "staleRecoveredCount" >= 0)');
+      },
+    },
+    {
+      name: "additional worker count condition",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_counts_check"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_counts_check" CHECK ("scannedCount" >= 0 AND "claimedCount" >= 0 AND "succeededCount" >= 0 AND "failedCount" >= 0 AND "skippedCount" >= 0 AND "manualReviewCount" >= 0 AND "staleRecoveredCount" >= 0 AND ("durationMs" IS NULL OR "durationMs" >= 0) AND "durationMs" IS NULL)');
+      },
+    },
+    {
+      name: "weakened alert occurrence check",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementOperationalAlert" DROP CONSTRAINT "SettlementOperationalAlert_occurrenceCount_check"');
+        await client.query('ALTER TABLE "SettlementOperationalAlert" ADD CONSTRAINT "SettlementOperationalAlert_occurrenceCount_check" CHECK ("occurrenceCount" >= 0)');
+      },
+    },
+    {
+      name: "wrong worker error-code typmod",
+      key: "operations_worker_columns",
+      mutation: (client) => client.query('ALTER TABLE "SettlementWorkerRun" ALTER COLUMN "sanitizedErrorCode" TYPE VARCHAR(63)'),
+    },
+    {
+      name: "wrong alert message typmod",
+      key: "operations_alert_columns",
+      mutation: (client) => client.query('ALTER TABLE "SettlementOperationalAlert" ALTER COLUMN "sanitizedMessage" TYPE VARCHAR(999)'),
+    },
+    {
       name: "wrong worker-run foreign key target",
       key: "operations_restrictive_fks",
       mutation: async (client) => {

@@ -1,12 +1,11 @@
 import "server-only";
 
-import { timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 function constantTimeEquals(left: string, right: string) {
-  const leftBuffer = Buffer.from(left);
-  const rightBuffer = Buffer.from(right);
-  if (leftBuffer.length !== rightBuffer.length) return false;
-  return timingSafeEqual(leftBuffer, rightBuffer);
+  const leftDigest = createHash("sha256").update(left).digest();
+  const rightDigest = createHash("sha256").update(right).digest();
+  return timingSafeEqual(leftDigest, rightDigest);
 }
 
 export function hasSettlementWorkerAuthorization(request: Request) {

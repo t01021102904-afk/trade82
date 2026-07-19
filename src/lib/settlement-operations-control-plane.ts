@@ -56,15 +56,22 @@ type WorkerRunSummary = {
   skippedCount: number;
   manualReviewCount: number;
   staleRecoveredCount: number;
+  timedOut?: boolean;
 };
 
 type RunOptions = {
   db?: OperationsDb;
   stripe?: Parameters<typeof executeSettlementLegTransfer>[0]["stripe"];
+  transferExecutor?: typeof executeSettlementLegTransfer;
+  reversalExecutor?: typeof executeSettlementReversal;
   now?: Date;
   clock?: () => Date;
   batchSize?: number;
 };
+
+export function createSettlementWorkerClock() {
+  return () => new Date();
+}
 
 function boundedBatchSize(value: number | undefined) {
   if (!Number.isFinite(value) || !value) return DEFAULT_SETTLEMENT_WORKER_BATCH_SIZE;
@@ -87,12 +94,14 @@ function safeWorkerErrorCode(value: string | undefined) {
     "account_invalid",
     "balance_insufficient",
     "max_attempts",
+    "reversal_max_attempts",
     "worker_timeout",
   ]).has(value ?? "") ? value : "worker_failed";
 }
 
-export function resolveSettlementWorkerRunStatus(summary: Pick<WorkerRunSummary, "failedCount" | "manualReviewCount" | "succeededCount" | "scannedCount">) {
+export function resolveSettlementWorkerRunStatus(summary: Pick<WorkerRunSummary, "failedCount" | "manualReviewCount" | "succeededCount" | "scannedCount" | "timedOut">) {
   if (summary.scannedCount === 0) return SettlementWorkerRunStatus.SUCCEEDED;
+  if (summary.timedOut) return summary.succeededCount > 0 ? SettlementWorkerRunStatus.PARTIALLY_FAILED : SettlementWorkerRunStatus.FAILED;
   const unsuccessfulCount = summary.failedCount + summary.manualReviewCount;
   if (unsuccessfulCount > 0 && summary.succeededCount > 0) return SettlementWorkerRunStatus.PARTIALLY_FAILED;
   if (unsuccessfulCount > 0) return SettlementWorkerRunStatus.FAILED;
@@ -128,6 +137,7 @@ async function finishWorkerRun(
       staleRecoveredCount: summary.staleRecoveredCount,
       durationMs,
       ...(sanitizedErrorCode ? { sanitizedErrorCode: safeWorkerErrorCode(sanitizedErrorCode) } : {}),
+      ...(!sanitizedErrorCode && summary.timedOut ? { sanitizedErrorCode: "worker_timeout" } : {}),
     },
   });
 }
@@ -174,7 +184,9 @@ async function transferCandidateIds(db: OperationsDb, now: Date, batchSize: numb
       AND leg."manualReviewRequired" = false
       AND leg."holdUntil" <= ${now}
       AND leg."amount" > 0
+      AND leg."currency" = 'usd'
       AND leg."stripeTransferId" IS NULL
+      AND leg."transferredAt" IS NULL
       AND payment."status" = 'PAID'::"PaymentRequestStatus"
       AND payment."requiresManualReconciliation" = false
       AND payment."refundAmount" = 0
@@ -209,6 +221,7 @@ async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: numb
       )
       AND payment."requiresManualReconciliation" = false
       AND payment."currency" = 'usd'
+      AND leg."currency" = 'usd'
       AND (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now})
       AND (reversal."reversalLockedAt" IS NULL OR reversal."reversalLockedAt" < ${new Date(now.getTime() - SETTLEMENT_WORKER_STALE_LOCK_MS)})
     ORDER BY reversal."createdAt" ASC, reversal."id" ASC
@@ -217,10 +230,9 @@ async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: numb
   `));
 }
 
-export async function runSettlementTransferBatch({ db = getDb(), stripe, now, clock, batchSize }: RunOptions = {}) {
-  const baseNow = now ?? new Date();
-  const readNow = clock ?? (() => baseNow);
-  const startedAt = readNow();
+export async function runSettlementTransferBatch({ db = getDb(), stripe, transferExecutor = executeSettlementLegTransfer, now, clock, batchSize }: RunOptions = {}) {
+  const readNow = clock ?? createSettlementWorkerClock();
+  const startedAt = now ?? readNow();
   const mode = getStripeConnectTransferExecutionMode();
   if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.TRANSFER, mode, startedAt);
   const run = await startWorkerRun(db, SettlementWorkerType.TRANSFER, mode, startedAt);
@@ -236,6 +248,7 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now, cl
     skippedCount: 0,
     manualReviewCount: 0,
     staleRecoveredCount: 0,
+    timedOut: false,
   };
   let lastError: string | undefined;
   let timedOut = false;
@@ -245,17 +258,32 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now, cl
       summary.skippedCount += ids.length - index;
       lastError = "worker_timeout";
       timedOut = true;
+      summary.timedOut = true;
       break;
     }
     try {
-      const result = await executeSettlementLegTransfer({ settlementLegId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
+      const result = await transferExecutor({ settlementLegId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
       if (candidate.staleRecovery && result.status !== "ineligible" && result.status !== "claim_lost") {
         summary.staleRecoveredCount += 1;
       }
       if (result.status === "transferred") {
         summary.succeededCount += 1;
       } else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") {
-        summary.skippedCount += 1;
+        if (result.errorCode === "max_attempts" || result.errorCode === "manual_review_required") {
+          summary.failedCount += 1;
+          summary.manualReviewCount += 1;
+          lastError = result.errorCode;
+          await recordTransferWorkerFailure({
+            db,
+            legId: candidate.id,
+            workerRunId: run.id,
+            now: executionNow,
+            errorCode: result.errorCode,
+            exhausted: result.errorCode === "max_attempts",
+          });
+        } else {
+          summary.skippedCount += 1;
+        }
       } else {
         summary.failedCount += 1;
         lastError = result.errorCode;
@@ -279,10 +307,9 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now, cl
   return { ...summary, status: resolveSettlementWorkerRunStatus(summary) };
 }
 
-export async function runSettlementReversalBatch({ db = getDb(), stripe, now, clock, batchSize }: RunOptions = {}) {
-  const baseNow = now ?? new Date();
-  const readNow = clock ?? (() => baseNow);
-  const startedAt = readNow();
+export async function runSettlementReversalBatch({ db = getDb(), stripe, reversalExecutor = executeSettlementReversal, now, clock, batchSize }: RunOptions = {}) {
+  const readNow = clock ?? createSettlementWorkerClock();
+  const startedAt = now ?? readNow();
   const mode = getStripeConnectTransferReversalExecutionMode();
   if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.REVERSAL, mode, startedAt);
   const run = await startWorkerRun(db, SettlementWorkerType.REVERSAL, mode, startedAt);
@@ -298,6 +325,7 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, now, cl
     skippedCount: 0,
     manualReviewCount: 0,
     staleRecoveredCount: 0,
+    timedOut: false,
   };
   let lastError: string | undefined;
   let timedOut = false;
@@ -307,12 +335,28 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, now, cl
       summary.skippedCount += ids.length - index;
       lastError = "worker_timeout";
       timedOut = true;
+      summary.timedOut = true;
       break;
     }
     try {
-      const result = await executeSettlementReversal({ settlementReversalId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
+      const result = await reversalExecutor({ settlementReversalId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
       if (result.status === "reversed") summary.succeededCount += 1;
-      else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") summary.skippedCount += 1;
+      else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") {
+        if (result.errorCode === "reversal_max_attempts" || result.errorCode === "manual_review_required") {
+          summary.failedCount += 1;
+          summary.manualReviewCount += 1;
+          lastError = result.errorCode;
+          await recordReversalWorkerFailure({
+            db,
+            reversalId: candidate.id,
+            workerRunId: run.id,
+            now: executionNow,
+            exhausted: result.errorCode === "reversal_max_attempts",
+          });
+        } else {
+          summary.skippedCount += 1;
+        }
+      }
       else if (result.status === "needs_manual_review") {
         summary.failedCount += 1;
         summary.manualReviewCount += 1;
@@ -854,6 +898,8 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
       status: true,
       amount: true,
       currency: true,
+      stripeTransferId: true,
+      transferredAt: true,
       holdUntil: true,
       transferLockedAt: true,
       nextTransferAttemptAt: true,
@@ -863,7 +909,7 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
           paymentFlow: true,
           status: true,
           approvedAt: true,
-          paymentRequest: { select: { status: true, requiresManualReconciliation: true, refundAmount: true, disputes: { select: { id: true } } } },
+      paymentRequest: { select: { status: true, requiresManualReconciliation: true, refundAmount: true, currency: true, disputes: { select: { id: true } } } },
           tradeOrder: { select: { paymentStatus: true, orderStatus: true } },
         },
       },
@@ -897,11 +943,11 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
       settlement: {
         select: {
           paymentFlow: true,
-          paymentRequest: { select: { status: true, requiresManualReconciliation: true } },
+      paymentRequest: { select: { status: true, requiresManualReconciliation: true, currency: true } },
         },
       },
       sourceType: true,
-      settlementLeg: { select: { type: true, status: true } },
+      settlementLeg: { select: { type: true, status: true, currency: true } },
     },
     take: 500,
   });
@@ -913,16 +959,20 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
       && (!leg.transferLockedAt || now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS);
     const readyTransfer = leg.settlement.status === SettlementStatus.READY
       && leg.status === SettlementLegStatus.READY
-      && !leg.transferLockedAt;
+      && (!leg.transferLockedAt || now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS);
     return leg.settlement.paymentFlow === SettlementPaymentFlow.SCT
       && leg.settlement.approvedAt !== null
       && (readyTransfer || staleTransferRecovery)
       && TRANSFERABLE_LEG_TYPES.has(leg.type)
       && leg.amount > 0
       && leg.holdUntil <= now
+      && leg.stripeTransferId === null
+      && leg.transferredAt === null
+      && leg.currency === "usd"
       && !leg.manualReviewRequired
       && payment.status === PaymentRequestStatus.PAID
       && !payment.requiresManualReconciliation
+      && payment.currency === "usd"
       && payment.refundAmount === 0
       && payment.disputes.length === 0
       && order.paymentStatus === OrderPaymentStatus.PAID
@@ -938,6 +988,7 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
       && reversal.sourceType !== "DISPUTE_LOST"
     ) return false;
     if (reversal.settlement.paymentRequest.requiresManualReconciliation) return false;
+    if (reversal.settlement.paymentRequest.currency !== "usd" || reversal.settlementLeg.currency !== "usd") return false;
     if (!TRANSFERABLE_LEG_TYPES.has(reversal.settlementLeg.type)) return false;
     if (!TRANSFERABLE_LEG_STATUSES.has(reversal.settlementLeg.status)) return false;
     if (reversal.amount <= reversal.successfullyReversedAmount) return false;
@@ -1017,64 +1068,152 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
 }
 
 export async function getSettlementOperationsMetrics({ db = getDb(), now = new Date() }: { db?: OperationsDb; now?: Date } = {}) {
-  const [legs, reversals, runs] = await Promise.all([
-    db.settlementLeg.findMany({ select: { type: true, status: true, amount: true, currency: true, createdAt: true, holdUntil: true, transferredAt: true, transferLockedAt: true, nextTransferAttemptAt: true, manualReviewRequired: true, transferAttemptCount: true, settlement: { select: { id: true, paymentFlow: true } } } }),
-    db.settlementReversal.findMany({ select: { status: true, reversalAttemptCount: true, successfullyReversedAmount: true, amount: true, currency: true, reversalLockedAt: true, nextReversalAttemptAt: true, createdAt: true, settlement: { select: { paymentFlow: true } }, settlementLeg: { select: { type: true } } } }),
+  const staleBefore = new Date(now.getTime() - SETTLEMENT_WORKER_STALE_LOCK_MS);
+  const [legMetrics, reversalMetrics, ageMetrics, heldSettlementMetrics, runs] = await Promise.all([
+    db.$queryRaw<Array<{
+      type: string;
+      status: string;
+      currency: string;
+      count: number;
+      amount_sum: number;
+      manual_review: boolean;
+      attempt_exhausted: boolean;
+      retry_due: boolean;
+      stale: boolean;
+      attempted: boolean;
+    }>>(Prisma.sql`
+      SELECT leg."type"::text AS type,
+        leg."status"::text AS status,
+        leg."currency" AS currency,
+        COUNT(*)::int AS count,
+        COALESCE(SUM(leg."amount"), 0)::int AS amount_sum,
+        leg."manualReviewRequired" AS manual_review,
+        (leg."transferAttemptCount" >= 5) AS attempt_exhausted,
+        (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}) AS retry_due,
+        (leg."transferLockedAt" IS NOT NULL AND leg."transferLockedAt" < ${staleBefore}) AS stale,
+        (leg."transferAttemptCount" > 0) AS attempted
+      FROM "SettlementLeg" AS leg
+      JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
+      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+      GROUP BY leg."type", leg."status", leg."currency", leg."manualReviewRequired",
+        (leg."transferAttemptCount" >= 5),
+        (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}),
+        (leg."transferLockedAt" IS NOT NULL AND leg."transferLockedAt" < ${staleBefore}),
+        (leg."transferAttemptCount" > 0)
+    `),
+    db.$queryRaw<Array<{
+      type: string;
+      status: string;
+      currency: string;
+      count: number;
+      amount_sum: number;
+      reversed_sum: number;
+      retry_due: boolean;
+      stale: boolean;
+      attempt_exhausted: boolean;
+      attempted: boolean;
+    }>>(Prisma.sql`
+      SELECT leg."type"::text AS type,
+        reversal."status"::text AS status,
+        reversal."currency" AS currency,
+        COUNT(*)::int AS count,
+        COALESCE(SUM(reversal."amount"), 0)::int AS amount_sum,
+        COALESCE(SUM(reversal."successfullyReversedAmount"), 0)::int AS reversed_sum,
+        (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}) AS retry_due,
+        (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}) AS stale,
+        (reversal."reversalAttemptCount" >= 5) AS attempt_exhausted,
+        (reversal."reversalAttemptCount" > 0) AS attempted
+      FROM "SettlementReversal" AS reversal
+      JOIN "Settlement" AS settlement ON settlement."id" = reversal."settlementId"
+      JOIN "SettlementLeg" AS leg ON leg."id" = reversal."settlementLegId"
+        AND leg."settlementId" = reversal."settlementId"
+      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+      GROUP BY leg."type", reversal."status", reversal."currency",
+        (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}),
+        (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}),
+        (reversal."reversalAttemptCount" >= 5),
+        (reversal."reversalAttemptCount" > 0)
+    `),
+    db.$queryRaw<Array<{ average_attempts: number; p50_age_ms: number; p95_age_ms: number; oldest_age_ms: number }>>(Prisma.sql`
+      SELECT
+        COALESCE(AVG(leg."transferAttemptCount") FILTER (WHERE leg."transferAttemptCount" > 0), 0)::float8 AS average_attempts,
+        COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY GREATEST(0::numeric, EXTRACT(EPOCH FROM (${now}::timestamp - leg."createdAt")) * 1000)) FILTER (WHERE leg."status" <> 'TRANSFERRED'::"SettlementLegStatus"), 0)::float8 AS p50_age_ms,
+        COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY GREATEST(0::numeric, EXTRACT(EPOCH FROM (${now}::timestamp - leg."createdAt")) * 1000)) FILTER (WHERE leg."status" <> 'TRANSFERRED'::"SettlementLegStatus"), 0)::float8 AS p95_age_ms,
+        COALESCE(MAX(GREATEST(0::numeric, EXTRACT(EPOCH FROM (${now}::timestamp - leg."createdAt")) * 1000)) FILTER (WHERE leg."status" <> 'TRANSFERRED'::"SettlementLegStatus"), 0)::float8 AS oldest_age_ms
+      FROM "SettlementLeg" AS leg
+      JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
+      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+    `),
+    db.$queryRaw<Array<{ held_settlement_count: number }>>(Prisma.sql`
+      SELECT COUNT(DISTINCT settlement."id")::int AS held_settlement_count
+      FROM "SettlementLeg" AS leg
+      JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
+      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+        AND leg."status" = 'HOLD'::"SettlementLegStatus"
+    `),
     db.settlementWorkerRun.findMany({ orderBy: { startedAt: "desc" }, take: 10, select: { id: true, status: true, workerType: true, startedAt: true, completedAt: true } }),
   ]);
-  const sctLegs = legs.filter((leg) => leg.settlement.paymentFlow === SettlementPaymentFlow.SCT);
-  const transferableLegs = sctLegs.filter((leg) => TRANSFERABLE_LEG_TYPES.has(leg.type));
-  const sctReversals = reversals.filter((reversal) => reversal.settlement.paymentFlow === SettlementPaymentFlow.SCT && TRANSFERABLE_LEG_TYPES.has(reversal.settlementLeg.type));
-  const amountBy = (items: Array<{ amount: number; currency: string }>) => items.reduce<Record<string, number>>((result, item) => { result[item.currency] = (result[item.currency] ?? 0) + item.amount; return result; }, {});
-  const ready = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.READY);
-  const held = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.HOLD);
-  const transferred = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.TRANSFERRED);
-  const failedTransfers = transferableLegs.filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED && (leg.manualReviewRequired || leg.transferAttemptCount >= 5));
-  const pendingReversals = sctReversals.filter((reversal) => reversal.status === SettlementReversalStatus.PENDING);
-  const attemptedTransfers = transferableLegs.filter((leg) => leg.transferAttemptCount > 0);
-  const attemptedReversals = sctReversals.filter((reversal) => reversal.reversalAttemptCount > 0);
-  const processingAges = transferableLegs
-    .filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED)
-    .map((leg) => Math.max(0, now.getTime() - leg.createdAt.getTime()))
-    .sort((left, right) => left - right);
-  const percentile = (values: number[], ratio: number) => values.length ? values[Math.min(values.length - 1, Math.floor((values.length - 1) * ratio))] : 0;
-  const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+
+  const asNumber = (value: number | string | null | undefined) => Number(value ?? 0);
+  const amountBy = (rows: Array<{ currency: string; amount_sum: number }>) => rows.reduce<Record<string, number>>((result, row) => {
+    result[row.currency] = (result[row.currency] ?? 0) + asNumber(row.amount_sum);
+    return result;
+  }, {});
+  const legRows = legMetrics.map((row) => ({ ...row, count: asNumber(row.count), amount_sum: asNumber(row.amount_sum) }));
+  const reversalRows = reversalMetrics.map((row) => ({ ...row, count: asNumber(row.count), amount_sum: asNumber(row.amount_sum), reversed_sum: asNumber(row.reversed_sum) }));
+  const rowsFor = (status: string, rows = legRows) => rows.filter((row) => row.status === status);
+  const ready = rowsFor("READY");
+  const held = rowsFor("HOLD");
+  const transferred = rowsFor("TRANSFERRED");
+  const attemptedTransfers = legRows.filter((row) => row.attempted);
+  const failedTransfers = legRows.filter((row) => row.status !== "TRANSFERRED" && (row.manual_review || row.attempt_exhausted));
+  const pendingReversals = reversalRows.filter((row) => row.status === "PENDING");
+  const attemptedReversals = reversalRows.filter((row) => row.attempted);
+  const completedReversals = reversalRows.filter((row) => row.status === "COMPLETED");
+  const amountByReversalRemaining = (rows: typeof reversalRows) => rows.reduce<Record<string, number>>((result, row) => {
+    result[row.currency] = (result[row.currency] ?? 0) + Math.max(0, row.amount_sum - row.reversed_sum);
+    return result;
+  }, {});
   const workerSuccessCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.SUCCEEDED).length;
   const workerFailureCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.FAILED || run.status === SettlementWorkerRunStatus.PARTIALLY_FAILED).length;
-  const oldestUnprocessedAgeMs = processingAges.length ? Math.max(...processingAges) : 0;
-  const heldSettlementIds = new Set(held.map((leg) => leg.settlement.id));
-  const retryExhaustedTransferCount = failedTransfers.filter((leg) => leg.transferAttemptCount >= 5).length;
-  const retryExhaustedReversalCount = sctReversals.filter((reversal) => reversal.reversalAttemptCount >= 5 && reversal.status !== SettlementReversalStatus.COMPLETED).length;
+  const age = ageMetrics[0] ?? { average_attempts: 0, p50_age_ms: 0, p95_age_ms: 0, oldest_age_ms: 0 };
+  const heldCount = asNumber(heldSettlementMetrics[0]?.held_settlement_count);
+  const manualReviewCount = legRows.filter((row) => row.manual_review).reduce((sum, row) => sum + row.count, 0)
+    + reversalRows.filter((row) => row.status === "NEEDS_MANUAL_REVIEW").reduce((sum, row) => sum + row.count, 0);
   return {
-    flow: { SCT: { readyTransferCount: ready.length, readyTransferAmount: amountBy(ready), heldCount: held.length, heldAmount: amountBy(held), transferredCount: transferred.length, transferredAmount: amountBy(transferred), sellerPayableAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.SELLER_PAYABLE)), partnerReferralAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.PARTNER_REFERRAL)) }, DIRECT_CHARGE: { available: false } },
-    readyTransferCount: ready.length,
+    flow: { SCT: { readyTransferCount: ready.reduce((sum, row) => sum + row.count, 0), readyTransferAmount: amountBy(ready), heldCount: held.reduce((sum, row) => sum + row.count, 0), heldAmount: amountBy(held), transferredCount: transferred.reduce((sum, row) => sum + row.count, 0), transferredAmount: amountBy(transferred), sellerPayableAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.SELLER_PAYABLE)), partnerReferralAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.PARTNER_REFERRAL)) }, DIRECT_CHARGE: { available: false } },
+    readyTransferCount: ready.reduce((sum, row) => sum + row.count, 0),
     readyTransferAmount: amountBy(ready),
-    heldSettlementCount: heldSettlementIds.size,
+    heldSettlementCount: heldCount,
     heldAmount: amountBy(held),
     transferredAmount: amountBy(transferred),
-    reversedAmount: amountBy(sctReversals.map((item) => ({ amount: item.successfullyReversedAmount, currency: item.currency }))),
-    pendingReversalCount: pendingReversals.length,
-    pendingReversalAmount: amountBy(pendingReversals.map((item) => ({ amount: item.amount - item.successfullyReversedAmount, currency: item.currency }))),
-    retryDueTransferCount: transferableLegs.filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED && leg.nextTransferAttemptAt && leg.nextTransferAttemptAt <= now).length,
-    retryDueReversalCount: pendingReversals.filter((item) => !item.nextReversalAttemptAt || item.nextReversalAttemptAt <= now).length,
-    staleExecutionCount: transferableLegs.filter((leg) => leg.transferLockedAt && now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length + pendingReversals.filter((item) => item.reversalLockedAt && now.getTime() - item.reversalLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length,
-    successfulTransferCount: transferred.length,
-    failedTransferCount: failedTransfers.length,
-    successfulReversalCount: sctReversals.filter((item) => item.status === SettlementReversalStatus.COMPLETED).length,
-    transferSuccessRate: attemptedTransfers.length ? Math.min(1, transferred.length / attemptedTransfers.length) : 0,
-    reversalSuccessRate: attemptedReversals.length ? Math.min(1, sctReversals.filter((item) => item.status === SettlementReversalStatus.COMPLETED).length / attemptedReversals.length) : 0,
-    averageTransferAttempts: average(attemptedTransfers.map((leg) => leg.transferAttemptCount)),
-    p50ProcessingAgeMs: percentile(processingAges, 0.5),
-    p95ProcessingAgeMs: percentile(processingAges, 0.95),
+    reversedAmount: amountBy(reversalRows.map((row) => ({ currency: row.currency, amount_sum: row.reversed_sum }))),
+    pendingReversalCount: pendingReversals.reduce((sum, row) => sum + row.count, 0),
+    pendingReversalAmount: amountByReversalRemaining(pendingReversals),
+    retryDueTransferCount: legRows.filter((row) => row.status !== "TRANSFERRED" && row.retry_due).reduce((sum, row) => sum + row.count, 0),
+    retryDueReversalCount: pendingReversals.filter((row) => row.retry_due).reduce((sum, row) => sum + row.count, 0),
+    staleExecutionCount: legRows.filter((row) => row.stale).reduce((sum, row) => sum + row.count, 0) + reversalRows.filter((row) => row.stale).reduce((sum, row) => sum + row.count, 0),
+    successfulTransferCount: transferred.reduce((sum, row) => sum + row.count, 0),
+    failedTransferCount: failedTransfers.reduce((sum, row) => sum + row.count, 0),
+    successfulReversalCount: completedReversals.reduce((sum, row) => sum + row.count, 0),
+    transferSuccessRate: attemptedTransfers.reduce((sum, row) => sum + row.count, 0) ? Math.min(1, transferred.reduce((sum, row) => sum + row.count, 0) / attemptedTransfers.reduce((sum, row) => sum + row.count, 0)) : 0,
+    reversalSuccessRate: attemptedReversals.reduce((sum, row) => sum + row.count, 0) ? Math.min(1, completedReversals.reduce((sum, row) => sum + row.count, 0) / attemptedReversals.reduce((sum, row) => sum + row.count, 0)) : 0,
+    averageTransferAttempts: asNumber(age.average_attempts),
+    p50ProcessingAgeMs: asNumber(age.p50_age_ms),
+    p95ProcessingAgeMs: asNumber(age.p95_age_ms),
     workerSuccessCount,
     workerFailureCount,
     workerMetricsWindow: "latest_10_runs",
-    oldestUnprocessedAgeMs,
-    retryExhaustedTransferCount,
-    retryExhaustedReversalCount,
-    sellerPayableAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.SELLER_PAYABLE)),
-    partnerReferralAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.PARTNER_REFERRAL)),
-    manualReviewCount: transferableLegs.filter((leg) => leg.manualReviewRequired).length + sctReversals.filter((item) => item.status === SettlementReversalStatus.NEEDS_MANUAL_REVIEW).length,
+    oldestUnprocessedAgeMs: asNumber(age.oldest_age_ms),
+    retryExhaustedTransferCount: failedTransfers.filter((row) => row.attempt_exhausted).reduce((sum, row) => sum + row.count, 0),
+    retryExhaustedReversalCount: reversalRows.filter((row) => row.attempt_exhausted && row.status !== "COMPLETED").reduce((sum, row) => sum + row.count, 0),
+    sellerPayableAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.SELLER_PAYABLE)),
+    partnerReferralAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.PARTNER_REFERRAL)),
+    manualReviewCount,
     latestSuccessfulWorkerRun: runs.find((run) => run.status === SettlementWorkerRunStatus.SUCCEEDED) ?? null,
     latestFailedWorkerRun: runs.find((run) => run.status === SettlementWorkerRunStatus.FAILED || run.status === SettlementWorkerRunStatus.PARTIALLY_FAILED) ?? null,
   };

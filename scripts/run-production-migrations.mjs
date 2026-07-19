@@ -1440,9 +1440,14 @@ export async function queryOperationsMigrationSchema(client) {
         ('SettlementOperationalAlert', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
         ('SettlementOperationalAlert', 'updatedAt', 'timestamp without time zone', 'timestamp', 'NO', NULL::text)
     ),
+    expected_typmods(table_name, column_name, character_maximum_length) AS (
+      VALUES
+        ('SettlementWorkerRun', 'sanitizedErrorCode', 64),
+        ('SettlementOperationalAlert', 'sanitizedMessage', 1000)
+    ),
     actual_columns AS (
       SELECT column_row.table_name, column_row.column_name, column_row.data_type,
-        column_row.udt_name, column_row.is_nullable,
+        column_row.udt_name, column_row.is_nullable, column_row.character_maximum_length,
         regexp_replace(COALESCE(pg_get_expr(default_row.adbin, default_row.adrelid), ''), '\\s+', '', 'g') AS default_expression
       FROM information_schema.columns column_row
       JOIN pg_class table_row ON table_row.relname = column_row.table_name
@@ -1491,6 +1496,21 @@ export async function queryOperationsMigrationSchema(client) {
       LEFT JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
       LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
       WHERE index_row.relkind = 'i' AND index_schema.oid IS NOT NULL
+    ),
+    constraint_meta AS (
+      SELECT constraint_row.oid, constraint_row.conname, constraint_row.contype,
+        constraint_row.conkey,
+        lower(regexp_replace(pg_get_constraintdef(constraint_row.oid), '[^a-zA-Z0-9<>=]+', '', 'g')) AS normalized_definition
+      FROM pg_constraint constraint_row
+      JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+      JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+      WHERE schema_row.nspname = 'public'
+        AND ((table_row.relname = 'SettlementWorkerRun' AND constraint_row.conname IN ('SettlementWorkerRun_pkey', 'SettlementWorkerRun_counts_check'))
+          OR (table_row.relname = 'SettlementOperationalAlert' AND constraint_row.conname IN (
+            'SettlementOperationalAlert_pkey', 'SettlementOperationalAlert_deduplicationKey_key',
+            'SettlementOperationalAlert_occurrenceCount_check', 'SettlementOperationalAlert_settlementId_fkey',
+            'SettlementOperationalAlert_settlementLegId_fkey', 'SettlementOperationalAlert_settlementReversalId_fkey',
+            'SettlementOperationalAlert_workerRunId_fkey', 'SettlementOperationalAlert_acknowledgedByUserId_fkey')))
     ),
     expected_fks(child_column, parent_table, delete_action) AS (
       VALUES
@@ -1562,6 +1582,7 @@ export async function queryOperationsMigrationSchema(client) {
               OR actual.data_type <> expected.data_type
               OR actual.udt_name <> expected.udt_name
               OR actual.is_nullable <> expected.nullable
+              OR COALESCE(actual.character_maximum_length, -1) <> COALESCE((SELECT expected_typmod.character_maximum_length FROM expected_typmods expected_typmod WHERE expected_typmod.table_name = expected.table_name AND expected_typmod.column_name = expected.column_name), -1)
               OR COALESCE(expected.default_expression, '') <> COALESCE(actual.default_expression, '')
             )
         )
@@ -1577,6 +1598,7 @@ export async function queryOperationsMigrationSchema(client) {
               OR actual.data_type <> expected.data_type
               OR actual.is_nullable <> expected.nullable
               OR actual.udt_name <> expected.udt_name
+              OR COALESCE(actual.character_maximum_length, -1) <> COALESCE((SELECT expected_typmod.character_maximum_length FROM expected_typmods expected_typmod WHERE expected_typmod.table_name = expected.table_name AND expected_typmod.column_name = expected.column_name), -1)
               OR COALESCE(expected.default_expression, '') <> COALESCE(actual.default_expression, '')
             )
         )
@@ -1592,32 +1614,19 @@ export async function queryOperationsMigrationSchema(client) {
       (
         SELECT count(*) = 10
           AND bool_and(
-            (conname = 'SettlementWorkerRun_pkey' AND contype = 'p')
-            OR (conname = 'SettlementOperationalAlert_pkey' AND contype = 'p')
-            OR (conname = 'SettlementOperationalAlert_deduplicationKey_key' AND contype = 'u')
+            (conname = 'SettlementWorkerRun_pkey' AND contype = 'p'
+              AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = 'public."SettlementWorkerRun"'::regclass AND attname = 'id' AND NOT attisdropped)]::smallint[])
+            OR (conname = 'SettlementOperationalAlert_pkey' AND contype = 'p'
+              AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = 'public."SettlementOperationalAlert"'::regclass AND attname = 'id' AND NOT attisdropped)]::smallint[])
+            OR (conname = 'SettlementOperationalAlert_deduplicationKey_key' AND contype = 'u'
+              AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = 'public."SettlementOperationalAlert"'::regclass AND attname = 'deduplicationKey' AND NOT attisdropped)]::smallint[])
             OR (conname = 'SettlementWorkerRun_counts_check' AND contype = 'c'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%scannedCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%claimedCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%succeededCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%failedCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%skippedCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%manualReviewCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%staleRecoveredCount%'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%durationMs%')
+              AND normalized_definition = 'checkscannedcount>=0andclaimedcount>=0andsucceededcount>=0andfailedcount>=0andskippedcount>=0andmanualreviewcount>=0andstalerecoveredcount>=0anddurationmsisnullordurationms>=0')
             OR (conname = 'SettlementOperationalAlert_occurrenceCount_check' AND contype = 'c'
-              AND pg_get_constraintdef(constraint_row.oid) LIKE '%occurrenceCount%')
+              AND normalized_definition = 'checkoccurrencecount>0')
             OR conname LIKE 'SettlementOperationalAlert_%_fkey'
           )
-        FROM pg_constraint constraint_row
-        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
-        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
-        WHERE schema_row.nspname = 'public'
-          AND ((table_row.relname = 'SettlementWorkerRun' AND conname IN ('SettlementWorkerRun_pkey', 'SettlementWorkerRun_counts_check'))
-            OR (table_row.relname = 'SettlementOperationalAlert' AND conname IN (
-              'SettlementOperationalAlert_pkey', 'SettlementOperationalAlert_deduplicationKey_key',
-              'SettlementOperationalAlert_occurrenceCount_check', 'SettlementOperationalAlert_settlementId_fkey',
-              'SettlementOperationalAlert_settlementLegId_fkey', 'SettlementOperationalAlert_settlementReversalId_fkey',
-              'SettlementOperationalAlert_workerRunId_fkey', 'SettlementOperationalAlert_acknowledgedByUserId_fkey')))
+        FROM constraint_meta
       ) AS operations_constraints,
       (
         SELECT count(*) = 5 AND bool_and(
