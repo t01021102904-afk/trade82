@@ -3,6 +3,7 @@ import "server-only";
 import Stripe from "stripe";
 import { getDb } from "@/lib/db";
 import { syncStripeConnectedAccount } from "@/lib/stripe-connect-onboarding";
+import { syncSellerStripeMerchantAccount } from "@/lib/stripe-direct-charge-merchant";
 import {
   assertStripeConnectRuntimeConfiguration,
   isStripeConnectRuntimeConfigurationError,
@@ -37,7 +38,12 @@ export async function processStripeConnectWebhookEvent(
   }
 
   const synced = await syncStripeConnectedAccount({ db, account });
-  return { handled: true, found: synced.found, updated: synced.updated } as const;
+  const merchantSynced = await syncSellerStripeMerchantAccount({ db, account });
+  return {
+    handled: true,
+    found: synced.found || merchantSynced.found,
+    updated: synced.updated || merchantSynced.updated,
+  } as const;
 }
 
 export async function handleStripeConnectWebhookRequest({

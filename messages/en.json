@@ -1186,6 +1186,40 @@
       "DISABLED": "Unavailable"
     }
   },
+  "stripeDirectChargeMerchant": {
+    "eyebrow": "Seller settings",
+    "title": "Stripe payment account",
+    "description": "Use this separate Stripe account to accept buyer card payments directly and receive payouts to your seller company's registered bank account.",
+    "settingsDescription": "Set up the separate Stripe account used for direct buyer card payments and future payouts to your registered bank account.",
+    "openSettings": "Open Stripe payment account",
+    "start": "Start onboarding",
+    "continue": "Continue onboarding",
+    "maintenance": "Stripe payment account onboarding is currently unavailable.",
+    "error": "Unable to load or update the Stripe payment account. Please try again.",
+    "noFinancialAction": "No payment, transfer, or payout is initiated from this screen.",
+    "status": {
+      "notStarted": "Not started",
+      "ONBOARDING_INCOMPLETE": "Onboarding incomplete",
+      "UNDER_REVIEW": "Under review",
+      "ENABLED": "Enabled",
+      "RESTRICTED": "Restricted",
+      "DISABLED": "Disabled"
+    },
+    "statusDescription": {
+      "ONBOARDING_INCOMPLETE": "Complete the Stripe-hosted onboarding steps to submit your information.",
+      "UNDER_REVIEW": "Stripe is reviewing the submitted information. No action is required here.",
+      "ENABLED": "Card payments and bank payouts are enabled for this merchant account.",
+      "RESTRICTED": "Stripe requires additional review before this account can accept direct charges.",
+      "DISABLED": "This Stripe account cannot continue onboarding. Contact Trade82 support.",
+      "notStarted": ""
+    },
+    "indicators": {
+      "cardPayments": "Card payments",
+      "bankPayouts": "Bank payouts",
+      "informationSubmitted": "Information submitted",
+      "requirements": "Requirements outstanding"
+    }
+  },
   "payouts": {
     "adminLabel": "Admin",
     "adminTitle": "Manual payouts",

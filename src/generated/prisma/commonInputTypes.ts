@@ -633,6 +633,23 @@ export type EnumStripeConnectedAccountStatusWithAggregatesFilter<$PrismaModel = 
   _max?: Prisma.NestedEnumStripeConnectedAccountStatusFilter<$PrismaModel>
 }
 
+export type EnumSellerStripeMerchantAccountStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerStripeMerchantAccountStatus | Prisma.EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel> | $Enums.SellerStripeMerchantAccountStatus
+}
+
+export type EnumSellerStripeMerchantAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerStripeMerchantAccountStatus | Prisma.EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerStripeMerchantAccountStatusWithAggregatesFilter<$PrismaModel> | $Enums.SellerStripeMerchantAccountStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel>
+}
+
 export type EnumReferralSubjectTypeNullableFilter<$PrismaModel = never> = {
   equals?: $Enums.ReferralSubjectType | Prisma.EnumReferralSubjectTypeFieldRefInput<$PrismaModel> | null
   in?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel> | null
@@ -1841,6 +1858,23 @@ export type NestedEnumStripeConnectedAccountStatusWithAggregatesFilter<$PrismaMo
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumStripeConnectedAccountStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumStripeConnectedAccountStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerStripeMerchantAccountStatus | Prisma.EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel> | $Enums.SellerStripeMerchantAccountStatus
+}
+
+export type NestedEnumSellerStripeMerchantAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SellerStripeMerchantAccountStatus | Prisma.EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SellerStripeMerchantAccountStatus[] | Prisma.ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSellerStripeMerchantAccountStatusWithAggregatesFilter<$PrismaModel> | $Enums.SellerStripeMerchantAccountStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSellerStripeMerchantAccountStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel = never> = {

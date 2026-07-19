@@ -352,6 +352,14 @@ enum StripeConnectedAccountStatus {
   DISABLED
 }
 
+enum SellerStripeMerchantAccountStatus {
+  ONBOARDING_INCOMPLETE
+  UNDER_REVIEW
+  ENABLED
+  RESTRICTED
+  DISABLED
+}
+
 enum SettlementStatus {
   PENDING
   HOLD
@@ -486,74 +494,75 @@ model UserProfile {
 }
 
 model Company {
-  id                                String                    @id @default(cuid())
+  id                                String                       @id @default(cuid())
   ownerUserId                       String
-  owner                             UserProfile               @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  owner                             UserProfile                  @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
   companyRole                       CompanyRole
   legalName                         String
   tradeName                         String?
-  displayNameEn                     String                    @default("")
+  displayNameEn                     String                       @default("")
   logoOriginalUrl                   String?
   logoThumbnailUrl                  String?
   logoUrl                           String?
-  useDefaultLogo                    Boolean                   @default(true)
-  website                           String                    @default("")
+  useDefaultLogo                    Boolean                      @default(true)
+  website                           String                       @default("")
   country                           String
-  city                              String                    @default("")
-  stateOrProvince                   String                    @default("")
+  city                              String                       @default("")
+  stateOrProvince                   String                       @default("")
   businessAddress                   String
-  description                       String                    @default("")
-  descriptionEn                     String                    @default("")
-  categories                        String[]                  @default([])
-  viewCount                         Int                       @default(0)
-  verificationStatus                CompanyVerificationStatus @default(unverified)
+  description                       String                       @default("")
+  descriptionEn                     String                       @default("")
+  categories                        String[]                     @default([])
+  viewCount                         Int                          @default(0)
+  verificationStatus                CompanyVerificationStatus    @default(unverified)
   deletedAt                         DateTime?
-  stripeCustomerId                  String?                   @unique
-  stripeSubscriptionId              String?                   @unique
+  stripeCustomerId                  String?                      @unique
+  stripeSubscriptionId              String?                      @unique
   subscriptionStatus                String?
   subscriptionPlan                  String?
   subscriptionCurrentPeriodEnd      DateTime?
   verifiedSellerSince               DateTime?
   sellerSupportPlan                 String?
   sellerSupportStatus               String?
-  sellerSupportStripeCustomerId     String?                   @unique
-  sellerSupportStripeSubscriptionId String?                   @unique
+  sellerSupportStripeCustomerId     String?                      @unique
+  sellerSupportStripeSubscriptionId String?                      @unique
   sellerSupportCurrentPeriodEnd     DateTime?
-  sellerSupportMonthlyLimit         Int                       @default(0)
-  sellerSupportMonthlyUsed          Int                       @default(0)
+  sellerSupportMonthlyLimit         Int                          @default(0)
+  sellerSupportMonthlyUsed          Int                          @default(0)
   sellerProfile                     SellerProfile?
   buyerProfile                      BuyerProfile?
   products                          Product[]
   verificationRequests              VerificationRequest[]
-  buyerInquiries                    Inquiry[]                 @relation("BuyerCompanyInquiries")
-  sellerInquiries                   Inquiry[]                 @relation("SellerCompanyInquiries")
-  recipientInquiries                Inquiry[]                 @relation("RecipientCompanyInquiries")
-  rfqSellerQuotes                   RfqSellerQuote[]          @relation("SellerCompanyRfqQuotes")
-  sentCompanyMessages               Message[]                 @relation("MessageSenderCompany")
-  receivedMessages                  Message[]                 @relation("MessageReceiverCompany")
-  uploadedMessageAttachments        MessageAttachment[]       @relation("MessageAttachmentCompany")
-  documentFolders                   DocumentFolder[]          @relation("CompanyDocumentFolders")
-  tradeDocuments                    TradeDocument[]           @relation("CompanyTradeDocuments")
-  sharedTradeDocuments              TradeDocument[]           @relation("SharedBuyerDocuments")
+  buyerInquiries                    Inquiry[]                    @relation("BuyerCompanyInquiries")
+  sellerInquiries                   Inquiry[]                    @relation("SellerCompanyInquiries")
+  recipientInquiries                Inquiry[]                    @relation("RecipientCompanyInquiries")
+  rfqSellerQuotes                   RfqSellerQuote[]             @relation("SellerCompanyRfqQuotes")
+  sentCompanyMessages               Message[]                    @relation("MessageSenderCompany")
+  receivedMessages                  Message[]                    @relation("MessageReceiverCompany")
+  uploadedMessageAttachments        MessageAttachment[]          @relation("MessageAttachmentCompany")
+  documentFolders                   DocumentFolder[]             @relation("CompanyDocumentFolders")
+  tradeDocuments                    TradeDocument[]              @relation("CompanyTradeDocuments")
+  sharedTradeDocuments              TradeDocument[]              @relation("SharedBuyerDocuments")
   savedItems                        SavedItem[]
-  buyerDeals                        Deal[]                    @relation("BuyerCompanyDeals")
-  sellerDeals                       Deal[]                    @relation("SellerCompanyDeals")
-  buyerRfqRequests                  RfqRequest[]              @relation("BuyerCompanyRfqs")
+  buyerDeals                        Deal[]                       @relation("BuyerCompanyDeals")
+  sellerDeals                       Deal[]                       @relation("SellerCompanyDeals")
+  buyerRfqRequests                  RfqRequest[]                 @relation("BuyerCompanyRfqs")
   marketingExposures                MarketingExposure[]
-  buyerPaymentRequests              PaymentRequest[]          @relation("BuyerCompanyPaymentRequests")
-  sellerPaymentRequests             PaymentRequest[]          @relation("SellerCompanyPaymentRequests")
-  buyerTradeOrders                  TradeOrder[]              @relation("BuyerCompanyTradeOrders")
-  sellerTradeOrders                 TradeOrder[]              @relation("SellerCompanyTradeOrders")
-  sellerPayoutProfile               SellerPayoutProfile?      @relation("SellerCompanyPayoutProfile")
-  sellerPayouts                     SellerPayout[]            @relation("SellerCompanyPayouts")
-  stripeConnectedAccount            StripeConnectedAccount?   @relation("CompanyStripeConnectedAccount")
-  settlementLegRecipients           SettlementLeg[]           @relation("SettlementLegRecipientCompany")
-  reviewsWritten                    Review[]                  @relation("ReviewWriter")
-  reviewsReceived                   Review[]                  @relation("ReviewRecipient")
-  companyReviewsWritten             CompanyReview[]           @relation("CompanyReviewWriter")
-  companyReviewsReceived            CompanyReview[]           @relation("CompanyReviewRecipient")
-  createdAt                         DateTime                  @default(now())
-  updatedAt                         DateTime                  @updatedAt
+  buyerPaymentRequests              PaymentRequest[]             @relation("BuyerCompanyPaymentRequests")
+  sellerPaymentRequests             PaymentRequest[]             @relation("SellerCompanyPaymentRequests")
+  buyerTradeOrders                  TradeOrder[]                 @relation("BuyerCompanyTradeOrders")
+  sellerTradeOrders                 TradeOrder[]                 @relation("SellerCompanyTradeOrders")
+  sellerPayoutProfile               SellerPayoutProfile?         @relation("SellerCompanyPayoutProfile")
+  sellerPayouts                     SellerPayout[]               @relation("SellerCompanyPayouts")
+  stripeConnectedAccount            StripeConnectedAccount?      @relation("CompanyStripeConnectedAccount")
+  sellerStripeMerchantAccount       SellerStripeMerchantAccount? @relation("CompanySellerStripeMerchantAccount")
+  settlementLegRecipients           SettlementLeg[]              @relation("SettlementLegRecipientCompany")
+  reviewsWritten                    Review[]                     @relation("ReviewWriter")
+  reviewsReceived                   Review[]                     @relation("ReviewRecipient")
+  companyReviewsWritten             CompanyReview[]              @relation("CompanyReviewWriter")
+  companyReviewsReceived            CompanyReview[]              @relation("CompanyReviewRecipient")
+  createdAt                         DateTime                     @default(now())
+  updatedAt                         DateTime                     @updatedAt
 
   @@unique([ownerUserId, companyRole])
   @@index([companyRole, verificationStatus])
@@ -1060,6 +1069,30 @@ model StripeConnectedAccount {
   onboardingComplete Boolean                      @default(false)
   createdAt          DateTime                     @default(now())
   updatedAt          DateTime                     @updatedAt
+
+  @@index([status, updatedAt])
+}
+
+// This is separate from StripeConnectedAccount: it is the seller's future
+// Direct Charges merchant account, not a settlement-transfer recipient.
+model SellerStripeMerchantAccount {
+  id                       String                            @id @default(cuid())
+  companyId                String                            @unique
+  company                  Company                           @relation("CompanySellerStripeMerchantAccount", fields: [companyId], references: [id], onDelete: Restrict)
+  stripeAccountId          String                            @unique
+  country                  String
+  status                   SellerStripeMerchantAccountStatus @default(ONBOARDING_INCOMPLETE)
+  chargesEnabled           Boolean                           @default(false)
+  payoutsEnabled           Boolean                           @default(false)
+  cardPaymentsEnabled      Boolean                           @default(false)
+  transfersEnabled         Boolean                           @default(false)
+  detailsSubmitted         Boolean                           @default(false)
+  onboardingComplete       Boolean                           @default(false)
+  controllerFeesPayer      String                            @default("account")
+  controllerLossesPayments String                            @default("stripe")
+  dashboardType            String                            @default("full")
+  createdAt                DateTime                          @default(now())
+  updatedAt                DateTime                          @updatedAt
 
   @@index([status, updatedAt])
 }

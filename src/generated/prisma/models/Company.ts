@@ -495,6 +495,7 @@ export type CompanyWhereInput = {
   sellerPayoutProfile?: Prisma.XOR<Prisma.SellerPayoutProfileNullableScalarRelationFilter, Prisma.SellerPayoutProfileWhereInput> | null
   sellerPayouts?: Prisma.SellerPayoutListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
+  sellerStripeMerchantAccount?: Prisma.XOR<Prisma.SellerStripeMerchantAccountNullableScalarRelationFilter, Prisma.SellerStripeMerchantAccountWhereInput> | null
   settlementLegRecipients?: Prisma.SettlementLegListRelationFilter
   reviewsWritten?: Prisma.ReviewListRelationFilter
   reviewsReceived?: Prisma.ReviewListRelationFilter
@@ -566,6 +567,7 @@ export type CompanyOrderByWithRelationInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileOrderByWithRelationInput
   sellerPayouts?: Prisma.SellerPayoutOrderByRelationAggregateInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOrderByWithRelationInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountOrderByWithRelationInput
   settlementLegRecipients?: Prisma.SettlementLegOrderByRelationAggregateInput
   reviewsWritten?: Prisma.ReviewOrderByRelationAggregateInput
   reviewsReceived?: Prisma.ReviewOrderByRelationAggregateInput
@@ -641,6 +643,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   sellerPayoutProfile?: Prisma.XOR<Prisma.SellerPayoutProfileNullableScalarRelationFilter, Prisma.SellerPayoutProfileWhereInput> | null
   sellerPayouts?: Prisma.SellerPayoutListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
+  sellerStripeMerchantAccount?: Prisma.XOR<Prisma.SellerStripeMerchantAccountNullableScalarRelationFilter, Prisma.SellerStripeMerchantAccountWhereInput> | null
   settlementLegRecipients?: Prisma.SettlementLegListRelationFilter
   reviewsWritten?: Prisma.ReviewListRelationFilter
   reviewsReceived?: Prisma.ReviewListRelationFilter
@@ -797,6 +800,7 @@ export type CompanyCreateInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -867,6 +871,7 @@ export type CompanyUncheckedCreateInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -937,6 +942,7 @@ export type CompanyUpdateInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -1007,6 +1013,7 @@ export type CompanyUncheckedUpdateInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -1547,6 +1554,20 @@ export type CompanyUpdateOneWithoutStripeConnectedAccountNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutStripeConnectedAccountInput, Prisma.CompanyUpdateWithoutStripeConnectedAccountInput>, Prisma.CompanyUncheckedUpdateWithoutStripeConnectedAccountInput>
 }
 
+export type CompanyCreateNestedOneWithoutSellerStripeMerchantAccountInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedCreateWithoutSellerStripeMerchantAccountInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutSellerStripeMerchantAccountInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutSellerStripeMerchantAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedCreateWithoutSellerStripeMerchantAccountInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutSellerStripeMerchantAccountInput
+  upsert?: Prisma.CompanyUpsertWithoutSellerStripeMerchantAccountInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUpdateWithoutSellerStripeMerchantAccountInput>, Prisma.CompanyUncheckedUpdateWithoutSellerStripeMerchantAccountInput>
+}
+
 export type CompanyCreateNestedOneWithoutSettlementLegRecipientsInput = {
   create?: Prisma.XOR<Prisma.CompanyCreateWithoutSettlementLegRecipientsInput, Prisma.CompanyUncheckedCreateWithoutSettlementLegRecipientsInput>
   connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutSettlementLegRecipientsInput
@@ -1871,6 +1892,7 @@ export type CompanyCreateWithoutOwnerInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -1940,6 +1962,7 @@ export type CompanyUncheckedCreateWithoutOwnerInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -2077,6 +2100,7 @@ export type CompanyCreateWithoutSellerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -2146,6 +2170,7 @@ export type CompanyUncheckedCreateWithoutSellerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -2231,6 +2256,7 @@ export type CompanyUpdateWithoutSellerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -2300,6 +2326,7 @@ export type CompanyUncheckedUpdateWithoutSellerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -2369,6 +2396,7 @@ export type CompanyCreateWithoutBuyerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -2438,6 +2466,7 @@ export type CompanyUncheckedCreateWithoutBuyerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -2523,6 +2552,7 @@ export type CompanyUpdateWithoutBuyerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -2592,6 +2622,7 @@ export type CompanyUncheckedUpdateWithoutBuyerProfileInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -2661,6 +2692,7 @@ export type CompanyCreateWithoutProductsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -2730,6 +2762,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -2815,6 +2848,7 @@ export type CompanyUpdateWithoutProductsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -2884,6 +2918,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -2953,6 +2988,7 @@ export type CompanyCreateWithoutVerificationRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -3022,6 +3058,7 @@ export type CompanyUncheckedCreateWithoutVerificationRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -3107,6 +3144,7 @@ export type CompanyUpdateWithoutVerificationRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -3176,6 +3214,7 @@ export type CompanyUncheckedUpdateWithoutVerificationRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -3245,6 +3284,7 @@ export type CompanyCreateWithoutBuyerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -3314,6 +3354,7 @@ export type CompanyUncheckedCreateWithoutBuyerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -3388,6 +3429,7 @@ export type CompanyCreateWithoutSellerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -3457,6 +3499,7 @@ export type CompanyUncheckedCreateWithoutSellerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -3531,6 +3574,7 @@ export type CompanyCreateWithoutRecipientInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -3600,6 +3644,7 @@ export type CompanyUncheckedCreateWithoutRecipientInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -3685,6 +3730,7 @@ export type CompanyUpdateWithoutBuyerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -3754,6 +3800,7 @@ export type CompanyUncheckedUpdateWithoutBuyerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -3834,6 +3881,7 @@ export type CompanyUpdateWithoutSellerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -3903,6 +3951,7 @@ export type CompanyUncheckedUpdateWithoutSellerInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -3983,6 +4032,7 @@ export type CompanyUpdateWithoutRecipientInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -4052,6 +4102,7 @@ export type CompanyUncheckedUpdateWithoutRecipientInquiriesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -4121,6 +4172,7 @@ export type CompanyCreateWithoutBuyerRfqRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -4190,6 +4242,7 @@ export type CompanyUncheckedCreateWithoutBuyerRfqRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -4275,6 +4328,7 @@ export type CompanyUpdateWithoutBuyerRfqRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -4344,6 +4398,7 @@ export type CompanyUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -4413,6 +4468,7 @@ export type CompanyCreateWithoutRfqSellerQuotesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -4482,6 +4538,7 @@ export type CompanyUncheckedCreateWithoutRfqSellerQuotesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -4567,6 +4624,7 @@ export type CompanyUpdateWithoutRfqSellerQuotesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -4636,6 +4694,7 @@ export type CompanyUncheckedUpdateWithoutRfqSellerQuotesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -4705,6 +4764,7 @@ export type CompanyCreateWithoutMarketingExposuresInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -4774,6 +4834,7 @@ export type CompanyUncheckedCreateWithoutMarketingExposuresInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -4859,6 +4920,7 @@ export type CompanyUpdateWithoutMarketingExposuresInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -4928,6 +4990,7 @@ export type CompanyUncheckedUpdateWithoutMarketingExposuresInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -4997,6 +5060,7 @@ export type CompanyCreateWithoutBuyerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -5066,6 +5130,7 @@ export type CompanyUncheckedCreateWithoutBuyerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -5140,6 +5205,7 @@ export type CompanyCreateWithoutSellerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -5209,6 +5275,7 @@ export type CompanyUncheckedCreateWithoutSellerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -5294,6 +5361,7 @@ export type CompanyUpdateWithoutBuyerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -5363,6 +5431,7 @@ export type CompanyUncheckedUpdateWithoutBuyerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -5443,6 +5512,7 @@ export type CompanyUpdateWithoutSellerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -5512,6 +5582,7 @@ export type CompanyUncheckedUpdateWithoutSellerPaymentRequestsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -5581,6 +5652,7 @@ export type CompanyCreateWithoutStripeConnectedAccountInput = {
   sellerTradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutSellerCompanyInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -5650,6 +5722,7 @@ export type CompanyUncheckedCreateWithoutStripeConnectedAccountInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutSellerCompanyInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -5735,6 +5808,7 @@ export type CompanyUpdateWithoutStripeConnectedAccountInput = {
   sellerTradeOrders?: Prisma.TradeOrderUpdateManyWithoutSellerCompanyNestedInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -5804,6 +5878,303 @@ export type CompanyUncheckedUpdateWithoutStripeConnectedAccountInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutSellerCompanyNestedInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyCreateWithoutSellerStripeMerchantAccountInput = {
+  id?: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  displayNameEn?: string
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  descriptionEn?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionStatus?: string | null
+  subscriptionPlan?: string | null
+  subscriptionCurrentPeriodEnd?: Date | string | null
+  verifiedSellerSince?: Date | string | null
+  sellerSupportPlan?: string | null
+  sellerSupportStatus?: string | null
+  sellerSupportStripeCustomerId?: string | null
+  sellerSupportStripeSubscriptionId?: string | null
+  sellerSupportCurrentPeriodEnd?: Date | string | null
+  sellerSupportMonthlyLimit?: number
+  sellerSupportMonthlyUsed?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserProfileCreateNestedOneWithoutCompaniesInput
+  sellerProfile?: Prisma.SellerProfileCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryCreateNestedManyWithoutRecipientCompanyInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteCreateNestedManyWithoutSellerCompanyInput
+  sentCompanyMessages?: Prisma.MessageCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealCreateNestedManyWithoutSellerCompanyInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerCompanyInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutCompanyInput
+  buyerPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutBuyerCompanyInput
+  sellerPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutSellerCompanyInput
+  buyerTradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutBuyerCompanyInput
+  sellerTradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutSellerCompanyInput
+  sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
+  sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
+  reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutSellerStripeMerchantAccountInput = {
+  id?: string
+  ownerUserId: string
+  companyRole: $Enums.CompanyRole
+  legalName: string
+  tradeName?: string | null
+  displayNameEn?: string
+  logoOriginalUrl?: string | null
+  logoThumbnailUrl?: string | null
+  logoUrl?: string | null
+  useDefaultLogo?: boolean
+  website?: string
+  country: string
+  city?: string
+  stateOrProvince?: string
+  businessAddress: string
+  description?: string
+  descriptionEn?: string
+  categories?: Prisma.CompanyCreatecategoriesInput | string[]
+  viewCount?: number
+  verificationStatus?: $Enums.CompanyVerificationStatus
+  deletedAt?: Date | string | null
+  stripeCustomerId?: string | null
+  stripeSubscriptionId?: string | null
+  subscriptionStatus?: string | null
+  subscriptionPlan?: string | null
+  subscriptionCurrentPeriodEnd?: Date | string | null
+  verifiedSellerSince?: Date | string | null
+  sellerSupportPlan?: string | null
+  sellerSupportStatus?: string | null
+  sellerSupportStripeCustomerId?: string | null
+  sellerSupportStripeSubscriptionId?: string | null
+  sellerSupportCurrentPeriodEnd?: Date | string | null
+  sellerSupportMonthlyLimit?: number
+  sellerSupportMonthlyUsed?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedCreateNestedOneWithoutCompanyInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutSellerCompanyInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutCompanyInput
+  buyerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSellerCompanyInput
+  recipientInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedCreateNestedManyWithoutSellerCompanyInput
+  sentCompanyMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderCompanyInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverCompanyInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByCompanyInput
+  documentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCompanyInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutCompanyInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutSharedBuyerInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutCompanyInput
+  buyerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerDeals?: Prisma.DealUncheckedCreateNestedManyWithoutSellerCompanyInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutCompanyInput
+  buyerPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutSellerCompanyInput
+  buyerTradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutBuyerCompanyInput
+  sellerTradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutSellerCompanyInput
+  sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
+  sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
+  reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+  companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
+  companyReviewsReceived?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutSellerStripeMerchantAccountInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedCreateWithoutSellerStripeMerchantAccountInput>
+}
+
+export type CompanyUpsertWithoutSellerStripeMerchantAccountInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedUpdateWithoutSellerStripeMerchantAccountInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedCreateWithoutSellerStripeMerchantAccountInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutSellerStripeMerchantAccountInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutSellerStripeMerchantAccountInput, Prisma.CompanyUncheckedUpdateWithoutSellerStripeMerchantAccountInput>
+}
+
+export type CompanyUpdateWithoutSellerStripeMerchantAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedSellerSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sellerSupportPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sellerSupportMonthlyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerSupportMonthlyUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserProfileUpdateOneRequiredWithoutCompaniesNestedInput
+  sellerProfile?: Prisma.SellerProfileUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUpdateManyWithoutRecipientCompanyNestedInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUpdateManyWithoutSellerCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUpdateManyWithoutSellerCompanyNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerCompanyNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutCompanyNestedInput
+  buyerPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutBuyerCompanyNestedInput
+  sellerPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutSellerCompanyNestedInput
+  buyerTradeOrders?: Prisma.TradeOrderUpdateManyWithoutBuyerCompanyNestedInput
+  sellerTradeOrders?: Prisma.TradeOrderUpdateManyWithoutSellerCompanyNestedInput
+  sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
+  sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
+  reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
+  companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
+  companyReviewsReceived?: Prisma.CompanyReviewUpdateManyWithoutReviewedCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutSellerStripeMerchantAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyRole?: Prisma.EnumCompanyRoleFieldUpdateOperationsInput | $Enums.CompanyRole
+  legalName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayNameEn?: Prisma.StringFieldUpdateOperationsInput | string
+  logoOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoThumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  useDefaultLogo?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  website?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  stateOrProvince?: Prisma.StringFieldUpdateOperationsInput | string
+  businessAddress?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  descriptionEn?: Prisma.StringFieldUpdateOperationsInput | string
+  categories?: Prisma.CompanyUpdatecategoriesInput | string[]
+  viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  verificationStatus?: Prisma.EnumCompanyVerificationStatusFieldUpdateOperationsInput | $Enums.CompanyVerificationStatus
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  stripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  subscriptionCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedSellerSince?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sellerSupportPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStripeCustomerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportStripeSubscriptionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sellerSupportCurrentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sellerSupportMonthlyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerSupportMonthlyUsed?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sellerProfile?: Prisma.SellerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  buyerProfile?: Prisma.BuyerProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  verificationRequests?: Prisma.VerificationRequestUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  recipientInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutRecipientCompanyNestedInput
+  rfqSellerQuotes?: Prisma.RfqSellerQuoteUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  sentCompanyMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderCompanyNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverCompanyNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByCompanyNestedInput
+  documentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCompanyNestedInput
+  tradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  sharedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutSharedBuyerNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerDeals?: Prisma.DealUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerDeals?: Prisma.DealUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutCompanyNestedInput
+  buyerPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  buyerTradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutBuyerCompanyNestedInput
+  sellerTradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -5874,6 +6245,7 @@ export type CompanyCreateWithoutSettlementLegRecipientsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -5943,6 +6315,7 @@ export type CompanyUncheckedCreateWithoutSettlementLegRecipientsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -6028,6 +6401,7 @@ export type CompanyUpdateWithoutSettlementLegRecipientsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -6097,6 +6471,7 @@ export type CompanyUncheckedUpdateWithoutSettlementLegRecipientsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -6165,6 +6540,7 @@ export type CompanyCreateWithoutBuyerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -6234,6 +6610,7 @@ export type CompanyUncheckedCreateWithoutBuyerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -6308,6 +6685,7 @@ export type CompanyCreateWithoutSellerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -6377,6 +6755,7 @@ export type CompanyUncheckedCreateWithoutSellerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -6462,6 +6841,7 @@ export type CompanyUpdateWithoutBuyerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -6531,6 +6911,7 @@ export type CompanyUncheckedUpdateWithoutBuyerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -6611,6 +6992,7 @@ export type CompanyUpdateWithoutSellerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -6680,6 +7062,7 @@ export type CompanyUncheckedUpdateWithoutSellerTradeOrdersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -6749,6 +7132,7 @@ export type CompanyCreateWithoutSellerPayoutProfileInput = {
   sellerTradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutSellerCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -6818,6 +7202,7 @@ export type CompanyUncheckedCreateWithoutSellerPayoutProfileInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutSellerCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -6903,6 +7288,7 @@ export type CompanyUpdateWithoutSellerPayoutProfileInput = {
   sellerTradeOrders?: Prisma.TradeOrderUpdateManyWithoutSellerCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -6972,6 +7358,7 @@ export type CompanyUncheckedUpdateWithoutSellerPayoutProfileInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutSellerCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -7041,6 +7428,7 @@ export type CompanyCreateWithoutSellerPayoutsInput = {
   sellerTradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutSellerCompanyInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -7110,6 +7498,7 @@ export type CompanyUncheckedCreateWithoutSellerPayoutsInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutSellerCompanyInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -7195,6 +7584,7 @@ export type CompanyUpdateWithoutSellerPayoutsInput = {
   sellerTradeOrders?: Prisma.TradeOrderUpdateManyWithoutSellerCompanyNestedInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -7264,6 +7654,7 @@ export type CompanyUncheckedUpdateWithoutSellerPayoutsInput = {
   sellerTradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutSellerCompanyNestedInput
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -7333,6 +7724,7 @@ export type CompanyCreateWithoutSavedItemsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -7402,6 +7794,7 @@ export type CompanyUncheckedCreateWithoutSavedItemsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -7487,6 +7880,7 @@ export type CompanyUpdateWithoutSavedItemsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -7556,6 +7950,7 @@ export type CompanyUncheckedUpdateWithoutSavedItemsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -7625,6 +8020,7 @@ export type CompanyCreateWithoutSentCompanyMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -7694,6 +8090,7 @@ export type CompanyUncheckedCreateWithoutSentCompanyMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -7768,6 +8165,7 @@ export type CompanyCreateWithoutReceivedMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -7837,6 +8235,7 @@ export type CompanyUncheckedCreateWithoutReceivedMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -7922,6 +8321,7 @@ export type CompanyUpdateWithoutSentCompanyMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -7991,6 +8391,7 @@ export type CompanyUncheckedUpdateWithoutSentCompanyMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -8071,6 +8472,7 @@ export type CompanyUpdateWithoutReceivedMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -8140,6 +8542,7 @@ export type CompanyUncheckedUpdateWithoutReceivedMessagesInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -8209,6 +8612,7 @@ export type CompanyCreateWithoutUploadedMessageAttachmentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -8278,6 +8682,7 @@ export type CompanyUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -8363,6 +8768,7 @@ export type CompanyUpdateWithoutUploadedMessageAttachmentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -8432,6 +8838,7 @@ export type CompanyUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -8501,6 +8908,7 @@ export type CompanyCreateWithoutDocumentFoldersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -8570,6 +8978,7 @@ export type CompanyUncheckedCreateWithoutDocumentFoldersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -8655,6 +9064,7 @@ export type CompanyUpdateWithoutDocumentFoldersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -8724,6 +9134,7 @@ export type CompanyUncheckedUpdateWithoutDocumentFoldersInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -8793,6 +9204,7 @@ export type CompanyCreateWithoutTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -8862,6 +9274,7 @@ export type CompanyUncheckedCreateWithoutTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -8936,6 +9349,7 @@ export type CompanyCreateWithoutSharedTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -9005,6 +9419,7 @@ export type CompanyUncheckedCreateWithoutSharedTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -9090,6 +9505,7 @@ export type CompanyUpdateWithoutTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -9159,6 +9575,7 @@ export type CompanyUncheckedUpdateWithoutTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -9239,6 +9656,7 @@ export type CompanyUpdateWithoutSharedTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -9308,6 +9726,7 @@ export type CompanyUncheckedUpdateWithoutSharedTradeDocumentsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -9377,6 +9796,7 @@ export type CompanyCreateWithoutBuyerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -9446,6 +9866,7 @@ export type CompanyUncheckedCreateWithoutBuyerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -9520,6 +9941,7 @@ export type CompanyCreateWithoutSellerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -9589,6 +10011,7 @@ export type CompanyUncheckedCreateWithoutSellerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -9674,6 +10097,7 @@ export type CompanyUpdateWithoutBuyerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -9743,6 +10167,7 @@ export type CompanyUncheckedUpdateWithoutBuyerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -9823,6 +10248,7 @@ export type CompanyUpdateWithoutSellerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -9892,6 +10318,7 @@ export type CompanyUncheckedUpdateWithoutSellerDealsInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -9962,6 +10389,7 @@ export type CompanyCreateWithoutReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -10031,6 +10459,7 @@ export type CompanyUncheckedCreateWithoutReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -10105,6 +10534,7 @@ export type CompanyCreateWithoutReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewCreateNestedManyWithoutReviewerCompanyInput
@@ -10174,6 +10604,7 @@ export type CompanyUncheckedCreateWithoutReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
@@ -10259,6 +10690,7 @@ export type CompanyUpdateWithoutReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -10328,6 +10760,7 @@ export type CompanyUncheckedUpdateWithoutReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -10408,6 +10841,7 @@ export type CompanyUpdateWithoutReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUpdateManyWithoutReviewerCompanyNestedInput
@@ -10477,6 +10911,7 @@ export type CompanyUncheckedUpdateWithoutReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   companyReviewsWritten?: Prisma.CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
@@ -10546,6 +10981,7 @@ export type CompanyCreateWithoutCompanyReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -10615,6 +11051,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -10689,6 +11126,7 @@ export type CompanyCreateWithoutCompanyReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutReviewedCompanyInput
@@ -10758,6 +11196,7 @@ export type CompanyUncheckedCreateWithoutCompanyReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedCreateNestedOneWithoutCompanyInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSellerCompanyInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutCompanyInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedCreateNestedOneWithoutCompanyInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientCompanyInput
   reviewsWritten?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewerCompanyInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutReviewedCompanyInput
@@ -10843,6 +11282,7 @@ export type CompanyUpdateWithoutCompanyReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -10912,6 +11352,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsWrittenInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -10992,6 +11433,7 @@ export type CompanyUpdateWithoutCompanyReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -11061,6 +11503,7 @@ export type CompanyUncheckedUpdateWithoutCompanyReviewsReceivedInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -11167,6 +11610,7 @@ export type CompanyUpdateWithoutOwnerInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutReviewedCompanyNestedInput
@@ -11236,6 +11680,7 @@ export type CompanyUncheckedUpdateWithoutOwnerInput = {
   sellerPayoutProfile?: Prisma.SellerPayoutProfileUncheckedUpdateOneWithoutCompanyNestedInput
   sellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSellerCompanyNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutCompanyNestedInput
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountUncheckedUpdateOneWithoutCompanyNestedInput
   settlementLegRecipients?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientCompanyNestedInput
   reviewsWritten?: Prisma.ReviewUncheckedUpdateManyWithoutReviewerCompanyNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput
@@ -11610,6 +12055,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   sellerPayoutProfile?: boolean | Prisma.Company$sellerPayoutProfileArgs<ExtArgs>
   sellerPayouts?: boolean | Prisma.Company$sellerPayoutsArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.Company$stripeConnectedAccountArgs<ExtArgs>
+  sellerStripeMerchantAccount?: boolean | Prisma.Company$sellerStripeMerchantAccountArgs<ExtArgs>
   settlementLegRecipients?: boolean | Prisma.Company$settlementLegRecipientsArgs<ExtArgs>
   reviewsWritten?: boolean | Prisma.Company$reviewsWrittenArgs<ExtArgs>
   reviewsReceived?: boolean | Prisma.Company$reviewsReceivedArgs<ExtArgs>
@@ -11766,6 +12212,7 @@ export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sellerPayoutProfile?: boolean | Prisma.Company$sellerPayoutProfileArgs<ExtArgs>
   sellerPayouts?: boolean | Prisma.Company$sellerPayoutsArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.Company$stripeConnectedAccountArgs<ExtArgs>
+  sellerStripeMerchantAccount?: boolean | Prisma.Company$sellerStripeMerchantAccountArgs<ExtArgs>
   settlementLegRecipients?: boolean | Prisma.Company$settlementLegRecipientsArgs<ExtArgs>
   reviewsWritten?: boolean | Prisma.Company$reviewsWrittenArgs<ExtArgs>
   reviewsReceived?: boolean | Prisma.Company$reviewsReceivedArgs<ExtArgs>
@@ -11810,6 +12257,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     sellerPayoutProfile: Prisma.$SellerPayoutProfilePayload<ExtArgs> | null
     sellerPayouts: Prisma.$SellerPayoutPayload<ExtArgs>[]
     stripeConnectedAccount: Prisma.$StripeConnectedAccountPayload<ExtArgs> | null
+    sellerStripeMerchantAccount: Prisma.$SellerStripeMerchantAccountPayload<ExtArgs> | null
     settlementLegRecipients: Prisma.$SettlementLegPayload<ExtArgs>[]
     reviewsWritten: Prisma.$ReviewPayload<ExtArgs>[]
     reviewsReceived: Prisma.$ReviewPayload<ExtArgs>[]
@@ -12274,6 +12722,7 @@ export interface Prisma__CompanyClient<T, Null = never, ExtArgs extends runtime.
   sellerPayoutProfile<T extends Prisma.Company$sellerPayoutProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sellerPayoutProfileArgs<ExtArgs>>): Prisma.Prisma__SellerPayoutProfileClient<runtime.Types.Result.GetResult<Prisma.$SellerPayoutProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   sellerPayouts<T extends Prisma.Company$sellerPayoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sellerPayoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stripeConnectedAccount<T extends Prisma.Company$stripeConnectedAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$stripeConnectedAccountArgs<ExtArgs>>): Prisma.Prisma__StripeConnectedAccountClient<runtime.Types.Result.GetResult<Prisma.$StripeConnectedAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  sellerStripeMerchantAccount<T extends Prisma.Company$sellerStripeMerchantAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$sellerStripeMerchantAccountArgs<ExtArgs>>): Prisma.Prisma__SellerStripeMerchantAccountClient<runtime.Types.Result.GetResult<Prisma.$SellerStripeMerchantAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settlementLegRecipients<T extends Prisma.Company$settlementLegRecipientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$settlementLegRecipientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsWritten<T extends Prisma.Company$reviewsWrittenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$reviewsWrittenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsReceived<T extends Prisma.Company$reviewsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Company$reviewsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13346,6 +13795,25 @@ export type Company$stripeConnectedAccountArgs<ExtArgs extends runtime.Types.Ext
    */
   include?: Prisma.StripeConnectedAccountInclude<ExtArgs> | null
   where?: Prisma.StripeConnectedAccountWhereInput
+}
+
+/**
+ * Company.sellerStripeMerchantAccount
+ */
+export type Company$sellerStripeMerchantAccountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SellerStripeMerchantAccount
+   */
+  select?: Prisma.SellerStripeMerchantAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SellerStripeMerchantAccount
+   */
+  omit?: Prisma.SellerStripeMerchantAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SellerStripeMerchantAccountInclude<ExtArgs> | null
+  where?: Prisma.SellerStripeMerchantAccountWhereInput
 }
 
 /**

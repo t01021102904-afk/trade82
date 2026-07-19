@@ -5,6 +5,7 @@ import { DeleteAccountDangerZone } from "@/components/delete-account-danger-zone
 import { SectionHeader } from "@/components/section-header";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import type { AccountRole } from "@/lib/types";
+import Link from "next/link";
 
 export function SettingsPage({
   locale,
@@ -45,7 +46,28 @@ export function SettingsPage({
             <DeleteAccountDangerZone />
           </>
         ) : (
-          <CompanyProfileSettings />
+          <>
+            <CompanyProfileSettings />
+            {(role === "seller" || role === "both") && (
+              <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                  {messages.stripeDirectChargeMerchant.eyebrow}
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-zinc-950">
+                  {messages.stripeDirectChargeMerchant.title}
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+                  {messages.stripeDirectChargeMerchant.settingsDescription}
+                </p>
+                <Link
+                  href={locale === "ko" ? "/ko/settings/stripe-merchant" : "/settings/stripe-merchant"}
+                  className="mt-5 inline-flex items-center rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-900 transition hover:border-emerald-500 hover:text-emerald-700"
+                >
+                  {messages.stripeDirectChargeMerchant.openSettings}
+                </Link>
+              </section>
+            )}
+          </>
         )}
       </div>
     </div>
