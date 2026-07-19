@@ -16,6 +16,7 @@ export const APPROVED_PRODUCTION_MIGRATION_BATCH = Object.freeze([
 export const FIRST_APPROVED_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[0];
 export const TARGET_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[1];
 export const MERCHANT_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[2];
+export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_control_plane";
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
   "20260627010000_add_buyer_preferred_supplier_type",
@@ -160,7 +161,7 @@ function isSuccessfulMigrationRecord(record, schemaEvidence) {
       && hasLegacySchemaEvidence(record.migration_name, schemaEvidence));
 }
 
-const MERCHANT_PENDING_MIGRATIONS = Object.freeze([MERCHANT_MIGRATION]);
+const OPERATIONS_PENDING_MIGRATIONS = Object.freeze([OPERATIONS_MIGRATION]);
 
 function hasExactMigrationList(actual, expected) {
   return actual.length === expected.length
@@ -198,10 +199,12 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const firstApprovedIndex = localMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
   const targetIndex = localMigrationNames.indexOf(TARGET_MIGRATION);
   const merchantIndex = localMigrationNames.indexOf(MERCHANT_MIGRATION);
+  const operationsIndex = localMigrationNames.indexOf(OPERATIONS_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
-    || merchantIndex !== localMigrationNames.length - 1) {
+    || operationsIndex !== merchantIndex + 1
+    || operationsIndex !== localMigrationNames.length - 1) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -227,15 +230,17 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     if (!databaseNames.has(PREREQUISITE_MIGRATION)
       || !databaseNames.has(FIRST_APPROVED_MIGRATION)
       || !databaseNames.has(TARGET_MIGRATION)
-      || !databaseNames.has(MERCHANT_MIGRATION)) {
+      || !databaseNames.has(MERCHANT_MIGRATION)
+      || !databaseNames.has(OPERATIONS_MIGRATION)) {
       throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
   }
 
-  if (!hasExactMigrationList(pendingMigrations, MERCHANT_PENDING_MIGRATIONS)
+  if (!hasExactMigrationList(pendingMigrations, OPERATIONS_PENDING_MIGRATIONS)
     || !databaseNames.has(FIRST_APPROVED_MIGRATION)
-    || !databaseNames.has(TARGET_MIGRATION)) {
+    || !databaseNames.has(TARGET_MIGRATION)
+    || !databaseNames.has(MERCHANT_MIGRATION)) {
     throw pendingSetError("Production has an unexpected pending migration.");
   }
 
@@ -1338,6 +1343,216 @@ export async function queryMerchantMigrationInitialState(client) {
   return result.rows[0] ?? null;
 }
 
+export async function queryOperationsMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Settlement'
+          AND column_name = 'paymentFlow'
+      ) AS operations_payment_flow_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'manualReviewRequired'
+      ) AS operations_leg_manual_review_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN ('SettlementWorkerRun', 'SettlementOperationalAlert')
+      ) AS operations_tables_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname IN (
+            'SettlementPaymentFlow',
+            'SettlementWorkerType',
+            'SettlementWorkerRunStatus',
+            'SettlementOperationalAlertType',
+            'SettlementOperationalAlertSeverity',
+            'SettlementOperationalAlertStatus'
+          )
+      ) AS operations_enum_types_absent
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryOperationsMigrationSchema(client) {
+  const result = await client.query(`
+    SELECT
+      (
+        SELECT count(*) = 6
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname IN (
+            'SettlementPaymentFlow',
+            'SettlementWorkerType',
+            'SettlementWorkerRunStatus',
+            'SettlementOperationalAlertType',
+            'SettlementOperationalAlertSeverity',
+            'SettlementOperationalAlertStatus'
+          )
+          AND pg_type.typtype = 'e'
+      ) AS operations_enum_types,
+      (
+        SELECT count(*) = 29
+          AND bool_and(
+            (pg_type.typname = 'SettlementPaymentFlow' AND pg_enum.enumlabel IN ('SCT', 'DIRECT_CHARGE'))
+            OR (pg_type.typname = 'SettlementWorkerType' AND pg_enum.enumlabel IN ('TRANSFER', 'REVERSAL', 'STALE_RECOVERY', 'METRIC_SNAPSHOT'))
+            OR (pg_type.typname = 'SettlementWorkerRunStatus' AND pg_enum.enumlabel IN ('RUNNING', 'SUCCEEDED', 'PARTIALLY_FAILED', 'FAILED', 'SKIPPED'))
+            OR (pg_type.typname = 'SettlementOperationalAlertType' AND pg_enum.enumlabel IN (
+              'TRANSFER_RETRY_EXHAUSTED', 'REVERSAL_RETRY_EXHAUSTED',
+              'TRANSFER_NEEDS_MANUAL_REVIEW', 'REVERSAL_NEEDS_MANUAL_REVIEW',
+              'STALE_TRANSFER_CLAIM', 'STALE_REVERSAL_CLAIM', 'WORKER_FAILED',
+              'WORKER_PARTIALLY_FAILED', 'LONG_PENDING_TRANSFER', 'LONG_PENDING_REVERSAL',
+              'DISPUTE_OPEN_WITH_READY_TRANSFER', 'REFUND_WITH_UNREVERSED_TRANSFER'
+            ))
+            OR (pg_type.typname = 'SettlementOperationalAlertSeverity' AND pg_enum.enumlabel IN ('INFO', 'WARNING', 'CRITICAL'))
+            OR (pg_type.typname = 'SettlementOperationalAlertStatus' AND pg_enum.enumlabel IN ('OPEN', 'ACKNOWLEDGED', 'RESOLVED'))
+          )
+        FROM pg_enum
+        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname IN (
+            'SettlementPaymentFlow', 'SettlementWorkerType', 'SettlementWorkerRunStatus',
+            'SettlementOperationalAlertType', 'SettlementOperationalAlertSeverity',
+            'SettlementOperationalAlertStatus'
+          )
+          AND pg_type.typtype = 'e'
+      ) AS operations_enum_values,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'Settlement'
+          AND column_name = 'paymentFlow'
+          AND udt_name = 'SettlementPaymentFlow'
+          AND is_nullable = 'NO'
+          AND column_default = '''SCT''::"SettlementPaymentFlow"'
+      ) AS operations_payment_flow_column,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'manualReviewRequired'
+          AND data_type = 'boolean'
+          AND is_nullable = 'NO'
+          AND column_default = 'false'
+      ) AS operations_leg_manual_review,
+      (
+        SELECT count(*) = 2
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN ('SettlementWorkerRun', 'SettlementOperationalAlert')
+          AND table_type = 'BASE TABLE'
+      ) AS operations_tables,
+      (
+        SELECT count(*) = 30
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND (
+            (table_name = 'SettlementWorkerRun' AND column_name IN (
+              'id', 'workerType', 'executionMode', 'status', 'startedAt', 'completedAt',
+              'scannedCount', 'claimedCount', 'succeededCount', 'failedCount',
+              'skippedCount', 'manualReviewCount', 'staleRecoveredCount', 'durationMs',
+              'sanitizedErrorCode'
+            ))
+            OR (table_name = 'SettlementOperationalAlert' AND column_name IN (
+              'id', 'alertType', 'severity', 'status', 'settlementId', 'settlementLegId',
+              'settlementReversalId', 'workerRunId', 'title', 'sanitizedMessage',
+              'occurrenceCount', 'deduplicationKey', 'acknowledgedAt',
+              'acknowledgedByUserId', 'resolvedAt'
+            ))
+          )
+      ) AS operations_columns,
+      (
+        SELECT count(*) = 10
+        FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relkind = 'i'
+          AND index_row.relname IN (
+            'SettlementWorkerRun_workerType_status_startedAt_idx',
+            'SettlementWorkerRun_status_startedAt_idx',
+            'SettlementOperationalAlert_status_severity_lastOccurredAt_idx',
+            'SettlementOperationalAlert_settlementId_status_idx',
+            'SettlementOperationalAlert_settlementLegId_status_idx',
+            'SettlementOperationalAlert_settlementReversalId_status_idx',
+            'SettlementOperationalAlert_workerRunId_idx',
+            'SettlementLeg_status_nextTransferAttemptAt_transferLockedAt_idx',
+            'SettlementLeg_manualReviewRequired_status_idx',
+            'SettlementReversal_status_nextReversalAttemptAt_reversalLockedAt_idx'
+          )
+      ) AS operations_indexes,
+      (
+        SELECT count(*) = 10
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND (
+            (table_row.relname = 'SettlementWorkerRun' AND constraint_row.conname IN (
+              'SettlementWorkerRun_pkey', 'SettlementWorkerRun_counts_check'
+            ))
+            OR (table_row.relname = 'SettlementOperationalAlert' AND constraint_row.conname IN (
+              'SettlementOperationalAlert_pkey',
+              'SettlementOperationalAlert_deduplicationKey_key',
+              'SettlementOperationalAlert_occurrenceCount_check',
+              'SettlementOperationalAlert_settlementId_fkey',
+              'SettlementOperationalAlert_settlementLegId_fkey',
+              'SettlementOperationalAlert_settlementReversalId_fkey',
+              'SettlementOperationalAlert_workerRunId_fkey',
+              'SettlementOperationalAlert_acknowledgedByUserId_fkey'
+            ))
+          )
+      ) AS operations_constraints,
+      (
+        SELECT count(*) = 5
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SettlementOperationalAlert'
+          AND constraint_row.contype = 'f'
+          AND constraint_row.confdeltype IN ('r', 'n')
+      ) AS operations_restrictive_fks,
+      (
+        SELECT count(*) = 2
+        FROM pg_class table_row
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname IN ('SettlementWorkerRun', 'SettlementOperationalAlert')
+          AND table_row.relkind IN ('r', 'p')
+          AND table_row.relrowsecurity IS TRUE
+      ) AS operations_rls,
+      NOT has_table_privilege('anon', 'public."SettlementWorkerRun"', 'SELECT')
+        AND NOT has_table_privilege('anon', 'public."SettlementOperationalAlert"', 'SELECT')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementWorkerRun"', 'SELECT')
+        AND NOT has_table_privilege('authenticated', 'public."SettlementOperationalAlert"', 'SELECT')
+        AS operations_public_access_revoked
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryOperationsMigrationInitialState(client) {
+  const result = await client.query(`
+    SELECT
+      (SELECT count(*) = 0 FROM public."SettlementWorkerRun") AS operations_worker_run_zero_rows,
+      (SELECT count(*) = 0 FROM public."SettlementOperationalAlert") AS operations_alert_zero_rows
+  `);
+  return result.rows[0] ?? null;
+}
+
 function allEvidencePresent(evidence, keys) {
   return Boolean(evidence) && keys.every((key) => evidence[key] === true);
 }
@@ -1455,6 +1670,32 @@ const MERCHANT_MIGRATION_SCHEMA_KEYS = [
 ];
 
 const MERCHANT_MIGRATION_INITIAL_STATE_KEYS = ["merchant_zero_rows"];
+
+const OPERATIONS_MIGRATION_PREFLIGHT_KEYS = [
+  "operations_payment_flow_absent",
+  "operations_leg_manual_review_absent",
+  "operations_tables_absent",
+  "operations_enum_types_absent",
+];
+
+const OPERATIONS_MIGRATION_SCHEMA_KEYS = [
+  "operations_enum_types",
+  "operations_enum_values",
+  "operations_payment_flow_column",
+  "operations_leg_manual_review",
+  "operations_tables",
+  "operations_columns",
+  "operations_indexes",
+  "operations_constraints",
+  "operations_restrictive_fks",
+  "operations_rls",
+  "operations_public_access_revoked",
+];
+
+const OPERATIONS_MIGRATION_INITIAL_STATE_KEYS = [
+  "operations_worker_run_zero_rows",
+  "operations_alert_zero_rows",
+];
 
 function createProductionClient(connectionString) {
   return new Client({ connectionString });
@@ -1617,6 +1858,20 @@ export async function runProductionMigrations({
           "target_preflight_failed",
         );
       }
+
+      try {
+        assertMigrationApplied(beforeRecords, OPERATIONS_MIGRATION);
+        const operationsSchema = await queryOperationsMigrationSchema(client);
+        if (!allEvidencePresent(operationsSchema, OPERATIONS_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Settlement operations schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
       return "already-applied";
     }
 
@@ -1720,6 +1975,19 @@ export async function runProductionMigrations({
     }
 
     try {
+      const operationsPreflight = await queryOperationsMigrationPreflight(client);
+      if (!allEvidencePresent(operationsPreflight, OPERATIONS_MIGRATION_PREFLIGHT_KEYS)) {
+        throw new Error("Settlement operations migration preflight failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "migration_state_evaluation",
+        source,
+        "target_preflight_failed",
+      );
+    }
+
+    try {
       deploy(environment);
     } catch (error) {
       if (error instanceof ProductionMigrationDiagnostic) throw error;
@@ -1798,6 +2066,24 @@ export async function runProductionMigrations({
       const merchantInitialState = await queryMerchantMigrationInitialState(client);
       if (!allEvidencePresent(merchantInitialState, MERCHANT_MIGRATION_INITIAL_STATE_KEYS)) {
         throw new Error("Merchant migration initial state verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "target_postverify_failed",
+      );
+    }
+
+    try {
+      assertMigrationApplied(afterRecords, OPERATIONS_MIGRATION);
+      const operationsSchema = await queryOperationsMigrationSchema(client);
+      if (!allEvidencePresent(operationsSchema, OPERATIONS_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Settlement operations schema post-verification failed.");
+      }
+      const operationsInitialState = await queryOperationsMigrationInitialState(client);
+      if (!allEvidencePresent(operationsInitialState, OPERATIONS_MIGRATION_INITIAL_STATE_KEYS)) {
+        throw new Error("Settlement operations initial state verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

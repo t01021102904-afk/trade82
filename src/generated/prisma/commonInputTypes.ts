@@ -657,6 +657,13 @@ export type EnumReferralSubjectTypeNullableFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel> | $Enums.ReferralSubjectType | null
 }
 
+export type EnumSettlementPaymentFlowFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementPaymentFlow | Prisma.EnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel> | $Enums.SettlementPaymentFlow
+}
+
 export type EnumSettlementStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SettlementStatus | Prisma.EnumSettlementStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SettlementStatus[] | Prisma.ListEnumSettlementStatusFieldRefInput<$PrismaModel>
@@ -672,6 +679,16 @@ export type EnumReferralSubjectTypeNullableWithAggregatesFilter<$PrismaModel = n
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel>
+}
+
+export type EnumSettlementPaymentFlowWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementPaymentFlow | Prisma.EnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementPaymentFlowWithAggregatesFilter<$PrismaModel> | $Enums.SettlementPaymentFlow
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel>
 }
 
 export type EnumSettlementStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -784,6 +801,91 @@ export type EnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
+}
+
+export type EnumSettlementWorkerTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerType | Prisma.EnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel> | $Enums.SettlementWorkerType
+}
+
+export type EnumSettlementWorkerRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerRunStatus | Prisma.EnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel> | $Enums.SettlementWorkerRunStatus
+}
+
+export type EnumSettlementWorkerTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerType | Prisma.EnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerTypeWithAggregatesFilter<$PrismaModel> | $Enums.SettlementWorkerType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel>
+}
+
+export type EnumSettlementWorkerRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerRunStatus | Prisma.EnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementWorkerRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel>
+}
+
+export type EnumSettlementOperationalAlertTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertType | Prisma.EnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel> | $Enums.SettlementOperationalAlertType
+}
+
+export type EnumSettlementOperationalAlertSeverityFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertSeverity | Prisma.EnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel> | $Enums.SettlementOperationalAlertSeverity
+}
+
+export type EnumSettlementOperationalAlertStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertStatus | Prisma.EnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel> | $Enums.SettlementOperationalAlertStatus
+}
+
+export type EnumSettlementOperationalAlertTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertType | Prisma.EnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertTypeWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel>
+}
+
+export type EnumSettlementOperationalAlertSeverityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertSeverity | Prisma.EnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertSeverityWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertSeverity
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel>
+}
+
+export type EnumSettlementOperationalAlertStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertStatus | Prisma.EnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel>
 }
 
 export type EnumTradeOrderStatusFilter<$PrismaModel = never> = {
@@ -1884,6 +1986,13 @@ export type NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel = never> = 
   not?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel> | $Enums.ReferralSubjectType | null
 }
 
+export type NestedEnumSettlementPaymentFlowFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementPaymentFlow | Prisma.EnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel> | $Enums.SettlementPaymentFlow
+}
+
 export type NestedEnumSettlementStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SettlementStatus | Prisma.EnumSettlementStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SettlementStatus[] | Prisma.ListEnumSettlementStatusFieldRefInput<$PrismaModel>
@@ -1899,6 +2008,16 @@ export type NestedEnumReferralSubjectTypeNullableWithAggregatesFilter<$PrismaMod
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumReferralSubjectTypeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementPaymentFlowWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementPaymentFlow | Prisma.EnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementPaymentFlow[] | Prisma.ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementPaymentFlowWithAggregatesFilter<$PrismaModel> | $Enums.SettlementPaymentFlow
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementPaymentFlowFilter<$PrismaModel>
 }
 
 export type NestedEnumSettlementStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -2011,6 +2130,91 @@ export type NestedEnumSettlementReversalStatusWithAggregatesFilter<$PrismaModel 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSettlementReversalStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementWorkerTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerType | Prisma.EnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel> | $Enums.SettlementWorkerType
+}
+
+export type NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerRunStatus | Prisma.EnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel> | $Enums.SettlementWorkerRunStatus
+}
+
+export type NestedEnumSettlementWorkerTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerType | Prisma.EnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerType[] | Prisma.ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerTypeWithAggregatesFilter<$PrismaModel> | $Enums.SettlementWorkerType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementWorkerTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementWorkerRunStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementWorkerRunStatus | Prisma.EnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementWorkerRunStatus[] | Prisma.ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementWorkerRunStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementWorkerRunStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementWorkerRunStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertType | Prisma.EnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel> | $Enums.SettlementOperationalAlertType
+}
+
+export type NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertSeverity | Prisma.EnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel> | $Enums.SettlementOperationalAlertSeverity
+}
+
+export type NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertStatus | Prisma.EnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel> | $Enums.SettlementOperationalAlertStatus
+}
+
+export type NestedEnumSettlementOperationalAlertTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertType | Prisma.EnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertType[] | Prisma.ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertTypeWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementOperationalAlertSeverityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertSeverity | Prisma.EnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertSeverity[] | Prisma.ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertSeverityWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertSeverity
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertSeverityFilter<$PrismaModel>
+}
+
+export type NestedEnumSettlementOperationalAlertStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SettlementOperationalAlertStatus | Prisma.EnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.SettlementOperationalAlertStatus[] | Prisma.ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumSettlementOperationalAlertStatusWithAggregatesFilter<$PrismaModel> | $Enums.SettlementOperationalAlertStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumSettlementOperationalAlertStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumTradeOrderStatusFilter<$PrismaModel = never> = {

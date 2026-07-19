@@ -1,6 +1,11 @@
 import "server-only";
 
-export type StripeConnectTransferExecutionMode = "off" | "manual";
+import {
+  parseStripeConnectExecutionMode,
+  type StripeConnectExecutionMode,
+} from "@/lib/stripe-connect-execution-mode";
+
+export type StripeConnectTransferExecutionMode = StripeConnectExecutionMode;
 
 type TransferExecutionEnvironment = {
   STRIPE_CONNECT_TRANSFER_EXECUTION_MODE?: string;
@@ -17,10 +22,5 @@ function runtimeEnvironment(): TransferExecutionEnvironment {
 export function getStripeConnectTransferExecutionMode(
   env: TransferExecutionEnvironment = runtimeEnvironment(),
 ): StripeConnectTransferExecutionMode {
-  switch (env.STRIPE_CONNECT_TRANSFER_EXECUTION_MODE?.trim().toLowerCase()) {
-    case "manual":
-      return "manual";
-    default:
-      return "off";
-  }
+  return parseStripeConnectExecutionMode(env.STRIPE_CONNECT_TRANSFER_EXECUTION_MODE);
 }

@@ -32,9 +32,9 @@ test("reversal allocation uses immutable original leg amounts and closes roundin
   assert.equal(full.get("PARTNER_REFERRAL"), 55);
 });
 
-test("reversal execution is manual-only and fails closed for missing or invalid modes", async () => {
+test("reversal execution modes fail closed unless explicitly manual or auto", async () => {
   assert.equal(getStripeConnectTransferReversalExecutionMode({}), "off");
-  assert.equal(getStripeConnectTransferReversalExecutionMode({ STRIPE_CONNECT_REVERSAL_EXECUTION_MODE: "auto" }), "off");
+  assert.equal(getStripeConnectTransferReversalExecutionMode({ STRIPE_CONNECT_REVERSAL_EXECUTION_MODE: " auto " }), "auto");
   assert.equal(getStripeConnectTransferReversalExecutionMode({ STRIPE_CONNECT_REVERSAL_EXECUTION_MODE: " MANUAL " }), "manual");
 
   let databaseCalled = false;

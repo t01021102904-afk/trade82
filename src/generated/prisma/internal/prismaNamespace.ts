@@ -411,6 +411,8 @@ export const ModelName = {
   SettlementLeg: 'SettlementLeg',
   SettlementEvent: 'SettlementEvent',
   SettlementReversal: 'SettlementReversal',
+  SettlementWorkerRun: 'SettlementWorkerRun',
+  SettlementOperationalAlert: 'SettlementOperationalAlert',
   OrderNumberCounter: 'OrderNumberCounter',
   TradeOrder: 'TradeOrder',
   TradeOrderItem: 'TradeOrderItem',
@@ -445,7 +447,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2447,6 +2449,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SettlementWorkerRun: {
+      payload: Prisma.$SettlementWorkerRunPayload<ExtArgs>
+      fields: Prisma.SettlementWorkerRunFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementWorkerRunFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementWorkerRunFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementWorkerRunFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementWorkerRunFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementWorkerRunFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementWorkerRunCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementWorkerRunCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementWorkerRunCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementWorkerRunDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        update: {
+          args: Prisma.SettlementWorkerRunUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementWorkerRunDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementWorkerRunUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementWorkerRunUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementWorkerRunUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementWorkerRunPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementWorkerRunAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementWorkerRun>
+        }
+        groupBy: {
+          args: Prisma.SettlementWorkerRunGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementWorkerRunGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementWorkerRunCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementWorkerRunCountAggregateOutputType> | number
+        }
+      }
+    }
+    SettlementOperationalAlert: {
+      payload: Prisma.$SettlementOperationalAlertPayload<ExtArgs>
+      fields: Prisma.SettlementOperationalAlertFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SettlementOperationalAlertFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SettlementOperationalAlertFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        findFirst: {
+          args: Prisma.SettlementOperationalAlertFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SettlementOperationalAlertFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        findMany: {
+          args: Prisma.SettlementOperationalAlertFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>[]
+        }
+        create: {
+          args: Prisma.SettlementOperationalAlertCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        createMany: {
+          args: Prisma.SettlementOperationalAlertCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SettlementOperationalAlertCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>[]
+        }
+        delete: {
+          args: Prisma.SettlementOperationalAlertDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        update: {
+          args: Prisma.SettlementOperationalAlertUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        deleteMany: {
+          args: Prisma.SettlementOperationalAlertDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SettlementOperationalAlertUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SettlementOperationalAlertUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>[]
+        }
+        upsert: {
+          args: Prisma.SettlementOperationalAlertUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SettlementOperationalAlertPayload>
+        }
+        aggregate: {
+          args: Prisma.SettlementOperationalAlertAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSettlementOperationalAlert>
+        }
+        groupBy: {
+          args: Prisma.SettlementOperationalAlertGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementOperationalAlertGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SettlementOperationalAlertCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SettlementOperationalAlertCountAggregateOutputType> | number
+        }
+      }
+    }
     OrderNumberCounter: {
       payload: Prisma.$OrderNumberCounterPayload<ExtArgs>
       fields: Prisma.OrderNumberCounterFieldRefs
@@ -4428,6 +4578,7 @@ export const SettlementScalarFieldEnum = {
   partnerReferralAmount: 'partnerReferralAmount',
   trade82RetainedAmountBeforeStripeFees: 'trade82RetainedAmountBeforeStripeFees',
   currency: 'currency',
+  paymentFlow: 'paymentFlow',
   holdUntil: 'holdUntil',
   status: 'status',
   approvedAt: 'approvedAt',
@@ -4458,6 +4609,7 @@ export const SettlementLegScalarFieldEnum = {
   nextTransferAttemptAt: 'nextTransferAttemptAt',
   transferLastError: 'transferLastError',
   transferLockedAt: 'transferLockedAt',
+  manualReviewRequired: 'manualReviewRequired',
   transferredAt: 'transferredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -4508,6 +4660,54 @@ export const SettlementReversalScalarFieldEnum = {
 } as const
 
 export type SettlementReversalScalarFieldEnum = (typeof SettlementReversalScalarFieldEnum)[keyof typeof SettlementReversalScalarFieldEnum]
+
+
+export const SettlementWorkerRunScalarFieldEnum = {
+  id: 'id',
+  workerType: 'workerType',
+  executionMode: 'executionMode',
+  status: 'status',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  scannedCount: 'scannedCount',
+  claimedCount: 'claimedCount',
+  succeededCount: 'succeededCount',
+  failedCount: 'failedCount',
+  skippedCount: 'skippedCount',
+  manualReviewCount: 'manualReviewCount',
+  staleRecoveredCount: 'staleRecoveredCount',
+  durationMs: 'durationMs',
+  sanitizedErrorCode: 'sanitizedErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementWorkerRunScalarFieldEnum = (typeof SettlementWorkerRunScalarFieldEnum)[keyof typeof SettlementWorkerRunScalarFieldEnum]
+
+
+export const SettlementOperationalAlertScalarFieldEnum = {
+  id: 'id',
+  alertType: 'alertType',
+  severity: 'severity',
+  status: 'status',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  settlementReversalId: 'settlementReversalId',
+  workerRunId: 'workerRunId',
+  title: 'title',
+  sanitizedMessage: 'sanitizedMessage',
+  occurrenceCount: 'occurrenceCount',
+  firstOccurredAt: 'firstOccurredAt',
+  lastOccurredAt: 'lastOccurredAt',
+  acknowledgedAt: 'acknowledgedAt',
+  acknowledgedByUserId: 'acknowledgedByUserId',
+  resolvedAt: 'resolvedAt',
+  deduplicationKey: 'deduplicationKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementOperationalAlertScalarFieldEnum = (typeof SettlementOperationalAlertScalarFieldEnum)[keyof typeof SettlementOperationalAlertScalarFieldEnum]
 
 
 export const OrderNumberCounterScalarFieldEnum = {
@@ -5346,6 +5546,20 @@ export type ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInp
 
 
 /**
+ * Reference to a field of type 'SettlementPaymentFlow'
+ */
+export type EnumSettlementPaymentFlowFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementPaymentFlow'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementPaymentFlow[]'
+ */
+export type ListEnumSettlementPaymentFlowFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementPaymentFlow[]'>
+    
+
+
+/**
  * Reference to a field of type 'SettlementStatus'
  */
 export type EnumSettlementStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementStatus'>
@@ -5440,6 +5654,76 @@ export type EnumSettlementReversalStatusFieldRefInput<$PrismaModel> = FieldRefIn
  * Reference to a field of type 'SettlementReversalStatus[]'
  */
 export type ListEnumSettlementReversalStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementReversalStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementWorkerType'
+ */
+export type EnumSettlementWorkerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementWorkerType'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementWorkerType[]'
+ */
+export type ListEnumSettlementWorkerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementWorkerType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementWorkerRunStatus'
+ */
+export type EnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementWorkerRunStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementWorkerRunStatus[]'
+ */
+export type ListEnumSettlementWorkerRunStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementWorkerRunStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertType'
+ */
+export type EnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertType'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertType[]'
+ */
+export type ListEnumSettlementOperationalAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertSeverity'
+ */
+export type EnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertSeverity'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertSeverity[]'
+ */
+export type ListEnumSettlementOperationalAlertSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertSeverity[]'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertStatus'
+ */
+export type EnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SettlementOperationalAlertStatus[]'
+ */
+export type ListEnumSettlementOperationalAlertStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SettlementOperationalAlertStatus[]'>
     
 
 
@@ -5901,6 +6185,8 @@ export type GlobalOmitConfig = {
   settlementLeg?: Prisma.SettlementLegOmit
   settlementEvent?: Prisma.SettlementEventOmit
   settlementReversal?: Prisma.SettlementReversalOmit
+  settlementWorkerRun?: Prisma.SettlementWorkerRunOmit
+  settlementOperationalAlert?: Prisma.SettlementOperationalAlertOmit
   orderNumberCounter?: Prisma.OrderNumberCounterOmit
   tradeOrder?: Prisma.TradeOrderOmit
   tradeOrderItem?: Prisma.TradeOrderItemOmit

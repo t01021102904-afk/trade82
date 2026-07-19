@@ -1,6 +1,11 @@
 import "server-only";
 
-export type StripeConnectTransferReversalExecutionMode = "off" | "manual";
+import {
+  parseStripeConnectExecutionMode,
+  type StripeConnectExecutionMode,
+} from "@/lib/stripe-connect-execution-mode";
+
+export type StripeConnectTransferReversalExecutionMode = StripeConnectExecutionMode;
 
 type ReversalExecutionEnvironment = {
   STRIPE_CONNECT_REVERSAL_EXECUTION_MODE?: string;
@@ -15,7 +20,5 @@ function runtimeEnvironment(): ReversalExecutionEnvironment {
 export function getStripeConnectTransferReversalExecutionMode(
   env: ReversalExecutionEnvironment = runtimeEnvironment(),
 ): StripeConnectTransferReversalExecutionMode {
-  return env.STRIPE_CONNECT_REVERSAL_EXECUTION_MODE?.trim().toLowerCase() === "manual"
-    ? "manual"
-    : "off";
+  return parseStripeConnectExecutionMode(env.STRIPE_CONNECT_REVERSAL_EXECUTION_MODE);
 }

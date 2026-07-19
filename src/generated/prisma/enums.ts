@@ -496,6 +496,71 @@ export const SettlementStatus = {
 export type SettlementStatus = (typeof SettlementStatus)[keyof typeof SettlementStatus]
 
 
+export const SettlementPaymentFlow = {
+  SCT: 'SCT',
+  DIRECT_CHARGE: 'DIRECT_CHARGE'
+} as const
+
+export type SettlementPaymentFlow = (typeof SettlementPaymentFlow)[keyof typeof SettlementPaymentFlow]
+
+
+export const SettlementWorkerType = {
+  TRANSFER: 'TRANSFER',
+  REVERSAL: 'REVERSAL',
+  STALE_RECOVERY: 'STALE_RECOVERY',
+  METRIC_SNAPSHOT: 'METRIC_SNAPSHOT'
+} as const
+
+export type SettlementWorkerType = (typeof SettlementWorkerType)[keyof typeof SettlementWorkerType]
+
+
+export const SettlementWorkerRunStatus = {
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  PARTIALLY_FAILED: 'PARTIALLY_FAILED',
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type SettlementWorkerRunStatus = (typeof SettlementWorkerRunStatus)[keyof typeof SettlementWorkerRunStatus]
+
+
+export const SettlementOperationalAlertType = {
+  TRANSFER_RETRY_EXHAUSTED: 'TRANSFER_RETRY_EXHAUSTED',
+  REVERSAL_RETRY_EXHAUSTED: 'REVERSAL_RETRY_EXHAUSTED',
+  TRANSFER_NEEDS_MANUAL_REVIEW: 'TRANSFER_NEEDS_MANUAL_REVIEW',
+  REVERSAL_NEEDS_MANUAL_REVIEW: 'REVERSAL_NEEDS_MANUAL_REVIEW',
+  STALE_TRANSFER_CLAIM: 'STALE_TRANSFER_CLAIM',
+  STALE_REVERSAL_CLAIM: 'STALE_REVERSAL_CLAIM',
+  WORKER_FAILED: 'WORKER_FAILED',
+  WORKER_PARTIALLY_FAILED: 'WORKER_PARTIALLY_FAILED',
+  LONG_PENDING_TRANSFER: 'LONG_PENDING_TRANSFER',
+  LONG_PENDING_REVERSAL: 'LONG_PENDING_REVERSAL',
+  DISPUTE_OPEN_WITH_READY_TRANSFER: 'DISPUTE_OPEN_WITH_READY_TRANSFER',
+  REFUND_WITH_UNREVERSED_TRANSFER: 'REFUND_WITH_UNREVERSED_TRANSFER'
+} as const
+
+export type SettlementOperationalAlertType = (typeof SettlementOperationalAlertType)[keyof typeof SettlementOperationalAlertType]
+
+
+export const SettlementOperationalAlertSeverity = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  CRITICAL: 'CRITICAL'
+} as const
+
+export type SettlementOperationalAlertSeverity = (typeof SettlementOperationalAlertSeverity)[keyof typeof SettlementOperationalAlertSeverity]
+
+
+export const SettlementOperationalAlertStatus = {
+  OPEN: 'OPEN',
+  ACKNOWLEDGED: 'ACKNOWLEDGED',
+  RESOLVED: 'RESOLVED'
+} as const
+
+export type SettlementOperationalAlertStatus = (typeof SettlementOperationalAlertStatus)[keyof typeof SettlementOperationalAlertStatus]
+
+
 export const SettlementLegType = {
   SELLER_PAYABLE: 'SELLER_PAYABLE',
   PARTNER_REFERRAL: 'PARTNER_REFERRAL',

@@ -6,6 +6,7 @@ import {
   SettlementEventType,
   SettlementLegStatus,
   SettlementLegType,
+  SettlementPaymentFlow,
   SettlementReversalSourceType,
   SettlementReversalStatus,
   SettlementStatus,
@@ -209,7 +210,7 @@ async function createReversalEvent(
     settlementId: string;
     settlementLegId: string;
     eventType: SettlementEventType;
-    actorUserId?: string;
+    actorUserId?: string | null;
     message: string;
     metadata: Prisma.InputJsonValue;
     idempotencyKey: string;
@@ -243,7 +244,7 @@ async function claimReversal({
 }: {
   db: ReversalDb;
   reversalId: string;
-  actorUserId: string;
+    actorUserId?: string | null;
   now: Date;
 }): Promise<{ kind: "claimed"; reversal: ClaimedReversal } | { kind: "ineligible"; reason: string } | { kind: "claim_lost" }> {
   return db.$transaction(async (tx) => {
@@ -283,6 +284,7 @@ async function claimReversal({
             id: true,
             status: true,
             paymentRequestId: true,
+            paymentFlow: true,
             paymentRequest: { select: { requiresManualReconciliation: true } },
           },
         },
@@ -301,6 +303,7 @@ async function claimReversal({
       },
     });
     if (!reversal) return { kind: "ineligible", reason: "reversal_not_found" };
+    if (reversal.settlement.paymentFlow !== SettlementPaymentFlow.SCT) return { kind: "ineligible", reason: "direct_charge_not_supported" };
     if (reversal.status !== SettlementReversalStatus.PENDING) return { kind: "ineligible", reason: "reversal_not_pending" };
     if (reversal.settlementLeg.settlementId !== reversal.settlementId) return { kind: "ineligible", reason: "reversal_leg_mismatch" };
     if (reversal.settlementLeg.type === SettlementLegType.PLATFORM_FEE) return { kind: "ineligible", reason: "platform_fee_not_reversible" };
@@ -432,7 +435,7 @@ async function finalizeSuccessfulReversal({
   db: ReversalDb;
   reversal: ClaimedReversal;
   stripeReversal: Pick<Stripe.TransferReversal, "id" | "amount">;
-  actorUserId: string;
+  actorUserId?: string | null;
   now: Date;
 }) {
   if (!Number.isSafeInteger(stripeReversal.amount) || stripeReversal.amount !== reversal.remainingAmount) {
@@ -627,13 +630,13 @@ export async function executeSettlementReversal({
   now = new Date(),
 }: {
   settlementReversalId: string;
-  actorUserId: string;
+  actorUserId?: string | null;
   mode?: StripeConnectTransferReversalExecutionMode;
   db?: ReversalDb;
   stripe?: ReversalStripeClient;
   now?: Date;
 }) {
-  if (mode !== "manual") {
+  if (mode !== "manual" && mode !== "auto") {
     return {
       ok: false,
       settlementReversalId,

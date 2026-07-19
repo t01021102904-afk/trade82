@@ -7,6 +7,7 @@ import {
   SettlementEventType,
   SettlementLegStatus,
   SettlementLegType,
+  SettlementPaymentFlow,
   SettlementStatus,
   StripeConnectedAccountStatus,
 } from "@/generated/prisma/client";
@@ -208,7 +209,9 @@ export function validateTransferLegEligibility(
   now: Date,
   { claimed = false }: { claimed?: boolean } = {},
 ) {
+  if (leg.settlement.paymentFlow !== SettlementPaymentFlow.SCT) return "direct_charge_not_supported";
   if (!transferableLegTypes.has(leg.type)) return "not_transferable";
+  if (leg.manualReviewRequired) return "manual_review_required";
   if (
     !claimed
     && leg.status !== SettlementLegStatus.READY
@@ -257,7 +260,7 @@ async function createTransferEvent(
     settlementId: string;
     settlementLegId: string;
     eventType: SettlementEventType;
-    actorUserId?: string;
+    actorUserId?: string | null;
     message: string;
     metadata: Prisma.InputJsonValue;
     idempotencyKey: string;
@@ -318,7 +321,7 @@ async function claimTransferLeg({
   db: TransferExecutorDb;
   settlementLegId: string;
   now: Date;
-  actorUserId: string;
+    actorUserId?: string | null;
 }) {
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`trade82-settlement-transfer:${settlementLegId}`}, 0))`;
@@ -520,7 +523,7 @@ async function releaseFailedClaim({
   leg: ClaimedTransferLeg;
   now: Date;
   failure: SettlementTransferFailure;
-  actorUserId: string;
+  actorUserId?: string | null;
   executionKind: TransferExecutionKind;
 }) {
   const isStaleRecovery = executionKind === "stale_recovery";
@@ -593,7 +596,7 @@ async function finalizeSuccessfulTransfer({
   leg: ClaimedTransferLeg;
   transfer: Pick<Stripe.Transfer, "id">;
   now: Date;
-  actorUserId: string;
+  actorUserId?: string | null;
 }) {
   const updated = await db.$transaction(async (tx) => {
     const changed = await tx.settlementLeg.updateMany({
@@ -646,14 +649,14 @@ export async function executeSettlementLegTransfer({
   assertRuntime = assertStripeConnectRuntimeConfiguration,
 }: {
   settlementLegId: string;
-  actorUserId: string;
+  actorUserId?: string | null;
   mode?: StripeConnectTransferExecutionMode;
   db?: TransferExecutorDb;
   stripe?: Pick<Stripe, "transfers">;
   now?: Date;
   assertRuntime?: () => unknown;
 }) {
-  if (mode !== "manual") {
+  if (mode !== "manual" && mode !== "auto") {
     return {
       ok: false,
       settlementLegId,

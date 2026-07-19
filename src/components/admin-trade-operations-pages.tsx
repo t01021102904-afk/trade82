@@ -3,6 +3,7 @@ import { AdminOrderManagement } from "@/components/admin-order-management";
 import { AdminPayoutManagement } from "@/components/admin-payout-management";
 import { AdminPayoutProfileManagement } from "@/components/admin-payout-profile-management";
 import { AdminSettlementManagement } from "@/components/admin-settlement-management";
+import { AdminSettlementOperationsSummary } from "@/components/admin-settlement-operations-summary";
 import { getDictionary, type Locale } from "@/lib/i18n";
 
 export function AdminOrdersPageContent({ locale }: { locale: Locale }) {
@@ -52,6 +53,7 @@ export function AdminSettlementsPageContent({ locale }: { locale: Locale }) {
         <h1 className="mt-2 text-2xl font-semibold theme-foreground">{copy.adminTitle}</h1>
         <p className="mt-2 text-sm theme-muted">{copy.adminDescription}</p>
       </header>
+      <AdminSettlementOperationsSummary locale={locale} />
       <AdminSettlementManagement copy={copy} />
     </main>
   );
