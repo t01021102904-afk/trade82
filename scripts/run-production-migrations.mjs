@@ -176,9 +176,9 @@ function pendingSetError(message) {
 
 function assertApprovedMigrationRecordOrder(databaseRecords) {
   const approvedRecords = databaseRecords
-    .filter((record) => APPROVED_PRODUCTION_MIGRATION_BATCH.includes(record.migration_name))
+    .filter((record) => [...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION].includes(record.migration_name))
     .map((record) => record.migration_name);
-  const expectedPrefix = APPROVED_PRODUCTION_MIGRATION_BATCH.slice(0, approvedRecords.length);
+  const expectedPrefix = [...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION].slice(0, approvedRecords.length);
   if (!hasExactMigrationList(approvedRecords, expectedPrefix)) {
     throw pendingSetError("Approved production migrations are out of order.");
   }
@@ -1386,6 +1386,120 @@ export async function queryOperationsMigrationPreflight(client) {
 
 export async function queryOperationsMigrationSchema(client) {
   const result = await client.query(`
+    WITH expected_enums(type_name, labels) AS (
+      VALUES
+        ('SettlementPaymentFlow', ARRAY['SCT', 'DIRECT_CHARGE']::text[]),
+        ('SettlementWorkerType', ARRAY['TRANSFER', 'REVERSAL', 'STALE_RECOVERY', 'METRIC_SNAPSHOT']::text[]),
+        ('SettlementWorkerRunStatus', ARRAY['RUNNING', 'SUCCEEDED', 'PARTIALLY_FAILED', 'FAILED', 'SKIPPED']::text[]),
+        ('SettlementOperationalAlertType', ARRAY[
+          'TRANSFER_RETRY_EXHAUSTED', 'REVERSAL_RETRY_EXHAUSTED',
+          'TRANSFER_NEEDS_MANUAL_REVIEW', 'REVERSAL_NEEDS_MANUAL_REVIEW',
+          'STALE_TRANSFER_CLAIM', 'STALE_REVERSAL_CLAIM', 'WORKER_FAILED',
+          'WORKER_PARTIALLY_FAILED', 'LONG_PENDING_TRANSFER', 'LONG_PENDING_REVERSAL',
+          'DISPUTE_OPEN_WITH_READY_TRANSFER', 'REFUND_WITH_UNREVERSED_TRANSFER'
+        ]::text[]),
+        ('SettlementOperationalAlertSeverity', ARRAY['INFO', 'WARNING', 'CRITICAL']::text[]),
+        ('SettlementOperationalAlertStatus', ARRAY['OPEN', 'ACKNOWLEDGED', 'RESOLVED']::text[])
+    ),
+    expected_columns(table_name, column_name, data_type, udt_name, nullable, default_expression) AS (
+      VALUES
+        ('SettlementWorkerRun', 'id', 'text', 'text', 'NO', NULL::text),
+        ('SettlementWorkerRun', 'workerType', 'USER-DEFINED', 'SettlementWorkerType', 'NO', NULL::text),
+        ('SettlementWorkerRun', 'executionMode', 'text', 'text', 'NO', NULL::text),
+        ('SettlementWorkerRun', 'status', 'USER-DEFINED', 'SettlementWorkerRunStatus', 'NO', '''RUNNING''::"SettlementWorkerRunStatus"'),
+        ('SettlementWorkerRun', 'startedAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('SettlementWorkerRun', 'completedAt', 'timestamp without time zone', 'timestamp', 'YES', NULL::text),
+        ('SettlementWorkerRun', 'scannedCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'claimedCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'succeededCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'failedCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'skippedCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'manualReviewCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'staleRecoveredCount', 'integer', 'int4', 'NO', '0'),
+        ('SettlementWorkerRun', 'durationMs', 'integer', 'int4', 'YES', NULL::text),
+        ('SettlementWorkerRun', 'sanitizedErrorCode', 'character varying', 'varchar', 'YES', NULL::text),
+        ('SettlementWorkerRun', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('SettlementWorkerRun', 'updatedAt', 'timestamp without time zone', 'timestamp', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'id', 'text', 'text', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'alertType', 'USER-DEFINED', 'SettlementOperationalAlertType', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'severity', 'USER-DEFINED', 'SettlementOperationalAlertSeverity', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'status', 'USER-DEFINED', 'SettlementOperationalAlertStatus', 'NO', '''OPEN''::"SettlementOperationalAlertStatus"'),
+        ('SettlementOperationalAlert', 'settlementId', 'text', 'text', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'settlementLegId', 'text', 'text', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'settlementReversalId', 'text', 'text', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'workerRunId', 'text', 'text', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'title', 'text', 'text', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'sanitizedMessage', 'character varying', 'varchar', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'occurrenceCount', 'integer', 'int4', 'NO', '1'),
+        ('SettlementOperationalAlert', 'firstOccurredAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('SettlementOperationalAlert', 'lastOccurredAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('SettlementOperationalAlert', 'acknowledgedAt', 'timestamp without time zone', 'timestamp', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'acknowledgedByUserId', 'text', 'text', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'resolvedAt', 'timestamp without time zone', 'timestamp', 'YES', NULL::text),
+        ('SettlementOperationalAlert', 'deduplicationKey', 'text', 'text', 'NO', NULL::text),
+        ('SettlementOperationalAlert', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('SettlementOperationalAlert', 'updatedAt', 'timestamp without time zone', 'timestamp', 'NO', NULL::text)
+    ),
+    actual_columns AS (
+      SELECT column_row.table_name, column_row.column_name, column_row.data_type,
+        column_row.udt_name, column_row.is_nullable,
+        regexp_replace(COALESCE(pg_get_expr(default_row.adbin, default_row.adrelid), ''), '\\s+', '', 'g') AS default_expression
+      FROM information_schema.columns column_row
+      JOIN pg_class table_row ON table_row.relname = column_row.table_name
+      JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        AND schema_row.nspname = column_row.table_schema
+      JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+        AND attribute_row.attname = column_row.column_name
+        AND NOT attribute_row.attisdropped
+      LEFT JOIN pg_attrdef default_row ON default_row.adrelid = attribute_row.attrelid
+        AND default_row.adnum = attribute_row.attnum
+      WHERE column_row.table_schema = 'public'
+        AND table_row.relkind IN ('r', 'p')
+        AND column_row.table_name IN ('SettlementWorkerRun', 'SettlementOperationalAlert')
+    ),
+    expected_indexes(index_name, table_name, key_columns, is_unique) AS (
+      VALUES
+        ('SettlementWorkerRun_workerType_status_startedAt_idx', 'SettlementWorkerRun', ARRAY['workerType', 'status', 'startedAt']::text[], false),
+        ('SettlementWorkerRun_status_startedAt_idx', 'SettlementWorkerRun', ARRAY['status', 'startedAt']::text[], false),
+        ('SettlementOperationalAlert_status_severity_lastOccurredAt_idx', 'SettlementOperationalAlert', ARRAY['status', 'severity', 'lastOccurredAt']::text[], false),
+        ('SettlementOperationalAlert_settlementId_status_idx', 'SettlementOperationalAlert', ARRAY['settlementId', 'status']::text[], false),
+        ('SettlementOperationalAlert_settlementLegId_status_idx', 'SettlementOperationalAlert', ARRAY['settlementLegId', 'status']::text[], false),
+        ('SettlementOperationalAlert_settlementReversalId_status_idx', 'SettlementOperationalAlert', ARRAY['settlementReversalId', 'status']::text[], false),
+        ('SettlementOperationalAlert_workerRunId_idx', 'SettlementOperationalAlert', ARRAY['workerRunId']::text[], false),
+        ('SettlementLeg_status_nextTransferAttemptAt_transferLockedAt_idx', 'SettlementLeg', ARRAY['status', 'nextTransferAttemptAt', 'transferLockedAt']::text[], false),
+        ('SettlementLeg_manualReviewRequired_status_idx', 'SettlementLeg', ARRAY['manualReviewRequired', 'status']::text[], false),
+        ('SettlementReversal_status_nextReversalAttemptAt_reversalLockedAt_idx', 'SettlementReversal', ARRAY['status', 'nextReversalAttemptAt', 'reversalLockedAt']::text[], false)
+    ),
+    actual_indexes AS (
+      SELECT expected.index_name, expected.table_name, expected.key_columns, expected.is_unique,
+        index_meta.indisvalid, index_meta.indisready, index_meta.indpred, index_meta.indexprs,
+        index_meta.indisunique, index_meta.indnatts, index_meta.indnkeyatts,
+        access_method.amname,
+        ARRAY(
+          SELECT attribute_row.attname::text
+          FROM unnest(index_meta.indkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+            AND attribute_row.attnum = key_row.attnum
+          WHERE key_row.ord <= index_meta.indnkeyatts
+          ORDER BY key_row.ord
+        ) AS actual_key_columns
+      FROM expected_indexes expected
+      LEFT JOIN pg_class index_row ON index_row.relname = left(expected.index_name, 63)
+      LEFT JOIN pg_namespace index_schema ON index_schema.oid = index_row.relnamespace
+        AND index_schema.nspname = 'public'
+      LEFT JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+      LEFT JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+      LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
+      WHERE index_row.relkind = 'i' AND index_schema.oid IS NOT NULL
+    ),
+    expected_fks(child_column, parent_table, delete_action) AS (
+      VALUES
+        ('settlementId', 'Settlement', 'r'),
+        ('settlementLegId', 'SettlementLeg', 'r'),
+        ('settlementReversalId', 'SettlementReversal', 'r'),
+        ('workerRunId', 'SettlementWorkerRun', 'n'),
+        ('acknowledgedByUserId', 'UserProfile', 'n')
+    )
     SELECT
       (
         SELECT count(*) = 6
@@ -1403,31 +1517,13 @@ export async function queryOperationsMigrationSchema(client) {
           AND pg_type.typtype = 'e'
       ) AS operations_enum_types,
       (
-        SELECT count(*) = 29
-          AND bool_and(
-            (pg_type.typname = 'SettlementPaymentFlow' AND pg_enum.enumlabel IN ('SCT', 'DIRECT_CHARGE'))
-            OR (pg_type.typname = 'SettlementWorkerType' AND pg_enum.enumlabel IN ('TRANSFER', 'REVERSAL', 'STALE_RECOVERY', 'METRIC_SNAPSHOT'))
-            OR (pg_type.typname = 'SettlementWorkerRunStatus' AND pg_enum.enumlabel IN ('RUNNING', 'SUCCEEDED', 'PARTIALLY_FAILED', 'FAILED', 'SKIPPED'))
-            OR (pg_type.typname = 'SettlementOperationalAlertType' AND pg_enum.enumlabel IN (
-              'TRANSFER_RETRY_EXHAUSTED', 'REVERSAL_RETRY_EXHAUSTED',
-              'TRANSFER_NEEDS_MANUAL_REVIEW', 'REVERSAL_NEEDS_MANUAL_REVIEW',
-              'STALE_TRANSFER_CLAIM', 'STALE_REVERSAL_CLAIM', 'WORKER_FAILED',
-              'WORKER_PARTIALLY_FAILED', 'LONG_PENDING_TRANSFER', 'LONG_PENDING_REVERSAL',
-              'DISPUTE_OPEN_WITH_READY_TRANSFER', 'REFUND_WITH_UNREVERSED_TRANSFER'
-            ))
-            OR (pg_type.typname = 'SettlementOperationalAlertSeverity' AND pg_enum.enumlabel IN ('INFO', 'WARNING', 'CRITICAL'))
-            OR (pg_type.typname = 'SettlementOperationalAlertStatus' AND pg_enum.enumlabel IN ('OPEN', 'ACKNOWLEDGED', 'RESOLVED'))
-          )
-        FROM pg_enum
-        JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
-        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
-        WHERE pg_namespace.nspname = 'public'
-          AND pg_type.typname IN (
-            'SettlementPaymentFlow', 'SettlementWorkerType', 'SettlementWorkerRunStatus',
-            'SettlementOperationalAlertType', 'SettlementOperationalAlertSeverity',
-            'SettlementOperationalAlertStatus'
-          )
-          AND pg_type.typtype = 'e'
+        SELECT count(*) = 6 AND bool_and(
+          (SELECT array_agg(pg_enum.enumlabel::text ORDER BY pg_enum.enumsortorder)
+           FROM pg_enum JOIN pg_type ON pg_type.oid = pg_enum.enumtypid
+           JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+           WHERE pg_namespace.nspname = 'public' AND pg_type.typname = expected.type_name AND pg_type.typtype = 'e') = expected.labels
+        )
+        FROM expected_enums expected
       ) AS operations_enum_values,
       EXISTS (
         SELECT 1
@@ -1457,74 +1553,84 @@ export async function queryOperationsMigrationSchema(client) {
           AND table_type = 'BASE TABLE'
       ) AS operations_tables,
       (
-        SELECT count(*) = 30
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND (
-            (table_name = 'SettlementWorkerRun' AND column_name IN (
-              'id', 'workerType', 'executionMode', 'status', 'startedAt', 'completedAt',
-              'scannedCount', 'claimedCount', 'succeededCount', 'failedCount',
-              'skippedCount', 'manualReviewCount', 'staleRecoveredCount', 'durationMs',
-              'sanitizedErrorCode'
-            ))
-            OR (table_name = 'SettlementOperationalAlert' AND column_name IN (
-              'id', 'alertType', 'severity', 'status', 'settlementId', 'settlementLegId',
-              'settlementReversalId', 'workerRunId', 'title', 'sanitizedMessage',
-              'occurrenceCount', 'deduplicationKey', 'acknowledgedAt',
-              'acknowledgedByUserId', 'resolvedAt'
-            ))
-          )
-      ) AS operations_columns,
+        SELECT count(*) = 17 AND NOT EXISTS (
+          SELECT 1 FROM expected_columns expected
+          LEFT JOIN actual_columns actual USING (table_name, column_name)
+          WHERE expected.table_name = 'SettlementWorkerRun'
+            AND (
+              actual.column_name IS NULL
+              OR actual.data_type <> expected.data_type
+              OR actual.udt_name <> expected.udt_name
+              OR actual.is_nullable <> expected.nullable
+              OR COALESCE(expected.default_expression, '') <> COALESCE(actual.default_expression, '')
+            )
+        )
+        FROM actual_columns WHERE table_name = 'SettlementWorkerRun'
+      ) AS operations_worker_columns,
       (
-        SELECT count(*) = 10
-        FROM pg_class index_row
-        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
-        WHERE schema_row.nspname = 'public'
-          AND index_row.relkind = 'i'
-          AND index_row.relname IN (
-            'SettlementWorkerRun_workerType_status_startedAt_idx',
-            'SettlementWorkerRun_status_startedAt_idx',
-            'SettlementOperationalAlert_status_severity_lastOccurredAt_idx',
-            'SettlementOperationalAlert_settlementId_status_idx',
-            'SettlementOperationalAlert_settlementLegId_status_idx',
-            'SettlementOperationalAlert_settlementReversalId_status_idx',
-            'SettlementOperationalAlert_workerRunId_idx',
-            'SettlementLeg_status_nextTransferAttemptAt_transferLockedAt_idx',
-            'SettlementLeg_manualReviewRequired_status_idx',
-            'SettlementReversal_status_nextReversalAttemptAt_reversalLockedAt_idx'
-          )
+        SELECT count(*) = 19 AND NOT EXISTS (
+          SELECT 1 FROM expected_columns expected
+          LEFT JOIN actual_columns actual USING (table_name, column_name)
+          WHERE expected.table_name = 'SettlementOperationalAlert'
+            AND (
+              actual.column_name IS NULL
+              OR actual.data_type <> expected.data_type
+              OR actual.is_nullable <> expected.nullable
+              OR actual.udt_name <> expected.udt_name
+              OR COALESCE(expected.default_expression, '') <> COALESCE(actual.default_expression, '')
+            )
+        )
+        FROM actual_columns WHERE table_name = 'SettlementOperationalAlert'
+      ) AS operations_alert_columns,
+      (
+        SELECT count(*) = 10 AND bool_and(indisvalid AND indisready AND indpred IS NULL AND indexprs IS NULL
+          AND amname = 'btree' AND indisunique = expected.is_unique
+          AND indnatts = cardinality(key_columns) AND indnkeyatts = cardinality(key_columns)
+          AND actual_key_columns = key_columns)
+        FROM actual_indexes JOIN expected_indexes expected USING (index_name, table_name, key_columns, is_unique)
       ) AS operations_indexes,
       (
         SELECT count(*) = 10
+          AND bool_and(
+            (conname = 'SettlementWorkerRun_pkey' AND contype = 'p')
+            OR (conname = 'SettlementOperationalAlert_pkey' AND contype = 'p')
+            OR (conname = 'SettlementOperationalAlert_deduplicationKey_key' AND contype = 'u')
+            OR (conname = 'SettlementWorkerRun_counts_check' AND contype = 'c'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%scannedCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%claimedCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%succeededCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%failedCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%skippedCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%manualReviewCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%staleRecoveredCount%'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%durationMs%')
+            OR (conname = 'SettlementOperationalAlert_occurrenceCount_check' AND contype = 'c'
+              AND pg_get_constraintdef(constraint_row.oid) LIKE '%occurrenceCount%')
+            OR conname LIKE 'SettlementOperationalAlert_%_fkey'
+          )
         FROM pg_constraint constraint_row
         JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
         JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
         WHERE schema_row.nspname = 'public'
-          AND (
-            (table_row.relname = 'SettlementWorkerRun' AND constraint_row.conname IN (
-              'SettlementWorkerRun_pkey', 'SettlementWorkerRun_counts_check'
-            ))
-            OR (table_row.relname = 'SettlementOperationalAlert' AND constraint_row.conname IN (
-              'SettlementOperationalAlert_pkey',
-              'SettlementOperationalAlert_deduplicationKey_key',
-              'SettlementOperationalAlert_occurrenceCount_check',
-              'SettlementOperationalAlert_settlementId_fkey',
-              'SettlementOperationalAlert_settlementLegId_fkey',
-              'SettlementOperationalAlert_settlementReversalId_fkey',
-              'SettlementOperationalAlert_workerRunId_fkey',
-              'SettlementOperationalAlert_acknowledgedByUserId_fkey'
-            ))
-          )
+          AND ((table_row.relname = 'SettlementWorkerRun' AND conname IN ('SettlementWorkerRun_pkey', 'SettlementWorkerRun_counts_check'))
+            OR (table_row.relname = 'SettlementOperationalAlert' AND conname IN (
+              'SettlementOperationalAlert_pkey', 'SettlementOperationalAlert_deduplicationKey_key',
+              'SettlementOperationalAlert_occurrenceCount_check', 'SettlementOperationalAlert_settlementId_fkey',
+              'SettlementOperationalAlert_settlementLegId_fkey', 'SettlementOperationalAlert_settlementReversalId_fkey',
+              'SettlementOperationalAlert_workerRunId_fkey', 'SettlementOperationalAlert_acknowledgedByUserId_fkey')))
       ) AS operations_constraints,
       (
-        SELECT count(*) = 5
+        SELECT count(*) = 5 AND bool_and(
+          constraint_row.contype = 'f'
+          AND constraint_row.confdeltype = expected.delete_action
+          AND constraint_row.confupdtype = 'c'
+          AND constraint_row.conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = constraint_row.conrelid AND attname = expected.child_column AND NOT attisdropped)]::smallint[]
+          AND constraint_row.confkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = constraint_row.confrelid AND attname = 'id' AND NOT attisdropped)]::smallint[]
+          AND constraint_row.confrelid = (SELECT parent_class.oid FROM pg_class parent_class WHERE parent_class.relname = expected.parent_table AND parent_class.relnamespace = 'public'::regnamespace)
+        )
         FROM pg_constraint constraint_row
-        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
-        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
-        WHERE schema_row.nspname = 'public'
-          AND table_row.relname = 'SettlementOperationalAlert'
-          AND constraint_row.contype = 'f'
-          AND constraint_row.confdeltype IN ('r', 'n')
+        JOIN expected_fks expected ON constraint_row.conname = 'SettlementOperationalAlert_' || expected.child_column || '_fkey'
+        WHERE constraint_row.conrelid = 'public."SettlementOperationalAlert"'::regclass
       ) AS operations_restrictive_fks,
       (
         SELECT count(*) = 2
@@ -1535,10 +1641,13 @@ export async function queryOperationsMigrationSchema(client) {
           AND table_row.relkind IN ('r', 'p')
           AND table_row.relrowsecurity IS TRUE
       ) AS operations_rls,
-      NOT has_table_privilege('anon', 'public."SettlementWorkerRun"', 'SELECT')
-        AND NOT has_table_privilege('anon', 'public."SettlementOperationalAlert"', 'SELECT')
-        AND NOT has_table_privilege('authenticated', 'public."SettlementWorkerRun"', 'SELECT')
-        AND NOT has_table_privilege('authenticated', 'public."SettlementOperationalAlert"', 'SELECT')
+      NOT EXISTS (
+        SELECT 1
+        FROM (VALUES ('anon'::name), ('authenticated'::name)) roles(role_name)
+        CROSS JOIN (VALUES ('SettlementWorkerRun'::text), ('SettlementOperationalAlert'::text)) tables(table_name)
+        CROSS JOIN (VALUES ('SELECT'::text), ('INSERT'::text), ('UPDATE'::text), ('DELETE'::text), ('TRUNCATE'::text), ('REFERENCES'::text), ('TRIGGER'::text)) privileges(privilege_name)
+        WHERE has_table_privilege(roles.role_name, format('public.%I', tables.table_name), privileges.privilege_name)
+      )
         AS operations_public_access_revoked
   `);
   return result.rows[0] ?? null;
@@ -1638,20 +1747,6 @@ const SECOND_MIGRATION_SCHEMA_KEYS = [
   "second_public_access_revoked",
 ];
 
-const MERCHANT_MIGRATION_PREFLIGHT_KEYS = [
-  "merchant_company_table",
-  "merchant_company_id_text",
-  "merchant_company_id_key",
-  "merchant_table_absent",
-  "merchant_status_enum_absent",
-  "merchant_company_index_absent",
-  "merchant_stripe_index_absent",
-  "merchant_status_index_absent",
-  "merchant_company_fk_absent",
-  "merchant_anon_role",
-  "merchant_authenticated_role",
-];
-
 const MERCHANT_MIGRATION_SCHEMA_KEYS = [
   "merchant_status_enum",
   "merchant_table",
@@ -1669,8 +1764,6 @@ const MERCHANT_MIGRATION_SCHEMA_KEYS = [
   "merchant_public_access_revoked",
 ];
 
-const MERCHANT_MIGRATION_INITIAL_STATE_KEYS = ["merchant_zero_rows"];
-
 const OPERATIONS_MIGRATION_PREFLIGHT_KEYS = [
   "operations_payment_flow_absent",
   "operations_leg_manual_review_absent",
@@ -1684,7 +1777,8 @@ const OPERATIONS_MIGRATION_SCHEMA_KEYS = [
   "operations_payment_flow_column",
   "operations_leg_manual_review",
   "operations_tables",
-  "operations_columns",
+  "operations_worker_columns",
+  "operations_alert_columns",
   "operations_indexes",
   "operations_constraints",
   "operations_restrictive_fks",
@@ -1962,9 +2056,10 @@ export async function runProductionMigrations({
     }
 
     try {
-      const merchantPreflight = await queryMerchantMigrationPreflight(client);
-      if (!allEvidencePresent(merchantPreflight, MERCHANT_MIGRATION_PREFLIGHT_KEYS)) {
-        throw new Error("Merchant migration preflight failed.");
+      assertMigrationApplied(beforeRecords, MERCHANT_MIGRATION);
+      const merchantSchema = await queryMerchantMigrationSchema(client);
+      if (!allEvidencePresent(merchantSchema, MERCHANT_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Merchant schema preflight failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(
@@ -2062,10 +2157,6 @@ export async function runProductionMigrations({
       const merchantSchema = await queryMerchantMigrationSchema(client);
       if (!allEvidencePresent(merchantSchema, MERCHANT_MIGRATION_SCHEMA_KEYS)) {
         throw new Error("Merchant migration post-verification failed.");
-      }
-      const merchantInitialState = await queryMerchantMigrationInitialState(client);
-      if (!allEvidencePresent(merchantInitialState, MERCHANT_MIGRATION_INITIAL_STATE_KEYS)) {
-        throw new Error("Merchant migration initial state verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

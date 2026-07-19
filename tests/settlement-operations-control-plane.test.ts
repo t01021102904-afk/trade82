@@ -3,9 +3,11 @@ import { test } from "node:test";
 
 import { hasSettlementWorkerAuthorization } from "../src/lib/settlement-worker-auth.ts";
 import {
+  resolveSettlementWorkerRunStatus,
   runSettlementReversalBatch,
   runSettlementTransferBatch,
 } from "../src/lib/settlement-operations-control-plane.ts";
+import { SettlementWorkerRunStatus } from "../src/generated/prisma/client.ts";
 import { parseStripeConnectExecutionMode } from "../src/lib/stripe-connect-execution-mode.ts";
 
 function withEnvironment(values: Record<string, string | undefined>, callback: () => Promise<void> | void) {
@@ -70,6 +72,14 @@ test("execution-mode parsing supports only off, manual, and auto", () => {
   assert.equal(parseStripeConnectExecutionMode(" unknown "), "off");
   assert.equal(parseStripeConnectExecutionMode(" MANUAL "), "manual");
   assert.equal(parseStripeConnectExecutionMode(" auto "), "auto");
+});
+
+test("worker accounting treats manual review as failure and empty runs as success", () => {
+  assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 0, failedCount: 0, manualReviewCount: 0, succeededCount: 0 }), SettlementWorkerRunStatus.SUCCEEDED);
+  assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 1, failedCount: 0, manualReviewCount: 1, succeededCount: 0 }), SettlementWorkerRunStatus.FAILED);
+  assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 2, failedCount: 0, manualReviewCount: 1, succeededCount: 1 }), SettlementWorkerRunStatus.PARTIALLY_FAILED);
+  assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 1, failedCount: 1, manualReviewCount: 0, succeededCount: 0 }), SettlementWorkerRunStatus.FAILED);
+  assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 1, failedCount: 0, manualReviewCount: 0, succeededCount: 1 }), SettlementWorkerRunStatus.SUCCEEDED);
 });
 
 test("off and manual transfer workers create no Stripe calls and do not query candidates", async () => {

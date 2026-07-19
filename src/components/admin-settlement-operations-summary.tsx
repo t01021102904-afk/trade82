@@ -17,6 +17,10 @@ type Metrics = {
   successfulTransferCount?: number;
   successfulReversalCount?: number;
   failedTransferCount?: number;
+  retryExhaustedTransferCount?: number;
+  retryExhaustedReversalCount?: number;
+  oldestUnprocessedAgeMs?: number;
+  workerMetricsWindow?: string;
   transferredAmount?: Record<string, number>;
   reversedAmount?: Record<string, number>;
 };
@@ -108,10 +112,12 @@ export function AdminSettlementOperationsSummary({ locale }: { locale: Locale })
   const cards = [
     [copy.readyTransferCount, `${metrics.readyTransferCount ?? "—"} · ${formatAmounts(metrics.readyTransferAmount)}`],
     [copy.heldSettlementCount, `${metrics.heldSettlementCount ?? "—"} · ${formatAmounts(metrics.heldAmount)}`],
-    [copy.retryDueTransferCount, preview.retryDueCount ?? metrics.retryDueTransferCount],
+    [copy.retryDueTransferCount, metrics.retryDueTransferCount],
+    [copy.retryExhaustedTransferCount, metrics.retryExhaustedTransferCount],
     [copy.failedTransferCount, metrics.failedTransferCount],
     [copy.pendingReversalCount, `${metrics.pendingReversalCount ?? "—"} · ${formatAmounts(metrics.pendingReversalAmount)}`],
     [copy.retryDueReversalCount, metrics.retryDueReversalCount],
+    [copy.retryExhaustedReversalCount, metrics.retryExhaustedReversalCount],
     [copy.manualReviewCount, metrics.manualReviewCount],
     [copy.staleExecutionCount, preview.staleLockCount ?? metrics.staleExecutionCount],
     [copy.successfulTransferCount, metrics.successfulTransferCount],
@@ -148,6 +154,7 @@ export function AdminSettlementOperationsSummary({ locale }: { locale: Locale })
       <p className="text-xs theme-muted">{copy.dryRun}: {preview.transferCandidates?.length ?? 0}</p>
       <p className="text-xs theme-muted">{copy.candidateAmount}: {formatAmounts(preview.totalCandidateAmountByCurrency)}</p>
       <p className="text-xs theme-muted">{copy.oldestCandidateAge}: {preview.oldestCandidateAgeMs ? `${Math.round(preview.oldestCandidateAgeMs / 60000)} min` : "—"}</p>
+      <p className="text-xs theme-muted">{copy.oldestUnprocessedAge}: {metrics.oldestUnprocessedAgeMs ? `${Math.round(metrics.oldestUnprocessedAgeMs / 60000)} min` : "—"} · {copy.workerMetricsWindow}: {metrics.workerMetricsWindow ?? "—"}</p>
       <div className="grid gap-2 text-xs">
         <p className="font-medium theme-foreground">{copy.excludedRows}: {preview.excludedRows?.length ?? 0}</p>
         {preview.excludedRows?.slice(0, 10).map((row) => <p key={`${row.kind}:${row.id}`} className="theme-muted">{row.kind} · {row.id} · {row.reason}</p>)}

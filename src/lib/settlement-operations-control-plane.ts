@@ -62,6 +62,7 @@ type RunOptions = {
   db?: OperationsDb;
   stripe?: Parameters<typeof executeSettlementLegTransfer>[0]["stripe"];
   now?: Date;
+  clock?: () => Date;
   batchSize?: number;
 };
 
@@ -90,10 +91,11 @@ function safeWorkerErrorCode(value: string | undefined) {
   ]).has(value ?? "") ? value : "worker_failed";
 }
 
-function runStatus(summary: Pick<WorkerRunSummary, "failedCount" | "succeededCount" | "scannedCount">) {
+export function resolveSettlementWorkerRunStatus(summary: Pick<WorkerRunSummary, "failedCount" | "manualReviewCount" | "succeededCount" | "scannedCount">) {
   if (summary.scannedCount === 0) return SettlementWorkerRunStatus.SUCCEEDED;
-  if (summary.failedCount > 0 && summary.succeededCount > 0) return SettlementWorkerRunStatus.PARTIALLY_FAILED;
-  if (summary.failedCount > 0) return SettlementWorkerRunStatus.FAILED;
+  const unsuccessfulCount = summary.failedCount + summary.manualReviewCount;
+  if (unsuccessfulCount > 0 && summary.succeededCount > 0) return SettlementWorkerRunStatus.PARTIALLY_FAILED;
+  if (unsuccessfulCount > 0) return SettlementWorkerRunStatus.FAILED;
   return SettlementWorkerRunStatus.SUCCEEDED;
 }
 
@@ -115,7 +117,7 @@ async function finishWorkerRun(
   await db.settlementWorkerRun.update({
     where: { id: run.id },
     data: {
-      status: runStatus(summary),
+      status: resolveSettlementWorkerRunStatus(summary),
       completedAt: now,
       scannedCount: summary.scannedCount,
       claimedCount: summary.claimedCount,
@@ -155,17 +157,20 @@ async function skippedWorkerRun(
 }
 
 async function transferCandidateIds(db: OperationsDb, now: Date, batchSize: number) {
-  return db.$transaction(async (tx) => tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
-    SELECT leg."id"
+  return db.$transaction(async (tx) => tx.$queryRaw<Array<{ id: string; staleRecovery: boolean }>>(Prisma.sql`
+    SELECT leg."id",
+      (leg."status" = 'TRANSFER_PENDING'::"SettlementLegStatus") AS "staleRecovery"
     FROM "SettlementLeg" AS leg
     JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
     JOIN "PaymentRequest" AS payment ON payment."id" = settlement."paymentRequestId"
     JOIN "TradeOrder" AS order_record ON order_record."id" = settlement."tradeOrderId"
     WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
-      AND settlement."status" = 'READY'::"SettlementStatus"
       AND settlement."approvedAt" IS NOT NULL
       AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
-      AND leg."status" = 'READY'::"SettlementLegStatus"
+      AND (
+        (settlement."status" = 'READY'::"SettlementStatus" AND leg."status" = 'READY'::"SettlementLegStatus")
+        OR (settlement."status" = 'TRANSFER_PENDING'::"SettlementStatus" AND leg."status" = 'TRANSFER_PENDING'::"SettlementLegStatus")
+      )
       AND leg."manualReviewRequired" = false
       AND leg."holdUntil" <= ${now}
       AND leg."amount" > 0
@@ -198,7 +203,10 @@ async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: numb
       AND reversal."settlementLegId" IS NOT NULL
       AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
       AND leg."status" IN ('TRANSFERRED'::"SettlementLegStatus", 'REVERSAL_PENDING'::"SettlementLegStatus")
-      AND payment."status" NOT IN ('DISPUTED'::"PaymentRequestStatus")
+      AND (
+        payment."status" <> 'DISPUTED'::"PaymentRequestStatus"
+        OR reversal."sourceType" = 'DISPUTE_LOST'::"SettlementReversalSourceType"
+      )
       AND payment."requiresManualReconciliation" = false
       AND payment."currency" = 'usd'
       AND (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now})
@@ -209,11 +217,14 @@ async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: numb
   `));
 }
 
-export async function runSettlementTransferBatch({ db = getDb(), stripe, now = new Date(), batchSize }: RunOptions = {}) {
+export async function runSettlementTransferBatch({ db = getDb(), stripe, now, clock, batchSize }: RunOptions = {}) {
+  const baseNow = now ?? new Date();
+  const readNow = clock ?? (() => baseNow);
+  const startedAt = readNow();
   const mode = getStripeConnectTransferExecutionMode();
-  if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.TRANSFER, mode, now);
-  const run = await startWorkerRun(db, SettlementWorkerType.TRANSFER, mode, now);
-  const ids = await transferCandidateIds(db, now, boundedBatchSize(batchSize));
+  if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.TRANSFER, mode, startedAt);
+  const run = await startWorkerRun(db, SettlementWorkerType.TRANSFER, mode, startedAt);
+  const ids = await transferCandidateIds(db, startedAt, boundedBatchSize(batchSize));
   const summary: WorkerRunSummary = {
     workerRunId: run.id,
     executionMode: mode,
@@ -227,14 +238,20 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now = n
     staleRecoveredCount: 0,
   };
   let lastError: string | undefined;
-  for (const candidate of ids) {
-    if (Date.now() - run.startedAt.getTime() > SETTLEMENT_WORKER_MAX_DURATION_MS) {
-      summary.skippedCount += 1;
+  let timedOut = false;
+  for (const [index, candidate] of ids.entries()) {
+    const executionNow = readNow();
+    if (executionNow.getTime() - run.startedAt.getTime() >= SETTLEMENT_WORKER_MAX_DURATION_MS) {
+      summary.skippedCount += ids.length - index;
       lastError = "worker_timeout";
-      continue;
+      timedOut = true;
+      break;
     }
     try {
-      const result = await executeSettlementLegTransfer({ settlementLegId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now });
+      const result = await executeSettlementLegTransfer({ settlementLegId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
+      if (candidate.staleRecovery && result.status !== "ineligible" && result.status !== "claim_lost") {
+        summary.staleRecoveredCount += 1;
+      }
       if (result.status === "transferred") {
         summary.succeededCount += 1;
       } else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") {
@@ -246,7 +263,7 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now = n
           const exhausted = !result.nextTransferAttemptAt;
           if (exhausted) {
             summary.manualReviewCount += 1;
-            await recordTransferWorkerFailure({ db, legId: candidate.id, workerRunId: run.id, now, errorCode: result.errorCode, exhausted });
+            await recordTransferWorkerFailure({ db, legId: candidate.id, workerRunId: run.id, now: executionNow, errorCode: result.errorCode, exhausted });
           }
         }
       }
@@ -256,17 +273,20 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, now = n
       lastError = "worker_failed";
     }
   }
-  const completedAt = new Date();
-  await recordWorkerRunFailureAlert({ db, workerRunId: run.id, workerType: SettlementWorkerType.TRANSFER, summary, now: completedAt });
+  const completedAt = readNow();
+  await recordWorkerRunFailureAlert({ db, workerRunId: run.id, workerType: SettlementWorkerType.TRANSFER, summary, errorCode: timedOut ? "worker_timeout" : undefined, now: completedAt });
   await finishWorkerRun(db, run, summary, completedAt, lastError);
-  return { ...summary, status: runStatus(summary) };
+  return { ...summary, status: resolveSettlementWorkerRunStatus(summary) };
 }
 
-export async function runSettlementReversalBatch({ db = getDb(), stripe, now = new Date(), batchSize }: RunOptions = {}) {
+export async function runSettlementReversalBatch({ db = getDb(), stripe, now, clock, batchSize }: RunOptions = {}) {
+  const baseNow = now ?? new Date();
+  const readNow = clock ?? (() => baseNow);
+  const startedAt = readNow();
   const mode = getStripeConnectTransferReversalExecutionMode();
-  if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.REVERSAL, mode, now);
-  const run = await startWorkerRun(db, SettlementWorkerType.REVERSAL, mode, now);
-  const ids = await reversalCandidateIds(db, now, boundedBatchSize(batchSize));
+  if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.REVERSAL, mode, startedAt);
+  const run = await startWorkerRun(db, SettlementWorkerType.REVERSAL, mode, startedAt);
+  const ids = await reversalCandidateIds(db, startedAt, boundedBatchSize(batchSize));
   const summary: WorkerRunSummary = {
     workerRunId: run.id,
     executionMode: mode,
@@ -280,14 +300,24 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, now = n
     staleRecoveredCount: 0,
   };
   let lastError: string | undefined;
-  for (const candidate of ids) {
+  let timedOut = false;
+  for (const [index, candidate] of ids.entries()) {
+    const executionNow = readNow();
+    if (executionNow.getTime() - run.startedAt.getTime() >= SETTLEMENT_WORKER_MAX_DURATION_MS) {
+      summary.skippedCount += ids.length - index;
+      lastError = "worker_timeout";
+      timedOut = true;
+      break;
+    }
     try {
-      const result = await executeSettlementReversal({ settlementReversalId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now });
+      const result = await executeSettlementReversal({ settlementReversalId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
       if (result.status === "reversed") summary.succeededCount += 1;
       else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") summary.skippedCount += 1;
       else if (result.status === "needs_manual_review") {
+        summary.failedCount += 1;
         summary.manualReviewCount += 1;
-        await recordReversalWorkerFailure({ db, reversalId: candidate.id, workerRunId: run.id, now, exhausted: true });
+        lastError = "max_attempts";
+        await recordReversalWorkerFailure({ db, reversalId: candidate.id, workerRunId: run.id, now: executionNow, exhausted: true });
       }
       else {
         summary.failedCount += 1;
@@ -296,7 +326,7 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, now = n
           const exhausted = !result.nextReversalAttemptAt;
           if (exhausted) {
             summary.manualReviewCount += 1;
-            await recordReversalWorkerFailure({ db, reversalId: candidate.id, workerRunId: run.id, now, exhausted });
+            await recordReversalWorkerFailure({ db, reversalId: candidate.id, workerRunId: run.id, now: executionNow, exhausted });
           }
         }
       }
@@ -306,10 +336,10 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, now = n
       lastError = "worker_failed";
     }
   }
-  const completedAt = new Date();
-  await recordWorkerRunFailureAlert({ db, workerRunId: run.id, workerType: SettlementWorkerType.REVERSAL, summary, now: completedAt });
+  const completedAt = readNow();
+  await recordWorkerRunFailureAlert({ db, workerRunId: run.id, workerType: SettlementWorkerType.REVERSAL, summary, errorCode: timedOut ? "worker_timeout" : undefined, now: completedAt });
   await finishWorkerRun(db, run, summary, completedAt, lastError);
-  return { ...summary, status: runStatus(summary) };
+  return { ...summary, status: resolveSettlementWorkerRunStatus(summary) };
 }
 
 async function upsertOperationalAlert({
@@ -357,6 +387,8 @@ async function upsertOperationalAlert({
       lastOccurredAt: now,
       occurrenceCount: { increment: 1 },
       status: SettlementOperationalAlertStatus.OPEN,
+      acknowledgedAt: null,
+      acknowledgedByUserId: null,
       resolvedAt: null,
       sanitizedMessage,
       ...(workerRunId ? { workerRunId } : {}),
@@ -437,15 +469,17 @@ async function recordWorkerRunFailureAlert({
   workerRunId,
   workerType,
   summary,
+  errorCode,
   now,
 }: {
   db: OperationsDb;
   workerRunId: string;
   workerType: SettlementWorkerType;
   summary: Pick<WorkerRunSummary, "failedCount" | "succeededCount">;
+  errorCode?: string;
   now: Date;
 }) {
-  if (summary.failedCount === 0) return;
+  if (summary.failedCount === 0 && !errorCode) return;
   const partiallyFailed = summary.succeededCount > 0;
   await upsertOperationalAlert({
     db,
@@ -455,7 +489,9 @@ async function recordWorkerRunFailureAlert({
     severity: SettlementOperationalAlertSeverity.CRITICAL,
     deduplicationKey: `worker-${workerType.toLowerCase()}-${partiallyFailed ? "partial" : "failed"}`,
     title: partiallyFailed ? "Settlement worker partially failed" : "Settlement worker failed",
-    sanitizedMessage: partiallyFailed
+    sanitizedMessage: errorCode === "worker_timeout"
+      ? "A settlement worker exceeded its maximum run duration; unprocessed records were skipped."
+      : partiallyFailed
       ? "A settlement worker completed with one or more failed records."
       : "A settlement worker did not complete any record successfully.",
     workerRunId,
@@ -854,6 +890,7 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
       successfullyReversedAmount: true,
       currency: true,
       status: true,
+      reversalAttemptCount: true,
       reversalLockedAt: true,
       nextReversalAttemptAt: true,
       createdAt: true,
@@ -863,6 +900,7 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
           paymentRequest: { select: { status: true, requiresManualReconciliation: true } },
         },
       },
+      sourceType: true,
       settlementLeg: { select: { type: true, status: true } },
     },
     take: 500,
@@ -870,15 +908,19 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
   const transferCandidates = filtered.filter((leg) => {
     const payment = leg.settlement.paymentRequest;
     const order = leg.settlement.tradeOrder;
-    return leg.settlement.paymentFlow === SettlementPaymentFlow.SCT
-      && leg.settlement.status === SettlementStatus.READY
-      && leg.settlement.approvedAt !== null
+    const staleTransferRecovery = leg.settlement.status === SettlementStatus.TRANSFER_PENDING
+      && leg.status === SettlementLegStatus.TRANSFER_PENDING
+      && (!leg.transferLockedAt || now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS);
+    const readyTransfer = leg.settlement.status === SettlementStatus.READY
       && leg.status === SettlementLegStatus.READY
+      && !leg.transferLockedAt;
+    return leg.settlement.paymentFlow === SettlementPaymentFlow.SCT
+      && leg.settlement.approvedAt !== null
+      && (readyTransfer || staleTransferRecovery)
       && TRANSFERABLE_LEG_TYPES.has(leg.type)
       && leg.amount > 0
       && leg.holdUntil <= now
       && !leg.manualReviewRequired
-      && leg.transferLockedAt === null
       && payment.status === PaymentRequestStatus.PAID
       && !payment.requiresManualReconciliation
       && payment.refundAmount === 0
@@ -891,7 +933,10 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
     const retryDue = !reversal.nextReversalAttemptAt || reversal.nextReversalAttemptAt <= now;
     const stale = Boolean(reversal.reversalLockedAt && now.getTime() - reversal.reversalLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS);
     if (reversal.settlement.paymentFlow !== SettlementPaymentFlow.SCT) return false;
-    if (reversal.settlement.paymentRequest.status === PaymentRequestStatus.DISPUTED) return false;
+    if (
+      reversal.settlement.paymentRequest.status === PaymentRequestStatus.DISPUTED
+      && reversal.sourceType !== "DISPUTE_LOST"
+    ) return false;
     if (reversal.settlement.paymentRequest.requiresManualReconciliation) return false;
     if (!TRANSFERABLE_LEG_TYPES.has(reversal.settlementLeg.type)) return false;
     if (!TRANSFERABLE_LEG_STATUSES.has(reversal.settlementLeg.status)) return false;
@@ -954,6 +999,7 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
           reason: reversal.settlement.paymentFlow === SettlementPaymentFlow.DIRECT_CHARGE
             ? "direct_charge_not_supported"
             : reversal.settlement.paymentRequest.status === PaymentRequestStatus.DISPUTED
+              && reversal.sourceType !== "DISPUTE_LOST"
               ? "disputed"
               : reversal.settlement.paymentRequest.requiresManualReconciliation
                 ? "manual_reconciliation"
@@ -972,20 +1018,22 @@ export async function inspectSettlementOperations({ db = getDb(), now = new Date
 
 export async function getSettlementOperationsMetrics({ db = getDb(), now = new Date() }: { db?: OperationsDb; now?: Date } = {}) {
   const [legs, reversals, runs] = await Promise.all([
-    db.settlementLeg.findMany({ select: { type: true, status: true, amount: true, currency: true, createdAt: true, holdUntil: true, transferredAt: true, transferLockedAt: true, nextTransferAttemptAt: true, manualReviewRequired: true, transferAttemptCount: true, settlement: { select: { paymentFlow: true } } } }),
-    db.settlementReversal.findMany({ select: { status: true, successfullyReversedAmount: true, amount: true, currency: true, reversalLockedAt: true, nextReversalAttemptAt: true, createdAt: true, settlement: { select: { paymentFlow: true } } } }),
+    db.settlementLeg.findMany({ select: { type: true, status: true, amount: true, currency: true, createdAt: true, holdUntil: true, transferredAt: true, transferLockedAt: true, nextTransferAttemptAt: true, manualReviewRequired: true, transferAttemptCount: true, settlement: { select: { id: true, paymentFlow: true } } } }),
+    db.settlementReversal.findMany({ select: { status: true, reversalAttemptCount: true, successfullyReversedAmount: true, amount: true, currency: true, reversalLockedAt: true, nextReversalAttemptAt: true, createdAt: true, settlement: { select: { paymentFlow: true } }, settlementLeg: { select: { type: true } } } }),
     db.settlementWorkerRun.findMany({ orderBy: { startedAt: "desc" }, take: 10, select: { id: true, status: true, workerType: true, startedAt: true, completedAt: true } }),
   ]);
   const sctLegs = legs.filter((leg) => leg.settlement.paymentFlow === SettlementPaymentFlow.SCT);
+  const transferableLegs = sctLegs.filter((leg) => TRANSFERABLE_LEG_TYPES.has(leg.type));
+  const sctReversals = reversals.filter((reversal) => reversal.settlement.paymentFlow === SettlementPaymentFlow.SCT && TRANSFERABLE_LEG_TYPES.has(reversal.settlementLeg.type));
   const amountBy = (items: Array<{ amount: number; currency: string }>) => items.reduce<Record<string, number>>((result, item) => { result[item.currency] = (result[item.currency] ?? 0) + item.amount; return result; }, {});
-  const ready = sctLegs.filter((leg) => leg.status === SettlementLegStatus.READY);
-  const held = sctLegs.filter((leg) => leg.status === SettlementLegStatus.HOLD);
-  const transferred = sctLegs.filter((leg) => leg.status === SettlementLegStatus.TRANSFERRED);
-  const failedTransfers = sctLegs.filter((leg) => leg.status === SettlementLegStatus.READY && leg.transferAttemptCount >= 5);
-  const pendingReversals = reversals.filter((reversal) => reversal.settlement.paymentFlow === SettlementPaymentFlow.SCT && reversal.status === SettlementReversalStatus.PENDING);
-  const attemptedTransfers = sctLegs.filter((leg) => leg.transferAttemptCount > 0);
-  const attemptedReversals = reversals.filter((reversal) => reversal.settlement.paymentFlow === SettlementPaymentFlow.SCT && reversal.status !== SettlementReversalStatus.PENDING);
-  const processingAges = sctLegs
+  const ready = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.READY);
+  const held = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.HOLD);
+  const transferred = transferableLegs.filter((leg) => leg.status === SettlementLegStatus.TRANSFERRED);
+  const failedTransfers = transferableLegs.filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED && (leg.manualReviewRequired || leg.transferAttemptCount >= 5));
+  const pendingReversals = sctReversals.filter((reversal) => reversal.status === SettlementReversalStatus.PENDING);
+  const attemptedTransfers = transferableLegs.filter((leg) => leg.transferAttemptCount > 0);
+  const attemptedReversals = sctReversals.filter((reversal) => reversal.reversalAttemptCount > 0);
+  const processingAges = transferableLegs
     .filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED)
     .map((leg) => Math.max(0, now.getTime() - leg.createdAt.getTime()))
     .sort((left, right) => left - right);
@@ -993,46 +1041,60 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
   const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
   const workerSuccessCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.SUCCEEDED).length;
   const workerFailureCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.FAILED || run.status === SettlementWorkerRunStatus.PARTIALLY_FAILED).length;
+  const oldestUnprocessedAgeMs = processingAges.length ? Math.max(...processingAges) : 0;
+  const heldSettlementIds = new Set(held.map((leg) => leg.settlement.id));
+  const retryExhaustedTransferCount = failedTransfers.filter((leg) => leg.transferAttemptCount >= 5).length;
+  const retryExhaustedReversalCount = sctReversals.filter((reversal) => reversal.reversalAttemptCount >= 5 && reversal.status !== SettlementReversalStatus.COMPLETED).length;
   return {
     flow: { SCT: { readyTransferCount: ready.length, readyTransferAmount: amountBy(ready), heldCount: held.length, heldAmount: amountBy(held), transferredCount: transferred.length, transferredAmount: amountBy(transferred), sellerPayableAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.SELLER_PAYABLE)), partnerReferralAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.PARTNER_REFERRAL)) }, DIRECT_CHARGE: { available: false } },
     readyTransferCount: ready.length,
     readyTransferAmount: amountBy(ready),
-    heldSettlementCount: held.length,
+    heldSettlementCount: heldSettlementIds.size,
     heldAmount: amountBy(held),
     transferredAmount: amountBy(transferred),
-    reversedAmount: amountBy(reversals.filter((reversal) => reversal.settlement.paymentFlow === SettlementPaymentFlow.SCT).map((item) => ({ amount: item.successfullyReversedAmount, currency: item.currency }))),
+    reversedAmount: amountBy(sctReversals.map((item) => ({ amount: item.successfullyReversedAmount, currency: item.currency }))),
     pendingReversalCount: pendingReversals.length,
     pendingReversalAmount: amountBy(pendingReversals.map((item) => ({ amount: item.amount - item.successfullyReversedAmount, currency: item.currency }))),
-    retryDueTransferCount: sctLegs.filter((leg) => leg.nextTransferAttemptAt && leg.nextTransferAttemptAt <= now).length,
+    retryDueTransferCount: transferableLegs.filter((leg) => leg.status !== SettlementLegStatus.TRANSFERRED && leg.nextTransferAttemptAt && leg.nextTransferAttemptAt <= now).length,
     retryDueReversalCount: pendingReversals.filter((item) => !item.nextReversalAttemptAt || item.nextReversalAttemptAt <= now).length,
-    staleExecutionCount: sctLegs.filter((leg) => leg.transferLockedAt && now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length + pendingReversals.filter((item) => item.reversalLockedAt && now.getTime() - item.reversalLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length,
+    staleExecutionCount: transferableLegs.filter((leg) => leg.transferLockedAt && now.getTime() - leg.transferLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length + pendingReversals.filter((item) => item.reversalLockedAt && now.getTime() - item.reversalLockedAt.getTime() >= SETTLEMENT_WORKER_STALE_LOCK_MS).length,
     successfulTransferCount: transferred.length,
     failedTransferCount: failedTransfers.length,
-    successfulReversalCount: reversals.filter((item) => item.settlement.paymentFlow === SettlementPaymentFlow.SCT && item.status === SettlementReversalStatus.COMPLETED).length,
-    transferSuccessRate: attemptedTransfers.length ? transferred.length / attemptedTransfers.length : 0,
-    reversalSuccessRate: attemptedReversals.length ? reversals.filter((item) => item.settlement.paymentFlow === SettlementPaymentFlow.SCT && item.status === SettlementReversalStatus.COMPLETED).length / attemptedReversals.length : 0,
+    successfulReversalCount: sctReversals.filter((item) => item.status === SettlementReversalStatus.COMPLETED).length,
+    transferSuccessRate: attemptedTransfers.length ? Math.min(1, transferred.length / attemptedTransfers.length) : 0,
+    reversalSuccessRate: attemptedReversals.length ? Math.min(1, sctReversals.filter((item) => item.status === SettlementReversalStatus.COMPLETED).length / attemptedReversals.length) : 0,
     averageTransferAttempts: average(attemptedTransfers.map((leg) => leg.transferAttemptCount)),
     p50ProcessingAgeMs: percentile(processingAges, 0.5),
     p95ProcessingAgeMs: percentile(processingAges, 0.95),
     workerSuccessCount,
     workerFailureCount,
+    workerMetricsWindow: "latest_10_runs",
+    oldestUnprocessedAgeMs,
+    retryExhaustedTransferCount,
+    retryExhaustedReversalCount,
     sellerPayableAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.SELLER_PAYABLE)),
     partnerReferralAmount: amountBy(sctLegs.filter((leg) => leg.type === SettlementLegType.PARTNER_REFERRAL)),
-    manualReviewCount: sctLegs.filter((leg) => leg.manualReviewRequired).length + reversals.filter((item) => item.settlement.paymentFlow === SettlementPaymentFlow.SCT && item.status === SettlementReversalStatus.NEEDS_MANUAL_REVIEW).length,
+    manualReviewCount: transferableLegs.filter((leg) => leg.manualReviewRequired).length + sctReversals.filter((item) => item.status === SettlementReversalStatus.NEEDS_MANUAL_REVIEW).length,
     latestSuccessfulWorkerRun: runs.find((run) => run.status === SettlementWorkerRunStatus.SUCCEEDED) ?? null,
     latestFailedWorkerRun: runs.find((run) => run.status === SettlementWorkerRunStatus.FAILED || run.status === SettlementWorkerRunStatus.PARTIALLY_FAILED) ?? null,
   };
 }
 
-export async function acknowledgeSettlementAlert({ db = getDb(), alertId, actorUserId, resolve = false }: { db?: OperationsDb; alertId: string; actorUserId: string; resolve?: boolean }) {
+export async function acknowledgeSettlementAlert({ db = getDb(), alertId, actorUserId, resolve = false, now = new Date() }: { db?: OperationsDb; alertId: string; actorUserId: string; resolve?: boolean; now?: Date }) {
   return db.$transaction(async (tx) => {
     const alert = await tx.settlementOperationalAlert.findUnique({ where: { id: alertId }, select: { id: true, settlementId: true, status: true } });
     if (!alert) return { ok: false, status: "not_found" as const };
     const status = resolve ? SettlementOperationalAlertStatus.RESOLVED : SettlementOperationalAlertStatus.ACKNOWLEDGED;
-    const updated = await tx.settlementOperationalAlert.updateMany({ where: { id: alertId, status: { not: SettlementOperationalAlertStatus.RESOLVED } }, data: { status, ...(resolve ? { resolvedAt: new Date() } : { acknowledgedAt: new Date(), acknowledgedByUserId: actorUserId }) } });
+    if (alert.status === status) return { ok: true, status: resolve ? "resolved" as const : "acknowledged" as const };
+    if (!resolve && alert.status === SettlementOperationalAlertStatus.RESOLVED) return { ok: false, status: "stale" as const };
+    const updated = await tx.settlementOperationalAlert.updateMany({ where: { id: alertId, status: alert.status }, data: { status, ...(resolve ? { resolvedAt: now } : { acknowledgedAt: now, acknowledgedByUserId: actorUserId }) } });
     if (updated.count !== 1) return { ok: false, status: "stale" as const };
     if (alert.settlementId) {
-      await tx.settlementEvent.create({ data: { settlementId: alert.settlementId, eventType: SettlementEventType.ADMIN_REEVALUATED, actorUserId, message: resolve ? "An administrator resolved an operational alert." : "An administrator acknowledged an operational alert.", metadata: { action: resolve ? "alert_resolved" : "alert_acknowledged", alertId }, idempotencyKey: `settlement-alert:${alertId}:${resolve ? "resolved" : "acknowledged"}` } });
+      await tx.settlementEvent.upsert({
+        where: { idempotencyKey: `settlement-alert:${alertId}:${resolve ? "resolved" : "acknowledged"}` },
+        update: {},
+        create: { settlementId: alert.settlementId, eventType: SettlementEventType.ADMIN_REEVALUATED, actorUserId, message: resolve ? "An administrator resolved an operational alert." : "An administrator acknowledged an operational alert.", metadata: { action: resolve ? "alert_resolved" : "alert_acknowledged", alertId }, idempotencyKey: `settlement-alert:${alertId}:${resolve ? "resolved" : "acknowledged"}` },
+      });
     }
     return { ok: true, status: resolve ? "resolved" as const : "acknowledged" as const };
   });

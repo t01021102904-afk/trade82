@@ -163,10 +163,6 @@ function merchantSchema(overrides = {}) {
   };
 }
 
-function merchantInitialState(overrides = {}) {
-  return { merchant_zero_rows: true, ...overrides };
-}
-
 function operationsPreflight(overrides = {}) {
   return {
     operations_payment_flow_absent: true,
@@ -184,7 +180,8 @@ function operationsSchema(overrides = {}) {
     operations_payment_flow_column: true,
     operations_leg_manual_review: true,
     operations_tables: true,
-    operations_columns: true,
+    operations_worker_columns: true,
+    operations_alert_columns: true,
     operations_indexes: true,
     operations_constraints: true,
     operations_restrictive_fks: true,
@@ -240,7 +237,7 @@ function deploymentResponses(afterRecords = [
     [targetSchema()],
     [firstSchema()],
     [secondSchema()],
-    [merchantPreflight()],
+    [merchantSchema()],
     [operationsPreflight()],
     afterRecords,
     [prerequisiteSchema()],
@@ -248,7 +245,6 @@ function deploymentResponses(afterRecords = [
     [firstSchema()],
     [secondSchema()],
     [merchantSchema()],
-    [merchantInitialState()],
     [operationsSchema()],
     [operationsInitialState()],
   ];
@@ -349,7 +345,7 @@ test("only approved migrations applied with operations pending runs the allowlis
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 17);
+  assert.equal(fake.calls.query, 16);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -482,7 +478,7 @@ test("merchant post-verification fails closed for each schema field", async () =
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[12] = [merchantSchema({ [key]: false })];
+    responses[13] = [merchantSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -516,9 +512,9 @@ test("target preflight fails closed for each newly required dependency field", a
   }
 });
 
-test("merchant initial state is checked only after a new deployment", async () => {
+test("operations deployment does not require merchant zero rows, while new operations rows fail initial-state verification", async () => {
   const responses = deploymentResponses();
-  responses[13] = [merchantInitialState({ merchant_zero_rows: false })];
+  responses[15] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
   const fake = fakeClient(responses);
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => {},

@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import pg from "pg";
+import {
+  queryOperationsMigrationInitialState,
+  queryOperationsMigrationSchema,
+} from "../scripts/run-production-migrations.mjs";
 
 const { Pool } = pg;
 const DATABASE_PREFIX = "trade82_settlement_operations_test_";
@@ -14,7 +18,7 @@ function localDatabaseUrl() {
   return value;
 }
 
-test("settlement operations migration exposes locked, private operational tables with no rows", async () => {
+test("settlement operations migration exposes the durable catalog contract and starts empty", async () => {
   const pool = new Pool({ connectionString: localDatabaseUrl(), max: 1 });
   try {
     const client = await pool.connect();
@@ -27,6 +31,16 @@ test("settlement operations migration exposes locked, private operational tables
         ORDER BY table_name
       `);
       assert.deepEqual(tables.rows.map((row) => row.table_name), ["SettlementOperationalAlert", "SettlementWorkerRun"]);
+
+      const schema = await queryOperationsMigrationSchema(client);
+      for (const [key, value] of Object.entries(schema)) {
+        assert.equal(value, true, key);
+      }
+      const initialState = await queryOperationsMigrationInitialState(client);
+      assert.deepEqual(initialState, {
+        operations_worker_run_zero_rows: true,
+        operations_alert_zero_rows: true,
+      });
 
       const enums = await client.query(`
         SELECT t.typname, e.enumlabel
@@ -75,6 +89,128 @@ test("settlement operations migration exposes locked, private operational tables
       }
     } finally {
       client.release();
+    }
+  } finally {
+    await pool.end();
+  }
+});
+
+test("operational catalog checks remain durable after legitimate worker and alert rows exist", async () => {
+  const pool = new Pool({ connectionString: localDatabaseUrl(), max: 1 });
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(`
+      DELETE FROM public."SettlementOperationalAlert"
+      WHERE "id" = 'ops-integration-alert'
+    `);
+    await client.query(`
+      DELETE FROM public."SettlementWorkerRun"
+      WHERE "id" = 'ops-integration-worker'
+    `);
+    await client.query(`
+      INSERT INTO public."SettlementWorkerRun"
+        ("id", "workerType", "executionMode", "status", "startedAt", "completedAt", "updatedAt")
+      VALUES ('ops-integration-worker', 'TRANSFER', 'auto', 'SUCCEEDED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `);
+    await client.query(`
+      INSERT INTO public."SettlementOperationalAlert"
+        ("id", "alertType", "severity", "status", "title", "sanitizedMessage", "deduplicationKey", "updatedAt")
+      VALUES ('ops-integration-alert', 'WORKER_FAILED', 'CRITICAL', 'OPEN', 'Integration alert', 'safe diagnostic', 'ops-integration-alert', CURRENT_TIMESTAMP)
+    `);
+
+    const schema = await queryOperationsMigrationSchema(client);
+    for (const [key, value] of Object.entries(schema)) {
+      assert.equal(value, true, key);
+    }
+    const initialState = await queryOperationsMigrationInitialState(client);
+    assert.deepEqual(initialState, {
+      operations_worker_run_zero_rows: false,
+      operations_alert_zero_rows: false,
+    });
+  } finally {
+    await client.query("ROLLBACK").catch(() => {});
+    client.release();
+    await pool.end();
+  }
+});
+
+test("operational catalog verification rejects malformed indexes, defaults, constraints, RLS, and privileges", async (t) => {
+  const pool = new Pool({ connectionString: localDatabaseUrl(), max: 1 });
+  const cases = [
+    {
+      name: "partial operational index",
+      key: "operations_indexes",
+      mutation: async (client) => {
+        await client.query('DROP INDEX "SettlementWorkerRun_status_startedAt_idx"');
+        await client.query('CREATE INDEX "SettlementWorkerRun_status_startedAt_idx" ON "SettlementWorkerRun" ("status", "startedAt") WHERE "status" = \'RUNNING\'');
+      },
+    },
+    {
+      name: "non-btree operational index",
+      key: "operations_indexes",
+      mutation: async (client) => {
+        await client.query('DROP INDEX "SettlementWorkerRun_status_startedAt_idx"');
+        await client.query('CREATE INDEX "SettlementWorkerRun_status_startedAt_idx" ON "SettlementWorkerRun" USING hash ("status")');
+      },
+    },
+    {
+      name: "extra worker column",
+      key: "operations_worker_columns",
+      mutation: (client) => client.query('ALTER TABLE "SettlementWorkerRun" ADD COLUMN "catalogMutationExtra" TEXT'),
+    },
+    {
+      name: "unexpected worker default",
+      key: "operations_worker_columns",
+      mutation: (client) => client.query('ALTER TABLE "SettlementWorkerRun" ALTER COLUMN "scannedCount" SET DEFAULT 1'),
+    },
+    {
+      name: "unexpected alert default",
+      key: "operations_alert_columns",
+      mutation: (client) => client.query('ALTER TABLE "SettlementOperationalAlert" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP'),
+    },
+    {
+      name: "wrong deduplication constraint",
+      key: "operations_constraints",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementOperationalAlert" DROP CONSTRAINT "SettlementOperationalAlert_deduplicationKey_key"');
+        await client.query('ALTER TABLE "SettlementOperationalAlert" ADD CONSTRAINT "SettlementOperationalAlert_title_key" UNIQUE ("title")');
+      },
+    },
+    {
+      name: "wrong worker-run foreign key target",
+      key: "operations_restrictive_fks",
+      mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementOperationalAlert" DROP CONSTRAINT "SettlementOperationalAlert_workerRunId_fkey"');
+        await client.query('ALTER TABLE "SettlementOperationalAlert" ADD CONSTRAINT "SettlementOperationalAlert_workerRunId_fkey" FOREIGN KEY ("workerRunId") REFERENCES "Settlement"("id") ON DELETE SET NULL ON UPDATE CASCADE');
+      },
+    },
+    {
+      name: "RLS disabled",
+      key: "operations_rls",
+      mutation: (client) => client.query('ALTER TABLE "SettlementWorkerRun" DISABLE ROW LEVEL SECURITY'),
+    },
+    {
+      name: "public role privilege granted",
+      key: "operations_public_access_revoked",
+      mutation: (client) => client.query('GRANT SELECT ON TABLE "SettlementOperationalAlert" TO anon'),
+    },
+  ];
+
+  try {
+    for (const testCase of cases) {
+      await t.test(testCase.name, async () => {
+        const client = await pool.connect();
+        try {
+          await client.query("BEGIN");
+          await testCase.mutation(client);
+          const schema = await queryOperationsMigrationSchema(client);
+          assert.equal(schema[testCase.key], false, testCase.key);
+        } finally {
+          await client.query("ROLLBACK").catch(() => {});
+          client.release();
+        }
+      });
     }
   } finally {
     await pool.end();
