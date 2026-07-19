@@ -406,6 +406,7 @@ export const ModelName = {
   ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
   StripeConnectedAccount: 'StripeConnectedAccount',
+  SellerStripeMerchantAccount: 'SellerStripeMerchantAccount',
   Settlement: 'Settlement',
   SettlementLeg: 'SettlementLeg',
   SettlementEvent: 'SettlementEvent',
@@ -444,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2073,6 +2074,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.StripeConnectedAccountCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.StripeConnectedAccountCountAggregateOutputType> | number
+        }
+      }
+    }
+    SellerStripeMerchantAccount: {
+      payload: Prisma.$SellerStripeMerchantAccountPayload<ExtArgs>
+      fields: Prisma.SellerStripeMerchantAccountFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SellerStripeMerchantAccountFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SellerStripeMerchantAccountFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        findFirst: {
+          args: Prisma.SellerStripeMerchantAccountFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SellerStripeMerchantAccountFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        findMany: {
+          args: Prisma.SellerStripeMerchantAccountFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>[]
+        }
+        create: {
+          args: Prisma.SellerStripeMerchantAccountCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        createMany: {
+          args: Prisma.SellerStripeMerchantAccountCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SellerStripeMerchantAccountCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>[]
+        }
+        delete: {
+          args: Prisma.SellerStripeMerchantAccountDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        update: {
+          args: Prisma.SellerStripeMerchantAccountUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        deleteMany: {
+          args: Prisma.SellerStripeMerchantAccountDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SellerStripeMerchantAccountUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SellerStripeMerchantAccountUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>[]
+        }
+        upsert: {
+          args: Prisma.SellerStripeMerchantAccountUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SellerStripeMerchantAccountPayload>
+        }
+        aggregate: {
+          args: Prisma.SellerStripeMerchantAccountAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSellerStripeMerchantAccount>
+        }
+        groupBy: {
+          args: Prisma.SellerStripeMerchantAccountGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerStripeMerchantAccountGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SellerStripeMerchantAccountCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SellerStripeMerchantAccountCountAggregateOutputType> | number
         }
       }
     }
@@ -4315,6 +4390,29 @@ export const StripeConnectedAccountScalarFieldEnum = {
 export type StripeConnectedAccountScalarFieldEnum = (typeof StripeConnectedAccountScalarFieldEnum)[keyof typeof StripeConnectedAccountScalarFieldEnum]
 
 
+export const SellerStripeMerchantAccountScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  stripeAccountId: 'stripeAccountId',
+  country: 'country',
+  status: 'status',
+  chargesEnabled: 'chargesEnabled',
+  payoutsEnabled: 'payoutsEnabled',
+  cardPaymentsEnabled: 'cardPaymentsEnabled',
+  transfersEnabled: 'transfersEnabled',
+  detailsSubmitted: 'detailsSubmitted',
+  onboardingComplete: 'onboardingComplete',
+  requirementsOutstanding: 'requirementsOutstanding',
+  controllerFeesPayer: 'controllerFeesPayer',
+  controllerLossesPayments: 'controllerLossesPayments',
+  dashboardType: 'dashboardType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerStripeMerchantAccountScalarFieldEnum = (typeof SellerStripeMerchantAccountScalarFieldEnum)[keyof typeof SellerStripeMerchantAccountScalarFieldEnum]
+
+
 export const SettlementScalarFieldEnum = {
   id: 'id',
   paymentRequestId: 'paymentRequestId',
@@ -5220,6 +5318,20 @@ export type ListEnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = Fi
 
 
 /**
+ * Reference to a field of type 'SellerStripeMerchantAccountStatus'
+ */
+export type EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerStripeMerchantAccountStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SellerStripeMerchantAccountStatus[]'
+ */
+export type ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerStripeMerchantAccountStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'ReferralSubjectType'
  */
 export type EnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType'>
@@ -5784,6 +5896,7 @@ export type GlobalOmitConfig = {
   referralClaimToken?: Prisma.ReferralClaimTokenOmit
   referralAttribution?: Prisma.ReferralAttributionOmit
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOmit
+  sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountOmit
   settlement?: Prisma.SettlementOmit
   settlementLeg?: Prisma.SettlementLegOmit
   settlementEvent?: Prisma.SettlementEventOmit

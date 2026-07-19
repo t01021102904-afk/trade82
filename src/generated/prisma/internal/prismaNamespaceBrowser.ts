@@ -73,6 +73,7 @@ export const ModelName = {
   ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
   StripeConnectedAccount: 'StripeConnectedAccount',
+  SellerStripeMerchantAccount: 'SellerStripeMerchantAccount',
   Settlement: 'Settlement',
   SettlementLeg: 'SettlementLeg',
   SettlementEvent: 'SettlementEvent',
@@ -610,6 +611,29 @@ export const StripeConnectedAccountScalarFieldEnum = {
 } as const
 
 export type StripeConnectedAccountScalarFieldEnum = (typeof StripeConnectedAccountScalarFieldEnum)[keyof typeof StripeConnectedAccountScalarFieldEnum]
+
+
+export const SellerStripeMerchantAccountScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  stripeAccountId: 'stripeAccountId',
+  country: 'country',
+  status: 'status',
+  chargesEnabled: 'chargesEnabled',
+  payoutsEnabled: 'payoutsEnabled',
+  cardPaymentsEnabled: 'cardPaymentsEnabled',
+  transfersEnabled: 'transfersEnabled',
+  detailsSubmitted: 'detailsSubmitted',
+  onboardingComplete: 'onboardingComplete',
+  requirementsOutstanding: 'requirementsOutstanding',
+  controllerFeesPayer: 'controllerFeesPayer',
+  controllerLossesPayments: 'controllerLossesPayments',
+  dashboardType: 'dashboardType',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SellerStripeMerchantAccountScalarFieldEnum = (typeof SellerStripeMerchantAccountScalarFieldEnum)[keyof typeof SellerStripeMerchantAccountScalarFieldEnum]
 
 
 export const SettlementScalarFieldEnum = {

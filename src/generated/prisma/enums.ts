@@ -471,6 +471,17 @@ export const StripeConnectedAccountStatus = {
 export type StripeConnectedAccountStatus = (typeof StripeConnectedAccountStatus)[keyof typeof StripeConnectedAccountStatus]
 
 
+export const SellerStripeMerchantAccountStatus = {
+  ONBOARDING_INCOMPLETE: 'ONBOARDING_INCOMPLETE',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  ENABLED: 'ENABLED',
+  RESTRICTED: 'RESTRICTED',
+  DISABLED: 'DISABLED'
+} as const
+
+export type SellerStripeMerchantAccountStatus = (typeof SellerStripeMerchantAccountStatus)[keyof typeof SellerStripeMerchantAccountStatus]
+
+
 export const SettlementStatus = {
   PENDING: 'PENDING',
   HOLD: 'HOLD',

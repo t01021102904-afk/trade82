@@ -128,6 +128,11 @@ export type ReferralAttribution = Prisma.ReferralAttributionModel
  */
 export type StripeConnectedAccount = Prisma.StripeConnectedAccountModel
 /**
+ * Model SellerStripeMerchantAccount
+ * 
+ */
+export type SellerStripeMerchantAccount = Prisma.SellerStripeMerchantAccountModel
+/**
  * Model Settlement
  * 
  */
