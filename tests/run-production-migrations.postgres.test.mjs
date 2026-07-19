@@ -199,6 +199,16 @@ test("merchant catalog checks reject unsafe indexes, foreign keys, privileges, a
       },
     },
     {
+      name: "company index that is partial",
+      key: "merchant_company_unique",
+      sql: async () => {
+        await client.query('DROP INDEX public."SellerStripeMerchantAccount_companyId_key"');
+        await client.query(
+          'CREATE UNIQUE INDEX "SellerStripeMerchantAccount_companyId_key" ON public."SellerStripeMerchantAccount"("companyId") WHERE "companyId" IS NOT NULL',
+        );
+      },
+    },
+    {
       name: "stripe account index on the wrong column",
       key: "merchant_stripe_unique",
       sql: async () => {
@@ -209,12 +219,42 @@ test("merchant catalog checks reject unsafe indexes, foreign keys, privileges, a
       },
     },
     {
+      name: "stripe account index that is partial",
+      key: "merchant_stripe_unique",
+      sql: async () => {
+        await client.query('DROP INDEX public."SellerStripeMerchantAccount_stripeAccountId_key"');
+        await client.query(
+          'CREATE UNIQUE INDEX "SellerStripeMerchantAccount_stripeAccountId_key" ON public."SellerStripeMerchantAccount"("stripeAccountId") WHERE "stripeAccountId" IS NOT NULL',
+        );
+      },
+    },
+    {
       name: "status index in the wrong order",
       key: "merchant_status_index",
       sql: async () => {
         await client.query('DROP INDEX public."SellerStripeMerchantAccount_status_updatedAt_idx"');
         await client.query(
           'CREATE INDEX "SellerStripeMerchantAccount_status_updatedAt_idx" ON public."SellerStripeMerchantAccount"("updatedAt", "status")',
+        );
+      },
+    },
+    {
+      name: "status index that is partial",
+      key: "merchant_status_index",
+      sql: async () => {
+        await client.query('DROP INDEX public."SellerStripeMerchantAccount_status_updatedAt_idx"');
+        await client.query(
+          'CREATE INDEX "SellerStripeMerchantAccount_status_updatedAt_idx" ON public."SellerStripeMerchantAccount"("status", "updatedAt") WHERE "status" IS NOT NULL',
+        );
+      },
+    },
+    {
+      name: "company index that is not btree",
+      key: "merchant_company_unique",
+      sql: async () => {
+        await client.query('DROP INDEX public."SellerStripeMerchantAccount_companyId_key"');
+        await client.query(
+          'CREATE INDEX "SellerStripeMerchantAccount_companyId_key" ON public."SellerStripeMerchantAccount" USING hash ("companyId")',
         );
       },
     },
@@ -258,6 +298,48 @@ test("merchant catalog checks reject unsafe indexes, foreign keys, privileges, a
       name: "leaked authenticated insert privilege",
       key: "merchant_public_access_revoked",
       sql: () => client.query('GRANT INSERT ON TABLE public."SellerStripeMerchantAccount" TO authenticated'),
+    },
+    {
+      name: "invalid controller fees payer default",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "controllerFeesPayer" SET DEFAULT \'account_invalid\'',
+      ),
+    },
+    {
+      name: "invalid controller losses payments default",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "controllerLossesPayments" SET DEFAULT \'stripe_invalid\'',
+      ),
+    },
+    {
+      name: "invalid dashboard type default",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "dashboardType" SET DEFAULT \'full_invalid\'',
+      ),
+    },
+    {
+      name: "boolean default changed to true",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "chargesEnabled" SET DEFAULT true',
+      ),
+    },
+    {
+      name: "createdAt default shifted",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "createdAt" SET DEFAULT (CURRENT_TIMESTAMP + interval \'1 minute\')',
+      ),
+    },
+    {
+      name: "unexpected updatedAt default",
+      key: "merchant_defaults",
+      sql: () => client.query(
+        'ALTER TABLE public."SellerStripeMerchantAccount" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP',
+      ),
     },
   ];
 

@@ -1146,6 +1146,7 @@ export async function queryMerchantMigrationSchema(client) {
         FROM pg_class index_row
         JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
         JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_am access_method ON access_method.oid = index_row.relam
         JOIN pg_attribute attribute ON attribute.attrelid = table_row.oid
           AND attribute.attnum = index_meta.indkey[0]
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
@@ -1153,9 +1154,16 @@ export async function queryMerchantMigrationSchema(client) {
           AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_companyId_key'
           AND index_row.relkind = 'i'
+          AND access_method.amname = 'btree'
+          AND index_meta.indisvalid
+          AND index_meta.indisready
+          AND index_meta.indpred IS NULL
+          AND index_meta.indexprs IS NULL
           AND index_meta.indisunique
           AND index_meta.indnatts = 1
           AND index_meta.indnkeyatts = 1
+          AND index_meta.indnatts = index_meta.indnkeyatts
+          AND NOT attribute.attisdropped
           AND attribute.attname = 'companyId'
       ) AS merchant_company_unique,
       EXISTS (
@@ -1163,6 +1171,7 @@ export async function queryMerchantMigrationSchema(client) {
         FROM pg_class index_row
         JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
         JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_am access_method ON access_method.oid = index_row.relam
         JOIN pg_attribute attribute ON attribute.attrelid = table_row.oid
           AND attribute.attnum = index_meta.indkey[0]
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
@@ -1170,9 +1179,16 @@ export async function queryMerchantMigrationSchema(client) {
           AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_stripeAccountId_key'
           AND index_row.relkind = 'i'
+          AND access_method.amname = 'btree'
+          AND index_meta.indisvalid
+          AND index_meta.indisready
+          AND index_meta.indpred IS NULL
+          AND index_meta.indexprs IS NULL
           AND index_meta.indisunique
           AND index_meta.indnatts = 1
           AND index_meta.indnkeyatts = 1
+          AND index_meta.indnatts = index_meta.indnkeyatts
+          AND NOT attribute.attisdropped
           AND attribute.attname = 'stripeAccountId'
       ) AS merchant_stripe_unique,
       EXISTS (
@@ -1180,17 +1196,27 @@ export async function queryMerchantMigrationSchema(client) {
         FROM pg_class index_row
         JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
         JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_am access_method ON access_method.oid = index_row.relam
         JOIN pg_attribute status_attribute ON status_attribute.attrelid = table_row.oid
           AND status_attribute.attname = 'status'
+          AND NOT status_attribute.attisdropped
         JOIN pg_attribute updated_attribute ON updated_attribute.attrelid = table_row.oid
           AND updated_attribute.attname = 'updatedAt'
+          AND NOT updated_attribute.attisdropped
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
         WHERE schema_row.nspname = 'public'
           AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_status_updatedAt_idx'
           AND index_row.relkind = 'i'
+          AND access_method.amname = 'btree'
+          AND index_meta.indisvalid
+          AND index_meta.indisready
+          AND index_meta.indpred IS NULL
+          AND index_meta.indexprs IS NULL
+          AND NOT index_meta.indisunique
           AND index_meta.indnatts = 2
           AND index_meta.indnkeyatts = 2
+          AND index_meta.indnatts = index_meta.indnkeyatts
           AND index_meta.indkey[0] = status_attribute.attnum
           AND index_meta.indkey[1] = updated_attribute.attnum
       ) AS merchant_status_index,
@@ -1227,22 +1253,46 @@ export async function queryMerchantMigrationSchema(client) {
           AND constraint_row.confupdtype = 'c'
       ) AS merchant_company_fk_restrict,
       (
-        SELECT count(*) = 12
+        SELECT count(*) = 17
+          AND count(*) FILTER (WHERE column_name IN (
+            'status', 'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled',
+            'transfersEnabled', 'detailsSubmitted', 'onboardingComplete',
+            'requirementsOutstanding', 'controllerFeesPayer',
+            'controllerLossesPayments', 'dashboardType', 'createdAt'
+          ) AND default_expression IS NOT NULL) = 12
+          AND count(*) FILTER (WHERE column_name IN (
+            'id', 'companyId', 'stripeAccountId', 'country', 'updatedAt'
+          ) AND default_expression IS NULL) = 5
           AND count(*) FILTER (WHERE (
-            (column_name = 'status' AND column_default LIKE '%ONBOARDING_INCOMPLETE%')
+            (column_name = 'status'
+              AND default_expression = '''ONBOARDING_INCOMPLETE''::"SellerStripeMerchantAccountStatus"')
             OR (column_name IN (
               'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled', 'transfersEnabled',
               'detailsSubmitted', 'onboardingComplete', 'requirementsOutstanding'
-            ) AND column_default = 'false')
-            OR (column_name = 'controllerFeesPayer' AND column_default LIKE '%account%')
-            OR (column_name = 'controllerLossesPayments' AND column_default LIKE '%stripe%')
-            OR (column_name = 'dashboardType' AND column_default LIKE '%full%')
-            OR (column_name = 'createdAt' AND column_default LIKE '%CURRENT_TIMESTAMP%')
+            ) AND default_expression = 'false')
+            OR (column_name = 'controllerFeesPayer' AND default_expression = '''account''::text')
+            OR (column_name = 'controllerLossesPayments' AND default_expression = '''stripe''::text')
+            OR (column_name = 'dashboardType' AND default_expression = '''full''::text')
+            OR (column_name = 'createdAt' AND default_expression = 'CURRENT_TIMESTAMP')
           )) = 12
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SellerStripeMerchantAccount'
-          AND column_default IS NOT NULL
+        FROM (
+          SELECT column_row.column_name,
+            regexp_replace(
+              pg_get_expr(default_row.adbin, default_row.adrelid),
+              '\\s+', '', 'g'
+            ) AS default_expression
+          FROM information_schema.columns column_row
+          JOIN pg_class table_row ON table_row.relname = column_row.table_name
+          JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+            AND schema_row.nspname = column_row.table_schema
+          JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+            AND attribute_row.attname = column_row.column_name
+            AND NOT attribute_row.attisdropped
+          LEFT JOIN pg_attrdef default_row ON default_row.adrelid = attribute_row.attrelid
+            AND default_row.adnum = attribute_row.attnum
+          WHERE column_row.table_schema = 'public'
+            AND column_row.table_name = 'SellerStripeMerchantAccount'
+        ) defaults
       ) AS merchant_defaults,
       (
         SELECT count(*) = 17
