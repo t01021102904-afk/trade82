@@ -167,20 +167,32 @@ function hasExactMigrationList(actual, expected) {
     && actual.every((migrationName, index) => migrationName === expected[index]);
 }
 
+function pendingSetError(message) {
+  const error = new Error(message);
+  error.code = "pending_set_mismatch";
+  return error;
+}
+
+function assertApprovedMigrationRecordOrder(databaseRecords) {
+  const approvedRecords = databaseRecords
+    .filter((record) => APPROVED_PRODUCTION_MIGRATION_BATCH.includes(record.migration_name))
+    .map((record) => record.migration_name);
+  const expectedPrefix = APPROVED_PRODUCTION_MIGRATION_BATCH.slice(0, approvedRecords.length);
+  if (!hasExactMigrationList(approvedRecords, expectedPrefix)) {
+    throw pendingSetError("Approved production migrations are out of order.");
+  }
+}
+
 function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const localNames = new Set(localMigrationNames);
   const databaseNames = new Set();
 
   if (localNames.size !== localMigrationNames.length) {
-    const error = new Error("Local migration history contains duplicate names.");
-    error.code = "pending_set_mismatch";
-    throw error;
+    throw pendingSetError("Local migration history contains duplicate names.");
   }
 
   if (!hasExactMigrationList(localMigrationNames, [...localMigrationNames].sort())) {
-    const error = new Error("Local migration history is not in canonical order.");
-    error.code = "pending_set_mismatch";
-    throw error;
+    throw pendingSetError("Local migration history is not in canonical order.");
   }
 
   const firstApprovedIndex = localMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
@@ -190,9 +202,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
     || merchantIndex !== localMigrationNames.length - 1) {
-    const error = new Error("The approved migration batch is not the final local migration suffix.");
-    error.code = "pending_set_mismatch";
-    throw error;
+    throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
   for (const record of databaseRecords) {
@@ -209,6 +219,8 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     }
   }
 
+  assertApprovedMigrationRecordOrder(databaseRecords);
+
   const pendingMigrations = localMigrationNames.filter((name) => !databaseNames.has(name));
 
   if (pendingMigrations.length === 0) {
@@ -216,9 +228,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       || !databaseNames.has(FIRST_APPROVED_MIGRATION)
       || !databaseNames.has(TARGET_MIGRATION)
       || !databaseNames.has(MERCHANT_MIGRATION)) {
-      const error = new Error("The allowlisted production migration is not recorded.");
-      error.code = "pending_set_mismatch";
-      throw error;
+      throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
   }
@@ -226,9 +236,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   if (!hasExactMigrationList(pendingMigrations, MERCHANT_PENDING_MIGRATIONS)
     || !databaseNames.has(FIRST_APPROVED_MIGRATION)
     || !databaseNames.has(TARGET_MIGRATION)) {
-    const error = new Error("Production has an unexpected pending migration.");
-    error.code = "pending_set_mismatch";
-    throw error;
+    throw pendingSetError("Production has an unexpected pending migration.");
   }
 
   return { action: "deploy", pendingMigrations };
@@ -338,7 +346,7 @@ async function queryLegacySchemaEvidence(client) {
   return result.rows[0] ?? null;
 }
 
-async function queryPrerequisitePreflight(client) {
+export async function queryPrerequisitePreflight(client) {
   const result = await client.query(`
     SELECT
       EXISTS (
@@ -552,6 +560,67 @@ export async function queryTargetSchema(client) {
           AND pg_type.typtype = 'e'
           AND pg_enum.enumlabel IN ('ADMIN_APPROVED', 'ADMIN_HELD', 'ADMIN_REEVALUATED')
       ) AS target_enum_values,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'SettlementEventType'
+          AND pg_type.typtype = 'e'
+      ) AS target_event_type_enum,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'UserProfile'
+          AND table_type = 'BASE TABLE'
+      ) AS target_user_profile_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'UserProfile'
+          AND column_name = 'id'
+          AND data_type = 'text'
+      ) AS target_user_profile_id_text,
+      EXISTS (
+        SELECT 1
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'UserProfile'
+          AND constraint_row.contype IN ('p', 'u')
+          AND array_length(constraint_row.conkey, 1) = 1
+          AND constraint_row.conkey[1] = (
+            SELECT attribute.attnum
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = table_row.oid
+              AND attribute.attname = 'id'
+              AND NOT attribute.attisdropped
+          )
+      ) AS target_user_profile_id_key,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'status'
+      ) AS target_settlement_leg_status,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementLeg'
+          AND column_name = 'holdUntil'
+      ) AS target_settlement_leg_hold_until,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SettlementReversal'
+          AND column_name = 'status'
+      ) AS target_settlement_reversal_status,
       (
         SELECT count(*) = 13
         FROM information_schema.columns
@@ -909,7 +978,7 @@ async function querySecondMigrationSchema(client) {
   return result.rows[0] ?? null;
 }
 
-async function queryMerchantMigrationPreflight(client) {
+export async function queryMerchantMigrationPreflight(client) {
   const result = await client.query(`
     SELECT
       EXISTS (
@@ -996,7 +1065,7 @@ async function queryMerchantMigrationPreflight(client) {
   return result.rows[0] ?? null;
 }
 
-async function queryMerchantMigrationSchema(client) {
+export async function queryMerchantMigrationSchema(client) {
   const result = await client.query(`
     SELECT
       (
@@ -1023,14 +1092,37 @@ async function queryMerchantMigrationSchema(client) {
         FROM information_schema.columns
         WHERE table_schema = 'public'
           AND table_name = 'SellerStripeMerchantAccount'
-          AND column_name IN (
+      ) AS merchant_columns_total,
+      (
+        SELECT count(*) = 17
+          AND count(*) FILTER (WHERE column_name IN (
             'id', 'companyId', 'stripeAccountId', 'country', 'status',
             'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled', 'transfersEnabled',
             'detailsSubmitted', 'onboardingComplete', 'requirementsOutstanding',
             'controllerFeesPayer', 'controllerLossesPayments', 'dashboardType',
             'createdAt', 'updatedAt'
-          )
-      ) AS merchant_columns,
+          )) = 17
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+      ) AS merchant_columns_names,
+      (
+        SELECT count(*) = 17
+          AND count(*) FILTER (WHERE (
+            (column_name IN ('id', 'companyId', 'stripeAccountId', 'country', 'controllerFeesPayer',
+              'controllerLossesPayments', 'dashboardType')
+              AND data_type = 'text')
+            OR (column_name = 'status' AND data_type = 'USER-DEFINED'
+              AND udt_schema = 'public' AND udt_name = 'SellerStripeMerchantAccountStatus')
+            OR (column_name IN ('chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled',
+              'transfersEnabled', 'detailsSubmitted', 'onboardingComplete', 'requirementsOutstanding')
+              AND data_type = 'boolean')
+            OR (column_name IN ('createdAt', 'updatedAt') AND data_type = 'timestamp without time zone')
+          )) = 17
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+      ) AS merchant_column_types,
       EXISTS (
         SELECT 1
         FROM pg_constraint constraint_row
@@ -1050,25 +1142,57 @@ async function queryMerchantMigrationSchema(client) {
           )
       ) AS merchant_primary_key,
       EXISTS (
-        SELECT 1 FROM pg_class index_row
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+        JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_attribute attribute ON attribute.attrelid = table_row.oid
+          AND attribute.attnum = index_meta.indkey[0]
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
         WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_companyId_key'
           AND index_row.relkind = 'i'
+          AND index_meta.indisunique
+          AND index_meta.indnatts = 1
+          AND index_meta.indnkeyatts = 1
+          AND attribute.attname = 'companyId'
       ) AS merchant_company_unique,
       EXISTS (
-        SELECT 1 FROM pg_class index_row
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+        JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_attribute attribute ON attribute.attrelid = table_row.oid
+          AND attribute.attnum = index_meta.indkey[0]
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
         WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_stripeAccountId_key'
           AND index_row.relkind = 'i'
+          AND index_meta.indisunique
+          AND index_meta.indnatts = 1
+          AND index_meta.indnkeyatts = 1
+          AND attribute.attname = 'stripeAccountId'
       ) AS merchant_stripe_unique,
       EXISTS (
-        SELECT 1 FROM pg_class index_row
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+        JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        JOIN pg_attribute status_attribute ON status_attribute.attrelid = table_row.oid
+          AND status_attribute.attname = 'status'
+        JOIN pg_attribute updated_attribute ON updated_attribute.attrelid = table_row.oid
+          AND updated_attribute.attname = 'updatedAt'
         JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
         WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'SellerStripeMerchantAccount'
           AND index_row.relname = 'SellerStripeMerchantAccount_status_updatedAt_idx'
           AND index_row.relkind = 'i'
+          AND index_meta.indnatts = 2
+          AND index_meta.indnkeyatts = 2
+          AND index_meta.indkey[0] = status_attribute.attnum
+          AND index_meta.indkey[1] = updated_attribute.attnum
       ) AS merchant_status_index,
       EXISTS (
         SELECT 1
@@ -1083,14 +1207,28 @@ async function queryMerchantMigrationSchema(client) {
           AND parent_row.relname = 'Company'
           AND constraint_row.conname = 'SellerStripeMerchantAccount_companyId_fkey'
           AND constraint_row.contype = 'f'
+          AND array_length(constraint_row.conkey, 1) = 1
+          AND array_length(constraint_row.confkey, 1) = 1
+          AND constraint_row.conkey[1] = (
+            SELECT attribute.attnum
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = child_row.oid
+              AND attribute.attname = 'companyId'
+              AND NOT attribute.attisdropped
+          )
+          AND constraint_row.confkey[1] = (
+            SELECT attribute.attnum
+            FROM pg_attribute attribute
+            WHERE attribute.attrelid = parent_row.oid
+              AND attribute.attname = 'id'
+              AND NOT attribute.attisdropped
+          )
           AND constraint_row.confdeltype = 'r'
+          AND constraint_row.confupdtype = 'c'
       ) AS merchant_company_fk_restrict,
       (
-        SELECT count(*) = 11
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = 'SellerStripeMerchantAccount'
-          AND (
+        SELECT count(*) = 12
+          AND count(*) FILTER (WHERE (
             (column_name = 'status' AND column_default LIKE '%ONBOARDING_INCOMPLETE%')
             OR (column_name IN (
               'chargesEnabled', 'payoutsEnabled', 'cardPaymentsEnabled', 'transfersEnabled',
@@ -1099,7 +1237,12 @@ async function queryMerchantMigrationSchema(client) {
             OR (column_name = 'controllerFeesPayer' AND column_default LIKE '%account%')
             OR (column_name = 'controllerLossesPayments' AND column_default LIKE '%stripe%')
             OR (column_name = 'dashboardType' AND column_default LIKE '%full%')
-          )
+            OR (column_name = 'createdAt' AND column_default LIKE '%CURRENT_TIMESTAMP%')
+          )) = 12
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'SellerStripeMerchantAccount'
+          AND column_default IS NOT NULL
       ) AS merchant_defaults,
       (
         SELECT count(*) = 17
@@ -1130,11 +1273,17 @@ async function queryMerchantMigrationSchema(client) {
         AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRUNCATE')
         AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'REFERENCES')
         AND NOT has_table_privilege('authenticated', 'public."SellerStripeMerchantAccount"', 'TRIGGER')
-        AS merchant_public_access_revoked,
-      (
-        SELECT count(*) = 0
-        FROM "SellerStripeMerchantAccount"
-      ) AS merchant_zero_rows
+        AS merchant_public_access_revoked
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryMerchantMigrationInitialState(client) {
+  const result = await client.query(`
+    SELECT (
+      SELECT count(*) = 0
+      FROM public."SellerStripeMerchantAccount"
+    ) AS merchant_zero_rows
   `);
   return result.rows[0] ?? null;
 }
@@ -1173,6 +1322,13 @@ const PREREQUISITE_SCHEMA_KEYS = [
 
 const TARGET_SCHEMA_KEYS = [
   "target_enum_values",
+  "target_event_type_enum",
+  "target_user_profile_table",
+  "target_user_profile_id_text",
+  "target_user_profile_id_key",
+  "target_settlement_leg_status",
+  "target_settlement_leg_hold_until",
+  "target_settlement_reversal_status",
   "target_columns",
   "target_hold_reason_check",
   "target_leg_retry_check",
@@ -1234,7 +1390,9 @@ const MERCHANT_MIGRATION_PREFLIGHT_KEYS = [
 const MERCHANT_MIGRATION_SCHEMA_KEYS = [
   "merchant_status_enum",
   "merchant_table",
-  "merchant_columns",
+  "merchant_columns_total",
+  "merchant_columns_names",
+  "merchant_column_types",
   "merchant_primary_key",
   "merchant_company_unique",
   "merchant_stripe_unique",
@@ -1244,8 +1402,9 @@ const MERCHANT_MIGRATION_SCHEMA_KEYS = [
   "merchant_nullability",
   "merchant_rls",
   "merchant_public_access_revoked",
-  "merchant_zero_rows",
 ];
+
+const MERCHANT_MIGRATION_INITIAL_STATE_KEYS = ["merchant_zero_rows"];
 
 function createProductionClient(connectionString) {
   return new Client({ connectionString });
@@ -1585,6 +1744,10 @@ export async function runProductionMigrations({
       const merchantSchema = await queryMerchantMigrationSchema(client);
       if (!allEvidencePresent(merchantSchema, MERCHANT_MIGRATION_SCHEMA_KEYS)) {
         throw new Error("Merchant migration post-verification failed.");
+      }
+      const merchantInitialState = await queryMerchantMigrationInitialState(client);
+      if (!allEvidencePresent(merchantInitialState, MERCHANT_MIGRATION_INITIAL_STATE_KEYS)) {
+        throw new Error("Merchant migration initial state verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

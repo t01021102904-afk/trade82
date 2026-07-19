@@ -250,18 +250,47 @@ test("merchant readiness requires both card payments and transfers and maps safe
   assert.equal(canContinueSellerMerchantOnboarding({ status: "DISABLED", onboardingComplete: false }), false);
 });
 
-test("merchant country validation uses the shared allowlist and blocks malformed countries before Stripe", async () => {
-  const { db } = createFakeDb("ZZ");
-  let stripeCalls = 0;
-  const stripe = {
-    accounts: { create: async () => { stripeCalls += 1; return stripeAccount("acct_merchant"); } },
-    accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
-  };
-  await withMerchantMode(async () => {
-    await assert.rejects(
-      () => startSellerStripeMerchantOnboarding({ userId: "seller-owner", db: db as never, stripe: stripe as never }),
-      /valid account country|not configured/,
-    );
-  });
-  assert.equal(stripeCalls, 0);
+test("merchant country aliases normalize and invalid values make zero Stripe calls", async () => {
+  for (const country of ["KR", "South Korea", "Republic of Korea", "Korea, Republic of", "Korea"]) {
+    const { db } = createFakeDb(country);
+    let stripeCalls = 0;
+    const stripe = {
+      accounts: {
+        create: async (params: Row) => {
+          stripeCalls += 1;
+          assert.equal(params.country, "KR");
+          return stripeAccount("acct_merchant");
+        },
+      },
+      accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
+    };
+    await withMerchantMode(async () => {
+      await startSellerStripeMerchantOnboarding({
+        userId: "seller-owner",
+        db: db as never,
+        stripe: stripe as never,
+      });
+    });
+    assert.equal(stripeCalls, 1, country);
+  }
+
+  for (const country of [null, "", "   ", "ZZ", "KOR"]) {
+    const { db } = createFakeDb(country as never);
+    let stripeCalls = 0;
+    const stripe = {
+      accounts: { create: async () => { stripeCalls += 1; return stripeAccount("acct_merchant"); } },
+      accountLinks: { create: async () => ({ url: "https://connect.stripe.test/link" }) },
+    };
+    await withMerchantMode(async () => {
+      await assert.rejects(
+        () => startSellerStripeMerchantOnboarding({
+          userId: "seller-owner",
+          db: db as never,
+          stripe: stripe as never,
+        }),
+        /valid account country|not configured/,
+      );
+    });
+    assert.equal(stripeCalls, 0, String(country));
+  }
 });

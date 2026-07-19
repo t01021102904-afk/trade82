@@ -30,6 +30,9 @@ const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href
 const merchant = await import(
   new URL("../src/lib/stripe-direct-charge-merchant.ts", import.meta.url).href,
 );
+const { processStripeConnectWebhookEvent } = await import(
+  new URL("../src/lib/stripe-connect-onboarding-webhook.ts", import.meta.url).href,
+);
 const db = getDb() as PrismaClient;
 
 after(async () => {
@@ -255,4 +258,116 @@ test("merchant table keeps restrictive database security and empty initial state
   assert.equal(security.public_access_revoked, true);
   assert.equal(security.restrictive_fk, true);
   assert.equal(security.status_index, true);
+});
+
+test("seller-facing status is company-owner scoped and merchant webhooks ignore unrelated accounts", async () => {
+  const id = suffix();
+  const sellerA = await db.userProfile.create({
+    data: {
+      clerkUserId: `merchant-owner-a-${id}`,
+      email: `merchant-owner-a-${id}@example.test`,
+      displayName: "Merchant owner A",
+      country: "KR",
+      role: "seller",
+    },
+  });
+  const sellerB = await db.userProfile.create({
+    data: {
+      clerkUserId: `merchant-owner-b-${id}`,
+      email: `merchant-owner-b-${id}@example.test`,
+      displayName: "Merchant owner B",
+      country: "KR",
+      role: "seller",
+    },
+  });
+  const buyer = await db.userProfile.create({
+    data: {
+      clerkUserId: `merchant-buyer-${id}`,
+      email: `merchant-buyer-${id}@example.test`,
+      displayName: "Merchant buyer",
+      country: "KR",
+      role: "buyer",
+    },
+  });
+  const companyA = await db.company.create({
+    data: {
+      ownerUserId: sellerA.id,
+      companyRole: "seller",
+      legalName: `Merchant company A ${id}`,
+      country: "KR",
+      city: "Seoul",
+      businessAddress: "Seoul",
+    },
+  });
+  const companyB = await db.company.create({
+    data: {
+      ownerUserId: sellerB.id,
+      companyRole: "seller",
+      legalName: `Merchant company B ${id}`,
+      country: "KR",
+      city: "Busan",
+      businessAddress: "Busan",
+    },
+  });
+
+  try {
+    await db.sellerStripeMerchantAccount.create({
+      data: {
+        companyId: companyA.id,
+        stripeAccountId: `acct_merchant_a_${id}`,
+        country: "KR",
+      },
+    });
+    await db.sellerStripeMerchantAccount.create({
+      data: {
+        companyId: companyB.id,
+        stripeAccountId: `acct_merchant_b_${id}`,
+        country: "KR",
+      },
+    });
+
+    const statusA = await merchant.getSellerStripeMerchantAccountStatus({ userId: sellerA.id, db });
+    const statusB = await merchant.getSellerStripeMerchantAccountStatus({ userId: sellerB.id, db });
+    assert.equal(statusA.exists, true);
+    assert.equal(statusB.exists, true);
+    assert.equal(statusA.country, "KR");
+    assert.equal(statusB.country, "KR");
+    await assert.rejects(
+      () => merchant.getSellerStripeMerchantAccountStatus({ userId: buyer.id, db }),
+      /seller company/,
+    );
+
+    const settlementAccountCount = await db.stripeConnectedAccount.count();
+    const synced = await processStripeConnectWebhookEvent({
+      id: `evt_merchant_${id}`,
+      type: "account.updated",
+      livemode: false,
+      data: { object: enabledAccount(`acct_merchant_a_${id}`) },
+    } as never, { db });
+    assert.deepEqual(synced, { handled: true, found: true, updated: true });
+    const refreshedA = await db.sellerStripeMerchantAccount.findUniqueOrThrow({
+      where: { companyId: companyA.id },
+    });
+    assert.equal(refreshedA.status, "ENABLED");
+    assert.equal(await db.stripeConnectedAccount.count(), settlementAccountCount);
+
+    const ignored = await processStripeConnectWebhookEvent({
+      id: `evt_unrelated_${id}`,
+      type: "account.updated",
+      livemode: false,
+      data: { object: enabledAccount(`acct_unrelated_${id}`) },
+    } as never, { db });
+    assert.deepEqual(ignored, { handled: true, found: false, updated: false });
+    const unchangedB = await db.sellerStripeMerchantAccount.findUniqueOrThrow({
+      where: { companyId: companyB.id },
+    });
+    assert.equal(unchangedB.status, "ONBOARDING_INCOMPLETE");
+    assert.equal(await db.stripeConnectedAccount.count(), settlementAccountCount);
+  } finally {
+    await db.sellerStripeMerchantAccount.deleteMany({
+      where: { companyId: { in: [companyA.id, companyB.id] } },
+    });
+    await db.company.deleteMany({ where: { id: { in: [companyA.id, companyB.id] } } });
+    await db.userProfile.deleteMany({ where: { id: { in: [sellerA.id, sellerB.id, buyer.id] } } });
+  }
 });

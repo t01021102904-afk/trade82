@@ -79,6 +79,13 @@ function prerequisiteSchema(overrides = {}) {
 function targetSchema(overrides = {}) {
   return {
     target_enum_values: true,
+    target_event_type_enum: true,
+    target_user_profile_table: true,
+    target_user_profile_id_text: true,
+    target_user_profile_id_key: true,
+    target_settlement_leg_status: true,
+    target_settlement_leg_hold_until: true,
+    target_settlement_reversal_status: true,
     target_columns: true,
     target_hold_reason_check: true,
     target_leg_retry_check: true,
@@ -138,7 +145,9 @@ function merchantSchema(overrides = {}) {
   return {
     merchant_status_enum: true,
     merchant_table: true,
-    merchant_columns: true,
+    merchant_columns_total: true,
+    merchant_columns_names: true,
+    merchant_column_types: true,
     merchant_primary_key: true,
     merchant_company_unique: true,
     merchant_stripe_unique: true,
@@ -148,9 +157,12 @@ function merchantSchema(overrides = {}) {
     merchant_nullability: true,
     merchant_rls: true,
     merchant_public_access_revoked: true,
-    merchant_zero_rows: true,
     ...overrides,
   };
+}
+
+function merchantInitialState(overrides = {}) {
+  return { merchant_zero_rows: true, ...overrides };
 }
 
 function fakeClient(responses) {
@@ -201,6 +213,7 @@ function deploymentResponses(afterRecords = [
     [firstSchema()],
     [secondSchema()],
     [merchantSchema()],
+    [merchantInitialState()],
   ];
 }
 
@@ -297,7 +310,7 @@ test("only old reversals applied with merchant pending runs the allowlisted migr
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 13);
+  assert.equal(fake.calls.query, 14);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -342,6 +355,14 @@ test("old reversal states, reordered batches, missing history, and future migrat
   await assertDiagnostic(runProductionMigrations(productionOptions(reorderedFake, {
     localMigrationNames: reordered,
   })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
+
+  const reorderedDatabase = fakeClient([
+    [...historicalRecords, appliedTarget, appliedFirst, appliedMerchant],
+    [legacySchemaEvidence()],
+  ]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(reorderedDatabase)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch",
+  });
 
   const futureNames = [...localMigrations, "20260718130000_future_migration"];
   const futureFake = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant], [legacySchemaEvidence()]]);
@@ -407,7 +428,9 @@ test("merchant post-verification fails closed for each schema field", async () =
   const keys = [
     "merchant_status_enum",
     "merchant_table",
-    "merchant_columns",
+    "merchant_columns_total",
+    "merchant_columns_names",
+    "merchant_column_types",
     "merchant_primary_key",
     "merchant_company_unique",
     "merchant_stripe_unique",
@@ -417,7 +440,6 @@ test("merchant post-verification fails closed for each schema field", async () =
     "merchant_nullability",
     "merchant_rls",
     "merchant_public_access_revoked",
-    "merchant_zero_rows",
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
@@ -430,6 +452,44 @@ test("merchant post-verification fails closed for each schema field", async () =
     });
     assert.equal(fake.calls.end, 1);
   }
+});
+
+test("target preflight fails closed for each newly required dependency field", async () => {
+  const keys = [
+    "target_event_type_enum",
+    "target_user_profile_table",
+    "target_user_profile_id_text",
+    "target_user_profile_id_key",
+    "target_settlement_leg_status",
+    "target_settlement_leg_hold_until",
+    "target_settlement_reversal_status",
+  ];
+  for (const key of keys) {
+    const responses = deploymentResponses();
+    responses[3] = [targetSchema({ [key]: false })];
+    const fake = fakeClient(responses);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+      deploy: () => {},
+    })), {
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "target_preflight_failed",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
+});
+
+test("merchant initial state is checked only after a new deployment", async () => {
+  const responses = deploymentResponses();
+  responses[13] = [merchantInitialState({ merchant_zero_rows: false })];
+  const fake = fakeClient(responses);
+  await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+    deploy: () => {},
+  })), {
+    stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
+  });
+
+  const completed = fakeClient(completedResponses());
+  assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
+  assert.equal(completed.calls.query, 7);
 });
 
 test("legacy zero-step migrations remain accepted only with complete evidence", async () => {
