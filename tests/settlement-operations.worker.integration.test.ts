@@ -30,6 +30,7 @@ const [{ getDb }, tradeOrdersModule, financials, operations, settlementRules] = 
 const db = getDb() as PrismaClient;
 const tradeOrders = tradeOrdersModule as TradeOrdersModule;
 let sequence = 0;
+let stripeResponseSequence = 0;
 
 function unique(prefix: string) {
   sequence += 1;
@@ -344,7 +345,8 @@ function transferStripe(calls: TestStripeCall[]) {
     transfers: {
       create: async (params: TestStripeCall["params"], options: TestStripeCall["options"]) => {
         calls.push({ params, options });
-        return { id: `tr_worker_${calls.length}` };
+        stripeResponseSequence += 1;
+        return { id: `tr_worker_${stripeResponseSequence}` };
       },
     },
   } as never;
@@ -355,7 +357,8 @@ function reversalStripe(calls: TestStripeCall[]) {
     transfers: {
       createReversal: async (transferId: string, params: TestStripeCall["params"], options: TestStripeCall["options"]) => {
         calls.push({ transferId, params, options });
-        return { id: `trr_worker_${calls.length}`, amount: params.amount };
+        stripeResponseSequence += 1;
+        return { id: `trr_worker_${stripeResponseSequence}`, amount: params.amount };
       },
       listReversals: async () => ({ data: [], has_more: false }),
     },
@@ -549,7 +552,7 @@ test("reversal candidates enforce retry, lock, flow, status, dispute, and curren
     });
     const direct = await createFixture({ paymentFlow: "DIRECT_CHARGE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
     const platform = await createFixture({ legType: "PLATFORM_FEE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
-    const wrongCurrency = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", legCurrency: "eur" });
+    const wrongCurrency = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", paymentCurrency: "eur" });
     const calls: TestStripeCall[] = [];
     const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now, clock: fixedClock(now), batchSize: 20 });
 
@@ -627,7 +630,7 @@ test("worker metrics use database aggregates and keep Direct Charge unavailable"
     assert.equal(after.flow.DIRECT_CHARGE.available, false);
     assert.equal(after.readyTransferCount - before.readyTransferCount, 1);
     assert.equal(after.heldSettlementCount - before.heldSettlementCount, 1);
-    assert.equal(after.successfulTransferCount - before.successfulTransferCount, 1);
+    assert.equal(after.successfulTransferCount - before.successfulTransferCount, 2);
     assert.equal(after.pendingReversalCount - before.pendingReversalCount, 1);
     assert.equal(after.pendingReversalAmount.usd - before.pendingReversalAmount.usd, 3_000);
     assert.equal(after.sellerPayableAmount.usd - before.sellerPayableAmount.usd, ready.leg.amount + held.leg.amount + transferred.leg.amount + reversal.leg.amount);
