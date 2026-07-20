@@ -181,8 +181,11 @@ test("operational catalog verification rejects malformed indexes, defaults, cons
       name: "worker primary key on wrong column",
       key: "operations_constraints",
       mutation: async (client) => {
+        await client.query('ALTER TABLE "SettlementOperationalAlert" DROP CONSTRAINT "SettlementOperationalAlert_workerRunId_fkey"');
         await client.query('ALTER TABLE "SettlementWorkerRun" DROP CONSTRAINT "SettlementWorkerRun_pkey"');
+        await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_id_key" UNIQUE ("id")');
         await client.query('ALTER TABLE "SettlementWorkerRun" ADD CONSTRAINT "SettlementWorkerRun_pkey" PRIMARY KEY ("startedAt")');
+        await client.query('ALTER TABLE "SettlementOperationalAlert" ADD CONSTRAINT "SettlementOperationalAlert_workerRunId_fkey" FOREIGN KEY ("workerRunId") REFERENCES "SettlementWorkerRun"("id") ON DELETE SET NULL ON UPDATE CASCADE');
       },
     },
     {
