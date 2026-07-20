@@ -22,6 +22,8 @@ function assertDisposableDatabase() {
 
 assertDisposableDatabase();
 process.env.DATABASE_POOL_MAX = "12";
+process.env.PAYOUT_DATA_ENCRYPTION_KEY ??= Buffer.alloc(32, 7).toString("base64");
+process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-v1";
 
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const tradeOrders = await import(new URL("../src/lib/trade-orders.ts", import.meta.url).href);
