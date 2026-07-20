@@ -551,7 +551,7 @@ test("reversal candidates enforce retry, lock, flow, status, dispute, and curren
       reversalStatus: "NEEDS_MANUAL_REVIEW",
     });
     const direct = await createFixture({ paymentFlow: "DIRECT_CHARGE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
-    const platform = await createFixture({ legType: "PLATFORM_FEE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
+    const platform = await createFixture({ legType: "PLATFORM_FEE", legStatus: "TRANSFERRED", settlementStatus: "TRANSFERRED", transferState: true });
     const wrongCurrency = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", paymentCurrency: "eur" });
     const calls: TestStripeCall[] = [];
     const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now, clock: fixedClock(now), batchSize: 20 });
@@ -565,7 +565,7 @@ test("reversal candidates enforce retry, lock, flow, status, dispute, and curren
     assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(retryNotDue), status: "PENDING" } }), 1);
     assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(manualReview), status: "NEEDS_MANUAL_REVIEW" } }), 1);
     assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(direct), status: "PENDING" } }), 1);
-    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(platform), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { settlementId: platform.settlement.id } }), 0);
     assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(wrongCurrency), status: "PENDING" } }), 1);
     assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(exhausted), status: "NEEDS_MANUAL_REVIEW" } }), 1);
   });
@@ -612,7 +612,8 @@ test("retry timing and terminal/manual-review records do not make Stripe calls",
     const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: retryNotDue.now, clock: fixedClock(retryNotDue.now), batchSize: 20 });
     assert.equal(calls.length, 0);
     assert.equal(result.succeededCount, 0);
-    assert.equal(result.skippedCount, 1);
+    assert.equal(result.skippedCount, 0);
+    assert.equal(result.failedCount, 1);
     assert.ok(result.manualReviewCount >= 1);
   });
 });
