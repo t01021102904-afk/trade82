@@ -1094,25 +1094,33 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       stale: boolean;
       attempted: boolean;
     }>>(Prisma.sql`
-      SELECT leg."type"::text AS type,
-        leg."status"::text AS status,
-        leg."currency" AS currency,
+      WITH categorized AS (
+        SELECT leg."type"::text AS type,
+          leg."status"::text AS status,
+          leg."currency" AS currency,
+          leg."amount" AS amount,
+          leg."manualReviewRequired" AS manual_review,
+          (leg."transferAttemptCount" >= 5) AS attempt_exhausted,
+          (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}) AS retry_due,
+          (leg."transferLockedAt" IS NOT NULL AND leg."transferLockedAt" < ${staleBefore}) AS stale,
+          (leg."transferAttemptCount" > 0) AS attempted
+        FROM "SettlementLeg" AS leg
+        JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
+        WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+          AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+      )
+      SELECT type,
+        status,
+        currency,
         COUNT(*) AS count,
-        COALESCE(SUM(leg."amount"), 0)::numeric AS amount_sum,
-        leg."manualReviewRequired" AS manual_review,
-        (leg."transferAttemptCount" >= 5) AS attempt_exhausted,
-        (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}) AS retry_due,
-        (leg."transferLockedAt" IS NOT NULL AND leg."transferLockedAt" < ${staleBefore}) AS stale,
-        (leg."transferAttemptCount" > 0) AS attempted
-      FROM "SettlementLeg" AS leg
-      JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
-      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
-        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
-      GROUP BY leg."type", leg."status", leg."currency", leg."manualReviewRequired",
-        (leg."transferAttemptCount" >= 5),
-        (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}),
-        (leg."transferLockedAt" IS NOT NULL AND leg."transferLockedAt" < ${staleBefore}),
-        (leg."transferAttemptCount" > 0)
+        COALESCE(SUM(amount), 0)::numeric AS amount_sum,
+        manual_review,
+        attempt_exhausted,
+        retry_due,
+        stale,
+        attempted
+      FROM categorized
+      GROUP BY type, status, currency, manual_review, attempt_exhausted, retry_due, stale, attempted
     `),
     db.$queryRaw<Array<{
       type: string;
@@ -1126,27 +1134,35 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       attempt_exhausted: boolean;
       attempted: boolean;
     }>>(Prisma.sql`
-      SELECT leg."type"::text AS type,
-        reversal."status"::text AS status,
-        reversal."currency" AS currency,
+      WITH categorized AS (
+        SELECT leg."type"::text AS type,
+          reversal."status"::text AS status,
+          reversal."currency" AS currency,
+          reversal."amount" AS amount,
+          reversal."successfullyReversedAmount" AS reversed_amount,
+          (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}) AS retry_due,
+          (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}) AS stale,
+          (reversal."reversalAttemptCount" >= 5) AS attempt_exhausted,
+          (reversal."reversalAttemptCount" > 0) AS attempted
+        FROM "SettlementReversal" AS reversal
+        JOIN "Settlement" AS settlement ON settlement."id" = reversal."settlementId"
+        JOIN "SettlementLeg" AS leg ON leg."id" = reversal."settlementLegId"
+          AND leg."settlementId" = reversal."settlementId"
+        WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
+          AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
+      )
+      SELECT type,
+        status,
+        currency,
         COUNT(*) AS count,
-        COALESCE(SUM(reversal."amount"), 0)::numeric AS amount_sum,
-        COALESCE(SUM(reversal."successfullyReversedAmount"), 0)::numeric AS reversed_sum,
-        (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}) AS retry_due,
-        (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}) AS stale,
-        (reversal."reversalAttemptCount" >= 5) AS attempt_exhausted,
-        (reversal."reversalAttemptCount" > 0) AS attempted
-      FROM "SettlementReversal" AS reversal
-      JOIN "Settlement" AS settlement ON settlement."id" = reversal."settlementId"
-      JOIN "SettlementLeg" AS leg ON leg."id" = reversal."settlementLegId"
-        AND leg."settlementId" = reversal."settlementId"
-      WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
-        AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
-      GROUP BY leg."type", reversal."status", reversal."currency",
-        (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}),
-        (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}),
-        (reversal."reversalAttemptCount" >= 5),
-        (reversal."reversalAttemptCount" > 0)
+        COALESCE(SUM(amount), 0)::numeric AS amount_sum,
+        COALESCE(SUM(reversed_amount), 0)::numeric AS reversed_sum,
+        retry_due,
+        stale,
+        attempt_exhausted,
+        attempted
+      FROM categorized
+      GROUP BY type, status, currency, retry_due, stale, attempt_exhausted, attempted
     `),
     db.$queryRaw<Array<{ average_attempts: number; p50_age_ms: number; p95_age_ms: number; oldest_age_ms: number }>>(Prisma.sql`
       SELECT

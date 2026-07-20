@@ -173,7 +173,7 @@ async function createFixture({
       grossAmount: amounts.grossAmount,
       platformFeeAmount: amounts.platformFeeAmount,
       sellerPayableAmount: amounts.sellerPayableAmount,
-      currency: paymentCurrency,
+      currency: "usd",
       paymentDueDate: new Date("2026-08-01T00:00:00.000Z"),
       orderTerms: "Worker fixture terms",
       status: "PAID",
@@ -190,6 +190,9 @@ async function createFixture({
     where: { id: order.id },
     data: { orderStatus: "PAID", paymentStatus: disputeStatus ? "DISPUTED" : "PAID", paidAt: paymentRequest.paidAt },
   });
+  const persistedPaymentRequest = paymentCurrency === "usd"
+    ? paymentRequest
+    : await db.paymentRequest.update({ where: { id: paymentRequest.id }, data: { currency: paymentCurrency } });
   if (disputeStatus) {
     await db.paymentRequest.update({ where: { id: paymentRequest.id }, data: { status: disputeStatus === "lost" ? "DISPUTED" : "DISPUTED" } });
     await db.paymentDispute.create({
@@ -230,6 +233,17 @@ async function createFixture({
       },
     });
   }
+  const referralAttribution = partner
+    ? await db.referralAttribution.create({
+        data: {
+          referredUserId: seller.id,
+          partnerProfileId: partner.id,
+          referralCode: partner.referralCode,
+          status: "LOCKED",
+          lockedAt: paidAt,
+        },
+      })
+    : null;
   if (legType === "SELLER_PAYABLE" || legType === "PLATFORM_FEE") {
     await db.stripeConnectedAccount.create({
       data: {
@@ -256,6 +270,15 @@ async function createFixture({
       ...financialsForSettlement,
       currency: "usd",
       paymentFlow,
+      ...(referralAttribution
+        ? {
+            referralAttributionId: referralAttribution.id,
+            referralPartnerProfileId: referralAttribution.partnerProfileId,
+            referralCodeSnapshot: referralAttribution.referralCode,
+            referralSubjectType: "SELLER",
+            referredUserIdSnapshot: referralAttribution.referredUserId,
+          }
+        : {}),
       holdUntil: new Date(now.getTime() - 60_000),
       status: settlementStatus,
       ...(settlementStatus === "HOLD" ? { holdReason: "Worker fixture hold" } : {}),
@@ -302,7 +325,7 @@ async function createFixture({
         },
       })
     : null;
-  return { suffix, buyer, seller, buyerCompany, sellerCompany, paymentRequest, order, settlement, leg, reversal, now };
+  return { suffix, buyer, seller, buyerCompany, sellerCompany, paymentRequest: persistedPaymentRequest, order, settlement, leg, reversal, now };
 }
 
 function requiredReversalId(fixture: { reversal: { id: string } | null }) {
