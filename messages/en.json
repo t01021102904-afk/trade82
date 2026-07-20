@@ -1502,6 +1502,8 @@
     "roleBuyerEyebrow": "Global buyer",
     "roleSupplierCardTitle": "I am a Korean supplier",
     "roleBuyerCardTitle": "I am a global buyer",
+    "deletionPendingTitle": "Account deletion is still in progress",
+    "deletionPendingText": "Role selection is unavailable until the account deletion request has finished.",
     "roleListProductsTitle": "I want to list products",
     "roleListProductsDescription": "Create product pages, control sensitive pricing and logistics fields, and receive qualified buyer inquiries.",
     "roleFindProductsTitle": "I want to find products",

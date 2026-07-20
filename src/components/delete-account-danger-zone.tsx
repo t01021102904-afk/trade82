@@ -27,7 +27,11 @@ export function DeleteAccountDangerZone() {
     document.cookie = "trade82_referral_claim=; Max-Age=0; Path=/; SameSite=Lax";
     for (const storage of [window.localStorage, window.sessionStorage]) {
       for (const key of Object.keys(storage)) {
-        if (key.startsWith("trade82_") || key.startsWith("onboarding")) {
+        if (
+          /(^|[_-])(trade82|onboarding|referral|role|company|dashboard)([_-]|$)/i.test(
+            key,
+          )
+        ) {
           storage.removeItem(key);
         }
       }

@@ -38,7 +38,14 @@ async function accessibleOrder(orderNumber: string, userId: string, admin: boole
   return getDb().tradeOrder.findFirst({
     where: {
       orderNumber,
-      ...(admin ? {} : { OR: [{ buyerCompany: { ownerUserId: userId } }, { sellerCompany: { ownerUserId: userId } }] }),
+        ...(admin
+          ? {}
+          : {
+              OR: [
+                { buyerCompany: { ownerUserId: userId, deletedAt: null } },
+                { sellerCompany: { ownerUserId: userId, deletedAt: null } },
+              ],
+            }),
     },
     include: {
       items: true,
@@ -74,7 +81,12 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
     const order = await accessibleOrder(orderNumber, user.id, admin);
     if (!order) return Response.json({ error: "Order not found." }, { status: 404, headers: noStore });
     const sellerCanEdit = await getDb().company.count({
-      where: { id: order.sellerCompanyId, ownerUserId: user.id, companyRole: "seller" },
+      where: {
+        id: order.sellerCompanyId,
+        ownerUserId: user.id,
+        companyRole: "seller",
+        deletedAt: null,
+      },
     });
     const canViewSellerFinancials = admin || sellerCanEdit > 0;
     return Response.json(
@@ -95,7 +107,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     if (!isTradeOrderSystemEnabledForClerkUser(user.clerkUserId)) return Response.json({ error: "Orders are not enabled for this account." }, { status: 403, headers: noStore });
     const orderNumber = idParam((await params).orderNumber, "orderNumber");
     const order = await getDb().tradeOrder.findFirst({
-      where: { orderNumber, sellerCompany: { ownerUserId: user.id } },
+      where: {
+        orderNumber,
+        sellerCompany: { ownerUserId: user.id, deletedAt: null },
+      },
       select: { id: true, sellerCompanyId: true },
     });
     if (!order) return Response.json({ error: "Only the seller may update shipment information." }, { status: 403, headers: noStore });

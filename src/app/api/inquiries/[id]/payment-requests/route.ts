@@ -79,7 +79,11 @@ export async function POST(
     const inquiry = await getDb().inquiry.findFirst({
       where: {
         id: inquiryId,
-        sellerCompany: { ownerUserId: user.id, companyRole: "seller" },
+        sellerCompany: {
+          ownerUserId: user.id,
+          companyRole: "seller",
+          deletedAt: null,
+        },
       },
       select: {
         id: true,

@@ -29,8 +29,8 @@ export default async function KoPartnerDashboardPage({
   if (!userId) redirect("/ko/login?redirect_url=%2Fko%2Fpartner%2Fdashboard");
   const profile = await getCurrentUserProfile();
   if (!profile) redirect("/ko/partner");
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: profile.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: profile.id, deletedAt: null },
     select: { id: true, status: true, referralCode: true },
   });
   if (!partner) redirect("/ko/partner");

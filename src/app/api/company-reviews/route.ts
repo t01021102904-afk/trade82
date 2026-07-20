@@ -12,6 +12,7 @@ import {
 } from "@/lib/api-security";
 import {
   canViewPublicCompany,
+  isActiveUserProfile,
   requireAuth,
 } from "@/lib/authz";
 import { getDb } from "@/lib/db";
@@ -24,7 +25,12 @@ export async function GET(request: Request) {
 
     const company = await getDb().company.findUnique({
       where: { id: companyId },
-      select: { id: true, companyRole: true, verificationStatus: true },
+      select: {
+        id: true,
+        companyRole: true,
+        verificationStatus: true,
+        deletedAt: true,
+      },
     });
 
     if (!company || !canViewPublicCompany(company)) {
@@ -36,7 +42,12 @@ export async function GET(request: Request) {
     }
 
     const reviews = await getDb().companyReview.findMany({
-      where: { reviewedCompanyId: companyId, isPublic: true, deletedAt: null },
+      where: {
+        reviewedCompanyId: companyId,
+        isPublic: true,
+        deletedAt: null,
+        reviewerCompany: { deletedAt: null },
+      },
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -79,10 +90,10 @@ async function currentViewerCanReview(company: {
   if (!userId) return false;
 
   const user = await getDb().userProfile.findUnique({
-    where: { clerkUserId: userId },
-    select: { id: true },
+    where: { clerkUserId: userId, deletedAt: null, deletionStatus: "ACTIVE" },
+    select: { id: true, deletionStatus: true, deletedAt: true },
   });
-  if (!user) return false;
+  if (!user || !isActiveUserProfile(user)) return false;
 
   const reviewerCompanyRole =
     company.companyRole === "seller" ? "buyer" : "seller";
@@ -90,6 +101,7 @@ async function currentViewerCanReview(company: {
     where: {
       ownerUserId: user.id,
       companyRole: reviewerCompanyRole,
+      deletedAt: null,
     },
     select: { id: true },
   });
@@ -98,6 +110,8 @@ async function currentViewerCanReview(company: {
   const completedDeal = await getDb().deal.findFirst({
     where: {
       dealStatus: "completed",
+      buyerCompany: { deletedAt: null },
+      sellerCompany: { deletedAt: null },
       OR: [
         {
           buyerCompanyId: reviewerCompany.id,
@@ -139,7 +153,12 @@ export async function POST(request: Request) {
 
     const reviewedCompany = await getDb().company.findUnique({
       where: { id: reviewedCompanyId },
-      select: { id: true, companyRole: true, verificationStatus: true },
+      select: {
+        id: true,
+        companyRole: true,
+        verificationStatus: true,
+        deletedAt: true,
+      },
     });
 
     if (!reviewedCompany || !canViewPublicCompany(reviewedCompany)) {
@@ -153,6 +172,7 @@ export async function POST(request: Request) {
       where: {
         ownerUserId: user.id,
         companyRole: reviewerCompanyRole,
+        deletedAt: null,
       },
       select: { id: true },
     });
@@ -167,6 +187,8 @@ export async function POST(request: Request) {
     const completedDeal = await getDb().deal.findFirst({
       where: {
         dealStatus: "completed",
+        buyerCompany: { deletedAt: null },
+        sellerCompany: { deletedAt: null },
         OR: [
           {
             buyerCompanyId: reviewerCompany.id,

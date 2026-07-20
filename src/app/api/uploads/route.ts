@@ -256,12 +256,19 @@ async function authorizeUpload({
   }
 
   if (!dealId) throw new Response("Deal required", { status: 400 });
-  const deal = await getDb().deal.findUnique({ where: { id: dealId } });
+  const deal = await getDb().deal.findFirst({
+    where: {
+      id: dealId,
+      buyerCompany: { deletedAt: null },
+      sellerCompany: { deletedAt: null },
+    },
+  });
   if (!deal) throw new Response("Deal not found", { status: 404 });
   const participant = await getDb().company.findFirst({
     where: {
       ownerUserId: userId,
       id: { in: [deal.buyerCompanyId, deal.sellerCompanyId] },
+      deletedAt: null,
     },
     select: { id: true },
   });
@@ -426,7 +433,7 @@ async function uploadPrivate({
   try {
     if (type === "verification_document") {
       const company = await getDb().company.findUnique({
-        where: { id: companyId },
+        where: { id: companyId, deletedAt: null },
         select: { companyRole: true, verificationStatus: true },
       });
       if (!company) {

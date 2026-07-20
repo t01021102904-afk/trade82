@@ -212,7 +212,10 @@ export async function listBuyerRfqs(buyerUserId: string) {
       company."legalName" AS "buyerCompanyName"
     FROM "RfqRequest" r
     JOIN "UserProfile" buyer ON buyer."id" = r."buyerUserId"
+      AND buyer."deletionStatus" = CAST('ACTIVE' AS "AccountDeletionStatus")
+      AND buyer."deletedAt" IS NULL
     LEFT JOIN "Company" company ON company."id" = r."buyerCompanyId"
+      AND company."deletedAt" IS NULL
     WHERE r."buyerUserId" = ${buyerUserId}
     ORDER BY r."createdAt" DESC
   `;
@@ -225,7 +228,10 @@ export async function getBuyerRfq(buyerUserId: string, id: string) {
       company."legalName" AS "buyerCompanyName"
     FROM "RfqRequest" r
     JOIN "UserProfile" buyer ON buyer."id" = r."buyerUserId"
+      AND buyer."deletionStatus" = CAST('ACTIVE' AS "AccountDeletionStatus")
+      AND buyer."deletedAt" IS NULL
     LEFT JOIN "Company" company ON company."id" = r."buyerCompanyId"
+      AND company."deletedAt" IS NULL
     WHERE r."id" = ${id} AND r."buyerUserId" = ${buyerUserId}
     LIMIT 1
   `;
@@ -594,6 +600,7 @@ export async function createOrReuseRfqSellerQuote({
       AND p."status" = CAST(${"active"} AS "ProductStatus")
       AND seller."companyRole" = CAST(${"seller"} AS "CompanyRole")
       AND seller."verificationStatus" = CAST(${"verified"} AS "CompanyVerificationStatus")
+      AND seller."deletedAt" IS NULL
       AND seller."legalName" <> ${DELETED_COMPANY_NAME}
       AND seller."ownerUserId" <> ${buyerUserId}
     LIMIT 1
@@ -650,6 +657,7 @@ export async function createOrReuseRfqQuoteConversation({
       id: rfq.buyerCompanyId,
       ownerUserId: buyerUserId,
       companyRole: "buyer",
+      deletedAt: null,
     },
   });
   if (!buyerCompany) {
@@ -663,6 +671,7 @@ export async function createOrReuseRfqQuoteConversation({
       id: quote.sellerCompanyId,
       companyRole: "seller",
       verificationStatus: "verified",
+      deletedAt: null,
       legalName: { not: DELETED_COMPANY_NAME },
     },
   });
@@ -676,6 +685,7 @@ export async function createOrReuseRfqQuoteConversation({
           id: quote.productId,
           sellerCompanyId: sellerCompany.id,
           status: "active",
+          deletedAt: null,
         },
         select: { id: true, name: true },
       })
@@ -908,6 +918,7 @@ async function generateSuggestedMatchesForRfq(rfq: RfqRecord) {
       status: "active",
       sellerCompany: {
         verificationStatus: "verified",
+        deletedAt: null,
         legalName: { not: DELETED_COMPANY_NAME },
         ownerUserId: { not: rfq.buyerUserId },
       },

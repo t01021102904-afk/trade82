@@ -81,14 +81,24 @@ export async function GET() {
     const admin = await isAdminUser();
     const paymentFeature = getMessagePaymentFeatureState(user.id);
     const viewerCompanies = await getDb().company.findMany({
-      where: { ownerUserId: user.id },
+      where: { ownerUserId: user.id, deletedAt: null },
       select: { id: true },
     });
     const inquiries = await getDb().inquiry.findMany({
       where: {
         OR: [
-          { senderUserId: user.id },
-          { recipientCompany: { ownerUserId: user.id } },
+          {
+            senderUserId: user.id,
+            buyerCompany: { deletedAt: null },
+            sellerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
+          {
+            recipientCompany: { ownerUserId: user.id, deletedAt: null },
+            buyerCompany: { deletedAt: null },
+            sellerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
           ...(admin
             ? [
                 {
@@ -193,6 +203,7 @@ async function findContactReadyCompany(
     where: {
       ownerUserId,
       companyRole,
+      deletedAt: null,
     },
     include: {
       buyerProfile: true,
@@ -390,6 +401,8 @@ export async function POST(request: Request) {
       ? await getDb().product.findFirst({
           where: {
             id: productId,
+            deletedAt: null,
+            sellerCompany: { deletedAt: null },
             ...(admin ? {} : { status: "active" }),
           },
           include: { sellerCompany: true },
@@ -411,9 +424,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const targetCompany = product?.sellerCompany ?? await getDb().company.findUnique({
-      where: { id: targetCompanyId },
-    });
+    const targetCompany =
+      product?.sellerCompany ??
+      (await getDb().company.findFirst({
+        where: { id: targetCompanyId, deletedAt: null },
+      }));
     if (
       !targetCompany ||
       (!admin && targetCompany.verificationStatus !== "verified")

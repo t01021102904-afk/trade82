@@ -9,8 +9,8 @@ export default async function StripeConnectSettingsPage() {
   const { userId } = await auth();
   if (!userId) redirect("/login?redirect_url=%2Fsettings%2Fstripe-connect");
   const user = await requireAuth();
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: user.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: user.id, deletedAt: null },
     select: { id: true },
   });
   if (!partner) redirect("/dashboard");

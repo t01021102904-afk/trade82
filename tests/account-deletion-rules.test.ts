@@ -8,11 +8,12 @@ const rules = await import(
 const orchestration = await import(
   new URL("../src/lib/account-deletion-orchestration.ts", import.meta.url).href,
 );
-const [deleteRoute, authz, onboardingStatus, deletionUi] = await Promise.all([
+const [deleteRoute, authz, onboardingStatus, deletionUi, requireAuthSource] = await Promise.all([
   readFile(new URL("../src/app/api/account/delete/route.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/lib/authz.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/lib/onboarding-status.ts", import.meta.url), "utf8"),
   readFile(new URL("../src/components/delete-account-danger-zone.tsx", import.meta.url), "utf8"),
+  readFile(new URL("../src/lib/require-auth.ts", import.meta.url), "utf8"),
 ]);
 
 test("only a verified Clerk deletion and a DELETED tombstone can report success", () => {
@@ -80,9 +81,13 @@ test("delete API returns a controlled non-2xx response for failed stages", () =>
 });
 
 test("deleted and pending profiles are never relinked by Clerk ID or email", () => {
-  assert.match(authz, /existingByClerkId\.deletionStatus !== AccountDeletionStatus\.ACTIVE/);
-  assert.match(authz, /existingByEmail\.deletionStatus !== AccountDeletionStatus\.ACTIVE/);
+  assert.match(authz, /isActiveUserProfile/);
+  assert.match(authz, /createFreshUserProfile/);
+  assert.match(authz, /existingByClerkId/);
+  assert.doesNotMatch(authz, /existingByEmail/);
   assert.match(onboardingStatus, /ownerUserId: userProfileId, deletedAt: null/);
+  assert.match(requireAuthSource, /const deletionProfile = await getCurrentDeletionProfile\(\)/);
+  assert.match(requireAuthSource, /deletionPending: true/);
 });
 
 test("successful deletion clears browser state then hard-redirects to role selection", () => {

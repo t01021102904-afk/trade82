@@ -10,12 +10,13 @@ import type {
   Product,
   UserProfile,
 } from "@/generated/prisma/client";
-import { AccountDeletionStatus, Prisma } from "@/generated/prisma/client";
+import { AccountDeletionStatus } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
-  consumeReferralClaimForNewUser,
-  REFERRAL_CLAIM_COOKIE,
-} from "@/lib/partner-referrals";
+  createFreshUserProfile,
+  isActiveUserProfile,
+} from "@/lib/fresh-user-profile";
+import { REFERRAL_CLAIM_COOKIE } from "@/lib/partner-referrals";
 import {
   getOnboardingCompanyState,
   inferRoleFromCompanyState,
@@ -52,14 +53,7 @@ function roleForExistingProfile(
   return existingRole;
 }
 
-function isEmailUniqueConflict(error: unknown) {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002" &&
-    Array.isArray(error.meta?.target) &&
-    error.meta.target.includes("email")
-  );
-}
+export { createFreshUserProfile, isActiveUserProfile } from "@/lib/fresh-user-profile";
 
 export function adminEmails() {
   return (process.env.ADMIN_EMAILS ?? "")
@@ -118,63 +112,31 @@ export async function getCurrentUserProfile() {
     });
   };
 
-  try {
-    const existingByClerkId = await db.userProfile.findUnique({
-      where: { clerkUserId: userId },
-    });
-    if (existingByClerkId) {
-      // A pending/deleted account is never allowed to reconnect to an active
-      // Clerk identity. Final deletion replaces the Clerk identifier, while a
-      // pending deletion stays blocked until the trusted deletion path finishes.
-      if (existingByClerkId.deletionStatus !== AccountDeletionStatus.ACTIVE) {
-        return null;
-      }
-      return await updateExistingProfile(existingByClerkId);
-    }
-
-    const existingByEmail = await db.userProfile.findUnique({
-      where: { email },
-    });
-    if (existingByEmail) {
-      if (existingByEmail.deletionStatus !== AccountDeletionStatus.ACTIVE) {
-        return null;
-      }
-      console.warn("Linking an active user profile to the current auth identity.");
-      return await updateExistingProfile(existingByEmail);
-    }
-
-    // Referral evidence can only be consumed while this identity receives its
-    // first local profile. Existing and relinked profiles never enter here.
-    const referralClaimToken = (await cookies()).get(REFERRAL_CLAIM_COOKIE)?.value;
-    return await db.$transaction(async (tx) => {
-      const profile = await tx.userProfile.create({
-        data: {
-          clerkUserId: userId,
-          email,
-          displayName,
-          role: createRole,
-          preferredLanguage,
-        },
-      });
-      await consumeReferralClaimForNewUser(tx, {
-        rawToken: referralClaimToken,
-        referredUserId: profile.id,
-      });
-      return profile;
-    });
-  } catch (error) {
-    if (!isEmailUniqueConflict(error)) throw error;
-
-    console.warn("Recovered user profile after email uniqueness conflict.");
-    const existingByEmail = await db.userProfile.findUnique({
-      where: { email },
-    });
-    if (!existingByEmail) throw error;
-    if (existingByEmail.deletionStatus !== AccountDeletionStatus.ACTIVE) {
+  const existingByClerkId = await db.userProfile.findUnique({
+    where: { clerkUserId: userId },
+  });
+  if (existingByClerkId) {
+    // A pending/deleted account is never allowed to reconnect to an active
+    // Clerk identity. Final deletion replaces the Clerk identifier, while a
+    // pending deletion stays blocked until the trusted deletion path finishes.
+    if (!isActiveUserProfile(existingByClerkId)) {
       return null;
     }
-    return updateExistingProfile(existingByEmail);
+    return await updateExistingProfile(existingByClerkId);
   }
+
+  // Referral evidence can only be consumed while this identity receives its
+  // first local profile. Existing profiles never enter here, and a new Clerk
+  // identity is never relinked by email to an older profile.
+  const referralClaimToken = (await cookies()).get(REFERRAL_CLAIM_COOKIE)?.value;
+  return createFreshUserProfile(db, {
+    clerkUserId: userId,
+    email,
+    displayName,
+    role: createRole,
+    preferredLanguage,
+    referralClaimToken,
+  });
 }
 
 /**
@@ -187,7 +149,7 @@ export async function getCurrentDeletionProfile() {
   if (!userId) return null;
 
   const profile = await getDb().userProfile.findUnique({
-    where: { clerkUserId: userId },
+    where: { clerkUserId: userId, deletedAt: null },
   });
   if (!profile || profile.deletionStatus === AccountDeletionStatus.DELETED) {
     return null;

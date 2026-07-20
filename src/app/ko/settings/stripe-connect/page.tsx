@@ -9,8 +9,8 @@ export default async function KoStripeConnectSettingsPage() {
   const { userId } = await auth();
   if (!userId) redirect("/ko/login?redirect_url=%2Fko%2Fsettings%2Fstripe-connect");
   const user = await requireAuth();
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: user.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: user.id, deletedAt: null },
     select: { id: true },
   });
   if (!partner) redirect("/ko/dashboard");

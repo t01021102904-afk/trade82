@@ -70,7 +70,11 @@ function publicFieldRequiredResponse() {
 
 async function ownProduct(id: string, userId: string) {
   return getDb().product.findFirst({
-    where: { id, sellerCompany: { ownerUserId: userId } },
+    where: {
+      id,
+      deletedAt: null,
+      sellerCompany: { ownerUserId: userId, deletedAt: null },
+    },
     include: { sellerCompany: true },
   });
 }

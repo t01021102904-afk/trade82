@@ -255,8 +255,8 @@ async function resolveOwner({
     return { type: ownerType, id: company.id, country: assertStripeConnectCountry(company.country) };
   }
 
-  const partner = await db.partnerProfile.findUnique({
-    where: { userId },
+  const partner = await db.partnerProfile.findFirst({
+    where: { userId, deletedAt: null },
     select: { id: true, status: true, country: true, user: { select: { country: true } } },
   });
   if (!partner || partner.status !== "ACTIVE") {

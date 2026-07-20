@@ -29,8 +29,8 @@ export default async function PartnerDashboardPage({
   if (!userId) redirect("/login?redirect_url=%2Fpartner%2Fdashboard");
   const profile = await getCurrentUserProfile();
   if (!profile) redirect("/partner");
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: profile.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: profile.id, deletedAt: null },
     select: { id: true, status: true, referralCode: true },
   });
   if (!partner) redirect("/partner");

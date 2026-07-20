@@ -44,7 +44,11 @@ export async function PATCH(
     const paymentRequest = await db.paymentRequest.findFirst({
       where: {
         id: paymentRequestId,
-        sellerCompany: { ownerUserId: user.id, companyRole: "seller" },
+        sellerCompany: {
+          ownerUserId: user.id,
+          companyRole: "seller",
+          deletedAt: null,
+        },
       },
       select: {
         id: true,

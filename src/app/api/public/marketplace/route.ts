@@ -59,7 +59,11 @@ export async function GET(request: Request) {
             select: { products: true },
           },
           reviewsReceived: {
-            where: { isPublic: true, adminApproved: true },
+            where: {
+              isPublic: true,
+              adminApproved: true,
+              reviewerCompany: { deletedAt: null },
+            },
             include: {
               reviewerCompany: {
                 select: { legalName: true, tradeName: true },
@@ -170,7 +174,11 @@ function publicCompanyInclude() {
       select: { products: true },
     },
     reviewsReceived: {
-      where: { isPublic: true, adminApproved: true },
+      where: {
+        isPublic: true,
+        adminApproved: true,
+        reviewerCompany: { deletedAt: null },
+      },
       include: {
         reviewerCompany: {
           select: { legalName: true, tradeName: true },

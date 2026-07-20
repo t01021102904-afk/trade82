@@ -38,18 +38,23 @@ export async function POST(
     const inquiry = await getDb().inquiry.findFirst({
       where: {
         id,
+        buyerCompany: { deletedAt: null },
+        sellerCompany: { deletedAt: null },
+        recipientCompany: { deletedAt: null },
         OR: [
           { senderUserId: user.id },
-          { recipientCompany: { ownerUserId: user.id } },
+          { recipientCompany: { ownerUserId: user.id, deletedAt: null } },
           ...(admin
             ? [
                 {
                   buyerCompany: {
+                    deletedAt: null,
                     OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
                   },
                 },
                 {
                   sellerCompany: {
+                    deletedAt: null,
                     OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
                   },
                 },
@@ -78,12 +83,14 @@ export async function POST(
       where: {
         ownerUserId: user.id,
         id: { in: [inquiry.buyerCompanyId, inquiry.sellerCompanyId] },
+        deletedAt: null,
       },
     });
     const adminSenderCompany = !senderCompany && admin
       ? await getDb().company.findFirst({
           where: {
             id: { in: [inquiry.buyerCompanyId, inquiry.sellerCompanyId] },
+            deletedAt: null,
             OR: [{ legalName: "Trade82 team" }, { tradeName: "Trade82 team" }],
           },
         })

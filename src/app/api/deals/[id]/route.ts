@@ -40,8 +40,13 @@ export async function PATCH(
       "confirm_completion",
     ] satisfies DealAction[]);
 
-    const deal = await getDb().deal.findUnique({
-      where: { id },
+    const deal = await getDb().deal.findFirst({
+      where: {
+        id,
+        buyerCompany: { deletedAt: null },
+        sellerCompany: { deletedAt: null },
+        product: { deletedAt: null },
+      },
       include: { buyerCompany: true, sellerCompany: true, product: true, reviews: true },
     });
     if (!deal) {
@@ -54,6 +59,7 @@ export async function PATCH(
     const participant = await getDb().company.findFirst({
       where: {
         ownerUserId: user.id,
+        deletedAt: null,
         id: { in: [deal.buyerCompanyId, deal.sellerCompanyId] },
       },
       select: { id: true, companyRole: true },
