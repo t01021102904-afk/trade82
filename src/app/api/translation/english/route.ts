@@ -86,10 +86,11 @@ async function authorizeProductTranslation(
       where: { id: productId },
       select: {
         id: true,
+        deletedAt: true,
         sellerCompany: { select: { ownerUserId: true } },
       },
     });
-    if (!product) {
+    if (!product || product.deletedAt) {
       throw new Response("Not found", { status: 404 });
     }
     if (!admin && product.sellerCompany.ownerUserId !== userId) {
@@ -100,7 +101,7 @@ async function authorizeProductTranslation(
 
   if (admin) return;
   const company = await getDb().company.findFirst({
-    where: { ownerUserId: userId, companyRole: "seller" },
+    where: { ownerUserId: userId, companyRole: "seller", deletedAt: null },
     select: { id: true },
   });
   if (!company) {
@@ -118,9 +119,9 @@ async function authorizeCompanyTranslation(
   if (companyId) {
     const company = await getDb().company.findUnique({
       where: { id: companyId },
-      select: { id: true, companyRole: true, ownerUserId: true },
+      select: { id: true, companyRole: true, ownerUserId: true, deletedAt: true },
     });
-    if (!company || company.companyRole !== "seller") {
+    if (!company || company.deletedAt || company.companyRole !== "seller") {
       throw new Response("Not found", { status: 404 });
     }
     if (!admin && company.ownerUserId !== userId) {

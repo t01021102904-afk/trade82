@@ -1502,6 +1502,8 @@
     "roleBuyerEyebrow": "글로벌 바이어",
     "roleSupplierCardTitle": "저는 한국 셀러입니다",
     "roleBuyerCardTitle": "저는 글로벌 바이어입니다",
+    "deletionPendingTitle": "계정 삭제가 아직 진행 중입니다",
+    "deletionPendingText": "계정 삭제 요청이 완료될 때까지 역할을 선택할 수 없습니다.",
     "roleListProductsTitle": "상품을 등록하고 싶어요",
     "roleListProductsDescription": "상품 페이지를 만들고 민감한 가격·물류 정보의 공개 범위를 조정한 뒤 적합한 바이어 문의를 받을 수 있습니다.",
     "roleFindProductsTitle": "상품을 찾고 싶어요",

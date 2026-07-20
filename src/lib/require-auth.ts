@@ -1,7 +1,12 @@
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
+import {
+  getCurrentDeletionProfile,
+  getCurrentUserProfile,
+  isAdminUser,
+} from "@/lib/authz";
+import { AccountDeletionStatus } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
   getOnboardingCompanyState,
@@ -214,6 +219,15 @@ export async function requireAppProfile(redirectUrl: string) {
 }
 
 export async function requireOnboardingEntry(redirectUrl: string) {
+  const deletionProfile = await getCurrentDeletionProfile();
+  if (deletionProfile?.deletionStatus === AccountDeletionStatus.DELETION_PENDING) {
+    return {
+      role: "user" as const,
+      canChangeRole: false,
+      deletionPending: true,
+    };
+  }
+
   await requireAuth(redirectUrl);
 
   const [clerkUser, profile] = await Promise.all([
@@ -235,7 +249,11 @@ export async function requireOnboardingEntry(redirectUrl: string) {
   );
 
   if (role === "user" || canChangeRole) {
-    return { role, canChangeRole };
+    return {
+      role,
+      canChangeRole,
+      deletionPending: false,
+    };
   }
   if (role === "admin") redirect(`${prefix}/admin`);
 

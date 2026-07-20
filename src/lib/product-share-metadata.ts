@@ -104,6 +104,7 @@ export async function getProductShareMetadata(
       where: {
         id: productId,
         status: "active",
+        deletedAt: null,
         sellerCompany: {
           verificationStatus: "verified",
           deletedAt: null,
@@ -201,6 +202,7 @@ export async function getProductStructuredData(
       where: {
         id: productId,
         status: "active",
+        deletedAt: null,
         sellerCompany: {
           verificationStatus: "verified",
           deletedAt: null,

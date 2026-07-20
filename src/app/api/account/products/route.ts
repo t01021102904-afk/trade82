@@ -87,7 +87,10 @@ export async function GET() {
   try {
     const { user } = await requireSeller();
     const products = await getDb().product.findMany({
-      where: { sellerCompany: { ownerUserId: user.id } },
+      where: {
+        deletedAt: null,
+        sellerCompany: { ownerUserId: user.id, deletedAt: null },
+      },
       include: {
         images: { orderBy: { position: "asc" } },
         sellerCompany: {

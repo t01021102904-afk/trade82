@@ -87,7 +87,11 @@ export async function POST(
     const paymentRequest = await db.paymentRequest.findFirst({
       where: {
         id: paymentRequestId,
-        buyerCompany: { ownerUserId: user.id, companyRole: "buyer" },
+        buyerCompany: {
+          ownerUserId: user.id,
+          companyRole: "buyer",
+          deletedAt: null,
+        },
       },
     });
     if (!paymentRequest) {

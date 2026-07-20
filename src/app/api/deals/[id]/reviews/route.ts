@@ -31,7 +31,14 @@ export async function POST(
 
     const { id: rawId } = await params;
     const id = idParam(rawId, "dealId");
-    const deal = await getDb().deal.findUnique({ where: { id } });
+    const deal = await getDb().deal.findFirst({
+      where: {
+        id,
+        buyerCompany: { deletedAt: null },
+        sellerCompany: { deletedAt: null },
+        product: { deletedAt: null },
+      },
+    });
     if (!deal || deal.dealStatus !== "completed") {
       return Response.json(
         { error: "Only completed deals can be reviewed." },
@@ -41,6 +48,7 @@ export async function POST(
     const reviewer = await getDb().company.findFirst({
       where: {
         ownerUserId: user.id,
+        deletedAt: null,
         id: { in: [deal.buyerCompanyId, deal.sellerCompanyId] },
       },
     });

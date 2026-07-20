@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const type = enumField(body, "type", ["company", "product"] as const);
     if (type === "company") {
       const result = await getDb().company.updateMany({
-        where: { id, verificationStatus: "verified" },
+        where: { id, verificationStatus: "verified", deletedAt: null },
         data: { viewCount: { increment: 1 } },
       });
       return Response.json({ counted: result.count === 1 });
@@ -30,7 +30,8 @@ export async function POST(request: Request) {
       where: {
         id,
         status: "active",
-        sellerCompany: { verificationStatus: "verified" },
+        deletedAt: null,
+        sellerCompany: { verificationStatus: "verified", deletedAt: null },
       },
       data: { viewCount: { increment: 1 } },
     });

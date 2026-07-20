@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  AccountDeletionStatus,
   SettlementLegStatus,
   SettlementLegType,
   SettlementReversalStatus,
@@ -128,8 +129,12 @@ export async function getPartnerDashboardData({
     commissionLegs,
     referredMembers,
   ] = await Promise.all([
-    db.partnerProfile.findUniqueOrThrow({
-      where: { id: partnerProfileId },
+    db.partnerProfile.findFirstOrThrow({
+      where: {
+        id: partnerProfileId,
+        deletedAt: null,
+        status: "ACTIVE",
+      },
       include: { stripeConnectedAccount: true },
     }),
     db.referralAttribution.count({ where: { partnerProfileId } }),
@@ -176,7 +181,13 @@ export async function getPartnerDashboardData({
       },
     }),
     db.referralAttribution.findMany({
-      where: { partnerProfileId },
+      where: {
+        partnerProfileId,
+        referredUser: {
+          deletedAt: null,
+          deletionStatus: AccountDeletionStatus.ACTIVE,
+        },
+      },
       orderBy: [{ lockedAt: "desc" }, { id: "desc" }],
       take: safePageSize,
       skip: (safeMemberPage - 1) * safePageSize,

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const page = Math.max(1, Number(url.searchParams.get("page") ?? "1") || 1);
     const pageSize = Math.min(50, Math.max(1, Number(url.searchParams.get("pageSize") ?? "24") || 24));
     const companies = await getDb().company.findMany({
-      where: { ownerUserId: user.id },
+      where: { ownerUserId: user.id, deletedAt: null },
       select: { id: true, companyRole: true },
     });
     const buyerCompanyIds = companies.filter((company) => company.companyRole === "buyer").map((company) => company.id);

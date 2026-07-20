@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       where: {
         ownerUserId: user.id,
         companyRole: "seller",
+        deletedAt: null,
       },
       select: {
         stripeCustomerId: true,

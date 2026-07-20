@@ -50,11 +50,15 @@ export async function GET(request: Request) {
         deals,
       ] = await Promise.all([
         getDb().product.findMany({
-          where: { sellerCompanyId: company.id },
+          where: { sellerCompanyId: company.id, deletedAt: null },
           select: { id: true, viewCount: true, status: true },
         }),
         getDb().inquiry.findMany({
-          where: { sellerCompanyId: company.id },
+          where: {
+            sellerCompanyId: company.id,
+            buyerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
           orderBy: { updatedAt: "desc" },
           take: 8,
           include: {
@@ -63,7 +67,13 @@ export async function GET(request: Request) {
             sender: { select: { avatarUrl: true } },
           },
         }),
-        getDb().inquiry.count({ where: { sellerCompanyId: company.id } }),
+        getDb().inquiry.count({
+          where: {
+            sellerCompanyId: company.id,
+            buyerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
+        }),
         getDb().companyReview.findMany({
           where: {
             reviewedCompanyId: company.id,
@@ -108,7 +118,10 @@ export async function GET(request: Request) {
           _avg: { rating: true },
         }),
         getDb().deal.findMany({
-          where: { sellerCompanyId: company.id },
+          where: {
+            sellerCompanyId: company.id,
+            buyerCompany: { deletedAt: null },
+          },
           select: {
             dealStatus: true,
             reviews: {
@@ -189,15 +202,27 @@ export async function GET(request: Request) {
       products,
     ] = await Promise.all([
       getDb().savedItem.findMany({
-        where: { userId: user.id, type: "product" },
+        where: {
+          userId: user.id,
+          type: "product",
+          product: { deletedAt: null, sellerCompany: { deletedAt: null } },
+        },
         orderBy: { createdAt: "desc" },
         take: 8,
       }),
       getDb().savedItem.count({
-        where: { userId: user.id, type: "product" },
+        where: {
+          userId: user.id,
+          type: "product",
+          product: { deletedAt: null, sellerCompany: { deletedAt: null } },
+        },
       }),
       getDb().inquiry.findMany({
-        where: { buyerCompanyId: company.id },
+        where: {
+          buyerCompanyId: company.id,
+          sellerCompany: { deletedAt: null },
+          product: { deletedAt: null },
+        },
         orderBy: { updatedAt: "desc" },
         take: 8,
         include: {
@@ -206,17 +231,29 @@ export async function GET(request: Request) {
           sender: { select: { avatarUrl: true } },
         },
       }),
-      getDb().inquiry.count({ where: { buyerCompanyId: company.id } }),
+      getDb().inquiry.count({
+        where: {
+          buyerCompanyId: company.id,
+          sellerCompany: { deletedAt: null },
+          product: { deletedAt: null },
+        },
+      }),
       getDb().deal.findMany({
-        where: { buyerCompanyId: company.id },
+        where: {
+          buyerCompanyId: company.id,
+          sellerCompany: { deletedAt: null },
+          product: { deletedAt: null },
+        },
         include: { reviews: { where: { reviewerCompanyId: company.id } } },
       }),
       getDb().product.findMany({
         where: {
           status: "active",
+          deletedAt: null,
           sellerCompany: {
             companyRole: "seller",
             verificationStatus: "verified",
+            deletedAt: null,
             legalName: { not: DELETED_COMPANY_NAME },
           },
         },

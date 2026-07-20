@@ -17,8 +17,8 @@ export default async function KoPartnerPage() {
 
   const profile = await getCurrentUserProfile();
   const partner = profile
-    ? await getDb().partnerProfile.findUnique({
-        where: { userId: profile.id },
+    ? await getDb().partnerProfile.findFirst({
+        where: { userId: profile.id, deletedAt: null },
         select: { status: true },
       })
     : null;

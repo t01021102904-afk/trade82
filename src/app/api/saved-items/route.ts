@@ -23,7 +23,18 @@ export async function GET() {
   try {
     const { user } = await requireSavedItemsAccess();
     const items = await getDb().savedItem.findMany({
-      where: { userId: user.id },
+      where: {
+        userId: user.id,
+        OR: [
+          {
+            product: {
+              deletedAt: null,
+              sellerCompany: { deletedAt: null },
+            },
+          },
+          { company: { deletedAt: null } },
+        ],
+      },
       include: {
         product: {
           include: {
@@ -130,7 +141,11 @@ async function resolveTarget(
           ? {}
           : {
               status: "active",
-              sellerCompany: { verificationStatus: "verified" },
+              deletedAt: null,
+              sellerCompany: {
+                verificationStatus: "verified",
+                deletedAt: null,
+              },
             }),
       },
       select: { id: true, name: true, imageUrl: true },
@@ -150,6 +165,7 @@ async function resolveTarget(
     where: {
       id: targetId,
       ...(admin ? {} : { verificationStatus: "verified" }),
+      deletedAt: null,
     },
     select: {
       id: true,

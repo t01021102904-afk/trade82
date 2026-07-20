@@ -25,6 +25,7 @@ export async function DashboardSettingsPage({
           where: {
             ownerUserId: profile.id,
             companyRole: "seller",
+            deletedAt: null,
           },
           select: {
             id: true,

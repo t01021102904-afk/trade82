@@ -16,8 +16,8 @@ export async function PartnerJoinPage({ locale }: { locale: Locale }) {
     redirect(`${withLocale("/signup", locale)}?redirect_url=${encodeURIComponent(destination)}`);
   }
 
-  const partner = await getDb().partnerProfile.findUnique({
-    where: { userId: profile.id },
+  const partner = await getDb().partnerProfile.findFirst({
+    where: { userId: profile.id, deletedAt: null },
     select: {
       status: true,
       legalName: true,

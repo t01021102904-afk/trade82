@@ -19,8 +19,8 @@ export async function GET() {
     const deals = await getDb().deal.findMany({
       where: {
         OR: [
-          { buyerCompany: { ownerUserId: user.id } },
-          { sellerCompany: { ownerUserId: user.id } },
+          { buyerCompany: { ownerUserId: user.id, deletedAt: null } },
+          { sellerCompany: { ownerUserId: user.id, deletedAt: null } },
         ],
       },
       include: {
@@ -68,8 +68,8 @@ export async function POST(request: Request) {
           where: {
             id: inquiryId,
             OR: [
-              { buyerCompany: { ownerUserId: user.id } },
-              { sellerCompany: { ownerUserId: user.id } },
+              { buyerCompany: { ownerUserId: user.id, deletedAt: null } },
+              { sellerCompany: { ownerUserId: user.id, deletedAt: null } },
             ],
           },
           include: { buyerCompany: true, sellerCompany: true },
@@ -81,7 +81,12 @@ export async function POST(request: Request) {
 
     const existingDeal = inquiryId
       ? await getDb().deal.findFirst({
-          where: { inquiryId },
+          where: {
+            inquiryId,
+            buyerCompany: { deletedAt: null },
+            sellerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
           include: {
             buyerCompany: true,
             sellerCompany: true,
@@ -101,6 +106,7 @@ export async function POST(request: Request) {
     const participant = await getDb().company.findFirst({
       where: {
         ownerUserId: user.id,
+        deletedAt: null,
         id: { in: [buyerCompanyId, sellerCompanyId] },
       },
     });

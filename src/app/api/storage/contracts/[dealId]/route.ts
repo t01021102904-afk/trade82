@@ -16,7 +16,13 @@ export async function GET(
     const user = await requireAuth();
     const { dealId: rawDealId } = await params;
     const dealId = idParam(rawDealId, "dealId");
-    const deal = await getDb().deal.findUnique({ where: { id: dealId } });
+    const deal = await getDb().deal.findFirst({
+      where: {
+        id: dealId,
+        buyerCompany: { deletedAt: null },
+        sellerCompany: { deletedAt: null },
+      },
+    });
     if (!deal?.contractFilePath) {
       return Response.json({ error: "Contract file not found" }, { status: 404 });
     }
@@ -24,6 +30,7 @@ export async function GET(
       where: {
         ownerUserId: user.id,
         id: { in: [deal.buyerCompanyId, deal.sellerCompanyId] },
+        deletedAt: null,
       },
       select: { id: true },
     });
