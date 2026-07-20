@@ -53,6 +53,7 @@ export type SettlementLegMinAggregateOutputType = {
   nextTransferAttemptAt: Date | null
   transferLastError: string | null
   transferLockedAt: Date | null
+  manualReviewRequired: boolean | null
   transferredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -75,6 +76,7 @@ export type SettlementLegMaxAggregateOutputType = {
   nextTransferAttemptAt: Date | null
   transferLastError: string | null
   transferLockedAt: Date | null
+  manualReviewRequired: boolean | null
   transferredAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -97,6 +99,7 @@ export type SettlementLegCountAggregateOutputType = {
   nextTransferAttemptAt: number
   transferLastError: number
   transferLockedAt: number
+  manualReviewRequired: number
   transferredAt: number
   createdAt: number
   updatedAt: number
@@ -131,6 +134,7 @@ export type SettlementLegMinAggregateInputType = {
   nextTransferAttemptAt?: true
   transferLastError?: true
   transferLockedAt?: true
+  manualReviewRequired?: true
   transferredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -153,6 +157,7 @@ export type SettlementLegMaxAggregateInputType = {
   nextTransferAttemptAt?: true
   transferLastError?: true
   transferLockedAt?: true
+  manualReviewRequired?: true
   transferredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -175,6 +180,7 @@ export type SettlementLegCountAggregateInputType = {
   nextTransferAttemptAt?: true
   transferLastError?: true
   transferLockedAt?: true
+  manualReviewRequired?: true
   transferredAt?: true
   createdAt?: true
   updatedAt?: true
@@ -284,6 +290,7 @@ export type SettlementLegGroupByOutputType = {
   nextTransferAttemptAt: Date | null
   transferLastError: string | null
   transferLockedAt: Date | null
+  manualReviewRequired: boolean
   transferredAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -329,6 +336,7 @@ export type SettlementLegWhereInput = {
   nextTransferAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   transferLastError?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   transferLockedAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
+  manualReviewRequired?: Prisma.BoolFilter<"SettlementLeg"> | boolean
   transferredAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
@@ -338,6 +346,7 @@ export type SettlementLegWhereInput = {
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
+  operationalAlerts?: Prisma.SettlementOperationalAlertListRelationFilter
 }
 
 export type SettlementLegOrderByWithRelationInput = {
@@ -357,6 +366,7 @@ export type SettlementLegOrderByWithRelationInput = {
   nextTransferAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   transferLastError?: Prisma.SortOrderInput | Prisma.SortOrder
   transferLockedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  manualReviewRequired?: Prisma.SortOrder
   transferredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -366,6 +376,7 @@ export type SettlementLegOrderByWithRelationInput = {
   partnerProfile?: Prisma.PartnerProfileOrderByWithRelationInput
   events?: Prisma.SettlementEventOrderByRelationAggregateInput
   reversals?: Prisma.SettlementReversalOrderByRelationAggregateInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertOrderByRelationAggregateInput
 }
 
 export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
@@ -390,6 +401,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   nextTransferAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   transferLastError?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   transferLockedAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
+  manualReviewRequired?: Prisma.BoolFilter<"SettlementLeg"> | boolean
   transferredAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
@@ -399,6 +411,7 @@ export type SettlementLegWhereUniqueInput = Prisma.AtLeast<{
   partnerProfile?: Prisma.XOR<Prisma.PartnerProfileNullableScalarRelationFilter, Prisma.PartnerProfileWhereInput> | null
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
+  operationalAlerts?: Prisma.SettlementOperationalAlertListRelationFilter
 }, "id" | "idempotencyKey" | "stripeTransferId" | "settlementId_type" | "settlementId_id">
 
 export type SettlementLegOrderByWithAggregationInput = {
@@ -418,6 +431,7 @@ export type SettlementLegOrderByWithAggregationInput = {
   nextTransferAttemptAt?: Prisma.SortOrderInput | Prisma.SortOrder
   transferLastError?: Prisma.SortOrderInput | Prisma.SortOrder
   transferLockedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  manualReviewRequired?: Prisma.SortOrder
   transferredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -448,6 +462,7 @@ export type SettlementLegScalarWhereWithAggregatesInput = {
   nextTransferAttemptAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementLeg"> | Date | string | null
   transferLastError?: Prisma.StringNullableWithAggregatesFilter<"SettlementLeg"> | string | null
   transferLockedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementLeg"> | Date | string | null
+  manualReviewRequired?: Prisma.BoolWithAggregatesFilter<"SettlementLeg"> | boolean
   transferredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SettlementLeg"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SettlementLeg"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SettlementLeg"> | Date | string
@@ -466,6 +481,7 @@ export type SettlementLegCreateInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -475,6 +491,7 @@ export type SettlementLegCreateInput = {
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateInput = {
@@ -494,11 +511,13 @@ export type SettlementLegUncheckedCreateInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUpdateInput = {
@@ -514,6 +533,7 @@ export type SettlementLegUpdateInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -523,6 +543,7 @@ export type SettlementLegUpdateInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateInput = {
@@ -542,11 +563,13 @@ export type SettlementLegUncheckedUpdateInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegCreateManyInput = {
@@ -566,6 +589,7 @@ export type SettlementLegCreateManyInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -584,6 +608,7 @@ export type SettlementLegUpdateManyMutationInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -606,6 +631,7 @@ export type SettlementLegUncheckedUpdateManyInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -648,6 +674,7 @@ export type SettlementLegCountOrderByAggregateInput = {
   nextTransferAttemptAt?: Prisma.SortOrder
   transferLastError?: Prisma.SortOrder
   transferLockedAt?: Prisma.SortOrder
+  manualReviewRequired?: Prisma.SortOrder
   transferredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -675,6 +702,7 @@ export type SettlementLegMaxOrderByAggregateInput = {
   nextTransferAttemptAt?: Prisma.SortOrder
   transferLastError?: Prisma.SortOrder
   transferLockedAt?: Prisma.SortOrder
+  manualReviewRequired?: Prisma.SortOrder
   transferredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -697,6 +725,7 @@ export type SettlementLegMinOrderByAggregateInput = {
   nextTransferAttemptAt?: Prisma.SortOrder
   transferLastError?: Prisma.SortOrder
   transferLockedAt?: Prisma.SortOrder
+  manualReviewRequired?: Prisma.SortOrder
   transferredAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -923,6 +952,22 @@ export type SettlementLegUpdateOneRequiredWithoutReversalsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementLegUpdateToOneWithWhereWithoutReversalsInput, Prisma.SettlementLegUpdateWithoutReversalsInput>, Prisma.SettlementLegUncheckedUpdateWithoutReversalsInput>
 }
 
+export type SettlementLegCreateNestedOneWithoutOperationalAlertsInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedCreateWithoutOperationalAlertsInput>
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutOperationalAlertsInput
+  connect?: Prisma.SettlementLegWhereUniqueInput
+}
+
+export type SettlementLegUpdateOneWithoutOperationalAlertsNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementLegCreateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedCreateWithoutOperationalAlertsInput>
+  connectOrCreate?: Prisma.SettlementLegCreateOrConnectWithoutOperationalAlertsInput
+  upsert?: Prisma.SettlementLegUpsertWithoutOperationalAlertsInput
+  disconnect?: Prisma.SettlementLegWhereInput | boolean
+  delete?: Prisma.SettlementLegWhereInput | boolean
+  connect?: Prisma.SettlementLegWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementLegUpdateToOneWithWhereWithoutOperationalAlertsInput, Prisma.SettlementLegUpdateWithoutOperationalAlertsInput>, Prisma.SettlementLegUncheckedUpdateWithoutOperationalAlertsInput>
+}
+
 export type SettlementLegCreateWithoutRecipientUserInput = {
   id?: string
   type: $Enums.SettlementLegType
@@ -936,6 +981,7 @@ export type SettlementLegCreateWithoutRecipientUserInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -944,6 +990,7 @@ export type SettlementLegCreateWithoutRecipientUserInput = {
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutRecipientUserInput = {
@@ -962,11 +1009,13 @@ export type SettlementLegUncheckedCreateWithoutRecipientUserInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutRecipientUserInput = {
@@ -1015,6 +1064,7 @@ export type SettlementLegScalarWhereInput = {
   nextTransferAttemptAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   transferLastError?: Prisma.StringNullableFilter<"SettlementLeg"> | string | null
   transferLockedAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
+  manualReviewRequired?: Prisma.BoolFilter<"SettlementLeg"> | boolean
   transferredAt?: Prisma.DateTimeNullableFilter<"SettlementLeg"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SettlementLeg"> | Date | string
@@ -1033,6 +1083,7 @@ export type SettlementLegCreateWithoutRecipientCompanyInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1041,6 +1092,7 @@ export type SettlementLegCreateWithoutRecipientCompanyInput = {
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutRecipientCompanyInput = {
@@ -1059,11 +1111,13 @@ export type SettlementLegUncheckedCreateWithoutRecipientCompanyInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutRecipientCompanyInput = {
@@ -1105,6 +1159,7 @@ export type SettlementLegCreateWithoutPartnerProfileInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1113,6 +1168,7 @@ export type SettlementLegCreateWithoutPartnerProfileInput = {
   recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutPartnerProfileInput = {
@@ -1131,11 +1187,13 @@ export type SettlementLegUncheckedCreateWithoutPartnerProfileInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutPartnerProfileInput = {
@@ -1177,6 +1235,7 @@ export type SettlementLegCreateWithoutSettlementInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1185,6 +1244,7 @@ export type SettlementLegCreateWithoutSettlementInput = {
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutSettlementInput = {
@@ -1203,11 +1263,13 @@ export type SettlementLegUncheckedCreateWithoutSettlementInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutSettlementInput = {
@@ -1249,6 +1311,7 @@ export type SettlementLegCreateWithoutEventsInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1257,6 +1320,7 @@ export type SettlementLegCreateWithoutEventsInput = {
   recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutEventsInput = {
@@ -1276,10 +1340,12 @@ export type SettlementLegUncheckedCreateWithoutEventsInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutEventsInput = {
@@ -1311,6 +1377,7 @@ export type SettlementLegUpdateWithoutEventsInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1319,6 +1386,7 @@ export type SettlementLegUpdateWithoutEventsInput = {
   recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutEventsInput = {
@@ -1338,10 +1406,12 @@ export type SettlementLegUncheckedUpdateWithoutEventsInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegCreateWithoutReversalsInput = {
@@ -1357,6 +1427,7 @@ export type SettlementLegCreateWithoutReversalsInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1365,6 +1436,7 @@ export type SettlementLegCreateWithoutReversalsInput = {
   recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
   partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegUncheckedCreateWithoutReversalsInput = {
@@ -1384,10 +1456,12 @@ export type SettlementLegUncheckedCreateWithoutReversalsInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementLegInput
 }
 
 export type SettlementLegCreateOrConnectWithoutReversalsInput = {
@@ -1419,6 +1493,7 @@ export type SettlementLegUpdateWithoutReversalsInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1427,6 +1502,7 @@ export type SettlementLegUpdateWithoutReversalsInput = {
   recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutReversalsInput = {
@@ -1446,10 +1522,128 @@ export type SettlementLegUncheckedUpdateWithoutReversalsInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
+}
+
+export type SettlementLegCreateWithoutOperationalAlertsInput = {
+  id?: string
+  type: $Enums.SettlementLegType
+  amount: number
+  currency?: string
+  holdUntil: Date | string
+  status?: $Enums.SettlementLegStatus
+  idempotencyKey: string
+  stripeTransferId?: string | null
+  transferAttemptCount?: number
+  nextTransferAttemptAt?: Date | string | null
+  transferLastError?: string | null
+  transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
+  transferredAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  settlement: Prisma.SettlementCreateNestedOneWithoutLegsInput
+  recipientCompany?: Prisma.CompanyCreateNestedOneWithoutSettlementLegRecipientsInput
+  recipientUser?: Prisma.UserProfileCreateNestedOneWithoutSettlementLegRecipientUsersInput
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementLegsInput
+  events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementLegInput
+  reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementLegInput
+}
+
+export type SettlementLegUncheckedCreateWithoutOperationalAlertsInput = {
+  id?: string
+  settlementId: string
+  type: $Enums.SettlementLegType
+  recipientCompanyId?: string | null
+  recipientUserId?: string | null
+  partnerProfileId?: string | null
+  amount: number
+  currency?: string
+  holdUntil: Date | string
+  status?: $Enums.SettlementLegStatus
+  idempotencyKey: string
+  stripeTransferId?: string | null
+  transferAttemptCount?: number
+  nextTransferAttemptAt?: Date | string | null
+  transferLastError?: string | null
+  transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
+  transferredAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementLegInput
+  reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementLegInput
+}
+
+export type SettlementLegCreateOrConnectWithoutOperationalAlertsInput = {
+  where: Prisma.SettlementLegWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementLegCreateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedCreateWithoutOperationalAlertsInput>
+}
+
+export type SettlementLegUpsertWithoutOperationalAlertsInput = {
+  update: Prisma.XOR<Prisma.SettlementLegUpdateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedUpdateWithoutOperationalAlertsInput>
+  create: Prisma.XOR<Prisma.SettlementLegCreateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedCreateWithoutOperationalAlertsInput>
+  where?: Prisma.SettlementLegWhereInput
+}
+
+export type SettlementLegUpdateToOneWithWhereWithoutOperationalAlertsInput = {
+  where?: Prisma.SettlementLegWhereInput
+  data: Prisma.XOR<Prisma.SettlementLegUpdateWithoutOperationalAlertsInput, Prisma.SettlementLegUncheckedUpdateWithoutOperationalAlertsInput>
+}
+
+export type SettlementLegUpdateWithoutOperationalAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementLegStatusFieldUpdateOperationsInput | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transferAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  settlement?: Prisma.SettlementUpdateOneRequiredWithoutLegsNestedInput
+  recipientCompany?: Prisma.CompanyUpdateOneWithoutSettlementLegRecipientsNestedInput
+  recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
+  events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
+  reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+}
+
+export type SettlementLegUncheckedUpdateWithoutOperationalAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  settlementId?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumSettlementLegTypeFieldUpdateOperationsInput | $Enums.SettlementLegType
+  recipientCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipientUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  partnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementLegStatusFieldUpdateOperationsInput | $Enums.SettlementLegStatus
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  stripeTransferId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transferAttemptCount?: Prisma.IntFieldUpdateOperationsInput | number
+  nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
+  reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegCreateManyRecipientUserInput = {
@@ -1468,6 +1662,7 @@ export type SettlementLegCreateManyRecipientUserInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1486,6 +1681,7 @@ export type SettlementLegUpdateWithoutRecipientUserInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1494,6 +1690,7 @@ export type SettlementLegUpdateWithoutRecipientUserInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutRecipientUserInput = {
@@ -1512,11 +1709,13 @@ export type SettlementLegUncheckedUpdateWithoutRecipientUserInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateManyWithoutRecipientUserInput = {
@@ -1535,6 +1734,7 @@ export type SettlementLegUncheckedUpdateManyWithoutRecipientUserInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1556,6 +1756,7 @@ export type SettlementLegCreateManyRecipientCompanyInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1574,6 +1775,7 @@ export type SettlementLegUpdateWithoutRecipientCompanyInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1582,6 +1784,7 @@ export type SettlementLegUpdateWithoutRecipientCompanyInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutRecipientCompanyInput = {
@@ -1600,11 +1803,13 @@ export type SettlementLegUncheckedUpdateWithoutRecipientCompanyInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateManyWithoutRecipientCompanyInput = {
@@ -1623,6 +1828,7 @@ export type SettlementLegUncheckedUpdateManyWithoutRecipientCompanyInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1644,6 +1850,7 @@ export type SettlementLegCreateManyPartnerProfileInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1662,6 +1869,7 @@ export type SettlementLegUpdateWithoutPartnerProfileInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1670,6 +1878,7 @@ export type SettlementLegUpdateWithoutPartnerProfileInput = {
   recipientUser?: Prisma.UserProfileUpdateOneWithoutSettlementLegRecipientUsersNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutPartnerProfileInput = {
@@ -1688,11 +1897,13 @@ export type SettlementLegUncheckedUpdateWithoutPartnerProfileInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateManyWithoutPartnerProfileInput = {
@@ -1711,6 +1922,7 @@ export type SettlementLegUncheckedUpdateManyWithoutPartnerProfileInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1732,6 +1944,7 @@ export type SettlementLegCreateManySettlementInput = {
   nextTransferAttemptAt?: Date | string | null
   transferLastError?: string | null
   transferLockedAt?: Date | string | null
+  manualReviewRequired?: boolean
   transferredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1750,6 +1963,7 @@ export type SettlementLegUpdateWithoutSettlementInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1758,6 +1972,7 @@ export type SettlementLegUpdateWithoutSettlementInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementLegsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateWithoutSettlementInput = {
@@ -1776,11 +1991,13 @@ export type SettlementLegUncheckedUpdateWithoutSettlementInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementLegNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementLegNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementLegNestedInput
 }
 
 export type SettlementLegUncheckedUpdateManyWithoutSettlementInput = {
@@ -1799,6 +2016,7 @@ export type SettlementLegUncheckedUpdateManyWithoutSettlementInput = {
   nextTransferAttemptAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   transferLastError?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   transferLockedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  manualReviewRequired?: Prisma.BoolFieldUpdateOperationsInput | boolean
   transferredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1812,11 +2030,13 @@ export type SettlementLegUncheckedUpdateManyWithoutSettlementInput = {
 export type SettlementLegCountOutputType = {
   events: number
   reversals: number
+  operationalAlerts: number
 }
 
 export type SettlementLegCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   events?: boolean | SettlementLegCountOutputTypeCountEventsArgs
   reversals?: boolean | SettlementLegCountOutputTypeCountReversalsArgs
+  operationalAlerts?: boolean | SettlementLegCountOutputTypeCountOperationalAlertsArgs
 }
 
 /**
@@ -1843,6 +2063,13 @@ export type SettlementLegCountOutputTypeCountReversalsArgs<ExtArgs extends runti
   where?: Prisma.SettlementReversalWhereInput
 }
 
+/**
+ * SettlementLegCountOutputType without action
+ */
+export type SettlementLegCountOutputTypeCountOperationalAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SettlementOperationalAlertWhereInput
+}
+
 
 export type SettlementLegSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1861,6 +2088,7 @@ export type SettlementLegSelect<ExtArgs extends runtime.Types.Extensions.Interna
   nextTransferAttemptAt?: boolean
   transferLastError?: boolean
   transferLockedAt?: boolean
+  manualReviewRequired?: boolean
   transferredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1870,6 +2098,7 @@ export type SettlementLegSelect<ExtArgs extends runtime.Types.Extensions.Interna
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
   events?: boolean | Prisma.SettlementLeg$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.SettlementLeg$reversalsArgs<ExtArgs>
+  operationalAlerts?: boolean | Prisma.SettlementLeg$operationalAlertsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementLegCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settlementLeg"]>
 
@@ -1890,6 +2119,7 @@ export type SettlementLegSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   nextTransferAttemptAt?: boolean
   transferLastError?: boolean
   transferLockedAt?: boolean
+  manualReviewRequired?: boolean
   transferredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1916,6 +2146,7 @@ export type SettlementLegSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   nextTransferAttemptAt?: boolean
   transferLastError?: boolean
   transferLockedAt?: boolean
+  manualReviewRequired?: boolean
   transferredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1942,12 +2173,13 @@ export type SettlementLegSelectScalar = {
   nextTransferAttemptAt?: boolean
   transferLastError?: boolean
   transferLockedAt?: boolean
+  manualReviewRequired?: boolean
   transferredAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SettlementLegOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "type" | "recipientCompanyId" | "recipientUserId" | "partnerProfileId" | "amount" | "currency" | "holdUntil" | "status" | "idempotencyKey" | "stripeTransferId" | "transferAttemptCount" | "nextTransferAttemptAt" | "transferLastError" | "transferLockedAt" | "transferredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["settlementLeg"]>
+export type SettlementLegOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "type" | "recipientCompanyId" | "recipientUserId" | "partnerProfileId" | "amount" | "currency" | "holdUntil" | "status" | "idempotencyKey" | "stripeTransferId" | "transferAttemptCount" | "nextTransferAttemptAt" | "transferLastError" | "transferLockedAt" | "manualReviewRequired" | "transferredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["settlementLeg"]>
 export type SettlementLegInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   recipientCompany?: boolean | Prisma.SettlementLeg$recipientCompanyArgs<ExtArgs>
@@ -1955,6 +2187,7 @@ export type SettlementLegInclude<ExtArgs extends runtime.Types.Extensions.Intern
   partnerProfile?: boolean | Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>
   events?: boolean | Prisma.SettlementLeg$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.SettlementLeg$reversalsArgs<ExtArgs>
+  operationalAlerts?: boolean | Prisma.SettlementLeg$operationalAlertsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementLegCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SettlementLegIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1979,6 +2212,7 @@ export type $SettlementLegPayload<ExtArgs extends runtime.Types.Extensions.Inter
     partnerProfile: Prisma.$PartnerProfilePayload<ExtArgs> | null
     events: Prisma.$SettlementEventPayload<ExtArgs>[]
     reversals: Prisma.$SettlementReversalPayload<ExtArgs>[]
+    operationalAlerts: Prisma.$SettlementOperationalAlertPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1997,6 +2231,7 @@ export type $SettlementLegPayload<ExtArgs extends runtime.Types.Extensions.Inter
     nextTransferAttemptAt: Date | null
     transferLastError: string | null
     transferLockedAt: Date | null
+    manualReviewRequired: boolean
     transferredAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -2400,6 +2635,7 @@ export interface Prisma__SettlementLegClient<T, Null = never, ExtArgs extends ru
   partnerProfile<T extends Prisma.SettlementLeg$partnerProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$partnerProfileArgs<ExtArgs>>): Prisma.Prisma__PartnerProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   events<T extends Prisma.SettlementLeg$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reversals<T extends Prisma.SettlementLeg$reversalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$reversalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementReversalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  operationalAlerts<T extends Prisma.SettlementLeg$operationalAlertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SettlementLeg$operationalAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementOperationalAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2445,6 +2681,7 @@ export interface SettlementLegFieldRefs {
   readonly nextTransferAttemptAt: Prisma.FieldRef<"SettlementLeg", 'DateTime'>
   readonly transferLastError: Prisma.FieldRef<"SettlementLeg", 'String'>
   readonly transferLockedAt: Prisma.FieldRef<"SettlementLeg", 'DateTime'>
+  readonly manualReviewRequired: Prisma.FieldRef<"SettlementLeg", 'Boolean'>
   readonly transferredAt: Prisma.FieldRef<"SettlementLeg", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"SettlementLeg", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"SettlementLeg", 'DateTime'>
@@ -2951,6 +3188,30 @@ export type SettlementLeg$reversalsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.SettlementReversalScalarFieldEnum | Prisma.SettlementReversalScalarFieldEnum[]
+}
+
+/**
+ * SettlementLeg.operationalAlerts
+ */
+export type SettlementLeg$operationalAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SettlementOperationalAlert
+   */
+  select?: Prisma.SettlementOperationalAlertSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SettlementOperationalAlert
+   */
+  omit?: Prisma.SettlementOperationalAlertOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementOperationalAlertInclude<ExtArgs> | null
+  where?: Prisma.SettlementOperationalAlertWhereInput
+  orderBy?: Prisma.SettlementOperationalAlertOrderByWithRelationInput | Prisma.SettlementOperationalAlertOrderByWithRelationInput[]
+  cursor?: Prisma.SettlementOperationalAlertWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SettlementOperationalAlertScalarFieldEnum | Prisma.SettlementOperationalAlertScalarFieldEnum[]
 }
 
 /**

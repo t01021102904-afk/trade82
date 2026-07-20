@@ -75,6 +75,7 @@ type SettlementCopy = {
 type Settlement = {
   id: string;
   status: string;
+  paymentFlow: "SCT" | "DIRECT_CHARGE";
   currency: string;
   grossAmount: number;
   sellerPayableAmount: number;
@@ -103,6 +104,7 @@ type Settlement = {
     nextTransferAttemptAt: string | null;
     transferLastError: string | null;
     transferLockedAt: string | null;
+    manualReviewRequired: boolean;
     recipientCompany: { legalName: string; tradeName: string | null } | null;
     partnerProfile: { referralCode: string } | null;
   }>;
@@ -397,7 +399,10 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
               <p className="text-sm font-semibold theme-foreground">{copy.order} {settlement.tradeOrder.orderNumber}</p>
               <p className="mt-1 text-sm theme-muted">{copy.buyer}: {settlement.tradeOrder.buyerCompanyName} · {copy.seller}: {settlement.tradeOrder.sellerCompanyName}</p>
             </div>
-            <span className="border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700">{settlement.status}</span>
+            <div className="flex flex-wrap gap-2">
+              <span className="border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700">{settlement.paymentFlow === "DIRECT_CHARGE" ? "Direct Charge" : "Legacy SCT"}</span>
+              <span className="border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-700">{settlement.status}</span>
+            </div>
           </div>
 
           <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
@@ -422,7 +427,9 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
                   <span>{leg.type} · {money(leg.amount, leg.currency)}</span>
                   <span className="inline-flex items-center gap-2 text-xs theme-muted">
                     <span>{leg.status}</span>
-                    {(leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL")
+                    {settlement.paymentFlow === "SCT"
+                      && !leg.manualReviewRequired
+                      && (leg.type === "SELLER_PAYABLE" || leg.type === "PARTNER_REFERRAL")
                       && (leg.status === "READY" || isStaleTransferPending(leg, new Date())) ? (
                       <button
                         type="button"
@@ -449,11 +456,12 @@ export function AdminSettlementManagement({ copy }: { copy: SettlementCopy }) {
                   const stale = isStaleSettlementReversal(reversal, new Date());
                   const retryDue = !reversal.nextReversalAttemptAt || Date.parse(reversal.nextReversalAttemptAt) <= Date.now();
                   const lockActive = Boolean(reversal.reversalLockedAt && Date.parse(reversal.reversalLockedAt) > Date.now() - 10 * 60 * 1000);
-                  const canExecute = reversal.status === "PENDING" && remaining > 0 && retryDue && !lockActive;
+                  const canExecute = settlement.paymentFlow === "SCT" && reversal.status === "PENDING" && remaining > 0 && retryDue && !lockActive;
                   const canRequeue = (reversal.status === "FAILED" || reversal.status === "NEEDS_MANUAL_REVIEW")
                     && remaining > 0
                     && Boolean(reversal.originalStripeTransferId)
-                    && !lockActive;
+                    && !lockActive
+                    && settlement.paymentFlow === "SCT";
                   return (
                     <div key={reversal.id} className="grid gap-1 text-xs theme-muted sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                       <div>

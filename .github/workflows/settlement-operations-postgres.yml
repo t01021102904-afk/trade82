@@ -1,0 +1,114 @@
+name: Settlement operations PostgreSQL
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      STRIPE_SECRET_KEY: sk_test_ci_fixture
+      STRIPE_CONNECT_RUNTIME_MODE: test
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate Prisma client
+        run: |
+          npx prisma generate
+          npx prisma validate
+
+      - name: Create Supabase compatibility roles
+        run: |
+          psql -v ON_ERROR_STOP=1 -d postgres <<'SQL'
+          DO $$
+          BEGIN
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_roles WHERE rolname = 'anon'
+            ) THEN
+              CREATE ROLE anon NOLOGIN;
+            END IF;
+
+            IF NOT EXISTS (
+              SELECT 1 FROM pg_roles WHERE rolname = 'authenticated'
+            ) THEN
+              CREATE ROLE authenticated NOLOGIN;
+            END IF;
+          END
+          $$;
+          SQL
+
+      - name: Create isolated databases
+        run: |
+          set -eu
+          for database in \
+            trade82_settlement_operations_test_ci \
+            trade82_settlement_operations_worker_test_ci \
+            trade82_order_payout_test_ci; do
+            psql -v ON_ERROR_STOP=1 -d postgres -c "CREATE DATABASE \"$database\";"
+          done
+
+      - name: Apply full migration history to each isolated database
+        run: |
+          set -eu
+          for database in \
+            trade82_settlement_operations_test_ci \
+            trade82_settlement_operations_worker_test_ci \
+            trade82_order_payout_test_ci; do
+            DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/$database?schema=public" npx prisma migrate deploy
+          done
+
+      - name: Run catalog integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_settlement_operations_test_ci?schema=public
+        run: npm run test:settlement-operations:catalog
+
+      - name: Run worker integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_settlement_operations_worker_test_ci?schema=public
+        run: npm run test:settlement-operations:workers
+
+      - name: Run order and payout integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
+        run: npm run test:orders:integration
+
+      - name: Run application tests
+        run: npm test
+
+      - name: Lint and typecheck
+        run: |
+          npm run lint
+          npx tsc --noEmit
+
+      - name: Check patch formatting
+        run: git diff --check

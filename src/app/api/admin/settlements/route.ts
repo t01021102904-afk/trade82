@@ -11,6 +11,7 @@ export async function GET() {
       select: {
         id: true,
         status: true,
+        paymentFlow: true,
         currency: true,
         grossAmount: true,
         sellerPayableAmount: true,
@@ -49,6 +50,7 @@ export async function GET() {
             nextTransferAttemptAt: true,
             transferLastError: true,
             transferLockedAt: true,
+            manualReviewRequired: true,
             recipientCompany: { select: { legalName: true, tradeName: true } },
             partnerProfile: { select: { referralCode: true } },
           },

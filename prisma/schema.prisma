@@ -371,6 +371,53 @@ enum SettlementStatus {
   CANCELLED
 }
 
+enum SettlementPaymentFlow {
+  SCT
+  DIRECT_CHARGE
+}
+
+enum SettlementWorkerType {
+  TRANSFER
+  REVERSAL
+  STALE_RECOVERY
+  METRIC_SNAPSHOT
+}
+
+enum SettlementWorkerRunStatus {
+  RUNNING
+  SUCCEEDED
+  PARTIALLY_FAILED
+  FAILED
+  SKIPPED
+}
+
+enum SettlementOperationalAlertType {
+  TRANSFER_RETRY_EXHAUSTED
+  REVERSAL_RETRY_EXHAUSTED
+  TRANSFER_NEEDS_MANUAL_REVIEW
+  REVERSAL_NEEDS_MANUAL_REVIEW
+  STALE_TRANSFER_CLAIM
+  STALE_REVERSAL_CLAIM
+  WORKER_FAILED
+  WORKER_PARTIALLY_FAILED
+  LONG_PENDING_TRANSFER
+  LONG_PENDING_REVERSAL
+  DISPUTE_OPEN_WITH_READY_TRANSFER
+  REFUND_WITH_UNREVERSED_TRANSFER
+}
+
+enum SettlementOperationalAlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum SettlementOperationalAlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
 enum SettlementLegType {
   SELLER_PAYABLE
   PARTNER_REFERRAL
@@ -487,6 +534,7 @@ model UserProfile {
   referredReferralAttribution    ReferralAttribution?            @relation("ReferredUserAttribution")
   consumedReferralClaimTokens    ReferralClaimToken[]            @relation("ReferralClaimConsumedByUser")
   settlementLegRecipientUsers    SettlementLeg[]                 @relation("SettlementLegRecipientUser")
+  acknowledgedSettlementAlerts   SettlementOperationalAlert[]    @relation("SettlementOperationalAlertAcknowledgedBy")
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
 
@@ -1099,36 +1147,38 @@ model SellerStripeMerchantAccount {
 }
 
 model Settlement {
-  id                                    String               @id @default(cuid())
-  paymentRequestId                      String               @unique
-  paymentRequest                        PaymentRequest       @relation("PaymentRequestConnectSettlement", fields: [paymentRequestId], references: [id], onDelete: Restrict)
-  tradeOrderId                          String               @unique
-  tradeOrder                            TradeOrder           @relation("TradeOrderConnectSettlement", fields: [tradeOrderId], references: [id], onDelete: Restrict)
+  id                                    String                       @id @default(cuid())
+  paymentRequestId                      String                       @unique
+  paymentRequest                        PaymentRequest               @relation("PaymentRequestConnectSettlement", fields: [paymentRequestId], references: [id], onDelete: Restrict)
+  tradeOrderId                          String                       @unique
+  tradeOrder                            TradeOrder                   @relation("TradeOrderConnectSettlement", fields: [tradeOrderId], references: [id], onDelete: Restrict)
   referralAttributionId                 String?
-  referralAttribution                   ReferralAttribution? @relation(fields: [referralAttributionId], references: [id], onDelete: Restrict)
+  referralAttribution                   ReferralAttribution?         @relation(fields: [referralAttributionId], references: [id], onDelete: Restrict)
   referralPartnerProfileId              String?
-  referralPartnerProfile                PartnerProfile?      @relation("SettlementReferralPartnerProfile", fields: [referralPartnerProfileId], references: [id], onDelete: Restrict)
+  referralPartnerProfile                PartnerProfile?              @relation("SettlementReferralPartnerProfile", fields: [referralPartnerProfileId], references: [id], onDelete: Restrict)
   referralCodeSnapshot                  String?
   referralSubjectType                   ReferralSubjectType?
   referredUserIdSnapshot                String?
   grossAmount                           Int
   platformFeeAmount                     Int
   sellerPayableAmount                   Int
-  partnerReferralAmount                 Int                  @default(0)
+  partnerReferralAmount                 Int                          @default(0)
   trade82RetainedAmountBeforeStripeFees Int
-  currency                              String               @default("usd")
+  currency                              String                       @default("usd")
+  paymentFlow                           SettlementPaymentFlow        @default(SCT)
   holdUntil                             DateTime
-  status                                SettlementStatus     @default(HOLD)
+  status                                SettlementStatus             @default(HOLD)
   approvedAt                            DateTime?
   approvedByUserId                      String?
-  approvedByUser                        UserProfile?         @relation("SettlementApprovedBy", fields: [approvedByUserId], references: [id], onDelete: SetNull)
-  holdReason                            String?              @db.VarChar(1000)
-  idempotencyKey                        String               @unique
+  approvedByUser                        UserProfile?                 @relation("SettlementApprovedBy", fields: [approvedByUserId], references: [id], onDelete: SetNull)
+  holdReason                            String?                      @db.VarChar(1000)
+  idempotencyKey                        String                       @unique
   legs                                  SettlementLeg[]
   events                                SettlementEvent[]
   reversals                             SettlementReversal[]
-  createdAt                             DateTime             @default(now())
-  updatedAt                             DateTime             @updatedAt
+  operationalAlerts                     SettlementOperationalAlert[]
+  createdAt                             DateTime                     @default(now())
+  updatedAt                             DateTime                     @updatedAt
 
   @@index([status, holdUntil])
   @@index([approvedByUserId])
@@ -1137,31 +1187,33 @@ model Settlement {
 }
 
 model SettlementLeg {
-  id                    String               @id @default(cuid())
+  id                    String                       @id @default(cuid())
   settlementId          String
-  settlement            Settlement           @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  settlement            Settlement                   @relation(fields: [settlementId], references: [id], onDelete: Restrict)
   type                  SettlementLegType
   recipientCompanyId    String?
-  recipientCompany      Company?             @relation("SettlementLegRecipientCompany", fields: [recipientCompanyId], references: [id], onDelete: Restrict)
+  recipientCompany      Company?                     @relation("SettlementLegRecipientCompany", fields: [recipientCompanyId], references: [id], onDelete: Restrict)
   recipientUserId       String?
-  recipientUser         UserProfile?         @relation("SettlementLegRecipientUser", fields: [recipientUserId], references: [id], onDelete: Restrict)
+  recipientUser         UserProfile?                 @relation("SettlementLegRecipientUser", fields: [recipientUserId], references: [id], onDelete: Restrict)
   partnerProfileId      String?
-  partnerProfile        PartnerProfile?      @relation("SettlementLegPartnerProfile", fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  partnerProfile        PartnerProfile?              @relation("SettlementLegPartnerProfile", fields: [partnerProfileId], references: [id], onDelete: Restrict)
   amount                Int
-  currency              String               @default("usd")
+  currency              String                       @default("usd")
   holdUntil             DateTime
-  status                SettlementLegStatus  @default(HOLD)
-  idempotencyKey        String               @unique
-  stripeTransferId      String?              @unique
-  transferAttemptCount  Int                  @default(0)
+  status                SettlementLegStatus          @default(HOLD)
+  idempotencyKey        String                       @unique
+  stripeTransferId      String?                      @unique
+  transferAttemptCount  Int                          @default(0)
   nextTransferAttemptAt DateTime?
-  transferLastError     String?              @db.VarChar(1000)
+  transferLastError     String?                      @db.VarChar(1000)
   transferLockedAt      DateTime?
+  manualReviewRequired  Boolean                      @default(false)
   transferredAt         DateTime?
   events                SettlementEvent[]
-  reversals             SettlementReversal[] @relation("SettlementReversalSettlementLeg")
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
+  reversals             SettlementReversal[]         @relation("SettlementReversalSettlementLeg")
+  operationalAlerts     SettlementOperationalAlert[]
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
 
   @@unique([settlementId, type])
   @@unique([settlementId, id])
@@ -1215,6 +1267,7 @@ model SettlementReversal {
   reversalLastError          String?                       @db.VarChar(1000)
   reversalLockedAt           DateTime?
   completedAt                DateTime?
+  operationalAlerts          SettlementOperationalAlert[]
   createdAt                  DateTime                      @default(now())
 
   @@unique([stripeRefundId, settlementLegId])
@@ -1224,6 +1277,63 @@ model SettlementReversal {
   @@index([settlementLegId, createdAt])
   @@index([status, nextReversalAttemptAt])
   @@index([sourceType, stripeSourceObjectId, settlementLegId])
+}
+
+model SettlementWorkerRun {
+  id                  String                       @id @default(cuid())
+  workerType          SettlementWorkerType
+  executionMode       String
+  status              SettlementWorkerRunStatus    @default(RUNNING)
+  startedAt           DateTime                     @default(now())
+  completedAt         DateTime?
+  scannedCount        Int                          @default(0)
+  claimedCount        Int                          @default(0)
+  succeededCount      Int                          @default(0)
+  failedCount         Int                          @default(0)
+  skippedCount        Int                          @default(0)
+  manualReviewCount   Int                          @default(0)
+  staleRecoveredCount Int                          @default(0)
+  durationMs          Int?
+  sanitizedErrorCode  String?                      @db.VarChar(64)
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  operationalAlerts   SettlementOperationalAlert[]
+
+  @@index([workerType, status, startedAt])
+  @@index([status, startedAt])
+}
+
+model SettlementOperationalAlert {
+  id                   String                             @id @default(cuid())
+  alertType            SettlementOperationalAlertType
+  severity             SettlementOperationalAlertSeverity
+  status               SettlementOperationalAlertStatus   @default(OPEN)
+  settlementId         String?
+  settlement           Settlement?                        @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  settlementLegId      String?
+  settlementLeg        SettlementLeg?                     @relation(fields: [settlementLegId], references: [id], onDelete: Restrict)
+  settlementReversalId String?
+  settlementReversal   SettlementReversal?                @relation(fields: [settlementReversalId], references: [id], onDelete: Restrict)
+  workerRunId          String?
+  workerRun            SettlementWorkerRun?               @relation(fields: [workerRunId], references: [id], onDelete: SetNull)
+  title                String
+  sanitizedMessage     String                             @db.VarChar(1000)
+  occurrenceCount      Int                                @default(1)
+  firstOccurredAt      DateTime                           @default(now())
+  lastOccurredAt       DateTime                           @default(now())
+  acknowledgedAt       DateTime?
+  acknowledgedByUserId String?
+  acknowledgedByUser   UserProfile?                       @relation("SettlementOperationalAlertAcknowledgedBy", fields: [acknowledgedByUserId], references: [id], onDelete: SetNull)
+  resolvedAt           DateTime?
+  deduplicationKey     String                             @unique
+  createdAt            DateTime                           @default(now())
+  updatedAt            DateTime                           @updatedAt
+
+  @@index([status, severity, lastOccurredAt])
+  @@index([settlementId, status])
+  @@index([settlementLegId, status])
+  @@index([settlementReversalId, status])
+  @@index([workerRunId])
 }
 
 // Financial order records deliberately use restrictive foreign keys. Historical

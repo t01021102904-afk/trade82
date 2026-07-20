@@ -7,6 +7,7 @@ import {
   FIRST_APPROVED_MIGRATION,
   LEGACY_ZERO_STEP_MIGRATIONS,
   MERCHANT_MIGRATION,
+  OPERATIONS_MIGRATION,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
   formatDiagnostic,
@@ -19,7 +20,7 @@ import {
 const directUrl = `postgresql://postgres:credential-placeholder@db.${EXPECTED_SUPABASE_PROJECT}.supabase.co:5432/postgres`;
 const poolerUrl = `postgresql://postgres.${EXPECTED_SUPABASE_PROJECT}:credential-placeholder@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
 const localMigrations = readLocalMigrationNames();
-const approvedNames = new Set(APPROVED_PRODUCTION_MIGRATION_BATCH);
+const approvedNames = new Set([...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION]);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
 function record(migrationName, overrides = {}) {
@@ -42,6 +43,7 @@ const historicalRecords = historicalMigrationNames.map((name) => (
 const appliedFirst = record(FIRST_APPROVED_MIGRATION);
 const appliedTarget = record(TARGET_MIGRATION);
 const appliedMerchant = record(MERCHANT_MIGRATION);
+const appliedOperations = record(OPERATIONS_MIGRATION);
 
 function legacySchemaEvidence(overrides = {}) {
   return {
@@ -161,8 +163,36 @@ function merchantSchema(overrides = {}) {
   };
 }
 
-function merchantInitialState(overrides = {}) {
-  return { merchant_zero_rows: true, ...overrides };
+function operationsPreflight(overrides = {}) {
+  return {
+    operations_payment_flow_absent: true,
+    operations_leg_manual_review_absent: true,
+    operations_tables_absent: true,
+    operations_enum_types_absent: true,
+    ...overrides,
+  };
+}
+
+function operationsSchema(overrides = {}) {
+  return {
+    operations_enum_types: true,
+    operations_enum_values: true,
+    operations_payment_flow_column: true,
+    operations_leg_manual_review: true,
+    operations_tables: true,
+    operations_worker_columns: true,
+    operations_alert_columns: true,
+    operations_indexes: true,
+    operations_constraints: true,
+    operations_restrictive_fks: true,
+    operations_rls: true,
+    operations_public_access_revoked: true,
+    ...overrides,
+  };
+}
+
+function operationsInitialState(overrides = {}) {
+  return { operations_worker_run_zero_rows: true, operations_alert_zero_rows: true, ...overrides };
 }
 
 function fakeClient(responses) {
@@ -198,26 +228,8 @@ function deploymentResponses(afterRecords = [
   appliedFirst,
   appliedTarget,
   appliedMerchant,
+  appliedOperations,
 ]) {
-  return [
-    [...historicalRecords, appliedFirst, appliedTarget],
-    [legacySchemaEvidence()],
-    [prerequisiteSchema()],
-    [targetSchema()],
-    [firstSchema()],
-    [secondSchema()],
-    [merchantPreflight()],
-    afterRecords,
-    [prerequisiteSchema()],
-    [targetSchema()],
-    [firstSchema()],
-    [secondSchema()],
-    [merchantSchema()],
-    [merchantInitialState()],
-  ];
-}
-
-function completedResponses() {
   return [
     [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant],
     [legacySchemaEvidence()],
@@ -226,6 +238,28 @@ function completedResponses() {
     [firstSchema()],
     [secondSchema()],
     [merchantSchema()],
+    [operationsPreflight()],
+    afterRecords,
+    [prerequisiteSchema()],
+    [targetSchema()],
+    [firstSchema()],
+    [secondSchema()],
+    [merchantSchema()],
+    [operationsSchema()],
+    [operationsInitialState()],
+  ];
+}
+
+function completedResponses() {
+  return [
+    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations],
+    [legacySchemaEvidence()],
+    [prerequisiteSchema()],
+    [targetSchema()],
+    [firstSchema()],
+    [secondSchema()],
+    [merchantSchema()],
+    [operationsSchema()],
   ];
 }
 
@@ -254,13 +288,14 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved batch is the final three-migration suffix", () => {
+test("the approved batch is followed only by the operations migration", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-1), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-2), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-1), OPERATIONS_MIGRATION);
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {
@@ -302,7 +337,7 @@ test("database connection failures identify the selected source without exposing
   }), { stage: "database_connection", source: "DIRECT_URL", code: "ECONNREFUSED" });
 });
 
-test("only old reversals applied with merchant pending runs the allowlisted migration", async () => {
+test("only approved migrations applied with operations pending runs the allowlisted migration", async () => {
   const fake = fakeClient(deploymentResponses());
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
@@ -310,11 +345,11 @@ test("only old reversals applied with merchant pending runs the allowlisted migr
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 14);
+  assert.equal(fake.calls.query, 16);
   assert.equal(fake.calls.end, 1);
 });
 
-test("all three approved migrations applied skips Prisma after complete verification", async () => {
+test("all approved migrations applied skips Prisma after complete verification", async () => {
   const fake = fakeClient(completedResponses());
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
@@ -322,7 +357,7 @@ test("all three approved migrations applied skips Prisma after complete verifica
   }));
   assert.equal(result, "already-applied");
   assert.equal(deploys, 0);
-  assert.equal(fake.calls.query, 7);
+  assert.equal(fake.calls.query, 8);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -397,6 +432,34 @@ test("failed, rolled-back, duplicate, unknown, and target zero-step records fail
   })), { stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch" });
 });
 
+test("operations migration records are strict and legitimate operational rows do not alter the applied path", async () => {
+  for (const invalidRecord of [
+    zeroStepRecord(OPERATIONS_MIGRATION),
+    record(OPERATIONS_MIGRATION, { finished_at: null }),
+    record(OPERATIONS_MIGRATION, { rolled_back_at: new Date() }),
+  ]) {
+    const fake = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, invalidRecord], [legacySchemaEvidence()]]);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake)), {
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
+    });
+    assert.equal(fake.calls.end, 1);
+  }
+
+  const duplicate = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedOperations]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(duplicate)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "unknown",
+  });
+
+  const reordered = fakeClient([[...historicalRecords, appliedFirst, appliedTarget, appliedOperations, appliedMerchant], [legacySchemaEvidence()]]);
+  await assertDiagnostic(runProductionMigrations(productionOptions(reordered)), {
+    stage: "migration_state_evaluation", source: "DIRECT_URL", code: "pending_set_mismatch",
+  });
+
+  const completed = fakeClient(completedResponses());
+  assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
+  assert.equal(completed.calls.query, 8, "already-applied verification must not require an empty operational catalog");
+});
+
 test("merchant preflight fails closed for each fixed evidence field", async () => {
   const keys = [
     "merchant_company_table",
@@ -443,7 +506,7 @@ test("merchant post-verification fails closed for each schema field", async () =
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[12] = [merchantSchema({ [key]: false })];
+    responses[13] = [merchantSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -477,9 +540,9 @@ test("target preflight fails closed for each newly required dependency field", a
   }
 });
 
-test("merchant initial state is checked only after a new deployment", async () => {
+test("operations deployment does not require merchant zero rows, while new operations rows fail initial-state verification", async () => {
   const responses = deploymentResponses();
-  responses[13] = [merchantInitialState({ merchant_zero_rows: false })];
+  responses[15] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
   const fake = fakeClient(responses);
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => {},
@@ -489,7 +552,7 @@ test("merchant initial state is checked only after a new deployment", async () =
 
   const completed = fakeClient(completedResponses());
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
-  assert.equal(completed.calls.query, 7);
+  assert.equal(completed.calls.query, 8);
 });
 
 test("legacy zero-step migrations remain accepted only with complete evidence", async () => {
@@ -504,7 +567,7 @@ test("legacy zero-step migrations remain accepted only with complete evidence", 
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
 
   const missingEvidence = fakeClient([
-    [...historicalRecords, appliedFirst, appliedTarget],
+    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant],
     [legacySchemaEvidence({ deal_status_in_progress: false })],
   ]);
   await assertDiagnostic(runProductionMigrations(productionOptions(missingEvidence)), {
@@ -514,7 +577,7 @@ test("legacy zero-step migrations remain accepted only with complete evidence", 
 
 test("approved migrations require exactly one applied step after deploy", async () => {
   for (const migrationName of APPROVED_PRODUCTION_MIGRATION_BATCH) {
-    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant];
+    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations];
     const index = afterRecords.findIndex((entry) => entry.migration_name === migrationName);
     afterRecords[index] = zeroStepRecord(migrationName);
     const fake = fakeClient(deploymentResponses(afterRecords));

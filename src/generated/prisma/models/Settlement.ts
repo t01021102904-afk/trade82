@@ -57,6 +57,7 @@ export type SettlementMinAggregateOutputType = {
   partnerReferralAmount: number | null
   trade82RetainedAmountBeforeStripeFees: number | null
   currency: string | null
+  paymentFlow: $Enums.SettlementPaymentFlow | null
   holdUntil: Date | null
   status: $Enums.SettlementStatus | null
   approvedAt: Date | null
@@ -82,6 +83,7 @@ export type SettlementMaxAggregateOutputType = {
   partnerReferralAmount: number | null
   trade82RetainedAmountBeforeStripeFees: number | null
   currency: string | null
+  paymentFlow: $Enums.SettlementPaymentFlow | null
   holdUntil: Date | null
   status: $Enums.SettlementStatus | null
   approvedAt: Date | null
@@ -107,6 +109,7 @@ export type SettlementCountAggregateOutputType = {
   partnerReferralAmount: number
   trade82RetainedAmountBeforeStripeFees: number
   currency: number
+  paymentFlow: number
   holdUntil: number
   status: number
   approvedAt: number
@@ -150,6 +153,7 @@ export type SettlementMinAggregateInputType = {
   partnerReferralAmount?: true
   trade82RetainedAmountBeforeStripeFees?: true
   currency?: true
+  paymentFlow?: true
   holdUntil?: true
   status?: true
   approvedAt?: true
@@ -175,6 +179,7 @@ export type SettlementMaxAggregateInputType = {
   partnerReferralAmount?: true
   trade82RetainedAmountBeforeStripeFees?: true
   currency?: true
+  paymentFlow?: true
   holdUntil?: true
   status?: true
   approvedAt?: true
@@ -200,6 +205,7 @@ export type SettlementCountAggregateInputType = {
   partnerReferralAmount?: true
   trade82RetainedAmountBeforeStripeFees?: true
   currency?: true
+  paymentFlow?: true
   holdUntil?: true
   status?: true
   approvedAt?: true
@@ -312,6 +318,7 @@ export type SettlementGroupByOutputType = {
   partnerReferralAmount: number
   trade82RetainedAmountBeforeStripeFees: number
   currency: string
+  paymentFlow: $Enums.SettlementPaymentFlow
   holdUntil: Date
   status: $Enums.SettlementStatus
   approvedAt: Date | null
@@ -360,6 +367,7 @@ export type SettlementWhereInput = {
   partnerReferralAmount?: Prisma.IntFilter<"Settlement"> | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFilter<"Settlement"> | number
   currency?: Prisma.StringFilter<"Settlement"> | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFilter<"Settlement"> | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFilter<"Settlement"> | Date | string
   status?: Prisma.EnumSettlementStatusFilter<"Settlement"> | $Enums.SettlementStatus
   approvedAt?: Prisma.DateTimeNullableFilter<"Settlement"> | Date | string | null
@@ -376,6 +384,7 @@ export type SettlementWhereInput = {
   legs?: Prisma.SettlementLegListRelationFilter
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
+  operationalAlerts?: Prisma.SettlementOperationalAlertListRelationFilter
 }
 
 export type SettlementOrderByWithRelationInput = {
@@ -393,6 +402,7 @@ export type SettlementOrderByWithRelationInput = {
   partnerReferralAmount?: Prisma.SortOrder
   trade82RetainedAmountBeforeStripeFees?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  paymentFlow?: Prisma.SortOrder
   holdUntil?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -409,6 +419,7 @@ export type SettlementOrderByWithRelationInput = {
   legs?: Prisma.SettlementLegOrderByRelationAggregateInput
   events?: Prisma.SettlementEventOrderByRelationAggregateInput
   reversals?: Prisma.SettlementReversalOrderByRelationAggregateInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertOrderByRelationAggregateInput
 }
 
 export type SettlementWhereUniqueInput = Prisma.AtLeast<{
@@ -430,6 +441,7 @@ export type SettlementWhereUniqueInput = Prisma.AtLeast<{
   partnerReferralAmount?: Prisma.IntFilter<"Settlement"> | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFilter<"Settlement"> | number
   currency?: Prisma.StringFilter<"Settlement"> | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFilter<"Settlement"> | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFilter<"Settlement"> | Date | string
   status?: Prisma.EnumSettlementStatusFilter<"Settlement"> | $Enums.SettlementStatus
   approvedAt?: Prisma.DateTimeNullableFilter<"Settlement"> | Date | string | null
@@ -445,6 +457,7 @@ export type SettlementWhereUniqueInput = Prisma.AtLeast<{
   legs?: Prisma.SettlementLegListRelationFilter
   events?: Prisma.SettlementEventListRelationFilter
   reversals?: Prisma.SettlementReversalListRelationFilter
+  operationalAlerts?: Prisma.SettlementOperationalAlertListRelationFilter
 }, "id" | "paymentRequestId" | "tradeOrderId" | "idempotencyKey">
 
 export type SettlementOrderByWithAggregationInput = {
@@ -462,6 +475,7 @@ export type SettlementOrderByWithAggregationInput = {
   partnerReferralAmount?: Prisma.SortOrder
   trade82RetainedAmountBeforeStripeFees?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  paymentFlow?: Prisma.SortOrder
   holdUntil?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -495,6 +509,7 @@ export type SettlementScalarWhereWithAggregatesInput = {
   partnerReferralAmount?: Prisma.IntWithAggregatesFilter<"Settlement"> | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntWithAggregatesFilter<"Settlement"> | number
   currency?: Prisma.StringWithAggregatesFilter<"Settlement"> | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowWithAggregatesFilter<"Settlement"> | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeWithAggregatesFilter<"Settlement"> | Date | string
   status?: Prisma.EnumSettlementStatusWithAggregatesFilter<"Settlement"> | $Enums.SettlementStatus
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Settlement"> | Date | string | null
@@ -516,6 +531,7 @@ export type SettlementCreateInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -531,6 +547,7 @@ export type SettlementCreateInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateInput = {
@@ -548,6 +565,7 @@ export type SettlementUncheckedCreateInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -559,6 +577,7 @@ export type SettlementUncheckedCreateInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUpdateInput = {
@@ -572,6 +591,7 @@ export type SettlementUpdateInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -587,6 +607,7 @@ export type SettlementUpdateInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateInput = {
@@ -604,6 +625,7 @@ export type SettlementUncheckedUpdateInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -615,6 +637,7 @@ export type SettlementUncheckedUpdateInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateManyInput = {
@@ -632,6 +655,7 @@ export type SettlementCreateManyInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -653,6 +677,7 @@ export type SettlementUpdateManyMutationInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -677,6 +702,7 @@ export type SettlementUncheckedUpdateManyInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -717,6 +743,7 @@ export type SettlementCountOrderByAggregateInput = {
   partnerReferralAmount?: Prisma.SortOrder
   trade82RetainedAmountBeforeStripeFees?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  paymentFlow?: Prisma.SortOrder
   holdUntil?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -750,6 +777,7 @@ export type SettlementMaxOrderByAggregateInput = {
   partnerReferralAmount?: Prisma.SortOrder
   trade82RetainedAmountBeforeStripeFees?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  paymentFlow?: Prisma.SortOrder
   holdUntil?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -775,6 +803,7 @@ export type SettlementMinOrderByAggregateInput = {
   partnerReferralAmount?: Prisma.SortOrder
   trade82RetainedAmountBeforeStripeFees?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  paymentFlow?: Prisma.SortOrder
   holdUntil?: Prisma.SortOrder
   status?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -960,6 +989,10 @@ export type NullableEnumReferralSubjectTypeFieldUpdateOperationsInput = {
   set?: $Enums.ReferralSubjectType | null
 }
 
+export type EnumSettlementPaymentFlowFieldUpdateOperationsInput = {
+  set?: $Enums.SettlementPaymentFlow
+}
+
 export type EnumSettlementStatusFieldUpdateOperationsInput = {
   set?: $Enums.SettlementStatus
 }
@@ -1006,6 +1039,22 @@ export type SettlementUpdateOneRequiredWithoutReversalsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementUpdateToOneWithWhereWithoutReversalsInput, Prisma.SettlementUpdateWithoutReversalsInput>, Prisma.SettlementUncheckedUpdateWithoutReversalsInput>
 }
 
+export type SettlementCreateNestedOneWithoutOperationalAlertsInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedCreateWithoutOperationalAlertsInput>
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutOperationalAlertsInput
+  connect?: Prisma.SettlementWhereUniqueInput
+}
+
+export type SettlementUpdateOneWithoutOperationalAlertsNestedInput = {
+  create?: Prisma.XOR<Prisma.SettlementCreateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedCreateWithoutOperationalAlertsInput>
+  connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutOperationalAlertsInput
+  upsert?: Prisma.SettlementUpsertWithoutOperationalAlertsInput
+  disconnect?: Prisma.SettlementWhereInput | boolean
+  delete?: Prisma.SettlementWhereInput | boolean
+  connect?: Prisma.SettlementWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SettlementUpdateToOneWithWhereWithoutOperationalAlertsInput, Prisma.SettlementUpdateWithoutOperationalAlertsInput>, Prisma.SettlementUncheckedUpdateWithoutOperationalAlertsInput>
+}
+
 export type SettlementCreateNestedOneWithoutTradeOrderInput = {
   create?: Prisma.XOR<Prisma.SettlementCreateWithoutTradeOrderInput, Prisma.SettlementUncheckedCreateWithoutTradeOrderInput>
   connectOrCreate?: Prisma.SettlementCreateOrConnectWithoutTradeOrderInput
@@ -1049,6 +1098,7 @@ export type SettlementCreateWithoutApprovedByUserInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1063,6 +1113,7 @@ export type SettlementCreateWithoutApprovedByUserInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutApprovedByUserInput = {
@@ -1080,6 +1131,7 @@ export type SettlementUncheckedCreateWithoutApprovedByUserInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1090,6 +1142,7 @@ export type SettlementUncheckedCreateWithoutApprovedByUserInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutApprovedByUserInput = {
@@ -1136,6 +1189,7 @@ export type SettlementScalarWhereInput = {
   partnerReferralAmount?: Prisma.IntFilter<"Settlement"> | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFilter<"Settlement"> | number
   currency?: Prisma.StringFilter<"Settlement"> | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFilter<"Settlement"> | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFilter<"Settlement"> | Date | string
   status?: Prisma.EnumSettlementStatusFilter<"Settlement"> | $Enums.SettlementStatus
   approvedAt?: Prisma.DateTimeNullableFilter<"Settlement"> | Date | string | null
@@ -1157,6 +1211,7 @@ export type SettlementCreateWithoutPaymentRequestInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1171,6 +1226,7 @@ export type SettlementCreateWithoutPaymentRequestInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutPaymentRequestInput = {
@@ -1187,6 +1243,7 @@ export type SettlementUncheckedCreateWithoutPaymentRequestInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1198,6 +1255,7 @@ export type SettlementUncheckedCreateWithoutPaymentRequestInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutPaymentRequestInput = {
@@ -1227,6 +1285,7 @@ export type SettlementUpdateWithoutPaymentRequestInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1241,6 +1300,7 @@ export type SettlementUpdateWithoutPaymentRequestInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutPaymentRequestInput = {
@@ -1257,6 +1317,7 @@ export type SettlementUncheckedUpdateWithoutPaymentRequestInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1268,6 +1329,7 @@ export type SettlementUncheckedUpdateWithoutPaymentRequestInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateWithoutReferralPartnerProfileInput = {
@@ -1281,6 +1343,7 @@ export type SettlementCreateWithoutReferralPartnerProfileInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1295,6 +1358,7 @@ export type SettlementCreateWithoutReferralPartnerProfileInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutReferralPartnerProfileInput = {
@@ -1311,6 +1375,7 @@ export type SettlementUncheckedCreateWithoutReferralPartnerProfileInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1322,6 +1387,7 @@ export type SettlementUncheckedCreateWithoutReferralPartnerProfileInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutReferralPartnerProfileInput = {
@@ -1361,6 +1427,7 @@ export type SettlementCreateWithoutReferralAttributionInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1375,6 +1442,7 @@ export type SettlementCreateWithoutReferralAttributionInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutReferralAttributionInput = {
@@ -1391,6 +1459,7 @@ export type SettlementUncheckedCreateWithoutReferralAttributionInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1402,6 +1471,7 @@ export type SettlementUncheckedCreateWithoutReferralAttributionInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutReferralAttributionInput = {
@@ -1441,6 +1511,7 @@ export type SettlementCreateWithoutLegsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1455,6 +1526,7 @@ export type SettlementCreateWithoutLegsInput = {
   approvedByUser?: Prisma.UserProfileCreateNestedOneWithoutApprovedSettlementsInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutLegsInput = {
@@ -1472,6 +1544,7 @@ export type SettlementUncheckedCreateWithoutLegsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1482,6 +1555,7 @@ export type SettlementUncheckedCreateWithoutLegsInput = {
   updatedAt?: Date | string
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutLegsInput = {
@@ -1511,6 +1585,7 @@ export type SettlementUpdateWithoutLegsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1525,6 +1600,7 @@ export type SettlementUpdateWithoutLegsInput = {
   approvedByUser?: Prisma.UserProfileUpdateOneWithoutApprovedSettlementsNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutLegsInput = {
@@ -1542,6 +1618,7 @@ export type SettlementUncheckedUpdateWithoutLegsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1552,6 +1629,7 @@ export type SettlementUncheckedUpdateWithoutLegsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateWithoutEventsInput = {
@@ -1565,6 +1643,7 @@ export type SettlementCreateWithoutEventsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1579,6 +1658,7 @@ export type SettlementCreateWithoutEventsInput = {
   approvedByUser?: Prisma.UserProfileCreateNestedOneWithoutApprovedSettlementsInput
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutEventsInput = {
@@ -1596,6 +1676,7 @@ export type SettlementUncheckedCreateWithoutEventsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1606,6 +1687,7 @@ export type SettlementUncheckedCreateWithoutEventsInput = {
   updatedAt?: Date | string
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutEventsInput = {
@@ -1635,6 +1717,7 @@ export type SettlementUpdateWithoutEventsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1649,6 +1732,7 @@ export type SettlementUpdateWithoutEventsInput = {
   approvedByUser?: Prisma.UserProfileUpdateOneWithoutApprovedSettlementsNestedInput
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutEventsInput = {
@@ -1666,6 +1750,7 @@ export type SettlementUncheckedUpdateWithoutEventsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1676,6 +1761,7 @@ export type SettlementUncheckedUpdateWithoutEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateWithoutReversalsInput = {
@@ -1689,6 +1775,7 @@ export type SettlementCreateWithoutReversalsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1703,6 +1790,7 @@ export type SettlementCreateWithoutReversalsInput = {
   approvedByUser?: Prisma.UserProfileCreateNestedOneWithoutApprovedSettlementsInput
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutReversalsInput = {
@@ -1720,6 +1808,7 @@ export type SettlementUncheckedCreateWithoutReversalsInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1730,6 +1819,7 @@ export type SettlementUncheckedCreateWithoutReversalsInput = {
   updatedAt?: Date | string
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutReversalsInput = {
@@ -1759,6 +1849,7 @@ export type SettlementUpdateWithoutReversalsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1773,6 +1864,7 @@ export type SettlementUpdateWithoutReversalsInput = {
   approvedByUser?: Prisma.UserProfileUpdateOneWithoutApprovedSettlementsNestedInput
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutReversalsInput = {
@@ -1790,6 +1882,7 @@ export type SettlementUncheckedUpdateWithoutReversalsInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1800,6 +1893,139 @@ export type SettlementUncheckedUpdateWithoutReversalsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementCreateWithoutOperationalAlertsInput = {
+  id?: string
+  referralCodeSnapshot?: string | null
+  referralSubjectType?: $Enums.ReferralSubjectType | null
+  referredUserIdSnapshot?: string | null
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  partnerReferralAmount?: number
+  trade82RetainedAmountBeforeStripeFees: number
+  currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
+  holdUntil: Date | string
+  status?: $Enums.SettlementStatus
+  approvedAt?: Date | string | null
+  holdReason?: string | null
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  paymentRequest: Prisma.PaymentRequestCreateNestedOneWithoutConnectSettlementInput
+  tradeOrder: Prisma.TradeOrderCreateNestedOneWithoutConnectSettlementInput
+  referralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutSettlementsInput
+  referralPartnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutSettlementsInput
+  approvedByUser?: Prisma.UserProfileCreateNestedOneWithoutApprovedSettlementsInput
+  legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
+  events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
+  reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementUncheckedCreateWithoutOperationalAlertsInput = {
+  id?: string
+  paymentRequestId: string
+  tradeOrderId: string
+  referralAttributionId?: string | null
+  referralPartnerProfileId?: string | null
+  referralCodeSnapshot?: string | null
+  referralSubjectType?: $Enums.ReferralSubjectType | null
+  referredUserIdSnapshot?: string | null
+  grossAmount: number
+  platformFeeAmount: number
+  sellerPayableAmount: number
+  partnerReferralAmount?: number
+  trade82RetainedAmountBeforeStripeFees: number
+  currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
+  holdUntil: Date | string
+  status?: $Enums.SettlementStatus
+  approvedAt?: Date | string | null
+  approvedByUserId?: string | null
+  holdReason?: string | null
+  idempotencyKey: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
+  events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
+  reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+}
+
+export type SettlementCreateOrConnectWithoutOperationalAlertsInput = {
+  where: Prisma.SettlementWhereUniqueInput
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedCreateWithoutOperationalAlertsInput>
+}
+
+export type SettlementUpsertWithoutOperationalAlertsInput = {
+  update: Prisma.XOR<Prisma.SettlementUpdateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedUpdateWithoutOperationalAlertsInput>
+  create: Prisma.XOR<Prisma.SettlementCreateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedCreateWithoutOperationalAlertsInput>
+  where?: Prisma.SettlementWhereInput
+}
+
+export type SettlementUpdateToOneWithWhereWithoutOperationalAlertsInput = {
+  where?: Prisma.SettlementWhereInput
+  data: Prisma.XOR<Prisma.SettlementUpdateWithoutOperationalAlertsInput, Prisma.SettlementUncheckedUpdateWithoutOperationalAlertsInput>
+}
+
+export type SettlementUpdateWithoutOperationalAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCodeSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralSubjectType?: Prisma.NullableEnumReferralSubjectTypeFieldUpdateOperationsInput | $Enums.ReferralSubjectType | null
+  referredUserIdSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  holdReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  paymentRequest?: Prisma.PaymentRequestUpdateOneRequiredWithoutConnectSettlementNestedInput
+  tradeOrder?: Prisma.TradeOrderUpdateOneRequiredWithoutConnectSettlementNestedInput
+  referralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutSettlementsNestedInput
+  referralPartnerProfile?: Prisma.PartnerProfileUpdateOneWithoutSettlementsNestedInput
+  approvedByUser?: Prisma.UserProfileUpdateOneWithoutApprovedSettlementsNestedInput
+  legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
+  events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
+  reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+}
+
+export type SettlementUncheckedUpdateWithoutOperationalAlertsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentRequestId?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeOrderId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralAttributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralPartnerProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralCodeSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  referralSubjectType?: Prisma.NullableEnumReferralSubjectTypeFieldUpdateOperationsInput | $Enums.ReferralSubjectType | null
+  referredUserIdSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  platformFeeAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  sellerPayableAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
+  currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
+  holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  holdReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
+  events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
+  reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateWithoutTradeOrderInput = {
@@ -1813,6 +2039,7 @@ export type SettlementCreateWithoutTradeOrderInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1827,6 +2054,7 @@ export type SettlementCreateWithoutTradeOrderInput = {
   legs?: Prisma.SettlementLegCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementUncheckedCreateWithoutTradeOrderInput = {
@@ -1843,6 +2071,7 @@ export type SettlementUncheckedCreateWithoutTradeOrderInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1854,6 +2083,7 @@ export type SettlementUncheckedCreateWithoutTradeOrderInput = {
   legs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutSettlementInput
   events?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutSettlementInput
   reversals?: Prisma.SettlementReversalUncheckedCreateNestedManyWithoutSettlementInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutSettlementInput
 }
 
 export type SettlementCreateOrConnectWithoutTradeOrderInput = {
@@ -1883,6 +2113,7 @@ export type SettlementUpdateWithoutTradeOrderInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1897,6 +2128,7 @@ export type SettlementUpdateWithoutTradeOrderInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutTradeOrderInput = {
@@ -1913,6 +2145,7 @@ export type SettlementUncheckedUpdateWithoutTradeOrderInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1924,6 +2157,7 @@ export type SettlementUncheckedUpdateWithoutTradeOrderInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementCreateManyApprovedByUserInput = {
@@ -1941,6 +2175,7 @@ export type SettlementCreateManyApprovedByUserInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -1961,6 +2196,7 @@ export type SettlementUpdateWithoutApprovedByUserInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1975,6 +2211,7 @@ export type SettlementUpdateWithoutApprovedByUserInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutApprovedByUserInput = {
@@ -1992,6 +2229,7 @@ export type SettlementUncheckedUpdateWithoutApprovedByUserInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2002,6 +2240,7 @@ export type SettlementUncheckedUpdateWithoutApprovedByUserInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateManyWithoutApprovedByUserInput = {
@@ -2019,6 +2258,7 @@ export type SettlementUncheckedUpdateManyWithoutApprovedByUserInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2042,6 +2282,7 @@ export type SettlementCreateManyReferralPartnerProfileInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -2063,6 +2304,7 @@ export type SettlementUpdateWithoutReferralPartnerProfileInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2077,6 +2319,7 @@ export type SettlementUpdateWithoutReferralPartnerProfileInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutReferralPartnerProfileInput = {
@@ -2093,6 +2336,7 @@ export type SettlementUncheckedUpdateWithoutReferralPartnerProfileInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2104,6 +2348,7 @@ export type SettlementUncheckedUpdateWithoutReferralPartnerProfileInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateManyWithoutReferralPartnerProfileInput = {
@@ -2120,6 +2365,7 @@ export type SettlementUncheckedUpdateManyWithoutReferralPartnerProfileInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2144,6 +2390,7 @@ export type SettlementCreateManyReferralAttributionInput = {
   partnerReferralAmount?: number
   trade82RetainedAmountBeforeStripeFees: number
   currency?: string
+  paymentFlow?: $Enums.SettlementPaymentFlow
   holdUntil: Date | string
   status?: $Enums.SettlementStatus
   approvedAt?: Date | string | null
@@ -2165,6 +2412,7 @@ export type SettlementUpdateWithoutReferralAttributionInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2179,6 +2427,7 @@ export type SettlementUpdateWithoutReferralAttributionInput = {
   legs?: Prisma.SettlementLegUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateWithoutReferralAttributionInput = {
@@ -2195,6 +2444,7 @@ export type SettlementUncheckedUpdateWithoutReferralAttributionInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2206,6 +2456,7 @@ export type SettlementUncheckedUpdateWithoutReferralAttributionInput = {
   legs?: Prisma.SettlementLegUncheckedUpdateManyWithoutSettlementNestedInput
   events?: Prisma.SettlementEventUncheckedUpdateManyWithoutSettlementNestedInput
   reversals?: Prisma.SettlementReversalUncheckedUpdateManyWithoutSettlementNestedInput
+  operationalAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutSettlementNestedInput
 }
 
 export type SettlementUncheckedUpdateManyWithoutReferralAttributionInput = {
@@ -2222,6 +2473,7 @@ export type SettlementUncheckedUpdateManyWithoutReferralAttributionInput = {
   partnerReferralAmount?: Prisma.IntFieldUpdateOperationsInput | number
   trade82RetainedAmountBeforeStripeFees?: Prisma.IntFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentFlow?: Prisma.EnumSettlementPaymentFlowFieldUpdateOperationsInput | $Enums.SettlementPaymentFlow
   holdUntil?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.EnumSettlementStatusFieldUpdateOperationsInput | $Enums.SettlementStatus
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2241,12 +2493,14 @@ export type SettlementCountOutputType = {
   legs: number
   events: number
   reversals: number
+  operationalAlerts: number
 }
 
 export type SettlementCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   legs?: boolean | SettlementCountOutputTypeCountLegsArgs
   events?: boolean | SettlementCountOutputTypeCountEventsArgs
   reversals?: boolean | SettlementCountOutputTypeCountReversalsArgs
+  operationalAlerts?: boolean | SettlementCountOutputTypeCountOperationalAlertsArgs
 }
 
 /**
@@ -2280,6 +2534,13 @@ export type SettlementCountOutputTypeCountReversalsArgs<ExtArgs extends runtime.
   where?: Prisma.SettlementReversalWhereInput
 }
 
+/**
+ * SettlementCountOutputType without action
+ */
+export type SettlementCountOutputTypeCountOperationalAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SettlementOperationalAlertWhereInput
+}
+
 
 export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2296,6 +2557,7 @@ export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   partnerReferralAmount?: boolean
   trade82RetainedAmountBeforeStripeFees?: boolean
   currency?: boolean
+  paymentFlow?: boolean
   holdUntil?: boolean
   status?: boolean
   approvedAt?: boolean
@@ -2312,6 +2574,7 @@ export type SettlementSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   legs?: boolean | Prisma.Settlement$legsArgs<ExtArgs>
   events?: boolean | Prisma.Settlement$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.Settlement$reversalsArgs<ExtArgs>
+  operationalAlerts?: boolean | Prisma.Settlement$operationalAlertsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["settlement"]>
 
@@ -2330,6 +2593,7 @@ export type SettlementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   partnerReferralAmount?: boolean
   trade82RetainedAmountBeforeStripeFees?: boolean
   currency?: boolean
+  paymentFlow?: boolean
   holdUntil?: boolean
   status?: boolean
   approvedAt?: boolean
@@ -2360,6 +2624,7 @@ export type SettlementSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   partnerReferralAmount?: boolean
   trade82RetainedAmountBeforeStripeFees?: boolean
   currency?: boolean
+  paymentFlow?: boolean
   holdUntil?: boolean
   status?: boolean
   approvedAt?: boolean
@@ -2390,6 +2655,7 @@ export type SettlementSelectScalar = {
   partnerReferralAmount?: boolean
   trade82RetainedAmountBeforeStripeFees?: boolean
   currency?: boolean
+  paymentFlow?: boolean
   holdUntil?: boolean
   status?: boolean
   approvedAt?: boolean
@@ -2400,7 +2666,7 @@ export type SettlementSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SettlementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "tradeOrderId" | "referralAttributionId" | "referralPartnerProfileId" | "referralCodeSnapshot" | "referralSubjectType" | "referredUserIdSnapshot" | "grossAmount" | "platformFeeAmount" | "sellerPayableAmount" | "partnerReferralAmount" | "trade82RetainedAmountBeforeStripeFees" | "currency" | "holdUntil" | "status" | "approvedAt" | "approvedByUserId" | "holdReason" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["settlement"]>
+export type SettlementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "paymentRequestId" | "tradeOrderId" | "referralAttributionId" | "referralPartnerProfileId" | "referralCodeSnapshot" | "referralSubjectType" | "referredUserIdSnapshot" | "grossAmount" | "platformFeeAmount" | "sellerPayableAmount" | "partnerReferralAmount" | "trade82RetainedAmountBeforeStripeFees" | "currency" | "paymentFlow" | "holdUntil" | "status" | "approvedAt" | "approvedByUserId" | "holdReason" | "idempotencyKey" | "createdAt" | "updatedAt", ExtArgs["result"]["settlement"]>
 export type SettlementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   paymentRequest?: boolean | Prisma.PaymentRequestDefaultArgs<ExtArgs>
   tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
@@ -2410,6 +2676,7 @@ export type SettlementInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   legs?: boolean | Prisma.Settlement$legsArgs<ExtArgs>
   events?: boolean | Prisma.Settlement$eventsArgs<ExtArgs>
   reversals?: boolean | Prisma.Settlement$reversalsArgs<ExtArgs>
+  operationalAlerts?: boolean | Prisma.Settlement$operationalAlertsArgs<ExtArgs>
   _count?: boolean | Prisma.SettlementCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SettlementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2438,6 +2705,7 @@ export type $SettlementPayload<ExtArgs extends runtime.Types.Extensions.Internal
     legs: Prisma.$SettlementLegPayload<ExtArgs>[]
     events: Prisma.$SettlementEventPayload<ExtArgs>[]
     reversals: Prisma.$SettlementReversalPayload<ExtArgs>[]
+    operationalAlerts: Prisma.$SettlementOperationalAlertPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2454,6 +2722,7 @@ export type $SettlementPayload<ExtArgs extends runtime.Types.Extensions.Internal
     partnerReferralAmount: number
     trade82RetainedAmountBeforeStripeFees: number
     currency: string
+    paymentFlow: $Enums.SettlementPaymentFlow
     holdUntil: Date
     status: $Enums.SettlementStatus
     approvedAt: Date | null
@@ -2864,6 +3133,7 @@ export interface Prisma__SettlementClient<T, Null = never, ExtArgs extends runti
   legs<T extends Prisma.Settlement$legsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$legsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.Settlement$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reversals<T extends Prisma.Settlement$reversalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$reversalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementReversalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  operationalAlerts<T extends Prisma.Settlement$operationalAlertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Settlement$operationalAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementOperationalAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2907,6 +3177,7 @@ export interface SettlementFieldRefs {
   readonly partnerReferralAmount: Prisma.FieldRef<"Settlement", 'Int'>
   readonly trade82RetainedAmountBeforeStripeFees: Prisma.FieldRef<"Settlement", 'Int'>
   readonly currency: Prisma.FieldRef<"Settlement", 'String'>
+  readonly paymentFlow: Prisma.FieldRef<"Settlement", 'SettlementPaymentFlow'>
   readonly holdUntil: Prisma.FieldRef<"Settlement", 'DateTime'>
   readonly status: Prisma.FieldRef<"Settlement", 'SettlementStatus'>
   readonly approvedAt: Prisma.FieldRef<"Settlement", 'DateTime'>
@@ -3442,6 +3713,30 @@ export type Settlement$reversalsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.SettlementReversalScalarFieldEnum | Prisma.SettlementReversalScalarFieldEnum[]
+}
+
+/**
+ * Settlement.operationalAlerts
+ */
+export type Settlement$operationalAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SettlementOperationalAlert
+   */
+  select?: Prisma.SettlementOperationalAlertSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SettlementOperationalAlert
+   */
+  omit?: Prisma.SettlementOperationalAlertOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SettlementOperationalAlertInclude<ExtArgs> | null
+  where?: Prisma.SettlementOperationalAlertWhereInput
+  orderBy?: Prisma.SettlementOperationalAlertOrderByWithRelationInput | Prisma.SettlementOperationalAlertOrderByWithRelationInput[]
+  cursor?: Prisma.SettlementOperationalAlertWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SettlementOperationalAlertScalarFieldEnum | Prisma.SettlementOperationalAlertScalarFieldEnum[]
 }
 
 /**

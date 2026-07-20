@@ -153,6 +153,16 @@ export type SettlementEvent = Prisma.SettlementEventModel
  */
 export type SettlementReversal = Prisma.SettlementReversalModel
 /**
+ * Model SettlementWorkerRun
+ * 
+ */
+export type SettlementWorkerRun = Prisma.SettlementWorkerRunModel
+/**
+ * Model SettlementOperationalAlert
+ * 
+ */
+export type SettlementOperationalAlert = Prisma.SettlementOperationalAlertModel
+/**
  * Model OrderNumberCounter
  * 
  */

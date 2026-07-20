@@ -78,6 +78,8 @@ export const ModelName = {
   SettlementLeg: 'SettlementLeg',
   SettlementEvent: 'SettlementEvent',
   SettlementReversal: 'SettlementReversal',
+  SettlementWorkerRun: 'SettlementWorkerRun',
+  SettlementOperationalAlert: 'SettlementOperationalAlert',
   OrderNumberCounter: 'OrderNumberCounter',
   TradeOrder: 'TradeOrder',
   TradeOrderItem: 'TradeOrderItem',
@@ -651,6 +653,7 @@ export const SettlementScalarFieldEnum = {
   partnerReferralAmount: 'partnerReferralAmount',
   trade82RetainedAmountBeforeStripeFees: 'trade82RetainedAmountBeforeStripeFees',
   currency: 'currency',
+  paymentFlow: 'paymentFlow',
   holdUntil: 'holdUntil',
   status: 'status',
   approvedAt: 'approvedAt',
@@ -681,6 +684,7 @@ export const SettlementLegScalarFieldEnum = {
   nextTransferAttemptAt: 'nextTransferAttemptAt',
   transferLastError: 'transferLastError',
   transferLockedAt: 'transferLockedAt',
+  manualReviewRequired: 'manualReviewRequired',
   transferredAt: 'transferredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -731,6 +735,54 @@ export const SettlementReversalScalarFieldEnum = {
 } as const
 
 export type SettlementReversalScalarFieldEnum = (typeof SettlementReversalScalarFieldEnum)[keyof typeof SettlementReversalScalarFieldEnum]
+
+
+export const SettlementWorkerRunScalarFieldEnum = {
+  id: 'id',
+  workerType: 'workerType',
+  executionMode: 'executionMode',
+  status: 'status',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  scannedCount: 'scannedCount',
+  claimedCount: 'claimedCount',
+  succeededCount: 'succeededCount',
+  failedCount: 'failedCount',
+  skippedCount: 'skippedCount',
+  manualReviewCount: 'manualReviewCount',
+  staleRecoveredCount: 'staleRecoveredCount',
+  durationMs: 'durationMs',
+  sanitizedErrorCode: 'sanitizedErrorCode',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementWorkerRunScalarFieldEnum = (typeof SettlementWorkerRunScalarFieldEnum)[keyof typeof SettlementWorkerRunScalarFieldEnum]
+
+
+export const SettlementOperationalAlertScalarFieldEnum = {
+  id: 'id',
+  alertType: 'alertType',
+  severity: 'severity',
+  status: 'status',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  settlementReversalId: 'settlementReversalId',
+  workerRunId: 'workerRunId',
+  title: 'title',
+  sanitizedMessage: 'sanitizedMessage',
+  occurrenceCount: 'occurrenceCount',
+  firstOccurredAt: 'firstOccurredAt',
+  lastOccurredAt: 'lastOccurredAt',
+  acknowledgedAt: 'acknowledgedAt',
+  acknowledgedByUserId: 'acknowledgedByUserId',
+  resolvedAt: 'resolvedAt',
+  deduplicationKey: 'deduplicationKey',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SettlementOperationalAlertScalarFieldEnum = (typeof SettlementOperationalAlertScalarFieldEnum)[keyof typeof SettlementOperationalAlertScalarFieldEnum]
 
 
 export const OrderNumberCounterScalarFieldEnum = {

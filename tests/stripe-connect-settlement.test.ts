@@ -42,6 +42,7 @@ import {
   SettlementEventType,
   SettlementLegStatus,
   SettlementLegType,
+  SettlementPaymentFlow,
   SettlementStatus,
   StripeConnectedAccountStatus,
 } from "../src/generated/prisma/client.ts";
@@ -145,11 +146,11 @@ test("missing and invalid settlement modes fail closed", () => {
   assert.equal(getStripeConnectSettlementMode({ STRIPE_CONNECT_SETTLEMENT_MODE: "on" }), "on");
 });
 
-test("transfer execution mode defaults to off and only accepts explicit manual mode", () => {
+test("transfer execution mode defaults to off and accepts explicit manual or auto mode", () => {
   assert.equal(getStripeConnectTransferExecutionMode({}), "off");
   assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: "invalid" }), "off");
   assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: " MANUAL " }), "manual");
-  assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: "auto" }), "off");
+  assert.equal(getStripeConnectTransferExecutionMode({ STRIPE_CONNECT_TRANSFER_EXECUTION_MODE: " auto " }), "auto");
 });
 
 test("release eligibility requires an enabled transfer account and uses reversal-adjusted net amounts", () => {
@@ -199,6 +200,7 @@ function claimedTransferLeg(overrides: Partial<Parameters<typeof validateClaimed
     partnerProfileId: null,
     settlement: {
       id: "settlement_123",
+      paymentFlow: SettlementPaymentFlow.SCT,
       status: SettlementStatus.READY,
       approvedAt: now,
       holdReason: null,
@@ -219,6 +221,7 @@ function claimedTransferLeg(overrides: Partial<Parameters<typeof validateClaimed
       },
     },
     partnerProfile: null,
+    manualReviewRequired: false,
     ...overrides,
   } as Parameters<typeof validateClaimedTransferLeg>[0];
 }
