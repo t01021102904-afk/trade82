@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import { after, test } from "node:test";
+import type { Prisma, PrismaClient } from "../src/generated/prisma/client.ts";
+import type { createTradeOrderForPaymentRequest } from "../src/lib/trade-orders.ts";
+
+type TradeOrdersModule = { createTradeOrderForPaymentRequest: typeof createTradeOrderForPaymentRequest };
 
 function assertDisposableDatabase() {
   const value = process.env.DATABASE_URL;
@@ -15,7 +19,7 @@ process.env.DATABASE_POOL_MAX = "12";
 process.env.STRIPE_CONNECT_RUNTIME_MODE = "test";
 process.env.STRIPE_SECRET_KEY = "sk_test_worker_fixture";
 
-const [{ getDb }, tradeOrders, financials, operations, settlementRules] = await Promise.all([
+const [{ getDb }, tradeOrdersModule, financials, operations, settlementRules] = await Promise.all([
   import(new URL("../src/lib/db.ts", import.meta.url).href),
   import(new URL("../src/lib/trade-orders.ts", import.meta.url).href),
   import(new URL("../src/lib/order-financials.ts", import.meta.url).href),
@@ -23,7 +27,8 @@ const [{ getDb }, tradeOrders, financials, operations, settlementRules] = await 
   import(new URL("../src/lib/stripe-connect-settlement-financials.ts", import.meta.url).href),
 ]);
 
-const db = getDb() as any;
+const db = getDb() as PrismaClient;
+const tradeOrders = tradeOrdersModule as TradeOrdersModule;
 let sequence = 0;
 
 function unique(prefix: string) {
@@ -178,7 +183,9 @@ async function createFixture({
       stripeChargeId: `ch_${suffix}`,
     },
   });
-  const order = await db.$transaction((tx: any) => tradeOrders.createTradeOrderForPaymentRequest(tx, paymentRequest.id, paymentRequest.paidAt));
+  const paidAt = paymentRequest.paidAt;
+  assert.ok(paidAt);
+  const order = await db.$transaction((tx: Prisma.TransactionClient) => tradeOrders.createTradeOrderForPaymentRequest(tx, paymentRequest.id, paidAt));
   await db.tradeOrder.update({
     where: { id: order.id },
     data: { orderStatus: "PAID", paymentStatus: disputeStatus ? "DISPUTED" : "PAID", paidAt: paymentRequest.paidAt },
@@ -191,7 +198,7 @@ async function createFixture({
         stripeDisputeId: `dp_${suffix}`,
         amount: 11_000,
         status: disputeStatus,
-        lastStripeEventCreatedAt: paymentRequest.paidAt,
+        lastStripeEventCreatedAt: paidAt,
         lastStripeEventId: `evt_${suffix}`,
       },
     });
@@ -258,7 +265,7 @@ async function createFixture({
         create: {
           type: legType,
           ...(legType === "SELLER_PAYABLE" ? { recipientCompanyId: sellerCompany.id } : {}),
-          ...(legType === "PARTNER_REFERRAL" && partner ? { recipientUserId: partnerUser.id, partnerProfileId: partner.id } : {}),
+          ...(legType === "PARTNER_REFERRAL" && partner ? { recipientUserId: partner.userId, partnerProfileId: partner.id } : {}),
           amount: legType === "PLATFORM_FEE" ? financialsForSettlement.platformFeeAmount : legType === "PARTNER_REFERRAL" ? financialsForSettlement.partnerReferralAmount : financialsForSettlement.sellerPayableAmount,
           currency: legCurrency,
           holdUntil: new Date(now.getTime() - 60_000),
@@ -298,10 +305,21 @@ async function createFixture({
   return { suffix, buyer, seller, buyerCompany, sellerCompany, paymentRequest, order, settlement, leg, reversal, now };
 }
 
-function transferStripe(calls: any[]) {
+function requiredReversalId(fixture: { reversal: { id: string } | null }) {
+  assert.ok(fixture.reversal);
+  return fixture.reversal.id;
+}
+
+type TestStripeCall = {
+  params: { amount: number; currency?: string; source_transaction?: string; destination?: string };
+  options: { idempotencyKey: string };
+  transferId?: string;
+};
+
+function transferStripe(calls: TestStripeCall[]) {
   return {
     transfers: {
-      create: async (params: any, options: any) => {
+      create: async (params: TestStripeCall["params"], options: TestStripeCall["options"]) => {
         calls.push({ params, options });
         return { id: `tr_worker_${calls.length}` };
       },
@@ -309,16 +327,20 @@ function transferStripe(calls: any[]) {
   } as never;
 }
 
-function reversalStripe(calls: any[]) {
+function reversalStripe(calls: TestStripeCall[]) {
   return {
     transfers: {
-      createReversal: async (transferId: string, params: any, options: any) => {
+      createReversal: async (transferId: string, params: TestStripeCall["params"], options: TestStripeCall["options"]) => {
         calls.push({ transferId, params, options });
         return { id: `trr_worker_${calls.length}`, amount: params.amount };
       },
       listReversals: async () => ({ data: [], has_more: false }),
     },
   } as never;
+}
+
+function fixedClock(now: Date) {
+  return () => new Date(now.getTime());
 }
 
 after(async () => {
@@ -329,16 +351,16 @@ test("runs seller and partner transfers with immutable USD/source/idempotency va
   await envWithModes(async () => {
     const sellerFixture = await createFixture();
     const partnerFixture = await createFixture({ legType: "PARTNER_REFERRAL" });
-    const calls: any[] = [];
-    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: sellerFixture.now, batchSize: 20 });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: sellerFixture.now, clock: fixedClock(sellerFixture.now), batchSize: 20 });
 
     assert.equal(result.succeededCount, 2);
     assert.equal(calls.length, 2);
     assert.deepEqual(calls.map((call) => [call.params.currency, call.params.source_transaction]), [["usd", sellerFixture.paymentRequest.stripeChargeId], ["usd", partnerFixture.paymentRequest.stripeChargeId]]);
-    assert.ok(calls.every((call) => call.params.amount > 0 && call.params.destination.startsWith("acct_") && call.options.idempotencyKey.startsWith("stripe-connect-transfer:settlement-leg:")));
+    assert.ok(calls.every((call) => call.params.amount > 0 && call.params.destination?.startsWith("acct_") && call.options.idempotencyKey.startsWith("stripe-connect-transfer:settlement-leg:")));
     const stored = await db.settlementLeg.findMany({ where: { id: { in: [sellerFixture.leg.id, partnerFixture.leg.id] } }, select: { status: true, transferLockedAt: true, transferredAt: true, stripeTransferId: true } });
-    assert.equal(stored.filter((row: any) => row.status === "TRANSFERRED").length, 2);
-    assert.ok(stored.every((row: any) => row.transferLockedAt === null && row.transferredAt && row.stripeTransferId));
+    assert.equal(stored.filter((row) => row.status === "TRANSFERRED").length, 2);
+    assert.ok(stored.every((row) => row.transferLockedAt === null && row.transferredAt && row.stripeTransferId));
     assert.equal(result.status, "SUCCEEDED");
   });
 });
@@ -349,8 +371,8 @@ test("excludes Direct Charge and platform-fee legs without Stripe calls", async 
     const platform = await createFixture({ legType: "PLATFORM_FEE" });
     const wrongPaymentCurrency = await createFixture({ paymentCurrency: "eur" });
     const wrongLegCurrency = await createFixture({ legCurrency: "eur" });
-    const calls: any[] = [];
-    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: direct.now });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: direct.now, clock: fixedClock(direct.now) });
 
     assert.equal(calls.length, 0);
     assert.equal(result.succeededCount, 0);
@@ -361,10 +383,10 @@ test("excludes Direct Charge and platform-fee legs without Stripe calls", async 
 test("two concurrent transfer workers claim one leg and make one mocked call", async () => {
   await envWithModes(async () => {
     const fixture = await createFixture();
-    const calls: any[] = [];
+    const calls: TestStripeCall[] = [];
     const [first, second] = await Promise.all([
-      operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: fixture.now, batchSize: 1 }),
-      operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: fixture.now, batchSize: 1 }),
+      operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: fixture.now, clock: fixedClock(fixture.now), batchSize: 1 }),
+      operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: fixture.now, clock: fixedClock(fixture.now), batchSize: 1 }),
     ]);
     assert.equal(calls.length, 1);
     assert.equal(first.succeededCount + second.succeededCount, 1);
@@ -386,8 +408,8 @@ test("transfer workers recover stale claims but leave active claims and Direct C
       transferLockedAt: new Date(now.getTime() - 1_000),
     });
     const direct = await createFixture({ paymentFlow: "DIRECT_CHARGE" });
-    const calls: any[] = [];
-    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now, batchSize: 20 });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now, clock: fixedClock(now), batchSize: 20 });
 
     assert.equal(calls.length, 1);
     assert.equal(result.staleRecoveredCount, 1);
@@ -397,33 +419,43 @@ test("transfer workers recover stale claims but leave active claims and Direct C
   });
 });
 
-test("refund and DISPUTE_LOST reversal workers preserve partial amounts and complete full reversals", async () => {
+test("independent refund and dispute reversals preserve remaining amounts and finalize safely", async () => {
   await envWithModes(async () => {
-    const refund = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", reversalAmount: 10_450, successfullyReversedAmount: 4_000 });
-    const dispute = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "DISPUTE_LOST", disputeStatus: "lost", reversalAmount: 10_450 });
-    const calls: any[] = [];
-    const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: refund.now, batchSize: 20 });
+    const partialRefund = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", reversalAmount: 10_450, successfullyReversedAmount: 4_000 });
+    const fullRefund = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", reversalAmount: 10_450 });
+    const partialDispute = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "DISPUTE_LOST", disputeStatus: "lost", reversalAmount: 10_450, successfullyReversedAmount: 3_000 });
+    const fullDispute = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "DISPUTE_LOST", disputeStatus: "lost", reversalAmount: 10_450 });
+    const calls: TestStripeCall[] = [];
+    const fixtures = [partialRefund, fullRefund, partialDispute, fullDispute];
+    const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: partialRefund.now, clock: fixedClock(partialRefund.now), batchSize: 20 });
 
-    assert.equal(result.succeededCount, 2);
-    assert.equal(calls.length, 2);
-    assert.deepEqual(calls.map((call) => call.params.amount).sort((left, right) => left - right), [6_450, 10_450]);
+    assert.equal(result.succeededCount, 4);
+    assert.equal(calls.length, 4);
+    assert.deepEqual(calls.map((call) => call.params.amount).sort((left, right) => left - right), [6_450, 7_450, 10_450, 10_450]);
     assert.ok(calls.every((call) => call.params.currency === undefined && call.options.idempotencyKey.startsWith("stripe-connect-transfer-reversal:settlement-reversal:")));
-    const stored = await db.settlementReversal.findMany({ where: { id: { in: [refund.reversal.id, dispute.reversal.id] } }, select: { status: true, successfullyReversedAmount: true, reversalLockedAt: true } });
-    assert.ok(stored.every((row: any) => row.status === "COMPLETED" && row.reversalLockedAt === null));
-    assert.equal(stored.find((row: any) => row.successfullyReversedAmount === 10_450)?.successfullyReversedAmount, 10_450);
-    assert.equal(await db.settlementLeg.count({ where: { id: dispute.leg.id, status: "REVERSED" } }), 1);
-    assert.equal(await db.settlement.count({ where: { id: dispute.settlement.id, status: "REVERSED" } }), 1);
-    assert.equal(await db.settlementLeg.count({ where: { id: refund.leg.id, status: "TRANSFERRED" } }), 1);
+    const stored = await db.settlementReversal.findMany({
+      where: { id: { in: fixtures.map(requiredReversalId) } },
+      select: { id: true, status: true, amount: true, requestedAmount: true, successfullyReversedAmount: true, reversalAttemptCount: true, reversalLockedAt: true, nextReversalAttemptAt: true, reversalLastError: true, completedAt: true, stripeTransferReversalId: true, idempotencyKey: true },
+    });
+    assert.equal(stored.length, 4);
+    assert.ok(stored.every((row) => row.status === "COMPLETED" && row.reversalLockedAt === null && row.nextReversalAttemptAt === null && row.reversalLastError === null && row.completedAt && row.stripeTransferReversalId));
+    assert.ok(stored.every((row) => row.successfullyReversedAmount === row.requestedAmount && row.reversalAttemptCount === 1 && row.idempotencyKey));
+    assert.equal(new Set(calls.map((call) => call.options.idempotencyKey)).size, 4);
+    for (const fixture of fixtures) {
+      assert.equal(await db.settlementLeg.count({ where: { id: fixture.leg.id, status: "REVERSED" } }), 1);
+      assert.equal(await db.settlement.count({ where: { id: fixture.settlement.id, status: "REVERSED" } }), 1);
+    }
   });
 });
 
 test("two concurrent reversal workers claim one reversal and make one mocked call", async () => {
   await envWithModes(async () => {
     const fixture = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
-    const calls: any[] = [];
+    const calls: TestStripeCall[] = [];
+    assert.ok(fixture.reversal);
     const [first, second] = await Promise.all([
-      operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: fixture.now, batchSize: 1 }),
-      operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: fixture.now, batchSize: 1 }),
+      operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: fixture.now, clock: fixedClock(fixture.now), batchSize: 1 }),
+      operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now: fixture.now, clock: fixedClock(fixture.now), batchSize: 1 }),
     ]);
     assert.equal(calls.length, 1);
     assert.equal(first.succeededCount + second.succeededCount, 1);
@@ -431,7 +463,24 @@ test("two concurrent reversal workers claim one reversal and make one mocked cal
   });
 });
 
-test("reversal workers recover stale claims but do not touch active claims or open disputes", async () => {
+test("an exhausted READY transfer is held for manual review without a Stripe call", async () => {
+  await envWithModes(async () => {
+    const fixture = await createFixture({ transferAttemptCount: 5 });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: fixture.now, clock: fixedClock(fixture.now), batchSize: 20 });
+
+    assert.equal(calls.length, 0);
+    assert.equal(result.failedCount, 1);
+    assert.equal(result.manualReviewCount, 1);
+    assert.equal(result.skippedCount, 0);
+    assert.equal(result.claimedCount, 0);
+    assert.equal(result.status, "FAILED");
+    assert.equal((await db.settlementLeg.findUnique({ where: { id: fixture.leg.id }, select: { manualReviewRequired: true } }))?.manualReviewRequired, true);
+    assert.equal(await db.settlementOperationalAlert.count({ where: { settlementLegId: fixture.leg.id, alertType: "TRANSFER_RETRY_EXHAUSTED" } }), 1);
+  });
+});
+
+test("reversal candidates enforce retry, lock, flow, status, dispute, and currency guards", async () => {
   await envWithModes(async () => {
     const now = new Date("2026-07-19T12:00:00.000Z");
     const stale = await createFixture({
@@ -455,15 +504,75 @@ test("reversal workers recover stale claims but do not touch active claims or op
       reversalSource: "REFUND",
       disputeStatus: "open",
     });
-    const calls: any[] = [];
-    const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now, batchSize: 20 });
+    const retryNotDue = await createFixture({
+      legStatus: "TRANSFERRED",
+      settlementStatus: "REVERSAL_PENDING",
+      transferState: true,
+      reversalSource: "REFUND",
+      nextReversalAttemptAt: new Date(now.getTime() + 60_000),
+    });
+    const exhausted = await createFixture({
+      legStatus: "TRANSFERRED",
+      settlementStatus: "REVERSAL_PENDING",
+      transferState: true,
+      reversalSource: "REFUND",
+      reversalAttemptCount: 5,
+    });
+    const manualReview = await createFixture({
+      legStatus: "TRANSFERRED",
+      settlementStatus: "REVERSAL_PENDING",
+      transferState: true,
+      reversalSource: "REFUND",
+      reversalStatus: "NEEDS_MANUAL_REVIEW",
+    });
+    const direct = await createFixture({ paymentFlow: "DIRECT_CHARGE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
+    const platform = await createFixture({ legType: "PLATFORM_FEE", legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND" });
+    const wrongCurrency = await createFixture({ legStatus: "TRANSFERRED", settlementStatus: "REVERSAL_PENDING", transferState: true, reversalSource: "REFUND", legCurrency: "eur" });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementReversalBatch({ db, stripe: reversalStripe(calls), now, clock: fixedClock(now), batchSize: 20 });
 
     assert.equal(calls.length, 1);
     assert.equal(result.staleRecoveredCount, 1);
-    assert.equal(await db.settlementReversal.count({ where: { id: stale.reversal.id, status: "COMPLETED" } }), 1);
-    assert.equal(await db.settlementReversal.count({ where: { id: active.reversal.id, status: "PENDING" } }), 1);
-    assert.equal(await db.settlementReversal.count({ where: { id: openDispute.reversal.id, status: "PENDING" } }), 1);
+    assert.equal(result.manualReviewCount, 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(stale), status: "COMPLETED" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(active), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(openDispute), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(retryNotDue), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(manualReview), status: "NEEDS_MANUAL_REVIEW" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(direct), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(platform), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(wrongCurrency), status: "PENDING" } }), 1);
+    assert.equal(await db.settlementReversal.count({ where: { id: requiredReversalId(exhausted), status: "NEEDS_MANUAL_REVIEW" } }), 1);
   });
+});
+
+test("operational alerts reopen and deduplicate in PostgreSQL", async () => {
+  const now = new Date("2026-07-19T12:00:00.000Z");
+  const first = await operations.upsertSettlementOperationalAlert({
+    db,
+    alertType: "WORKER_FAILED",
+    severity: "CRITICAL",
+    deduplicationKey: "worker-integration-dedup",
+    title: "Worker failed",
+    sanitizedMessage: "A worker failed safely.",
+    now,
+  });
+  await db.settlementOperationalAlert.update({ where: { id: first.id }, data: { status: "RESOLVED", resolvedAt: now } });
+  const second = await operations.upsertSettlementOperationalAlert({
+    db,
+    alertType: "WORKER_FAILED",
+    severity: "CRITICAL",
+    deduplicationKey: "worker-integration-dedup",
+    title: "Worker failed",
+    sanitizedMessage: "A worker failed safely again.",
+    now: new Date(now.getTime() + 1_000),
+  });
+  assert.equal(second.id, first.id);
+  assert.equal(second.occurrenceCount, 2);
+  const stored = await db.settlementOperationalAlert.findUnique({ where: { id: first.id }, select: { status: true, resolvedAt: true, sanitizedMessage: true } });
+  assert.equal(stored?.status, "OPEN");
+  assert.equal(stored?.resolvedAt, null);
+  assert.equal(stored?.sanitizedMessage, "A worker failed safely again.");
 });
 
 test("retry timing and terminal/manual-review records do not make Stripe calls", async () => {
@@ -474,8 +583,8 @@ test("retry timing and terminal/manual-review records do not make Stripe calls",
     await db.settlementLeg.update({ where: { id: retryNotDue.leg.id }, data: { nextTransferAttemptAt: new Date(retryNotDue.now.getTime() + 60_000) } });
     await db.settlementLeg.update({ where: { id: exhausted.leg.id }, data: { transferAttemptCount: 5 } });
     await db.settlementLeg.update({ where: { id: manualReview.leg.id }, data: { manualReviewRequired: true } });
-    const calls: any[] = [];
-    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: retryNotDue.now, batchSize: 20 });
+    const calls: TestStripeCall[] = [];
+    const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: retryNotDue.now, clock: fixedClock(retryNotDue.now), batchSize: 20 });
     assert.equal(calls.length, 0);
     assert.equal(result.succeededCount, 0);
     assert.equal(result.skippedCount, 1);
@@ -500,5 +609,19 @@ test("worker metrics use database aggregates and keep Direct Charge unavailable"
     assert.equal(after.pendingReversalCount - before.pendingReversalCount, 1);
     assert.equal(after.pendingReversalAmount.usd - before.pendingReversalAmount.usd, 3_000);
     assert.equal(after.sellerPayableAmount.usd - before.sellerPayableAmount.usd, ready.leg.amount + held.leg.amount + transferred.leg.amount + reversal.leg.amount);
+  });
+});
+
+test("worker metrics preserve aggregate amounts above signed 32-bit range", async () => {
+  await envWithModes(async () => {
+    const now = new Date("2026-07-19T12:00:00.000Z");
+    const first = await createFixture();
+    const second = await createFixture();
+    await db.settlementLeg.updateMany({
+      where: { id: { in: [first.leg.id, second.leg.id] } },
+      data: { amount: 2_000_000_000 },
+    });
+    const metrics = await operations.getSettlementOperationsMetrics({ db, now });
+    assert.ok(metrics.readyTransferAmount.usd >= 4_000_000_000);
   });
 });

@@ -73,6 +73,15 @@ export function createSettlementWorkerClock() {
   return () => new Date();
 }
 
+export function toSafeSettlementMetricInteger(value: unknown): number {
+  if (typeof value === "bigint" && (value > BigInt(Number.MAX_SAFE_INTEGER) || value < BigInt(0))) {
+    throw new Error("metrics_aggregate_unsafe");
+  }
+  const numeric = value === null || value === undefined ? 0 : Number(value);
+  if (!Number.isSafeInteger(numeric) || numeric < 0) throw new Error("metrics_aggregate_unsafe");
+  return numeric;
+}
+
 function boundedBatchSize(value: number | undefined) {
   if (!Number.isFinite(value) || !value) return DEFAULT_SETTLEMENT_WORKER_BATCH_SIZE;
   return Math.min(100, Math.max(1, Math.floor(value)));
@@ -203,8 +212,10 @@ async function transferCandidateIds(db: OperationsDb, now: Date, batchSize: numb
 }
 
 async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: number) {
-  return db.$transaction(async (tx) => tx.$queryRaw<Array<{ id: string; settlementId: string }>>(Prisma.sql`
-    SELECT reversal."id", reversal."settlementId"
+  return db.$transaction(async (tx) => tx.$queryRaw<Array<{ id: string; settlementId: string; staleRecovery: boolean }>>(Prisma.sql`
+    SELECT reversal."id", reversal."settlementId",
+      (reversal."reversalLockedAt" IS NOT NULL
+        AND reversal."reversalLockedAt" < ${new Date(now.getTime() - SETTLEMENT_WORKER_STALE_LOCK_MS)}) AS "staleRecovery"
     FROM "SettlementReversal" AS reversal
     JOIN "Settlement" AS settlement ON settlement."id" = reversal."settlementId"
     JOIN "SettlementLeg" AS leg ON leg."id" = reversal."settlementLegId"
@@ -231,7 +242,7 @@ async function reversalCandidateIds(db: OperationsDb, now: Date, batchSize: numb
 }
 
 export async function runSettlementTransferBatch({ db = getDb(), stripe, transferExecutor = executeSettlementLegTransfer, now, clock, batchSize }: RunOptions = {}) {
-  const readNow = clock ?? createSettlementWorkerClock();
+  const readNow = clock ?? (now ? () => new Date(now.getTime()) : createSettlementWorkerClock());
   const startedAt = now ?? readNow();
   const mode = getStripeConnectTransferExecutionMode();
   if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.TRANSFER, mode, startedAt);
@@ -263,7 +274,7 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, transfe
     }
     try {
       const result = await transferExecutor({ settlementLegId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
-      if (candidate.staleRecovery && result.status !== "ineligible" && result.status !== "claim_lost") {
+      if (candidate.staleRecovery && result.status === "transferred") {
         summary.staleRecoveredCount += 1;
       }
       if (result.status === "transferred") {
@@ -295,7 +306,7 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, transfe
           }
         }
       }
-      summary.claimedCount += result.status === "claim_lost" || result.status === "ineligible" ? 0 : 1;
+      summary.claimedCount += result.status === "claim_lost" || result.status === "ineligible" || result.status === "disabled" ? 0 : 1;
     } catch {
       summary.failedCount += 1;
       lastError = "worker_failed";
@@ -308,7 +319,7 @@ export async function runSettlementTransferBatch({ db = getDb(), stripe, transfe
 }
 
 export async function runSettlementReversalBatch({ db = getDb(), stripe, reversalExecutor = executeSettlementReversal, now, clock, batchSize }: RunOptions = {}) {
-  const readNow = clock ?? createSettlementWorkerClock();
+  const readNow = clock ?? (now ? () => new Date(now.getTime()) : createSettlementWorkerClock());
   const startedAt = now ?? readNow();
   const mode = getStripeConnectTransferReversalExecutionMode();
   if (mode !== "auto") return skippedWorkerRun(db, SettlementWorkerType.REVERSAL, mode, startedAt);
@@ -340,6 +351,7 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, reversa
     }
     try {
       const result = await reversalExecutor({ settlementReversalId: candidate.id, actorUserId: null, mode: "auto", db, stripe, now: executionNow });
+      if (candidate.staleRecovery && result.status === "reversed") summary.staleRecoveredCount += 1;
       if (result.status === "reversed") summary.succeededCount += 1;
       else if (result.status === "ineligible" || result.status === "claim_lost" || result.status === "disabled") {
         if (result.errorCode === "reversal_max_attempts" || result.errorCode === "manual_review_required") {
@@ -374,7 +386,7 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, reversa
           }
         }
       }
-      summary.claimedCount += result.status === "claim_lost" || result.status === "ineligible" ? 0 : 1;
+      summary.claimedCount += result.status === "claim_lost" || result.status === "ineligible" || result.status === "disabled" ? 0 : 1;
     } catch {
       summary.failedCount += 1;
       lastError = "worker_failed";
@@ -386,7 +398,7 @@ export async function runSettlementReversalBatch({ db = getDb(), stripe, reversa
   return { ...summary, status: resolveSettlementWorkerRunStatus(summary) };
 }
 
-async function upsertOperationalAlert({
+export async function upsertSettlementOperationalAlert({
   db,
   alertType,
   severity,
@@ -461,7 +473,7 @@ async function recordTransferWorkerFailure({
   }
   const leg = await db.settlementLeg.findUnique({ where: { id: legId }, select: { settlementId: true } });
   if (!leg) return;
-  await upsertOperationalAlert({
+  await upsertSettlementOperationalAlert({
     db,
     alertType: exhausted ? SettlementOperationalAlertType.TRANSFER_RETRY_EXHAUSTED : SettlementOperationalAlertType.TRANSFER_NEEDS_MANUAL_REVIEW,
     severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -492,7 +504,7 @@ async function recordReversalWorkerFailure({
 }) {
   const reversal = await db.settlementReversal.findUnique({ where: { id: reversalId }, select: { settlementId: true } });
   if (!reversal) return;
-  await upsertOperationalAlert({
+  await upsertSettlementOperationalAlert({
     db,
     alertType: exhausted ? SettlementOperationalAlertType.REVERSAL_RETRY_EXHAUSTED : SettlementOperationalAlertType.REVERSAL_NEEDS_MANUAL_REVIEW,
     severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -525,7 +537,7 @@ async function recordWorkerRunFailureAlert({
 }) {
   if (summary.failedCount === 0 && !errorCode) return;
   const partiallyFailed = summary.succeededCount > 0;
-  await upsertOperationalAlert({
+  await upsertSettlementOperationalAlert({
     db,
     alertType: partiallyFailed
       ? SettlementOperationalAlertType.WORKER_PARTIALLY_FAILED
@@ -559,7 +571,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
       data: { status: SettlementWorkerRunStatus.FAILED, completedAt: now, sanitizedErrorCode: "worker_timeout" },
     });
     if (changed.count === 1) {
-      await upsertOperationalAlert({
+      await upsertSettlementOperationalAlert({
         db,
         alertType: SettlementOperationalAlertType.WORKER_FAILED,
         severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -602,7 +614,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
     });
     if (changed) {
       recovered.transfer += 1;
-      await upsertOperationalAlert({
+      await upsertSettlementOperationalAlert({
         db,
         alertType: SettlementOperationalAlertType.STALE_TRANSFER_CLAIM,
         severity: SettlementOperationalAlertSeverity.WARNING,
@@ -642,7 +654,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
     });
     if (changed) {
       recovered.reversal += 1;
-      await upsertOperationalAlert({
+      await upsertSettlementOperationalAlert({
         db,
         alertType: SettlementOperationalAlertType.STALE_REVERSAL_CLAIM,
         severity: SettlementOperationalAlertSeverity.WARNING,
@@ -681,7 +693,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
           idempotencyKey: `settlement:leg:${leg.id}:manual-review:max-attempts`,
         },
       });
-      await upsertOperationalAlert({
+      await upsertSettlementOperationalAlert({
         db,
         alertType: SettlementOperationalAlertType.TRANSFER_RETRY_EXHAUSTED,
         severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -721,7 +733,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
           idempotencyKey: `settlement:reversal:${reversal.id}:manual-review:max-attempts`,
         },
       });
-      await upsertOperationalAlert({
+      await upsertSettlementOperationalAlert({
         db,
         alertType: SettlementOperationalAlertType.REVERSAL_RETRY_EXHAUSTED,
         severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -746,7 +758,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
     take: DEFAULT_SETTLEMENT_WORKER_BATCH_SIZE,
   });
   for (const leg of disputedReadyLegs) {
-    await upsertOperationalAlert({
+    await upsertSettlementOperationalAlert({
       db,
       alertType: SettlementOperationalAlertType.DISPUTE_OPEN_WITH_READY_TRANSFER,
       severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -771,7 +783,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
     take: DEFAULT_SETTLEMENT_WORKER_BATCH_SIZE,
   });
   for (const leg of longPendingTransfers) {
-    await upsertOperationalAlert({
+    await upsertSettlementOperationalAlert({
       db,
       alertType: SettlementOperationalAlertType.LONG_PENDING_TRANSFER,
       severity: SettlementOperationalAlertSeverity.WARNING,
@@ -794,7 +806,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
     take: DEFAULT_SETTLEMENT_WORKER_BATCH_SIZE,
   });
   for (const reversal of longPendingReversals) {
-    await upsertOperationalAlert({
+    await upsertSettlementOperationalAlert({
       db,
       alertType: SettlementOperationalAlertType.LONG_PENDING_REVERSAL,
       severity: SettlementOperationalAlertSeverity.WARNING,
@@ -830,7 +842,7 @@ export async function runSettlementStaleRecovery({ db = getDb(), now = new Date(
   for (const leg of refundedTransferredLegs) {
     const reversedAmount = leg.reversals.reduce((sum, reversal) => sum + reversal.successfullyReversedAmount, 0);
     if (reversedAmount >= leg.settlement.paymentRequest.refundAmount) continue;
-    await upsertOperationalAlert({
+    await upsertSettlementOperationalAlert({
       db,
       alertType: SettlementOperationalAlertType.REFUND_WITH_UNREVERSED_TRANSFER,
       severity: SettlementOperationalAlertSeverity.CRITICAL,
@@ -1074,8 +1086,8 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       type: string;
       status: string;
       currency: string;
-      count: number;
-      amount_sum: number;
+      count: number | bigint | string;
+      amount_sum: number | bigint | string;
       manual_review: boolean;
       attempt_exhausted: boolean;
       retry_due: boolean;
@@ -1085,8 +1097,8 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       SELECT leg."type"::text AS type,
         leg."status"::text AS status,
         leg."currency" AS currency,
-        COUNT(*)::int AS count,
-        COALESCE(SUM(leg."amount"), 0)::int AS amount_sum,
+        COUNT(*) AS count,
+        COALESCE(SUM(leg."amount"), 0)::numeric AS amount_sum,
         leg."manualReviewRequired" AS manual_review,
         (leg."transferAttemptCount" >= 5) AS attempt_exhausted,
         (leg."nextTransferAttemptAt" IS NOT NULL AND leg."nextTransferAttemptAt" <= ${now}) AS retry_due,
@@ -1106,9 +1118,9 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       type: string;
       status: string;
       currency: string;
-      count: number;
-      amount_sum: number;
-      reversed_sum: number;
+      count: number | bigint | string;
+      amount_sum: number | bigint | string;
+      reversed_sum: number | bigint | string;
       retry_due: boolean;
       stale: boolean;
       attempt_exhausted: boolean;
@@ -1117,9 +1129,9 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
       SELECT leg."type"::text AS type,
         reversal."status"::text AS status,
         reversal."currency" AS currency,
-        COUNT(*)::int AS count,
-        COALESCE(SUM(reversal."amount"), 0)::int AS amount_sum,
-        COALESCE(SUM(reversal."successfullyReversedAmount"), 0)::int AS reversed_sum,
+        COUNT(*) AS count,
+        COALESCE(SUM(reversal."amount"), 0)::numeric AS amount_sum,
+        COALESCE(SUM(reversal."successfullyReversedAmount"), 0)::numeric AS reversed_sum,
         (reversal."nextReversalAttemptAt" IS NULL OR reversal."nextReversalAttemptAt" <= ${now}) AS retry_due,
         (reversal."reversalLockedAt" IS NOT NULL AND reversal."reversalLockedAt" < ${staleBefore}) AS stale,
         (reversal."reversalAttemptCount" >= 5) AS attempt_exhausted,
@@ -1148,7 +1160,7 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
         AND leg."type" IN ('SELLER_PAYABLE'::"SettlementLegType", 'PARTNER_REFERRAL'::"SettlementLegType")
     `),
     db.$queryRaw<Array<{ held_settlement_count: number }>>(Prisma.sql`
-      SELECT COUNT(DISTINCT settlement."id")::int AS held_settlement_count
+      SELECT COUNT(DISTINCT settlement."id") AS held_settlement_count
       FROM "SettlementLeg" AS leg
       JOIN "Settlement" AS settlement ON settlement."id" = leg."settlementId"
       WHERE settlement."paymentFlow" = ${SettlementPaymentFlow.SCT}::"SettlementPaymentFlow"
@@ -1158,59 +1170,81 @@ export async function getSettlementOperationsMetrics({ db = getDb(), now = new D
     db.settlementWorkerRun.findMany({ orderBy: { startedAt: "desc" }, take: 10, select: { id: true, status: true, workerType: true, startedAt: true, completedAt: true } }),
   ]);
 
-  const asNumber = (value: number | string | null | undefined) => Number(value ?? 0);
-  const amountBy = (rows: Array<{ currency: string; amount_sum: number }>) => rows.reduce<Record<string, number>>((result, row) => {
-    result[row.currency] = (result[row.currency] ?? 0) + asNumber(row.amount_sum);
+  const asSafeInteger = (value: number | bigint | string | null | undefined, field: string) => {
+    try {
+      return toSafeSettlementMetricInteger(value);
+    } catch {
+      throw new Error(`metrics_${field}_unsafe`);
+    }
+  };
+  const asSafeMetricNumber = (value: number | string | null | undefined, field: string) => {
+    const numeric = Number(value ?? 0);
+    if (!Number.isFinite(numeric) || numeric < 0 || numeric > Number.MAX_SAFE_INTEGER) {
+      throw new Error(`metrics_${field}_unsafe`);
+    }
+    return numeric;
+  };
+  const addSafe = (left: number, right: number, field: string) => {
+    const result = left + right;
+    if (!Number.isSafeInteger(result) || result < 0) throw new Error(`metrics_${field}_unsafe`);
+    return result;
+  };
+  const countRows = (rows: Array<{ count: number }>) => rows.reduce((sum, row) => addSafe(sum, row.count, "count"), 0);
+  const amountBy = (rows: Array<{ currency: string; amount_sum: number | bigint | string }>) => rows.reduce<Record<string, number>>((result, row) => {
+    result[row.currency] = addSafe(result[row.currency] ?? 0, asSafeInteger(row.amount_sum, "amount"), "amount");
     return result;
   }, {});
-  const legRows = legMetrics.map((row) => ({ ...row, count: asNumber(row.count), amount_sum: asNumber(row.amount_sum) }));
-  const reversalRows = reversalMetrics.map((row) => ({ ...row, count: asNumber(row.count), amount_sum: asNumber(row.amount_sum), reversed_sum: asNumber(row.reversed_sum) }));
+  const legRows = legMetrics.map((row) => ({ ...row, count: asSafeInteger(row.count, "count"), amount_sum: asSafeInteger(row.amount_sum, "amount") }));
+  const reversalRows = reversalMetrics.map((row) => ({ ...row, count: asSafeInteger(row.count, "count"), amount_sum: asSafeInteger(row.amount_sum, "amount"), reversed_sum: asSafeInteger(row.reversed_sum, "reversed_amount") }));
   const rowsFor = (status: string, rows = legRows) => rows.filter((row) => row.status === status);
   const ready = rowsFor("READY");
   const held = rowsFor("HOLD");
   const transferred = rowsFor("TRANSFERRED");
   const attemptedTransfers = legRows.filter((row) => row.attempted);
+  const transferredAttempted = attemptedTransfers.filter((row) => row.status === "TRANSFERRED");
   const failedTransfers = legRows.filter((row) => row.status !== "TRANSFERRED" && (row.manual_review || row.attempt_exhausted));
   const pendingReversals = reversalRows.filter((row) => row.status === "PENDING");
   const attemptedReversals = reversalRows.filter((row) => row.attempted);
+  const completedAttemptedReversals = attemptedReversals.filter((row) => row.status === "COMPLETED");
   const completedReversals = reversalRows.filter((row) => row.status === "COMPLETED");
   const amountByReversalRemaining = (rows: typeof reversalRows) => rows.reduce<Record<string, number>>((result, row) => {
-    result[row.currency] = (result[row.currency] ?? 0) + Math.max(0, row.amount_sum - row.reversed_sum);
+    result[row.currency] = addSafe(result[row.currency] ?? 0, Math.max(0, row.amount_sum - row.reversed_sum), "remaining_amount");
     return result;
   }, {});
   const workerSuccessCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.SUCCEEDED).length;
   const workerFailureCount = runs.filter((run) => run.status === SettlementWorkerRunStatus.FAILED || run.status === SettlementWorkerRunStatus.PARTIALLY_FAILED).length;
   const age = ageMetrics[0] ?? { average_attempts: 0, p50_age_ms: 0, p95_age_ms: 0, oldest_age_ms: 0 };
-  const heldCount = asNumber(heldSettlementMetrics[0]?.held_settlement_count);
-  const manualReviewCount = legRows.filter((row) => row.manual_review).reduce((sum, row) => sum + row.count, 0)
-    + reversalRows.filter((row) => row.status === "NEEDS_MANUAL_REVIEW").reduce((sum, row) => sum + row.count, 0);
+  const heldCount = asSafeInteger(heldSettlementMetrics[0]?.held_settlement_count as number | bigint | string | undefined, "held_count");
+  const manualReviewCount = addSafe(countRows(legRows.filter((row) => row.manual_review)), countRows(reversalRows.filter((row) => row.status === "NEEDS_MANUAL_REVIEW")), "manual_review_count");
+  const attemptedTransferCount = countRows(attemptedTransfers);
+  const attemptedReversalCount = countRows(attemptedReversals);
   return {
-    flow: { SCT: { readyTransferCount: ready.reduce((sum, row) => sum + row.count, 0), readyTransferAmount: amountBy(ready), heldCount: held.reduce((sum, row) => sum + row.count, 0), heldAmount: amountBy(held), transferredCount: transferred.reduce((sum, row) => sum + row.count, 0), transferredAmount: amountBy(transferred), sellerPayableAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.SELLER_PAYABLE)), partnerReferralAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.PARTNER_REFERRAL)) }, DIRECT_CHARGE: { available: false } },
-    readyTransferCount: ready.reduce((sum, row) => sum + row.count, 0),
+    flow: { SCT: { readyTransferCount: countRows(ready), readyTransferAmount: amountBy(ready), heldCount: countRows(held), heldAmount: amountBy(held), transferredCount: countRows(transferred), transferredAmount: amountBy(transferred), sellerPayableAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.SELLER_PAYABLE)), partnerReferralAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.PARTNER_REFERRAL)) }, DIRECT_CHARGE: { available: false } },
+    readyTransferCount: countRows(ready),
     readyTransferAmount: amountBy(ready),
     heldSettlementCount: heldCount,
     heldAmount: amountBy(held),
     transferredAmount: amountBy(transferred),
     reversedAmount: amountBy(reversalRows.map((row) => ({ currency: row.currency, amount_sum: row.reversed_sum }))),
-    pendingReversalCount: pendingReversals.reduce((sum, row) => sum + row.count, 0),
+    pendingReversalCount: countRows(pendingReversals),
     pendingReversalAmount: amountByReversalRemaining(pendingReversals),
-    retryDueTransferCount: legRows.filter((row) => row.status !== "TRANSFERRED" && row.retry_due).reduce((sum, row) => sum + row.count, 0),
-    retryDueReversalCount: pendingReversals.filter((row) => row.retry_due).reduce((sum, row) => sum + row.count, 0),
-    staleExecutionCount: legRows.filter((row) => row.stale).reduce((sum, row) => sum + row.count, 0) + reversalRows.filter((row) => row.stale).reduce((sum, row) => sum + row.count, 0),
-    successfulTransferCount: transferred.reduce((sum, row) => sum + row.count, 0),
-    failedTransferCount: failedTransfers.reduce((sum, row) => sum + row.count, 0),
-    successfulReversalCount: completedReversals.reduce((sum, row) => sum + row.count, 0),
-    transferSuccessRate: attemptedTransfers.reduce((sum, row) => sum + row.count, 0) ? Math.min(1, transferred.reduce((sum, row) => sum + row.count, 0) / attemptedTransfers.reduce((sum, row) => sum + row.count, 0)) : 0,
-    reversalSuccessRate: attemptedReversals.reduce((sum, row) => sum + row.count, 0) ? Math.min(1, completedReversals.reduce((sum, row) => sum + row.count, 0) / attemptedReversals.reduce((sum, row) => sum + row.count, 0)) : 0,
-    averageTransferAttempts: asNumber(age.average_attempts),
-    p50ProcessingAgeMs: asNumber(age.p50_age_ms),
-    p95ProcessingAgeMs: asNumber(age.p95_age_ms),
+    retryDueTransferCount: countRows(legRows.filter((row) => row.status !== "TRANSFERRED" && row.retry_due)),
+    retryDueReversalCount: countRows(pendingReversals.filter((row) => row.retry_due)),
+    staleExecutionCount: addSafe(countRows(legRows.filter((row) => row.stale)), countRows(reversalRows.filter((row) => row.stale)), "stale_execution_count"),
+    successfulTransferCount: countRows(transferred),
+    failedTransferCount: countRows(failedTransfers),
+    successfulReversalCount: countRows(completedReversals),
+    transferSuccessRate: attemptedTransferCount ? countRows(transferredAttempted) / attemptedTransferCount : 0,
+    reversalSuccessRate: attemptedReversalCount ? countRows(completedAttemptedReversals) / attemptedReversalCount : 0,
+    averageTransferAttempts: asSafeMetricNumber(age.average_attempts, "average_attempts"),
+    p50ProcessingAgeMs: asSafeMetricNumber(age.p50_age_ms, "p50_age_ms"),
+    p95ProcessingAgeMs: asSafeMetricNumber(age.p95_age_ms, "p95_age_ms"),
     workerSuccessCount,
     workerFailureCount,
     workerMetricsWindow: "latest_10_runs",
-    oldestUnprocessedAgeMs: asNumber(age.oldest_age_ms),
-    retryExhaustedTransferCount: failedTransfers.filter((row) => row.attempt_exhausted).reduce((sum, row) => sum + row.count, 0),
-    retryExhaustedReversalCount: reversalRows.filter((row) => row.attempt_exhausted && row.status !== "COMPLETED").reduce((sum, row) => sum + row.count, 0),
+    oldestUnprocessedAgeMs: asSafeMetricNumber(age.oldest_age_ms, "oldest_age_ms"),
+    retryExhaustedTransferCount: countRows(failedTransfers.filter((row) => row.attempt_exhausted)),
+    retryExhaustedReversalCount: countRows(reversalRows.filter((row) => row.attempt_exhausted && row.status !== "COMPLETED")),
     sellerPayableAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.SELLER_PAYABLE)),
     partnerReferralAmount: amountBy(legRows.filter((row) => row.type === SettlementLegType.PARTNER_REFERRAL)),
     manualReviewCount,

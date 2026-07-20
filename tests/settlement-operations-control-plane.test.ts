@@ -7,6 +7,7 @@ import {
   resolveSettlementWorkerRunStatus,
   runSettlementReversalBatch,
   runSettlementTransferBatch,
+  toSafeSettlementMetricInteger,
 } from "../src/lib/settlement-operations-control-plane.ts";
 import { SettlementWorkerRunStatus } from "../src/generated/prisma/client.ts";
 import { parseStripeConnectExecutionMode } from "../src/lib/stripe-connect-execution-mode.ts";
@@ -129,6 +130,12 @@ test("worker accounting treats manual review as failure and empty runs as succes
   assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 1, failedCount: 0, manualReviewCount: 0, succeededCount: 0, timedOut: true }), SettlementWorkerRunStatus.FAILED);
   assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 2, failedCount: 0, manualReviewCount: 0, succeededCount: 1, timedOut: true }), SettlementWorkerRunStatus.PARTIALLY_FAILED);
   assert.equal(resolveSettlementWorkerRunStatus({ scannedCount: 0, failedCount: 0, manualReviewCount: 0, succeededCount: 0, timedOut: true }), SettlementWorkerRunStatus.SUCCEEDED);
+});
+
+test("metric aggregate conversion accepts values above int32 and rejects unsafe integers", () => {
+  assert.equal(toSafeSettlementMetricInteger("2147483648"), 2_147_483_648);
+  assert.equal(toSafeSettlementMetricInteger(BigInt(Number.MAX_SAFE_INTEGER)), Number.MAX_SAFE_INTEGER);
+  assert.throws(() => toSafeSettlementMetricInteger("9007199254740992"), /metrics_aggregate_unsafe/);
 });
 
 test("transfer worker timeout before success persists FAILED and skips unprocessed rows", async () => {
