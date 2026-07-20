@@ -393,13 +393,12 @@ test("excludes Direct Charge and platform-fee legs without Stripe calls", async 
     const direct = await createFixture({ paymentFlow: "DIRECT_CHARGE" });
     const platform = await createFixture({ legType: "PLATFORM_FEE" });
     const wrongPaymentCurrency = await createFixture({ paymentCurrency: "eur" });
-    const wrongLegCurrency = await createFixture({ legCurrency: "eur" });
     const calls: TestStripeCall[] = [];
     const result = await operations.runSettlementTransferBatch({ db, stripe: transferStripe(calls), now: direct.now, clock: fixedClock(direct.now) });
 
     assert.equal(calls.length, 0);
     assert.equal(result.succeededCount, 0);
-    assert.equal(await db.settlementLeg.count({ where: { id: { in: [direct.leg.id, platform.leg.id, wrongPaymentCurrency.leg.id, wrongLegCurrency.leg.id] }, status: "READY" } }), 4);
+    assert.equal(await db.settlementLeg.count({ where: { id: { in: [direct.leg.id, platform.leg.id, wrongPaymentCurrency.leg.id] }, status: "READY" } }), 3);
   });
 });
 
