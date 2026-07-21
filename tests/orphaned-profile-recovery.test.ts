@@ -126,6 +126,15 @@ test("recovery requires the existing account cleanup to finish before creation",
   );
   assert.match(
     recovery.recoverOrphanedUserProfile.toString(),
-    /isDeletedAndAnonymized\(deletedProfile\)/,
+    /replacementProfileId/,
   );
+  assert.match(
+    recovery.recoverOrphanedUserProfile.toString(),
+    /onBeforeCommit/,
+  );
+});
+
+test("recovery uses a bounded lease for pending profiles", () => {
+  assert.equal(recovery.ORPHANED_PROFILE_RECOVERY_LEASE_MS, 5 * 60_000);
+  assert.match(recovery.recoverOrphanedUserProfile.toString(), /hasRecentRecoveryLease/);
 });

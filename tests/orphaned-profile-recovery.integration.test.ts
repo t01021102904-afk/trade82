@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { after, test } from "node:test";
 
+import type { StorageFileTarget } from "../src/lib/account-deletion.ts";
 import type { PrismaClient } from "../src/generated/prisma/client.ts";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -22,8 +23,15 @@ const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href
 const { AccountDeletionStatus } = await import(
   new URL("../src/generated/prisma/client.ts", import.meta.url).href,
 );
-const { recoverOrphanedUserProfile, OrphanedProfileRecoveryClerkError } =
+const {
+  ORPHANED_PROFILE_RECOVERY_LEASE_MS,
+  recoverOrphanedUserProfile,
+  OrphanedProfileRecoveryClerkError,
+} =
   await import(new URL("../src/lib/orphaned-profile-recovery.ts", import.meta.url).href);
+const { cleanupTrade82AccountData } = await import(
+  new URL("../src/lib/account-deletion.ts", import.meta.url).href,
+);
 
 const db = getDb() as PrismaClient;
 
@@ -40,20 +48,6 @@ function missingClerkUser() {
     status: 404,
     errors: [{ code: "resource_not_found" }],
     isClerkAPIResponseError: () => true,
-  };
-}
-
-function cleanupResult(profileId: string, clerkUserId: string) {
-  return {
-    userProfileId: profileId,
-    clerkUserId,
-    companyCount: 0,
-    productCount: 0,
-    messageAttachmentCount: 0,
-    publicStorageDeleteCount: 0,
-    privateStorageDeleteCount: 0,
-    failedStorageDeleteCount: 0,
-    deletionStatus: AccountDeletionStatus.DELETED,
   };
 }
 
@@ -84,18 +78,9 @@ test("missing old Clerk identity is anonymized before one fresh profile is creat
       findClerkUser: async () => {
         throw missingClerkUser();
       },
-      cleanup: async ({ userProfileId, clerkUserId }: { userProfileId: string; clerkUserId: string }) => {
+      cleanup: async (target: Parameters<typeof cleanupTrade82AccountData>[0]) => {
         cleanupCalls += 1;
-        await db.userProfile.update({
-          where: { id: userProfileId },
-          data: {
-            clerkUserId: `deleted:${userProfileId}`,
-            email: `deleted-${userProfileId}@deleted.trade82.local`,
-            deletionStatus: AccountDeletionStatus.DELETED,
-            deletedAt: new Date(),
-          },
-        });
-        return cleanupResult(userProfileId, clerkUserId);
+        return cleanupTrade82AccountData(target);
       },
     });
 
@@ -176,19 +161,10 @@ test("two concurrent recoveries claim one old profile and create one new profile
       findClerkUser: async () => {
         throw missingClerkUser();
       },
-      cleanup: async ({ userProfileId, clerkUserId }: { userProfileId: string; clerkUserId: string }) => {
+      cleanup: async (target: Parameters<typeof cleanupTrade82AccountData>[0]) => {
         cleanupCalls += 1;
         await new Promise((resolve) => setTimeout(resolve, 50));
-        await db.userProfile.update({
-          where: { id: userProfileId },
-          data: {
-            clerkUserId: `deleted:${userProfileId}`,
-            email: `deleted-${userProfileId}@deleted.trade82.local`,
-            deletionStatus: AccountDeletionStatus.DELETED,
-            deletedAt: new Date(),
-          },
-        });
-        return cleanupResult(userProfileId, clerkUserId);
+        return cleanupTrade82AccountData(target);
       },
     };
 
@@ -208,5 +184,234 @@ test("two concurrent recoveries claim one old profile and create one new profile
   } finally {
     await db.userProfile.deleteMany({ where: { email: oldProfile.email } });
     await db.userProfile.deleteMany({ where: { clerkUserId: `deleted:${oldProfile.id}` } });
+  }
+});
+
+test("replacement failure rolls back anonymization and leaves no new profile", async () => {
+  const id = suffix();
+  const oldProfile = await createOldProfile(id);
+  const currentClerkUserId = `clerk-new-${id}`;
+
+  try {
+    await assert.rejects(
+      recoverOrphanedUserProfile({
+        db: db as never,
+        currentClerkUserId,
+        email: oldProfile.email,
+        displayName: "Fresh owner",
+        preferredLanguage: "en",
+        findClerkUser: async () => {
+          throw missingClerkUser();
+        },
+        createReplacementProfile: async () => {
+          throw new Error("injected replacement failure");
+        },
+      }),
+    );
+
+    const unchanged = await db.userProfile.findUnique({ where: { id: oldProfile.id } });
+    assert.equal(unchanged?.deletionStatus, AccountDeletionStatus.DELETION_PENDING);
+    assert.equal(unchanged?.email, oldProfile.email);
+    assert.equal(unchanged?.clerkUserId, oldProfile.clerkUserId);
+    assert.equal(
+      await db.userProfile.count({ where: { clerkUserId: currentClerkUserId } }),
+      0,
+    );
+  } finally {
+    await db.userProfile.deleteMany({ where: { clerkUserId: currentClerkUserId } });
+    await db.userProfile.delete({ where: { id: oldProfile.id } });
+  }
+});
+
+test("recent pending leases block recovery without cleanup or Clerk lookup", async () => {
+  const id = suffix();
+  const oldProfile = await createOldProfile(id);
+  const currentClerkUserId = `clerk-new-${id}`;
+  const requestedAt = new Date(Date.now() - ORPHANED_PROFILE_RECOVERY_LEASE_MS + 1_000);
+  let clerkLookups = 0;
+
+  try {
+    await db.userProfile.update({
+      where: { id: oldProfile.id },
+      data: {
+        deletionStatus: AccountDeletionStatus.DELETION_PENDING,
+        deletionRequestedAt: requestedAt,
+      },
+    });
+
+    const result = await recoverOrphanedUserProfile({
+      db: db as never,
+      currentClerkUserId,
+      email: oldProfile.email,
+      displayName: "Fresh owner",
+      preferredLanguage: "en",
+      findClerkUser: async () => {
+        clerkLookups += 1;
+        throw missingClerkUser();
+      },
+    });
+    assert.deepEqual(result, { kind: "recovery_in_progress" });
+    assert.equal(clerkLookups, 0);
+    assert.equal(await db.userProfile.count({ where: { clerkUserId: currentClerkUserId } }), 0);
+  } finally {
+    await db.userProfile.deleteMany({ where: { clerkUserId: currentClerkUserId } });
+    await db.userProfile.delete({ where: { id: oldProfile.id } });
+  }
+});
+
+test("expired pending leases reverify the old identity and resume recovery", async () => {
+  const id = suffix();
+  const oldProfile = await createOldProfile(id);
+  const currentClerkUserId = `clerk-new-${id}`;
+  const expiredAt = new Date(Date.now() - ORPHANED_PROFILE_RECOVERY_LEASE_MS - 1_000);
+  let clerkLookups = 0;
+
+  try {
+    await db.userProfile.update({
+      where: { id: oldProfile.id },
+      data: {
+        deletionStatus: AccountDeletionStatus.DELETION_PENDING,
+        deletionRequestedAt: expiredAt,
+      },
+    });
+
+    const result = await recoverOrphanedUserProfile({
+      db: db as never,
+      currentClerkUserId,
+      email: oldProfile.email,
+      displayName: "Fresh owner",
+      preferredLanguage: "ko",
+      findClerkUser: async () => {
+        clerkLookups += 1;
+        throw missingClerkUser();
+      },
+    });
+    assert.equal(result.kind, "recovered");
+    assert.equal(clerkLookups, 1);
+    assert.equal(
+      await db.userProfile.count({
+        where: { email: oldProfile.email, deletionStatus: AccountDeletionStatus.ACTIVE },
+      }),
+      1,
+    );
+  } finally {
+    await db.userProfile.deleteMany({ where: { clerkUserId: currentClerkUserId } });
+    await db.userProfile.deleteMany({ where: { id: oldProfile.id } });
+  }
+});
+
+test("retry after a committed replacement returns already_recovered without cleanup", async () => {
+  const id = suffix();
+  const oldProfile = await createOldProfile(id);
+  const currentClerkUserId = `clerk-new-${id}`;
+  let cleanupCalls = 0;
+
+  try {
+    const options = {
+      db: db as never,
+      currentClerkUserId,
+      email: oldProfile.email,
+      displayName: "Fresh owner",
+      preferredLanguage: "en" as const,
+      findClerkUser: async () => {
+        throw missingClerkUser();
+      },
+      cleanup: async (target: Parameters<typeof cleanupTrade82AccountData>[0]) => {
+        cleanupCalls += 1;
+        return cleanupTrade82AccountData(target);
+      },
+    };
+
+    const first = await recoverOrphanedUserProfile(options);
+    const second = await recoverOrphanedUserProfile(options);
+    assert.equal(first.kind, "recovered");
+    assert.equal(second.kind, "already_recovered");
+    assert.equal(cleanupCalls, 1);
+    assert.equal(
+      await db.userProfile.count({ where: { clerkUserId: currentClerkUserId } }),
+      1,
+    );
+    assert.equal(
+      await db.userProfile.count({
+        where: {
+          email: { startsWith: "deleted-" },
+          clerkUserId: { startsWith: "deleted:" },
+          deletionStatus: AccountDeletionStatus.DELETED,
+        },
+      }),
+      1,
+    );
+  } finally {
+    await db.userProfile.deleteMany({ where: { clerkUserId: currentClerkUserId } });
+    await db.userProfile.deleteMany({ where: { id: oldProfile.id } });
+  }
+});
+
+test("storage cleanup failure after commit preserves the replacement and is idempotent", async () => {
+  const id = suffix();
+  const oldProfile = await createOldProfile(id);
+  const currentClerkUserId = `clerk-new-${id}`;
+  let cleanupCalls = 0;
+  let storageDeleteCalls = 0;
+  let failedStorageDeleteCount = 0;
+
+  await db.userProfile.update({
+    where: { id: oldProfile.id },
+    data: {
+      avatarUrl: `https://storage.example.test/storage/v1/object/public/marketplace-assets/profile-avatars/${id}/avatar.webp`,
+    },
+  });
+
+  try {
+    const options = {
+      db: db as never,
+      currentClerkUserId,
+      email: oldProfile.email,
+      displayName: "Fresh owner",
+      preferredLanguage: "en" as const,
+      findClerkUser: async () => {
+        throw missingClerkUser();
+      },
+      cleanup: async (target: Parameters<typeof cleanupTrade82AccountData>[0]) => {
+        cleanupCalls += 1;
+        const result = await cleanupTrade82AccountData(target, {
+          deleteStorageFiles: async (files: StorageFileTarget[]) => {
+            storageDeleteCalls += 1;
+            assert.equal(files.length, 1);
+            const failed = files.length;
+            failedStorageDeleteCount += failed;
+            return {
+              publicStorageDeleteCount: 0,
+              privateStorageDeleteCount: 0,
+              failedStorageDeleteCount: failed,
+            };
+          },
+        });
+        return result;
+      },
+    };
+
+    const first = await recoverOrphanedUserProfile(options);
+    assert.equal(first.kind, "recovered");
+    assert.equal(cleanupCalls, 1);
+    assert.equal(storageDeleteCalls, 1);
+    assert.equal(failedStorageDeleteCount, 1);
+
+    const [oldState, replacement] = await Promise.all([
+      db.userProfile.findUnique({ where: { id: oldProfile.id } }),
+      db.userProfile.findUnique({ where: { clerkUserId: currentClerkUserId } }),
+    ]);
+    assert.equal(oldState?.deletionStatus, AccountDeletionStatus.DELETED);
+    assert.equal(oldState?.email, `deleted-${oldProfile.id}@deleted.trade82.local`);
+    assert.equal(oldState?.clerkUserId, `deleted:${oldProfile.id}`);
+    assert.equal(replacement?.deletionStatus, AccountDeletionStatus.ACTIVE);
+
+    const second = await recoverOrphanedUserProfile(options);
+    assert.deepEqual(second, { kind: "already_recovered", profileId: replacement?.id });
+    assert.equal(cleanupCalls, 1);
+    assert.equal(storageDeleteCalls, 1);
+  } finally {
+    await db.userProfile.deleteMany({ where: { clerkUserId: currentClerkUserId } });
+    await db.userProfile.deleteMany({ where: { id: oldProfile.id } });
   }
 });

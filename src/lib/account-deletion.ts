@@ -4,7 +4,7 @@ import {
   DELETED_COMPANY_NAME,
   DELETED_USER_NAME,
 } from "@/lib/deletion-markers";
-import { AccountDeletionStatus } from "@/generated/prisma/client";
+import { AccountDeletionStatus, Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
   deleteStorageFile,
@@ -12,19 +12,42 @@ import {
   getPublicStorageBucket,
 } from "@/lib/supabase-storage";
 
+export type AccountDeletionTransactionFinalizer = (
+  tx: Prisma.TransactionClient,
+  context: {
+    userProfileId: string;
+    clerkUserId: string;
+    email: string;
+  },
+) => Promise<{ replacementProfileId?: string } | void>;
+
 type CleanupTarget =
   | {
       userProfileId: string;
       clerkUserId?: string;
+      onBeforeCommit?: AccountDeletionTransactionFinalizer;
     }
   | {
       userProfileId?: string;
       clerkUserId: string;
+      onBeforeCommit?: AccountDeletionTransactionFinalizer;
     };
 
-type StorageFileTarget = {
+export type StorageFileTarget = {
   path: string;
   visibility: "public" | "private";
+};
+
+export type StorageDeletionResult = {
+  publicStorageDeleteCount: number;
+  privateStorageDeleteCount: number;
+  failedStorageDeleteCount: number;
+};
+
+export type AccountDeletionCleanupOptions = {
+  deleteStorageFiles?: (
+    files: StorageFileTarget[],
+  ) => Promise<StorageDeletionResult>;
 };
 
 export type AccountDeletionCleanupResult = {
@@ -37,6 +60,7 @@ export type AccountDeletionCleanupResult = {
   privateStorageDeleteCount: number;
   failedStorageDeleteCount: number;
   deletionStatus: AccountDeletionStatus | null;
+  replacementProfileId?: string;
 };
 
 export async function markAccountDeletionPending(userProfileId: string) {
@@ -102,7 +126,9 @@ function addProductImageVariantPaths(paths: Set<string>, basePath: string) {
   }
 }
 
-async function deleteOwnedStorageFiles(files: StorageFileTarget[]) {
+async function deleteOwnedStorageFiles(
+  files: StorageFileTarget[],
+): Promise<StorageDeletionResult> {
   let publicStorageDeleteCount = 0;
   let privateStorageDeleteCount = 0;
   let failedStorageDeleteCount = 0;
@@ -135,7 +161,10 @@ async function deleteOwnedStorageFiles(files: StorageFileTarget[]) {
   };
 }
 
-export async function cleanupTrade82AccountData(target: CleanupTarget) {
+export async function cleanupTrade82AccountData(
+  target: CleanupTarget,
+  options: AccountDeletionCleanupOptions = {},
+) {
   const db = getDb();
   const profile = await db.userProfile.findFirst({
     where: {
@@ -241,7 +270,7 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
     if (deal.contractFilePath) privateStoragePaths.add(deal.contractFilePath);
   }
 
-  await db.$transaction(async (tx) => {
+  const transactionResult = await db.$transaction(async (tx) => {
     if (productIds.length) {
       await tx.inquiry.updateMany({
         where: { productId: { in: productIds } },
@@ -483,6 +512,12 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
         deletedAt: new Date(),
       },
     });
+
+    return target.onBeforeCommit?.(tx, {
+      userProfileId: profile.id,
+      clerkUserId: profile.clerkUserId,
+      email: profile.email,
+    });
   });
 
   const storageFiles = [
@@ -495,7 +530,9 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
       visibility: "private" as const,
     })),
   ];
-  const storageResult = await deleteOwnedStorageFiles(storageFiles);
+  const storageResult = await (options.deleteStorageFiles ?? deleteOwnedStorageFiles)(
+    storageFiles,
+  );
 
   return {
     userProfileId: profile.id,
@@ -505,5 +542,6 @@ export async function cleanupTrade82AccountData(target: CleanupTarget) {
     messageAttachmentCount: messageAttachments.length,
     ...storageResult,
     deletionStatus: AccountDeletionStatus.DELETED,
+    replacementProfileId: transactionResult?.replacementProfileId,
   } satisfies AccountDeletionCleanupResult;
 }
