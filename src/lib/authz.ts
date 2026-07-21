@@ -1,6 +1,6 @@
 import "server-only";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 
 import type {
@@ -21,6 +21,10 @@ import {
   getOnboardingCompanyState,
   inferRoleFromCompanyState,
 } from "@/lib/onboarding-status";
+import {
+  resolveCurrentClerkUser,
+  type ResolvedClerkUser,
+} from "@/lib/clerk-identity";
 
 type CompanyWithOwner = Company & {
   owner?: Pick<UserProfile, "id">;
@@ -66,18 +70,23 @@ export function isAdminEmail(email: string | null | undefined) {
   return Boolean(email && adminEmails().includes(email.toLowerCase()));
 }
 
-export async function isAdminUser() {
-  const clerkUser = await currentUser();
-  return isAdminEmail(clerkUser?.primaryEmailAddress?.emailAddress);
+export async function isAdminUser(clerkUser?: ResolvedClerkUser | null) {
+  const resolvedClerkUser =
+    clerkUser === undefined ? await resolveCurrentClerkUser() : clerkUser;
+  return isAdminEmail(resolvedClerkUser?.primaryEmailAddress?.emailAddress);
 }
 
-export async function getCurrentUserProfile() {
-  const { userId } = await auth();
-  if (!userId) return null;
-
-  const clerkUser = await currentUser();
+export async function getCurrentUserProfile(
+  resolvedClerkUser?: ResolvedClerkUser | null,
+) {
+  const clerkUser =
+    resolvedClerkUser === undefined
+      ? await resolveCurrentClerkUser()
+      : resolvedClerkUser;
   const primaryEmail = clerkUser?.primaryEmailAddress?.emailAddress;
   if (!clerkUser || !primaryEmail) return null;
+
+  const userId = clerkUser.id;
 
   const admin = isAdminEmail(primaryEmail);
   const metadataRole = roleFromMetadata(clerkUser.publicMetadata.role);
@@ -164,8 +173,12 @@ export async function requireAuth() {
 }
 
 export async function requireAdmin() {
-  const user = await requireAuth();
-  if (!(await isAdminUser())) {
+  const clerkUser = await resolveCurrentClerkUser();
+  if (!clerkUser) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+  const user = await getCurrentUserProfile(clerkUser);
+  if (!user || !(await isAdminUser(clerkUser))) {
     throw new Response("Forbidden", { status: 403 });
   }
   return user;

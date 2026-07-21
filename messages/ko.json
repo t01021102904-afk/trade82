@@ -1483,7 +1483,11 @@
     "signupTitle": "Trade82 계정 만들기",
     "signupText": "Clerk로 계정을 만든 뒤 바이어 또는 셀러 프로필을 완성하세요.",
     "login": "로그인",
-    "signup": "회원가입"
+    "signup": "회원가입",
+    "accountDeletedTitle": "계정이 삭제되었습니다",
+    "accountDeletedText": "세션을 정리하고 있습니다. 새 Trade82 계정을 만들려면 회원가입을 계속하세요.",
+    "resettingSession": "세션을 정리하는 중입니다...",
+    "continueToSignup": "회원가입 계속하기"
   },
   "onboarding": {
     "roleLabel": "온보딩",

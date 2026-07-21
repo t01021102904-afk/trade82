@@ -1483,7 +1483,11 @@
     "signupTitle": "Create your Trade82 account",
     "signupText": "Create an account with Clerk, then complete your buyer or seller profile.",
     "login": "Login",
-    "signup": "Signup"
+    "signup": "Signup",
+    "accountDeletedTitle": "Your account was deleted",
+    "accountDeletedText": "Your session is being cleared. Continue to signup to create a new Trade82 account.",
+    "resettingSession": "Clearing your session...",
+    "continueToSignup": "Continue to signup"
   },
   "onboarding": {
     "roleLabel": "Onboarding",
