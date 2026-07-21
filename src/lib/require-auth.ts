@@ -22,6 +22,7 @@ import {
   resolveCurrentClerkUser,
   type ResolvedClerkUser,
 } from "@/lib/clerk-identity";
+import { isExistingEmailDifferentClerkIdentityError } from "@/lib/fresh-user-profile";
 
 type PublicMetadata = {
   role?: unknown;
@@ -39,6 +40,10 @@ function localePrefix(pathname: string) {
   }
 
   return "";
+}
+
+function redirectToAccountRecovery(pathname: string): never {
+  redirect(`${localePrefix(pathname)}/account-recovery`);
 }
 
 export function getUserRole(metadata: PublicMetadata): AccountRole | null {
@@ -152,7 +157,17 @@ export async function redirectSignedInUserFromSignup(
   const clerkUser = await resolveCurrentClerkUser();
   if (!clerkUser) return;
 
-  const profile = await getCurrentUserProfile(clerkUser);
+  let profile;
+  try {
+    profile = await getCurrentUserProfile(clerkUser);
+  } catch (error) {
+    if (
+      isExistingEmailDifferentClerkIdentityError(error)
+    ) {
+      return;
+    }
+    throw error;
+  }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
@@ -186,7 +201,17 @@ export async function redirectSignedInUserFromSignup(
 
 export async function requireAppProfile(redirectUrl: string) {
   const clerkUser = await requireAuth(redirectUrl);
-  const profile = await getCurrentUserProfile(clerkUser);
+  let profile;
+  try {
+    profile = await getCurrentUserProfile(clerkUser);
+  } catch (error) {
+    if (
+      isExistingEmailDifferentClerkIdentityError(error)
+    ) {
+      redirectToAccountRecovery(redirectUrl);
+    }
+    throw error;
+  }
   const prefix = localePrefix(redirectUrl);
   if (!profile) {
     redirect(`${prefix}/login`);
@@ -230,7 +255,17 @@ export async function requireOnboardingEntry(redirectUrl: string) {
   }
 
   const clerkUser = await requireAuth(redirectUrl);
-  const profile = await getCurrentUserProfile(clerkUser);
+  let profile;
+  try {
+    profile = await getCurrentUserProfile(clerkUser);
+  } catch (error) {
+    if (
+      isExistingEmailDifferentClerkIdentityError(error)
+    ) {
+      redirectToAccountRecovery(redirectUrl);
+    }
+    throw error;
+  }
   const prefix = localePrefix(redirectUrl);
   if (!profile) {
     redirect(`${prefix}/login`);
@@ -269,7 +304,17 @@ export async function requireOnboardingRole(
   expectedRole: AccountRole,
 ) {
   const clerkUser = await requireAuth(redirectUrl);
-  const profile = await getCurrentUserProfile(clerkUser);
+  let profile;
+  try {
+    profile = await getCurrentUserProfile(clerkUser);
+  } catch (error) {
+    if (
+      isExistingEmailDifferentClerkIdentityError(error)
+    ) {
+      redirectToAccountRecovery(redirectUrl);
+    }
+    throw error;
+  }
   const prefix = localePrefix(redirectUrl);
   if (!profile) {
     redirect(`${prefix}/login`);
