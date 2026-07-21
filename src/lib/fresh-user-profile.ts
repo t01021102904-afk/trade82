@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   AccountDeletionStatus,
-  Prisma,
   type AccountRole,
   type UserProfile,
 } from "@/generated/prisma/client";
@@ -21,13 +20,26 @@ export function isActiveUserProfile(
   );
 }
 
-function isEmailUniqueConflict(error: unknown) {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002" &&
-    Array.isArray(error.meta?.target) &&
-    error.meta.target.includes("email")
-  );
+export class ExistingEmailDifferentClerkIdentityError extends Error {
+  readonly code = "existing_email_different_clerk_identity";
+
+  constructor() {
+    super("Account recovery is required before this identity can continue.");
+    this.name = "ExistingEmailDifferentClerkIdentityError";
+  }
+}
+
+export function isExistingEmailDifferentClerkIdentityError(error: unknown) {
+  return error instanceof ExistingEmailDifferentClerkIdentityError;
+}
+
+function isUniqueConstraintError(
+  error: unknown,
+): error is { code: "P2002" } {
+  if (!error || typeof error !== "object" || !("code" in error)) {
+    return false;
+  }
+  return error.code === "P2002";
 }
 
 type FreshProfileDatabase = ReturnType<typeof getDb>;
@@ -50,12 +62,14 @@ export async function createFreshUserProfile(
     referralClaimToken: string | undefined;
   },
 ) {
+  const normalizedEmail = email.trim().toLowerCase();
+
   try {
     return await db.$transaction(async (tx) => {
       const profile = await tx.userProfile.create({
         data: {
           clerkUserId,
-          email,
+          email: normalizedEmail,
           displayName,
           role,
           preferredLanguage,
@@ -68,14 +82,26 @@ export async function createFreshUserProfile(
       return profile;
     });
   } catch (error) {
-    if (!isEmailUniqueConflict(error)) throw error;
+    if (!isUniqueConstraintError(error)) throw error;
 
-    // A concurrent request for this same Clerk identity may have won the
-    // unique insert. An email conflict from another identity is never a
-    // relinking opportunity.
-    const existingByClerkId = await db.userProfile.findUnique({
-      where: { clerkUserId },
-    });
-    return isActiveUserProfile(existingByClerkId) ? existingByClerkId : null;
+    // Prisma's adapter-pg errors do not always include meta.target. Resolve
+    // the conflict from the authoritative unique columns instead of
+    // guessing from provider-specific error metadata.
+    const [existingByClerkId, existingByEmail] = await Promise.all([
+      db.userProfile.findUnique({ where: { clerkUserId } }),
+      db.userProfile.findUnique({ where: { email: normalizedEmail } }),
+    ]);
+
+    if (isActiveUserProfile(existingByClerkId)) {
+      return existingByClerkId;
+    }
+
+    if (existingByEmail && existingByEmail.clerkUserId !== clerkUserId) {
+      throw new ExistingEmailDifferentClerkIdentityError();
+    }
+
+    // A non-active row or an unexplained unique conflict must not be treated
+    // as permission to relink an identity or create an ambiguous profile.
+    throw error;
   }
 }

@@ -1487,7 +1487,17 @@
     "accountDeletedTitle": "Your account was deleted",
     "accountDeletedText": "Your session is being cleared. Continue to signup to create a new Trade82 account.",
     "resettingSession": "Clearing your session...",
-    "continueToSignup": "Continue to signup"
+    "continueToSignup": "Continue to signup",
+    "accountRecoveryLabel": "Account recovery",
+    "accountRecoveryTitle": "Recover your Trade82 account",
+    "accountRecoveryText": "We found an older local account that uses your verified email. Trade82 will only recover it after confirming the previous Clerk identity no longer exists.",
+    "accountRecoveryButton": "Recover account",
+    "accountRecoveryWorking": "Recovering your account...",
+    "accountRecoveryExisting": "The previous account is still active. Sign in with that account or contact support.",
+    "accountRecoveryInProgress": "Account recovery is already in progress. Please try again shortly.",
+    "accountRecoveryNotFound": "No recoverable account was found.",
+    "accountRecoveryNoVerifiedEmail": "A verified primary email is required to recover this account.",
+    "accountRecoveryUnavailable": "Account recovery is temporarily unavailable. Please try again later."
   },
   "onboarding": {
     "roleLabel": "Onboarding",

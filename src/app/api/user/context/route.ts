@@ -1,6 +1,7 @@
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
 import { rateLimitOrResponse } from "@/lib/api-security";
 import { getDb } from "@/lib/db";
+import { isExistingEmailDifferentClerkIdentityError } from "@/lib/fresh-user-profile";
 
 export async function GET(request: Request) {
   try {
@@ -33,7 +34,13 @@ export async function GET(request: Request) {
       isAdmin: await isAdminUser(),
       companies,
     });
-  } catch {
+  } catch (error) {
+    if (isExistingEmailDifferentClerkIdentityError(error)) {
+      return Response.json(
+        { error: "Account recovery is required before continuing." },
+        { status: 409 },
+      );
+    }
     console.error("Unable to load user context.");
     return Response.json(
       { error: "Unable to load user context." },
