@@ -1,4 +1,4 @@
-import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import {
@@ -18,6 +18,10 @@ import {
 } from "@/lib/onboarding-status";
 import type { AccountRole } from "@/lib/types";
 import { safeInternalPath } from "@/lib/url-security";
+import {
+  resolveCurrentClerkUser,
+  type ResolvedClerkUser,
+} from "@/lib/clerk-identity";
 
 type PublicMetadata = {
   role?: unknown;
@@ -130,27 +134,25 @@ async function syncClerkOnboardingMetadata(
   }
 }
 
-export async function requireAuth(redirectUrl: string) {
-  const { userId } = await auth();
+export async function requireAuth(
+  redirectUrl: string,
+): Promise<ResolvedClerkUser> {
+  const clerkUser = await resolveCurrentClerkUser();
+  if (clerkUser) return clerkUser;
 
-  if (!userId) {
-    const prefix = localePrefix(redirectUrl);
-    const fallback = `${prefix || ""}/dashboard`;
-    const safeRedirectUrl = safeInternalPath(redirectUrl, fallback);
-    redirect(`${prefix}/login?redirect_url=${encodeURIComponent(safeRedirectUrl)}`);
-  }
+  const prefix = localePrefix(redirectUrl);
+  const fallback = `${prefix || ""}/dashboard`;
+  const safeRedirectUrl = safeInternalPath(redirectUrl, fallback);
+  redirect(`${prefix}/login?redirect_url=${encodeURIComponent(safeRedirectUrl)}`);
 }
 
 export async function redirectSignedInUserFromSignup(
   basePath: "" | "/en" | "/ko",
 ) {
-  const { userId } = await auth();
-  if (!userId) return;
+  const clerkUser = await resolveCurrentClerkUser();
+  if (!clerkUser) return;
 
-  const [clerkUser, profile] = await Promise.all([
-    currentUser(),
-    getCurrentUserProfile(),
-  ]);
+  const profile = await getCurrentUserProfile(clerkUser);
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
@@ -183,13 +185,12 @@ export async function redirectSignedInUserFromSignup(
 }
 
 export async function requireAppProfile(redirectUrl: string) {
-  await requireAuth(redirectUrl);
-
-  const [clerkUser, profile] = await Promise.all([
-    currentUser(),
-    getCurrentUserProfile(),
-  ]);
+  const clerkUser = await requireAuth(redirectUrl);
+  const profile = await getCurrentUserProfile(clerkUser);
   const prefix = localePrefix(redirectUrl);
+  if (!profile) {
+    redirect(`${prefix}/login`);
+  }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const { role, onboardingComplete } = await resolveOnboardingState(
     profile,
@@ -228,13 +229,12 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     };
   }
 
-  await requireAuth(redirectUrl);
-
-  const [clerkUser, profile] = await Promise.all([
-    currentUser(),
-    getCurrentUserProfile(),
-  ]);
+  const clerkUser = await requireAuth(redirectUrl);
+  const profile = await getCurrentUserProfile(clerkUser);
   const prefix = localePrefix(redirectUrl);
+  if (!profile) {
+    redirect(`${prefix}/login`);
+  }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
     profile,
@@ -268,13 +268,12 @@ export async function requireOnboardingRole(
   redirectUrl: string,
   expectedRole: AccountRole,
 ) {
-  await requireAuth(redirectUrl);
-
-  const [clerkUser, profile] = await Promise.all([
-    currentUser(),
-    getCurrentUserProfile(),
-  ]);
+  const clerkUser = await requireAuth(redirectUrl);
+  const profile = await getCurrentUserProfile(clerkUser);
   const prefix = localePrefix(redirectUrl);
+  if (!profile) {
+    redirect(`${prefix}/login`);
+  }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
   const { role, canChangeRole, onboardingComplete, companyState } =
     await resolveOnboardingState(
@@ -323,13 +322,12 @@ export async function requireDashboardRole(
 }
 
 export async function requireAdmin(redirectUrl: string) {
-  await requireAuth(redirectUrl);
+  const clerkUser = await requireAuth(redirectUrl);
 
-  if (!(await isAdminUser())) {
+  if (!(await isAdminUser(clerkUser))) {
     const prefix = localePrefix(redirectUrl);
     redirect(`${prefix}/dashboard`);
   }
 
-  const user = await currentUser();
-  return { email: user?.primaryEmailAddress?.emailAddress ?? "" };
+  return { email: clerkUser.primaryEmailAddress?.emailAddress ?? "" };
 }

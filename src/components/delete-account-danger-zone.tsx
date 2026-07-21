@@ -61,11 +61,15 @@ export function DeleteAccountDangerZone() {
       }
 
       clearDeletedAccountBrowserState();
-      const onboardingPath = withLocale("/onboarding/role", locale);
       const signupPath = withLocale("/signup", locale);
-      const redirectUrl = `${signupPath}?accountDeleted=1&redirect_url=${encodeURIComponent(onboardingPath)}`;
-      await signOut().catch(() => undefined);
-      window.location.replace(redirectUrl);
+      const recoveryPath = withLocale("/account-deleted", locale);
+      try {
+        await signOut({ redirectUrl: signupPath });
+      } catch {
+        window.location.replace(recoveryPath);
+        return;
+      }
+      window.location.replace(signupPath);
     } catch {
       setError(t("settings.deleteAccountError"));
     } finally {
