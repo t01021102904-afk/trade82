@@ -1,9 +1,25 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import {
-  hasPartnerReferralActivity,
-  type PartnerAnalyticsRange,
-  type PartnerReferralAnalytics,
+  buildPartnerAnalyticsWorkspaceModel,
+  compareAnalyticsValue,
+  groupPartnerAnalyticsPoints,
+  metricDefinition,
+  parseAnalyticsDateKey,
+  partnerAnalyticsGroupingOptions,
+  partnerAnalyticsMetrics,
+  partnerAnalyticsRangeOptions,
+  safeAnalyticsNumber,
+  type AnalyticsGrouping,
+  type AnalyticsMetric,
+  type AnalyticsPoint,
+} from "@/lib/partner-analytics-workspace";
+import type {
+  PartnerAnalyticsRange,
+  PartnerReferralAnalytics,
 } from "@/lib/partner-referral-analytics";
 import {
   createTranslator,
@@ -12,24 +28,31 @@ import {
   withLocale,
 } from "@/lib/i18n";
 
-type TrafficPoint = PartnerReferralAnalytics["trafficSeries"][number];
-type ConversionPoint = PartnerReferralAnalytics["conversionSeries"][number];
-
-const rangeOptions: Array<{ value: PartnerAnalyticsRange; key: string }> = [
-  { value: "7d", key: "last7Days" },
-  { value: "30d", key: "last30Days" },
-  { value: "90d", key: "last90Days" },
-  { value: "all", key: "allTime" },
+const kpiMetrics: AnalyticsMetric[] = [
+  "totalClicks",
+  "uniqueVisitors",
+  "attributedSignups",
+  "sellerRegistrations",
+  "buyerRegistrations",
+  "netCommission",
 ];
 
 function percentage(value: number) {
-  return `${value.toFixed(1)}%`;
+  return `${safeAnalyticsNumber(value).toFixed(1)}%`;
+}
+
+function money(amount: number, currency: string) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(safeAnalyticsNumber(amount) / 100);
 }
 
 function displayDate(value: string, locale: Locale) {
-  const date = new Date(
-    `${value}${value.length === 7 ? "-01" : ""}T00:00:00.000Z`,
-  );
+  if (value === "total") {
+    return locale === "ko" ? "합계" : "Total";
+  }
+  const date = parseAnalyticsDateKey(value);
   return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "short",
     day: value.length === 7 ? undefined : "numeric",
@@ -37,199 +60,213 @@ function displayDate(value: string, locale: Locale) {
   }).format(date);
 }
 
-function AnalyticsChart<T extends Record<string, number | string>>({
-  id,
-  title,
-  description,
-  points,
-  series,
+function comparisonLabel({
+  current,
+  previous,
   locale,
 }: {
-  id: string;
-  title: string;
-  description: string;
-  points: T[];
-  series: Array<{ key: keyof T; label: string; color: string }>;
+  current: number;
+  previous: number;
   locale: Locale;
 }) {
-  const width = 640;
-  const height = 230;
-  const left = 46;
-  const right = 16;
-  const top = 22;
-  const bottom = 44;
-  const innerWidth = width - left - right;
-  const innerHeight = height - top - bottom;
-  const values = points.flatMap((point) =>
-    series.map(({ key }) => Number(point[key]) || 0),
-  );
-  const maximum = Math.max(1, ...values);
-  const x = (index: number) =>
-    points.length <= 1
-      ? left + innerWidth / 2
-      : left + (index / (points.length - 1)) * innerWidth;
-  const y = (value: number) =>
-    top + innerHeight - (value / maximum) * innerHeight;
-  const labelIndexes = Array.from(
-    new Set([0, Math.floor((points.length - 1) / 2), points.length - 1]),
-  );
+  const comparison = compareAnalyticsValue(current, previous);
+  if (comparison.status === "new") {
+    return locale === "ko" ? "이전 기간 대비 신규" : "New vs previous period";
+  }
+  if (comparison.percentChange === null) {
+    return locale === "ko"
+      ? "이전 기간과 변화 없음"
+      : "No change vs previous period";
+  }
+  const prefix = comparison.percentChange > 0 ? "+" : "";
+  return locale === "ko"
+    ? `이전 기간 대비 ${prefix}${comparison.percentChange}%`
+    : `${prefix}${comparison.percentChange}% vs previous period`;
+}
+
+function formatMetricValue({
+  metric,
+  value,
+  currency,
+}: {
+  metric: AnalyticsMetric;
+  value: number;
+  currency: string;
+}) {
+  const definition = metricDefinition(metric);
+  if (definition.kind === "money") return money(value, currency);
+  if (definition.kind === "rate") return percentage(value);
+  return new Intl.NumberFormat("en-US").format(safeAnalyticsNumber(value));
+}
+
+function buildRangeHref({
+  basePath,
+  query,
+  range,
+  locale,
+}: {
+  basePath: string;
+  query: Record<string, string>;
+  range: PartnerAnalyticsRange;
+  locale: Locale;
+}) {
+  const params = new URLSearchParams(query);
+  params.set("analyticsRange", range);
+  return withLocale(`${basePath}?${params.toString()}`, locale);
+}
+
+function ChartPanel({
+  locale,
+  metric,
+  points,
+  totalValue,
+  currency,
+}: {
+  locale: Locale;
+  metric: AnalyticsMetric;
+  points: AnalyticsPoint[];
+  totalValue: number;
+  currency: string;
+}) {
+  const definition = metricDefinition(metric);
+  const chartPoints =
+    metric === "qualifyingTransactions" || metric === "netCommission"
+      ? [{ date: "total", value: totalValue }]
+      : points.map((point) => ({
+          date: point.date,
+          value: safeAnalyticsNumber(point[metric as keyof AnalyticsPoint]),
+        }));
+  const maximum = Math.max(1, ...chartPoints.map((point) => point.value));
+  const t = createTranslator(getDictionary(locale));
+
+  if (definition.kind === "rate") {
+    const width = 720;
+    const height = 260;
+    const left = 44;
+    const right = 18;
+    const top = 22;
+    const bottom = 44;
+    const innerWidth = width - left - right;
+    const innerHeight = height - top - bottom;
+    const x = (index: number) =>
+      chartPoints.length <= 1
+        ? left + innerWidth / 2
+        : left + (index / (chartPoints.length - 1)) * innerWidth;
+    const y = (value: number) =>
+      top + innerHeight - (value / Math.max(100, maximum)) * innerHeight;
+    const path = chartPoints
+      .map(
+        (point, index) =>
+          `${index ? "L" : "M"}${x(index)},${y(point.value)}`,
+      )
+      .join(" ");
+
+    return (
+      <svg
+        className="mt-6 h-auto w-full min-w-[560px]"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
+      >
+        <line
+          x1={left}
+          x2={left + innerWidth}
+          y1={top + innerHeight}
+          y2={top + innerHeight}
+          stroke="#E4E4E7"
+        />
+        <line
+          x1={left}
+          x2={left}
+          y1={top}
+          y2={top + innerHeight}
+          stroke="#E4E4E7"
+        />
+        <path
+          d={path}
+          fill="none"
+          stroke={definition.color}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="3"
+        />
+        {chartPoints.map((point, index) => (
+          <circle
+            key={point.date}
+            cx={x(index)}
+            cy={y(point.value)}
+            r="4"
+            fill={definition.color}
+          />
+        ))}
+        <text
+          x={left - 8}
+          y={top + 4}
+          textAnchor="end"
+          className="fill-zinc-500 text-[11px]"
+        >
+          100%
+        </text>
+        <text
+          x={left - 8}
+          y={top + innerHeight + 4}
+          textAnchor="end"
+          className="fill-zinc-500 text-[11px]"
+        >
+          0%
+        </text>
+        {chartPoints.map((point, index) =>
+          index === 0 ||
+          index === chartPoints.length - 1 ||
+          index === Math.floor((chartPoints.length - 1) / 2) ? (
+            <text
+              key={`${point.date}-label`}
+              x={x(index)}
+              y={height - 13}
+              textAnchor="middle"
+              className="fill-zinc-500 text-[11px]"
+            >
+              {displayDate(point.date, locale)}
+            </text>
+          ) : null,
+        )}
+      </svg>
+    );
+  }
 
   return (
-    <div className="min-w-0 border p-4 theme-border theme-surface-elevated">
-      <h3
-        id={`${id}-title`}
-        className="text-base font-semibold theme-foreground"
-      >
-        {title}
-      </h3>
-      <p id={`${id}-description`} className="mt-1 text-xs theme-muted">
-        {description}
-      </p>
-      {points.length ? (
-        <>
-          <div className="mt-4 overflow-x-auto">
-            <svg
-              className="h-auto min-w-[520px] w-full"
-              viewBox={`0 0 ${width} ${height}`}
-              role="img"
-              aria-labelledby={`${id}-title ${id}-description`}
-            >
-              <line
-                x1={left}
-                x2={left + innerWidth}
-                y1={top + innerHeight}
-                y2={top + innerHeight}
-                stroke="currentColor"
-                className="theme-muted"
-                strokeOpacity="0.3"
-              />
-              <line
-                x1={left}
-                x2={left}
-                y1={top}
-                y2={top + innerHeight}
-                stroke="currentColor"
-                className="theme-muted"
-                strokeOpacity="0.3"
-              />
-              <text
-                x={left - 8}
-                y={top + 4}
-                textAnchor="end"
-                className="fill-current text-[11px] theme-muted"
-              >
-                {maximum}
-              </text>
-              <text
-                x={left - 8}
-                y={top + innerHeight + 4}
-                textAnchor="end"
-                className="fill-current text-[11px] theme-muted"
-              >
-                0
-              </text>
-              {series.map(({ key, color, label }) => {
-                const path = points
-                  .map(
-                    (point, index) =>
-                      `${index ? "L" : "M"}${x(index)},${y(Number(point[key]) || 0)}`,
-                  )
-                  .join(" ");
-                return (
-                  <g key={String(key)}>
-                    <path
-                      d={path}
-                      fill="none"
-                      stroke={color}
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    {points.map((point, index) => (
-                      <circle
-                        key={`${String(key)}-${String(point.date)}`}
-                        cx={x(index)}
-                        cy={y(Number(point[key]) || 0)}
-                        r="5"
-                        fill={color}
-                        aria-label={`${label}, ${displayDate(String(point.date), locale)}: ${Number(point[key]) || 0}`}
-                      />
-                    ))}
-                  </g>
-                );
-              })}
-              {labelIndexes.map((index) => (
-                <text
-                  key={index}
-                  x={x(index)}
-                  y={height - 13}
-                  textAnchor="middle"
-                  className="fill-current text-[11px] theme-muted"
-                >
-                  {displayDate(String(points[index]?.date), locale)}
-                </text>
-              ))}
-            </svg>
+    <div
+      className="mt-6 grid min-w-[560px] items-end gap-2"
+      style={{
+        gridTemplateColumns: `repeat(${Math.max(
+          1,
+          chartPoints.length,
+        )}, minmax(22px, 1fr))`,
+      }}
+      role="img"
+      aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
+    >
+      {chartPoints.map((point) => (
+        <div key={point.date} className="grid gap-2">
+          <div className="flex h-52 items-end rounded-t bg-zinc-50">
+            <div
+              className="w-full rounded-t"
+              style={{
+                height: `${Math.max(4, (point.value / maximum) * 100)}%`,
+                backgroundColor: definition.color,
+              }}
+              title={`${displayDate(point.date, locale)}: ${formatMetricValue({
+                metric,
+                value: point.value,
+                currency,
+              })}`}
+            />
           </div>
-          <div
-            className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs theme-muted"
-            aria-label={`${title} legend`}
-          >
-            {series.map(({ key, color, label }) => (
-              <span
-                key={String(key)}
-                className="inline-flex items-center gap-2"
-              >
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ backgroundColor: color }}
-                  aria-hidden="true"
-                />
-                {label}
-              </span>
-            ))}
-          </div>
-          <details className="mt-4 text-xs theme-muted">
-            <summary className="cursor-pointer font-medium">
-              {locale === "ko" ? "데이터 표 보기" : "View data table"}
-            </summary>
-            <div className="mt-2 max-h-64 overflow-auto">
-              <table className="w-full text-left">
-                <caption className="sr-only">{title}</caption>
-                <thead>
-                  <tr className="border-b theme-border">
-                    <th className="py-2 pr-3 font-medium">
-                      {locale === "ko" ? "날짜" : "Date"}
-                    </th>
-                    {series.map(({ key, label }) => (
-                      <th key={String(key)} className="py-2 pr-3 font-medium">
-                        {label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {points.map((point) => (
-                    <tr
-                      key={String(point.date)}
-                      className="border-b theme-border last:border-0"
-                    >
-                      <td className="py-2 pr-3">
-                        {displayDate(String(point.date), locale)}
-                      </td>
-                      {series.map(({ key }) => (
-                        <td key={String(key)} className="py-2 pr-3">
-                          {Number(point[key]) || 0}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </details>
-        </>
-      ) : null}
+          <span className="truncate text-center text-[11px] text-zinc-500">
+            {displayDate(point.date, locale)}
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -237,122 +274,235 @@ function AnalyticsChart<T extends Record<string, number | string>>({
 export function PartnerReferralAnalyticsSection({
   locale,
   analytics,
+  qualifyingTransactions = 0,
+  netCommissionAmount = 0,
+  currency = "usd",
   basePath = "/partner/dashboard",
   query = {},
 }: {
   locale: Locale;
   analytics: PartnerReferralAnalytics;
+  qualifyingTransactions?: number;
+  netCommissionAmount?: number;
+  currency?: string;
   basePath?: string;
   query?: Record<string, string>;
 }) {
   const t = createTranslator(getDictionary(locale));
-  const totals = analytics.totals;
-  const hasActivity = hasPartnerReferralActivity(totals);
-  const kpis = [
-    ["totalVisits", totals.totalClicks],
-    ["uniqueVisitors", totals.uniqueVisitors],
-    ["referredSignups", totals.attributedSignups],
-    ["sellerRegistrations", totals.sellerRegistrations],
-    ["buyerRegistrations", totals.buyerRegistrations],
-    ["signupConversion", percentage(totals.signupConversionRate)],
-    ["sellerConversionRate", percentage(totals.sellerConversionRate)],
-    ["buyerConversionRate", percentage(totals.buyerConversionRate)],
-  ] as const;
+  const [selectedMetric, setSelectedMetric] =
+    useState<AnalyticsMetric>("totalClicks");
+  const [grouping, setGrouping] = useState<AnalyticsGrouping>(
+    analytics.range === "all" ? "monthly" : "daily",
+  );
+  const model = useMemo(
+    () =>
+      buildPartnerAnalyticsWorkspaceModel({
+        analytics,
+        qualifyingTransactions,
+        netCommissionAmount,
+      }),
+    [analytics, qualifyingTransactions, netCommissionAmount],
+  );
+  const groupedPoints = useMemo(
+    () => groupPartnerAnalyticsPoints(model.points, grouping),
+    [model.points, grouping],
+  );
+  const selectedDefinition = metricDefinition(selectedMetric);
+  const selectedValue = safeAnalyticsNumber(model.totals[selectedMetric]);
+  const previousValue = safeAnalyticsNumber(
+    model.comparisonTotals[selectedMetric],
+  );
 
   return (
-    <section aria-labelledby="partner-referral-performance">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+    <section
+      aria-labelledby="partner-analytics-workspace"
+      className="rounded-[20px] border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm sm:p-5"
+      data-testid="partner-analytics-workspace"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+            {t("partnerProgram.analyticsWorkspaceEyebrow")}
+          </p>
           <h2
-            id="partner-referral-performance"
-            className="text-lg font-semibold theme-foreground"
+            id="partner-analytics-workspace"
+            className="mt-1 text-xl font-semibold text-zinc-950"
           >
-            {t("partnerProgram.referralPerformance")}
+            {t("partnerProgram.analyticsWorkspaceTitle")}
           </h2>
-          <p className="mt-1 text-sm theme-muted">
-            {t("partnerProgram.referralPerformanceDescription")}
+          <p className="mt-1 max-w-2xl text-sm text-zinc-600">
+            {t("partnerProgram.analyticsWorkspaceDescription")}
           </p>
         </div>
+        <div className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600">
+          {t(
+            `partnerProgram.${
+              partnerAnalyticsRangeOptions.find(
+                (option) => option.value === analytics.range,
+              )?.key ?? "last30Days"
+            }`,
+          )}
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+        {kpiMetrics.map((metric) => {
+          const definition = metricDefinition(metric);
+          return (
+            <article
+              key={metric}
+              className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
+            >
+              <p className="text-xs font-medium text-zinc-500">
+                {t(`partnerProgram.${definition.key}`)}
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-zinc-950">
+                {formatMetricValue({
+                  metric,
+                  value: model.totals[metric],
+                  currency,
+                })}
+              </p>
+              <p className="mt-2 text-xs text-zinc-500">
+                {comparisonLabel({
+                  current: model.totals[metric],
+                  previous: model.comparisonTotals[metric],
+                  locale,
+                })}
+              </p>
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          <div>
+            <h3 className="text-base font-semibold text-zinc-950">
+              {t("partnerProgram.analyticsMainChart")}
+            </h3>
+            <p className="mt-1 text-sm text-zinc-600">
+              {comparisonLabel({
+                current: selectedValue,
+                previous: previousValue,
+                locale,
+              })}
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <label className="grid gap-1 text-xs font-medium text-zinc-600">
+              {t("partnerProgram.analyticsMetric")}
+              <select
+                className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={selectedMetric}
+                onChange={(event) =>
+                  setSelectedMetric(event.target.value as AnalyticsMetric)
+                }
+              >
+                {partnerAnalyticsMetrics.map((metric) => (
+                  <option key={metric.value} value={metric.value}>
+                    {t(`partnerProgram.${metric.key}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-zinc-600">
+              {t("partnerProgram.analyticsRange")}
+              <select
+                className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={analytics.range}
+                onChange={(event) => {
+                  window.location.href = buildRangeHref({
+                    basePath,
+                    query,
+                    range: event.target.value as PartnerAnalyticsRange,
+                    locale,
+                  });
+                }}
+              >
+                {partnerAnalyticsRangeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(`partnerProgram.${option.key}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="grid gap-1 text-xs font-medium text-zinc-600">
+              {t("partnerProgram.analyticsGrouping")}
+              <select
+                className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={grouping}
+                onChange={(event) =>
+                  setGrouping(event.target.value as AnalyticsGrouping)
+                }
+              >
+                {partnerAnalyticsGroupingOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(`partnerProgram.${option.key}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        {!model.hasActivity ? (
+          <div className="mt-6 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 p-5 text-sm text-zinc-600">
+            {t("partnerProgram.emptyReferralActivity")}
+          </div>
+        ) : null}
+
+        <div className="overflow-x-auto">
+          <ChartPanel
+            locale={locale}
+            metric={selectedMetric}
+            points={groupedPoints}
+            totalValue={selectedValue}
+            currency={currency}
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-zinc-500">
+          <span
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: selectedDefinition.color }}
+            aria-hidden="true"
+          />
+          <span>{t(`partnerProgram.${selectedDefinition.key}`)}</span>
+          <span aria-hidden="true">/</span>
+          <span>
+            {t(
+              `partnerProgram.${
+                selectedDefinition.kind === "rate" ? "lineChart" : "barChart"
+              }`,
+            )}
+          </span>
+        </div>
+
         <nav
-          className="flex flex-wrap gap-2"
+          className="mt-5 flex flex-wrap gap-2 border-t border-zinc-200 pt-4"
           aria-label={t("partnerProgram.analyticsRange")}
         >
-          {rangeOptions.map(({ value, key }) => (
+          {partnerAnalyticsRangeOptions.map((option) => (
             <Link
-              key={value}
-              href={withLocale(
-                `${basePath}?${new URLSearchParams({ ...query, analyticsRange: value }).toString()}`,
+              key={option.value}
+              href={buildRangeHref({
+                basePath,
+                query,
+                range: option.value,
                 locale,
-              )}
-              aria-current={analytics.range === value ? "page" : undefined}
-              className={`border px-3 py-1.5 text-xs font-medium theme-border ${analytics.range === value ? "bg-[var(--foreground)] text-[var(--background)]" : "theme-muted hover:text-[var(--foreground)]"}`}
+              })}
+              aria-current={analytics.range === option.value ? "page" : undefined}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                analytics.range === option.value
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                  : "border-zinc-200 bg-white text-zinc-600 hover:border-emerald-400 hover:text-zinc-950"
+              }`}
             >
-              {t(`partnerProgram.${key}`)}
+              {t(`partnerProgram.${option.key}`)}
             </Link>
           ))}
         </nav>
-      </div>
-      <div className="mt-4 grid gap-px overflow-hidden border theme-border sm:grid-cols-2 lg:grid-cols-3">
-        {kpis.map(([key, value]) => (
-          <div key={key} className="bg-[var(--background)] p-4">
-            <p className="text-xs font-medium theme-muted">
-              {t(`partnerProgram.${key}`)}
-            </p>
-            <p className="mt-2 text-xl font-semibold theme-foreground">
-              {value}
-            </p>
-          </div>
-        ))}
-      </div>
-      {!hasActivity ? (
-        <p className="mt-4 border p-4 text-sm theme-border theme-muted">
-          {t("partnerProgram.emptyReferralActivity")}
-        </p>
-      ) : null}
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <AnalyticsChart
-          id="partner-traffic-chart"
-          title={t("partnerProgram.trafficChart")}
-          description={t("partnerProgram.trafficChartDescription")}
-          points={analytics.trafficSeries as TrafficPoint[]}
-          locale={locale}
-          series={[
-            {
-              key: "totalClicks",
-              label: t("partnerProgram.totalVisits"),
-              color: "#34B386",
-            },
-            {
-              key: "uniqueVisitors",
-              label: t("partnerProgram.uniqueVisitors"),
-              color: "#3478B3",
-            },
-          ]}
-        />
-        <AnalyticsChart
-          id="partner-conversion-chart"
-          title={t("partnerProgram.conversionChart")}
-          description={t("partnerProgram.conversionChartDescription")}
-          points={analytics.conversionSeries as ConversionPoint[]}
-          locale={locale}
-          series={[
-            {
-              key: "attributedSignups",
-              label: t("partnerProgram.referredSignups"),
-              color: "#9B59B6",
-            },
-            {
-              key: "sellerRegistrations",
-              label: t("partnerProgram.sellerRegistrations"),
-              color: "#E67E22",
-            },
-            {
-              key: "buyerRegistrations",
-              label: t("partnerProgram.buyerRegistrations"),
-              color: "#2C9FA3",
-            },
-          ]}
-        />
       </div>
     </section>
   );

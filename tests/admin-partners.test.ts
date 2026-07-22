@@ -215,6 +215,9 @@ test("admin partner pages preserve localized navigation and admin-readonly safet
   assert.match(detailComponent, /viewMode="admin-readonly"/);
   assert.match(detailComponent, /paginationBasePath=\{`\/admin\/partners\//);
   assert.doesNotMatch(detailComponent, /\/partner\/dashboard/);
+  assert.match(dashboardView, /<PartnerReferralAnalyticsSection/);
+  assert.match(dashboardView, /qualifyingTransactions=\{data\.counts\.qualifyingTransactions\}/);
+  assert.match(dashboardView, /netCommissionAmount=\{data\.totals\.net\}/);
   assert.match(dashboardView, /adminReadonly \? null : \(/);
   assert.match(dashboardView, /<StripeConnectOnboardingPanel ownerType="partner" \/>/);
   assert.doesNotMatch(management, /name="analyticsRange"/);

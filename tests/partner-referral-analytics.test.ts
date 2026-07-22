@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
+import {
+  buildPartnerAnalyticsWorkspaceModel,
+  compareAnalyticsValue,
+  groupPartnerAnalyticsPoints,
+  partnerAnalyticsMetrics,
+} from "../src/lib/partner-analytics-workspace.ts";
 import {
   applyReferralVisitorCookie,
   getPartnerReferralAnalytics,
@@ -18,6 +25,7 @@ const now = new Date("2026-07-21T15:30:00.000Z");
 test("analytics range and visitor hashes fail closed without exposing raw identifiers", () => {
   assert.equal(normalizePartnerAnalyticsRange(undefined), "30d");
   assert.equal(normalizePartnerAnalyticsRange("30d"), "30d");
+  assert.equal(normalizePartnerAnalyticsRange("12m"), "12m");
   assert.equal(normalizePartnerAnalyticsRange("invalid"), "30d");
   const samePartnerHash = hashPartnerReferralVisitor("partner-1", "test-cookie-value");
   assert.equal(
@@ -157,6 +165,9 @@ test("analytics totals use PostgreSQL aggregates, zero-filled UTC buckets, and z
         [{ totalClicks: 6, uniqueVisitors: 2, firstActivity: new Date("2026-07-20T00:00:00.000Z") }],
         [{ attributedSignups: 1, firstActivity: new Date("2026-07-21T12:00:00.000Z") }],
         [{ sellerRegistrations: 1, buyerRegistrations: 1, firstActivity: new Date("2026-07-21T12:00:00.000Z") }],
+        [{ totalClicks: 3, uniqueVisitors: 1, firstActivity: new Date("2026-07-14T00:00:00.000Z") }],
+        [{ attributedSignups: 1, firstActivity: new Date("2026-07-14T12:00:00.000Z") }],
+        [{ sellerRegistrations: 0, buyerRegistrations: 0, firstActivity: null }],
         [
           { date: "2026-07-20", totalClicks: 3, uniqueVisitors: 1 },
           { date: "2026-07-21", totalClicks: 3, uniqueVisitors: 2 },
@@ -183,12 +194,15 @@ test("analytics totals use PostgreSQL aggregates, zero-filled UTC buckets, and z
   assert.equal(analytics.totals.signupConversionRate, 50);
   assert.equal(analytics.totals.sellerConversionRate, 50);
   assert.equal(analytics.totals.buyerConversionRate, 50);
+  assert.equal(analytics.comparisonTotals.totalClicks, 3);
+  assert.equal(analytics.comparisonTotals.uniqueVisitors, 1);
+  assert.equal(analytics.comparisonTotals.signupConversionRate, 100);
   assert.equal(analytics.trafficSeries.length, 7);
   assert.equal(analytics.trafficSeries[5]?.totalClicks, 3);
   assert.equal(analytics.trafficSeries[6]?.totalClicks, 3);
   assert.equal(analytics.trafficSeries[6]?.uniqueVisitors, 2);
   assert.doesNotMatch(JSON.stringify(analytics), /visitorHash|visitor-a|visitor-b/);
-  assert.equal(queryCount, 6);
+  assert.equal(queryCount, 9);
 
   queryCount = 0;
   const empty = await getPartnerReferralAnalytics({
@@ -204,7 +218,128 @@ test("analytics totals use PostgreSQL aggregates, zero-filled UTC buckets, and z
   assert.equal(empty.totals.signupConversionRate, 0);
   assert.equal(empty.totals.sellerConversionRate, 0);
   assert.equal(empty.totals.buyerConversionRate, 0);
+  assert.equal(empty.comparisonTotals.totalClicks, 0);
   assert.equal(empty.trafficSeries.length, 30);
+});
+
+test("unified partner analytics helpers provide safe comparison and grouped buckets", () => {
+  assert.deepEqual(compareAnalyticsValue(0, 0), {
+    status: "neutral",
+    percentChange: null,
+  });
+  assert.deepEqual(compareAnalyticsValue(4, 0), {
+    status: "new",
+    percentChange: null,
+  });
+  assert.deepEqual(compareAnalyticsValue(15, 10), {
+    status: "up",
+    percentChange: 50,
+  });
+
+  const grouped = groupPartnerAnalyticsPoints(
+    [
+      {
+        date: "2026-07-20",
+        totalClicks: 3,
+        uniqueVisitors: 2,
+        attributedSignups: 1,
+        sellerRegistrations: 1,
+        buyerRegistrations: 0,
+        signupConversionRate: 50,
+        sellerConversionRate: 50,
+        buyerConversionRate: 0,
+      },
+      {
+        date: "2026-07-21",
+        totalClicks: 7,
+        uniqueVisitors: 3,
+        attributedSignups: 2,
+        sellerRegistrations: 0,
+        buyerRegistrations: 1,
+        signupConversionRate: 66.7,
+        sellerConversionRate: 0,
+        buyerConversionRate: 33.3,
+      },
+    ],
+    "weekly",
+  );
+  assert.equal(grouped.length, 1);
+  assert.equal(grouped[0]?.totalClicks, 10);
+  assert.equal(grouped[0]?.uniqueVisitors, 5);
+  assert.equal(grouped[0]?.signupConversionRate, 60);
+});
+
+test("partner and admin dashboards render the unified white analytics workspace", async () => {
+  const analytics = {
+    range: "30d" as const,
+    totals: {
+      totalClicks: 10,
+      uniqueVisitors: 5,
+      attributedSignups: 3,
+      sellerRegistrations: 2,
+      buyerRegistrations: 1,
+      signupConversionRate: 60,
+      sellerConversionRate: 40,
+      buyerConversionRate: 20,
+    },
+    comparisonTotals: {
+      totalClicks: 5,
+      uniqueVisitors: 4,
+      attributedSignups: 1,
+      sellerRegistrations: 1,
+      buyerRegistrations: 0,
+      signupConversionRate: 25,
+      sellerConversionRate: 25,
+      buyerConversionRate: 0,
+    },
+    trafficSeries: [
+      { date: "2026-07-20", totalClicks: 4, uniqueVisitors: 2 },
+      { date: "2026-07-21", totalClicks: 6, uniqueVisitors: 3 },
+    ],
+    conversionSeries: [
+      {
+        date: "2026-07-20",
+        attributedSignups: 1,
+        sellerRegistrations: 1,
+        buyerRegistrations: 0,
+      },
+      {
+        date: "2026-07-21",
+        attributedSignups: 2,
+        sellerRegistrations: 1,
+        buyerRegistrations: 1,
+      },
+    ],
+  };
+  const model = buildPartnerAnalyticsWorkspaceModel({
+    analytics,
+    qualifyingTransactions: 4,
+    netCommissionAmount: 12345,
+  });
+  assert.equal(model.totals.qualifyingTransactions, 4);
+  assert.equal(model.totals.netCommission, 12345);
+  assert.equal(model.hasActivity, true);
+  assert.equal(
+    partnerAnalyticsMetrics.map((metric) => metric.value).includes("netCommission"),
+    true,
+  );
+
+  const componentSource = await readFile(
+    new URL("../src/components/partner-referral-analytics.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(componentSource, /data-testid="partner-analytics-workspace"/);
+  assert.match(componentSource, /buildPartnerAnalyticsWorkspaceModel/);
+  assert.match(componentSource, /setSelectedMetric/);
+  assert.match(componentSource, /setGrouping/);
+  assert.match(componentSource, /window\.location\.href = buildRangeHref/);
+  assert.match(componentSource, /bg-white/);
+  assert.match(componentSource, /border-zinc-200/);
+  assert.match(componentSource, /partnerAnalyticsRangeOptions/);
+  assert.doesNotMatch(componentSource, /trafficChart/);
+  assert.doesNotMatch(componentSource, /conversionChart/);
+  assert.doesNotMatch(componentSource, /StripeConnectOnboardingPanel/);
 });
 
 test("company conversion snapshots are immutable and idempotent for seller and buyer roles", async () => {

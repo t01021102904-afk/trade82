@@ -189,6 +189,9 @@ export function PartnerDashboardView({
         <PartnerReferralAnalyticsSection
           locale={locale}
           analytics={data.analytics}
+          qualifyingTransactions={data.counts.qualifyingTransactions}
+          netCommissionAmount={data.totals.net}
+          currency={data.totals.currency}
           basePath={paginationBasePath}
           query={paginationQuery}
         />
