@@ -10,12 +10,44 @@ import {
   queryMerchantMigrationInitialState,
   queryMerchantMigrationPreflight,
   queryMerchantMigrationSchema,
+  queryPartnerPayoutMigrationSchema,
   queryTargetSchema,
   readLocalMigrationNames,
   runProductionMigrations,
 } from "../scripts/run-production-migrations.mjs";
 
 const databaseUrl = process.env.PRODUCTION_MIGRATION_TEST_DATABASE_URL;
+
+const PARTNER_PAYOUT_FOREIGN_KEYS = [
+  {
+    table: "PartnerPayoutProfile",
+    constraint: "PartnerPayoutProfile_partnerProfileId_fkey",
+  },
+  {
+    table: "PartnerPayoutProfile",
+    constraint: "PartnerPayoutProfile_bankDirectoryId_fkey",
+  },
+  {
+    table: "PartnerPayoutProfile",
+    constraint: "PartnerPayoutProfile_verifiedByUserId_fkey",
+  },
+  {
+    table: "PartnerPayoutProfileAuditEvent",
+    constraint: "PartnerPayoutProfileAuditEvent_payoutProfileId_fkey",
+  },
+  {
+    table: "PartnerPayoutProfileAuditEvent",
+    constraint: "PartnerPayoutProfileAuditEvent_actorUserId_fkey",
+  },
+  {
+    table: "PartnerProfileAuditEvent",
+    constraint: "PartnerProfileAuditEvent_partnerProfileId_fkey",
+  },
+  {
+    table: "PartnerProfileAuditEvent",
+    constraint: "PartnerProfileAuditEvent_actorUserId_fkey",
+  },
+];
 
 function isDisposableLocalDatabase(url) {
   if (!url) return false;
@@ -133,6 +165,49 @@ test("analytics schema verification recognizes the real click-count constraint a
     assert.ok(migration.rows[0].finished_at);
     assert.equal(migration.rows[0].rolled_back_at, null);
     assert.equal(Number(migration.rows[0].applied_steps_count), 1);
+  } finally {
+    await client.query("ROLLBACK").catch(() => {});
+    await client.end();
+  }
+});
+
+test("partner payout schema verification requires every exact foreign key", {
+  skip: !isDisposableLocalDatabase(databaseUrl),
+  concurrency: false,
+}, async () => {
+  const client = new Client({ connectionString: databaseUrl });
+  await client.connect();
+
+  try {
+    const baseline = await queryPartnerPayoutMigrationSchema(client);
+    assert.equal(baseline.partner_payout_foreign_keys, true);
+
+    for (const foreignKey of PARTNER_PAYOUT_FOREIGN_KEYS) {
+      await client.query("BEGIN");
+      await client.query(
+        `ALTER TABLE public."${foreignKey.table}" DROP CONSTRAINT "${foreignKey.constraint}"`,
+      );
+      const evidence = await queryPartnerPayoutMigrationSchema(client);
+      assert.equal(
+        evidence.partner_payout_foreign_keys,
+        false,
+        foreignKey.constraint,
+      );
+      await client.query("ROLLBACK");
+    }
+
+    const verifiedByPolicy = await client.query(`
+      SELECT con.confdeltype, con.confupdtype
+      FROM pg_constraint con
+      JOIN pg_class child_table ON child_table.oid = con.conrelid
+      JOIN pg_namespace child_schema ON child_schema.oid = child_table.relnamespace
+      WHERE child_schema.nspname = 'public'
+        AND child_table.relname = 'PartnerPayoutProfile'
+        AND con.conname = 'PartnerPayoutProfile_verifiedByUserId_fkey'
+    `);
+    assert.equal(verifiedByPolicy.rowCount, 1);
+    assert.equal(verifiedByPolicy.rows[0].confdeltype, "r");
+    assert.equal(verifiedByPolicy.rows[0].confupdtype, "c");
   } finally {
     await client.query("ROLLBACK").catch(() => {});
     await client.end();

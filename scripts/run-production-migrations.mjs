@@ -2056,7 +2056,44 @@ export async function queryPartnerPayoutMigrationSchema(client) {
         AND index_row.relnamespace = 'public'::regnamespace
       LEFT JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
       LEFT JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
-      LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
+        LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
+    ),
+    expected_foreign_keys(table_name, constraint_name, child_column, parent_table) AS (
+      VALUES
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_bankDirectoryId_fkey', 'bankDirectoryId', 'BankDirectory'),
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_verifiedByUserId_fkey', 'verifiedByUserId', 'UserProfile'),
+        ('PartnerPayoutProfileAuditEvent', 'PartnerPayoutProfileAuditEvent_payoutProfileId_fkey', 'payoutProfileId', 'PartnerPayoutProfile'),
+        ('PartnerPayoutProfileAuditEvent', 'PartnerPayoutProfileAuditEvent_actorUserId_fkey', 'actorUserId', 'UserProfile'),
+        ('PartnerProfileAuditEvent', 'PartnerProfileAuditEvent_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('PartnerProfileAuditEvent', 'PartnerProfileAuditEvent_actorUserId_fkey', 'actorUserId', 'UserProfile')
+    ),
+    actual_foreign_keys AS (
+      SELECT expected.table_name, expected.constraint_name, expected.child_column,
+        expected.parent_table, constraint_row.contype, constraint_row.confdeltype,
+        constraint_row.confupdtype,
+        ARRAY(
+          SELECT child_attribute.attname::text
+          FROM unnest(constraint_row.conkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute child_attribute ON child_attribute.attrelid = child_table.oid
+            AND child_attribute.attnum = key_row.attnum
+          ORDER BY key_row.ord
+        ) AS child_columns,
+        ARRAY(
+          SELECT parent_attribute.attname::text
+          FROM unnest(constraint_row.confkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute parent_attribute ON parent_attribute.attrelid = parent_table.oid
+            AND parent_attribute.attnum = key_row.attnum
+          ORDER BY key_row.ord
+        ) AS parent_columns
+      FROM expected_foreign_keys expected
+      LEFT JOIN pg_class child_table ON child_table.relname = expected.table_name
+        AND child_table.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_class parent_table ON parent_table.relname = expected.parent_table
+        AND parent_table.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_constraint constraint_row ON constraint_row.conname = expected.constraint_name
+        AND constraint_row.conrelid = child_table.oid
+        AND constraint_row.confrelid = parent_table.oid
     )
     SELECT
       EXISTS (
@@ -2130,20 +2167,15 @@ export async function queryPartnerPayoutMigrationSchema(client) {
         FROM actual_indexes
       ) AS partner_payout_indexes,
       (
-        SELECT count(*) = 6
-          AND bool_and(contype = 'f' AND confdeltype IN ('r', 'n') AND confupdtype = 'c')
-        FROM pg_constraint
-        JOIN pg_class child_table ON child_table.oid = pg_constraint.conrelid
-        JOIN pg_namespace schema_row ON schema_row.oid = child_table.relnamespace
-        WHERE schema_row.nspname = 'public'
-          AND pg_constraint.conname IN (
-            'PartnerPayoutProfile_partnerProfileId_fkey',
-            'PartnerPayoutProfile_bankDirectoryId_fkey',
-            'PartnerPayoutProfile_verifiedByUserId_fkey',
-            'PartnerPayoutProfileAuditEvent_payoutProfileId_fkey',
-            'PartnerProfileAuditEvent_partnerProfileId_fkey',
-            'PartnerProfileAuditEvent_actorUserId_fkey'
+        SELECT count(*) = 7
+          AND bool_and(
+            contype = 'f'
+            AND confdeltype = 'r'
+            AND confupdtype = 'c'
+            AND child_columns = ARRAY[child_column]::text[]
+            AND parent_columns = ARRAY['id']::text[]
           )
+        FROM actual_foreign_keys
       ) AS partner_payout_foreign_keys,
       (
         SELECT count(*) = 3 AND bool_and(contype = 'c')

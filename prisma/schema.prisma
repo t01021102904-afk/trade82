@@ -1623,7 +1623,7 @@ model PartnerPayoutProfile {
   status                  PartnerPayoutProfileStatus       @default(PENDING_VERIFICATION)
   verifiedAt              DateTime?
   verifiedByUserId        String?
-  verifiedByUser          UserProfile?                     @relation("PartnerPayoutProfileVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: SetNull)
+  verifiedByUser          UserProfile?                     @relation("PartnerPayoutProfileVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: Restrict)
   auditEvents             PartnerPayoutProfileAuditEvent[]
   createdAt               DateTime                         @default(now())
   updatedAt               DateTime                         @updatedAt

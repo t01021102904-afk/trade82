@@ -747,6 +747,7 @@
     "partnerReject": "Reject partner",
     "partnerSuspend": "Suspend partner",
     "partnerReactivate": "Reactivate partner",
+    "partnerReopen": "Reopen for review",
     "partnerPayoutVerify": "Verify payout account",
     "partnerPayoutReject": "Reject payout account",
     "partnerPayoutDisable": "Disable payout account",

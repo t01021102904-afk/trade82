@@ -109,7 +109,7 @@ ALTER TABLE "PartnerPayoutProfile"
   ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT "PartnerPayoutProfile_verifiedByUserId_fkey"
   FOREIGN KEY ("verifiedByUserId") REFERENCES "UserProfile"("id")
-  ON DELETE SET NULL ON UPDATE CASCADE;
+  ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE "PartnerPayoutProfileAuditEvent"
   ADD CONSTRAINT "PartnerPayoutProfileAuditEvent_payoutProfileId_fkey"

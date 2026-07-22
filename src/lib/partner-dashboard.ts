@@ -15,6 +15,10 @@ import {
   type PartnerAnalyticsRange,
   type PartnerAnalyticsDatabase,
 } from "@/lib/partner-referral-analytics";
+import {
+  partnerPayoutProfileAdminSummarySelect,
+  partnerPayoutProfileOwnerSelect,
+} from "@/lib/partner-payout-profiles";
 
 const adjustmentStatuses: SettlementReversalStatus[] = [
   SettlementReversalStatus.ACCOUNTING_APPLIED,
@@ -116,6 +120,34 @@ export function anonymizePartnerMember(name: string) {
   return `${first.toUpperCase()}.`;
 }
 
+function emptyPartnerAnalytics(range: PartnerAnalyticsRange) {
+  return {
+    range,
+    totals: {
+      totalClicks: 0,
+      uniqueVisitors: 0,
+      attributedSignups: 0,
+      sellerRegistrations: 0,
+      buyerRegistrations: 0,
+      signupConversionRate: 0,
+      sellerConversionRate: 0,
+      buyerConversionRate: 0,
+    },
+    comparisonTotals: {
+      totalClicks: 0,
+      uniqueVisitors: 0,
+      attributedSignups: 0,
+      sellerRegistrations: 0,
+      buyerRegistrations: 0,
+      signupConversionRate: 0,
+      sellerConversionRate: 0,
+      buyerConversionRate: 0,
+    },
+    trafficSeries: [],
+    conversionSeries: [],
+  };
+}
+
 export async function getPartnerDashboardData({
   partnerProfileId,
   commissionPage = 1,
@@ -157,143 +189,99 @@ export async function getPartnerDashboardData({
     },
     include: {
       payoutProfile: {
-        select: {
-          id: true,
-          partnerProfileId: true,
-          bankDirectoryId: true,
-          country: true,
-          bankName: true,
-          accountHolder: true,
-          accountNumberLast4: true,
-          accountNumberMasked: true,
-          accountType: true,
-          payoutCurrency: true,
-          supportedCurrencies: true,
-          accountBelongsToPartner: true,
-          status: true,
-          verifiedAt: true,
-          verifiedByUserId: true,
-          createdAt: true,
-          updatedAt: true,
-          bankDirectory: {
-            select: {
-              id: true,
-              bankNameLocal: true,
-              bankNameEnglish: true,
-              bankCode: true,
-              defaultSwiftBic: true,
-              defaultBankAddress: true,
-              verifiedAt: true,
-            },
-          },
-        },
+        select: allowSuspended
+          ? partnerPayoutProfileAdminSummarySelect
+          : partnerPayoutProfileOwnerSelect,
       },
       user: { select: { displayName: true, email: true, preferredLanguage: true } },
     },
   });
   if (!partner) return null;
 
-  const [
-    referralCount,
-    qualifyingTransactions,
-    allLegs,
-    commissionLegs,
-    referredMembers,
-    analytics,
-  ] = await Promise.all([
-    db.referralAttribution.count({ where: { partnerProfileId } }),
-    db.settlement.count({
-      where: { referralPartnerProfileId: partnerProfileId },
-    }),
-    db.settlementLeg.findMany({
-      where: legWhere,
-      select: {
-        id: true,
-        amount: true,
-        currency: true,
-        status: true,
-        holdUntil: true,
-        settlement: {
-          select: {
-            createdAt: true,
-            grossAmount: true,
-            tradeOrder: { select: { orderNumber: true } },
-          },
-        },
-        reversals: { select: { amount: true, status: true } },
-      },
-    }),
-    db.settlementLeg.findMany({
-      where: legWhere,
-      orderBy: [{ settlement: { createdAt: "desc" } }, { id: "desc" }],
-      take: safePageSize,
-      skip: (safeCommissionPage - 1) * safePageSize,
-      select: {
-        id: true,
-        amount: true,
-        currency: true,
-        status: true,
-        holdUntil: true,
-        settlement: {
-          select: {
-            createdAt: true,
-            grossAmount: true,
-            tradeOrder: { select: { orderNumber: true } },
-          },
-        },
-        reversals: { select: { amount: true, status: true } },
-      },
-    }),
-    db.referralAttribution.findMany({
-      where: {
-        partnerProfileId,
-        referredUser: {
-          deletedAt: null,
-          deletionStatus: AccountDeletionStatus.ACTIVE,
-        },
-      },
-      orderBy: [{ lockedAt: "desc" }, { id: "desc" }],
-      take: safePageSize,
-      skip: (safeMemberPage - 1) * safePageSize,
-      select: {
-        status: true,
-        lockedAt: true,
-        referredUser: { select: { displayName: true, role: true } },
-        settlements: { select: { id: true }, take: 1 },
-      },
-    }),
-    "referralClickDailyVisitor" in db && "$queryRaw" in db
-      ? getPartnerReferralAnalytics({
-          db: db as unknown as PartnerAnalyticsDatabase,
-          partnerProfileId,
-          range: safeAnalyticsRange,
-        })
-      : Promise.resolve({
-          range: safeAnalyticsRange as PartnerAnalyticsRange,
-          totals: {
-            totalClicks: 0,
-            uniqueVisitors: 0,
-            attributedSignups: 0,
-            sellerRegistrations: 0,
-            buyerRegistrations: 0,
-            signupConversionRate: 0,
-            sellerConversionRate: 0,
-            buyerConversionRate: 0,
-          },
-          comparisonTotals: {
-            totalClicks: 0,
-            uniqueVisitors: 0,
-            attributedSignups: 0,
-            sellerRegistrations: 0,
-            buyerRegistrations: 0,
-            signupConversionRate: 0,
-            sellerConversionRate: 0,
-            buyerConversionRate: 0,
-          },
-          trafficSeries: [],
-          conversionSeries: [],
+  const restrictedPartnerView = !allowSuspended
+    && (partner.status === "PENDING_REVIEW" || partner.status === "REJECTED");
+  const operationalData = restrictedPartnerView
+    ? null
+    : await Promise.all([
+        db.referralAttribution.count({ where: { partnerProfileId } }),
+        db.settlement.count({
+          where: { referralPartnerProfileId: partnerProfileId },
         }),
-  ]);
+        db.settlementLeg.findMany({
+          where: legWhere,
+          select: {
+            id: true,
+            amount: true,
+            currency: true,
+            status: true,
+            holdUntil: true,
+            settlement: {
+              select: {
+                createdAt: true,
+                grossAmount: true,
+                tradeOrder: { select: { orderNumber: true } },
+              },
+            },
+            reversals: { select: { amount: true, status: true } },
+          },
+        }),
+        db.settlementLeg.findMany({
+          where: legWhere,
+          orderBy: [{ settlement: { createdAt: "desc" } }, { id: "desc" }],
+          take: safePageSize,
+          skip: (safeCommissionPage - 1) * safePageSize,
+          select: {
+            id: true,
+            amount: true,
+            currency: true,
+            status: true,
+            holdUntil: true,
+            settlement: {
+              select: {
+                createdAt: true,
+                grossAmount: true,
+                tradeOrder: { select: { orderNumber: true } },
+              },
+            },
+            reversals: { select: { amount: true, status: true } },
+          },
+        }),
+        db.referralAttribution.findMany({
+          where: {
+            partnerProfileId,
+            referredUser: {
+              deletedAt: null,
+              deletionStatus: AccountDeletionStatus.ACTIVE,
+            },
+          },
+          orderBy: [{ lockedAt: "desc" }, { id: "desc" }],
+          take: safePageSize,
+          skip: (safeMemberPage - 1) * safePageSize,
+          select: {
+            status: true,
+            lockedAt: true,
+            referredUser: { select: { displayName: true, role: true } },
+            settlements: { select: { id: true }, take: 1 },
+          },
+        }),
+        "referralClickDailyVisitor" in db && "$queryRaw" in db
+          ? getPartnerReferralAnalytics({
+              db: db as unknown as PartnerAnalyticsDatabase,
+              partnerProfileId,
+              range: safeAnalyticsRange,
+            })
+          : Promise.resolve(emptyPartnerAnalytics(safeAnalyticsRange)),
+      ]);
+
+  const referralCount = operationalData?.[0] ?? 0;
+  const qualifyingTransactions = operationalData?.[1] ?? 0;
+  const allLegs = (operationalData?.[2] ?? []) as PartnerLeg[];
+  const commissionLegs = (operationalData?.[3] ?? []) as PartnerLeg[];
+  const referredMembers = operationalData?.[4] ?? [];
+  const analytics = operationalData?.[5] ?? emptyPartnerAnalytics(safeAnalyticsRange);
+  const payoutProfile = !allowSuspended && partner.status === "REJECTED"
+    ? null
+    : partner.payoutProfile;
 
   // Unknown currencies are intentionally excluded from USD totals rather than
   // silently combining different money units. The history still exposes its
@@ -345,9 +333,9 @@ export async function getPartnerDashboardData({
       websiteOrSocialUrl: partner.websiteOrSocialUrl,
       promotionDescription: partner.promotionDescription,
       status: partner.status,
-      referralCode: partner.referralCode,
+      referralCode: partner.status === "ACTIVE" ? partner.referralCode : null,
       createdAt: partner.createdAt,
-      payoutProfile: partner.payoutProfile,
+      payoutProfile,
     },
     totals: { ...totals, currency: "usd" as const },
     counts: { referredMembers: referralCount, qualifyingTransactions },

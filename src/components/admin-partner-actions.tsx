@@ -94,23 +94,22 @@ export function AdminPartnerActions({
       </label>
       <div className="flex flex-wrap gap-2">
         {partnerStatus === "PENDING_REVIEW" ? (
-          <ActionButton disabled={busy} onClick={() => post(partnerPath, { action: "approve" })} label={t("admin.partnerApprove")} />
+          <>
+            <ActionButton disabled={busy} onClick={() => post(partnerPath, { action: "approve" })} label={t("admin.partnerApprove")} />
+            <ActionButton disabled={busy || !reason.trim()} onClick={() => post(partnerPath, { action: "reject", reason })} label={t("admin.partnerReject")} />
+          </>
         ) : null}
-        {partnerStatus === "REJECTED" || partnerStatus === "SUSPENDED" ? (
+        {partnerStatus === "SUSPENDED" ? (
           <ActionButton disabled={busy} onClick={() => post(partnerPath, { action: "reactivate" })} label={t("admin.partnerReactivate")} />
         ) : null}
-        {partnerStatus !== "SUSPENDED" ? (
+        {partnerStatus === "REJECTED" ? (
+          <ActionButton disabled={busy} onClick={() => post(partnerPath, { action: "reactivate" })} label={t("admin.partnerReopen")} />
+        ) : null}
+        {partnerStatus === "ACTIVE" ? (
           <ActionButton
             disabled={busy || !reason.trim()}
             onClick={() => post(partnerPath, { action: "suspend", reason })}
             label={t("admin.partnerSuspend")}
-          />
-        ) : null}
-        {partnerStatus !== "REJECTED" ? (
-          <ActionButton
-            disabled={busy || !reason.trim()}
-            onClick={() => post(partnerPath, { action: "reject", reason })}
-            label={t("admin.partnerReject")}
           />
         ) : null}
       </div>

@@ -1,4 +1,3 @@
-import { PartnerProfileStatus } from "@/generated/prisma/client";
 import { apiError } from "@/lib/api-response";
 import {
   assertSameOrigin,
@@ -13,15 +12,19 @@ import {
 } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import {
+  getPartnerLifecycleTransition,
+  type PartnerLifecycleAction,
+} from "@/lib/partner-lifecycle";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 const fields = new Set(["action", "reason"]);
-const actions = {
-  approve: PartnerProfileStatus.ACTIVE,
-  reactivate: PartnerProfileStatus.ACTIVE,
-  reject: PartnerProfileStatus.REJECTED,
-  suspend: PartnerProfileStatus.SUSPENDED,
-} as const;
+const actions = new Set<PartnerLifecycleAction>([
+  "approve",
+  "reactivate",
+  "reject",
+  "suspend",
+]);
 
 export async function POST(
   request: Request,
@@ -46,7 +49,9 @@ export async function POST(
     const body = await readJsonObject(request);
     rejectUnexpectedFields(body, fields);
     const action = stringField(body, "action", { max: 32, required: true });
-    if (!action || !(action in actions)) throw validationError("Action is invalid.");
+    if (!action || !actions.has(action as PartnerLifecycleAction)) {
+      throw validationError("Action is invalid.");
+    }
     const reason = stringField(body, "reason", { max: 500, fallback: null });
     if ((action === "reject" || action === "suspend") && !reason) {
       throw validationError("A reason is required.");
@@ -58,10 +63,11 @@ export async function POST(
         select: { id: true, status: true, deletedAt: true },
       });
       if (!current || current.deletedAt) return null;
-      const nextStatus = actions[action as keyof typeof actions];
-      if (current.status === nextStatus && action !== "approve" && action !== "reactivate") {
-        return { status: current.status };
-      }
+      const nextStatus = getPartnerLifecycleTransition(
+        action as PartnerLifecycleAction,
+        current.status,
+      );
+      if (!nextStatus) return { invalidTransition: true as const };
       await tx.partnerProfile.update({
         where: { id: current.id },
         data: { status: nextStatus },
@@ -74,9 +80,15 @@ export async function POST(
           metadata: reason ? { reason } : {},
         },
       });
-      return { status: nextStatus };
+      return { invalidTransition: false as const, status: nextStatus };
     });
     if (!result) return Response.json({ error: "Partner profile not found." }, { status: 404, headers: noStore });
+    if (result.invalidTransition) {
+      return Response.json(
+        { error: "Partner status transition is not allowed." },
+        { status: 409, headers: noStore },
+      );
+    }
     return Response.json({ ok: true, status: result.status }, { headers: noStore });
   } catch (error) {
     if (error instanceof ApiValidationError) return validationErrorResponse(error);

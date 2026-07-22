@@ -99,7 +99,6 @@ export async function enrollPartnerProfile({
             displayName: data.fullName,
             contactEmail: email.trim().toLowerCase(),
             contactPhone: data.phone,
-            country: "KR",
             preferredLanguage: data.preferredLanguage,
             termsConsentVersion: PARTNER_TERMS_VERSION,
             termsConsentedAt:
@@ -137,7 +136,6 @@ export async function enrollPartnerProfile({
           data: {
             displayName: data.fullName,
             phoneNumber: data.phone,
-            country: "KR",
             preferredLanguage: data.preferredLanguage,
           },
         });

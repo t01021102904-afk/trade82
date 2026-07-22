@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdminPartnerActions } from "@/components/admin-partner-actions";
 import { PartnerReferralAnalyticsSection } from "@/components/partner-referral-analytics";
 import { PartnerReferralLink } from "@/components/partner-referral-link";
+import { PartnerDashboardStatusPanel } from "@/components/partner-dashboard-status-panel";
 import { createTranslator, getDictionary, type Locale } from "@/lib/i18n";
 import { withLocale } from "@/lib/i18n";
 import {
@@ -71,6 +72,9 @@ export function PartnerDashboardView({
     rejected: "partnerStatusRejected",
   };
   const isActive = profileStatus === "active";
+  const isPendingReview = profileStatus === "pendingReview";
+  const showOperationalSections =
+    adminReadonly || isActive || profileStatus === "suspended";
   const summary = [
     ["gross", data.totals.gross],
     ["adjustments", data.totals.adjustments],
@@ -184,25 +188,40 @@ export function PartnerDashboardView({
         </section> : null}
 
         {!isActive ? (
-          <section className="border-l-2 border-amber-500 pl-4" role="status">
-            <p className="font-semibold theme-foreground">
-              {t(`partnerProgram.${profileStatusKey[profileStatus]}Title`)}
-            </p>
-            <p className="mt-1 text-sm leading-6 theme-muted">
-              {t(`partnerProgram.${profileStatusKey[profileStatus]}Description`)}
-            </p>
-          </section>
+          <PartnerDashboardStatusPanel
+            status={profileStatus}
+            statusTitle={t(`partnerProgram.${profileStatusKey[profileStatus]}Title`)}
+            statusDescription={t(
+              `partnerProgram.${profileStatusKey[profileStatus]}Description`,
+            )}
+            payout={
+              !adminReadonly && isPendingReview && data.partner.payoutProfile
+                ? {
+                    title: t("partnerProgram.payoutSetupTitle"),
+                    bankNameLabel: t("partnerProgram.bankName"),
+                    bankName: data.partner.payoutProfile.bankName,
+                    accountNumberLabel: t("partnerProgram.accountNumber"),
+                    accountNumberMasked: data.partner.payoutProfile.accountNumberMasked,
+                    statusLabel: t("partnerProgram.status"),
+                    status: t(
+                      `partnerProgram.payout${payoutStatus[0].toUpperCase()}${payoutStatus.slice(1)}`,
+                    ),
+                  }
+                : undefined
+            }
+          />
         ) : null}
 
-        <PartnerReferralAnalyticsSection
-          locale={locale}
-          analytics={data.analytics}
-          qualifyingTransactions={data.counts.qualifyingTransactions}
-          netCommissionAmount={data.totals.net}
-          currency={data.totals.currency}
-          basePath={paginationBasePath}
-          query={paginationQuery}
-        />
+        {showOperationalSections ? <>
+          <PartnerReferralAnalyticsSection
+            locale={locale}
+            analytics={data.analytics}
+            qualifyingTransactions={data.counts.qualifyingTransactions}
+            netCommissionAmount={data.totals.net}
+            currency={data.totals.currency}
+            basePath={paginationBasePath}
+            query={paginationQuery}
+          />
 
         <section aria-labelledby="partner-summary">
           <h2
@@ -330,7 +349,7 @@ export function PartnerDashboardView({
                 <div>
                   <dt className="text-xs theme-muted">{t("partnerProgram.bankName")}</dt>
                   <dd className="mt-1 theme-foreground">
-                    {data.partner.payoutProfile.bankDirectory.bankNameLocal} / {data.partner.payoutProfile.bankDirectory.bankNameEnglish}
+                    {data.partner.payoutProfile.bankName}
                   </dd>
                 </div>
                 <div>
@@ -426,6 +445,7 @@ export function PartnerDashboardView({
             query={paginationQuery}
           />
         </section>
+        </> : null}
       </div>
     </main>
   );

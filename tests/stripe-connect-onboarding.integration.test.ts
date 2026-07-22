@@ -202,3 +202,121 @@ test("disposable PostgreSQL stores one partner enrollment with private consent e
     else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
   }
 });
+
+test("partner enrollment preserves US user and company countries for sellers and buyers", async () => {
+  const id = suffix();
+  const [sellerUser, buyerUser] = await Promise.all([
+    db.userProfile.create({
+      data: {
+        clerkUserId: `partner-country-seller-${id}`,
+        email: `partner-country-seller-${id}@example.test`,
+        displayName: "US Seller",
+        country: "US",
+        role: "seller",
+      },
+    }),
+    db.userProfile.create({
+      data: {
+        clerkUserId: `partner-country-buyer-${id}`,
+        email: `partner-country-buyer-${id}@example.test`,
+        displayName: "US Buyer",
+        country: "US",
+        role: "buyer",
+      },
+    }),
+  ]);
+  const [sellerCompany, buyerCompany, bank] = await Promise.all([
+    db.company.create({
+      data: {
+        ownerUserId: sellerUser.id,
+        companyRole: "seller",
+        legalName: `US Seller ${id}`,
+        country: "US",
+        businessAddress: "New York",
+      },
+    }),
+    db.company.create({
+      data: {
+        ownerUserId: buyerUser.id,
+        companyRole: "buyer",
+        legalName: `US Buyer ${id}`,
+        country: "US",
+        businessAddress: "California",
+      },
+    }),
+    db.bankDirectory.create({
+      data: {
+        countryCode: "KR",
+        bankNameLocal: `국내은행 ${id}`,
+        bankNameEnglish: `Korean Bank ${id}`,
+        sourceType: "SEED",
+        isActive: true,
+      },
+      select: { id: true },
+    }),
+  ]);
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY ??= Buffer.alloc(32, 8).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-country-v1";
+
+  const input = (name: string) => ({
+    fullName: name,
+    phone: "+1 (212) 555-0199",
+    preferredLanguage: "en" as const,
+    bankDirectoryId: bank.id,
+    accountHolder: name,
+    accountNumber: "321-654-0987",
+    accountBelongsToPartner: true,
+    agreeToTerms: true,
+    acknowledgePayoutTerms: true,
+    acknowledgePrivacy: true,
+  });
+
+  try {
+    const [sellerEnrollment, buyerEnrollment] = await Promise.all([
+      enrollment.enrollPartnerProfile({
+        userId: sellerUser.id,
+        email: sellerUser.email,
+        input: input("US Seller Partner"),
+        db,
+      }),
+      enrollment.enrollPartnerProfile({
+        userId: buyerUser.id,
+        email: buyerUser.email,
+        input: input("US Buyer Partner"),
+        db,
+      }),
+    ]);
+    const [sellerPayout, buyerPayout] = await Promise.all([
+      db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { partnerProfileId: sellerEnrollment.partnerProfile.id },
+      }),
+      db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { partnerProfileId: buyerEnrollment.partnerProfile.id },
+      }),
+    ]);
+    const [sellerUserAfter, buyerUserAfter, sellerCompanyAfter, buyerCompanyAfter] = await Promise.all([
+      db.userProfile.findUniqueOrThrow({ where: { id: sellerUser.id } }),
+      db.userProfile.findUniqueOrThrow({ where: { id: buyerUser.id } }),
+      db.company.findUniqueOrThrow({ where: { id: sellerCompany.id } }),
+      db.company.findUniqueOrThrow({ where: { id: buyerCompany.id } }),
+    ]);
+
+    assert.equal(sellerUserAfter.country, "US");
+    assert.equal(buyerUserAfter.country, "US");
+    assert.equal(sellerCompanyAfter.country, "US");
+    assert.equal(buyerCompanyAfter.country, "US");
+    assert.equal(sellerPayout.country, "KR");
+    assert.equal(buyerPayout.country, "KR");
+    assert.equal(sellerPayout.accountType, "LOCAL");
+    assert.equal(buyerPayout.accountType, "LOCAL");
+    assert.equal(sellerPayout.payoutCurrency, "krw");
+    assert.equal(buyerPayout.payoutCurrency, "krw");
+  } finally {
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});

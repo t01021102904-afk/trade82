@@ -11,7 +11,10 @@ import {
 } from "@/lib/api-security";
 import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
-import { savePartnerPayoutProfile, partnerPayoutProfileSafeSelect } from "@/lib/partner-payout-profiles";
+import {
+  partnerPayoutProfileOwnerSelect,
+  savePartnerPayoutProfile,
+} from "@/lib/partner-payout-profiles";
 import { assertKoreanPayoutConfiguration } from "@/lib/seller-payout-profile-rules";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
@@ -40,7 +43,7 @@ export async function GET() {
     if (!partner) return Response.json({ profile: null, partnerRequired: true }, { headers: noStore });
     const profile = await getDb().partnerPayoutProfile.findUnique({
       where: { partnerProfileId: partner.id },
-      select: partnerPayoutProfileSafeSelect,
+      select: partnerPayoutProfileOwnerSelect,
     });
     return Response.json({ profile }, { headers: noStore });
   } catch (error) {

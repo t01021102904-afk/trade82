@@ -15,13 +15,37 @@ import {
   normalizeKoreanAccountNumber,
 } from "@/lib/seller-payout-profile-rules";
 
-export const partnerPayoutProfileSafeSelect = {
+const partnerPayoutProfileOwnerFields = {
+  id: true,
+  bankName: true,
+  accountHolder: true,
+  accountNumberMasked: true,
+  accountNumberLast4: true,
+  payoutCurrency: true,
+  status: true,
+  verifiedAt: true,
+  updatedAt: true,
+} satisfies Prisma.PartnerPayoutProfileSelect;
+
+export const partnerPayoutProfileOwnerSelect = {
+  ...partnerPayoutProfileOwnerFields,
+} satisfies Prisma.PartnerPayoutProfileSelect;
+
+export const partnerPayoutProfileAdminSummarySelect = {
+  ...partnerPayoutProfileOwnerFields,
+} satisfies Prisma.PartnerPayoutProfileSelect;
+
+export const partnerPayoutProfileInternalSelect = {
   id: true,
   partnerProfileId: true,
   bankDirectoryId: true,
   country: true,
   bankName: true,
   accountHolder: true,
+  accountNumberCiphertext: true,
+  accountNumberIv: true,
+  accountNumberAuthTag: true,
+  accountNumberKeyVersion: true,
   accountNumberLast4: true,
   accountNumberMasked: true,
   accountType: true,
@@ -135,7 +159,7 @@ export async function savePartnerPayoutProfile({
     where: { partnerProfileId },
     create: { partnerProfileId, ...data },
     update: data,
-    select: partnerPayoutProfileSafeSelect,
+    select: partnerPayoutProfileOwnerSelect,
   });
 
   await db.partnerPayoutProfileAuditEvent.create({

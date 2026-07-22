@@ -47,6 +47,12 @@ function createFakeDb({ ownerType = "seller", activePartner = true }: { ownerTyp
       findFirst: async () => ownerType === "seller" ? { id: "seller-company", country: "KR" } : null,
     },
     partnerProfile: {
+      findFirst: async () => ownerType === "partner" ? {
+        id: "partner-profile",
+        status: activePartner ? "ACTIVE" : "SUSPENDED",
+        country: null,
+        user: { country: "US" },
+      } : null,
       findUnique: async () => ownerType === "partner" ? {
         id: "partner-profile",
         status: activePartner ? "ACTIVE" : "SUSPENDED",
