@@ -220,6 +220,14 @@ function rangeWindow(range: PartnerAnalyticsRange, now: Date) {
   return { start: new Date(end.getTime() - days * DAY_MS), end };
 }
 
+function utcDateKey(value: Date) {
+  return dayKey(value);
+}
+
+function utcNaiveTimestampKey(value: Date) {
+  return `${utcDateKey(value)} ${pad(value.getUTCHours())}:${pad(value.getUTCMinutes())}:${pad(value.getUTCSeconds())}.${String(value.getUTCMilliseconds()).padStart(3, "0")}`;
+}
+
 function percent(value: number, denominator: number) {
   return denominator === 0
     ? 0
@@ -282,20 +290,27 @@ export async function getPartnerReferralAnalytics({
     throw new Error("Partner analytics aggregation requires PostgreSQL.");
   }
 
+  const windowKeys = {
+    startDate: window.start ? utcDateKey(window.start) : null,
+    endDate: utcDateKey(window.end),
+    startTimestamp: window.start ? utcNaiveTimestampKey(window.start) : null,
+    endTimestamp: utcNaiveTimestampKey(window.end),
+  };
+
   const clickFilter = Prisma.sql`
     "partnerProfileId" = ${partnerProfileId}
-    AND "day" < ${window.end}::timestamptz::date
-    AND (${window.start}::timestamptz IS NULL OR "day" >= ${window.start}::timestamptz::date)
+    AND "day" < ${windowKeys.endDate}::date
+    AND (${windowKeys.startDate}::date IS NULL OR "day" >= ${windowKeys.startDate}::date)
   `;
   const attributionFilter = Prisma.sql`
     "partnerProfileId" = ${partnerProfileId}
-    AND "lockedAt" < ${window.end}
-    AND (${window.start}::timestamptz IS NULL OR "lockedAt" >= ${window.start})
+    AND "lockedAt" < ${windowKeys.endTimestamp}::timestamp
+    AND (${windowKeys.startTimestamp}::timestamp IS NULL OR "lockedAt" >= ${windowKeys.startTimestamp}::timestamp)
   `;
   const conversionFilter = Prisma.sql`
     "partnerProfileId" = ${partnerProfileId}
-    AND "convertedAt" < ${window.end}
-    AND (${window.start}::timestamptz IS NULL OR "convertedAt" >= ${window.start})
+    AND "convertedAt" < ${windowKeys.endTimestamp}::timestamp
+    AND (${windowKeys.startTimestamp}::timestamp IS NULL OR "convertedAt" >= ${windowKeys.startTimestamp}::timestamp)
   `;
 
   const [clickSummaryRows, attributionSummaryRows, conversionSummaryRows] =
@@ -371,7 +386,7 @@ export async function getPartnerReferralAnalytics({
     range === "all"
       ? await db.$queryRaw<ConversionBucketRow[]>(Prisma.sql`
           SELECT
-            to_char(date_trunc('month', "convertedAt" AT TIME ZONE 'UTC'), 'YYYY-MM') AS date,
+            to_char(date_trunc('month', "convertedAt"), 'YYYY-MM') AS date,
             0::bigint AS "attributedSignups",
             COUNT(*) FILTER (WHERE "subjectType" = 'SELLER'::"ReferralSubjectType")::bigint AS "sellerRegistrations",
             COUNT(*) FILTER (WHERE "subjectType" = 'BUYER'::"ReferralSubjectType")::bigint AS "buyerRegistrations"
@@ -382,7 +397,7 @@ export async function getPartnerReferralAnalytics({
         `)
       : await db.$queryRaw<ConversionBucketRow[]>(Prisma.sql`
           SELECT
-            to_char(date_trunc('day', "convertedAt" AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS date,
+            to_char(date_trunc('day', "convertedAt"), 'YYYY-MM-DD') AS date,
             0::bigint AS "attributedSignups",
             COUNT(*) FILTER (WHERE "subjectType" = 'SELLER'::"ReferralSubjectType")::bigint AS "sellerRegistrations",
             COUNT(*) FILTER (WHERE "subjectType" = 'BUYER'::"ReferralSubjectType")::bigint AS "buyerRegistrations"
@@ -396,7 +411,7 @@ export async function getPartnerReferralAnalytics({
     range === "all"
       ? await db.$queryRaw<Array<{ date: string; attributedSignups: bigint | number }>>(Prisma.sql`
           SELECT
-            to_char(date_trunc('month', "lockedAt" AT TIME ZONE 'UTC'), 'YYYY-MM') AS date,
+            to_char(date_trunc('month', "lockedAt"), 'YYYY-MM') AS date,
             COUNT(*)::bigint AS "attributedSignups"
           FROM "ReferralAttribution"
           WHERE ${attributionFilter}
@@ -405,7 +420,7 @@ export async function getPartnerReferralAnalytics({
         `)
       : await db.$queryRaw<Array<{ date: string; attributedSignups: bigint | number }>>(Prisma.sql`
           SELECT
-            to_char(date_trunc('day', "lockedAt" AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS date,
+            to_char(date_trunc('day', "lockedAt"), 'YYYY-MM-DD') AS date,
             COUNT(*)::bigint AS "attributedSignups"
           FROM "ReferralAttribution"
           WHERE ${attributionFilter}
