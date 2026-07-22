@@ -308,7 +308,7 @@ export async function getPartnerReferralAnalytics({
   if (!db.$queryRaw) {
     throw new Error("Partner analytics aggregation requires PostgreSQL.");
   }
-  const queryRaw = db.$queryRaw;
+  const queryRaw = db.$queryRaw.bind(db);
 
   const windowKeys = {
     startDate: window.start ? utcDateKey(window.start) : null,

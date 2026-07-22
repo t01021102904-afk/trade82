@@ -222,6 +222,37 @@ test("analytics totals use PostgreSQL aggregates, zero-filled UTC buckets, and z
   assert.equal(empty.trafficSeries.length, 30);
 });
 
+test("analytics raw aggregate queries preserve Prisma client context", async () => {
+  let queryCount = 0;
+  const db = {
+    expectedContext: "transaction-client",
+    async $queryRaw() {
+      assert.equal(this.expectedContext, "transaction-client");
+      const result = [
+        [{ totalClicks: 1, uniqueVisitors: 1, firstActivity: new Date("2026-07-21T00:00:00.000Z") }],
+        [{ attributedSignups: 0, firstActivity: null }],
+        [{ sellerRegistrations: 0, buyerRegistrations: 0, firstActivity: null }],
+        [{ date: "2026-07", totalClicks: 1, uniqueVisitors: 1 }],
+        [],
+        [],
+      ][queryCount++] ?? [];
+      return result;
+    },
+    referralClickDailyVisitor: { upsert: async () => undefined },
+    referralConversion: { upsert: async () => undefined },
+  };
+
+  const analytics = await getPartnerReferralAnalytics({
+    db: db as never,
+    partnerProfileId: "partner-1",
+    range: "all",
+    now,
+  });
+
+  assert.equal(analytics.totals.totalClicks, 1);
+  assert.equal(queryCount, 6);
+});
+
 test("unified partner analytics helpers provide safe comparison and grouped buckets", () => {
   assert.deepEqual(compareAnalyticsValue(0, 0), {
     status: "neutral",
