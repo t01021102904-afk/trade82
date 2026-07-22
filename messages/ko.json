@@ -121,6 +121,8 @@
     "sellerRegistrations": "셀러 가입",
     "buyerRegistrations": "바이어 가입",
     "signupConversion": "가입 전환율",
+    "sellerConversionRate": "셀러 전환율",
+    "buyerConversionRate": "바이어 전환율",
     "trafficChart": "추천 트래픽",
     "trafficChartDescription": "선택한 기간의 방문과 순 방문자입니다.",
     "conversionChart": "추천 전환",

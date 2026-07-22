@@ -208,7 +208,7 @@ export async function getPartnerDashboardData({
         settlements: { select: { id: true }, take: 1 },
       },
     }),
-    "referralClickDailyVisitor" in db
+    "referralClickDailyVisitor" in db && "$queryRaw" in db
       ? getPartnerReferralAnalytics({
           db: db as unknown as PartnerAnalyticsDatabase,
           partnerProfileId,

@@ -4,11 +4,14 @@ import { test } from "node:test";
 import {
   applyReferralVisitorCookie,
   getPartnerReferralAnalytics,
-  hashReferralVisitor,
+  hasPartnerReferralActivity,
+  hashPartnerReferralVisitor,
   normalizePartnerAnalyticsRange,
   recordReferralClick,
 } from "../src/lib/partner-referral-analytics.ts";
 import { recordReferralConversionForCompany } from "../src/lib/partner-referral-conversions.ts";
+
+process.env.PARTNER_PROGRAM_MODE = "on";
 
 const now = new Date("2026-07-21T15:30:00.000Z");
 
@@ -16,9 +19,30 @@ test("analytics range and visitor hashes fail closed without exposing raw identi
   assert.equal(normalizePartnerAnalyticsRange(undefined), "30d");
   assert.equal(normalizePartnerAnalyticsRange("30d"), "30d");
   assert.equal(normalizePartnerAnalyticsRange("invalid"), "30d");
-  const hash = hashReferralVisitor("test-cookie-value");
-  assert.match(hash, /^[a-f0-9]{64}$/);
-  assert.notEqual(hash, "test-cookie-value");
+  const samePartnerHash = hashPartnerReferralVisitor("partner-1", "test-cookie-value");
+  assert.equal(
+    samePartnerHash,
+    hashPartnerReferralVisitor("partner-1", "test-cookie-value"),
+  );
+  assert.notEqual(
+    samePartnerHash,
+    hashPartnerReferralVisitor("partner-2", "test-cookie-value"),
+  );
+  assert.match(samePartnerHash, /^[a-f0-9]{64}$/);
+  assert.notEqual(samePartnerHash, "test-cookie-value");
+});
+
+test("seller conversion activity is not treated as an empty dashboard", () => {
+  assert.equal(
+    hasPartnerReferralActivity({
+      totalClicks: 0,
+      uniqueVisitors: 0,
+      attributedSignups: 0,
+      sellerRegistrations: 1,
+      buyerRegistrations: 0,
+    }),
+    true,
+  );
 });
 
 test("referral clicks exclude prefetches, non-GETs, self-clicks, and inactive partners", async () => {
@@ -125,44 +149,25 @@ test("referral click capture uses a random cookie and an atomic daily upsert", a
   );
 });
 
-test("analytics totals use distinct visitors, zero-filled UTC buckets, and a zero denominator rate", async () => {
+test("analytics totals use PostgreSQL aggregates, zero-filled UTC buckets, and zero denominator rates", async () => {
+  let queryCount = 0;
   const db = {
-    referralClickDailyVisitor: {
-      findMany: async () => [
-        {
-          visitorHash: "visitor-a",
-          day: new Date("2026-07-20T00:00:00.000Z"),
-          clickCount: 3,
-        },
-        {
-          visitorHash: "visitor-a",
-          day: new Date("2026-07-21T00:00:00.000Z"),
-          clickCount: 2,
-        },
-        {
-          visitorHash: "visitor-b",
-          day: new Date("2026-07-21T00:00:00.000Z"),
-          clickCount: 1,
-        },
-      ],
+    $queryRaw: async () => {
+      const result = [
+        [{ totalClicks: 6, uniqueVisitors: 2, firstActivity: new Date("2026-07-20T00:00:00.000Z") }],
+        [{ attributedSignups: 1, firstActivity: new Date("2026-07-21T12:00:00.000Z") }],
+        [{ sellerRegistrations: 1, buyerRegistrations: 1, firstActivity: new Date("2026-07-21T12:00:00.000Z") }],
+        [
+          { date: "2026-07-20", totalClicks: 3, uniqueVisitors: 1 },
+          { date: "2026-07-21", totalClicks: 3, uniqueVisitors: 2 },
+        ],
+        [{ date: "2026-07-21", attributedSignups: 0, sellerRegistrations: 1, buyerRegistrations: 1 }],
+        [{ date: "2026-07-21", attributedSignups: 1 }],
+      ][queryCount++] ?? [];
+      return result;
     },
-    referralAttribution: {
-      findMany: async () => [
-        { lockedAt: new Date("2026-07-21T12:00:00.000Z") },
-      ],
-    },
-    referralConversion: {
-      findMany: async () => [
-        {
-          subjectType: "SELLER" as const,
-          convertedAt: new Date("2026-07-21T12:00:00.000Z"),
-        },
-        {
-          subjectType: "BUYER" as const,
-          convertedAt: new Date("2026-07-21T12:00:00.000Z"),
-        },
-      ],
-    },
+    referralClickDailyVisitor: { upsert: async () => undefined },
+    referralConversion: { upsert: async () => undefined },
   };
   const analytics = await getPartnerReferralAnalytics({
     db: db as never,
@@ -176,22 +181,29 @@ test("analytics totals use distinct visitors, zero-filled UTC buckets, and a zer
   assert.equal(analytics.totals.sellerRegistrations, 1);
   assert.equal(analytics.totals.buyerRegistrations, 1);
   assert.equal(analytics.totals.signupConversionRate, 50);
+  assert.equal(analytics.totals.sellerConversionRate, 50);
+  assert.equal(analytics.totals.buyerConversionRate, 50);
   assert.equal(analytics.trafficSeries.length, 7);
   assert.equal(analytics.trafficSeries[5]?.totalClicks, 3);
   assert.equal(analytics.trafficSeries[6]?.totalClicks, 3);
   assert.equal(analytics.trafficSeries[6]?.uniqueVisitors, 2);
+  assert.doesNotMatch(JSON.stringify(analytics), /visitorHash|visitor-a|visitor-b/);
+  assert.equal(queryCount, 6);
 
+  queryCount = 0;
   const empty = await getPartnerReferralAnalytics({
     db: {
-      referralClickDailyVisitor: { findMany: async () => [] },
-      referralAttribution: { findMany: async () => [] },
-      referralConversion: { findMany: async () => [] },
+      $queryRaw: async () => [],
+      referralClickDailyVisitor: { upsert: async () => undefined },
+      referralConversion: { upsert: async () => undefined },
     } as never,
     partnerProfileId: "partner-1",
     range: "30d",
     now,
   });
   assert.equal(empty.totals.signupConversionRate, 0);
+  assert.equal(empty.totals.sellerConversionRate, 0);
+  assert.equal(empty.totals.buyerConversionRate, 0);
   assert.equal(empty.trafficSeries.length, 30);
 });
 

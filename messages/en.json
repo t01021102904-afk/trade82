@@ -121,6 +121,8 @@
     "sellerRegistrations": "Seller registrations",
     "buyerRegistrations": "Buyer registrations",
     "signupConversion": "Signup conversion",
+    "sellerConversionRate": "Seller conversion rate",
+    "buyerConversionRate": "Buyer conversion rate",
     "trafficChart": "Referral traffic",
     "trafficChartDescription": "Visits and unique visitors in this period.",
     "conversionChart": "Referral conversions",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import {
+  hasPartnerReferralActivity,
   type PartnerAnalyticsRange,
   type PartnerReferralAnalytics,
 } from "@/lib/partner-referral-analytics";
@@ -151,7 +152,6 @@ function AnalyticsChart<T extends Record<string, number | string>>({
                         cy={y(Number(point[key]) || 0)}
                         r="5"
                         fill={color}
-                        tabIndex={0}
                         aria-label={`${label}, ${displayDate(String(point.date), locale)}: ${Number(point[key]) || 0}`}
                       />
                     ))}
@@ -189,38 +189,45 @@ function AnalyticsChart<T extends Record<string, number | string>>({
               </span>
             ))}
           </div>
-          <table className="mt-4 w-full text-left text-xs theme-muted">
-            <caption className="sr-only">{title}</caption>
-            <thead>
-              <tr className="border-b theme-border">
-                <th className="py-2 pr-3 font-medium">
-                  {locale === "ko" ? "날짜" : "Date"}
-                </th>
-                {series.map(({ key, label }) => (
-                  <th key={String(key)} className="py-2 pr-3 font-medium">
-                    {label}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {points.map((point) => (
-                <tr
-                  key={String(point.date)}
-                  className="border-b theme-border last:border-0"
-                >
-                  <td className="py-2 pr-3">
-                    {displayDate(String(point.date), locale)}
-                  </td>
-                  {series.map(({ key }) => (
-                    <td key={String(key)} className="py-2 pr-3">
-                      {Number(point[key]) || 0}
-                    </td>
+          <details className="mt-4 text-xs theme-muted">
+            <summary className="cursor-pointer font-medium">
+              {locale === "ko" ? "데이터 표 보기" : "View data table"}
+            </summary>
+            <div className="mt-2 max-h-64 overflow-auto">
+              <table className="w-full text-left">
+                <caption className="sr-only">{title}</caption>
+                <thead>
+                  <tr className="border-b theme-border">
+                    <th className="py-2 pr-3 font-medium">
+                      {locale === "ko" ? "날짜" : "Date"}
+                    </th>
+                    {series.map(({ key, label }) => (
+                      <th key={String(key)} className="py-2 pr-3 font-medium">
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {points.map((point) => (
+                    <tr
+                      key={String(point.date)}
+                      className="border-b theme-border last:border-0"
+                    >
+                      <td className="py-2 pr-3">
+                        {displayDate(String(point.date), locale)}
+                      </td>
+                      {series.map(({ key }) => (
+                        <td key={String(key)} className="py-2 pr-3">
+                          {Number(point[key]) || 0}
+                        </td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
+          </details>
         </>
       ) : null}
     </div>
@@ -236,7 +243,7 @@ export function PartnerReferralAnalyticsSection({
 }) {
   const t = createTranslator(getDictionary(locale));
   const totals = analytics.totals;
-  const hasActivity = totals.totalClicks > 0 || totals.attributedSignups > 0;
+  const hasActivity = hasPartnerReferralActivity(totals);
   const kpis = [
     ["totalVisits", totals.totalClicks],
     ["uniqueVisitors", totals.uniqueVisitors],
@@ -244,6 +251,8 @@ export function PartnerReferralAnalyticsSection({
     ["sellerRegistrations", totals.sellerRegistrations],
     ["buyerRegistrations", totals.buyerRegistrations],
     ["signupConversion", percentage(totals.signupConversionRate)],
+    ["sellerConversionRate", percentage(totals.sellerConversionRate)],
+    ["buyerConversionRate", percentage(totals.buyerConversionRate)],
   ] as const;
 
   return (
