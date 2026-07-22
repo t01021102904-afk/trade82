@@ -13,6 +13,10 @@ import {
 import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
+  authorizePartnerPayoutWrite,
+  lockOwnedPartnerProfile,
+} from "@/lib/partner-profile-locks";
+import {
   partnerPayoutProfileOwnerSelect,
   savePartnerPayoutProfile,
 } from "@/lib/partner-payout-profiles";
@@ -67,14 +71,6 @@ export async function PUT(request: Request) {
       windowMs: 60 * 60_000,
     });
     if (rateLimited) return rateLimited;
-    const partner = await getOwnedPartner(user.id);
-    if (!partner) return Response.json({ error: "Partner profile is required." }, { status: 403, headers: noStore });
-    if (partner.status === PartnerProfileStatus.SUSPENDED) {
-      return Response.json({ error: "Payout information cannot be changed while the partner profile is suspended." }, { status: 403, headers: noStore });
-    }
-    if (partner.status === PartnerProfileStatus.REJECTED) {
-      return Response.json({ error: "Resubmit partner enrollment before changing payout information." }, { status: 409, headers: noStore });
-    }
     const body = await readJsonObject(request);
     rejectUnexpectedFields(body, fields);
     assertKoreanPayoutConfiguration({
@@ -83,10 +79,15 @@ export async function PUT(request: Request) {
       payoutCurrency: body.payoutCurrency,
       supportedCurrencies: body.supportedCurrencies,
     });
-    const profile = await getDb().$transaction((tx) =>
-      savePartnerPayoutProfile({
+    const result = await getDb().$transaction(async (tx) => {
+      const authorization = authorizePartnerPayoutWrite(
+        await lockOwnedPartnerProfile(tx, user.id),
+      );
+      if (!authorization.ok) return authorization;
+
+      const profile = await savePartnerPayoutProfile({
         db: tx,
-        partnerProfileId: partner.id,
+        partnerProfileId: authorization.partnerProfileId,
         actorUserId: user.id,
         input: {
           bankDirectoryId: idField(body, "bankDirectoryId", { required: true }) as string,
@@ -94,9 +95,13 @@ export async function PUT(request: Request) {
           accountNumber: requiredStringField(body, "accountNumber", 128),
           accountBelongsToPartner: body.accountBelongsToPartner === true,
         },
-      }),
-    );
-    return Response.json({ profile }, { headers: noStore });
+      });
+      return { ok: true as const, profile };
+    });
+    if (!result.ok) {
+      return Response.json({ error: result.error }, { status: result.status, headers: noStore });
+    }
+    return Response.json({ profile: result.profile }, { headers: noStore });
   } catch (error) {
     if (error instanceof ApiValidationError) return validationErrorResponse(error);
     if (error instanceof Error) return Response.json({ error: "Unable to update payout information." }, { status: 400, headers: noStore });

@@ -3,6 +3,7 @@ import "server-only";
 import { PartnerProfileStatus, Prisma, type PreferredLanguage, type PrismaClient } from "@/generated/prisma/client";
 import { validationError } from "@/lib/api-security";
 import { getDb } from "@/lib/db";
+import { lockOwnedPartnerProfile } from "@/lib/partner-profile-locks";
 import { createOrGetPartnerProfile } from "@/lib/partner-referrals";
 import { savePartnerPayoutProfile } from "@/lib/partner-payout-profiles";
 
@@ -73,20 +74,30 @@ export async function enrollPartnerProfile({
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       return await db.$transaction(async (tx) => {
-        const existing = await tx.partnerProfile.findUnique({
-          where: { userId },
-          select: {
-            id: true,
-            status: true,
-            termsConsentVersion: true,
-            termsConsentedAt: true,
-            privacyConsentVersion: true,
-            privacyConsentedAt: true,
-          },
-        });
-        if (existing?.status === PartnerProfileStatus.SUSPENDED) {
+        const lockedExisting = await lockOwnedPartnerProfile(tx, userId);
+        if (lockedExisting?.status === PartnerProfileStatus.SUSPENDED) {
           throw new Response("Partner profile is suspended", { status: 403 });
         }
+        if (lockedExisting && ![
+          PartnerProfileStatus.ACTIVE,
+          PartnerProfileStatus.PENDING_REVIEW,
+          PartnerProfileStatus.REJECTED,
+        ].includes(lockedExisting.status)) {
+          throw new Response("Partner profile status is not eligible for enrollment updates", { status: 409 });
+        }
+        const existing = lockedExisting
+          ? await tx.partnerProfile.findUniqueOrThrow({
+              where: { id: lockedExisting.id },
+              select: {
+                id: true,
+                status: true,
+                termsConsentVersion: true,
+                termsConsentedAt: true,
+                privacyConsentVersion: true,
+                privacyConsentedAt: true,
+              },
+            })
+          : null;
 
         const profileResult = existing
           ? { partnerProfile: { id: existing.id }, created: false }

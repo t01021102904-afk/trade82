@@ -16,6 +16,7 @@ import {
   getPartnerLifecycleTransition,
   type PartnerLifecycleAction,
 } from "@/lib/partner-lifecycle";
+import { lockPartnerProfileById } from "@/lib/partner-profile-locks";
 
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 const fields = new Set(["action", "reason"]);
@@ -58,11 +59,8 @@ export async function POST(
     }
 
     const result = await getDb().$transaction(async (tx) => {
-      const current = await tx.partnerProfile.findUnique({
-        where: { id: partnerProfileId },
-        select: { id: true, status: true, deletedAt: true },
-      });
-      if (!current || current.deletedAt) return null;
+      const current = await lockPartnerProfileById(tx, partnerProfileId);
+      if (!current) return null;
       const nextStatus = getPartnerLifecycleTransition(
         action as PartnerLifecycleAction,
         current.status,
