@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
-import { after, test } from "node:test";
+import { after, mock, test } from "node:test";
 
 import { PrismaClient } from "../src/generated/prisma/client.ts";
 
@@ -26,6 +26,17 @@ assertDisposableDatabase();
 process.env.DATABASE_POOL_MAX = "4";
 process.env.PARTNER_PROGRAM_MODE = "on";
 
+let routeAuthUser: { id: string; email: string } | null = null;
+
+mock.module("@/lib/authz", {
+  namedExports: {
+    requireAuth: async () => {
+      if (!routeAuthUser) throw new Response("Unauthorized", { status: 401 });
+      return routeAuthUser;
+    },
+  },
+});
+
 const { getDb } = await import(
   new URL("../src/lib/db.ts", import.meta.url).href
 );
@@ -38,6 +49,12 @@ const referralAnalytics = await import(
 const referralConversions = await import(
   new URL("../src/lib/partner-referral-conversions.ts", import.meta.url).href
 );
+const partnerPayoutRoute = await import(
+  new URL("../src/app/api/account/partner-payout-profile/route.ts", import.meta.url).href,
+);
+const partnerEnrollRoute = await import(
+  new URL("../src/app/api/partner/enroll/route.ts", import.meta.url).href,
+);
 const db = getDb() as PrismaClient;
 
 after(async () => {
@@ -46,6 +63,83 @@ after(async () => {
 
 function suffix() {
   return randomBytes(8).toString("hex");
+}
+
+function payoutRequest(body: Record<string, unknown>) {
+  return new Request("https://trade82.test/api/account/partner-payout-profile", {
+    method: "PUT",
+    headers: {
+      origin: "https://trade82.test",
+      host: "trade82.test",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function koreanPayoutBody(bankDirectoryId: string, accountNumber = "123-456-7890") {
+  return {
+    country: "KR",
+    bankDirectoryId,
+    accountHolder: "Partner Owner",
+    accountNumber,
+    accountType: "LOCAL",
+    payoutCurrency: "krw",
+    supportedCurrencies: ["krw"],
+    accountBelongsToPartner: true,
+  };
+}
+
+async function createPartnerPayoutFixture(status: "ACTIVE" | "PENDING_REVIEW" | "SUSPENDED" | "REJECTED") {
+  const id = suffix();
+  const user = await db.userProfile.create({
+    data: {
+      clerkUserId: `partner-payout-route-${id}`,
+      email: `partner-payout-route-${id}@example.test`,
+      displayName: "Partner Payout Owner",
+      role: "user",
+    },
+  });
+  const bank = await db.bankDirectory.create({
+    data: {
+      countryCode: "KR",
+      bankNameLocal: `테스트은행 ${id}`,
+      bankNameEnglish: `Test Bank ${id}`,
+      sourceType: "SEED",
+      isActive: true,
+    },
+    select: { id: true },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: user.id,
+      referralCode: `T82-${id.toUpperCase()}`,
+      status,
+    },
+  });
+  const payout = await db.partnerPayoutProfile.create({
+    data: {
+      partnerProfileId: partner.id,
+      bankDirectoryId: bank.id,
+      country: "KR",
+      bankName: "Existing Test Bank",
+      accountHolder: "Existing Owner",
+      accountNumberCiphertext: Buffer.alloc(32, 7),
+      accountNumberIv: Buffer.alloc(12, 8),
+      accountNumberAuthTag: Buffer.alloc(16, 9),
+      accountNumberKeyVersion: "test-v1",
+      accountNumberLast4: "0000",
+      accountNumberMasked: "•••• 0000",
+      accountType: "LOCAL",
+      payoutCurrency: "krw",
+      supportedCurrencies: ["krw"],
+      accountBelongsToPartner: true,
+      status: "VERIFIED",
+      verifiedAt: new Date("2026-07-20T00:00:00.000Z"),
+      verifiedByUserId: user.id,
+    },
+  });
+  return { id, user, bank, partner, payout };
 }
 
 test("disposable PostgreSQL keeps raw referral secrets out of the database and enforces first attribution", async () => {
@@ -590,4 +684,197 @@ test("disposable PostgreSQL records seller and buyer conversions idempotently", 
       ["SELLER", seller.createdAt],
     ],
   );
+});
+
+test("owner payout writes allow active and pending-review partners and reset verification safely", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 19).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "route-test-v1";
+  const active = await createPartnerPayoutFixture("ACTIVE");
+  const pending = await createPartnerPayoutFixture("PENDING_REVIEW");
+
+  try {
+    for (const fixture of [active, pending]) {
+      routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+      const beforeAuditCount = await db.partnerPayoutProfileAuditEvent.count({
+        where: { payoutProfileId: fixture.payout.id },
+      });
+      const response = await partnerPayoutRoute.PUT(
+        payoutRequest(koreanPayoutBody(fixture.bank.id, "987-654-3210")),
+      );
+      assert.equal(response.status, 200);
+      const payload = (await response.json()) as {
+        profile: Record<string, unknown>;
+      };
+      assert.deepEqual(Object.keys(payload.profile).sort(), [
+        "accountHolder",
+        "accountNumberLast4",
+        "accountNumberMasked",
+        "bankName",
+        "id",
+        "payoutCurrency",
+        "status",
+        "updatedAt",
+        "verifiedAt",
+      ].sort());
+      assert.equal(payload.profile.accountNumberLast4, "3210");
+      assert.equal(payload.profile.status, "PENDING_VERIFICATION");
+      assert.equal(payload.profile.verifiedAt, null);
+      assert.equal("accountNumberCiphertext" in payload.profile, false);
+      assert.equal("partnerProfileId" in payload.profile, false);
+      assert.equal("bankDirectoryId" in payload.profile, false);
+
+      const [partnerAfter, payoutAfter, auditCount] = await Promise.all([
+        db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+        db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+        db.partnerPayoutProfileAuditEvent.count({
+          where: { payoutProfileId: fixture.payout.id },
+        }),
+      ]);
+      assert.equal(partnerAfter.status, fixture.partner.status);
+      assert.equal(payoutAfter.status, "PENDING_VERIFICATION");
+      assert.equal(payoutAfter.verifiedAt, null);
+      assert.equal(payoutAfter.verifiedByUserId, null);
+      assert.equal(auditCount, beforeAuditCount + 1);
+    }
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("owner payout writes reject suspended and rejected partners without side effects", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 21).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "blocked-route-test-v1";
+  const suspended = await createPartnerPayoutFixture("SUSPENDED");
+  const rejected = await createPartnerPayoutFixture("REJECTED");
+
+  try {
+    for (const [fixture, expectedStatus] of [
+      [suspended, 403],
+      [rejected, 409],
+    ] as const) {
+      routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+      const before = await db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { id: fixture.payout.id },
+      });
+      const beforeAuditCount = await db.partnerPayoutProfileAuditEvent.count({
+        where: { payoutProfileId: fixture.payout.id },
+      });
+      const response = await partnerPayoutRoute.PUT(
+        payoutRequest(koreanPayoutBody(fixture.bank.id, "111-222-3333")),
+      );
+      assert.equal(response.status, expectedStatus);
+      assert.match((await response.json()).error, /payout|enrollment/i);
+
+      const [partnerAfter, payoutAfter, auditCount, rejectedGet] = await Promise.all([
+        db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+        db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+        db.partnerPayoutProfileAuditEvent.count({
+          where: { payoutProfileId: fixture.payout.id },
+        }),
+        fixture.partner.status === "REJECTED" ? partnerPayoutRoute.GET() : Promise.resolve(null),
+      ]);
+      assert.equal(partnerAfter.status, fixture.partner.status);
+      assert.deepEqual(payoutAfter, before);
+      assert.equal(auditCount, beforeAuditCount);
+      if (rejectedGet) {
+        assert.equal(rejectedGet.status, 200);
+        assert.deepEqual(await rejectedGet.json(), {
+          profile: null,
+          partnerStatus: "REJECTED",
+        });
+      }
+    }
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("rejected partner enrollment resubmission changes status and payout atomically", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 23).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "resubmission-test-v1";
+  const fixture = await createPartnerPayoutFixture("REJECTED");
+  routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+
+  const enrollmentBody = (bankDirectoryId: string, accountNumber: string) => ({
+    fullName: "Resubmitted Partner",
+    phone: "+1 (212) 555-0199",
+    preferredLanguage: "en",
+    country: "KR",
+    bankDirectoryId,
+    accountHolder: "Resubmitted Partner",
+    accountNumber,
+    accountType: "LOCAL",
+    payoutCurrency: "krw",
+    supportedCurrencies: ["krw"],
+    accountBelongsToPartner: true,
+    agreeToTerms: true,
+    acknowledgePayoutTerms: true,
+    acknowledgePrivacy: true,
+  });
+
+  try {
+    const beforePayout = await db.partnerPayoutProfile.findUniqueOrThrow({
+      where: { id: fixture.payout.id },
+    });
+    const failed = await partnerEnrollRoute.POST(
+      new Request("https://trade82.test/api/partner/enroll", {
+        method: "POST",
+        headers: {
+          origin: "https://trade82.test",
+          host: "trade82.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(enrollmentBody(`missing-${fixture.id}`, "555-666-7777")),
+      }),
+    );
+    assert.equal(failed.status, 400);
+    const [afterFailedPartner, afterFailedPayout] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(afterFailedPartner.status, "REJECTED");
+    assert.deepEqual(afterFailedPayout, beforePayout);
+
+    const succeeded = await partnerEnrollRoute.POST(
+      new Request("https://trade82.test/api/partner/enroll", {
+        method: "POST",
+        headers: {
+          origin: "https://trade82.test",
+          host: "trade82.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(enrollmentBody(fixture.bank.id, "555-666-7777")),
+      }),
+    );
+    assert.equal(succeeded.status, 200);
+    const [afterPartner, afterPayout] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(afterPartner.status, "PENDING_REVIEW");
+    assert.equal(afterPayout.status, "PENDING_VERIFICATION");
+    assert.equal(afterPayout.accountNumberLast4, "7777");
+    assert.equal(afterPayout.verifiedAt, null);
+    assert.equal(afterPayout.verifiedByUserId, null);
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
 });

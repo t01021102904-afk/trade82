@@ -1,4 +1,5 @@
 import { apiError } from "@/lib/api-response";
+import { PartnerProfileStatus } from "@/generated/prisma/client";
 import {
   assertSameOrigin,
   idField,
@@ -41,11 +42,14 @@ export async function GET() {
     const user = await requireAuth();
     const partner = await getOwnedPartner(user.id);
     if (!partner) return Response.json({ profile: null, partnerRequired: true }, { headers: noStore });
+    if (partner.status === PartnerProfileStatus.REJECTED) {
+      return Response.json({ profile: null, partnerStatus: partner.status }, { headers: noStore });
+    }
     const profile = await getDb().partnerPayoutProfile.findUnique({
       where: { partnerProfileId: partner.id },
       select: partnerPayoutProfileOwnerSelect,
     });
-    return Response.json({ profile }, { headers: noStore });
+    return Response.json({ profile, partnerStatus: partner.status }, { headers: noStore });
   } catch (error) {
     return apiError(error);
   }
@@ -65,6 +69,12 @@ export async function PUT(request: Request) {
     if (rateLimited) return rateLimited;
     const partner = await getOwnedPartner(user.id);
     if (!partner) return Response.json({ error: "Partner profile is required." }, { status: 403, headers: noStore });
+    if (partner.status === PartnerProfileStatus.SUSPENDED) {
+      return Response.json({ error: "Payout information cannot be changed while the partner profile is suspended." }, { status: 403, headers: noStore });
+    }
+    if (partner.status === PartnerProfileStatus.REJECTED) {
+      return Response.json({ error: "Resubmit partner enrollment before changing payout information." }, { status: 409, headers: noStore });
+    }
     const body = await readJsonObject(request);
     rejectUnexpectedFields(body, fields);
     assertKoreanPayoutConfiguration({
