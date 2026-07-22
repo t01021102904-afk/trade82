@@ -40,6 +40,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
             <AdminCard title={admin.allCompanies} description={admin.allCompaniesDescription} href={`${withLocale("/admin/companies", locale)}?status=all`} />
             <AdminCard title={admin.sellerCompanies} description={admin.sellerCompaniesDescription} href={`${withLocale("/admin/companies", locale)}?role=seller&status=all`} />
             <AdminCard title={admin.buyerCompanies} description={admin.buyerCompaniesDescription} href={`${withLocale("/admin/companies", locale)}?role=buyer&status=all`} />
+            <AdminCard title={admin.partnerManagement} description={admin.partnerManagementDescription} href={withLocale("/admin/partners", locale)} />
           </div>
         </section>
 
