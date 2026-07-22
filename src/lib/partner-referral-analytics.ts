@@ -10,20 +10,23 @@ export const REFERRAL_VISITOR_COOKIE = "trade82_referral_visitor";
 const VISITOR_COOKIE_MAX_AGE = 365 * 24 * 60 * 60;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-export type PartnerAnalyticsRange = "7d" | "30d" | "90d" | "all";
+export type PartnerAnalyticsRange = "7d" | "30d" | "90d" | "12m" | "all";
+
+type PartnerReferralAnalyticsTotals = {
+  totalClicks: number;
+  uniqueVisitors: number;
+  attributedSignups: number;
+  sellerRegistrations: number;
+  buyerRegistrations: number;
+  signupConversionRate: number;
+  sellerConversionRate: number;
+  buyerConversionRate: number;
+};
 
 export type PartnerReferralAnalytics = {
   range: PartnerAnalyticsRange;
-  totals: {
-    totalClicks: number;
-    uniqueVisitors: number;
-    attributedSignups: number;
-    sellerRegistrations: number;
-    buyerRegistrations: number;
-    signupConversionRate: number;
-    sellerConversionRate: number;
-    buyerConversionRate: number;
-  };
+  totals: PartnerReferralAnalyticsTotals;
+  comparisonTotals: PartnerReferralAnalyticsTotals;
   trafficSeries: Array<{
     date: string;
     totalClicks: number;
@@ -92,7 +95,12 @@ function monthKey(value: Date) {
 export function normalizePartnerAnalyticsRange(
   value: unknown,
 ): PartnerAnalyticsRange {
-  return value === "7d" || value === "90d" || value === "all" ? value : "30d";
+  return value === "7d" ||
+    value === "90d" ||
+    value === "12m" ||
+    value === "all"
+    ? value
+    : "30d";
 }
 
 function parseCookies(header: string | null) {
@@ -220,7 +228,7 @@ export function getPartnerAnalyticsWindow(
   const range = normalizePartnerAnalyticsRange(inputRange);
   const end = new Date(utcDay(now).getTime() + DAY_MS);
   if (range === "all") return { start: null, end };
-  const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
+  const days = range === "7d" ? 7 : range === "90d" ? 90 : range === "12m" ? 365 : 30;
   return { start: new Date(end.getTime() - days * DAY_MS), end };
 }
 
@@ -268,6 +276,13 @@ type ConversionBucketRow = {
   buyerRegistrations: bigint | number;
 };
 
+type AnalyticsWindowKeys = {
+  startDate: string | null;
+  endDate: string;
+  startTimestamp: string | null;
+  endTimestamp: string;
+};
+
 function numberValue(value: bigint | number | null | undefined) {
   return typeof value === "bigint" ? Number(value) : Number(value ?? 0);
 }
@@ -293,12 +308,109 @@ export async function getPartnerReferralAnalytics({
   if (!db.$queryRaw) {
     throw new Error("Partner analytics aggregation requires PostgreSQL.");
   }
+  const queryRaw = db.$queryRaw.bind(db);
 
   const windowKeys = {
     startDate: window.start ? utcDateKey(window.start) : null,
     endDate: utcDateKey(window.end),
     startTimestamp: window.start ? utcNaiveTimestampKey(window.start) : null,
     endTimestamp: utcNaiveTimestampKey(window.end),
+  };
+
+  const emptyTotals = (): PartnerReferralAnalyticsTotals => ({
+    totalClicks: 0,
+    uniqueVisitors: 0,
+    attributedSignups: 0,
+    sellerRegistrations: 0,
+    buyerRegistrations: 0,
+    signupConversionRate: 0,
+    sellerConversionRate: 0,
+    buyerConversionRate: 0,
+  });
+
+  const loadSummary = async (keys: AnalyticsWindowKeys) => {
+    const clickSummaryFilter = Prisma.sql`
+      "partnerProfileId" = ${partnerProfileId}
+      AND "day" < ${keys.endDate}::date
+      AND (${keys.startDate}::date IS NULL OR "day" >= ${keys.startDate}::date)
+    `;
+    const attributionSummaryFilter = Prisma.sql`
+      "partnerProfileId" = ${partnerProfileId}
+      AND "lockedAt" < ${keys.endTimestamp}::timestamp
+      AND (${keys.startTimestamp}::timestamp IS NULL OR "lockedAt" >= ${keys.startTimestamp}::timestamp)
+    `;
+    const conversionSummaryFilter = Prisma.sql`
+      "partnerProfileId" = ${partnerProfileId}
+      AND "convertedAt" < ${keys.endTimestamp}::timestamp
+      AND (${keys.startTimestamp}::timestamp IS NULL OR "convertedAt" >= ${keys.startTimestamp}::timestamp)
+    `;
+
+    const [clickSummaryRows, attributionSummaryRows, conversionSummaryRows] =
+      await Promise.all([
+        queryRaw<ClickSummaryRow[]>(Prisma.sql`
+          SELECT
+            COALESCE(SUM("clickCount"), 0)::bigint AS "totalClicks",
+            COUNT(DISTINCT "visitorHash")::bigint AS "uniqueVisitors",
+            MIN("day") AS "firstActivity"
+          FROM "ReferralClickDailyVisitor"
+          WHERE ${clickSummaryFilter}
+        `),
+        queryRaw<AttributionSummaryRow[]>(Prisma.sql`
+          SELECT
+            COUNT(*)::bigint AS "attributedSignups",
+            MIN("lockedAt") AS "firstActivity"
+          FROM "ReferralAttribution"
+          WHERE ${attributionSummaryFilter}
+        `),
+        queryRaw<ConversionSummaryRow[]>(Prisma.sql`
+          SELECT
+            COUNT(*) FILTER (WHERE "subjectType" = 'SELLER'::"ReferralSubjectType")::bigint AS "sellerRegistrations",
+            COUNT(*) FILTER (WHERE "subjectType" = 'BUYER'::"ReferralSubjectType")::bigint AS "buyerRegistrations",
+            MIN("convertedAt") AS "firstActivity"
+          FROM "ReferralConversion"
+          WHERE ${conversionSummaryFilter}
+        `),
+      ]);
+
+    const clickSummary = clickSummaryRows[0] ?? {
+      totalClicks: 0,
+      uniqueVisitors: 0,
+      firstActivity: null,
+    };
+    const attributionSummary = attributionSummaryRows[0] ?? {
+      attributedSignups: 0,
+      firstActivity: null,
+    };
+    const conversionSummary = conversionSummaryRows[0] ?? {
+      sellerRegistrations: 0,
+      buyerRegistrations: 0,
+      firstActivity: null,
+    };
+    const totalClicks = numberValue(clickSummary.totalClicks);
+    const uniqueVisitors = numberValue(clickSummary.uniqueVisitors);
+    const attributedSignups = numberValue(attributionSummary.attributedSignups);
+    const sellerRegistrations = numberValue(
+      conversionSummary.sellerRegistrations,
+    );
+    const buyerRegistrations = numberValue(conversionSummary.buyerRegistrations);
+
+    return {
+      firstActivity: [
+        dateValue(clickSummary.firstActivity),
+        dateValue(attributionSummary.firstActivity),
+        dateValue(conversionSummary.firstActivity),
+      ].filter((value): value is Date => value instanceof Date),
+      totals: {
+        totalClicks,
+        uniqueVisitors,
+        attributedSignups,
+        sellerRegistrations,
+        buyerRegistrations,
+        signupConversionRate: percent(attributedSignups, uniqueVisitors),
+        sellerConversionRate: percent(sellerRegistrations, uniqueVisitors),
+        buyerConversionRate: percent(buyerRegistrations, uniqueVisitors),
+      },
+    };
   };
 
   const clickFilter = Prisma.sql`
@@ -317,52 +429,22 @@ export async function getPartnerReferralAnalytics({
     AND (${windowKeys.startTimestamp}::timestamp IS NULL OR "convertedAt" >= ${windowKeys.startTimestamp}::timestamp)
   `;
 
-  const [clickSummaryRows, attributionSummaryRows, conversionSummaryRows] =
-    await Promise.all([
-      db.$queryRaw<ClickSummaryRow[]>(Prisma.sql`
-        SELECT
-          COALESCE(SUM("clickCount"), 0)::bigint AS "totalClicks",
-          COUNT(DISTINCT "visitorHash")::bigint AS "uniqueVisitors",
-          MIN("day") AS "firstActivity"
-        FROM "ReferralClickDailyVisitor"
-        WHERE ${clickFilter}
-      `),
-      db.$queryRaw<AttributionSummaryRow[]>(Prisma.sql`
-        SELECT
-          COUNT(*)::bigint AS "attributedSignups",
-          MIN("lockedAt") AS "firstActivity"
-        FROM "ReferralAttribution"
-        WHERE ${attributionFilter}
-      `),
-      db.$queryRaw<ConversionSummaryRow[]>(Prisma.sql`
-        SELECT
-          COUNT(*) FILTER (WHERE "subjectType" = 'SELLER'::"ReferralSubjectType")::bigint AS "sellerRegistrations",
-          COUNT(*) FILTER (WHERE "subjectType" = 'BUYER'::"ReferralSubjectType")::bigint AS "buyerRegistrations",
-          MIN("convertedAt") AS "firstActivity"
-        FROM "ReferralConversion"
-        WHERE ${conversionFilter}
-      `),
-    ]);
-
-  const clickSummary = clickSummaryRows[0] ?? {
-    totalClicks: 0,
-    uniqueVisitors: 0,
-    firstActivity: null,
-  };
-  const attributionSummary = attributionSummaryRows[0] ?? {
-    attributedSignups: 0,
-    firstActivity: null,
-  };
-  const conversionSummary = conversionSummaryRows[0] ?? {
-    sellerRegistrations: 0,
-    buyerRegistrations: 0,
-    firstActivity: null,
-  };
-  const totalClicks = numberValue(clickSummary.totalClicks);
-  const uniqueVisitors = numberValue(clickSummary.uniqueVisitors);
-  const attributedSignups = numberValue(attributionSummary.attributedSignups);
-  const sellerRegistrations = numberValue(conversionSummary.sellerRegistrations);
-  const buyerRegistrations = numberValue(conversionSummary.buyerRegistrations);
+  const currentSummary = await loadSummary(windowKeys);
+  const comparisonStart =
+    window.start && range !== "all"
+      ? new Date(window.start.getTime() - (window.end.getTime() - window.start.getTime()))
+      : null;
+  const comparisonTotals =
+    comparisonStart && window.start
+      ? (
+          await loadSummary({
+            startDate: utcDateKey(comparisonStart),
+            endDate: utcDateKey(window.start),
+            startTimestamp: utcNaiveTimestampKey(comparisonStart),
+            endTimestamp: utcNaiveTimestampKey(window.start),
+          })
+        ).totals
+      : emptyTotals();
 
   const trafficBucketRows =
     range === "all"
@@ -434,11 +516,7 @@ export async function getPartnerReferralAnalytics({
 
   const dates: string[] = [];
   if (range === "all") {
-    const datesFound = [
-      dateValue(clickSummary.firstActivity),
-      dateValue(attributionSummary.firstActivity),
-      dateValue(conversionSummary.firstActivity),
-    ].filter((value): value is Date => value instanceof Date);
+    const datesFound = currentSummary.firstActivity;
     if (datesFound.length) {
       const first = new Date(
         Math.min(...datesFound.map((dateItem) => dateItem.getTime())),
@@ -490,16 +568,8 @@ export async function getPartnerReferralAnalytics({
 
   return {
     range,
-    totals: {
-      totalClicks,
-      uniqueVisitors,
-      attributedSignups,
-      sellerRegistrations,
-      buyerRegistrations,
-      signupConversionRate: percent(attributedSignups, uniqueVisitors),
-      sellerConversionRate: percent(sellerRegistrations, uniqueVisitors),
-      buyerConversionRate: percent(buyerRegistrations, uniqueVisitors),
-    },
+    totals: currentSummary.totals,
+    comparisonTotals,
     trafficSeries: dates.map((dateValue) => {
       return {
         date: dateValue,
