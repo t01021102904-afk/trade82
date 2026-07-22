@@ -91,6 +91,21 @@ test("analytics schema verification recognizes the real click-count constraint a
     assert.equal(malformedSchema.analytics_constraints, false);
     await client.query("ROLLBACK");
 
+    await client.query("BEGIN");
+    await client.query(`
+      CREATE TABLE public."AnalyticsConstraintWrongTableFixture" (
+        "clickCount" integer NOT NULL
+      )
+    `);
+    await client.query(`
+      ALTER TABLE public."AnalyticsConstraintWrongTableFixture"
+      ADD CONSTRAINT "ReferralClickDailyVisitor_clickCount_check"
+      CHECK ("clickCount" > 0)
+    `);
+    const wrongTableSchema = await queryAnalyticsMigrationSchema(client);
+    assert.equal(wrongTableSchema.analytics_constraints, false);
+    await client.query("ROLLBACK");
+
     let deployCalled = false;
     const result = await runProductionMigrations({
       environment: {

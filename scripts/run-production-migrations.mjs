@@ -1867,8 +1867,12 @@ export async function queryAnalyticsMigrationSchema(client) {
       ) AS analytics_foreign_keys,
       (
         SELECT count(*) = 3 AND bool_and(
-          (constraint_row.contype = 'p' AND constraint_row.conname IN ('ReferralClickDailyVisitor_pkey', 'ReferralConversion_pkey'))
+          (constraint_row.contype = 'p' AND constraint_row.conname = 'ReferralClickDailyVisitor_pkey'
+            AND table_row.relname = 'ReferralClickDailyVisitor')
+          OR (constraint_row.contype = 'p' AND constraint_row.conname = 'ReferralConversion_pkey'
+            AND table_row.relname = 'ReferralConversion')
           OR (constraint_row.contype = 'c' AND constraint_row.conname = 'ReferralClickDailyVisitor_clickCount_check'
+            AND table_row.relname = 'ReferralClickDailyVisitor'
             AND lower(regexp_replace(pg_get_expr(constraint_row.conbin, constraint_row.conrelid), '[^a-zA-Z0-9<>=]+', '', 'g')) = 'clickcount>0')
         )
         FROM pg_constraint constraint_row
