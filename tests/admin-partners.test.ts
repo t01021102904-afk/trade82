@@ -218,8 +218,10 @@ test("admin partner pages preserve localized navigation and admin-readonly safet
   assert.match(dashboardView, /<PartnerReferralAnalyticsSection/);
   assert.match(dashboardView, /qualifyingTransactions=\{data\.counts\.qualifyingTransactions\}/);
   assert.match(dashboardView, /netCommissionAmount=\{data\.totals\.net\}/);
-  assert.match(dashboardView, /adminReadonly \? null : \(/);
-  assert.match(dashboardView, /<StripeConnectOnboardingPanel ownerType="partner" \/>/);
+  assert.match(dashboardView, /isActive && !adminReadonly/);
+  assert.match(dashboardView, /<AdminPartnerActions/);
+  assert.doesNotMatch(dashboardView, /StripeConnectOnboardingPanel/);
+  assert.doesNotMatch(dashboardView, /stripeConnectedAccount|stripeAccount/);
   assert.doesNotMatch(management, /name="analyticsRange"/);
   assert.doesNotMatch(management, /params\.set\("analyticsRange"/);
 });

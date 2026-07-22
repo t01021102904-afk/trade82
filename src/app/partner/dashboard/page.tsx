@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 
 import { PartnerDashboardView } from "@/components/partner-dashboard-view";
 import { PartnerProgramLanding } from "@/components/partner-program-landing";
-import { PartnerProfileStatus } from "@/generated/prisma/client";
 import { getCurrentUserProfile } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { getPartnerDashboardData } from "@/lib/partner-dashboard";
@@ -34,8 +33,6 @@ export default async function PartnerDashboardPage({
     select: { id: true, status: true, referralCode: true },
   });
   if (!partner) redirect("/partner");
-  if (partner.status !== PartnerProfileStatus.ACTIVE)
-    return <PartnerProgramLanding state="suspended" />;
   const params = await searchParams;
   const data = await getPartnerDashboardData({
     partnerProfileId: partner.id,
@@ -48,7 +45,7 @@ export default async function PartnerDashboardPage({
     <PartnerDashboardView
       locale="en"
       data={data}
-      referralUrl={`${getAppUrl().replace(/\/$/, "")}/r/${partner.referralCode}`}
+      referralUrl={partner.status === "ACTIVE" ? `${getAppUrl().replace(/\/$/, "")}/r/${partner.referralCode}` : ""}
       joined={params.joined === "1"}
     />
   );

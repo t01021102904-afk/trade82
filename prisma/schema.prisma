@@ -336,8 +336,18 @@ enum BankDirectorySourceType {
 // first rollout. They do not initiate transfers until a later, separately
 // guarded rollout enables that capability.
 enum PartnerProfileStatus {
+  PENDING_REVIEW
   ACTIVE
   SUSPENDED
+  REJECTED
+}
+
+enum PartnerPayoutProfileStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  REJECTED
+  DISABLED
 }
 
 enum ReferralAttributionStatus {
@@ -484,59 +494,62 @@ enum SettlementReversalStatus {
 }
 
 model UserProfile {
-  id                             String                          @id @default(cuid())
-  clerkUserId                    String                          @unique
-  email                          String                          @unique
-  displayName                    String
-  avatarOriginalUrl              String?
-  avatarUrl                      String?
-  companyAffiliation             String                          @default("")
-  jobTitle                       String                          @default("")
-  department                     String                          @default("")
-  bio                            String                          @default("")
-  phoneNumber                    String                          @default("")
-  linkedinUrl                    String                          @default("")
-  country                        String                          @default("")
-  city                           String                          @default("")
-  role                           AccountRole
-  preferredLanguage              PreferredLanguage               @default(en)
-  deletionStatus                 AccountDeletionStatus           @default(ACTIVE)
-  deletionRequestedAt            DateTime?
-  deletedAt                      DateTime?
-  companies                      Company[]
-  requestedVerifications         VerificationRequest[]           @relation("RequestedVerification")
-  reviewedVerifications          VerificationRequest[]           @relation("ReviewedVerification")
-  sentInquiries                  Inquiry[]                       @relation("InquirySender")
-  sentMessages                   Message[]                       @relation("MessageSender")
-  receivedMessages               Message[]                       @relation("MessageReceiver")
-  uploadedMessageAttachments     MessageAttachment[]             @relation("MessageAttachmentUploader")
-  createdDocumentFolders         DocumentFolder[]                @relation("CreatedDocumentFolders")
-  uploadedTradeDocuments         TradeDocument[]                 @relation("UploadedTradeDocuments")
-  savedItems                     SavedItem[]
-  createdDeals                   Deal[]                          @relation("DealCreator")
-  buyerRfqRequests               RfqRequest[]                    @relation("BuyerRfqRequests")
-  reviewedRfqRequests            RfqRequest[]                    @relation("ReviewedRfqRequests")
-  marketingExposures             MarketingExposure[]
-  createdPaymentRequests         PaymentRequest[]                @relation("PaymentRequestCreator")
-  releasedPaymentRequests        PaymentRequest[]                @relation("PaymentRequestReleasedBy")
-  paymentRequestEvents           PaymentRequestEvent[]           @relation("PaymentRequestEventActor")
-  tradeOrderEvents               TradeOrderEvent[]               @relation("TradeOrderEventActor")
-  sellerPayoutEvents             SellerPayoutEvent[]             @relation("SellerPayoutEventActor")
-  sellerPayoutAdjustments        SellerPayoutAdjustment[]        @relation("SellerPayoutAdjustmentActor")
-  preparedSellerPayouts          SellerPayout[]                  @relation("SellerPayoutPreparedBy")
-  approvedSellerPayouts          SellerPayout[]                  @relation("SellerPayoutApprovedBy")
-  sentSellerPayouts              SellerPayout[]                  @relation("SellerPayoutSentBy")
-  verifiedSellerPayoutProfiles   SellerPayoutProfile[]           @relation("SellerPayoutProfileVerifiedBy")
-  sellerPayoutProfileAuditEvents SellerPayoutProfileAuditEvent[] @relation("SellerPayoutProfileAuditActor")
-  settlementEvents               SettlementEvent[]               @relation("SettlementEventActor")
-  approvedSettlements            Settlement[]                    @relation("SettlementApprovedBy")
-  partnerProfile                 PartnerProfile?                 @relation("UserPartnerProfile")
-  referredReferralAttribution    ReferralAttribution?            @relation("ReferredUserAttribution")
-  consumedReferralClaimTokens    ReferralClaimToken[]            @relation("ReferralClaimConsumedByUser")
-  settlementLegRecipientUsers    SettlementLeg[]                 @relation("SettlementLegRecipientUser")
-  acknowledgedSettlementAlerts   SettlementOperationalAlert[]    @relation("SettlementOperationalAlertAcknowledgedBy")
-  createdAt                      DateTime                        @default(now())
-  updatedAt                      DateTime                        @updatedAt
+  id                              String                           @id @default(cuid())
+  clerkUserId                     String                           @unique
+  email                           String                           @unique
+  displayName                     String
+  avatarOriginalUrl               String?
+  avatarUrl                       String?
+  companyAffiliation              String                           @default("")
+  jobTitle                        String                           @default("")
+  department                      String                           @default("")
+  bio                             String                           @default("")
+  phoneNumber                     String                           @default("")
+  linkedinUrl                     String                           @default("")
+  country                         String                           @default("")
+  city                            String                           @default("")
+  role                            AccountRole
+  preferredLanguage               PreferredLanguage                @default(en)
+  deletionStatus                  AccountDeletionStatus            @default(ACTIVE)
+  deletionRequestedAt             DateTime?
+  deletedAt                       DateTime?
+  companies                       Company[]
+  requestedVerifications          VerificationRequest[]            @relation("RequestedVerification")
+  reviewedVerifications           VerificationRequest[]            @relation("ReviewedVerification")
+  sentInquiries                   Inquiry[]                        @relation("InquirySender")
+  sentMessages                    Message[]                        @relation("MessageSender")
+  receivedMessages                Message[]                        @relation("MessageReceiver")
+  uploadedMessageAttachments      MessageAttachment[]              @relation("MessageAttachmentUploader")
+  createdDocumentFolders          DocumentFolder[]                 @relation("CreatedDocumentFolders")
+  uploadedTradeDocuments          TradeDocument[]                  @relation("UploadedTradeDocuments")
+  savedItems                      SavedItem[]
+  createdDeals                    Deal[]                           @relation("DealCreator")
+  buyerRfqRequests                RfqRequest[]                     @relation("BuyerRfqRequests")
+  reviewedRfqRequests             RfqRequest[]                     @relation("ReviewedRfqRequests")
+  marketingExposures              MarketingExposure[]
+  createdPaymentRequests          PaymentRequest[]                 @relation("PaymentRequestCreator")
+  releasedPaymentRequests         PaymentRequest[]                 @relation("PaymentRequestReleasedBy")
+  paymentRequestEvents            PaymentRequestEvent[]            @relation("PaymentRequestEventActor")
+  tradeOrderEvents                TradeOrderEvent[]                @relation("TradeOrderEventActor")
+  sellerPayoutEvents              SellerPayoutEvent[]              @relation("SellerPayoutEventActor")
+  sellerPayoutAdjustments         SellerPayoutAdjustment[]         @relation("SellerPayoutAdjustmentActor")
+  preparedSellerPayouts           SellerPayout[]                   @relation("SellerPayoutPreparedBy")
+  approvedSellerPayouts           SellerPayout[]                   @relation("SellerPayoutApprovedBy")
+  sentSellerPayouts               SellerPayout[]                   @relation("SellerPayoutSentBy")
+  verifiedSellerPayoutProfiles    SellerPayoutProfile[]            @relation("SellerPayoutProfileVerifiedBy")
+  sellerPayoutProfileAuditEvents  SellerPayoutProfileAuditEvent[]  @relation("SellerPayoutProfileAuditActor")
+  verifiedPartnerPayoutProfiles   PartnerPayoutProfile[]           @relation("PartnerPayoutProfileVerifiedBy")
+  partnerPayoutProfileAuditEvents PartnerPayoutProfileAuditEvent[] @relation("PartnerPayoutProfileAuditActor")
+  partnerProfileAuditEvents       PartnerProfileAuditEvent[]       @relation("PartnerProfileAuditActor")
+  settlementEvents                SettlementEvent[]                @relation("SettlementEventActor")
+  approvedSettlements             Settlement[]                     @relation("SettlementApprovedBy")
+  partnerProfile                  PartnerProfile?                  @relation("UserPartnerProfile")
+  referredReferralAttribution     ReferralAttribution?             @relation("ReferredUserAttribution")
+  consumedReferralClaimTokens     ReferralClaimToken[]             @relation("ReferralClaimConsumedByUser")
+  settlementLegRecipientUsers     SettlementLeg[]                  @relation("SettlementLegRecipientUser")
+  acknowledgedSettlementAlerts    SettlementOperationalAlert[]     @relation("SettlementOperationalAlertAcknowledgedBy")
+  createdAt                       DateTime                         @default(now())
+  updatedAt                       DateTime                         @updatedAt
 
   @@index([deletionStatus, deletedAt])
 }
@@ -1052,6 +1065,8 @@ model PartnerProfile {
   promotionDescription       String?
   termsConsentVersion        String?
   termsConsentedAt           DateTime?
+  payoutTermsConsentVersion  String?
+  payoutTermsConsentedAt     DateTime?
   privacyConsentVersion      String?
   privacyConsentedAt         DateTime?
   deletedAt                  DateTime?
@@ -1060,6 +1075,8 @@ model PartnerProfile {
   referralConversions        ReferralConversion[]
   referralClaimTokens        ReferralClaimToken[]
   stripeConnectedAccount     StripeConnectedAccount?     @relation("PartnerProfileStripeConnectedAccount")
+  payoutProfile              PartnerPayoutProfile?
+  auditEvents                PartnerProfileAuditEvent[]
   settlementLegs             SettlementLeg[]             @relation("SettlementLegPartnerProfile")
   settlements                Settlement[]                @relation("SettlementReferralPartnerProfile")
   createdAt                  DateTime                    @default(now())
@@ -1506,21 +1523,22 @@ model TradeOrderEvent {
 }
 
 model BankDirectory {
-  id                 String                  @id @default(cuid())
-  countryCode        String
-  bankNameLocal      String
-  bankNameEnglish    String
-  bankCode           String?
-  defaultSwiftBic    String?
-  defaultBankAddress String?
-  officialWebsite    String?
-  sourceUrl          String?
-  verifiedAt         DateTime?
-  sourceType         BankDirectorySourceType @default(ADMIN)
-  isActive           Boolean                 @default(true)
-  payoutProfiles     SellerPayoutProfile[]
-  createdAt          DateTime                @default(now())
-  updatedAt          DateTime                @updatedAt
+  id                    String                  @id @default(cuid())
+  countryCode           String
+  bankNameLocal         String
+  bankNameEnglish       String
+  bankCode              String?
+  defaultSwiftBic       String?
+  defaultBankAddress    String?
+  officialWebsite       String?
+  sourceUrl             String?
+  verifiedAt            DateTime?
+  sourceType            BankDirectorySourceType @default(ADMIN)
+  isActive              Boolean                 @default(true)
+  payoutProfiles        SellerPayoutProfile[]
+  partnerPayoutProfiles PartnerPayoutProfile[]
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
 
   @@unique([countryCode, bankNameEnglish])
   @@index([countryCode, isActive])
@@ -1580,6 +1598,65 @@ model SellerPayoutProfileAuditEvent {
   createdAt       DateTime            @default(now())
 
   @@index([payoutProfileId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
+model PartnerPayoutProfile {
+  id                      String                           @id @default(cuid())
+  partnerProfileId        String                           @unique
+  partnerProfile          PartnerProfile                   @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  bankDirectoryId         String
+  bankDirectory           BankDirectory                    @relation(fields: [bankDirectoryId], references: [id], onDelete: Restrict)
+  country                 String
+  bankName                String
+  accountHolder           String
+  accountNumberCiphertext Bytes
+  accountNumberIv         Bytes
+  accountNumberAuthTag    Bytes
+  accountNumberKeyVersion String
+  accountNumberLast4      String
+  accountNumberMasked     String
+  accountType             PayoutAccountType                @default(LOCAL)
+  payoutCurrency          String                           @default("krw")
+  supportedCurrencies     String[]                         @default(["krw"])
+  accountBelongsToPartner Boolean                          @default(false)
+  status                  PartnerPayoutProfileStatus       @default(PENDING_VERIFICATION)
+  verifiedAt              DateTime?
+  verifiedByUserId        String?
+  verifiedByUser          UserProfile?                     @relation("PartnerPayoutProfileVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: SetNull)
+  auditEvents             PartnerPayoutProfileAuditEvent[]
+  createdAt               DateTime                         @default(now())
+  updatedAt               DateTime                         @updatedAt
+
+  @@index([status, updatedAt])
+  @@index([bankDirectoryId])
+}
+
+model PartnerPayoutProfileAuditEvent {
+  id              String               @id @default(cuid())
+  payoutProfileId String
+  payoutProfile   PartnerPayoutProfile @relation(fields: [payoutProfileId], references: [id], onDelete: Restrict)
+  actorUserId     String
+  actorUser       UserProfile          @relation("PartnerPayoutProfileAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+  action          String
+  metadata        Json                 @default("{}")
+  createdAt       DateTime             @default(now())
+
+  @@index([payoutProfileId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
+model PartnerProfileAuditEvent {
+  id               String         @id @default(cuid())
+  partnerProfileId String
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  actorUserId      String
+  actorUser        UserProfile    @relation("PartnerProfileAuditActor", fields: [actorUserId], references: [id], onDelete: Restrict)
+  action           String
+  metadata         Json           @default("{}")
+  createdAt        DateTime       @default(now())
+
+  @@index([partnerProfileId, createdAt])
   @@index([actorUserId, createdAt])
 }
 

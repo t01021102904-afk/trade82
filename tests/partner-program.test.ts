@@ -4,6 +4,7 @@ import { test } from "node:test";
 
 import {
   PartnerProfileStatus,
+  PartnerPayoutProfileStatus,
   ReferralAttributionStatus,
   SettlementLegStatus,
   SettlementReversalStatus,
@@ -45,20 +46,20 @@ test("partner program mode is explicitly opt-in and otherwise fails closed", () 
   assert.equal(getPartnerProgramMode(" on "), "on");
 });
 
-test("feature-off navigation omits Partner while an exact opt-in includes it", () => {
+test("public navigation omits Partner even when the feature is enabled", () => {
   assert.equal(
-    getPublicNavigationLinks(false).some((link) => link.href === "/partner"),
+    getPublicNavigationLinks(false).some((link) => (link.href as string) === "/partner"),
     false,
   );
   assert.equal(
     getPublicNavigationLinks(getPartnerProgramMode(" on ") === "on").some(
-      (link) => link.href === "/partner",
+      (link) => (link.href as string) === "/partner",
     ),
-    true,
+    false,
   );
   assert.equal(
     getPublicNavigationLinks(getPartnerProgramMode("ON") === "on").some(
-      (link) => link.href === "/partner",
+      (link) => (link.href as string) === "/partner",
     ),
     false,
   );
@@ -174,31 +175,28 @@ test("partner enrollment is idempotent and allocates a distinct referral code pe
   assert.notEqual(first.partnerProfile.referralCode, secondUser.partnerProfile.referralCode);
 });
 
-test("partner enrollment normalizes private contact data and requires recorded consent", () => {
+test("partner enrollment normalizes payout data and requires recorded consent", () => {
   const enrollment = normalizePartnerEnrollment({
-    legalName: "  Partner Legal Name  ",
-    displayName: "  Partner Name ",
-    email: "  PARTNER@example.test ",
+    fullName: "  Partner Name ",
     phone: "+1 (212) 555-0199",
-    country: " United States ",
     preferredLanguage: "en",
-    organizationName: "  Partner Organization ",
-    websiteOrSocialUrl: "https://example.test/profile",
-    promotionDescription: "  Share Trade82 with qualified buyers. ",
+    bankDirectoryId: " bank-1 ",
+    accountHolder: "  Partner Name  ",
+    accountNumber: " 123-456-7890 ",
+    accountBelongsToPartner: true,
     agreeToTerms: true,
+    acknowledgePayoutTerms: true,
     acknowledgePrivacy: true,
   });
 
   assert.deepEqual(enrollment, {
-    legalName: "Partner Legal Name",
-    displayName: "Partner Name",
-    email: "partner@example.test",
+    fullName: "Partner Name",
+    accountHolder: "Partner Name",
     phone: "+12125550199",
-    country: "United States",
     preferredLanguage: "en",
-    organizationName: "Partner Organization",
-    websiteOrSocialUrl: "https://example.test/profile",
-    promotionDescription: "Share Trade82 with qualified buyers.",
+    bankDirectoryId: "bank-1",
+    accountNumber: "123-456-7890",
+    accountBelongsToPartner: true,
   });
   assert.equal(normalizePartnerPhone("82-10-1234-5678"), "821012345678");
   assert.throws(() => normalizePartnerPhone("not-a-phone"));
@@ -206,6 +204,7 @@ test("partner enrollment normalizes private contact data and requires recorded c
     normalizePartnerEnrollment({
       ...enrollment,
       agreeToTerms: false,
+      acknowledgePayoutTerms: true,
       acknowledgePrivacy: true,
     }),
   );
@@ -340,22 +339,19 @@ test("partner payout and profile states use stable localized presentation keys",
   assert.equal(partnerProfileStatus("SUSPENDED"), "suspended");
   assert.equal(partnerPayoutSetupStatus(null), "notStarted");
   assert.equal(
-    partnerPayoutSetupStatus({ status: "PENDING", onboardingComplete: false }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.PENDING_VERIFICATION }),
     "pending",
   );
   assert.equal(
-    partnerPayoutSetupStatus({
-      status: "RESTRICTED",
-      onboardingComplete: true,
-    }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.REJECTED }),
     "restricted",
   );
   assert.equal(
-    partnerPayoutSetupStatus({ status: "ENABLED", onboardingComplete: true }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.VERIFIED }),
     "enabled",
   );
   assert.equal(
-    partnerPayoutSetupStatus({ status: "DISABLED", onboardingComplete: false }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.DISABLED }),
     "disabled",
   );
 });
@@ -391,12 +387,13 @@ test("partner pending earnings come from partner settlement legs without Stripe 
     getDatabase: (() =>
       ({
         partnerProfile: {
-          findUniqueOrThrow: async () => ({
+          findFirst: async () => ({
             id: "partner-1",
             status: PartnerProfileStatus.ACTIVE,
             referralCode: "T82-PARTNER_123",
             createdAt: new Date("2026-07-01T00:00:00.000Z"),
-            stripeConnectedAccount: null,
+            payoutProfile: null,
+            user: null,
           }),
         },
         referralAttribution: {
@@ -409,7 +406,7 @@ test("partner pending earnings come from partner settlement legs without Stripe 
   });
 
   assert.ok(result);
-  assert.equal(result.partner.stripeAccount, null);
+  assert.equal(result.partner.payoutProfile, null);
   assert.equal(result.totals.pending, 500);
   assert.equal(result.totals.available, 0);
   assert.equal(result.commissionHistory[0]?.orderNumber, "T82-ORDER-1");
@@ -513,17 +510,11 @@ test("partner routes clear stale claims and gate active functionality server-sid
   );
   assert.match(dashboardData, /if \(!partnerProgramEnabled\) return null;/);
   assert.match(dashboardData, /type: SettlementLegType\.PARTNER_REFERRAL/);
-  assert.match(
-    authz,
-    /if \(existingByClerkId\) \{\s*return await updateExistingProfile\(existingByClerkId\);\s*\}/,
-  );
-  assert.match(
-    authz,
-    /if \(existingByEmail\) \{[\s\S]*?return await updateExistingProfile\(existingByEmail\);\s*\}/,
-  );
+  assert.match(authz, /if \(existingByClerkId\) \{[\s\S]*?isActiveUserProfile\(existingByClerkId\)/);
+  assert.doesNotMatch(authz, /existingByEmail/);
   assert.doesNotMatch(
     dashboardData,
-    /paymentMethod|stripeSecret|bankAccount|email:/,
+    /paymentMethod|stripeSecret|bankAccount|stripeAccount|accountNumberCiphertext/,
   );
   assert.match(enrollRoute, /readJsonObject\(request\)/);
   assert.match(enrollRoute, /assertSameOrigin\(request\)/);
@@ -532,9 +523,11 @@ test("partner routes clear stale claims and gate active functionality server-sid
     enrollRoute,
     /stripeConnectedAccount|SettlementLeg|ReferralAttribution|transfers\.create/,
   );
-  assert.match(enrollment, /user id comes exclusively from the authenticated server session/i);
+  assert.match(enrollment, /userId/);
+  assert.match(enrollRoute, /const user = await requireAuth\(\)/);
+  assert.doesNotMatch(enrollment, /existingByEmail|relink.*email/i);
   assert.doesNotMatch(enrollment, /stripe\.accounts|bankAccount|routingNumber|swift/i);
-  assert.match(joinPage, /\/partner\/join/);
+  assert.match(joinPage, /\/onboarding\/partner/);
   assert.match(joinPage, /partner\?\.status === "SUSPENDED"/);
   assert.match(roleSelection, /partnerProgramEnabled/);
   assert.match(roleSelection, /partnerProgram\.joinAsPartner/);

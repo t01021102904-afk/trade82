@@ -28,11 +28,16 @@ export async function GET(request: Request) {
         tradeName: true,
       },
     });
+    const partnerProfile = await getDb().partnerProfile.findFirst({
+      where: { userId: profile.id, deletedAt: null },
+      select: { id: true, status: true },
+    });
 
     return Response.json({
       role: profile.role,
       isAdmin: await isAdminUser(),
       companies,
+      partnerProfile,
     });
   } catch (error) {
     if (isExistingEmailDifferentClerkIdentityError(error)) {

@@ -74,7 +74,7 @@ export function RoleSelection({
 
   const joinAsPartner = useCallback(() => {
     if (typeof window === "undefined" || redirecting.current) return;
-    const partnerJoinPath = withLocale("/partner/join", locale);
+    const partnerJoinPath = withLocale("/onboarding/partner", locale);
     if (isLoaded && isSignedIn && user) {
       router.push(partnerJoinPath);
       return;

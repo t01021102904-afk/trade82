@@ -9,7 +9,6 @@ export async function getCurrentPartnerProfile() {
   if (!user) return null;
   return getDb().partnerProfile.findFirst({
     where: { userId: user.id, deletedAt: null },
-    include: { stripeConnectedAccount: true },
   });
 }
 
@@ -19,7 +18,6 @@ export async function requireActivePartnerProfile() {
 
   const partner = await getDb().partnerProfile.findFirst({
     where: { userId: user.id, deletedAt: null },
-    include: { stripeConnectedAccount: true },
   });
   if (!partner) throw new Response("Partner profile required", { status: 403 });
   if (partner.status !== PartnerProfileStatus.ACTIVE) {

@@ -237,6 +237,21 @@ export type SellerPayoutProfile = Prisma.SellerPayoutProfileModel
  */
 export type SellerPayoutProfileAuditEvent = Prisma.SellerPayoutProfileAuditEventModel
 /**
+ * Model PartnerPayoutProfile
+ * 
+ */
+export type PartnerPayoutProfile = Prisma.PartnerPayoutProfileModel
+/**
+ * Model PartnerPayoutProfileAuditEvent
+ * 
+ */
+export type PartnerPayoutProfileAuditEvent = Prisma.PartnerPayoutProfileAuditEventModel
+/**
+ * Model PartnerProfileAuditEvent
+ * 
+ */
+export type PartnerProfileAuditEvent = Prisma.PartnerProfileAuditEventModel
+/**
  * Model SellerPayout
  * 
  */

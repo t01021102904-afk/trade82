@@ -1143,6 +1143,40 @@ export type EnumSellerPayoutProfileStatusWithAggregatesFilter<$PrismaModel = nev
   _max?: Prisma.NestedEnumSellerPayoutProfileStatusFilter<$PrismaModel>
 }
 
+export type BytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type EnumPartnerPayoutProfileStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutProfileStatus | Prisma.EnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel> | $Enums.PartnerPayoutProfileStatus
+}
+
+export type BytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
+}
+
+export type EnumPartnerPayoutProfileStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutProfileStatus | Prisma.EnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutProfileStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutProfileStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel>
+}
+
 export type EnumSellerPayoutStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SellerPayoutStatus | Prisma.EnumSellerPayoutStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SellerPayoutStatus[] | Prisma.ListEnumSellerPayoutStatusFieldRefInput<$PrismaModel>
@@ -1155,13 +1189,6 @@ export type EnumWireFeeBearerFilter<$PrismaModel = never> = {
   in?: $Enums.WireFeeBearer[] | Prisma.ListEnumWireFeeBearerFieldRefInput<$PrismaModel>
   notIn?: $Enums.WireFeeBearer[] | Prisma.ListEnumWireFeeBearerFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel> | $Enums.WireFeeBearer
-}
-
-export type BytesFilter<$PrismaModel = never> = {
-  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
-  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
 }
 
 export type EnumSellerPayoutStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -1182,16 +1209,6 @@ export type EnumWireFeeBearerWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel>
-}
-
-export type BytesWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
-  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedBytesFilter<$PrismaModel>
-  _max?: Prisma.NestedBytesFilter<$PrismaModel>
 }
 
 export type EnumSellerPayoutEventTypeFilter<$PrismaModel = never> = {
@@ -2462,6 +2479,40 @@ export type NestedEnumSellerPayoutProfileStatusWithAggregatesFilter<$PrismaModel
   _max?: Prisma.NestedEnumSellerPayoutProfileStatusFilter<$PrismaModel>
 }
 
+export type NestedBytesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
+}
+
+export type NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutProfileStatus | Prisma.EnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel> | $Enums.PartnerPayoutProfileStatus
+}
+
+export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
+  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedBytesFilter<$PrismaModel>
+  _max?: Prisma.NestedBytesFilter<$PrismaModel>
+}
+
+export type NestedEnumPartnerPayoutProfileStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutProfileStatus | Prisma.EnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutProfileStatus[] | Prisma.ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutProfileStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutProfileStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutProfileStatusFilter<$PrismaModel>
+}
+
 export type NestedEnumSellerPayoutStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SellerPayoutStatus | Prisma.EnumSellerPayoutStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SellerPayoutStatus[] | Prisma.ListEnumSellerPayoutStatusFieldRefInput<$PrismaModel>
@@ -2474,13 +2525,6 @@ export type NestedEnumWireFeeBearerFilter<$PrismaModel = never> = {
   in?: $Enums.WireFeeBearer[] | Prisma.ListEnumWireFeeBearerFieldRefInput<$PrismaModel>
   notIn?: $Enums.WireFeeBearer[] | Prisma.ListEnumWireFeeBearerFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel> | $Enums.WireFeeBearer
-}
-
-export type NestedBytesFilter<$PrismaModel = never> = {
-  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
-  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBytesFilter<$PrismaModel> | runtime.Bytes
 }
 
 export type NestedEnumSellerPayoutStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -2501,16 +2545,6 @@ export type NestedEnumWireFeeBearerWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWireFeeBearerFilter<$PrismaModel>
-}
-
-export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: runtime.Bytes | Prisma.BytesFieldRefInput<$PrismaModel>
-  in?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  notIn?: runtime.Bytes[] | Prisma.ListBytesFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedBytesWithAggregatesFilter<$PrismaModel> | runtime.Bytes
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedBytesFilter<$PrismaModel>
-  _max?: Prisma.NestedBytesFilter<$PrismaModel>
 }
 
 export type NestedEnumSellerPayoutEventTypeFilter<$PrismaModel = never> = {

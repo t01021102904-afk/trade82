@@ -6,13 +6,20 @@ import { getCurrentUserProfile } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { createTranslator, getDictionary, type Locale, withLocale } from "@/lib/i18n";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
+import { listActiveKoreanSellerPayoutBanks } from "@/lib/seller-payout-bank-directory";
 
-export async function PartnerJoinPage({ locale }: { locale: Locale }) {
+export async function PartnerJoinPage({
+  locale,
+  edit = false,
+}: {
+  locale: Locale;
+  edit?: boolean;
+}) {
   if (!isPartnerProgramEnabled()) return <PartnerProgramLanding state="unavailable" />;
 
   const profile = await getCurrentUserProfile();
   if (!profile) {
-    const destination = withLocale("/partner/join", locale);
+    const destination = withLocale("/onboarding/partner", locale);
     redirect(`${withLocale("/signup", locale)}?redirect_url=${encodeURIComponent(destination)}`);
   }
 
@@ -29,12 +36,16 @@ export async function PartnerJoinPage({ locale }: { locale: Locale }) {
       organizationName: true,
       websiteOrSocialUrl: true,
       promotionDescription: true,
+      payoutProfile: {
+        select: { bankDirectoryId: true, accountHolder: true },
+      },
     },
   });
-  if (partner?.status === "ACTIVE" && partner.legalName && partner.contactEmail) {
+  if (partner?.status === "ACTIVE" && partner.payoutProfile && !edit) {
     redirect(withLocale("/partner/dashboard", locale));
   }
   if (partner?.status === "SUSPENDED") return <PartnerProgramLanding state="suspended" />;
+  const banks = await listActiveKoreanSellerPayoutBanks(getDb());
   const t = createTranslator(getDictionary(locale));
 
   return (
@@ -53,15 +64,13 @@ export async function PartnerJoinPage({ locale }: { locale: Locale }) {
           <div className="mt-7">
             <PartnerEnrollmentForm
               initial={{
-                legalName: partner?.legalName ?? profile.displayName,
-                displayName: partner?.displayName ?? profile.displayName,
-                email: partner?.contactEmail ?? profile.email,
+                fullName: partner?.legalName ?? profile.displayName,
+                email: profile.email,
                 phone: partner?.contactPhone ?? profile.phoneNumber,
-                country: partner?.country ?? profile.country,
                 preferredLanguage: partner?.preferredLanguage ?? profile.preferredLanguage,
-                organizationName: partner?.organizationName ?? "",
-                websiteOrSocialUrl: partner?.websiteOrSocialUrl ?? "",
-                promotionDescription: partner?.promotionDescription ?? "",
+                banks,
+                bankDirectoryId: partner?.payoutProfile?.bankDirectoryId ?? "",
+                accountHolder: partner?.payoutProfile?.accountHolder ?? profile.displayName,
               }}
             />
           </div>

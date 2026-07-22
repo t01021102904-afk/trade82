@@ -423,6 +423,9 @@ export const ModelName = {
   BankDirectory: 'BankDirectory',
   SellerPayoutProfile: 'SellerPayoutProfile',
   SellerPayoutProfileAuditEvent: 'SellerPayoutProfileAuditEvent',
+  PartnerPayoutProfile: 'PartnerPayoutProfile',
+  PartnerPayoutProfileAuditEvent: 'PartnerPayoutProfileAuditEvent',
+  PartnerProfileAuditEvent: 'PartnerProfileAuditEvent',
   SellerPayout: 'SellerPayout',
   SellerPayoutEvent: 'SellerPayoutEvent',
   SellerPayoutAdjustment: 'SellerPayoutAdjustment',
@@ -449,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "referralClickDailyVisitor" | "referralConversion" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "referralClickDailyVisitor" | "referralConversion" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "partnerPayoutProfile" | "partnerPayoutProfileAuditEvent" | "partnerProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3339,6 +3342,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PartnerPayoutProfile: {
+      payload: Prisma.$PartnerPayoutProfilePayload<ExtArgs>
+      fields: Prisma.PartnerPayoutProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerPayoutProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerPayoutProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerPayoutProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerPayoutProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        findMany: {
+          args: Prisma.PartnerPayoutProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>[]
+        }
+        create: {
+          args: Prisma.PartnerPayoutProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        createMany: {
+          args: Prisma.PartnerPayoutProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerPayoutProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerPayoutProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        update: {
+          args: Prisma.PartnerPayoutProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerPayoutProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerPayoutProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerPayoutProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerPayoutProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerPayoutProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerPayoutProfile>
+        }
+        groupBy: {
+          args: Prisma.PartnerPayoutProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerPayoutProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerPayoutProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerPayoutProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartnerPayoutProfileAuditEvent: {
+      payload: Prisma.$PartnerPayoutProfileAuditEventPayload<ExtArgs>
+      fields: Prisma.PartnerPayoutProfileAuditEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerPayoutProfileAuditEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerPayoutProfileAuditEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerPayoutProfileAuditEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerPayoutProfileAuditEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        findMany: {
+          args: Prisma.PartnerPayoutProfileAuditEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>[]
+        }
+        create: {
+          args: Prisma.PartnerPayoutProfileAuditEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        createMany: {
+          args: Prisma.PartnerPayoutProfileAuditEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerPayoutProfileAuditEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerPayoutProfileAuditEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        update: {
+          args: Prisma.PartnerPayoutProfileAuditEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerPayoutProfileAuditEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerPayoutProfileAuditEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerPayoutProfileAuditEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerPayoutProfileAuditEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerPayoutProfileAuditEventPayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerPayoutProfileAuditEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerPayoutProfileAuditEvent>
+        }
+        groupBy: {
+          args: Prisma.PartnerPayoutProfileAuditEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerPayoutProfileAuditEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerPayoutProfileAuditEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerPayoutProfileAuditEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    PartnerProfileAuditEvent: {
+      payload: Prisma.$PartnerProfileAuditEventPayload<ExtArgs>
+      fields: Prisma.PartnerProfileAuditEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PartnerProfileAuditEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PartnerProfileAuditEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        findFirst: {
+          args: Prisma.PartnerProfileAuditEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PartnerProfileAuditEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        findMany: {
+          args: Prisma.PartnerProfileAuditEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>[]
+        }
+        create: {
+          args: Prisma.PartnerProfileAuditEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        createMany: {
+          args: Prisma.PartnerProfileAuditEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PartnerProfileAuditEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>[]
+        }
+        delete: {
+          args: Prisma.PartnerProfileAuditEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        update: {
+          args: Prisma.PartnerProfileAuditEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.PartnerProfileAuditEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PartnerProfileAuditEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PartnerProfileAuditEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.PartnerProfileAuditEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PartnerProfileAuditEventPayload>
+        }
+        aggregate: {
+          args: Prisma.PartnerProfileAuditEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePartnerProfileAuditEvent>
+        }
+        groupBy: {
+          args: Prisma.PartnerProfileAuditEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerProfileAuditEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PartnerProfileAuditEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PartnerProfileAuditEventCountAggregateOutputType> | number
+        }
+      }
+    }
     SellerPayout: {
       payload: Prisma.$SellerPayoutPayload<ExtArgs>
       fields: Prisma.SellerPayoutFieldRefs
@@ -4635,6 +4860,8 @@ export const PartnerProfileScalarFieldEnum = {
   promotionDescription: 'promotionDescription',
   termsConsentVersion: 'termsConsentVersion',
   termsConsentedAt: 'termsConsentedAt',
+  payoutTermsConsentVersion: 'payoutTermsConsentVersion',
+  payoutTermsConsentedAt: 'payoutTermsConsentedAt',
   privacyConsentVersion: 'privacyConsentVersion',
   privacyConsentedAt: 'privacyConsentedAt',
   deletedAt: 'deletedAt',
@@ -5070,6 +5297,57 @@ export const SellerPayoutProfileAuditEventScalarFieldEnum = {
 } as const
 
 export type SellerPayoutProfileAuditEventScalarFieldEnum = (typeof SellerPayoutProfileAuditEventScalarFieldEnum)[keyof typeof SellerPayoutProfileAuditEventScalarFieldEnum]
+
+
+export const PartnerPayoutProfileScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  bankDirectoryId: 'bankDirectoryId',
+  country: 'country',
+  bankName: 'bankName',
+  accountHolder: 'accountHolder',
+  accountNumberCiphertext: 'accountNumberCiphertext',
+  accountNumberIv: 'accountNumberIv',
+  accountNumberAuthTag: 'accountNumberAuthTag',
+  accountNumberKeyVersion: 'accountNumberKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  accountNumberMasked: 'accountNumberMasked',
+  accountType: 'accountType',
+  payoutCurrency: 'payoutCurrency',
+  supportedCurrencies: 'supportedCurrencies',
+  accountBelongsToPartner: 'accountBelongsToPartner',
+  status: 'status',
+  verifiedAt: 'verifiedAt',
+  verifiedByUserId: 'verifiedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerPayoutProfileScalarFieldEnum = (typeof PartnerPayoutProfileScalarFieldEnum)[keyof typeof PartnerPayoutProfileScalarFieldEnum]
+
+
+export const PartnerPayoutProfileAuditEventScalarFieldEnum = {
+  id: 'id',
+  payoutProfileId: 'payoutProfileId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PartnerPayoutProfileAuditEventScalarFieldEnum = (typeof PartnerPayoutProfileAuditEventScalarFieldEnum)[keyof typeof PartnerPayoutProfileAuditEventScalarFieldEnum]
+
+
+export const PartnerProfileAuditEventScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PartnerProfileAuditEventScalarFieldEnum = (typeof PartnerProfileAuditEventScalarFieldEnum)[keyof typeof PartnerProfileAuditEventScalarFieldEnum]
 
 
 export const SellerPayoutScalarFieldEnum = {
@@ -6059,6 +6337,20 @@ export type ListEnumSellerPayoutProfileStatusFieldRefInput<$PrismaModel> = Field
 
 
 /**
+ * Reference to a field of type 'PartnerPayoutProfileStatus'
+ */
+export type EnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerPayoutProfileStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PartnerPayoutProfileStatus[]'
+ */
+export type ListEnumPartnerPayoutProfileStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PartnerPayoutProfileStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'SellerPayoutStatus'
  */
 export type EnumSellerPayoutStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerPayoutStatus'>
@@ -6374,6 +6666,9 @@ export type GlobalOmitConfig = {
   bankDirectory?: Prisma.BankDirectoryOmit
   sellerPayoutProfile?: Prisma.SellerPayoutProfileOmit
   sellerPayoutProfileAuditEvent?: Prisma.SellerPayoutProfileAuditEventOmit
+  partnerPayoutProfile?: Prisma.PartnerPayoutProfileOmit
+  partnerPayoutProfileAuditEvent?: Prisma.PartnerPayoutProfileAuditEventOmit
+  partnerProfileAuditEvent?: Prisma.PartnerProfileAuditEventOmit
   sellerPayout?: Prisma.SellerPayoutOmit
   sellerPayoutEvent?: Prisma.SellerPayoutEventOmit
   sellerPayoutAdjustment?: Prisma.SellerPayoutAdjustmentOmit

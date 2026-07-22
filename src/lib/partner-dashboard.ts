@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   AccountDeletionStatus,
+  PartnerPayoutProfileStatus,
   SettlementLegStatus,
   SettlementLegType,
   SettlementReversalStatus,
@@ -78,18 +79,34 @@ export function partnerLegStatus(status: SettlementLegStatus) {
 }
 
 export function partnerProfileStatus(status: string) {
-  return status === "ACTIVE" ? ("active" as const) : ("suspended" as const);
+  switch (status) {
+    case "PENDING_REVIEW":
+      return "pendingReview" as const;
+    case "ACTIVE":
+      return "active" as const;
+    case "REJECTED":
+      return "rejected" as const;
+    default:
+      return "suspended" as const;
+  }
 }
 
 export function partnerPayoutSetupStatus(
-  account: { status: string; onboardingComplete: boolean } | null,
+  profile: { status: string } | null,
 ) {
-  if (!account) return "notStarted" as const;
-  if (account.status === "DISABLED") return "disabled" as const;
-  if (account.status === "ENABLED" && account.onboardingComplete)
-    return "enabled" as const;
-  if (account.status === "PENDING") return "pending" as const;
-  return "restricted" as const;
+  if (!profile) return "notStarted" as const;
+  switch (profile.status) {
+    case PartnerPayoutProfileStatus.VERIFIED:
+      return "enabled" as const;
+    case PartnerPayoutProfileStatus.PENDING_VERIFICATION:
+      return "pending" as const;
+    case PartnerPayoutProfileStatus.REJECTED:
+      return "restricted" as const;
+    case PartnerPayoutProfileStatus.DISABLED:
+      return "disabled" as const;
+    default:
+      return "notStarted" as const;
+  }
 }
 
 export function anonymizePartnerMember(name: string) {
@@ -136,10 +153,41 @@ export async function getPartnerDashboardData({
     where: {
       id: partnerProfileId,
       deletedAt: null,
-      status: allowSuspended ? { in: ["ACTIVE", "SUSPENDED"] } : "ACTIVE",
+      status: { in: ["PENDING_REVIEW", "ACTIVE", "SUSPENDED", "REJECTED"] },
     },
     include: {
-      stripeConnectedAccount: true,
+      payoutProfile: {
+        select: {
+          id: true,
+          partnerProfileId: true,
+          bankDirectoryId: true,
+          country: true,
+          bankName: true,
+          accountHolder: true,
+          accountNumberLast4: true,
+          accountNumberMasked: true,
+          accountType: true,
+          payoutCurrency: true,
+          supportedCurrencies: true,
+          accountBelongsToPartner: true,
+          status: true,
+          verifiedAt: true,
+          verifiedByUserId: true,
+          createdAt: true,
+          updatedAt: true,
+          bankDirectory: {
+            select: {
+              id: true,
+              bankNameLocal: true,
+              bankNameEnglish: true,
+              bankCode: true,
+              defaultSwiftBic: true,
+              defaultBankAddress: true,
+              verifiedAt: true,
+            },
+          },
+        },
+      },
       user: { select: { displayName: true, email: true, preferredLanguage: true } },
     },
   });
@@ -285,6 +333,7 @@ export async function getPartnerDashboardData({
 
   return {
     partner: {
+      id: partner.id,
       displayName: partner.displayName,
       legalName: partner.legalName,
       organizationName: partner.organizationName,
@@ -298,13 +347,7 @@ export async function getPartnerDashboardData({
       status: partner.status,
       referralCode: partner.referralCode,
       createdAt: partner.createdAt,
-      stripeAccount: partner.stripeConnectedAccount
-        ? {
-            status: partner.stripeConnectedAccount.status,
-            onboardingComplete:
-              partner.stripeConnectedAccount.onboardingComplete,
-          }
-        : null,
+      payoutProfile: partner.payoutProfile,
     },
     totals: { ...totals, currency: "usd" as const },
     counts: { referredMembers: referralCount, qualifyingTransactions },

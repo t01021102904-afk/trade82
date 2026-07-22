@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 
 import { PartnerProgramLanding } from "@/components/partner-program-landing";
-import { PartnerProfileStatus } from "@/generated/prisma/client";
 import { getCurrentUserProfile } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
@@ -22,15 +21,14 @@ export default async function KoPartnerPage() {
         select: { status: true },
       })
     : null;
-  return (
-    <PartnerProgramLanding
-      state={
-        partner?.status === PartnerProfileStatus.ACTIVE
+  const state = !partner
+    ? "eligible"
+    : partner.status === "PENDING_REVIEW"
+      ? "pendingReview"
+      : partner.status === "REJECTED"
+        ? "rejected"
+        : partner.status === "ACTIVE"
           ? "active"
-          : partner
-            ? "suspended"
-            : "eligible"
-      }
-    />
-  );
+          : "suspended";
+  return <PartnerProgramLanding state={state} />;
 }

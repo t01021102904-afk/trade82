@@ -132,34 +132,73 @@ test("disposable PostgreSQL stores one partner enrollment with private consent e
       role: "user",
     },
   });
+  const bank = await db.bankDirectory.create({
+    data: {
+      countryCode: "KR",
+      bankNameLocal: `테스트은행 ${id}`,
+      bankNameEnglish: `Test Bank ${id}`,
+      sourceType: "SEED",
+      isActive: true,
+    },
+    select: { id: true },
+  });
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY ??= Buffer.alloc(32, 7).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-v1";
   const input = {
-    legalName: "Partner Enrollment LLC",
-    displayName: "Partner Enrollment",
-    email: `partner-contact-${id}@example.test`,
+    fullName: "Partner Enrollment",
     phone: "+1 (212) 555-0199",
-    country: "United States",
     preferredLanguage: "en" as const,
-    organizationName: "Partner Organization",
-    websiteOrSocialUrl: "https://example.test/partner",
-    promotionDescription: "Qualified B2B referral outreach.",
+    bankDirectoryId: bank.id,
+    accountHolder: "Partner Enrollment",
+    accountNumber: "123-456-7890",
+    accountBelongsToPartner: true,
     agreeToTerms: true,
+    acknowledgePayoutTerms: true,
     acknowledgePrivacy: true,
   };
-  const first = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
-  const repeated = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
-  const profile = await db.partnerProfile.findUniqueOrThrow({ where: { userId: user.id } });
+  try {
+    const first = await enrollment.enrollPartnerProfile({
+      userId: user.id,
+      email: user.email,
+      input,
+      db,
+    });
+    const repeated = await enrollment.enrollPartnerProfile({
+      userId: user.id,
+      email: user.email,
+      input,
+      db,
+    });
+    const profile = await db.partnerProfile.findUniqueOrThrow({ where: { userId: user.id } });
+    const payout = await db.partnerPayoutProfile.findUniqueOrThrow({ where: { partnerProfileId: profile.id } });
 
-  assert.equal(first.created, true);
-  assert.equal(repeated.created, false);
-  assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
-  assert.equal(profile.contactEmail, input.email);
-  assert.equal(profile.contactPhone, "+12125550199");
-  assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
-  assert.ok(profile.termsConsentedAt);
-  assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);
-  assert.ok(profile.privacyConsentedAt);
-  assert.equal(
-    await db.stripeConnectedAccount.count({ where: { partnerProfileId: profile.id } }),
-    0,
-  );
+    assert.equal(first.created, true);
+    assert.equal(repeated.created, false);
+    assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
+    assert.equal(profile.contactEmail, user.email);
+    assert.equal(profile.contactPhone, "+12125550199");
+    assert.equal(profile.status, "PENDING_REVIEW");
+    assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
+    assert.ok(profile.termsConsentedAt);
+    assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);
+    assert.ok(profile.privacyConsentedAt);
+    assert.equal(payout.status, "PENDING_VERIFICATION");
+    assert.equal(payout.country, "KR");
+    assert.equal(payout.accountType, "LOCAL");
+    assert.equal(payout.payoutCurrency, "krw");
+    assert.equal(payout.accountNumberLast4, "7890");
+    assert.match(payout.accountNumberMasked, /7890$/);
+    assert.ok(payout.accountNumberCiphertext.length > 0);
+    assert.equal(
+      await db.stripeConnectedAccount.count({ where: { partnerProfileId: profile.id } }),
+      0,
+    );
+  } finally {
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
 });

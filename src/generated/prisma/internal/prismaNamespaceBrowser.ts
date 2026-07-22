@@ -90,6 +90,9 @@ export const ModelName = {
   BankDirectory: 'BankDirectory',
   SellerPayoutProfile: 'SellerPayoutProfile',
   SellerPayoutProfileAuditEvent: 'SellerPayoutProfileAuditEvent',
+  PartnerPayoutProfile: 'PartnerPayoutProfile',
+  PartnerPayoutProfileAuditEvent: 'PartnerPayoutProfileAuditEvent',
+  PartnerProfileAuditEvent: 'PartnerProfileAuditEvent',
   SellerPayout: 'SellerPayout',
   SellerPayoutEvent: 'SellerPayoutEvent',
   SellerPayoutAdjustment: 'SellerPayoutAdjustment',
@@ -562,6 +565,8 @@ export const PartnerProfileScalarFieldEnum = {
   promotionDescription: 'promotionDescription',
   termsConsentVersion: 'termsConsentVersion',
   termsConsentedAt: 'termsConsentedAt',
+  payoutTermsConsentVersion: 'payoutTermsConsentVersion',
+  payoutTermsConsentedAt: 'payoutTermsConsentedAt',
   privacyConsentVersion: 'privacyConsentVersion',
   privacyConsentedAt: 'privacyConsentedAt',
   deletedAt: 'deletedAt',
@@ -997,6 +1002,57 @@ export const SellerPayoutProfileAuditEventScalarFieldEnum = {
 } as const
 
 export type SellerPayoutProfileAuditEventScalarFieldEnum = (typeof SellerPayoutProfileAuditEventScalarFieldEnum)[keyof typeof SellerPayoutProfileAuditEventScalarFieldEnum]
+
+
+export const PartnerPayoutProfileScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  bankDirectoryId: 'bankDirectoryId',
+  country: 'country',
+  bankName: 'bankName',
+  accountHolder: 'accountHolder',
+  accountNumberCiphertext: 'accountNumberCiphertext',
+  accountNumberIv: 'accountNumberIv',
+  accountNumberAuthTag: 'accountNumberAuthTag',
+  accountNumberKeyVersion: 'accountNumberKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  accountNumberMasked: 'accountNumberMasked',
+  accountType: 'accountType',
+  payoutCurrency: 'payoutCurrency',
+  supportedCurrencies: 'supportedCurrencies',
+  accountBelongsToPartner: 'accountBelongsToPartner',
+  status: 'status',
+  verifiedAt: 'verifiedAt',
+  verifiedByUserId: 'verifiedByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerPayoutProfileScalarFieldEnum = (typeof PartnerPayoutProfileScalarFieldEnum)[keyof typeof PartnerPayoutProfileScalarFieldEnum]
+
+
+export const PartnerPayoutProfileAuditEventScalarFieldEnum = {
+  id: 'id',
+  payoutProfileId: 'payoutProfileId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PartnerPayoutProfileAuditEventScalarFieldEnum = (typeof PartnerPayoutProfileAuditEventScalarFieldEnum)[keyof typeof PartnerPayoutProfileAuditEventScalarFieldEnum]
+
+
+export const PartnerProfileAuditEventScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PartnerProfileAuditEventScalarFieldEnum = (typeof PartnerProfileAuditEventScalarFieldEnum)[keyof typeof PartnerProfileAuditEventScalarFieldEnum]
 
 
 export const SellerPayoutScalarFieldEnum = {

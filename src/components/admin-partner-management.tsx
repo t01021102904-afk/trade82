@@ -25,8 +25,10 @@ function money(value: number) {
 
 const statusLabels: Record<AdminPartnerStatusFilter, string> = {
   all: "partnerStatusAll",
+  pending_review: "partnerStatusPendingReview",
   active: "partnerStatusActive",
   suspended: "partnerStatusSuspended",
+  rejected: "partnerStatusRejected",
 };
 
 const payoutLabels: Record<AdminPartnerPayoutFilter, string> = {
@@ -91,7 +93,7 @@ export function AdminPartnerManagement({
           />
         </label>
         <SelectField name="status" label={t("admin.partnerStatusFilter")} value={query.status}>
-          {(["all", "active", "suspended"] as const).map((value) => (
+          {(["all", "pending_review", "active", "suspended", "rejected"] as const).map((value) => (
             <option key={value} value={value}>{t(`admin.${statusLabels[value]}`)}</option>
           ))}
         </SelectField>
@@ -153,7 +155,6 @@ export function AdminPartnerManagement({
                 <Header label={t("admin.partnerCountry")} />
                 <Header label={t("admin.partnerLanguage")} />
                 <Header label={t("admin.partnerStatus")} />
-                <Header label={t("admin.partnerReferralCode")} />
                 <Header label={t("admin.partnerJoined")} />
                 <Header label={t("admin.partnerLinkVisits")} numeric />
                 <Header label={t("admin.partnerUniqueVisitors")} numeric />
@@ -181,8 +182,7 @@ export function AdminPartnerManagement({
                   <td className="p-3 theme-muted">{row.contactEmail ?? "-"}</td>
                   <td className="p-3 theme-muted">{row.country ?? "-"}</td>
                   <td className="p-3 theme-muted">{row.preferredLanguage ?? "-"}</td>
-                  <td className="p-3">{t(`admin.${row.status === "ACTIVE" ? "partnerStatusActive" : "partnerStatusSuspended"}`)}</td>
-                  <td className="p-3 font-mono text-xs">{row.referralCode}</td>
+                  <td className="p-3">{t(`admin.${statusLabels[row.status.toLowerCase() as AdminPartnerStatusFilter] ?? "partnerStatusSuspended"}`)}</td>
                   <td className="p-3 whitespace-nowrap theme-muted">{date(row.createdAt, locale)}</td>
                   <td className="p-3 text-right tabular-nums">{row.linkVisits}</td>
                   <td className="p-3 text-right tabular-nums">{row.uniqueVisitors}</td>

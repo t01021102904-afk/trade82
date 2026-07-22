@@ -16,6 +16,7 @@ export type UserContext = {
     legalName: string;
     tradeName: string | null;
   }>;
+  partnerProfile: { id: string; status: string } | null;
   unreadMessageCount?: number;
 };
 

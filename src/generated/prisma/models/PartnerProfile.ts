@@ -40,6 +40,8 @@ export type PartnerProfileMinAggregateOutputType = {
   promotionDescription: string | null
   termsConsentVersion: string | null
   termsConsentedAt: Date | null
+  payoutTermsConsentVersion: string | null
+  payoutTermsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
   deletedAt: Date | null
@@ -63,6 +65,8 @@ export type PartnerProfileMaxAggregateOutputType = {
   promotionDescription: string | null
   termsConsentVersion: string | null
   termsConsentedAt: Date | null
+  payoutTermsConsentVersion: string | null
+  payoutTermsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
   deletedAt: Date | null
@@ -86,6 +90,8 @@ export type PartnerProfileCountAggregateOutputType = {
   promotionDescription: number
   termsConsentVersion: number
   termsConsentedAt: number
+  payoutTermsConsentVersion: number
+  payoutTermsConsentedAt: number
   privacyConsentVersion: number
   privacyConsentedAt: number
   deletedAt: number
@@ -111,6 +117,8 @@ export type PartnerProfileMinAggregateInputType = {
   promotionDescription?: true
   termsConsentVersion?: true
   termsConsentedAt?: true
+  payoutTermsConsentVersion?: true
+  payoutTermsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
   deletedAt?: true
@@ -134,6 +142,8 @@ export type PartnerProfileMaxAggregateInputType = {
   promotionDescription?: true
   termsConsentVersion?: true
   termsConsentedAt?: true
+  payoutTermsConsentVersion?: true
+  payoutTermsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
   deletedAt?: true
@@ -157,6 +167,8 @@ export type PartnerProfileCountAggregateInputType = {
   promotionDescription?: true
   termsConsentVersion?: true
   termsConsentedAt?: true
+  payoutTermsConsentVersion?: true
+  payoutTermsConsentedAt?: true
   privacyConsentVersion?: true
   privacyConsentedAt?: true
   deletedAt?: true
@@ -253,6 +265,8 @@ export type PartnerProfileGroupByOutputType = {
   promotionDescription: string | null
   termsConsentVersion: string | null
   termsConsentedAt: Date | null
+  payoutTermsConsentVersion: string | null
+  payoutTermsConsentedAt: Date | null
   privacyConsentVersion: string | null
   privacyConsentedAt: Date | null
   deletedAt: Date | null
@@ -297,6 +311,8 @@ export type PartnerProfileWhereInput = {
   promotionDescription?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   termsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  payoutTermsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  payoutTermsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
@@ -308,6 +324,8 @@ export type PartnerProfileWhereInput = {
   referralConversions?: Prisma.ReferralConversionListRelationFilter
   referralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
+  payoutProfile?: Prisma.XOR<Prisma.PartnerPayoutProfileNullableScalarRelationFilter, Prisma.PartnerPayoutProfileWhereInput> | null
+  auditEvents?: Prisma.PartnerProfileAuditEventListRelationFilter
   settlementLegs?: Prisma.SettlementLegListRelationFilter
   settlements?: Prisma.SettlementListRelationFilter
 }
@@ -328,6 +346,8 @@ export type PartnerProfileOrderByWithRelationInput = {
   promotionDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   termsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  payoutTermsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payoutTermsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -339,6 +359,8 @@ export type PartnerProfileOrderByWithRelationInput = {
   referralConversions?: Prisma.ReferralConversionOrderByRelationAggregateInput
   referralClaimTokens?: Prisma.ReferralClaimTokenOrderByRelationAggregateInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOrderByWithRelationInput
+  payoutProfile?: Prisma.PartnerPayoutProfileOrderByWithRelationInput
+  auditEvents?: Prisma.PartnerProfileAuditEventOrderByRelationAggregateInput
   settlementLegs?: Prisma.SettlementLegOrderByRelationAggregateInput
   settlements?: Prisma.SettlementOrderByRelationAggregateInput
 }
@@ -362,6 +384,8 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   promotionDescription?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   termsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   termsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
+  payoutTermsConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
+  payoutTermsConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableFilter<"PartnerProfile"> | Date | string | null
@@ -373,6 +397,8 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   referralConversions?: Prisma.ReferralConversionListRelationFilter
   referralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
+  payoutProfile?: Prisma.XOR<Prisma.PartnerPayoutProfileNullableScalarRelationFilter, Prisma.PartnerPayoutProfileWhereInput> | null
+  auditEvents?: Prisma.PartnerProfileAuditEventListRelationFilter
   settlementLegs?: Prisma.SettlementLegListRelationFilter
   settlements?: Prisma.SettlementListRelationFilter
 }, "id" | "userId" | "referralCode">
@@ -393,6 +419,8 @@ export type PartnerProfileOrderByWithAggregationInput = {
   promotionDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   termsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   termsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  payoutTermsConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  payoutTermsConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrderInput | Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -422,6 +450,8 @@ export type PartnerProfileScalarWhereWithAggregatesInput = {
   promotionDescription?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
   termsConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
   termsConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
+  payoutTermsConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
+  payoutTermsConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
   privacyConsentVersion?: Prisma.StringNullableWithAggregatesFilter<"PartnerProfile"> | string | null
   privacyConsentedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerProfile"> | Date | string | null
@@ -444,6 +474,8 @@ export type PartnerProfileCreateInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -455,6 +487,8 @@ export type PartnerProfileCreateInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -475,6 +509,8 @@ export type PartnerProfileUncheckedCreateInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -485,6 +521,8 @@ export type PartnerProfileUncheckedCreateInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -504,6 +542,8 @@ export type PartnerProfileUpdateInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -515,6 +555,8 @@ export type PartnerProfileUpdateInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -535,6 +577,8 @@ export type PartnerProfileUncheckedUpdateInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -545,6 +589,8 @@ export type PartnerProfileUncheckedUpdateInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -565,6 +611,8 @@ export type PartnerProfileCreateManyInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -587,6 +635,8 @@ export type PartnerProfileUpdateManyMutationInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -610,6 +660,8 @@ export type PartnerProfileUncheckedUpdateManyInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -638,6 +690,8 @@ export type PartnerProfileCountOrderByAggregateInput = {
   promotionDescription?: Prisma.SortOrder
   termsConsentVersion?: Prisma.SortOrder
   termsConsentedAt?: Prisma.SortOrder
+  payoutTermsConsentVersion?: Prisma.SortOrder
+  payoutTermsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -661,6 +715,8 @@ export type PartnerProfileMaxOrderByAggregateInput = {
   promotionDescription?: Prisma.SortOrder
   termsConsentVersion?: Prisma.SortOrder
   termsConsentedAt?: Prisma.SortOrder
+  payoutTermsConsentVersion?: Prisma.SortOrder
+  payoutTermsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -684,6 +740,8 @@ export type PartnerProfileMinOrderByAggregateInput = {
   promotionDescription?: Prisma.SortOrder
   termsConsentVersion?: Prisma.SortOrder
   termsConsentedAt?: Prisma.SortOrder
+  payoutTermsConsentVersion?: Prisma.SortOrder
+  payoutTermsConsentedAt?: Prisma.SortOrder
   privacyConsentVersion?: Prisma.SortOrder
   privacyConsentedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -840,6 +898,34 @@ export type PartnerProfileUpdateOneWithoutSettlementLegsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutSettlementLegsInput, Prisma.PartnerProfileUpdateWithoutSettlementLegsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutSettlementLegsInput>
 }
 
+export type PartnerProfileCreateNestedOneWithoutPayoutProfileInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedCreateWithoutPayoutProfileInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutPayoutProfileInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneRequiredWithoutPayoutProfileNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedCreateWithoutPayoutProfileInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutPayoutProfileInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutPayoutProfileInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutPayoutProfileInput, Prisma.PartnerProfileUpdateWithoutPayoutProfileInput>, Prisma.PartnerProfileUncheckedUpdateWithoutPayoutProfileInput>
+}
+
+export type PartnerProfileCreateNestedOneWithoutAuditEventsInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedCreateWithoutAuditEventsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutAuditEventsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneRequiredWithoutAuditEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedCreateWithoutAuditEventsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutAuditEventsInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutAuditEventsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutAuditEventsInput, Prisma.PartnerProfileUpdateWithoutAuditEventsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutAuditEventsInput>
+}
+
 export type PartnerProfileCreateWithoutUserInput = {
   id?: string
   referralCode: string
@@ -855,6 +941,8 @@ export type PartnerProfileCreateWithoutUserInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -865,6 +953,8 @@ export type PartnerProfileCreateWithoutUserInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -884,6 +974,8 @@ export type PartnerProfileUncheckedCreateWithoutUserInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -894,6 +986,8 @@ export type PartnerProfileUncheckedCreateWithoutUserInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -929,6 +1023,8 @@ export type PartnerProfileUpdateWithoutUserInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -939,6 +1035,8 @@ export type PartnerProfileUpdateWithoutUserInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -958,6 +1056,8 @@ export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -968,6 +1068,8 @@ export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -987,6 +1089,8 @@ export type PartnerProfileCreateWithoutReferralClaimTokensInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -997,6 +1101,8 @@ export type PartnerProfileCreateWithoutReferralClaimTokensInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1017,6 +1123,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralClaimTokensInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1026,6 +1134,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralClaimTokensInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1061,6 +1171,8 @@ export type PartnerProfileUpdateWithoutReferralClaimTokensInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1071,6 +1183,8 @@ export type PartnerProfileUpdateWithoutReferralClaimTokensInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1091,6 +1205,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClaimTokensInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1100,6 +1216,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClaimTokensInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1119,6 +1237,8 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1129,6 +1249,8 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1149,6 +1271,8 @@ export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1158,6 +1282,8 @@ export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1193,6 +1319,8 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1203,6 +1331,8 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1223,6 +1353,8 @@ export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1232,6 +1364,8 @@ export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1251,6 +1385,8 @@ export type PartnerProfileCreateWithoutReferralClickDailyVisitorsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1261,6 +1397,8 @@ export type PartnerProfileCreateWithoutReferralClickDailyVisitorsInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1281,6 +1419,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput 
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1290,6 +1430,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput 
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1325,6 +1467,8 @@ export type PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1335,6 +1479,8 @@ export type PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1355,6 +1501,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput 
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1364,6 +1512,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput 
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1383,6 +1533,8 @@ export type PartnerProfileCreateWithoutReferralConversionsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1393,6 +1545,8 @@ export type PartnerProfileCreateWithoutReferralConversionsInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1413,6 +1567,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralConversionsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1422,6 +1578,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralConversionsInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1457,6 +1615,8 @@ export type PartnerProfileUpdateWithoutReferralConversionsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1467,6 +1627,8 @@ export type PartnerProfileUpdateWithoutReferralConversionsInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1487,6 +1649,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralConversionsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1496,6 +1660,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralConversionsInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1515,6 +1681,8 @@ export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1525,6 +1693,8 @@ export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1545,6 +1715,8 @@ export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1554,6 +1726,8 @@ export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
@@ -1589,6 +1763,8 @@ export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1599,6 +1775,8 @@ export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1619,6 +1797,8 @@ export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1628,6 +1808,8 @@ export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
   referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
@@ -1647,6 +1829,8 @@ export type PartnerProfileCreateWithoutSettlementsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1658,6 +1842,8 @@ export type PartnerProfileCreateWithoutSettlementsInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
 }
 
@@ -1677,6 +1863,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1687,6 +1875,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
 }
 
@@ -1721,6 +1911,8 @@ export type PartnerProfileUpdateWithoutSettlementsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1732,6 +1924,8 @@ export type PartnerProfileUpdateWithoutSettlementsInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
 }
 
@@ -1751,6 +1945,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1761,6 +1957,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
 }
 
@@ -1779,6 +1977,8 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1790,6 +1990,8 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
@@ -1809,6 +2011,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   promotionDescription?: string | null
   termsConsentVersion?: string | null
   termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
   privacyConsentVersion?: string | null
   privacyConsentedAt?: Date | string | null
   deletedAt?: Date | string | null
@@ -1819,6 +2023,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
 }
 
@@ -1853,6 +2059,8 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1864,6 +2072,8 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
@@ -1883,6 +2093,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1893,6 +2105,304 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutPayoutProfileInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutPayoutProfileInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutPayoutProfileInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedCreateWithoutPayoutProfileInput>
+}
+
+export type PartnerProfileUpsertWithoutPayoutProfileInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedUpdateWithoutPayoutProfileInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedCreateWithoutPayoutProfileInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutPayoutProfileInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutPayoutProfileInput, Prisma.PartnerProfileUncheckedUpdateWithoutPayoutProfileInput>
+}
+
+export type PartnerProfileUpdateWithoutPayoutProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutPayoutProfileInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  auditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutAuditEventsInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutAuditEventsInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  payoutTermsConsentVersion?: string | null
+  payoutTermsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutAuditEventsInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedCreateWithoutAuditEventsInput>
+}
+
+export type PartnerProfileUpsertWithoutAuditEventsInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedUpdateWithoutAuditEventsInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedCreateWithoutAuditEventsInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutAuditEventsInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutAuditEventsInput, Prisma.PartnerProfileUncheckedUpdateWithoutAuditEventsInput>
+}
+
+export type PartnerProfileUpdateWithoutAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutAuditEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payoutTermsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payoutTermsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  payoutProfile?: Prisma.PartnerPayoutProfileUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
 }
 
@@ -1906,6 +2416,7 @@ export type PartnerProfileCountOutputType = {
   referralClickDailyVisitors: number
   referralConversions: number
   referralClaimTokens: number
+  auditEvents: number
   settlementLegs: number
   settlements: number
 }
@@ -1915,6 +2426,7 @@ export type PartnerProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Ex
   referralClickDailyVisitors?: boolean | PartnerProfileCountOutputTypeCountReferralClickDailyVisitorsArgs
   referralConversions?: boolean | PartnerProfileCountOutputTypeCountReferralConversionsArgs
   referralClaimTokens?: boolean | PartnerProfileCountOutputTypeCountReferralClaimTokensArgs
+  auditEvents?: boolean | PartnerProfileCountOutputTypeCountAuditEventsArgs
   settlementLegs?: boolean | PartnerProfileCountOutputTypeCountSettlementLegsArgs
   settlements?: boolean | PartnerProfileCountOutputTypeCountSettlementsArgs
 }
@@ -1960,6 +2472,13 @@ export type PartnerProfileCountOutputTypeCountReferralClaimTokensArgs<ExtArgs ex
 /**
  * PartnerProfileCountOutputType without action
  */
+export type PartnerProfileCountOutputTypeCountAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PartnerProfileAuditEventWhereInput
+}
+
+/**
+ * PartnerProfileCountOutputType without action
+ */
 export type PartnerProfileCountOutputTypeCountSettlementLegsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SettlementLegWhereInput
 }
@@ -1988,6 +2507,8 @@ export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   promotionDescription?: boolean
   termsConsentVersion?: boolean
   termsConsentedAt?: boolean
+  payoutTermsConsentVersion?: boolean
+  payoutTermsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
   deletedAt?: boolean
@@ -1999,6 +2520,8 @@ export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   referralConversions?: boolean | Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>
   referralClaimTokens?: boolean | Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
+  payoutProfile?: boolean | Prisma.PartnerProfile$payoutProfileArgs<ExtArgs>
+  auditEvents?: boolean | Prisma.PartnerProfile$auditEventsArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
   settlements?: boolean | Prisma.PartnerProfile$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -2020,6 +2543,8 @@ export type PartnerProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   promotionDescription?: boolean
   termsConsentVersion?: boolean
   termsConsentedAt?: boolean
+  payoutTermsConsentVersion?: boolean
+  payoutTermsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
   deletedAt?: boolean
@@ -2044,6 +2569,8 @@ export type PartnerProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   promotionDescription?: boolean
   termsConsentVersion?: boolean
   termsConsentedAt?: boolean
+  payoutTermsConsentVersion?: boolean
+  payoutTermsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
   deletedAt?: boolean
@@ -2068,6 +2595,8 @@ export type PartnerProfileSelectScalar = {
   promotionDescription?: boolean
   termsConsentVersion?: boolean
   termsConsentedAt?: boolean
+  payoutTermsConsentVersion?: boolean
+  payoutTermsConsentedAt?: boolean
   privacyConsentVersion?: boolean
   privacyConsentedAt?: boolean
   deletedAt?: boolean
@@ -2075,7 +2604,7 @@ export type PartnerProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "legalName" | "displayName" | "contactEmail" | "contactPhone" | "country" | "preferredLanguage" | "organizationName" | "websiteOrSocialUrl" | "promotionDescription" | "termsConsentVersion" | "termsConsentedAt" | "privacyConsentVersion" | "privacyConsentedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
+export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "referralCode" | "status" | "legalName" | "displayName" | "contactEmail" | "contactPhone" | "country" | "preferredLanguage" | "organizationName" | "websiteOrSocialUrl" | "promotionDescription" | "termsConsentVersion" | "termsConsentedAt" | "payoutTermsConsentVersion" | "payoutTermsConsentedAt" | "privacyConsentVersion" | "privacyConsentedAt" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerProfile"]>
 export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
@@ -2083,6 +2612,8 @@ export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.Inter
   referralConversions?: boolean | Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>
   referralClaimTokens?: boolean | Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
+  payoutProfile?: boolean | Prisma.PartnerProfile$payoutProfileArgs<ExtArgs>
+  auditEvents?: boolean | Prisma.PartnerProfile$auditEventsArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
   settlements?: boolean | Prisma.PartnerProfile$settlementsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerProfileCountOutputTypeDefaultArgs<ExtArgs>
@@ -2103,6 +2634,8 @@ export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     referralConversions: Prisma.$ReferralConversionPayload<ExtArgs>[]
     referralClaimTokens: Prisma.$ReferralClaimTokenPayload<ExtArgs>[]
     stripeConnectedAccount: Prisma.$StripeConnectedAccountPayload<ExtArgs> | null
+    payoutProfile: Prisma.$PartnerPayoutProfilePayload<ExtArgs> | null
+    auditEvents: Prisma.$PartnerProfileAuditEventPayload<ExtArgs>[]
     settlementLegs: Prisma.$SettlementLegPayload<ExtArgs>[]
     settlements: Prisma.$SettlementPayload<ExtArgs>[]
   }
@@ -2122,6 +2655,8 @@ export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
     promotionDescription: string | null
     termsConsentVersion: string | null
     termsConsentedAt: Date | null
+    payoutTermsConsentVersion: string | null
+    payoutTermsConsentedAt: Date | null
     privacyConsentVersion: string | null
     privacyConsentedAt: Date | null
     deletedAt: Date | null
@@ -2527,6 +3062,8 @@ export interface Prisma__PartnerProfileClient<T, Null = never, ExtArgs extends r
   referralConversions<T extends Prisma.PartnerProfile$referralConversionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralConversionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   referralClaimTokens<T extends Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralClaimTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stripeConnectedAccount<T extends Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>>): Prisma.Prisma__StripeConnectedAccountClient<runtime.Types.Result.GetResult<Prisma.$StripeConnectedAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  payoutProfile<T extends Prisma.PartnerProfile$payoutProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$payoutProfileArgs<ExtArgs>>): Prisma.Prisma__PartnerPayoutProfileClient<runtime.Types.Result.GetResult<Prisma.$PartnerPayoutProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  auditEvents<T extends Prisma.PartnerProfile$auditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerProfileAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlementLegs<T extends Prisma.PartnerProfile$settlementLegsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   settlements<T extends Prisma.PartnerProfile$settlementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$settlementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2573,6 +3110,8 @@ export interface PartnerProfileFieldRefs {
   readonly promotionDescription: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly termsConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly termsConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
+  readonly payoutTermsConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
+  readonly payoutTermsConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly privacyConsentVersion: Prisma.FieldRef<"PartnerProfile", 'String'>
   readonly privacyConsentedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"PartnerProfile", 'DateTime'>
@@ -3091,6 +3630,49 @@ export type PartnerProfile$stripeConnectedAccountArgs<ExtArgs extends runtime.Ty
    */
   include?: Prisma.StripeConnectedAccountInclude<ExtArgs> | null
   where?: Prisma.StripeConnectedAccountWhereInput
+}
+
+/**
+ * PartnerProfile.payoutProfile
+ */
+export type PartnerProfile$payoutProfileArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartnerPayoutProfile
+   */
+  select?: Prisma.PartnerPayoutProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartnerPayoutProfile
+   */
+  omit?: Prisma.PartnerPayoutProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerPayoutProfileInclude<ExtArgs> | null
+  where?: Prisma.PartnerPayoutProfileWhereInput
+}
+
+/**
+ * PartnerProfile.auditEvents
+ */
+export type PartnerProfile$auditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartnerProfileAuditEvent
+   */
+  select?: Prisma.PartnerProfileAuditEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartnerProfileAuditEvent
+   */
+  omit?: Prisma.PartnerProfileAuditEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerProfileAuditEventInclude<ExtArgs> | null
+  where?: Prisma.PartnerProfileAuditEventWhereInput
+  orderBy?: Prisma.PartnerProfileAuditEventOrderByWithRelationInput | Prisma.PartnerProfileAuditEventOrderByWithRelationInput[]
+  cursor?: Prisma.PartnerProfileAuditEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PartnerProfileAuditEventScalarFieldEnum | Prisma.PartnerProfileAuditEventScalarFieldEnum[]
 }
 
 /**

@@ -6,11 +6,17 @@ import { useI18n } from "@/components/i18n-provider";
 import { withLocale } from "@/lib/i18n";
 
 type LandingState =
-  "guest" | "eligible" | "active" | "suspended" | "unavailable";
+  | "guest"
+  | "eligible"
+  | "pendingReview"
+  | "active"
+  | "suspended"
+  | "rejected"
+  | "unavailable";
 
 export function PartnerProgramLanding({ state }: { state: LandingState }) {
   const { locale, t } = useI18n();
-  const partnerJoinPath = withLocale("/partner/join", locale);
+  const partnerJoinPath = withLocale("/onboarding/partner", locale);
   const signInPath = `${withLocale("/login", locale)}?redirect_url=${encodeURIComponent(partnerJoinPath)}`;
 
   return (
@@ -54,13 +60,13 @@ export function PartnerProgramLanding({ state }: { state: LandingState }) {
             </Link>
           ) : null}
         </div>
-        {state === "suspended" ? (
+        {state === "pendingReview" || state === "suspended" || state === "rejected" ? (
           <div className="max-w-xl border-l-2 border-amber-500 pl-4">
             <p className="font-semibold theme-foreground">
-              {t("partnerProgram.suspendedTitle")}
+              {t(`partnerProgram.${state === "pendingReview" ? "partnerStatusPendingReviewTitle" : state === "rejected" ? "partnerStatusRejectedTitle" : "suspendedTitle"}`)}
             </p>
             <p className="mt-1 text-sm leading-6 theme-muted">
-              {t("partnerProgram.suspendedDescription")}
+              {t(`partnerProgram.${state === "pendingReview" ? "partnerStatusPendingReviewDescription" : state === "rejected" ? "partnerStatusRejectedDescription" : "suspendedDescription"}`)}
             </p>
           </div>
         ) : null}

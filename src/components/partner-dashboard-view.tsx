@@ -1,8 +1,8 @@
 import Link from "next/link";
 
+import { AdminPartnerActions } from "@/components/admin-partner-actions";
 import { PartnerReferralAnalyticsSection } from "@/components/partner-referral-analytics";
 import { PartnerReferralLink } from "@/components/partner-referral-link";
-import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
 import { createTranslator, getDictionary, type Locale } from "@/lib/i18n";
 import { withLocale } from "@/lib/i18n";
 import {
@@ -63,8 +63,14 @@ export function PartnerDashboardView({
     return t(roleKey);
   };
   const profileStatus = partnerProfileStatus(data.partner.status);
-  const payoutStatus = partnerPayoutSetupStatus(data.partner.stripeAccount);
-  const stripeStatusLabel = data.partner.stripeAccount?.status ?? "-";
+  const payoutStatus = partnerPayoutSetupStatus(data.partner.payoutProfile);
+  const profileStatusKey: Record<typeof profileStatus, string> = {
+    pendingReview: "partnerStatusPendingReview",
+    active: "partnerStatusActive",
+    suspended: "partnerStatusSuspended",
+    rejected: "partnerStatusRejected",
+  };
+  const isActive = profileStatus === "active";
   const summary = [
     ["gross", data.totals.gross],
     ["adjustments", data.totals.adjustments],
@@ -110,7 +116,7 @@ export function PartnerDashboardView({
           </div>
           <div className="rounded-full border px-3 py-1 text-xs font-semibold theme-border theme-surface-muted">
             {t(
-              `partnerProgram.partnerStatus${profileStatus === "active" ? "Active" : "Suspended"}`,
+              `partnerProgram.${profileStatusKey[profileStatus]}`,
             )}
           </div>
         </div>
@@ -142,18 +148,27 @@ export function PartnerDashboardView({
               <IdentityField label={t("admin.partnerLanguage")} value={data.partner.preferredLanguage ?? "-"} />
               <IdentityField label={t("admin.partnerWebsiteOrSocial")} value={data.partner.websiteOrSocialUrl ?? "-"} />
               <IdentityField label={t("admin.partnerPromotionDescription")} value={data.partner.promotionDescription ?? "-"} />
-              <IdentityField label={t("admin.partnerReferralCode")} value={data.partner.referralCode} />
               <IdentityField
                 label={t("admin.partnerStatus")}
-                value={t(`admin.${data.partner.status === "ACTIVE" ? "partnerStatusActive" : "partnerStatusSuspended"}`)}
+                value={t(`admin.${profileStatusKey[profileStatus]}`)}
               />
               <IdentityField label={t("admin.partnerJoined")} value={date(data.partner.createdAt, locale)} />
-              <IdentityField label={t("admin.partnerStripeAccountStatus")} value={stripeStatusLabel} />
+              <IdentityField
+                label={t("admin.partnerPayoutSetup")}
+                value={t(`admin.${payoutStatus === "enabled" ? "partnerPayoutEnabled" : payoutStatus === "pending" ? "partnerPayoutPending" : payoutStatus === "notStarted" ? "partnerPayoutNotStarted" : payoutStatus === "disabled" ? "partnerPayoutDisabled" : "partnerPayoutRestricted"}`)}
+              />
             </dl>
+            <AdminPartnerActions
+              locale={locale}
+              partnerProfileId={data.partner.id}
+              partnerStatus={data.partner.status}
+              payoutProfileId={data.partner.payoutProfile?.id ?? null}
+              payoutStatus={data.partner.payoutProfile?.status ?? null}
+            />
           </section>
         ) : null}
 
-        <section
+        {isActive && !adminReadonly ? <section
           className="border p-5 theme-border theme-surface-elevated"
           aria-labelledby="partner-referral-link"
         >
@@ -166,25 +181,18 @@ export function PartnerDashboardView({
           <div className="mt-3">
             <PartnerReferralLink referralUrl={referralUrl} />
           </div>
-          <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-xs theme-muted">
-                {t("partnerProgram.referralCode")}
-              </dt>
-              <dd className="mt-1 font-mono theme-foreground">
-                {data.partner.referralCode}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs theme-muted">
-                {t("partnerProgram.memberSince")}
-              </dt>
-              <dd className="mt-1 theme-foreground">
-                {date(data.partner.createdAt, locale)}
-              </dd>
-            </div>
-          </dl>
-        </section>
+        </section> : null}
+
+        {!isActive ? (
+          <section className="border-l-2 border-amber-500 pl-4" role="status">
+            <p className="font-semibold theme-foreground">
+              {t(`partnerProgram.${profileStatusKey[profileStatus]}Title`)}
+            </p>
+            <p className="mt-1 text-sm leading-6 theme-muted">
+              {t(`partnerProgram.${profileStatusKey[profileStatus]}Description`)}
+            </p>
+          </section>
+        ) : null}
 
         <PartnerReferralAnalyticsSection
           locale={locale}
@@ -317,11 +325,28 @@ export function PartnerDashboardView({
               </p>
             ) : null}
             <p className="mt-2 text-sm leading-6 theme-muted">{t("partnerProgram.payoutSetupDescription")}</p>
-            {adminReadonly ? null : (
-              <div className="-mx-5 mt-4 border-t pt-4 theme-border">
-                <StripeConnectOnboardingPanel ownerType="partner" />
-              </div>
-            )}
+            {data.partner.payoutProfile ? (
+              <dl className="mt-4 grid gap-2 border-t pt-4 text-sm theme-border">
+                <div>
+                  <dt className="text-xs theme-muted">{t("partnerProgram.bankName")}</dt>
+                  <dd className="mt-1 theme-foreground">
+                    {data.partner.payoutProfile.bankDirectory.bankNameLocal} / {data.partner.payoutProfile.bankDirectory.bankNameEnglish}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs theme-muted">{t("partnerProgram.accountNumber")}</dt>
+                  <dd className="mt-1 font-mono theme-foreground">{data.partner.payoutProfile.accountNumberMasked}</dd>
+                </div>
+              </dl>
+            ) : null}
+            {!adminReadonly && isActive ? (
+              <Link
+                href={`${withLocale("/onboarding/partner", locale)}?edit=1`}
+                className="mt-4 inline-block text-sm font-medium underline theme-foreground"
+              >
+                {t("partnerProgram.managePayout")}
+              </Link>
+            ) : null}
             <dl className="mt-7 grid gap-3 border-t pt-5 theme-border">
               <div>
                 <dt className="text-xs theme-muted">
