@@ -405,6 +405,8 @@ export const ModelName = {
   PartnerProfile: 'PartnerProfile',
   ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
+  ReferralClickDailyVisitor: 'ReferralClickDailyVisitor',
+  ReferralConversion: 'ReferralConversion',
   StripeConnectedAccount: 'StripeConnectedAccount',
   SellerStripeMerchantAccount: 'SellerStripeMerchantAccount',
   Settlement: 'Settlement',
@@ -447,7 +449,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "referralClickDailyVisitor" | "referralConversion" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2002,6 +2004,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ReferralAttributionCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ReferralAttributionCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReferralClickDailyVisitor: {
+      payload: Prisma.$ReferralClickDailyVisitorPayload<ExtArgs>
+      fields: Prisma.ReferralClickDailyVisitorFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReferralClickDailyVisitorFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReferralClickDailyVisitorFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        findFirst: {
+          args: Prisma.ReferralClickDailyVisitorFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReferralClickDailyVisitorFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        findMany: {
+          args: Prisma.ReferralClickDailyVisitorFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>[]
+        }
+        create: {
+          args: Prisma.ReferralClickDailyVisitorCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        createMany: {
+          args: Prisma.ReferralClickDailyVisitorCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReferralClickDailyVisitorCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>[]
+        }
+        delete: {
+          args: Prisma.ReferralClickDailyVisitorDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        update: {
+          args: Prisma.ReferralClickDailyVisitorUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReferralClickDailyVisitorDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReferralClickDailyVisitorUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReferralClickDailyVisitorUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReferralClickDailyVisitorUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralClickDailyVisitorPayload>
+        }
+        aggregate: {
+          args: Prisma.ReferralClickDailyVisitorAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReferralClickDailyVisitor>
+        }
+        groupBy: {
+          args: Prisma.ReferralClickDailyVisitorGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralClickDailyVisitorGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReferralClickDailyVisitorCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralClickDailyVisitorCountAggregateOutputType> | number
+        }
+      }
+    }
+    ReferralConversion: {
+      payload: Prisma.$ReferralConversionPayload<ExtArgs>
+      fields: Prisma.ReferralConversionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ReferralConversionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ReferralConversionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        findFirst: {
+          args: Prisma.ReferralConversionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ReferralConversionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        findMany: {
+          args: Prisma.ReferralConversionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>[]
+        }
+        create: {
+          args: Prisma.ReferralConversionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        createMany: {
+          args: Prisma.ReferralConversionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ReferralConversionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>[]
+        }
+        delete: {
+          args: Prisma.ReferralConversionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        update: {
+          args: Prisma.ReferralConversionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        deleteMany: {
+          args: Prisma.ReferralConversionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ReferralConversionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ReferralConversionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>[]
+        }
+        upsert: {
+          args: Prisma.ReferralConversionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ReferralConversionPayload>
+        }
+        aggregate: {
+          args: Prisma.ReferralConversionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateReferralConversion>
+        }
+        groupBy: {
+          args: Prisma.ReferralConversionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralConversionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ReferralConversionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ReferralConversionCountAggregateOutputType> | number
         }
       }
     }
@@ -4522,6 +4672,33 @@ export const ReferralAttributionScalarFieldEnum = {
 export type ReferralAttributionScalarFieldEnum = (typeof ReferralAttributionScalarFieldEnum)[keyof typeof ReferralAttributionScalarFieldEnum]
 
 
+export const ReferralClickDailyVisitorScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  visitorHash: 'visitorHash',
+  day: 'day',
+  clickCount: 'clickCount',
+  firstClickedAt: 'firstClickedAt',
+  lastClickedAt: 'lastClickedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralClickDailyVisitorScalarFieldEnum = (typeof ReferralClickDailyVisitorScalarFieldEnum)[keyof typeof ReferralClickDailyVisitorScalarFieldEnum]
+
+
+export const ReferralConversionScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  referralAttributionId: 'referralAttributionId',
+  subjectType: 'subjectType',
+  convertedAt: 'convertedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ReferralConversionScalarFieldEnum = (typeof ReferralConversionScalarFieldEnum)[keyof typeof ReferralConversionScalarFieldEnum]
+
+
 export const StripeConnectedAccountScalarFieldEnum = {
   id: 'id',
   companyId: 'companyId',
@@ -5504,6 +5681,20 @@ export type ListEnumReferralAttributionStatusFieldRefInput<$PrismaModel> = Field
 
 
 /**
+ * Reference to a field of type 'ReferralSubjectType'
+ */
+export type EnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType'>
+    
+
+
+/**
+ * Reference to a field of type 'ReferralSubjectType[]'
+ */
+export type ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType[]'>
+    
+
+
+/**
  * Reference to a field of type 'StripeConnectedAccountStatus'
  */
 export type EnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeConnectedAccountStatus'>
@@ -5528,20 +5719,6 @@ export type EnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel> = F
  * Reference to a field of type 'SellerStripeMerchantAccountStatus[]'
  */
 export type ListEnumSellerStripeMerchantAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SellerStripeMerchantAccountStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'ReferralSubjectType'
- */
-export type EnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType'>
-    
-
-
-/**
- * Reference to a field of type 'ReferralSubjectType[]'
- */
-export type ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReferralSubjectType[]'>
     
 
 
@@ -6179,6 +6356,8 @@ export type GlobalOmitConfig = {
   partnerProfile?: Prisma.PartnerProfileOmit
   referralClaimToken?: Prisma.ReferralClaimTokenOmit
   referralAttribution?: Prisma.ReferralAttributionOmit
+  referralClickDailyVisitor?: Prisma.ReferralClickDailyVisitorOmit
+  referralConversion?: Prisma.ReferralConversionOmit
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOmit
   sellerStripeMerchantAccount?: Prisma.SellerStripeMerchantAccountOmit
   settlement?: Prisma.SettlementOmit

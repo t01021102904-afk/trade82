@@ -147,6 +147,16 @@ export type ReferralClaimToken = Prisma.ReferralClaimTokenModel
  */
 export type ReferralAttribution = Prisma.ReferralAttributionModel
 /**
+ * Model ReferralClickDailyVisitor
+ * 
+ */
+export type ReferralClickDailyVisitor = Prisma.ReferralClickDailyVisitorModel
+/**
+ * Model ReferralConversion
+ * 
+ */
+export type ReferralConversion = Prisma.ReferralConversionModel
+/**
  * Model StripeConnectedAccount
  * 
  */

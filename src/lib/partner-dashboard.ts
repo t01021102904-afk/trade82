@@ -8,6 +8,12 @@ import {
 } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
+import {
+  getPartnerReferralAnalytics,
+  normalizePartnerAnalyticsRange,
+  type PartnerAnalyticsRange,
+  type PartnerAnalyticsDatabase,
+} from "@/lib/partner-referral-analytics";
 
 const adjustmentStatuses: SettlementReversalStatus[] = [
   SettlementReversalStatus.ACCOUNTING_APPLIED,
@@ -98,6 +104,7 @@ export async function getPartnerDashboardData({
   commissionPage = 1,
   memberPage = 1,
   pageSize = 20,
+  analyticsRange = "30d",
   partnerProgramEnabled = isPartnerProgramEnabled(),
   getDatabase = getDb,
 }: {
@@ -105,6 +112,7 @@ export async function getPartnerDashboardData({
   commissionPage?: number;
   memberPage?: number;
   pageSize?: number;
+  analyticsRange?: unknown;
   partnerProgramEnabled?: boolean;
   getDatabase?: typeof getDb;
 }) {
@@ -116,6 +124,7 @@ export async function getPartnerDashboardData({
   const safeCommissionPage = Math.max(1, Math.floor(commissionPage));
   const safeMemberPage = Math.max(1, Math.floor(memberPage));
   const safePageSize = Math.min(50, Math.max(1, Math.floor(pageSize)));
+  const safeAnalyticsRange = normalizePartnerAnalyticsRange(analyticsRange);
   const legWhere = {
     partnerProfileId,
     type: SettlementLegType.PARTNER_REFERRAL,
@@ -128,6 +137,7 @@ export async function getPartnerDashboardData({
     allLegs,
     commissionLegs,
     referredMembers,
+    analytics,
   ] = await Promise.all([
     db.partnerProfile.findFirstOrThrow({
       where: {
@@ -198,6 +208,27 @@ export async function getPartnerDashboardData({
         settlements: { select: { id: true }, take: 1 },
       },
     }),
+    "referralClickDailyVisitor" in db && "$queryRaw" in db
+      ? getPartnerReferralAnalytics({
+          db: db as unknown as PartnerAnalyticsDatabase,
+          partnerProfileId,
+          range: safeAnalyticsRange,
+        })
+      : Promise.resolve({
+          range: safeAnalyticsRange as PartnerAnalyticsRange,
+          totals: {
+            totalClicks: 0,
+            uniqueVisitors: 0,
+            attributedSignups: 0,
+            sellerRegistrations: 0,
+            buyerRegistrations: 0,
+            signupConversionRate: 0,
+            sellerConversionRate: 0,
+            buyerConversionRate: 0,
+          },
+          trafficSeries: [],
+          conversionSeries: [],
+        }),
   ]);
 
   // Unknown currencies are intentionally excluded from USD totals rather than
@@ -251,6 +282,7 @@ export async function getPartnerDashboardData({
     },
     totals: { ...totals, currency: "usd" as const },
     counts: { referredMembers: referralCount, qualifyingTransactions },
+    analytics,
     commissionHistory: commissionLegs.map((leg) => ({
       transactionDate: leg.settlement.createdAt,
       orderNumber: leg.settlement.tradeOrder.orderNumber,

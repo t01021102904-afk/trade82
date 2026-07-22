@@ -41,6 +41,7 @@ export default async function PartnerDashboardPage({
     partnerProfileId: partner.id,
     commissionPage: toPage(params.commissionPage),
     memberPage: toPage(params.memberPage),
+    analyticsRange: params.analyticsRange,
   });
   if (!data) return <PartnerProgramLanding state="unavailable" />;
   return (

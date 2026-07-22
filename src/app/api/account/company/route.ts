@@ -9,6 +9,7 @@ import {
 import { requireBuyer, requireSeller } from "@/lib/authz";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
+import { recordReferralConversionForCompany } from "@/lib/partner-referral-conversions";
 import type {
   CompanyRole,
   CompanyVerificationStatus,
@@ -66,12 +67,16 @@ function listField(
   const maxItems = options.maxItems ?? 30;
   const maxLength = options.maxLength ?? 120;
   const items = strings(source[key]);
-  if (items.length > maxItems) throw validationError(`${key} has too many items.`);
-  return items.map((item) => {
-    const value = item.trim();
-    if (value.length > maxLength) throw validationError(`${key} item is too long.`);
-    return value;
-  }).filter(Boolean);
+  if (items.length > maxItems)
+    throw validationError(`${key} has too many items.`);
+  return items
+    .map((item) => {
+      const value = item.trim();
+      if (value.length > maxLength)
+        throw validationError(`${key} item is too long.`);
+      return value;
+    })
+    .filter(Boolean);
 }
 
 function exportCountriesField(
@@ -164,11 +169,17 @@ function logoFieldsForWrite(
     useDefaultLogo: boolean;
   } | null,
 ) {
-  const clearCompanyLogo = explicitBooleanField(body, "clearCompanyLogo", false);
+  const clearCompanyLogo = explicitBooleanField(
+    body,
+    "clearCompanyLogo",
+    false,
+  );
   const logoOriginalUrl = optionalLogoField(body, "logoOriginalUrl");
   const logoThumbnailUrl = optionalLogoField(body, "logoThumbnailUrl");
   const logoUrl = optionalLogoField(body, "logoUrl");
-  const hasIncomingLogo = Boolean(logoOriginalUrl || logoThumbnailUrl || logoUrl);
+  const hasIncomingLogo = Boolean(
+    logoOriginalUrl || logoThumbnailUrl || logoUrl,
+  );
 
   if (clearCompanyLogo) {
     return {
@@ -283,8 +294,9 @@ export async function PUT(request: Request) {
       windowMs: 60 * 60_000,
     });
     if (rateLimited) return rateLimited;
+    const db = getDb();
 
-    const existing = await getDb().company.findUnique({
+    const existing = await db.company.findUnique({
       where: {
         ownerUserId_companyRole: {
           ownerUserId: user.id,
@@ -320,7 +332,7 @@ export async function PUT(request: Request) {
           : "verified"
         : criticalChanged
           ? "needs_reverification"
-          : existing?.verificationStatus ?? "pending_review";
+          : (existing?.verificationStatus ?? "pending_review");
     const logoWriteFields = logoFieldsForWrite(body, existing);
 
     debugCompanyLogo("saving company logo fields", {
@@ -333,247 +345,278 @@ export async function PUT(request: Request) {
       clearCompanyLogo: body.clearCompanyLogo ?? null,
     });
 
-    const company = await getDb().company.upsert({
-      where: {
-        ownerUserId_companyRole: {
+    const company = await db.$transaction(async (tx) => {
+      const company = await tx.company.upsert({
+        where: {
+          ownerUserId_companyRole: {
+            ownerUserId: user.id,
+            companyRole,
+          },
+        },
+        create: {
           ownerUserId: user.id,
           companyRole,
+          legalName: textField(body, "legalName", "", 160),
+          tradeName: nullableTextField(body, "tradeName", null, 160),
+          displayNameEn: textField(body, "displayNameEn", "", 160),
+          logoOriginalUrl: logoWriteFields.logoOriginalUrl,
+          logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
+          logoUrl: logoWriteFields.logoUrl,
+          useDefaultLogo: logoWriteFields.useDefaultLogo,
+          website: websiteField(body, "website"),
+          country: textField(
+            body,
+            "country",
+            companyRole === "seller" ? "South Korea" : "",
+            100,
+          ),
+          city: textField(body, "city", "", 100),
+          stateOrProvince: textField(body, "stateOrProvince", "", 100),
+          businessAddress: textField(body, "businessAddress", "", 300),
+          description: textField(body, "description", "", 2_000),
+          descriptionEn: textField(body, "descriptionEn", "", 2_000),
+          categories: listField(body, "categories"),
+          verificationStatus,
         },
-      },
-      create: {
+        update: {
+          legalName: textField(
+            body,
+            "legalName",
+            existing?.legalName ?? "",
+            160,
+          ),
+          tradeName: nullableTextField(
+            body,
+            "tradeName",
+            existing?.tradeName ?? null,
+            160,
+          ),
+          displayNameEn: textField(
+            body,
+            "displayNameEn",
+            existing?.displayNameEn ?? "",
+            160,
+          ),
+          logoOriginalUrl: logoWriteFields.logoOriginalUrl,
+          logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
+          logoUrl: logoWriteFields.logoUrl,
+          useDefaultLogo: logoWriteFields.useDefaultLogo,
+          website: websiteField(body, "website", existing?.website ?? ""),
+          country: textField(body, "country", existing?.country ?? "", 100),
+          city: textField(body, "city", existing?.city ?? "", 100),
+          stateOrProvince: textField(
+            body,
+            "stateOrProvince",
+            existing?.stateOrProvince ?? "",
+            100,
+          ),
+          businessAddress: textField(
+            body,
+            "businessAddress",
+            existing?.businessAddress ?? "",
+            300,
+          ),
+          description: textField(
+            body,
+            "description",
+            existing?.description ?? "",
+            2_000,
+          ),
+          descriptionEn: textField(
+            body,
+            "descriptionEn",
+            existing?.descriptionEn ?? "",
+            2_000,
+          ),
+          categories: listField(body, "categories", existing?.categories ?? []),
+          verificationStatus,
+        },
+      });
+
+      debugCompanyLogo("company logo database update result", {
+        companyId: company.id,
+        companyRole: company.companyRole,
+        logoOriginalUrl: company.logoOriginalUrl,
+        logoThumbnailUrl: company.logoThumbnailUrl,
+        logoUrl: company.logoUrl,
+        useDefaultLogo: company.useDefaultLogo,
+      });
+
+      if (companyRole === "seller") {
+        await tx.sellerProfile.upsert({
+          where: { companyId: company.id },
+          create: {
+            companyId: company.id,
+            koreanBusinessRegistrationNumber: textField(
+              seller,
+              "koreanBusinessRegistrationNumber",
+            ),
+            representativeName: textField(seller, "representativeName"),
+            exportExperience: textField(seller, "exportExperience"),
+            exportExperienceEn: textField(
+              seller,
+              "exportExperienceEn",
+              "",
+              10_000,
+            ),
+            exportCountries: exportCountriesField(seller),
+            productCategories: listField(seller, "productCategories"),
+            minimumOrderQuantity: textField(seller, "minimumOrderQuantity"),
+            leadTime: textField(seller, "leadTime"),
+            certifications: listField(seller, "certifications"),
+            shippingTerms: listField(seller, "shippingTerms"),
+            paymentTerms: listField(seller, "paymentTerms"),
+            factoryOrDistributorStatus: textField(
+              seller,
+              "factoryOrDistributorStatus",
+              "manufacturer",
+            ),
+          },
+          update: {
+            koreanBusinessRegistrationNumber: textField(
+              seller,
+              "koreanBusinessRegistrationNumber",
+              existing?.sellerProfile?.koreanBusinessRegistrationNumber ?? "",
+            ),
+            representativeName: textField(
+              seller,
+              "representativeName",
+              existing?.sellerProfile?.representativeName ?? "",
+            ),
+            exportExperience: textField(
+              seller,
+              "exportExperience",
+              existing?.sellerProfile?.exportExperience ?? "",
+              10_000,
+            ),
+            exportExperienceEn: textField(
+              seller,
+              "exportExperienceEn",
+              existing?.sellerProfile?.exportExperienceEn ?? "",
+              10_000,
+            ),
+            exportCountries: exportCountriesField(
+              seller,
+              existing?.sellerProfile?.exportCountries ?? [],
+            ),
+            productCategories: listField(
+              seller,
+              "productCategories",
+              existing?.sellerProfile?.productCategories ?? [],
+            ),
+            minimumOrderQuantity: textField(
+              seller,
+              "minimumOrderQuantity",
+              existing?.sellerProfile?.minimumOrderQuantity ?? "",
+            ),
+            leadTime: textField(
+              seller,
+              "leadTime",
+              existing?.sellerProfile?.leadTime ?? "",
+            ),
+            certifications: listField(
+              seller,
+              "certifications",
+              existing?.sellerProfile?.certifications ?? [],
+            ),
+            shippingTerms: listField(
+              seller,
+              "shippingTerms",
+              existing?.sellerProfile?.shippingTerms ?? [],
+            ),
+            paymentTerms: listField(
+              seller,
+              "paymentTerms",
+              existing?.sellerProfile?.paymentTerms ?? [],
+            ),
+            factoryOrDistributorStatus: textField(
+              seller,
+              "factoryOrDistributorStatus",
+              existing?.sellerProfile?.factoryOrDistributorStatus ??
+                "manufacturer",
+            ),
+          },
+        });
+      } else {
+        const buyer = (body.buyerProfile ?? {}) as Record<string, unknown>;
+        await tx.buyerProfile.upsert({
+          where: { companyId: company.id },
+          create: {
+            companyId: company.id,
+            buyerType: textField(buyer, "buyerType", "importer"),
+            purchasingCategories: listField(buyer, "purchasingCategories"),
+            preferredSupplierType: textField(buyer, "preferredSupplierType"),
+            targetOrderSize: textField(buyer, "targetOrderSize"),
+            monthlyImportVolume: textField(buyer, "monthlyImportVolume"),
+            importExperience: textField(buyer, "importExperience"),
+            purchaseTimeline: textField(buyer, "purchaseTimeline"),
+            salesChannels: listField(buyer, "salesChannels"),
+          },
+          update: {
+            buyerType: textField(
+              buyer,
+              "buyerType",
+              existing?.buyerProfile?.buyerType ?? "importer",
+            ),
+            purchasingCategories: listField(
+              buyer,
+              "purchasingCategories",
+              existing?.buyerProfile?.purchasingCategories ?? [],
+            ),
+            preferredSupplierType: textField(
+              buyer,
+              "preferredSupplierType",
+              existing?.buyerProfile?.preferredSupplierType ?? "",
+            ),
+            targetOrderSize: textField(
+              buyer,
+              "targetOrderSize",
+              existing?.buyerProfile?.targetOrderSize ?? "",
+            ),
+            monthlyImportVolume: textField(
+              buyer,
+              "monthlyImportVolume",
+              existing?.buyerProfile?.monthlyImportVolume ?? "",
+            ),
+            importExperience: textField(
+              buyer,
+              "importExperience",
+              existing?.buyerProfile?.importExperience ?? "",
+            ),
+            purchaseTimeline: textField(
+              buyer,
+              "purchaseTimeline",
+              existing?.buyerProfile?.purchaseTimeline ?? "",
+            ),
+            salesChannels: listField(
+              buyer,
+              "salesChannels",
+              existing?.buyerProfile?.salesChannels ?? [],
+            ),
+          },
+        });
+      }
+
+      if (criticalChanged || (!existing && companyRole === "seller")) {
+        await tx.verificationRequest.create({
+          data: {
+            companyId: company.id,
+            requestedByUserId: user.id,
+            status: "pending_review",
+          },
+        });
+      }
+
+      await recordReferralConversionForCompany(tx, {
         ownerUserId: user.id,
         companyRole,
-        legalName: textField(body, "legalName", "", 160),
-        tradeName: nullableTextField(body, "tradeName", null, 160),
-        displayNameEn: textField(body, "displayNameEn", "", 160),
-        logoOriginalUrl: logoWriteFields.logoOriginalUrl,
-        logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
-        logoUrl: logoWriteFields.logoUrl,
-        useDefaultLogo: logoWriteFields.useDefaultLogo,
-        website: websiteField(body, "website"),
-        country: textField(
-          body,
-          "country",
-          companyRole === "seller" ? "South Korea" : "",
-          100,
-        ),
-        city: textField(body, "city", "", 100),
-        stateOrProvince: textField(body, "stateOrProvince", "", 100),
-        businessAddress: textField(body, "businessAddress", "", 300),
-        description: textField(body, "description", "", 2_000),
-        descriptionEn: textField(body, "descriptionEn", "", 2_000),
-        categories: listField(body, "categories"),
-        verificationStatus,
-      },
-      update: {
-        legalName: textField(body, "legalName", existing?.legalName ?? "", 160),
-        tradeName: nullableTextField(body, "tradeName", existing?.tradeName ?? null, 160),
-        displayNameEn: textField(
-          body,
-          "displayNameEn",
-          existing?.displayNameEn ?? "",
-          160,
-        ),
-        logoOriginalUrl: logoWriteFields.logoOriginalUrl,
-        logoThumbnailUrl: logoWriteFields.logoThumbnailUrl,
-        logoUrl: logoWriteFields.logoUrl,
-        useDefaultLogo: logoWriteFields.useDefaultLogo,
-        website: websiteField(body, "website", existing?.website ?? ""),
-        country: textField(body, "country", existing?.country ?? "", 100),
-        city: textField(body, "city", existing?.city ?? "", 100),
-        stateOrProvince: textField(
-          body,
-          "stateOrProvince",
-          existing?.stateOrProvince ?? "",
-          100,
-        ),
-        businessAddress: textField(
-          body,
-          "businessAddress",
-          existing?.businessAddress ?? "",
-          300,
-        ),
-        description: textField(body, "description", existing?.description ?? "", 2_000),
-        descriptionEn: textField(
-          body,
-          "descriptionEn",
-          existing?.descriptionEn ?? "",
-          2_000,
-        ),
-        categories: listField(body, "categories", existing?.categories ?? []),
-        verificationStatus,
-      },
+        companyCreatedAt: company.createdAt,
+      });
+
+      return company;
     });
 
-    debugCompanyLogo("company logo database update result", {
-      companyId: company.id,
-      companyRole: company.companyRole,
-      logoOriginalUrl: company.logoOriginalUrl,
-      logoThumbnailUrl: company.logoThumbnailUrl,
-      logoUrl: company.logoUrl,
-      useDefaultLogo: company.useDefaultLogo,
-    });
-
-    if (companyRole === "seller") {
-      await getDb().sellerProfile.upsert({
-        where: { companyId: company.id },
-        create: {
-          companyId: company.id,
-          koreanBusinessRegistrationNumber: textField(
-            seller,
-            "koreanBusinessRegistrationNumber",
-          ),
-          representativeName: textField(seller, "representativeName"),
-          exportExperience: textField(seller, "exportExperience"),
-          exportExperienceEn: textField(seller, "exportExperienceEn", "", 10_000),
-          exportCountries: exportCountriesField(seller),
-          productCategories: listField(seller, "productCategories"),
-          minimumOrderQuantity: textField(seller, "minimumOrderQuantity"),
-          leadTime: textField(seller, "leadTime"),
-          certifications: listField(seller, "certifications"),
-          shippingTerms: listField(seller, "shippingTerms"),
-          paymentTerms: listField(seller, "paymentTerms"),
-          factoryOrDistributorStatus: textField(
-            seller,
-            "factoryOrDistributorStatus",
-            "manufacturer",
-          ),
-        },
-        update: {
-          koreanBusinessRegistrationNumber: textField(
-            seller,
-            "koreanBusinessRegistrationNumber",
-            existing?.sellerProfile?.koreanBusinessRegistrationNumber ?? "",
-          ),
-          representativeName: textField(
-            seller,
-            "representativeName",
-            existing?.sellerProfile?.representativeName ?? "",
-          ),
-          exportExperience: textField(
-            seller,
-            "exportExperience",
-            existing?.sellerProfile?.exportExperience ?? "",
-            10_000,
-          ),
-          exportExperienceEn: textField(
-            seller,
-            "exportExperienceEn",
-            existing?.sellerProfile?.exportExperienceEn ?? "",
-            10_000,
-          ),
-          exportCountries: exportCountriesField(
-            seller,
-            existing?.sellerProfile?.exportCountries ?? [],
-          ),
-          productCategories: listField(
-            seller,
-            "productCategories",
-            existing?.sellerProfile?.productCategories ?? [],
-          ),
-          minimumOrderQuantity: textField(
-            seller,
-            "minimumOrderQuantity",
-            existing?.sellerProfile?.minimumOrderQuantity ?? "",
-          ),
-          leadTime: textField(
-            seller,
-            "leadTime",
-            existing?.sellerProfile?.leadTime ?? "",
-          ),
-          certifications: listField(
-            seller,
-            "certifications",
-            existing?.sellerProfile?.certifications ?? [],
-          ),
-          shippingTerms: listField(
-            seller,
-            "shippingTerms",
-            existing?.sellerProfile?.shippingTerms ?? [],
-          ),
-          paymentTerms: listField(
-            seller,
-            "paymentTerms",
-            existing?.sellerProfile?.paymentTerms ?? [],
-          ),
-          factoryOrDistributorStatus: textField(
-            seller,
-            "factoryOrDistributorStatus",
-            existing?.sellerProfile?.factoryOrDistributorStatus ?? "manufacturer",
-          ),
-        },
-      });
-    } else {
-      const buyer = (body.buyerProfile ?? {}) as Record<string, unknown>;
-      await getDb().buyerProfile.upsert({
-        where: { companyId: company.id },
-        create: {
-          companyId: company.id,
-          buyerType: textField(buyer, "buyerType", "importer"),
-          purchasingCategories: listField(buyer, "purchasingCategories"),
-          preferredSupplierType: textField(buyer, "preferredSupplierType"),
-          targetOrderSize: textField(buyer, "targetOrderSize"),
-          monthlyImportVolume: textField(buyer, "monthlyImportVolume"),
-          importExperience: textField(buyer, "importExperience"),
-          purchaseTimeline: textField(buyer, "purchaseTimeline"),
-          salesChannels: listField(buyer, "salesChannels"),
-        },
-        update: {
-          buyerType: textField(
-            buyer,
-            "buyerType",
-            existing?.buyerProfile?.buyerType ?? "importer",
-          ),
-          purchasingCategories: listField(
-            buyer,
-            "purchasingCategories",
-            existing?.buyerProfile?.purchasingCategories ?? [],
-          ),
-          preferredSupplierType: textField(
-            buyer,
-            "preferredSupplierType",
-            existing?.buyerProfile?.preferredSupplierType ?? "",
-          ),
-          targetOrderSize: textField(
-            buyer,
-            "targetOrderSize",
-            existing?.buyerProfile?.targetOrderSize ?? "",
-          ),
-          monthlyImportVolume: textField(
-            buyer,
-            "monthlyImportVolume",
-            existing?.buyerProfile?.monthlyImportVolume ?? "",
-          ),
-          importExperience: textField(
-            buyer,
-            "importExperience",
-            existing?.buyerProfile?.importExperience ?? "",
-          ),
-          purchaseTimeline: textField(
-            buyer,
-            "purchaseTimeline",
-            existing?.buyerProfile?.purchaseTimeline ?? "",
-          ),
-          salesChannels: listField(
-            buyer,
-            "salesChannels",
-            existing?.buyerProfile?.salesChannels ?? [],
-          ),
-        },
-      });
-    }
-
-    if (criticalChanged || (!existing && companyRole === "seller")) {
-      await getDb().verificationRequest.create({
-        data: {
-          companyId: company.id,
-          requestedByUserId: user.id,
-          status: "pending_review",
-        },
-      });
-    }
-
-    const savedCompany = await getDb().company.findUnique({
+    const savedCompany = await db.company.findUnique({
       where: { id: company.id },
       include: {
         sellerProfile: true,

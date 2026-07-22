@@ -304,6 +304,8 @@ export type PartnerProfileWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   attributions?: Prisma.ReferralAttributionListRelationFilter
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorListRelationFilter
+  referralConversions?: Prisma.ReferralConversionListRelationFilter
   referralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
   settlementLegs?: Prisma.SettlementLegListRelationFilter
@@ -333,6 +335,8 @@ export type PartnerProfileOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserProfileOrderByWithRelationInput
   attributions?: Prisma.ReferralAttributionOrderByRelationAggregateInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorOrderByRelationAggregateInput
+  referralConversions?: Prisma.ReferralConversionOrderByRelationAggregateInput
   referralClaimTokens?: Prisma.ReferralClaimTokenOrderByRelationAggregateInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountOrderByWithRelationInput
   settlementLegs?: Prisma.SettlementLegOrderByRelationAggregateInput
@@ -365,6 +369,8 @@ export type PartnerProfileWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"PartnerProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
   attributions?: Prisma.ReferralAttributionListRelationFilter
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorListRelationFilter
+  referralConversions?: Prisma.ReferralConversionListRelationFilter
   referralClaimTokens?: Prisma.ReferralClaimTokenListRelationFilter
   stripeConnectedAccount?: Prisma.XOR<Prisma.StripeConnectedAccountNullableScalarRelationFilter, Prisma.StripeConnectedAccountWhereInput> | null
   settlementLegs?: Prisma.SettlementLegListRelationFilter
@@ -445,6 +451,8 @@ export type PartnerProfileCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
@@ -473,6 +481,8 @@ export type PartnerProfileUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -501,6 +511,8 @@ export type PartnerProfileUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
@@ -529,6 +541,8 @@ export type PartnerProfileUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -750,6 +764,34 @@ export type PartnerProfileUpdateOneRequiredWithoutAttributionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutAttributionsInput, Prisma.PartnerProfileUpdateWithoutAttributionsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutAttributionsInput>
 }
 
+export type PartnerProfileCreateNestedOneWithoutReferralClickDailyVisitorsInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutReferralClickDailyVisitorsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneRequiredWithoutReferralClickDailyVisitorsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutReferralClickDailyVisitorsInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutReferralClickDailyVisitorsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput>
+}
+
+export type PartnerProfileCreateNestedOneWithoutReferralConversionsInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralConversionsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutReferralConversionsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+}
+
+export type PartnerProfileUpdateOneRequiredWithoutReferralConversionsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralConversionsInput>
+  connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutReferralConversionsInput
+  upsert?: Prisma.PartnerProfileUpsertWithoutReferralConversionsInput
+  connect?: Prisma.PartnerProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerProfileUpdateToOneWithWhereWithoutReferralConversionsInput, Prisma.PartnerProfileUpdateWithoutReferralConversionsInput>, Prisma.PartnerProfileUncheckedUpdateWithoutReferralConversionsInput>
+}
+
 export type PartnerProfileCreateNestedOneWithoutStripeConnectedAccountInput = {
   create?: Prisma.XOR<Prisma.PartnerProfileCreateWithoutStripeConnectedAccountInput, Prisma.PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput>
   connectOrCreate?: Prisma.PartnerProfileCreateOrConnectWithoutStripeConnectedAccountInput
@@ -819,6 +861,8 @@ export type PartnerProfileCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
@@ -846,6 +890,8 @@ export type PartnerProfileUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -889,6 +935,8 @@ export type PartnerProfileUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
@@ -916,6 +964,8 @@ export type PartnerProfileUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -944,6 +994,8 @@ export type PartnerProfileCreateWithoutReferralClaimTokensInput = {
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
@@ -971,6 +1023,8 @@ export type PartnerProfileUncheckedCreateWithoutReferralClaimTokensInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
@@ -1014,6 +1068,8 @@ export type PartnerProfileUpdateWithoutReferralClaimTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1041,6 +1097,8 @@ export type PartnerProfileUncheckedUpdateWithoutReferralClaimTokensInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1067,6 +1125,8 @@ export type PartnerProfileCreateWithoutAttributionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
@@ -1094,6 +1154,8 @@ export type PartnerProfileUncheckedCreateWithoutAttributionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1137,6 +1199,8 @@ export type PartnerProfileUpdateWithoutAttributionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
@@ -1164,6 +1228,272 @@ export type PartnerProfileUncheckedUpdateWithoutAttributionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutReferralClickDailyVisitorsInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutReferralClickDailyVisitorsInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput>
+}
+
+export type PartnerProfileUpsertWithoutReferralClickDailyVisitorsInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralClickDailyVisitorsInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutReferralClickDailyVisitorsInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput, Prisma.PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput>
+}
+
+export type PartnerProfileUpdateWithoutReferralClickDailyVisitorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutReferralClickDailyVisitorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileCreateWithoutReferralConversionsInput = {
+  id?: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
+  attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileUncheckedCreateWithoutReferralConversionsInput = {
+  id?: string
+  userId: string
+  referralCode: string
+  status?: $Enums.PartnerProfileStatus
+  legalName?: string | null
+  displayName?: string | null
+  contactEmail?: string | null
+  contactPhone?: string | null
+  country?: string | null
+  preferredLanguage?: $Enums.PreferredLanguage | null
+  organizationName?: string | null
+  websiteOrSocialUrl?: string | null
+  promotionDescription?: string | null
+  termsConsentVersion?: string | null
+  termsConsentedAt?: Date | string | null
+  privacyConsentVersion?: string | null
+  privacyConsentedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
+  settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
+  settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
+}
+
+export type PartnerProfileCreateOrConnectWithoutReferralConversionsInput = {
+  where: Prisma.PartnerProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralConversionsInput>
+}
+
+export type PartnerProfileUpsertWithoutReferralConversionsInput = {
+  update: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedUpdateWithoutReferralConversionsInput>
+  create: Prisma.XOR<Prisma.PartnerProfileCreateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedCreateWithoutReferralConversionsInput>
+  where?: Prisma.PartnerProfileWhereInput
+}
+
+export type PartnerProfileUpdateToOneWithWhereWithoutReferralConversionsInput = {
+  where?: Prisma.PartnerProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerProfileUpdateWithoutReferralConversionsInput, Prisma.PartnerProfileUncheckedUpdateWithoutReferralConversionsInput>
+}
+
+export type PartnerProfileUpdateWithoutReferralConversionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
+  attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
+  stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
+  settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
+  settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
+}
+
+export type PartnerProfileUncheckedUpdateWithoutReferralConversionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  referralCode?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumPartnerProfileStatusFieldUpdateOperationsInput | $Enums.PartnerProfileStatus
+  legalName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactEmail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLanguage?: Prisma.NullableEnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage | null
+  organizationName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  websiteOrSocialUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  promotionDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  privacyConsentVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  privacyConsentedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1192,6 +1522,8 @@ export type PartnerProfileCreateWithoutStripeConnectedAccountInput = {
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
@@ -1219,6 +1551,8 @@ export type PartnerProfileUncheckedCreateWithoutStripeConnectedAccountInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
@@ -1262,6 +1596,8 @@ export type PartnerProfileUpdateWithoutStripeConnectedAccountInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1289,6 +1625,8 @@ export type PartnerProfileUncheckedUpdateWithoutStripeConnectedAccountInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1316,6 +1654,8 @@ export type PartnerProfileCreateWithoutSettlementsInput = {
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegCreateNestedManyWithoutPartnerProfileInput
@@ -1343,6 +1683,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlementLegs?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutPartnerProfileInput
@@ -1386,6 +1728,8 @@ export type PartnerProfileUpdateWithoutSettlementsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUpdateManyWithoutPartnerProfileNestedInput
@@ -1413,6 +1757,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlementLegs?: Prisma.SettlementLegUncheckedUpdateManyWithoutPartnerProfileNestedInput
@@ -1440,6 +1786,8 @@ export type PartnerProfileCreateWithoutSettlementLegsInput = {
   updatedAt?: Date | string
   user: Prisma.UserProfileCreateNestedOneWithoutPartnerProfileInput
   attributions?: Prisma.ReferralAttributionCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountCreateNestedOneWithoutPartnerProfileInput
   settlements?: Prisma.SettlementCreateNestedManyWithoutReferralPartnerProfileInput
@@ -1467,6 +1815,8 @@ export type PartnerProfileUncheckedCreateWithoutSettlementLegsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   attributions?: Prisma.ReferralAttributionUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedCreateNestedManyWithoutPartnerProfileInput
+  referralConversions?: Prisma.ReferralConversionUncheckedCreateNestedManyWithoutPartnerProfileInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutPartnerProfileInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedCreateNestedOneWithoutPartnerProfileInput
   settlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutReferralPartnerProfileInput
@@ -1510,6 +1860,8 @@ export type PartnerProfileUpdateWithoutSettlementLegsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserProfileUpdateOneRequiredWithoutPartnerProfileNestedInput
   attributions?: Prisma.ReferralAttributionUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUpdateOneWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1537,6 +1889,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attributions?: Prisma.ReferralAttributionUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralClickDailyVisitors?: Prisma.ReferralClickDailyVisitorUncheckedUpdateManyWithoutPartnerProfileNestedInput
+  referralConversions?: Prisma.ReferralConversionUncheckedUpdateManyWithoutPartnerProfileNestedInput
   referralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutPartnerProfileNestedInput
   stripeConnectedAccount?: Prisma.StripeConnectedAccountUncheckedUpdateOneWithoutPartnerProfileNestedInput
   settlements?: Prisma.SettlementUncheckedUpdateManyWithoutReferralPartnerProfileNestedInput
@@ -1549,6 +1903,8 @@ export type PartnerProfileUncheckedUpdateWithoutSettlementLegsInput = {
 
 export type PartnerProfileCountOutputType = {
   attributions: number
+  referralClickDailyVisitors: number
+  referralConversions: number
   referralClaimTokens: number
   settlementLegs: number
   settlements: number
@@ -1556,6 +1912,8 @@ export type PartnerProfileCountOutputType = {
 
 export type PartnerProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   attributions?: boolean | PartnerProfileCountOutputTypeCountAttributionsArgs
+  referralClickDailyVisitors?: boolean | PartnerProfileCountOutputTypeCountReferralClickDailyVisitorsArgs
+  referralConversions?: boolean | PartnerProfileCountOutputTypeCountReferralConversionsArgs
   referralClaimTokens?: boolean | PartnerProfileCountOutputTypeCountReferralClaimTokensArgs
   settlementLegs?: boolean | PartnerProfileCountOutputTypeCountSettlementLegsArgs
   settlements?: boolean | PartnerProfileCountOutputTypeCountSettlementsArgs
@@ -1576,6 +1934,20 @@ export type PartnerProfileCountOutputTypeDefaultArgs<ExtArgs extends runtime.Typ
  */
 export type PartnerProfileCountOutputTypeCountAttributionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReferralAttributionWhereInput
+}
+
+/**
+ * PartnerProfileCountOutputType without action
+ */
+export type PartnerProfileCountOutputTypeCountReferralClickDailyVisitorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralClickDailyVisitorWhereInput
+}
+
+/**
+ * PartnerProfileCountOutputType without action
+ */
+export type PartnerProfileCountOutputTypeCountReferralConversionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ReferralConversionWhereInput
 }
 
 /**
@@ -1623,6 +1995,8 @@ export type PartnerProfileSelect<ExtArgs extends runtime.Types.Extensions.Intern
   updatedAt?: boolean
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
+  referralClickDailyVisitors?: boolean | Prisma.PartnerProfile$referralClickDailyVisitorsArgs<ExtArgs>
+  referralConversions?: boolean | Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>
   referralClaimTokens?: boolean | Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
@@ -1705,6 +2079,8 @@ export type PartnerProfileOmit<ExtArgs extends runtime.Types.Extensions.Internal
 export type PartnerProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   attributions?: boolean | Prisma.PartnerProfile$attributionsArgs<ExtArgs>
+  referralClickDailyVisitors?: boolean | Prisma.PartnerProfile$referralClickDailyVisitorsArgs<ExtArgs>
+  referralConversions?: boolean | Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>
   referralClaimTokens?: boolean | Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>
   stripeConnectedAccount?: boolean | Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>
   settlementLegs?: boolean | Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>
@@ -1723,6 +2099,8 @@ export type $PartnerProfilePayload<ExtArgs extends runtime.Types.Extensions.Inte
   objects: {
     user: Prisma.$UserProfilePayload<ExtArgs>
     attributions: Prisma.$ReferralAttributionPayload<ExtArgs>[]
+    referralClickDailyVisitors: Prisma.$ReferralClickDailyVisitorPayload<ExtArgs>[]
+    referralConversions: Prisma.$ReferralConversionPayload<ExtArgs>[]
     referralClaimTokens: Prisma.$ReferralClaimTokenPayload<ExtArgs>[]
     stripeConnectedAccount: Prisma.$StripeConnectedAccountPayload<ExtArgs> | null
     settlementLegs: Prisma.$SettlementLegPayload<ExtArgs>[]
@@ -2145,6 +2523,8 @@ export interface Prisma__PartnerProfileClient<T, Null = never, ExtArgs extends r
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   attributions<T extends Prisma.PartnerProfile$attributionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$attributionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralAttributionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralClickDailyVisitors<T extends Prisma.PartnerProfile$referralClickDailyVisitorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$referralClickDailyVisitorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralClickDailyVisitorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referralConversions<T extends Prisma.PartnerProfile$referralConversionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$referralConversionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralConversionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   referralClaimTokens<T extends Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$referralClaimTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReferralClaimTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   stripeConnectedAccount<T extends Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$stripeConnectedAccountArgs<ExtArgs>>): Prisma.Prisma__StripeConnectedAccountClient<runtime.Types.Result.GetResult<Prisma.$StripeConnectedAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   settlementLegs<T extends Prisma.PartnerProfile$settlementLegsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerProfile$settlementLegsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SettlementLegPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2620,6 +3000,54 @@ export type PartnerProfile$attributionsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.ReferralAttributionScalarFieldEnum | Prisma.ReferralAttributionScalarFieldEnum[]
+}
+
+/**
+ * PartnerProfile.referralClickDailyVisitors
+ */
+export type PartnerProfile$referralClickDailyVisitorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralClickDailyVisitor
+   */
+  select?: Prisma.ReferralClickDailyVisitorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralClickDailyVisitor
+   */
+  omit?: Prisma.ReferralClickDailyVisitorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralClickDailyVisitorInclude<ExtArgs> | null
+  where?: Prisma.ReferralClickDailyVisitorWhereInput
+  orderBy?: Prisma.ReferralClickDailyVisitorOrderByWithRelationInput | Prisma.ReferralClickDailyVisitorOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralClickDailyVisitorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralClickDailyVisitorScalarFieldEnum | Prisma.ReferralClickDailyVisitorScalarFieldEnum[]
+}
+
+/**
+ * PartnerProfile.referralConversions
+ */
+export type PartnerProfile$referralConversionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ReferralConversion
+   */
+  select?: Prisma.ReferralConversionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ReferralConversion
+   */
+  omit?: Prisma.ReferralConversionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ReferralConversionInclude<ExtArgs> | null
+  where?: Prisma.ReferralConversionWhereInput
+  orderBy?: Prisma.ReferralConversionOrderByWithRelationInput | Prisma.ReferralConversionOrderByWithRelationInput[]
+  cursor?: Prisma.ReferralConversionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ReferralConversionScalarFieldEnum | Prisma.ReferralConversionScalarFieldEnum[]
 }
 
 /**

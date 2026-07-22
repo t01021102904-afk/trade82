@@ -102,6 +102,11 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
         run: npm run test:orders:integration
 
+      - name: Run partner referral analytics integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
+        run: npm run test:partner-referral-analytics:integration
+
       - name: Run application tests
         run: npm test
 

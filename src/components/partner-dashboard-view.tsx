@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PartnerReferralAnalyticsSection } from "@/components/partner-referral-analytics";
 import { PartnerReferralLink } from "@/components/partner-referral-link";
 import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
 import { createTranslator, getDictionary, type Locale } from "@/lib/i18n";
@@ -124,6 +125,11 @@ export function PartnerDashboardView({
             </div>
           </dl>
         </section>
+
+        <PartnerReferralAnalyticsSection
+          locale={locale}
+          analytics={data.analytics}
+        />
 
         <section aria-labelledby="partner-summary">
           <h2

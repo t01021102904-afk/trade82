@@ -7,5 +7,11 @@ export async function resolve(specifier, context, nextResolve) {
       shortCircuit: true,
     };
   }
+  if (specifier === "next/server") {
+    return {
+      url: new URL("../node_modules/next/dist/server/web/exports/index.js", import.meta.url).href,
+      shortCircuit: true,
+    };
+  }
   return nextResolve(specifier, context);
 }

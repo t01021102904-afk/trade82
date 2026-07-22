@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   APPROVED_PRODUCTION_MIGRATION_BATCH,
+  ANALYTICS_MIGRATION,
   EXPECTED_SUPABASE_PROJECT,
   FIRST_APPROVED_MIGRATION,
   LEGACY_ZERO_STEP_MIGRATIONS,
@@ -20,7 +21,11 @@ import {
 const directUrl = `postgresql://postgres:credential-placeholder@db.${EXPECTED_SUPABASE_PROJECT}.supabase.co:5432/postgres`;
 const poolerUrl = `postgresql://postgres.${EXPECTED_SUPABASE_PROJECT}:credential-placeholder@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
 const localMigrations = readLocalMigrationNames();
-const approvedNames = new Set([...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION]);
+const approvedNames = new Set([
+  ...APPROVED_PRODUCTION_MIGRATION_BATCH,
+  OPERATIONS_MIGRATION,
+  ANALYTICS_MIGRATION,
+]);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
 function record(migrationName, overrides = {}) {
@@ -44,6 +49,7 @@ const appliedFirst = record(FIRST_APPROVED_MIGRATION);
 const appliedTarget = record(TARGET_MIGRATION);
 const appliedMerchant = record(MERCHANT_MIGRATION);
 const appliedOperations = record(OPERATIONS_MIGRATION);
+const appliedAnalytics = record(ANALYTICS_MIGRATION);
 
 function legacySchemaEvidence(overrides = {}) {
   return {
@@ -195,6 +201,34 @@ function operationsInitialState(overrides = {}) {
   return { operations_worker_run_zero_rows: true, operations_alert_zero_rows: true, ...overrides };
 }
 
+function analyticsPreflight(overrides = {}) {
+  return {
+    analytics_partner_profile_table: true,
+    analytics_referral_attribution_table: true,
+    analytics_subject_type_enum: true,
+    analytics_tables_absent: true,
+    analytics_indexes_absent: true,
+    ...overrides,
+  };
+}
+
+function analyticsSchema(overrides = {}) {
+  return {
+    analytics_tables: true,
+    analytics_columns: true,
+    analytics_indexes: true,
+    analytics_foreign_keys: true,
+    analytics_constraints: true,
+    analytics_rls: true,
+    analytics_public_access_revoked: true,
+    ...overrides,
+  };
+}
+
+function analyticsInitialState(overrides = {}) {
+  return { analytics_click_zero_rows: true, ...overrides };
+}
+
 function fakeClient(responses) {
   const calls = { connect: 0, query: 0, end: 0 };
   return {
@@ -229,6 +263,7 @@ function deploymentResponses(afterRecords = [
   appliedTarget,
   appliedMerchant,
   appliedOperations,
+  appliedAnalytics,
 ]) {
   return [
     [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant],
@@ -239,6 +274,7 @@ function deploymentResponses(afterRecords = [
     [secondSchema()],
     [merchantSchema()],
     [operationsPreflight()],
+    [analyticsPreflight()],
     afterRecords,
     [prerequisiteSchema()],
     [targetSchema()],
@@ -247,12 +283,14 @@ function deploymentResponses(afterRecords = [
     [merchantSchema()],
     [operationsSchema()],
     [operationsInitialState()],
+    [analyticsSchema()],
+    [analyticsInitialState()],
   ];
 }
 
 function completedResponses() {
   return [
-    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations],
+    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics],
     [legacySchemaEvidence()],
     [prerequisiteSchema()],
     [targetSchema()],
@@ -260,6 +298,7 @@ function completedResponses() {
     [secondSchema()],
     [merchantSchema()],
     [operationsSchema()],
+    [analyticsSchema()],
   ];
 }
 
@@ -288,14 +327,15 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved batch is followed only by the operations migration", () => {
+test("the approved batch is followed only by the operations and analytics migrations", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-2), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-1), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-3), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-2), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-1), ANALYTICS_MIGRATION);
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {
@@ -337,7 +377,7 @@ test("database connection failures identify the selected source without exposing
   }), { stage: "database_connection", source: "DIRECT_URL", code: "ECONNREFUSED" });
 });
 
-test("only approved migrations applied with operations pending runs the allowlisted migration", async () => {
+test("only approved migrations applied with operations and analytics pending runs the allowlisted migrations", async () => {
   const fake = fakeClient(deploymentResponses());
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
@@ -345,7 +385,7 @@ test("only approved migrations applied with operations pending runs the allowlis
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 16);
+  assert.equal(fake.calls.query, 19);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -357,7 +397,7 @@ test("all approved migrations applied skips Prisma after complete verification",
   }));
   assert.equal(result, "already-applied");
   assert.equal(deploys, 0);
-  assert.equal(fake.calls.query, 8);
+  assert.equal(fake.calls.query, 9);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -457,7 +497,7 @@ test("operations migration records are strict and legitimate operational rows do
 
   const completed = fakeClient(completedResponses());
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
-  assert.equal(completed.calls.query, 8, "already-applied verification must not require an empty operational catalog");
+  assert.equal(completed.calls.query, 9, "already-applied verification must not require empty operational or analytics catalogs");
 });
 
 test("merchant preflight fails closed for each fixed evidence field", async () => {
@@ -506,7 +546,7 @@ test("merchant post-verification fails closed for each schema field", async () =
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[13] = [merchantSchema({ [key]: false })];
+    responses[14] = [merchantSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -542,7 +582,7 @@ test("target preflight fails closed for each newly required dependency field", a
 
 test("operations deployment does not require merchant zero rows, while new operations rows fail initial-state verification", async () => {
   const responses = deploymentResponses();
-  responses[15] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
+  responses[16] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
   const fake = fakeClient(responses);
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => {},
@@ -552,7 +592,60 @@ test("operations deployment does not require merchant zero rows, while new opera
 
   const completed = fakeClient(completedResponses());
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
-  assert.equal(completed.calls.query, 8);
+  assert.equal(completed.calls.query, 9);
+});
+
+test("analytics preflight fails closed for each fixed evidence field", async () => {
+  const keys = [
+    "analytics_partner_profile_table",
+    "analytics_referral_attribution_table",
+    "analytics_subject_type_enum",
+    "analytics_tables_absent",
+    "analytics_indexes_absent",
+  ];
+  for (const key of keys) {
+    const responses = deploymentResponses();
+    responses[8] = [analyticsPreflight({ [key]: false })];
+    const fake = fakeClient(responses);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+      deploy: () => {},
+    })), {
+      stage: "migration_state_evaluation", source: "DIRECT_URL", code: "target_preflight_failed",
+    });
+  }
+});
+
+test("analytics post-verification fails closed for each schema field", async () => {
+  const keys = [
+    "analytics_tables",
+    "analytics_columns",
+    "analytics_indexes",
+    "analytics_foreign_keys",
+    "analytics_constraints",
+    "analytics_rls",
+    "analytics_public_access_revoked",
+  ];
+  for (const key of keys) {
+    const responses = deploymentResponses();
+    responses[17] = [analyticsSchema({ [key]: false })];
+    const fake = fakeClient(responses);
+    await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+      deploy: () => {},
+    })), {
+      stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
+    });
+  }
+});
+
+test("analytics initial-state verification requires an empty daily visitor table", async () => {
+  const responses = deploymentResponses();
+  responses[18] = [analyticsInitialState({ analytics_click_zero_rows: false })];
+  const fake = fakeClient(responses);
+  await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+    deploy: () => {},
+  })), {
+    stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
+  });
 });
 
 test("legacy zero-step migrations remain accepted only with complete evidence", async () => {
@@ -577,7 +670,7 @@ test("legacy zero-step migrations remain accepted only with complete evidence", 
 
 test("approved migrations require exactly one applied step after deploy", async () => {
   for (const migrationName of APPROVED_PRODUCTION_MIGRATION_BATCH) {
-    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations];
+    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics];
     const index = afterRecords.findIndex((entry) => entry.migration_name === migrationName);
     afterRecords[index] = zeroStepRecord(migrationName);
     const fake = fakeClient(deploymentResponses(afterRecords));
