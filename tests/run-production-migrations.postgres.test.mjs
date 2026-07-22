@@ -4,10 +4,15 @@ import { test } from "node:test";
 import { Client } from "pg";
 
 import {
+  ANALYTICS_MIGRATION,
+  queryAnalyticsMigrationInitialState,
+  queryAnalyticsMigrationSchema,
   queryMerchantMigrationInitialState,
   queryMerchantMigrationPreflight,
   queryMerchantMigrationSchema,
   queryTargetSchema,
+  readLocalMigrationNames,
+  runProductionMigrations,
 } from "../scripts/run-production-migrations.mjs";
 
 const databaseUrl = process.env.PRODUCTION_MIGRATION_TEST_DATABASE_URL;
@@ -55,6 +60,66 @@ test("target enum preflight accepts required admin values alongside unrelated va
     assert.equal(evidence.target_enum_values, true);
   } finally {
     await client.query("ROLLBACK");
+    await client.end();
+  }
+});
+
+test("analytics schema verification recognizes the real click-count constraint and skips an applied migration", {
+  skip: !isDisposableLocalDatabase(databaseUrl),
+  concurrency: false,
+}, async () => {
+  const client = new Client({ connectionString: databaseUrl });
+  await client.connect();
+
+  try {
+    const beforeSchema = await queryAnalyticsMigrationSchema(client);
+    const beforeInitialState = await queryAnalyticsMigrationInitialState(client);
+    assert.equal(beforeSchema.analytics_constraints, true);
+    for (const [key, value] of Object.entries(beforeSchema)) {
+      assert.equal(value, true, key);
+    }
+    assert.equal(beforeInitialState.analytics_click_zero_rows, true);
+
+    await client.query("BEGIN");
+    await client.query(
+      'ALTER TABLE public."ReferralClickDailyVisitor" DROP CONSTRAINT "ReferralClickDailyVisitor_clickCount_check"',
+    );
+    await client.query(
+      'ALTER TABLE public."ReferralClickDailyVisitor" ADD CONSTRAINT "ReferralClickDailyVisitor_clickCount_check" CHECK ("clickCount" >= 0)',
+    );
+    const malformedSchema = await queryAnalyticsMigrationSchema(client);
+    assert.equal(malformedSchema.analytics_constraints, false);
+    await client.query("ROLLBACK");
+
+    let deployCalled = false;
+    const result = await runProductionMigrations({
+      environment: {
+        VERCEL_ENV: "production",
+        DIRECT_URL: "postgresql://postgres.cjryteuoyiiwsxarblfd@127.0.0.1:5432/ignored",
+      },
+      createClient: () => new Client({ connectionString: databaseUrl }),
+      localMigrationNames: readLocalMigrationNames(),
+      deploy: () => {
+        deployCalled = true;
+      },
+    });
+    assert.equal(result, "already-applied");
+    assert.equal(deployCalled, false);
+
+    const afterSchema = await queryAnalyticsMigrationSchema(client);
+    const afterInitialState = await queryAnalyticsMigrationInitialState(client);
+    assert.deepEqual(afterSchema, beforeSchema);
+    assert.deepEqual(afterInitialState, beforeInitialState);
+    const migration = await client.query(
+      'SELECT migration_name, finished_at, rolled_back_at, applied_steps_count FROM "_prisma_migrations" WHERE migration_name = $1',
+      [ANALYTICS_MIGRATION],
+    );
+    assert.equal(migration.rowCount, 1);
+    assert.ok(migration.rows[0].finished_at);
+    assert.equal(migration.rows[0].rolled_back_at, null);
+    assert.equal(Number(migration.rows[0].applied_steps_count), 1);
+  } finally {
+    await client.query("ROLLBACK").catch(() => {});
     await client.end();
   }
 });

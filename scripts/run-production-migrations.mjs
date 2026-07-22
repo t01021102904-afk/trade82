@@ -1811,7 +1811,8 @@ export async function queryAnalyticsMigrationSchema(client) {
     ),
     actual_fks AS (
       SELECT expected.*, constraint_row.conkey, constraint_row.confkey,
-        constraint_row.confrelid, constraint_row.confdeltype, constraint_row.confupdtype,
+        constraint_row.conrelid, constraint_row.confrelid,
+        constraint_row.confdeltype, constraint_row.confupdtype,
         constraint_row.contype, child_table.oid AS child_oid, parent_table.oid AS parent_oid
       FROM expected_fks expected
       LEFT JOIN pg_constraint constraint_row ON constraint_row.conname = expected.constraint_name
@@ -1868,7 +1869,7 @@ export async function queryAnalyticsMigrationSchema(client) {
         SELECT count(*) = 3 AND bool_and(
           (constraint_row.contype = 'p' AND constraint_row.conname IN ('ReferralClickDailyVisitor_pkey', 'ReferralConversion_pkey'))
           OR (constraint_row.contype = 'c' AND constraint_row.conname = 'ReferralClickDailyVisitor_clickCount_check'
-            AND lower(regexp_replace(pg_get_constraintdef(constraint_row.oid), '[^a-zA-Z0-9<>=]+', '', 'g')) = 'check"clickcount">0')
+            AND lower(regexp_replace(pg_get_expr(constraint_row.conbin, constraint_row.conrelid), '[^a-zA-Z0-9<>=]+', '', 'g')) = 'clickcount>0')
         )
         FROM pg_constraint constraint_row
         JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
