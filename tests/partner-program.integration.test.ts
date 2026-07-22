@@ -32,6 +32,12 @@ const { getDb } = await import(
 const referrals = await import(
   new URL("../src/lib/partner-referrals.ts", import.meta.url).href
 );
+const referralAnalytics = await import(
+  new URL("../src/lib/partner-referral-analytics.ts", import.meta.url).href
+);
+const referralConversions = await import(
+  new URL("../src/lib/partner-referral-conversions.ts", import.meta.url).href
+);
 const db = getDb() as PrismaClient;
 
 after(async () => {
@@ -415,5 +421,173 @@ test("invalid referral evidence never blocks a normal local user-profile creatio
       where: { referredUserId: created.id },
     }),
     0,
+  );
+});
+
+test("disposable PostgreSQL aggregates concurrent daily clicks by visitor", async () => {
+  const id = suffix();
+  const now = new Date("2026-07-21T15:30:00.000Z");
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `analytics-partner-${id}`,
+      email: `analytics-partner-${id}@example.test`,
+      displayName: "Analytics Partner",
+      role: "user",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: partnerUser.id,
+      referralCode: `T82-${id.toUpperCase()}`,
+      status: "ACTIVE",
+    },
+  });
+  const visitorA = "A".repeat(43);
+  const visitorB = "B".repeat(43);
+  const requestFor = (visitor: string) =>
+    new Request(`https://trade82.test/r/${partner.referralCode}`, {
+      headers: { cookie: `trade82_referral_visitor=${visitor}` },
+    });
+
+  await Promise.all(
+    Array.from({ length: 4 }, () =>
+      referralAnalytics.recordReferralClick({
+        db,
+        request: requestFor(visitorA),
+        referralCode: partner.referralCode,
+        now,
+      }),
+    ),
+  );
+  await referralAnalytics.recordReferralClick({
+    db,
+    request: requestFor(visitorB),
+    referralCode: partner.referralCode,
+    now,
+  });
+  await referralAnalytics.recordReferralClick({
+    db,
+    request: requestFor(visitorA),
+    referralCode: partner.referralCode,
+    now: new Date("2026-07-22T01:00:00.000Z"),
+  });
+
+  const rows = await db.referralClickDailyVisitor.findMany({
+    where: { partnerProfileId: partner.id },
+    orderBy: { day: "asc" },
+  });
+  assert.equal(rows.length, 3);
+  const clicksByDay = new Map<string, number[]>();
+  for (const row of rows) {
+    const day = row.day.toISOString().slice(0, 10);
+    clicksByDay.set(day, [...(clicksByDay.get(day) ?? []), row.clickCount]);
+  }
+  assert.deepEqual(
+    [...clicksByDay.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([day, counts]) => [
+        day,
+        counts.sort((left, right) => left - right),
+      ]),
+    [
+      ["2026-07-21", [1, 4]],
+      ["2026-07-22", [1]],
+    ],
+  );
+
+  const analytics = await referralAnalytics.getPartnerReferralAnalytics({
+    db,
+    partnerProfileId: partner.id,
+    range: "7d",
+    now,
+  });
+  assert.equal(analytics.totals.totalClicks, 5);
+  assert.equal(analytics.totals.uniqueVisitors, 2);
+  assert.equal(analytics.trafficSeries.length, 7);
+});
+
+test("disposable PostgreSQL records seller and buyer conversions idempotently", async () => {
+  const id = suffix();
+  const partnerUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `conversion-partner-${id}`,
+      email: `conversion-partner-${id}@example.test`,
+      displayName: "Conversion Partner",
+      role: "user",
+    },
+  });
+  const referredUser = await db.userProfile.create({
+    data: {
+      clerkUserId: `conversion-referred-${id}`,
+      email: `conversion-referred-${id}@example.test`,
+      displayName: "Referred User",
+      role: "user",
+    },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: partnerUser.id,
+      referralCode: `T82-${id.toUpperCase()}`,
+      status: "ACTIVE",
+    },
+  });
+  const attribution = await db.referralAttribution.create({
+    data: {
+      referredUserId: referredUser.id,
+      partnerProfileId: partner.id,
+      referralCode: partner.referralCode,
+      status: "LOCKED",
+      lockedAt: new Date("2026-07-20T12:00:00.000Z"),
+    },
+  });
+  const seller = await db.company.create({
+    data: {
+      ownerUserId: referredUser.id,
+      companyRole: "seller",
+      legalName: `Analytics Seller ${id}`,
+      country: "South Korea",
+      businessAddress: "Seoul",
+    },
+  });
+  const buyer = await db.company.create({
+    data: {
+      ownerUserId: referredUser.id,
+      companyRole: "buyer",
+      legalName: `Analytics Buyer ${id}`,
+      country: "United States",
+      businessAddress: "New York",
+    },
+  });
+
+  await referralConversions.recordReferralConversionForCompany(db, {
+    ownerUserId: referredUser.id,
+    companyRole: "seller",
+    companyCreatedAt: seller.createdAt,
+  });
+  await referralConversions.recordReferralConversionForCompany(db, {
+    ownerUserId: referredUser.id,
+    companyRole: "seller",
+    companyCreatedAt: new Date("2026-07-21T12:00:00.000Z"),
+  });
+  await referralConversions.recordReferralConversionForCompany(db, {
+    ownerUserId: referredUser.id,
+    companyRole: "buyer",
+    companyCreatedAt: buyer.createdAt,
+  });
+
+  const conversions = await db.referralConversion.findMany({
+    where: { referralAttributionId: attribution.id },
+    orderBy: { subjectType: "asc" },
+  });
+  assert.equal(conversions.length, 2);
+  assert.deepEqual(
+    conversions.map((conversion) => [
+      conversion.subjectType,
+      conversion.convertedAt,
+    ]),
+    [
+      ["BUYER", buyer.createdAt],
+      ["SELLER", seller.createdAt],
+    ],
   );
 });

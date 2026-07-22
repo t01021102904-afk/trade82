@@ -17,6 +17,12 @@ export const FIRST_APPROVED_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[0];
 export const TARGET_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[1];
 export const MERCHANT_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[2];
 export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_control_plane";
+export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
+export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
+  ...APPROVED_PRODUCTION_MIGRATION_BATCH,
+  OPERATIONS_MIGRATION,
+  ANALYTICS_MIGRATION,
+]);
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
   "20260627010000_add_buyer_preferred_supplier_type",
@@ -161,7 +167,11 @@ function isSuccessfulMigrationRecord(record, schemaEvidence) {
       && hasLegacySchemaEvidence(record.migration_name, schemaEvidence));
 }
 
-const OPERATIONS_PENDING_MIGRATIONS = Object.freeze([OPERATIONS_MIGRATION]);
+const ALLOWLISTED_PENDING_MIGRATION_STATES = Object.freeze([
+  Object.freeze([OPERATIONS_MIGRATION]),
+  Object.freeze([ANALYTICS_MIGRATION]),
+  Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION]),
+]);
 
 function hasExactMigrationList(actual, expected) {
   return actual.length === expected.length
@@ -176,9 +186,9 @@ function pendingSetError(message) {
 
 function assertApprovedMigrationRecordOrder(databaseRecords) {
   const approvedRecords = databaseRecords
-    .filter((record) => [...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION].includes(record.migration_name))
+    .filter((record) => ALLOWLISTED_PRODUCTION_MIGRATIONS.includes(record.migration_name))
     .map((record) => record.migration_name);
-  const expectedPrefix = [...APPROVED_PRODUCTION_MIGRATION_BATCH, OPERATIONS_MIGRATION].slice(0, approvedRecords.length);
+  const expectedPrefix = ALLOWLISTED_PRODUCTION_MIGRATIONS.slice(0, approvedRecords.length);
   if (!hasExactMigrationList(approvedRecords, expectedPrefix)) {
     throw pendingSetError("Approved production migrations are out of order.");
   }
@@ -200,11 +210,13 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const targetIndex = localMigrationNames.indexOf(TARGET_MIGRATION);
   const merchantIndex = localMigrationNames.indexOf(MERCHANT_MIGRATION);
   const operationsIndex = localMigrationNames.indexOf(OPERATIONS_MIGRATION);
+  const analyticsIndex = localMigrationNames.indexOf(ANALYTICS_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
     || operationsIndex !== merchantIndex + 1
-    || operationsIndex !== localMigrationNames.length - 1) {
+    || analyticsIndex !== operationsIndex + 1
+    || analyticsIndex !== localMigrationNames.length - 1) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -231,16 +243,26 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       || !databaseNames.has(FIRST_APPROVED_MIGRATION)
       || !databaseNames.has(TARGET_MIGRATION)
       || !databaseNames.has(MERCHANT_MIGRATION)
-      || !databaseNames.has(OPERATIONS_MIGRATION)) {
+      || !databaseNames.has(OPERATIONS_MIGRATION)
+      || !databaseNames.has(ANALYTICS_MIGRATION)) {
       throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
   }
 
-  if (!hasExactMigrationList(pendingMigrations, OPERATIONS_PENDING_MIGRATIONS)
+  const isAllowedPendingState = ALLOWLISTED_PENDING_MIGRATION_STATES.some(
+    (allowed) => hasExactMigrationList(pendingMigrations, allowed),
+  );
+  if (!isAllowedPendingState
     || !databaseNames.has(FIRST_APPROVED_MIGRATION)
     || !databaseNames.has(TARGET_MIGRATION)
-    || !databaseNames.has(MERCHANT_MIGRATION)) {
+    || !databaseNames.has(MERCHANT_MIGRATION)
+    || (pendingMigrations.includes(ANALYTICS_MIGRATION)
+      && !databaseNames.has(OPERATIONS_MIGRATION)
+      && !hasExactMigrationList(
+        pendingMigrations,
+        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION],
+      ))) {
     throw pendingSetError("Production has an unexpected pending migration.");
   }
 
@@ -1671,6 +1693,219 @@ export async function queryOperationsMigrationInitialState(client) {
   return result.rows[0] ?? null;
 }
 
+export async function queryAnalyticsMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND table_type = 'BASE TABLE'
+      ) AS analytics_partner_profile_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'ReferralAttribution'
+          AND table_type = 'BASE TABLE'
+      ) AS analytics_referral_attribution_table,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'ReferralSubjectType'
+          AND pg_type.typtype = 'e'
+      ) AS analytics_subject_type_enum,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN ('ReferralClickDailyVisitor', 'ReferralConversion')
+      ) AS analytics_tables_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_class index_row
+        JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND index_row.relname IN (
+            'ReferralClickDailyVisitor_partnerProfileId_visitorHash_day_key',
+            'ReferralClickDailyVisitor_partnerProfileId_day_idx',
+            'ReferralConversion_referralAttributionId_subjectType_key',
+            'ReferralConversion_partnerProfileId_convertedAt_idx'
+          )
+      ) AS analytics_indexes_absent
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryAnalyticsMigrationSchema(client) {
+  const result = await client.query(`
+    WITH expected_columns(table_name, column_name, data_type, udt_name, nullable, default_expression) AS (
+      VALUES
+        ('ReferralClickDailyVisitor', 'id', 'text', 'text', 'NO', NULL::text),
+        ('ReferralClickDailyVisitor', 'partnerProfileId', 'text', 'text', 'NO', NULL::text),
+        ('ReferralClickDailyVisitor', 'visitorHash', 'text', 'text', 'NO', NULL::text),
+        ('ReferralClickDailyVisitor', 'day', 'date', 'date', 'NO', NULL::text),
+        ('ReferralClickDailyVisitor', 'clickCount', 'integer', 'int4', 'NO', '1'),
+        ('ReferralClickDailyVisitor', 'firstClickedAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('ReferralClickDailyVisitor', 'lastClickedAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('ReferralClickDailyVisitor', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP'),
+        ('ReferralClickDailyVisitor', 'updatedAt', 'timestamp without time zone', 'timestamp', 'NO', NULL::text),
+        ('ReferralConversion', 'id', 'text', 'text', 'NO', NULL::text),
+        ('ReferralConversion', 'partnerProfileId', 'text', 'text', 'NO', NULL::text),
+        ('ReferralConversion', 'referralAttributionId', 'text', 'text', 'NO', NULL::text),
+        ('ReferralConversion', 'subjectType', 'USER-DEFINED', 'ReferralSubjectType', 'NO', NULL::text),
+        ('ReferralConversion', 'convertedAt', 'timestamp without time zone', 'timestamp', 'NO', NULL::text),
+        ('ReferralConversion', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO', 'CURRENT_TIMESTAMP')
+    ),
+    actual_columns AS (
+      SELECT column_row.table_name, column_row.column_name, column_row.data_type,
+        column_row.udt_name, column_row.is_nullable,
+        regexp_replace(COALESCE(pg_get_expr(default_row.adbin, default_row.adrelid), ''), '\\s+', '', 'g') AS default_expression
+      FROM information_schema.columns column_row
+      JOIN pg_class table_row ON table_row.relname = column_row.table_name
+      JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        AND schema_row.nspname = column_row.table_schema
+      JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+        AND attribute_row.attname = column_row.column_name
+        AND NOT attribute_row.attisdropped
+      LEFT JOIN pg_attrdef default_row ON default_row.adrelid = attribute_row.attrelid
+        AND default_row.adnum = attribute_row.attnum
+      WHERE column_row.table_schema = 'public'
+        AND table_row.relkind IN ('r', 'p')
+        AND column_row.table_name IN ('ReferralClickDailyVisitor', 'ReferralConversion')
+    ),
+    expected_indexes(index_name, table_name, key_columns, is_unique) AS (
+      VALUES
+        ('ReferralClickDailyVisitor_partnerProfileId_visitorHash_day_key', 'ReferralClickDailyVisitor', ARRAY['partnerProfileId', 'visitorHash', 'day']::text[], true),
+        ('ReferralClickDailyVisitor_partnerProfileId_day_idx', 'ReferralClickDailyVisitor', ARRAY['partnerProfileId', 'day']::text[], false),
+        ('ReferralConversion_referralAttributionId_subjectType_key', 'ReferralConversion', ARRAY['referralAttributionId', 'subjectType']::text[], true),
+        ('ReferralConversion_partnerProfileId_convertedAt_idx', 'ReferralConversion', ARRAY['partnerProfileId', 'convertedAt']::text[], false)
+    ),
+    actual_indexes AS (
+      SELECT expected.index_name, expected.key_columns, expected.is_unique,
+        index_meta.indisvalid, index_meta.indisready, index_meta.indpred, index_meta.indexprs,
+        index_meta.indisunique, index_meta.indnatts, index_meta.indnkeyatts, access_method.amname,
+        ARRAY(
+          SELECT attribute_row.attname::text
+          FROM unnest(index_meta.indkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+            AND attribute_row.attnum = key_row.attnum
+          WHERE key_row.ord <= index_meta.indnkeyatts
+          ORDER BY key_row.ord
+        ) AS actual_key_columns
+      FROM expected_indexes expected
+      LEFT JOIN pg_class index_row ON index_row.relname = left(expected.index_name, 63)
+        AND index_row.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+      LEFT JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+      LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
+    ),
+    expected_fks(table_name, constraint_name, child_column, parent_table) AS (
+      VALUES
+        ('ReferralClickDailyVisitor', 'ReferralClickDailyVisitor_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('ReferralConversion', 'ReferralConversion_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('ReferralConversion', 'ReferralConversion_referralAttributionId_fkey', 'referralAttributionId', 'ReferralAttribution')
+    ),
+    actual_fks AS (
+      SELECT expected.*, constraint_row.conkey, constraint_row.confkey,
+        constraint_row.confrelid, constraint_row.confdeltype, constraint_row.confupdtype,
+        constraint_row.contype, child_table.oid AS child_oid, parent_table.oid AS parent_oid
+      FROM expected_fks expected
+      LEFT JOIN pg_constraint constraint_row ON constraint_row.conname = expected.constraint_name
+      LEFT JOIN pg_class child_table ON child_table.relname = expected.table_name
+        AND child_table.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_class parent_table ON parent_table.relname = expected.parent_table
+        AND parent_table.relnamespace = 'public'::regnamespace
+    )
+    SELECT
+      (
+        SELECT count(*) = 2
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN ('ReferralClickDailyVisitor', 'ReferralConversion')
+          AND table_type = 'BASE TABLE'
+      ) AS analytics_tables,
+      (
+        SELECT count(*) = 15 AND NOT EXISTS (
+          SELECT 1
+          FROM expected_columns expected
+          LEFT JOIN actual_columns actual USING (table_name, column_name)
+          WHERE actual.column_name IS NULL
+            OR actual.data_type <> expected.data_type
+            OR actual.udt_name <> expected.udt_name
+            OR actual.is_nullable <> expected.nullable
+            OR COALESCE(actual.default_expression, '') <> COALESCE(expected.default_expression, '')
+        )
+        FROM actual_columns
+      ) AS analytics_columns,
+      (
+        SELECT count(*) = 4 AND bool_and(
+          COALESCE(indisvalid, false) AND COALESCE(indisready, false)
+          AND indpred IS NULL AND indexprs IS NULL AND amname = 'btree'
+          AND COALESCE(indisunique, false) = is_unique
+          AND COALESCE(indnatts, -1) = cardinality(key_columns)
+          AND COALESCE(indnkeyatts, -1) = cardinality(key_columns)
+          AND actual_key_columns = key_columns
+        )
+        FROM actual_indexes
+      ) AS analytics_indexes,
+      (
+        SELECT count(*) = 3 AND bool_and(
+          contype = 'f'
+          AND confdeltype = 'r'
+          AND confupdtype = 'c'
+          AND conkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = child_oid AND attname = child_column AND NOT attisdropped)]::smallint[]
+          AND confkey = ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid = parent_oid AND attname = 'id' AND NOT attisdropped)]::smallint[]
+          AND confrelid = parent_oid
+          AND conrelid = child_oid
+        )
+        FROM actual_fks
+      ) AS analytics_foreign_keys,
+      (
+        SELECT count(*) = 3 AND bool_and(
+          (constraint_row.contype = 'p' AND constraint_row.conname IN ('ReferralClickDailyVisitor_pkey', 'ReferralConversion_pkey'))
+          OR (constraint_row.contype = 'c' AND constraint_row.conname = 'ReferralClickDailyVisitor_clickCount_check'
+            AND lower(regexp_replace(pg_get_constraintdef(constraint_row.oid), '[^a-zA-Z0-9<>=]+', '', 'g')) = 'check"clickcount">0')
+        )
+        FROM pg_constraint constraint_row
+        JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND constraint_row.conname IN (
+            'ReferralClickDailyVisitor_pkey',
+            'ReferralClickDailyVisitor_clickCount_check',
+            'ReferralConversion_pkey'
+          )
+      ) AS analytics_constraints,
+      (
+        SELECT count(*) = 2
+        FROM pg_class table_row
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname IN ('ReferralClickDailyVisitor', 'ReferralConversion')
+          AND table_row.relrowsecurity IS TRUE
+      ) AS analytics_rls,
+      NOT EXISTS (
+        SELECT 1
+        FROM (VALUES ('anon'::name), ('authenticated'::name)) roles(role_name)
+        CROSS JOIN (VALUES ('ReferralClickDailyVisitor'::text), ('ReferralConversion'::text)) tables(table_name)
+        CROSS JOIN (VALUES ('SELECT'::text), ('INSERT'::text), ('UPDATE'::text), ('DELETE'::text), ('TRUNCATE'::text), ('REFERENCES'::text), ('TRIGGER'::text)) privileges(privilege_name)
+        WHERE has_table_privilege(roles.role_name, format('public.%I', tables.table_name), privileges.privilege_name)
+      ) AS analytics_public_access_revoked
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryAnalyticsMigrationInitialState(client) {
+  const result = await client.query(`
+    SELECT (SELECT count(*) = 0 FROM public."ReferralClickDailyVisitor") AS analytics_click_zero_rows
+  `);
+  return result.rows[0] ?? null;
+}
+
 function allEvidencePresent(evidence, keys) {
   return Boolean(evidence) && keys.every((key) => evidence[key] === true);
 }
@@ -1798,6 +2033,28 @@ const OPERATIONS_MIGRATION_SCHEMA_KEYS = [
 const OPERATIONS_MIGRATION_INITIAL_STATE_KEYS = [
   "operations_worker_run_zero_rows",
   "operations_alert_zero_rows",
+];
+
+const ANALYTICS_MIGRATION_PREFLIGHT_KEYS = [
+  "analytics_partner_profile_table",
+  "analytics_referral_attribution_table",
+  "analytics_subject_type_enum",
+  "analytics_tables_absent",
+  "analytics_indexes_absent",
+];
+
+const ANALYTICS_MIGRATION_SCHEMA_KEYS = [
+  "analytics_tables",
+  "analytics_columns",
+  "analytics_indexes",
+  "analytics_foreign_keys",
+  "analytics_constraints",
+  "analytics_rls",
+  "analytics_public_access_revoked",
+];
+
+const ANALYTICS_MIGRATION_INITIAL_STATE_KEYS = [
+  "analytics_click_zero_rows",
 ];
 
 function createProductionClient(connectionString) {
@@ -1975,6 +2232,20 @@ export async function runProductionMigrations({
           "target_preflight_failed",
         );
       }
+
+      try {
+        assertMigrationApplied(beforeRecords, ANALYTICS_MIGRATION);
+        const analyticsSchema = await queryAnalyticsMigrationSchema(client);
+        if (!allEvidencePresent(analyticsSchema, ANALYTICS_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Partner referral analytics schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
       return "already-applied";
     }
 
@@ -2078,17 +2349,48 @@ export async function runProductionMigrations({
       );
     }
 
-    try {
-      const operationsPreflight = await queryOperationsMigrationPreflight(client);
-      if (!allEvidencePresent(operationsPreflight, OPERATIONS_MIGRATION_PREFLIGHT_KEYS)) {
-        throw new Error("Settlement operations migration preflight failed.");
+    if (state.pendingMigrations.includes(OPERATIONS_MIGRATION)) {
+      try {
+        const operationsPreflight = await queryOperationsMigrationPreflight(client);
+        if (!allEvidencePresent(operationsPreflight, OPERATIONS_MIGRATION_PREFLIGHT_KEYS)) {
+          throw new Error("Settlement operations migration preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
       }
-    } catch {
-      throw new ProductionMigrationDiagnostic(
-        "migration_state_evaluation",
-        source,
-        "target_preflight_failed",
-      );
+    } else {
+      try {
+        assertMigrationApplied(beforeRecords, OPERATIONS_MIGRATION);
+        const operationsSchema = await queryOperationsMigrationSchema(client);
+        if (!allEvidencePresent(operationsSchema, OPERATIONS_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Settlement operations schema recovery preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+    }
+
+    if (state.pendingMigrations.includes(ANALYTICS_MIGRATION)) {
+      try {
+        const analyticsPreflight = await queryAnalyticsMigrationPreflight(client);
+        if (!allEvidencePresent(analyticsPreflight, ANALYTICS_MIGRATION_PREFLIGHT_KEYS)) {
+          throw new Error("Partner referral analytics migration preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
     }
 
     try {
@@ -2184,6 +2486,24 @@ export async function runProductionMigrations({
       const operationsInitialState = await queryOperationsMigrationInitialState(client);
       if (!allEvidencePresent(operationsInitialState, OPERATIONS_MIGRATION_INITIAL_STATE_KEYS)) {
         throw new Error("Settlement operations initial state verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "target_postverify_failed",
+      );
+    }
+
+    try {
+      assertMigrationApplied(afterRecords, ANALYTICS_MIGRATION);
+      const analyticsSchema = await queryAnalyticsMigrationSchema(client);
+      if (!allEvidencePresent(analyticsSchema, ANALYTICS_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Partner referral analytics schema post-verification failed.");
+      }
+      const analyticsInitialState = await queryAnalyticsMigrationInitialState(client);
+      if (!allEvidencePresent(analyticsInitialState, ANALYTICS_MIGRATION_INITIAL_STATE_KEYS)) {
+        throw new Error("Partner referral analytics initial state verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

@@ -616,6 +616,23 @@ export type EnumReferralAttributionStatusWithAggregatesFilter<$PrismaModel = nev
   _max?: Prisma.NestedEnumReferralAttributionStatusFilter<$PrismaModel>
 }
 
+export type EnumReferralSubjectTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReferralSubjectType | Prisma.EnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel> | $Enums.ReferralSubjectType
+}
+
+export type EnumReferralSubjectTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReferralSubjectType | Prisma.EnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReferralSubjectTypeWithAggregatesFilter<$PrismaModel> | $Enums.ReferralSubjectType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel>
+}
+
 export type EnumStripeConnectedAccountStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.StripeConnectedAccountStatus | Prisma.EnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel>
   in?: $Enums.StripeConnectedAccountStatus[] | Prisma.ListEnumStripeConnectedAccountStatusFieldRefInput<$PrismaModel>
@@ -1943,6 +1960,23 @@ export type NestedEnumReferralAttributionStatusWithAggregatesFilter<$PrismaModel
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumReferralAttributionStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumReferralAttributionStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumReferralSubjectTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReferralSubjectType | Prisma.EnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel> | $Enums.ReferralSubjectType
+}
+
+export type NestedEnumReferralSubjectTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ReferralSubjectType | Prisma.EnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ReferralSubjectType[] | Prisma.ListEnumReferralSubjectTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumReferralSubjectTypeWithAggregatesFilter<$PrismaModel> | $Enums.ReferralSubjectType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumReferralSubjectTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumStripeConnectedAccountStatusFilter<$PrismaModel = never> = {

@@ -72,6 +72,8 @@ export const ModelName = {
   PartnerProfile: 'PartnerProfile',
   ReferralClaimToken: 'ReferralClaimToken',
   ReferralAttribution: 'ReferralAttribution',
+  ReferralClickDailyVisitor: 'ReferralClickDailyVisitor',
+  ReferralConversion: 'ReferralConversion',
   StripeConnectedAccount: 'StripeConnectedAccount',
   SellerStripeMerchantAccount: 'SellerStripeMerchantAccount',
   Settlement: 'Settlement',
@@ -595,6 +597,33 @@ export const ReferralAttributionScalarFieldEnum = {
 } as const
 
 export type ReferralAttributionScalarFieldEnum = (typeof ReferralAttributionScalarFieldEnum)[keyof typeof ReferralAttributionScalarFieldEnum]
+
+
+export const ReferralClickDailyVisitorScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  visitorHash: 'visitorHash',
+  day: 'day',
+  clickCount: 'clickCount',
+  firstClickedAt: 'firstClickedAt',
+  lastClickedAt: 'lastClickedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ReferralClickDailyVisitorScalarFieldEnum = (typeof ReferralClickDailyVisitorScalarFieldEnum)[keyof typeof ReferralClickDailyVisitorScalarFieldEnum]
+
+
+export const ReferralConversionScalarFieldEnum = {
+  id: 'id',
+  partnerProfileId: 'partnerProfileId',
+  referralAttributionId: 'referralAttributionId',
+  subjectType: 'subjectType',
+  convertedAt: 'convertedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ReferralConversionScalarFieldEnum = (typeof ReferralConversionScalarFieldEnum)[keyof typeof ReferralConversionScalarFieldEnum]
 
 
 export const StripeConnectedAccountScalarFieldEnum = {

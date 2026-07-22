@@ -1036,32 +1036,34 @@ model PaymentRequestWebhookEvent {
 // system. They reserve future Stripe Connect accounting without changing the
 // current PaymentRequest, TradeOrder, or SellerPayout lifecycle.
 model PartnerProfile {
-  id                     String                  @id @default(cuid())
-  userId                 String                  @unique
-  user                   UserProfile             @relation("UserPartnerProfile", fields: [userId], references: [id], onDelete: Restrict)
-  referralCode           String                  @unique
-  status                 PartnerProfileStatus    @default(ACTIVE)
-  legalName              String?
-  displayName            String?
-  contactEmail           String?
-  contactPhone           String?
-  country                String?
-  preferredLanguage      PreferredLanguage?
-  organizationName       String?
-  websiteOrSocialUrl     String?
-  promotionDescription   String?
-  termsConsentVersion    String?
-  termsConsentedAt       DateTime?
-  privacyConsentVersion  String?
-  privacyConsentedAt     DateTime?
-  deletedAt              DateTime?
-  attributions           ReferralAttribution[]
-  referralClaimTokens    ReferralClaimToken[]
-  stripeConnectedAccount StripeConnectedAccount? @relation("PartnerProfileStripeConnectedAccount")
-  settlementLegs         SettlementLeg[]         @relation("SettlementLegPartnerProfile")
-  settlements            Settlement[]            @relation("SettlementReferralPartnerProfile")
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
+  id                         String                      @id @default(cuid())
+  userId                     String                      @unique
+  user                       UserProfile                 @relation("UserPartnerProfile", fields: [userId], references: [id], onDelete: Restrict)
+  referralCode               String                      @unique
+  status                     PartnerProfileStatus        @default(ACTIVE)
+  legalName                  String?
+  displayName                String?
+  contactEmail               String?
+  contactPhone               String?
+  country                    String?
+  preferredLanguage          PreferredLanguage?
+  organizationName           String?
+  websiteOrSocialUrl         String?
+  promotionDescription       String?
+  termsConsentVersion        String?
+  termsConsentedAt           DateTime?
+  privacyConsentVersion      String?
+  privacyConsentedAt         DateTime?
+  deletedAt                  DateTime?
+  attributions               ReferralAttribution[]
+  referralClickDailyVisitors ReferralClickDailyVisitor[]
+  referralConversions        ReferralConversion[]
+  referralClaimTokens        ReferralClaimToken[]
+  stripeConnectedAccount     StripeConnectedAccount?     @relation("PartnerProfileStripeConnectedAccount")
+  settlementLegs             SettlementLeg[]             @relation("SettlementLegPartnerProfile")
+  settlements                Settlement[]                @relation("SettlementReferralPartnerProfile")
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
 
   @@index([status, createdAt])
   @@index([deletedAt, status])
@@ -1096,10 +1098,41 @@ model ReferralAttribution {
   status           ReferralAttributionStatus @default(LOCKED)
   lockedAt         DateTime                  @default(now())
   settlements      Settlement[]
+  conversions      ReferralConversion[]
   createdAt        DateTime                  @default(now())
   updatedAt        DateTime                  @updatedAt
 
   @@index([partnerProfileId, lockedAt])
+}
+
+model ReferralClickDailyVisitor {
+  id               String         @id @default(cuid())
+  partnerProfileId String
+  partnerProfile   PartnerProfile @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  visitorHash      String
+  day              DateTime       @db.Date
+  clickCount       Int            @default(1)
+  firstClickedAt   DateTime       @default(now())
+  lastClickedAt    DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([partnerProfileId, visitorHash, day])
+  @@index([partnerProfileId, day])
+}
+
+model ReferralConversion {
+  id                    String              @id @default(cuid())
+  partnerProfileId      String
+  partnerProfile        PartnerProfile      @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  referralAttributionId String
+  referralAttribution   ReferralAttribution @relation(fields: [referralAttributionId], references: [id], onDelete: Restrict)
+  subjectType           ReferralSubjectType
+  convertedAt           DateTime
+  createdAt             DateTime            @default(now())
+
+  @@unique([referralAttributionId, subjectType])
+  @@index([partnerProfileId, convertedAt])
 }
 
 model StripeConnectedAccount {
