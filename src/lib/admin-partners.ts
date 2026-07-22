@@ -3,7 +3,6 @@ import "server-only";
 import { Prisma } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
 import {
-  getPartnerAnalyticsWindow,
   normalizePartnerAnalyticsRange,
   type PartnerAnalyticsRange,
 } from "@/lib/partner-referral-analytics";
@@ -43,7 +42,6 @@ export type AdminPartnerListQuery = {
   sort: AdminPartnerSort;
   page: number;
   pageSize: number;
-  analyticsRange: PartnerAnalyticsRange;
 };
 
 export type AdminPartnerListRow = {
@@ -75,7 +73,7 @@ export type AdminPartnerListData = {
   page: number;
   pageSize: number;
   countries: string[];
-  analyticsRange: PartnerAnalyticsRange;
+  invalidPage: boolean;
 };
 
 export type AdminPartnerDetailQuery = {
@@ -128,7 +126,6 @@ export function parseAdminPartnerListQuery(
     sort: enumValue(firstValue(input.sort), sorts, "newest"),
     page: positiveInteger(firstValue(input.page), 1),
     pageSize,
-    analyticsRange: normalizePartnerAnalyticsRange(firstValue(input.analyticsRange)),
   };
 }
 
@@ -179,25 +176,6 @@ function buildFilters(query: AdminPartnerListQuery) {
   return Prisma.join(filters, " AND ");
 }
 
-function rangeFilter(alias: string, query: AdminPartnerListQuery) {
-  const window = getPartnerAnalyticsWindow(query.analyticsRange);
-  const end = window.end.toISOString().slice(0, 10);
-  if (!window.start) {
-    return Prisma.sql`${Prisma.raw(alias)}."day" < ${end}::date`;
-  }
-  const start = window.start.toISOString().slice(0, 10);
-  return Prisma.sql`${Prisma.raw(alias)}."day" >= ${start}::date AND ${Prisma.raw(alias)}."day" < ${end}::date`;
-}
-
-function timestampRangeFilter(alias: string, query: AdminPartnerListQuery) {
-  const window = getPartnerAnalyticsWindow(query.analyticsRange);
-  const end = window.end;
-  if (!window.start) {
-    return Prisma.sql`${Prisma.raw(alias)}."lockedAt" < ${end}`;
-  }
-  return Prisma.sql`${Prisma.raw(alias)}."lockedAt" >= ${window.start} AND ${Prisma.raw(alias)}."lockedAt" < ${end}`;
-}
-
 const sortExpressions: Record<AdminPartnerSort, string> = {
   newest: 'p."createdAt" DESC, p."id" DESC',
   oldest: 'p."createdAt" ASC, p."id" ASC',
@@ -235,13 +213,11 @@ export async function getAdminPartnerListData(
           COALESCE(SUM(d."clickCount"), 0)::bigint AS "linkVisits",
           COUNT(DISTINCT d."visitorHash")::bigint AS "uniqueVisitors"
         FROM "ReferralClickDailyVisitor" d
-        WHERE ${rangeFilter("d", query)}
         GROUP BY d."partnerProfileId"
       ),
       attribution_stats AS (
         SELECT "partnerProfileId", COUNT(*)::bigint AS "attributedSignups"
         FROM "ReferralAttribution" a
-        WHERE ${timestampRangeFilter("a", query)}
         GROUP BY "partnerProfileId"
       ),
       conversion_stats AS (
@@ -250,8 +226,6 @@ export async function getAdminPartnerListData(
           COUNT(*) FILTER (WHERE "subjectType" = 'SELLER')::bigint AS "sellerRegistrations",
           COUNT(*) FILTER (WHERE "subjectType" = 'BUYER')::bigint AS "buyerRegistrations"
         FROM "ReferralConversion" c
-        WHERE "convertedAt" >= ${getPartnerAnalyticsWindow(query.analyticsRange).start ?? new Date(0)}
-          AND "convertedAt" < ${getPartnerAnalyticsWindow(query.analyticsRange).end}
         GROUP BY "partnerProfileId"
       ),
       qualifying_stats AS (
@@ -349,9 +323,12 @@ export async function getAdminPartnerListData(
     total: numberValue(countRows[0]?.count),
     page: query.page,
     pageSize: query.pageSize,
+    invalidPage:
+      query.page > 1 &&
+      numberValue(countRows[0]?.count) > 0 &&
+      rows.length === 0,
     countries: countryRows
       .map((row) => row.country)
       .filter((country): country is string => Boolean(country)),
-    analyticsRange: query.analyticsRange,
   };
 }

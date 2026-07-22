@@ -68,7 +68,6 @@ export function AdminPartnerManagement({
     if (query.payoutSetup !== "all") params.set("payoutSetup", query.payoutSetup);
     if (query.sort !== "newest") params.set("sort", query.sort);
     if (query.pageSize !== 25) params.set("pageSize", String(query.pageSize));
-    if (query.analyticsRange !== "30d") params.set("analyticsRange", query.analyticsRange);
     params.set("page", String(page));
     return `${withLocale("/admin/partners", locale)}?${params.toString()}`;
   };
@@ -110,17 +109,6 @@ export function AdminPartnerManagement({
             <option key={value} value={value}>{t(`admin.${sortLabels[value]}`)}</option>
           ))}
         </SelectField>
-        <SelectField
-          name="analyticsRange"
-          label={t("admin.partnerAnalyticsRange")}
-          value={query.analyticsRange}
-        >
-          {(["7d", "30d", "90d", "all"] as const).map((value) => (
-            <option key={value} value={value}>
-              {t(`admin.partnerRange${value === "all" ? "All" : value.replace("d", "d")}`)}
-            </option>
-          ))}
-        </SelectField>
         <div className="flex items-end lg:col-span-2">
           <button type="submit" className="min-h-10 rounded-md border px-4 text-sm font-medium theme-secondary-button">
             {t("admin.partnerSearch")}
@@ -133,11 +121,22 @@ export function AdminPartnerManagement({
           {data.total} {t("admin.partnerCount")}
         </h2>
         <p className="text-sm theme-muted">
-          {t(`admin.partnerRange${query.analyticsRange === "all" ? "All" : query.analyticsRange}`)}
+          {t("admin.partnerAllTimeMetrics")}
         </p>
       </div>
 
-      {data.rows.length === 0 ? (
+      {data.invalidPage ? (
+        <div className="border p-8 theme-border theme-surface-elevated">
+          <h3 className="font-semibold theme-foreground">{t("admin.partnerInvalidPage")}</h3>
+          <p className="mt-2 text-sm theme-muted">{t("admin.partnerInvalidPageDescription")}</p>
+          <Link
+            href={pageHref(1)}
+            className="mt-4 inline-block text-sm font-medium underline theme-foreground"
+          >
+            {t("admin.partnerBackToFirstPage")}
+          </Link>
+        </div>
+      ) : data.rows.length === 0 ? (
         <div className="border p-8 theme-border theme-surface-elevated">
           <h3 className="font-semibold theme-foreground">{t("admin.partnerNoPartners")}</h3>
           <p className="mt-2 text-sm theme-muted">{t("admin.partnerNoPartnersDescription")}</p>

@@ -132,24 +132,7 @@ export async function getPartnerDashboardData({
     type: SettlementLegType.PARTNER_REFERRAL,
   };
 
-  type PartnerRecord = Awaited<ReturnType<typeof db.partnerProfile.findFirst>> & {
-    user?: {
-      displayName: string;
-      email: string;
-      preferredLanguage: string | null;
-    };
-    stripeConnectedAccount?: {
-      status: string;
-      onboardingComplete: boolean;
-    } | null;
-  };
-  const partnerModel = db.partnerProfile as unknown as {
-    findFirst?: (args: unknown) => Promise<PartnerRecord>;
-    findUniqueOrThrow?: (args: unknown) => Promise<NonNullable<PartnerRecord>>;
-  };
-  const findPartner = partnerModel.findFirst ?? partnerModel.findUniqueOrThrow;
-  if (!findPartner) throw new Error("Partner profile lookup is unavailable.");
-  const partner = await findPartner({
+  const partner = await db.partnerProfile.findFirst({
     where: {
       id: partnerProfileId,
       deletedAt: null,
