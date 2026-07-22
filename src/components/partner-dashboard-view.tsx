@@ -33,12 +33,19 @@ export function PartnerDashboardView({
   data,
   referralUrl,
   joined = false,
+  viewMode = "partner",
+  paginationBasePath = "/partner/dashboard",
+  paginationQuery = {},
 }: {
   locale: Locale;
   data: DashboardData;
   referralUrl: string;
   joined?: boolean;
+  viewMode?: "partner" | "admin-readonly";
+  paginationBasePath?: string;
+  paginationQuery?: Record<string, string>;
 }) {
+  const adminReadonly = viewMode === "admin-readonly";
   const t = createTranslator(getDictionary(locale));
   const statusKey = (status: string) => {
     const keys: Record<string, string> = {
@@ -57,6 +64,7 @@ export function PartnerDashboardView({
   };
   const profileStatus = partnerProfileStatus(data.partner.status);
   const payoutStatus = partnerPayoutSetupStatus(data.partner.stripeAccount);
+  const stripeStatusLabel = data.partner.stripeAccount?.status ?? "-";
   const summary = [
     ["gross", data.totals.gross],
     ["adjustments", data.totals.adjustments],
@@ -71,13 +79,33 @@ export function PartnerDashboardView({
   return (
     <main className="bm-grid-surface min-h-[calc(100vh-4rem)] theme-bg">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:px-8">
+        {adminReadonly ? (
+          <div className="border px-4 py-3 text-sm theme-border theme-surface-muted">
+            <p className="font-semibold theme-foreground">
+              {t("admin.partnerReadOnlyBanner")}
+            </p>
+            <p className="mt-1 theme-muted">
+              {t("admin.partnerReadOnlyDescription")}
+            </p>
+            <Link
+              href={withLocale("/admin/partners", locale)}
+              className="mt-2 inline-block font-medium underline theme-foreground"
+            >
+              {t("admin.backToPartnerManagement")}
+            </Link>
+          </div>
+        ) : null}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight theme-foreground">
-              {t("partnerProgram.dashboardTitle")}
+              {adminReadonly
+                ? t("admin.partnerDetailTitle")
+                : t("partnerProgram.dashboardTitle")}
             </h1>
             <p className="mt-2 text-sm theme-muted">
-              {t("partnerProgram.disclosure")}
+              {adminReadonly
+                ? t("admin.partnerDetailDescription")
+                : t("partnerProgram.disclosure")}
             </p>
           </div>
           <div className="rounded-full border px-3 py-1 text-xs font-semibold theme-border theme-surface-muted">
@@ -91,6 +119,38 @@ export function PartnerDashboardView({
           <p role="status" className="text-sm text-emerald-700">
             {t("partnerProgram.joinSuccess")}
           </p>
+        ) : null}
+
+        {adminReadonly ? (
+          <section
+            className="border p-5 theme-border theme-surface-elevated"
+            aria-labelledby="admin-partner-identity"
+          >
+            <h2
+              id="admin-partner-identity"
+              className="text-base font-semibold theme-foreground"
+            >
+              {t("admin.partnerIdentityTitle")}
+            </h2>
+            <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+              <IdentityField label={t("admin.partnerDisplayName")} value={data.partner.displayName ?? "-"} />
+              <IdentityField label={t("admin.partnerLegalName")} value={data.partner.legalName ?? "-"} />
+              <IdentityField label={t("admin.partnerOrganization")} value={data.partner.organizationName ?? "-"} />
+              <IdentityField label={t("admin.partnerContactEmail")} value={data.partner.contactEmail ?? "-"} />
+              <IdentityField label={t("admin.partnerContactPhone")} value={data.partner.contactPhone ?? "-"} />
+              <IdentityField label={t("admin.partnerCountry")} value={data.partner.country ?? "-"} />
+              <IdentityField label={t("admin.partnerLanguage")} value={data.partner.preferredLanguage ?? "-"} />
+              <IdentityField label={t("admin.partnerWebsiteOrSocial")} value={data.partner.websiteOrSocialUrl ?? "-"} />
+              <IdentityField label={t("admin.partnerPromotionDescription")} value={data.partner.promotionDescription ?? "-"} />
+              <IdentityField label={t("admin.partnerReferralCode")} value={data.partner.referralCode} />
+              <IdentityField
+                label={t("admin.partnerStatus")}
+                value={t(`admin.${data.partner.status === "ACTIVE" ? "partnerStatusActive" : "partnerStatusSuspended"}`)}
+              />
+              <IdentityField label={t("admin.partnerJoined")} value={date(data.partner.createdAt, locale)} />
+              <IdentityField label={t("admin.partnerStripeAccountStatus")} value={stripeStatusLabel} />
+            </dl>
+          </section>
         ) : null}
 
         <section
@@ -129,6 +189,8 @@ export function PartnerDashboardView({
         <PartnerReferralAnalyticsSection
           locale={locale}
           analytics={data.analytics}
+          basePath={paginationBasePath}
+          query={paginationQuery}
         />
 
         <section aria-labelledby="partner-summary">
@@ -234,6 +296,8 @@ export function PartnerDashboardView({
               current={data.commissionPagination.page}
               pages={data.commissionPagination.totalPages}
               queryKey="commissionPage"
+              basePath={paginationBasePath}
+              query={paginationQuery}
             />
           </div>
 
@@ -244,10 +308,17 @@ export function PartnerDashboardView({
                 ? t("partnerProgram.payoutSetupNotCompleted")
                 : t(`partnerProgram.payout${payoutStatus[0].toUpperCase()}${payoutStatus.slice(1)}`)}
             </p>
+            {adminReadonly ? (
+              <p className="mt-2 text-xs theme-muted">
+                {t("admin.partnerPayoutReadOnly")}
+              </p>
+            ) : null}
             <p className="mt-2 text-sm leading-6 theme-muted">{t("partnerProgram.payoutSetupDescription")}</p>
-            <div className="-mx-5 mt-4 border-t pt-4 theme-border">
-              <StripeConnectOnboardingPanel ownerType="partner" />
-            </div>
+            {adminReadonly ? null : (
+              <div className="-mx-5 mt-4 border-t pt-4 theme-border">
+                <StripeConnectOnboardingPanel ownerType="partner" />
+              </div>
+            )}
             <dl className="mt-7 grid gap-3 border-t pt-5 theme-border">
               <div>
                 <dt className="text-xs theme-muted">
@@ -323,10 +394,21 @@ export function PartnerDashboardView({
             current={data.memberPagination.page}
             pages={data.memberPagination.totalPages}
             queryKey="memberPage"
+            basePath={paginationBasePath}
+            query={paginationQuery}
           />
         </section>
       </div>
     </main>
+  );
+}
+
+function IdentityField({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs theme-muted">{label}</dt>
+      <dd className="mt-1 break-words theme-foreground">{value}</dd>
+    </div>
   );
 }
 
@@ -335,16 +417,25 @@ function Pagination({
   current,
   pages,
   queryKey,
+  basePath,
+  query,
 }: {
   locale: Locale;
   current: number;
   pages: number;
   queryKey: string;
+  basePath: string;
+  query: Record<string, string>;
 }) {
   if (pages <= 1) return null;
   const t = createTranslator(getDictionary(locale));
   const previous = Math.max(1, current - 1);
   const next = Math.min(pages, current + 1);
+  const hrefFor = (page: number) => {
+    const params = new URLSearchParams(query);
+    params.set(queryKey, String(page));
+    return withLocale(`${basePath}?${params.toString()}`, locale);
+  };
   return (
     <nav
       className="mt-4 flex items-center gap-3 text-sm"
@@ -352,7 +443,7 @@ function Pagination({
     >
       <Link
         className="theme-muted hover:text-[var(--foreground)]"
-        href={withLocale(`/partner/dashboard?${queryKey}=${previous}`, locale)}
+        href={hrefFor(previous)}
         aria-disabled={current === 1}
       >
         {t("partnerProgram.previous")}
@@ -362,7 +453,7 @@ function Pagination({
       </span>
       <Link
         className="theme-muted hover:text-[var(--foreground)]"
-        href={withLocale(`/partner/dashboard?${queryKey}=${next}`, locale)}
+        href={hrefFor(next)}
         aria-disabled={current === pages}
       >
         {t("partnerProgram.next")}

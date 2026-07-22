@@ -237,9 +237,13 @@ function AnalyticsChart<T extends Record<string, number | string>>({
 export function PartnerReferralAnalyticsSection({
   locale,
   analytics,
+  basePath = "/partner/dashboard",
+  query = {},
 }: {
   locale: Locale;
   analytics: PartnerReferralAnalytics;
+  basePath?: string;
+  query?: Record<string, string>;
 }) {
   const t = createTranslator(getDictionary(locale));
   const totals = analytics.totals;
@@ -277,7 +281,7 @@ export function PartnerReferralAnalyticsSection({
             <Link
               key={value}
               href={withLocale(
-                `/partner/dashboard?analyticsRange=${value}`,
+                `${basePath}?${new URLSearchParams({ ...query, analyticsRange: value }).toString()}`,
                 locale,
               )}
               aria-current={analytics.range === value ? "page" : undefined}

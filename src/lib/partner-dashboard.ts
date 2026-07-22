@@ -106,6 +106,7 @@ export async function getPartnerDashboardData({
   pageSize = 20,
   analyticsRange = "30d",
   partnerProgramEnabled = isPartnerProgramEnabled(),
+  allowSuspended = false,
   getDatabase = getDb,
 }: {
   partnerProfileId: string;
@@ -114,6 +115,7 @@ export async function getPartnerDashboardData({
   pageSize?: number;
   analyticsRange?: unknown;
   partnerProgramEnabled?: boolean;
+  allowSuspended?: boolean;
   getDatabase?: typeof getDb;
 }) {
   // This guard is intentionally before getDb() so feature-off requests never
@@ -130,8 +132,20 @@ export async function getPartnerDashboardData({
     type: SettlementLegType.PARTNER_REFERRAL,
   };
 
+  const partner = await db.partnerProfile.findFirst({
+    where: {
+      id: partnerProfileId,
+      deletedAt: null,
+      status: allowSuspended ? { in: ["ACTIVE", "SUSPENDED"] } : "ACTIVE",
+    },
+    include: {
+      stripeConnectedAccount: true,
+      user: { select: { displayName: true, email: true, preferredLanguage: true } },
+    },
+  });
+  if (!partner) return null;
+
   const [
-    partner,
     referralCount,
     qualifyingTransactions,
     allLegs,
@@ -139,14 +153,6 @@ export async function getPartnerDashboardData({
     referredMembers,
     analytics,
   ] = await Promise.all([
-    db.partnerProfile.findFirstOrThrow({
-      where: {
-        id: partnerProfileId,
-        deletedAt: null,
-        status: "ACTIVE",
-      },
-      include: { stripeConnectedAccount: true },
-    }),
     db.referralAttribution.count({ where: { partnerProfileId } }),
     db.settlement.count({
       where: { referralPartnerProfileId: partnerProfileId },
@@ -269,6 +275,16 @@ export async function getPartnerDashboardData({
 
   return {
     partner: {
+      displayName: partner.displayName,
+      legalName: partner.legalName,
+      organizationName: partner.organizationName,
+      contactEmail: partner.contactEmail ?? partner.user?.email ?? null,
+      contactPhone: partner.contactPhone,
+      country: partner.country,
+      preferredLanguage:
+        partner.preferredLanguage ?? partner.user?.preferredLanguage ?? null,
+      websiteOrSocialUrl: partner.websiteOrSocialUrl,
+      promotionDescription: partner.promotionDescription,
       status: partner.status,
       referralCode: partner.referralCode,
       createdAt: partner.createdAt,
@@ -314,4 +330,28 @@ export async function getPartnerDashboardData({
       totalRows: referralCount,
     },
   };
+}
+
+export async function getAdminPartnerDashboardData({
+  partnerProfileId,
+  commissionPage = 1,
+  memberPage = 1,
+  pageSize = 20,
+  analyticsRange = "30d",
+}: {
+  partnerProfileId: string;
+  commissionPage?: number;
+  memberPage?: number;
+  pageSize?: number;
+  analyticsRange?: unknown;
+}) {
+  return getPartnerDashboardData({
+    partnerProfileId,
+    commissionPage,
+    memberPage,
+    pageSize,
+    analyticsRange,
+    partnerProgramEnabled: true,
+    allowSuspended: true,
+  });
 }

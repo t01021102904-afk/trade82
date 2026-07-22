@@ -213,7 +213,11 @@ export function applyReferralVisitorCookie(
   response.headers.append("Set-Cookie", cookie);
 }
 
-function rangeWindow(range: PartnerAnalyticsRange, now: Date) {
+export function getPartnerAnalyticsWindow(
+  inputRange: unknown,
+  now = new Date(),
+) {
+  const range = normalizePartnerAnalyticsRange(inputRange);
   const end = new Date(utcDay(now).getTime() + DAY_MS);
   if (range === "all") return { start: null, end };
   const days = range === "7d" ? 7 : range === "90d" ? 90 : 30;
@@ -285,7 +289,7 @@ export async function getPartnerReferralAnalytics({
   now?: Date;
 }) {
   const range = normalizePartnerAnalyticsRange(inputRange);
-  const window = rangeWindow(range, now);
+  const window = getPartnerAnalyticsWindow(range, now);
   if (!db.$queryRaw) {
     throw new Error("Partner analytics aggregation requires PostgreSQL.");
   }
