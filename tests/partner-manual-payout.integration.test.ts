@@ -20,6 +20,8 @@ process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-v1";
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const { createTradeOrderForPaymentRequest } = await import(new URL("../src/lib/trade-orders.ts", import.meta.url).href);
 const { listAdminPayoutReviewTransactions } = await import(new URL("../src/lib/admin-payout-review.ts", import.meta.url).href);
+const { markPartnerPayoutSent, revealPartnerPayoutInstructions, setPartnerPayoutStatus } = await import(new URL("../src/lib/partner-payouts.ts", import.meta.url).href);
+const { encryptPayoutData } = await import(new URL("../src/lib/payout-crypto.ts", import.meta.url).href);
 const db = getDb() as PrismaClient;
 
 let sequence = 0;
@@ -173,6 +175,7 @@ async function createFixture({
     });
   }
   let partnerProfile: { id: string } | null = null;
+  let partnerPayoutProfileId: string | null = null;
   let attributionId: string | null = null;
   if (withPartner) {
     const partnerUser = await db.userProfile.create({
@@ -331,6 +334,8 @@ async function createFixture({
         verifiedByUserId: admin.id,
       },
     });
+    partnerPayoutProfileId = payoutProfile.id;
+    const snapshot = encryptPayoutData("01012345678");
     const partnerLeg = settlement.legs.find((leg) => leg.type === "PARTNER_REFERRAL");
     assert.ok(partnerLeg);
     partnerPayout = await db.partnerPayout.create({
@@ -350,6 +355,10 @@ async function createFixture({
         payoutCurrencySnapshot: "krw",
         bankNameSnapshot: "Integration Bank",
         accountHolderSnapshot: "Integration Partner",
+        accountNumberSnapshotEncrypted: Buffer.from(snapshot.ciphertext),
+        accountNumberSnapshotIv: Buffer.from(snapshot.iv),
+        accountNumberSnapshotAuthTag: Buffer.from(snapshot.authTag),
+        accountNumberSnapshotKeyVersion: snapshot.keyVersion,
         accountNumberLast4: "5678",
         accountNumberMasked: "••••5678",
         partnerLegalNameSnapshot: "Integration Partner LLC",
@@ -364,7 +373,7 @@ async function createFixture({
   if (withRefund) {
     await db.paymentRequest.update({ where: { id: paymentRequest.id }, data: { refundAmount: grossAmount } });
   }
-  return { order, paymentRequest, settlement, sellerPayout, partnerPayout };
+  return { order, paymentRequest, settlement, sellerPayout, partnerPayout, partnerProfileId: partnerProfile?.id ?? null, partnerPayoutProfileId };
 }
 
 after(async () => {
@@ -450,4 +459,68 @@ test("includes held settlements for review without mutating their status", async
   assert.equal(transaction?.transaction.paymentStatus, "PAID");
   const settlement = await db.settlement.findUniqueOrThrow({ where: { id: fixture.settlement.id }, select: { status: true } });
   assert.equal(settlement.status, "HOLD");
+});
+
+test("repeated admin review reads are read-only and return no encrypted fields", async () => {
+  const fixture = await createFixture({ withPartner: true });
+  const before = await Promise.all([
+    db.settlementEvent.count({ where: { settlementId: fixture.settlement.id } }),
+    db.partnerPayoutEvent.count({ where: { payoutId: fixture.partnerPayout!.id } }),
+    db.partnerPayout.findUniqueOrThrow({ where: { id: fixture.partnerPayout!.id }, select: { updatedAt: true } }),
+  ]);
+  const first = await listAdminPayoutReviewTransactions(fixture.order.id);
+  const second = await listAdminPayoutReviewTransactions(fixture.order.id);
+  const serialized = JSON.stringify([first, second]);
+  assert.equal(first.length, 1);
+  assert.equal(second.length, 1);
+  assert.doesNotMatch(serialized, /accountNumberSnapshotEncrypted|accountNumberSnapshotIv|accountNumberSnapshotAuthTag|accountNumberSnapshotKeyVersion/);
+  const after = await Promise.all([
+    db.settlementEvent.count({ where: { settlementId: fixture.settlement.id } }),
+    db.partnerPayoutEvent.count({ where: { payoutId: fixture.partnerPayout!.id } }),
+    db.partnerPayout.findUniqueOrThrow({ where: { id: fixture.partnerPayout!.id }, select: { updatedAt: true } }),
+  ]);
+  assert.deepEqual(after, before);
+});
+
+test("suspended partners cannot move a payout to processing or sent", async () => {
+  const fixture = await createFixture({ withPartner: true });
+  assert.ok(fixture.partnerProfileId);
+  await db.partnerProfile.update({ where: { id: fixture.partnerProfileId }, data: { status: "SUSPENDED" } });
+  const eventCount = await db.partnerPayoutEvent.count({ where: { payoutId: fixture.partnerPayout!.id } });
+  await assert.rejects(
+    setPartnerPayoutStatus({ payoutId: fixture.partnerPayout!.id, actorUserId: unique("admin"), status: "PROCESSING" }),
+    /eligible|state changed/i,
+  );
+  await assert.rejects(
+    markPartnerPayoutSent({
+      payoutId: fixture.partnerPayout!.id,
+      actorUserId: unique("admin"),
+      externalTransferReference: "wire-suspended",
+      confirmation: fixture.partnerPayout!.id,
+    }),
+    /eligible|state changed/i,
+  );
+  const [payout, profile, nextEventCount] = await Promise.all([
+    db.partnerPayout.findUniqueOrThrow({ where: { id: fixture.partnerPayout!.id }, select: { status: true, sentAt: true } }),
+    db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partnerProfileId }, select: { status: true } }),
+    db.partnerPayoutEvent.count({ where: { payoutId: fixture.partnerPayout!.id } }),
+  ]);
+  assert.equal(payout.status, "READY");
+  assert.equal(payout.sentAt, null);
+  assert.equal(profile.status, "SUSPENDED");
+  assert.equal(nextEventCount, eventCount);
+});
+
+test("partner account reveal creates one audited event", async () => {
+  const fixture = await createFixture({ withPartner: true });
+  const revealed = await revealPartnerPayoutInstructions({
+    payoutId: fixture.partnerPayout!.id,
+    actorUserId: unique("admin"),
+    reason: "Review partner payout instructions",
+  });
+  assert.equal(revealed.accountNumber, "01012345678");
+  assert.equal(
+    await db.partnerPayoutEvent.count({ where: { payoutId: fixture.partnerPayout!.id, eventType: "ACCOUNT_REVEALED" } }),
+    1,
+  );
 });

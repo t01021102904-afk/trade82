@@ -433,7 +433,7 @@ test("Open Bank Portal is only a verified website link with noopener and norefer
   assert.match(source.payoutUi, /isSafeOfficialBankWebsite/);
   assert.match(source.payoutUi, /rel="noopener noreferrer"/);
   assert.match(source.payoutUi, /t\("payouts\.openBankPortal"\)/);
-  assert.match(source.payoutUi, /t\("payouts\.manualExternalNotice"\)/);
+  assert.doesNotMatch(source.payoutUi, /t\("payouts\.manualExternalNotice"\)/);
 });
 
 test("payout proof uploads use a private bucket, matching type and extension, and short signed URLs", () => {
