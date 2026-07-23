@@ -373,7 +373,16 @@ async function createFixture({
   if (withRefund) {
     await db.paymentRequest.update({ where: { id: paymentRequest.id }, data: { refundAmount: grossAmount } });
   }
-  return { order, paymentRequest, settlement, sellerPayout, partnerPayout, partnerProfileId: partnerProfile?.id ?? null, partnerPayoutProfileId };
+  return {
+    order,
+    paymentRequest,
+    settlement,
+    sellerPayout,
+    partnerPayout,
+    partnerProfileId: partnerProfile?.id ?? null,
+    partnerPayoutProfileId,
+    adminUserId: admin.id,
+  };
 }
 
 after(async () => {
@@ -515,7 +524,7 @@ test("partner account reveal creates one audited event", async () => {
   const fixture = await createFixture({ withPartner: true });
   const revealed = await revealPartnerPayoutInstructions({
     payoutId: fixture.partnerPayout!.id,
-    actorUserId: unique("admin"),
+    actorUserId: fixture.adminUserId,
     reason: "Review partner payout instructions",
   });
   assert.equal(revealed.accountNumber, "01012345678");
