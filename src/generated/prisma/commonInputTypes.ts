@@ -1245,6 +1245,57 @@ export type EnumSellerPayoutAdjustmentTypeWithAggregatesFilter<$PrismaModel = ne
   _max?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
 }
 
+export type EnumPartnerPayoutStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutStatus | Prisma.EnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel> | $Enums.PartnerPayoutStatus
+}
+
+export type EnumPayoutAccountTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayoutAccountType | Prisma.EnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel> | $Enums.PayoutAccountType | null
+}
+
+export type EnumPartnerPayoutStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutStatus | Prisma.EnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel>
+}
+
+export type EnumPayoutAccountTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayoutAccountType | Prisma.EnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPayoutAccountTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.PayoutAccountType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel>
+}
+
+export type EnumPartnerPayoutEventTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutEventType | Prisma.EnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel> | $Enums.PartnerPayoutEventType
+}
+
+export type EnumPartnerPayoutEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutEventType | Prisma.EnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutEventType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel>
+}
+
 export type EnumSavedItemTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.SavedItemType | Prisma.EnumSavedItemTypeFieldRefInput<$PrismaModel>
   in?: $Enums.SavedItemType[] | Prisma.ListEnumSavedItemTypeFieldRefInput<$PrismaModel>
@@ -2579,6 +2630,57 @@ export type NestedEnumSellerPayoutAdjustmentTypeWithAggregatesFilter<$PrismaMode
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumSellerPayoutAdjustmentTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumPartnerPayoutStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutStatus | Prisma.EnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel> | $Enums.PartnerPayoutStatus
+}
+
+export type NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayoutAccountType | Prisma.EnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel> | $Enums.PayoutAccountType | null
+}
+
+export type NestedEnumPartnerPayoutStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutStatus | Prisma.EnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutStatus[] | Prisma.ListEnumPartnerPayoutStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutStatusWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPayoutAccountTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PayoutAccountType | Prisma.EnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  in?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  notIn?: $Enums.PayoutAccountType[] | Prisma.ListEnumPayoutAccountTypeFieldRefInput<$PrismaModel> | null
+  not?: Prisma.NestedEnumPayoutAccountTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.PayoutAccountType | null
+  _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPayoutAccountTypeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutEventType | Prisma.EnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel> | $Enums.PartnerPayoutEventType
+}
+
+export type NestedEnumPartnerPayoutEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PartnerPayoutEventType | Prisma.EnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.PartnerPayoutEventType[] | Prisma.ListEnumPartnerPayoutEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumPartnerPayoutEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.PartnerPayoutEventType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPartnerPayoutEventTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumSavedItemTypeFilter<$PrismaModel = never> = {

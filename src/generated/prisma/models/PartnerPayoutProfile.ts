@@ -310,6 +310,7 @@ export type PartnerPayoutProfileWhereInput = {
   bankDirectory?: Prisma.XOR<Prisma.BankDirectoryScalarRelationFilter, Prisma.BankDirectoryWhereInput>
   verifiedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventListRelationFilter
+  payouts?: Prisma.PartnerPayoutListRelationFilter
 }
 
 export type PartnerPayoutProfileOrderByWithRelationInput = {
@@ -338,6 +339,7 @@ export type PartnerPayoutProfileOrderByWithRelationInput = {
   bankDirectory?: Prisma.BankDirectoryOrderByWithRelationInput
   verifiedByUser?: Prisma.UserProfileOrderByWithRelationInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventOrderByRelationAggregateInput
+  payouts?: Prisma.PartnerPayoutOrderByRelationAggregateInput
 }
 
 export type PartnerPayoutProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -369,6 +371,7 @@ export type PartnerPayoutProfileWhereUniqueInput = Prisma.AtLeast<{
   bankDirectory?: Prisma.XOR<Prisma.BankDirectoryScalarRelationFilter, Prisma.BankDirectoryWhereInput>
   verifiedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventListRelationFilter
+  payouts?: Prisma.PartnerPayoutListRelationFilter
 }, "id" | "partnerProfileId">
 
 export type PartnerPayoutProfileOrderByWithAggregationInput = {
@@ -448,6 +451,7 @@ export type PartnerPayoutProfileCreateInput = {
   bankDirectory: Prisma.BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput
   verifiedByUser?: Prisma.UserProfileCreateNestedOneWithoutVerifiedPartnerPayoutProfilesInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUncheckedCreateInput = {
@@ -473,6 +477,7 @@ export type PartnerPayoutProfileUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutUncheckedCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUpdateInput = {
@@ -498,6 +503,7 @@ export type PartnerPayoutProfileUpdateInput = {
   bankDirectory?: Prisma.BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput
   verifiedByUser?: Prisma.UserProfileUpdateOneWithoutVerifiedPartnerPayoutProfilesNestedInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateInput = {
@@ -523,6 +529,7 @@ export type PartnerPayoutProfileUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileCreateManyInput = {
@@ -831,6 +838,22 @@ export type PartnerPayoutProfileUpdateOneRequiredWithoutAuditEventsNestedInput =
   update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerPayoutProfileUpdateToOneWithWhereWithoutAuditEventsInput, Prisma.PartnerPayoutProfileUpdateWithoutAuditEventsInput>, Prisma.PartnerPayoutProfileUncheckedUpdateWithoutAuditEventsInput>
 }
 
+export type PartnerPayoutProfileCreateNestedOneWithoutPayoutsInput = {
+  create?: Prisma.XOR<Prisma.PartnerPayoutProfileCreateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedCreateWithoutPayoutsInput>
+  connectOrCreate?: Prisma.PartnerPayoutProfileCreateOrConnectWithoutPayoutsInput
+  connect?: Prisma.PartnerPayoutProfileWhereUniqueInput
+}
+
+export type PartnerPayoutProfileUpdateOneWithoutPayoutsNestedInput = {
+  create?: Prisma.XOR<Prisma.PartnerPayoutProfileCreateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedCreateWithoutPayoutsInput>
+  connectOrCreate?: Prisma.PartnerPayoutProfileCreateOrConnectWithoutPayoutsInput
+  upsert?: Prisma.PartnerPayoutProfileUpsertWithoutPayoutsInput
+  disconnect?: Prisma.PartnerPayoutProfileWhereInput | boolean
+  delete?: Prisma.PartnerPayoutProfileWhereInput | boolean
+  connect?: Prisma.PartnerPayoutProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PartnerPayoutProfileUpdateToOneWithWhereWithoutPayoutsInput, Prisma.PartnerPayoutProfileUpdateWithoutPayoutsInput>, Prisma.PartnerPayoutProfileUncheckedUpdateWithoutPayoutsInput>
+}
+
 export type PartnerPayoutProfileCreateWithoutVerifiedByUserInput = {
   id?: string
   country: string
@@ -853,6 +876,7 @@ export type PartnerPayoutProfileCreateWithoutVerifiedByUserInput = {
   partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutPayoutProfileInput
   bankDirectory: Prisma.BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUncheckedCreateWithoutVerifiedByUserInput = {
@@ -877,6 +901,7 @@ export type PartnerPayoutProfileUncheckedCreateWithoutVerifiedByUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutUncheckedCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileCreateOrConnectWithoutVerifiedByUserInput = {
@@ -954,6 +979,7 @@ export type PartnerPayoutProfileCreateWithoutPartnerProfileInput = {
   bankDirectory: Prisma.BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput
   verifiedByUser?: Prisma.UserProfileCreateNestedOneWithoutVerifiedPartnerPayoutProfilesInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUncheckedCreateWithoutPartnerProfileInput = {
@@ -978,6 +1004,7 @@ export type PartnerPayoutProfileUncheckedCreateWithoutPartnerProfileInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutUncheckedCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileCreateOrConnectWithoutPartnerProfileInput = {
@@ -1018,6 +1045,7 @@ export type PartnerPayoutProfileUpdateWithoutPartnerProfileInput = {
   bankDirectory?: Prisma.BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput
   verifiedByUser?: Prisma.UserProfileUpdateOneWithoutVerifiedPartnerPayoutProfilesNestedInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateWithoutPartnerProfileInput = {
@@ -1042,6 +1070,7 @@ export type PartnerPayoutProfileUncheckedUpdateWithoutPartnerProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileCreateWithoutBankDirectoryInput = {
@@ -1066,6 +1095,7 @@ export type PartnerPayoutProfileCreateWithoutBankDirectoryInput = {
   partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutPayoutProfileInput
   verifiedByUser?: Prisma.UserProfileCreateNestedOneWithoutVerifiedPartnerPayoutProfilesInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUncheckedCreateWithoutBankDirectoryInput = {
@@ -1090,6 +1120,7 @@ export type PartnerPayoutProfileUncheckedCreateWithoutBankDirectoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutPayoutProfileInput
+  payouts?: Prisma.PartnerPayoutUncheckedCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileCreateOrConnectWithoutBankDirectoryInput = {
@@ -1140,6 +1171,7 @@ export type PartnerPayoutProfileCreateWithoutAuditEventsInput = {
   partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutPayoutProfileInput
   bankDirectory: Prisma.BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput
   verifiedByUser?: Prisma.UserProfileCreateNestedOneWithoutVerifiedPartnerPayoutProfilesInput
+  payouts?: Prisma.PartnerPayoutCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileUncheckedCreateWithoutAuditEventsInput = {
@@ -1164,6 +1196,7 @@ export type PartnerPayoutProfileUncheckedCreateWithoutAuditEventsInput = {
   verifiedByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  payouts?: Prisma.PartnerPayoutUncheckedCreateNestedManyWithoutPayoutProfileInput
 }
 
 export type PartnerPayoutProfileCreateOrConnectWithoutAuditEventsInput = {
@@ -1204,6 +1237,7 @@ export type PartnerPayoutProfileUpdateWithoutAuditEventsInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutPayoutProfileNestedInput
   bankDirectory?: Prisma.BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput
   verifiedByUser?: Prisma.UserProfileUpdateOneWithoutVerifiedPartnerPayoutProfilesNestedInput
+  payouts?: Prisma.PartnerPayoutUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateWithoutAuditEventsInput = {
@@ -1228,6 +1262,123 @@ export type PartnerPayoutProfileUncheckedUpdateWithoutAuditEventsInput = {
   verifiedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payouts?: Prisma.PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileNestedInput
+}
+
+export type PartnerPayoutProfileCreateWithoutPayoutsInput = {
+  id?: string
+  country: string
+  bankName: string
+  accountHolder: string
+  accountNumberCiphertext: runtime.Bytes
+  accountNumberIv: runtime.Bytes
+  accountNumberAuthTag: runtime.Bytes
+  accountNumberKeyVersion: string
+  accountNumberLast4: string
+  accountNumberMasked: string
+  accountType?: $Enums.PayoutAccountType
+  payoutCurrency?: string
+  supportedCurrencies?: Prisma.PartnerPayoutProfileCreatesupportedCurrenciesInput | string[]
+  accountBelongsToPartner?: boolean
+  status?: $Enums.PartnerPayoutProfileStatus
+  verifiedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  partnerProfile: Prisma.PartnerProfileCreateNestedOneWithoutPayoutProfileInput
+  bankDirectory: Prisma.BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput
+  verifiedByUser?: Prisma.UserProfileCreateNestedOneWithoutVerifiedPartnerPayoutProfilesInput
+  auditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutPayoutProfileInput
+}
+
+export type PartnerPayoutProfileUncheckedCreateWithoutPayoutsInput = {
+  id?: string
+  partnerProfileId: string
+  bankDirectoryId: string
+  country: string
+  bankName: string
+  accountHolder: string
+  accountNumberCiphertext: runtime.Bytes
+  accountNumberIv: runtime.Bytes
+  accountNumberAuthTag: runtime.Bytes
+  accountNumberKeyVersion: string
+  accountNumberLast4: string
+  accountNumberMasked: string
+  accountType?: $Enums.PayoutAccountType
+  payoutCurrency?: string
+  supportedCurrencies?: Prisma.PartnerPayoutProfileCreatesupportedCurrenciesInput | string[]
+  accountBelongsToPartner?: boolean
+  status?: $Enums.PartnerPayoutProfileStatus
+  verifiedAt?: Date | string | null
+  verifiedByUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutPayoutProfileInput
+}
+
+export type PartnerPayoutProfileCreateOrConnectWithoutPayoutsInput = {
+  where: Prisma.PartnerPayoutProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.PartnerPayoutProfileCreateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedCreateWithoutPayoutsInput>
+}
+
+export type PartnerPayoutProfileUpsertWithoutPayoutsInput = {
+  update: Prisma.XOR<Prisma.PartnerPayoutProfileUpdateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedUpdateWithoutPayoutsInput>
+  create: Prisma.XOR<Prisma.PartnerPayoutProfileCreateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedCreateWithoutPayoutsInput>
+  where?: Prisma.PartnerPayoutProfileWhereInput
+}
+
+export type PartnerPayoutProfileUpdateToOneWithWhereWithoutPayoutsInput = {
+  where?: Prisma.PartnerPayoutProfileWhereInput
+  data: Prisma.XOR<Prisma.PartnerPayoutProfileUpdateWithoutPayoutsInput, Prisma.PartnerPayoutProfileUncheckedUpdateWithoutPayoutsInput>
+}
+
+export type PartnerPayoutProfileUpdateWithoutPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  bankName?: Prisma.StringFieldUpdateOperationsInput | string
+  accountHolder?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberIv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberAuthTag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberLast4?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberMasked?: Prisma.StringFieldUpdateOperationsInput | string
+  accountType?: Prisma.EnumPayoutAccountTypeFieldUpdateOperationsInput | $Enums.PayoutAccountType
+  payoutCurrency?: Prisma.StringFieldUpdateOperationsInput | string
+  supportedCurrencies?: Prisma.PartnerPayoutProfileUpdatesupportedCurrenciesInput | string[]
+  accountBelongsToPartner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumPartnerPayoutProfileStatusFieldUpdateOperationsInput | $Enums.PartnerPayoutProfileStatus
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutPayoutProfileNestedInput
+  bankDirectory?: Prisma.BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput
+  verifiedByUser?: Prisma.UserProfileUpdateOneWithoutVerifiedPartnerPayoutProfilesNestedInput
+  auditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutPayoutProfileNestedInput
+}
+
+export type PartnerPayoutProfileUncheckedUpdateWithoutPayoutsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  partnerProfileId?: Prisma.StringFieldUpdateOperationsInput | string
+  bankDirectoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  bankName?: Prisma.StringFieldUpdateOperationsInput | string
+  accountHolder?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberCiphertext?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberIv?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberAuthTag?: Prisma.BytesFieldUpdateOperationsInput | runtime.Bytes
+  accountNumberKeyVersion?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberLast4?: Prisma.StringFieldUpdateOperationsInput | string
+  accountNumberMasked?: Prisma.StringFieldUpdateOperationsInput | string
+  accountType?: Prisma.EnumPayoutAccountTypeFieldUpdateOperationsInput | $Enums.PayoutAccountType
+  payoutCurrency?: Prisma.StringFieldUpdateOperationsInput | string
+  supportedCurrencies?: Prisma.PartnerPayoutProfileUpdatesupportedCurrenciesInput | string[]
+  accountBelongsToPartner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumPartnerPayoutProfileStatusFieldUpdateOperationsInput | $Enums.PartnerPayoutProfileStatus
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  verifiedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileCreateManyVerifiedByUserInput = {
@@ -1275,6 +1426,7 @@ export type PartnerPayoutProfileUpdateWithoutVerifiedByUserInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutPayoutProfileNestedInput
   bankDirectory?: Prisma.BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateWithoutVerifiedByUserInput = {
@@ -1299,6 +1451,7 @@ export type PartnerPayoutProfileUncheckedUpdateWithoutVerifiedByUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserInput = {
@@ -1369,6 +1522,7 @@ export type PartnerPayoutProfileUpdateWithoutBankDirectoryInput = {
   partnerProfile?: Prisma.PartnerProfileUpdateOneRequiredWithoutPayoutProfileNestedInput
   verifiedByUser?: Prisma.UserProfileUpdateOneWithoutVerifiedPartnerPayoutProfilesNestedInput
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateWithoutBankDirectoryInput = {
@@ -1393,6 +1547,7 @@ export type PartnerPayoutProfileUncheckedUpdateWithoutBankDirectoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   auditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutPayoutProfileNestedInput
+  payouts?: Prisma.PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileNestedInput
 }
 
 export type PartnerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryInput = {
@@ -1425,10 +1580,12 @@ export type PartnerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryInput = {
 
 export type PartnerPayoutProfileCountOutputType = {
   auditEvents: number
+  payouts: number
 }
 
 export type PartnerPayoutProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   auditEvents?: boolean | PartnerPayoutProfileCountOutputTypeCountAuditEventsArgs
+  payouts?: boolean | PartnerPayoutProfileCountOutputTypeCountPayoutsArgs
 }
 
 /**
@@ -1446,6 +1603,13 @@ export type PartnerPayoutProfileCountOutputTypeDefaultArgs<ExtArgs extends runti
  */
 export type PartnerPayoutProfileCountOutputTypeCountAuditEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PartnerPayoutProfileAuditEventWhereInput
+}
+
+/**
+ * PartnerPayoutProfileCountOutputType without action
+ */
+export type PartnerPayoutProfileCountOutputTypeCountPayoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PartnerPayoutWhereInput
 }
 
 
@@ -1475,6 +1639,7 @@ export type PartnerPayoutProfileSelect<ExtArgs extends runtime.Types.Extensions.
   bankDirectory?: boolean | Prisma.BankDirectoryDefaultArgs<ExtArgs>
   verifiedByUser?: boolean | Prisma.PartnerPayoutProfile$verifiedByUserArgs<ExtArgs>
   auditEvents?: boolean | Prisma.PartnerPayoutProfile$auditEventsArgs<ExtArgs>
+  payouts?: boolean | Prisma.PartnerPayoutProfile$payoutsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerPayoutProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["partnerPayoutProfile"]>
 
@@ -1562,6 +1727,7 @@ export type PartnerPayoutProfileInclude<ExtArgs extends runtime.Types.Extensions
   bankDirectory?: boolean | Prisma.BankDirectoryDefaultArgs<ExtArgs>
   verifiedByUser?: boolean | Prisma.PartnerPayoutProfile$verifiedByUserArgs<ExtArgs>
   auditEvents?: boolean | Prisma.PartnerPayoutProfile$auditEventsArgs<ExtArgs>
+  payouts?: boolean | Prisma.PartnerPayoutProfile$payoutsArgs<ExtArgs>
   _count?: boolean | Prisma.PartnerPayoutProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PartnerPayoutProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1582,6 +1748,7 @@ export type $PartnerPayoutProfilePayload<ExtArgs extends runtime.Types.Extension
     bankDirectory: Prisma.$BankDirectoryPayload<ExtArgs>
     verifiedByUser: Prisma.$UserProfilePayload<ExtArgs> | null
     auditEvents: Prisma.$PartnerPayoutProfileAuditEventPayload<ExtArgs>[]
+    payouts: Prisma.$PartnerPayoutPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2003,6 +2170,7 @@ export interface Prisma__PartnerPayoutProfileClient<T, Null = never, ExtArgs ext
   bankDirectory<T extends Prisma.BankDirectoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BankDirectoryDefaultArgs<ExtArgs>>): Prisma.Prisma__BankDirectoryClient<runtime.Types.Result.GetResult<Prisma.$BankDirectoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   verifiedByUser<T extends Prisma.PartnerPayoutProfile$verifiedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerPayoutProfile$verifiedByUserArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   auditEvents<T extends Prisma.PartnerPayoutProfile$auditEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerPayoutProfile$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerPayoutProfileAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  payouts<T extends Prisma.PartnerPayoutProfile$payoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PartnerPayoutProfile$payoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerPayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2494,6 +2662,30 @@ export type PartnerPayoutProfile$auditEventsArgs<ExtArgs extends runtime.Types.E
   take?: number
   skip?: number
   distinct?: Prisma.PartnerPayoutProfileAuditEventScalarFieldEnum | Prisma.PartnerPayoutProfileAuditEventScalarFieldEnum[]
+}
+
+/**
+ * PartnerPayoutProfile.payouts
+ */
+export type PartnerPayoutProfile$payoutsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartnerPayout
+   */
+  select?: Prisma.PartnerPayoutSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartnerPayout
+   */
+  omit?: Prisma.PartnerPayoutOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerPayoutInclude<ExtArgs> | null
+  where?: Prisma.PartnerPayoutWhereInput
+  orderBy?: Prisma.PartnerPayoutOrderByWithRelationInput | Prisma.PartnerPayoutOrderByWithRelationInput[]
+  cursor?: Prisma.PartnerPayoutWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PartnerPayoutScalarFieldEnum | Prisma.PartnerPayoutScalarFieldEnum[]
 }
 
 /**

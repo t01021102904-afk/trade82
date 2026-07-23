@@ -369,6 +369,36 @@ export const SellerPayoutStatus = {
 export type SellerPayoutStatus = (typeof SellerPayoutStatus)[keyof typeof SellerPayoutStatus]
 
 
+export const PartnerPayoutStatus = {
+  NOT_READY: 'NOT_READY',
+  HOLD: 'HOLD',
+  READY: 'READY',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type PartnerPayoutStatus = (typeof PartnerPayoutStatus)[keyof typeof PartnerPayoutStatus]
+
+
+export const PartnerPayoutEventType = {
+  CREATED: 'CREATED',
+  READY: 'READY',
+  HOLD: 'HOLD',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  RETURNED: 'RETURNED',
+  CANCELLED: 'CANCELLED',
+  ACCOUNT_REVEALED: 'ACCOUNT_REVEALED',
+  RECONCILIATION_REQUIRED: 'RECONCILIATION_REQUIRED'
+} as const
+
+export type PartnerPayoutEventType = (typeof PartnerPayoutEventType)[keyof typeof PartnerPayoutEventType]
+
+
 export const WireFeeBearer = {
   OUR: 'OUR',
   SHA: 'SHA',

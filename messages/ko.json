@@ -228,7 +228,7 @@
     "joinSuccess": "파트너 프로필과 추천 링크가 준비되었습니다.",
     "payoutSetupTitle": "지급 설정",
     "payoutSetupNotCompleted": "지급 설정이 완료되지 않았습니다",
-    "payoutSetupDescription": "지급 계좌를 검증하기 전에도 추천 수익은 적립될 수 있습니다. 지급을 준비하기 전에 Trade82가 한국 정산 계좌를 검토합니다.",
+    "payoutSetupDescription": "추천 수익은 Trade82의 검토 후 등록한 정산 계좌로 지급됩니다.",
     "bankName": "은행명",
     "accountNumber": "계좌번호",
     "setUpPayouts": "지급 계좌 설정",

@@ -20,6 +20,9 @@ async function refresh(request: Request, ownerTypeValue: string, requireSameOrig
   if (!isStripeConnectOwnerType(ownerTypeValue)) {
     throw new StripeConnectOnboardingError("Not found.", 404);
   }
+  if (ownerTypeValue === "partner") {
+    throw new StripeConnectOnboardingError("Partner Stripe onboarding has been replaced by manual Korean payout review.", 410);
+  }
   const rateLimited = rateLimitOrResponse({
     request,
     scope: `stripe-connect-onboarding-refresh:${ownerTypeValue}`,

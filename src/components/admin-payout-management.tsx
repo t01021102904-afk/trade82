@@ -53,6 +53,85 @@ type Payout = {
   sellerCompany: { legalName: string; tradeName: string | null };
 };
 
+type PartnerPayout = {
+  id: string;
+  payoutNumber: string;
+  status: string;
+  currency: string;
+  originalCommissionAmount: number;
+  reversalAdjustmentAmount: number;
+  finalPayoutAmount: number;
+  holdUntil: string;
+  bankNameSnapshot: string | null;
+  accountNumberLast4: string | null;
+  accountNumberMasked: string | null;
+  partnerLegalNameSnapshot: string | null;
+  partnerDisplayNameSnapshot: string | null;
+  partnerOrganizationSnapshot: string | null;
+  partnerEmailSnapshot: string | null;
+  partnerPhoneSnapshot: string | null;
+  partnerResidenceCountrySnapshot: string | null;
+  requiresManualReconciliation: boolean;
+  sentAt: string | null;
+  failedAt: string | null;
+  failureReason: string | null;
+  externalTransferReference: string | null;
+  externalBankReference: string | null;
+  settlement: {
+    id: string;
+    status: string;
+    grossAmount: number;
+    platformFeeAmount: number;
+    sellerPayableAmount: number;
+    partnerReferralAmount: number;
+    trade82RetainedAmountBeforeStripeFees: number;
+    currency: string;
+    paymentFlow: string;
+    holdUntil: string;
+    paymentRequest: {
+      id: string;
+      status: string;
+      grossAmount: number;
+      platformFeeAmount: number;
+      sellerPayableAmount: number;
+      stripeProcessingFeeAmount: number | null;
+      refundAmount: number;
+      currency: string;
+      paidAt: string | null;
+      requiresManualReconciliation: boolean;
+      disputes: Array<{ id: string; status: string; amount: number }>;
+    };
+    tradeOrder: {
+      id: string;
+      orderNumber: string;
+      orderStatus: string;
+      paymentStatus: string;
+      paidAt: string | null;
+      buyerCompanyName: string;
+      buyerContactName: string | null;
+      buyerEmail: string;
+      buyerPhone: string | null;
+      buyerCountry: string;
+      sellerCompanyName: string;
+      sellerContactName: string | null;
+      sellerEmail: string;
+      sellerPhone: string | null;
+      items: Array<{ productName: string }>;
+    };
+  };
+  settlementLeg: { id: string; type: string; status: string; amount: number; currency: string; holdUntil: string };
+  partnerProfile: {
+    id: string;
+    referralCode: string;
+    status: string;
+    displayName: string | null;
+    legalName: string | null;
+    contactEmail: string | null;
+    contactPhone: string | null;
+  };
+  payoutProfile: { id: string; status: string; accountNumberMasked: string | null; accountNumberLast4: string | null } | null;
+};
+
 type RevealedInstructions = {
   payoutId: string;
   scope: string | null;
@@ -66,6 +145,7 @@ function isActionableStatus(status: string) {
 export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
   const { locale, t } = useI18n();
   const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [partnerPayouts, setPartnerPayouts] = useState<PartnerPayout[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revealed, setRevealed] = useState<RevealedInstructions | null>(null);
@@ -89,6 +169,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       const data = await response.json().catch(() => null);
       if (!response.ok) throw new Error(t("payouts.loadPayoutsError"));
       setPayouts(data.payouts ?? []);
+      setPartnerPayouts(data.partnerPayouts ?? []);
     } catch {
       setError(t("payouts.loadPayoutsError"));
     } finally {
@@ -115,6 +196,44 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
     () => (selectedId ? payouts.filter((payout) => payout.id === selectedId) : payouts),
     [payouts, selectedId],
   );
+  const visiblePartnerPayouts = useMemo(
+    () => (selectedId ? partnerPayouts.filter((payout) => payout.id === selectedId) : partnerPayouts),
+    [partnerPayouts, selectedId],
+  );
+
+  const partnerCopy = locale === "ko"
+    ? {
+        title: "파트너 수동 지급",
+        subtitle: "추천 수수료 지급 검토",
+        transaction: "거래 요약",
+        buyer: "바이어 정보",
+        seller: "셀러 정보",
+        partner: "파트너 정보",
+        commission: "파트너 수수료",
+        trade82Retained: "Trade82 보유액",
+        holdUntil: "보류 종료",
+        payoutAccount: "지급 계좌",
+        noPartnerPayouts: "검토할 파트너 지급이 없습니다.",
+        reveal: "파트너 계좌 보기",
+        markSent: "파트너 지급 완료 기록",
+        warnings: "경고",
+      }
+    : {
+        title: "Partner manual payout",
+        subtitle: "Referral commission payout review",
+        transaction: "Transaction summary",
+        buyer: "Buyer information",
+        seller: "Seller information",
+        partner: "Partner information",
+        commission: "Partner commission",
+        trade82Retained: "Trade82 retained",
+        holdUntil: "Hold until",
+        payoutAccount: "Payout account",
+        noPartnerPayouts: "No partner payouts to review.",
+        reveal: "Reveal partner account",
+        markSent: "Record partner payout sent",
+        warnings: "Warnings",
+      };
 
   async function action(
     payout: Payout,
@@ -217,6 +336,64 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
     }
   }
 
+  async function partnerAction(
+    payout: PartnerPayout,
+    nextAction: "hold" | "processing" | "failed" | "returned" | "mark_sent",
+  ) {
+    setBusy(true);
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/partner-payouts/${payout.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          nextAction === "mark_sent"
+            ? {
+                action: nextAction,
+                externalTransferReference: reference,
+                externalBankReference: bankReference || undefined,
+                confirmation,
+                sentAt: new Date().toISOString(),
+              }
+            : { action: nextAction },
+        ),
+      });
+      await response.json().catch(() => null);
+      if (!response.ok) throw new Error(t("payouts.updatePayoutError"));
+      setConfirmation("");
+      setReference("");
+      setBankReference("");
+      setRevealed(null);
+      await load();
+    } catch {
+      setError(t("payouts.updatePayoutError"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revealPartner(payout: PartnerPayout) {
+    if (revealReason.trim().length < 3) {
+      setError(t("payouts.revealReasonError"));
+      return;
+    }
+    setError("");
+    try {
+      const response = await fetch(`/api/admin/partner-payouts/${payout.id}/reveal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: revealReason.trim() }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.instructions || typeof data.instructions !== "object") {
+        throw new Error(t("payouts.revealError"));
+      }
+      setRevealed({ payoutId: payout.id, scope: selectedId ?? null, instructions: data.instructions });
+    } catch {
+      setError(t("payouts.revealError"));
+    }
+  }
+
   async function recordInstructionExport(payoutId: string, actionName: "copied" | "downloaded") {
     const response = await fetch(`/api/admin/payouts/${payoutId}/instructions-exported`, {
       method: "POST",
@@ -252,6 +429,15 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       await recordInstructionExport(payout.id, "downloaded");
     } catch {
       setError(t("payouts.downloadError"));
+    }
+  }
+
+  async function copyPartnerInstructions(payoutId: string) {
+    if (activeReveal?.payoutId !== payoutId) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(activeReveal.instructions, null, 2));
+    } catch {
+      setError(t("payouts.copyError"));
     }
   }
 
@@ -351,7 +537,69 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
           </article>
         );
       })}
-      {!visible.length ? <p className="rounded-xl border px-5 py-8 text-sm theme-muted">{t("payouts.noPayouts")}</p> : null}
+      {visiblePartnerPayouts.map((payout) => {
+        const order = payout.settlement.tradeOrder;
+        const payment = payout.settlement.paymentRequest;
+        const instructionsAreRevealed = activeReveal?.payoutId === payout.id;
+        const canMarkSent = isActionableStatus(payout.status);
+        const warnings = [
+          payment.refundAmount > 0 ? `${t("payouts.refundAdjustment")}: ${formatTradeMoney(payment.refundAmount, payment.currency, locale)}` : "",
+          payment.requiresManualReconciliation ? t("payouts.manualReconciliationRequired") : "",
+          payment.disputes.length ? `${partnerCopy.warnings}: ${payment.disputes.map((item) => item.status).join(", ")}` : "",
+          payout.settlement.paymentFlow !== "SCT" ? "Direct Charge excluded from SCT partner payout execution." : "",
+        ].filter(Boolean);
+        return (
+          <article key={payout.id} className="grid gap-4 rounded-xl border p-5 theme-surface-elevated">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs theme-muted">{order.orderNumber} · {payout.payoutNumber}</p>
+                <h2 className="mt-1 text-lg font-semibold theme-foreground">{partnerCopy.title}</h2>
+                <p className="mt-1 text-sm theme-muted">{payout.partnerDisplayNameSnapshot ?? payout.partnerLegalNameSnapshot ?? payout.partnerProfile.referralCode} · {partnerCopy.subtitle}</p>
+              </div>
+              <span className="rounded-full border px-2.5 py-1 text-xs font-semibold theme-success-badge">{payoutStatusLabel(payout.status, t)}</span>
+            </div>
+            <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <Metric label={partnerCopy.transaction} value={`${order.orderNumber} · ${payment.status}`} />
+              <Metric label={t("payouts.gross")} value={formatTradeMoney(payment.grossAmount, payment.currency, locale)} />
+              <Metric label={t("payouts.baseSellerPayable")} value={formatTradeMoney(payment.sellerPayableAmount, payment.currency, locale)} />
+              <Metric label={partnerCopy.commission} value={formatTradeMoney(payout.originalCommissionAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.refundAdjustment")} value={formatTradeMoney(payout.reversalAdjustmentAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.finalPayout")} value={formatTradeMoney(payout.finalPayoutAmount, payout.currency, locale)} />
+              <Metric label={t("payouts.stripeFee")} value={payment.stripeProcessingFeeAmount === null ? "—" : formatTradeMoney(payment.stripeProcessingFeeAmount, payment.currency, locale)} />
+              <Metric label={partnerCopy.trade82Retained} value={formatTradeMoney(payout.settlement.trade82RetainedAmountBeforeStripeFees, payout.settlement.currency, locale)} />
+              <Metric label={partnerCopy.holdUntil} value={formatTradeDateTime(payout.holdUntil, locale)} />
+              <Metric label={partnerCopy.buyer} value={`${order.buyerCompanyName} · ${order.buyerEmail}`} />
+              <Metric label={partnerCopy.seller} value={`${order.sellerCompanyName} · ${order.sellerEmail}`} />
+              <Metric label={partnerCopy.partner} value={payout.partnerEmailSnapshot ?? payout.partnerProfile.contactEmail ?? "—"} />
+              <Metric label={partnerCopy.payoutAccount} value={`${payout.bankNameSnapshot ?? "—"} · ${payout.accountNumberMasked ?? (payout.accountNumberLast4 ? `•••• ${payout.accountNumberLast4}` : "—")}`} />
+            </div>
+            {warnings.length ? (
+              <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-950">
+                {warnings.join(" · ")}
+              </div>
+            ) : null}
+            {payout.status === "SENT" ? (
+              <p className="text-sm font-medium text-emerald-700">{t("payouts.externalPayoutSent").replace("{date}", formatTradeDateTime(payout.sentAt, locale))}</p>
+            ) : (
+              <div className="grid gap-2 border-t pt-4 theme-border">
+                <label className="grid gap-1 text-xs font-medium theme-muted">
+                  {t("payouts.revealReason")}
+                  <input value={revealReason} onChange={(event) => setRevealReason(event.target.value)} maxLength={500} className="input h-9" placeholder={t("payouts.revealReasonPlaceholder")} />
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button onClick={() => void revealPartner(payout)} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold"><ShieldAlert className="size-4" />{partnerCopy.reveal}</button>
+                  <button onClick={() => void copyPartnerInstructions(payout.id)} disabled={!instructionsAreRevealed} className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50"><ClipboardCopy className="size-4" />{t("payouts.copyInstructions")}</button>
+                  {canMarkSent ? <button onClick={() => void partnerAction(payout, "hold")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">{t("payouts.placeOnHold")}</button> : null}
+                  {payout.status === "READY" || payout.status === "HOLD" ? <button onClick={() => void partnerAction(payout, "processing")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold">{t("payouts.markProcessing")}</button> : null}
+                  {canMarkSent ? <button onClick={() => void partnerAction(payout, "failed")} disabled={busy} className="inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold text-red-700">{t("payouts.markFailed")}</button> : null}
+                </div>
+                {canMarkSent ? <div className="flex flex-wrap gap-2"><input value={reference} onChange={(event) => setReference(event.target.value)} placeholder={t("payouts.externalTransferReference")} className="input h-9" /><input value={bankReference} onChange={(event) => setBankReference(event.target.value)} placeholder={t("payouts.sendingBankReference")} className="input h-9" /><input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} placeholder={payout.payoutNumber} className="input h-9" /><button onClick={() => void partnerAction(payout, "mark_sent")} disabled={busy || !reference || !confirmation} className="inline-flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-xs font-semibold text-white disabled:opacity-50"><Send className="size-4" />{partnerCopy.markSent}</button></div> : null}
+              </div>
+            )}
+          </article>
+        );
+      })}
+      {!visible.length && !visiblePartnerPayouts.length ? <p className="rounded-xl border px-5 py-8 text-sm theme-muted">{t("payouts.noPayouts")}</p> : null}
       {activeReveal ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><div className="flex items-center justify-between gap-3"><p className="font-semibold">{t("payouts.revealedInstructions")}</p><button onClick={() => setRevealed(null)} className="inline-flex size-7 items-center justify-center rounded border" aria-label={t("payouts.hideRevealedInstructions")}><X className="size-4" /></button></div><p className="mt-1 text-xs">{t("payouts.revealExpiry")}</p><pre className="mt-2 overflow-auto whitespace-pre-wrap">{JSON.stringify(activeReveal.instructions, null, 2)}</pre></div> : null}
     </section>
   );

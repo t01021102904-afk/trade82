@@ -271,6 +271,30 @@ enum SellerPayoutStatus {
   CANCELLED
 }
 
+enum PartnerPayoutStatus {
+  NOT_READY
+  HOLD
+  READY
+  PROCESSING
+  SENT
+  FAILED
+  RETURNED
+  CANCELLED
+}
+
+enum PartnerPayoutEventType {
+  CREATED
+  READY
+  HOLD
+  PROCESSING
+  SENT
+  FAILED
+  RETURNED
+  CANCELLED
+  ACCOUNT_REVEALED
+  RECONCILIATION_REQUIRED
+}
+
 enum WireFeeBearer {
   OUR
   SHA
@@ -540,6 +564,9 @@ model UserProfile {
   sellerPayoutProfileAuditEvents  SellerPayoutProfileAuditEvent[]  @relation("SellerPayoutProfileAuditActor")
   verifiedPartnerPayoutProfiles   PartnerPayoutProfile[]           @relation("PartnerPayoutProfileVerifiedBy")
   partnerPayoutProfileAuditEvents PartnerPayoutProfileAuditEvent[] @relation("PartnerPayoutProfileAuditActor")
+  preparedPartnerPayouts          PartnerPayout[]                  @relation("PartnerPayoutPreparedBy")
+  sentPartnerPayouts              PartnerPayout[]                  @relation("PartnerPayoutSentBy")
+  partnerPayoutEvents             PartnerPayoutEvent[]             @relation("PartnerPayoutEventActor")
   partnerProfileAuditEvents       PartnerProfileAuditEvent[]       @relation("PartnerProfileAuditActor")
   settlementEvents                SettlementEvent[]                @relation("SettlementEventActor")
   approvedSettlements             Settlement[]                     @relation("SettlementApprovedBy")
@@ -1076,6 +1103,7 @@ model PartnerProfile {
   referralClaimTokens        ReferralClaimToken[]
   stripeConnectedAccount     StripeConnectedAccount?     @relation("PartnerProfileStripeConnectedAccount")
   payoutProfile              PartnerPayoutProfile?
+  partnerPayouts             PartnerPayout[]
   auditEvents                PartnerProfileAuditEvent[]
   settlementLegs             SettlementLeg[]             @relation("SettlementLegPartnerProfile")
   settlements                Settlement[]                @relation("SettlementReferralPartnerProfile")
@@ -1227,6 +1255,7 @@ model Settlement {
   events                                SettlementEvent[]
   reversals                             SettlementReversal[]
   operationalAlerts                     SettlementOperationalAlert[]
+  partnerPayout                         PartnerPayout?
   createdAt                             DateTime                     @default(now())
   updatedAt                             DateTime                     @updatedAt
 
@@ -1262,6 +1291,7 @@ model SettlementLeg {
   events                SettlementEvent[]
   reversals             SettlementReversal[]         @relation("SettlementReversalSettlementLeg")
   operationalAlerts     SettlementOperationalAlert[]
+  partnerPayout         PartnerPayout?
   createdAt             DateTime                     @default(now())
   updatedAt             DateTime                     @updatedAt
 
@@ -1444,6 +1474,7 @@ model TradeOrder {
   shipment          TradeOrderShipment?
   events            TradeOrderEvent[]
   payout            SellerPayout?
+  partnerPayouts    PartnerPayout[]
   connectSettlement Settlement?         @relation("TradeOrderConnectSettlement")
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -1625,6 +1656,7 @@ model PartnerPayoutProfile {
   verifiedByUserId        String?
   verifiedByUser          UserProfile?                     @relation("PartnerPayoutProfileVerifiedBy", fields: [verifiedByUserId], references: [id], onDelete: Restrict)
   auditEvents             PartnerPayoutProfileAuditEvent[]
+  payouts                 PartnerPayout[]
   createdAt               DateTime                         @default(now())
   updatedAt               DateTime                         @updatedAt
 
@@ -1751,6 +1783,80 @@ model SellerPayoutAdjustment {
 
   @@index([payoutId, createdAt])
   @@index([createdByUserId, createdAt])
+}
+
+model PartnerPayout {
+  id                              String                @id @default(cuid())
+  settlementId                    String                @unique
+  settlement                      Settlement            @relation(fields: [settlementId], references: [id], onDelete: Restrict)
+  settlementLegId                 String                @unique
+  settlementLeg                   SettlementLeg         @relation(fields: [settlementLegId], references: [id], onDelete: Restrict)
+  orderId                         String
+  order                           TradeOrder            @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  partnerProfileId                String
+  partnerProfile                  PartnerProfile        @relation(fields: [partnerProfileId], references: [id], onDelete: Restrict)
+  payoutProfileId                 String?
+  payoutProfile                   PartnerPayoutProfile? @relation(fields: [payoutProfileId], references: [id], onDelete: Restrict)
+  payoutNumber                    String                @unique
+  status                          PartnerPayoutStatus   @default(NOT_READY)
+  currency                        String                @default("usd")
+  originalCommissionAmount        Int
+  reversalAdjustmentAmount        Int                   @default(0)
+  finalPayoutAmount               Int
+  holdUntil                       DateTime
+  accountCountrySnapshot          String?
+  accountTypeSnapshot             PayoutAccountType?
+  payoutCurrencySnapshot          String?
+  supportedCurrenciesSnapshot     String[]              @default([])
+  bankNameSnapshot                String?
+  accountHolderSnapshot           String?
+  accountNumberSnapshotEncrypted  Bytes?
+  accountNumberSnapshotIv         Bytes?
+  accountNumberSnapshotAuthTag    Bytes?
+  accountNumberSnapshotKeyVersion String?
+  accountNumberLast4              String?
+  accountNumberMasked             String?
+  partnerLegalNameSnapshot        String?
+  partnerDisplayNameSnapshot      String?
+  partnerOrganizationSnapshot     String?
+  partnerEmailSnapshot            String?
+  partnerPhoneSnapshot            String?
+  partnerResidenceCountrySnapshot String?
+  preparedAt                      DateTime?
+  preparedByUserId                String?
+  preparedByUser                  UserProfile?          @relation("PartnerPayoutPreparedBy", fields: [preparedByUserId], references: [id], onDelete: SetNull)
+  sentAt                          DateTime?
+  sentByUserId                    String?
+  sentByUser                      UserProfile?          @relation("PartnerPayoutSentBy", fields: [sentByUserId], references: [id], onDelete: SetNull)
+  failedAt                        DateTime?
+  externalTransferReference       String?
+  externalBankReference           String?
+  failureReason                   String?
+  internalNote                    String?
+  requiresManualReconciliation    Boolean               @default(false)
+  events                          PartnerPayoutEvent[]
+  createdAt                       DateTime              @default(now())
+  updatedAt                       DateTime              @updatedAt
+
+  @@index([partnerProfileId, createdAt])
+  @@index([status, createdAt])
+  @@index([payoutProfileId])
+  @@index([orderId])
+}
+
+model PartnerPayoutEvent {
+  id          String                 @id @default(cuid())
+  payoutId    String
+  payout      PartnerPayout          @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+  actorUserId String?
+  actorUser   UserProfile?           @relation("PartnerPayoutEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  eventType   PartnerPayoutEventType
+  message     String?
+  metadata    Json                   @default("{}")
+  createdAt   DateTime               @default(now())
+
+  @@index([payoutId, createdAt])
+  @@index([eventType, createdAt])
 }
 
 model SavedItem {

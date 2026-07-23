@@ -96,6 +96,8 @@ export const ModelName = {
   SellerPayout: 'SellerPayout',
   SellerPayoutEvent: 'SellerPayoutEvent',
   SellerPayoutAdjustment: 'SellerPayoutAdjustment',
+  PartnerPayout: 'PartnerPayout',
+  PartnerPayoutEvent: 'PartnerPayoutEvent',
   SavedItem: 'SavedItem',
   Message: 'Message',
   MessageAttachment: 'MessageAttachment',
@@ -1129,6 +1131,68 @@ export const SellerPayoutAdjustmentScalarFieldEnum = {
 } as const
 
 export type SellerPayoutAdjustmentScalarFieldEnum = (typeof SellerPayoutAdjustmentScalarFieldEnum)[keyof typeof SellerPayoutAdjustmentScalarFieldEnum]
+
+
+export const PartnerPayoutScalarFieldEnum = {
+  id: 'id',
+  settlementId: 'settlementId',
+  settlementLegId: 'settlementLegId',
+  orderId: 'orderId',
+  partnerProfileId: 'partnerProfileId',
+  payoutProfileId: 'payoutProfileId',
+  payoutNumber: 'payoutNumber',
+  status: 'status',
+  currency: 'currency',
+  originalCommissionAmount: 'originalCommissionAmount',
+  reversalAdjustmentAmount: 'reversalAdjustmentAmount',
+  finalPayoutAmount: 'finalPayoutAmount',
+  holdUntil: 'holdUntil',
+  accountCountrySnapshot: 'accountCountrySnapshot',
+  accountTypeSnapshot: 'accountTypeSnapshot',
+  payoutCurrencySnapshot: 'payoutCurrencySnapshot',
+  supportedCurrenciesSnapshot: 'supportedCurrenciesSnapshot',
+  bankNameSnapshot: 'bankNameSnapshot',
+  accountHolderSnapshot: 'accountHolderSnapshot',
+  accountNumberSnapshotEncrypted: 'accountNumberSnapshotEncrypted',
+  accountNumberSnapshotIv: 'accountNumberSnapshotIv',
+  accountNumberSnapshotAuthTag: 'accountNumberSnapshotAuthTag',
+  accountNumberSnapshotKeyVersion: 'accountNumberSnapshotKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  accountNumberMasked: 'accountNumberMasked',
+  partnerLegalNameSnapshot: 'partnerLegalNameSnapshot',
+  partnerDisplayNameSnapshot: 'partnerDisplayNameSnapshot',
+  partnerOrganizationSnapshot: 'partnerOrganizationSnapshot',
+  partnerEmailSnapshot: 'partnerEmailSnapshot',
+  partnerPhoneSnapshot: 'partnerPhoneSnapshot',
+  partnerResidenceCountrySnapshot: 'partnerResidenceCountrySnapshot',
+  preparedAt: 'preparedAt',
+  preparedByUserId: 'preparedByUserId',
+  sentAt: 'sentAt',
+  sentByUserId: 'sentByUserId',
+  failedAt: 'failedAt',
+  externalTransferReference: 'externalTransferReference',
+  externalBankReference: 'externalBankReference',
+  failureReason: 'failureReason',
+  internalNote: 'internalNote',
+  requiresManualReconciliation: 'requiresManualReconciliation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PartnerPayoutScalarFieldEnum = (typeof PartnerPayoutScalarFieldEnum)[keyof typeof PartnerPayoutScalarFieldEnum]
+
+
+export const PartnerPayoutEventScalarFieldEnum = {
+  id: 'id',
+  payoutId: 'payoutId',
+  actorUserId: 'actorUserId',
+  eventType: 'eventType',
+  message: 'message',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type PartnerPayoutEventScalarFieldEnum = (typeof PartnerPayoutEventScalarFieldEnum)[keyof typeof PartnerPayoutEventScalarFieldEnum]
 
 
 export const SavedItemScalarFieldEnum = {

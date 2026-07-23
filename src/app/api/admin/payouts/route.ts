@@ -1,6 +1,7 @@
 import { apiError } from "@/lib/api-response";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { ensurePartnerPayoutsForAdminReview } from "@/lib/partner-payouts";
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
 export async function GET(request: Request) {
@@ -12,9 +13,11 @@ export async function GET(request: Request) {
         { status: 403, headers: { "Cache-Control": "no-store" } },
       );
     }
+    await ensurePartnerPayoutsForAdminReview(user.id);
+    const requestedId = new URL(request.url).searchParams.get("id")?.trim();
     const payouts = await getDb().sellerPayout.findMany({
-      where: new URL(request.url).searchParams.get("id")?.trim()
-        ? { id: new URL(request.url).searchParams.get("id")!.trim() }
+      where: requestedId
+        ? { id: requestedId }
         : undefined,
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -63,7 +66,111 @@ export async function GET(request: Request) {
         sellerCompany: { select: { id: true, legalName: true, tradeName: true } },
       },
     });
-    return Response.json({ payouts }, { headers: { "Cache-Control": "no-store" } });
+    const partnerPayouts = await getDb().partnerPayout.findMany({
+      where: requestedId ? { id: requestedId } : undefined,
+      orderBy: { createdAt: "desc" },
+      take: 100,
+      select: {
+        id: true,
+        payoutNumber: true,
+        status: true,
+        currency: true,
+        originalCommissionAmount: true,
+        reversalAdjustmentAmount: true,
+        finalPayoutAmount: true,
+        holdUntil: true,
+        bankNameSnapshot: true,
+        accountNumberLast4: true,
+        accountNumberMasked: true,
+        partnerLegalNameSnapshot: true,
+        partnerDisplayNameSnapshot: true,
+        partnerOrganizationSnapshot: true,
+        partnerEmailSnapshot: true,
+        partnerPhoneSnapshot: true,
+        partnerResidenceCountrySnapshot: true,
+        requiresManualReconciliation: true,
+        sentAt: true,
+        failedAt: true,
+        failureReason: true,
+        externalTransferReference: true,
+        externalBankReference: true,
+        settlement: {
+          select: {
+            id: true,
+            status: true,
+            grossAmount: true,
+            platformFeeAmount: true,
+            sellerPayableAmount: true,
+            partnerReferralAmount: true,
+            trade82RetainedAmountBeforeStripeFees: true,
+            currency: true,
+            paymentFlow: true,
+            holdUntil: true,
+            paymentRequest: {
+              select: {
+                id: true,
+                status: true,
+                grossAmount: true,
+                platformFeeAmount: true,
+                sellerPayableAmount: true,
+                stripeProcessingFeeAmount: true,
+                refundAmount: true,
+                currency: true,
+                paidAt: true,
+                requiresManualReconciliation: true,
+                disputes: { select: { id: true, status: true, amount: true } },
+              },
+            },
+            tradeOrder: {
+              select: {
+                id: true,
+                orderNumber: true,
+                orderStatus: true,
+                paymentStatus: true,
+                paidAt: true,
+                buyerCompanyName: true,
+                buyerContactName: true,
+                buyerEmail: true,
+                buyerPhone: true,
+                buyerCountry: true,
+                sellerCompanyName: true,
+                sellerContactName: true,
+                sellerEmail: true,
+                sellerPhone: true,
+                items: { take: 1, orderBy: { createdAt: "asc" }, select: { productName: true } },
+              },
+            },
+          },
+        },
+        settlementLeg: {
+          select: { id: true, type: true, status: true, amount: true, currency: true, holdUntil: true },
+        },
+        partnerProfile: {
+          select: {
+            id: true,
+            referralCode: true,
+            status: true,
+            displayName: true,
+            legalName: true,
+            contactEmail: true,
+            contactPhone: true,
+          },
+        },
+        payoutProfile: { select: { id: true, status: true, accountNumberMasked: true, accountNumberLast4: true } },
+      },
+    });
+    const unifiedPayouts = [
+      ...payouts.map((payout) => ({ recipientType: "seller" as const, sellerPayout: payout, partnerPayout: null })),
+      ...partnerPayouts.map((payout) => ({ recipientType: "partner" as const, sellerPayout: null, partnerPayout: payout })),
+    ].sort((a, b) => {
+      const aDate = (a.sellerPayout?.sentAt ?? a.partnerPayout?.sentAt ?? "9999").toString();
+      const bDate = (b.sellerPayout?.sentAt ?? b.partnerPayout?.sentAt ?? "9999").toString();
+      return bDate.localeCompare(aDate);
+    });
+    return Response.json(
+      { payouts, partnerPayouts, unifiedPayouts },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     return apiError(error);
   }
