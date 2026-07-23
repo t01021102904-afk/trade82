@@ -20,7 +20,7 @@ process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-v1";
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const { createTradeOrderForPaymentRequest } = await import(new URL("../src/lib/trade-orders.ts", import.meta.url).href);
 const { listAdminPayoutReviewTransactions } = await import(new URL("../src/lib/admin-payout-review.ts", import.meta.url).href);
-const { markPartnerPayoutSent, revealPartnerPayoutInstructions, setPartnerPayoutStatus } = await import(new URL("../src/lib/partner-payouts.ts", import.meta.url).href);
+const { markPartnerPayoutSent, preparePartnerPayoutForSettlementLeg, revealPartnerPayoutInstructions, setPartnerPayoutStatus } = await import(new URL("../src/lib/partner-payouts.ts", import.meta.url).href);
 const { encryptPayoutData } = await import(new URL("../src/lib/payout-crypto.ts", import.meta.url).href);
 const db = getDb() as PrismaClient;
 
@@ -32,6 +32,7 @@ function unique(prefix: string) {
 
 async function createFixture({
   withPartner = false,
+  preparePartnerPayout = true,
   currency = "usd",
   paymentFlow = "SCT",
   status = "READY",
@@ -39,6 +40,7 @@ async function createFixture({
   withDispute = false,
 }: {
   withPartner?: boolean;
+  preparePartnerPayout?: boolean;
   currency?: string;
   paymentFlow?: "SCT" | "DIRECT_CHARGE";
   status?: "READY" | "HOLD";
@@ -338,7 +340,8 @@ async function createFixture({
     const snapshot = encryptPayoutData("01012345678");
     const partnerLeg = settlement.legs.find((leg) => leg.type === "PARTNER_REFERRAL");
     assert.ok(partnerLeg);
-    partnerPayout = await db.partnerPayout.create({
+    if (preparePartnerPayout) {
+      partnerPayout = await db.partnerPayout.create({
       data: {
         settlementId: settlement.id,
         settlementLegId: partnerLeg.id,
@@ -368,7 +371,8 @@ async function createFixture({
         partnerResidenceCountrySnapshot: "US",
         snapshotCapturedAt: new Date("2026-07-20T14:00:00.000Z"),
       },
-    });
+      });
+    }
   }
   if (withRefund) {
     await db.paymentRequest.update({ where: { id: paymentRequest.id }, data: { refundAmount: grossAmount } });
@@ -381,6 +385,7 @@ async function createFixture({
     partnerPayout,
     partnerProfileId: partnerProfile?.id ?? null,
     partnerPayoutProfileId,
+    partnerSettlementLegId: settlement.legs.find((leg) => leg.type === "PARTNER_REFERRAL")?.id ?? null,
     adminUserId: admin.id,
   };
 }
@@ -419,6 +424,55 @@ test("returns referral allocation and immutable attribution without subtracting 
   assert.equal(transaction.reconciliation.grossAllocationDifference, 0);
   assert.equal(transaction.reconciliation.platformFeeAllocationDifference, 0);
   assert.equal(transaction.reconciliation.balanced, true);
+});
+
+test("classifies a referral settlement without a PartnerPayout as not prepared", async () => {
+  const fixture = await createFixture({ withPartner: true, preparePartnerPayout: false });
+  const before = await db.settlementEvent.count({ where: { settlementId: fixture.settlement.id } });
+  const [transaction] = await listAdminPayoutReviewTransactions(fixture.order.id);
+  assert.ok(transaction);
+  assert.equal(transaction.hasPartnerAttribution, true);
+  assert.equal(transaction.partnerAttributionId, fixture.settlement.referralAttributionId);
+  assert.equal(transaction.partnerSettlementLegId, fixture.partnerSettlementLegId);
+  assert.equal(transaction.partnerExpectedCommissionAmount, 50);
+  assert.equal(transaction.partnerPreparationState, "NOT_PREPARED");
+  assert.equal(transaction.partnerPayout, null);
+  assert.equal(transaction.reconciliation.partnerCommission, 50);
+  assert.doesNotMatch(JSON.stringify(transaction), /Ciphertext|accountNumberSnapshotEncrypted|accountNumberSnapshotIv|accountNumberSnapshotAuthTag/);
+  assert.equal(await db.settlementEvent.count({ where: { settlementId: fixture.settlement.id } }), before);
+});
+
+test("explicit partner payout reconciliation creates exactly one idempotent payout", async () => {
+  const fixture = await createFixture({ withPartner: true, preparePartnerPayout: false });
+  assert.ok(fixture.partnerSettlementLegId);
+  const first = await preparePartnerPayoutForSettlementLeg({
+    settlementLegId: fixture.partnerSettlementLegId,
+    actorUserId: fixture.adminUserId,
+  });
+  const second = await preparePartnerPayoutForSettlementLeg({
+    settlementLegId: fixture.partnerSettlementLegId,
+    actorUserId: fixture.adminUserId,
+  });
+  assert.equal(first.id, second.id);
+  assert.equal(
+    await db.partnerPayout.count({ where: { settlementLegId: fixture.partnerSettlementLegId } }),
+    1,
+  );
+  const [transaction] = await listAdminPayoutReviewTransactions(fixture.order.id);
+  assert.equal(transaction?.partnerPreparationState, "PREPARED");
+  assert.equal(transaction?.partnerPayout?.id, first.id);
+});
+
+test("transactions without referral attribution remain not applicable", async () => {
+  const fixture = await createFixture();
+  const [transaction] = await listAdminPayoutReviewTransactions(fixture.order.id);
+  assert.ok(transaction);
+  assert.equal(transaction.hasPartnerAttribution, false);
+  assert.equal(transaction.partnerAttributionId, null);
+  assert.equal(transaction.partnerSettlementLegId, null);
+  assert.equal(transaction.partnerExpectedCommissionAmount, 0);
+  assert.equal(transaction.partnerPreparationState, "NOT_APPLICABLE");
+  assert.equal(transaction.partnerPayout, null);
 });
 
 test("flags a currency mismatch instead of declaring the allocation balanced", async () => {

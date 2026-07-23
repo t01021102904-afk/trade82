@@ -85,6 +85,11 @@ export type AdminPayoutReviewTransaction = {
       createdByUser: { displayName: string; email: string };
     }>;
   } | null;
+  hasPartnerAttribution: boolean;
+  partnerAttributionId: string | null;
+  partnerSettlementLegId: string | null;
+  partnerExpectedCommissionAmount: number;
+  partnerPreparationState: "NOT_APPLICABLE" | "NOT_PREPARED" | "PREPARED";
   partnerPayout: {
     id: string;
     payoutNumber: string;
@@ -176,6 +181,7 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
               { id: requestedId },
               { payout: { is: { id: requestedId } } },
               { partnerPayouts: { some: { id: requestedId } } },
+              { connectSettlement: { is: { legs: { some: { id: requestedId } } } } },
             ],
           }
         : {}),
@@ -304,6 +310,12 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
           currency: true,
           holdUntil: true,
           referralAttributionId: true,
+          referralAttribution: { select: { id: true } },
+          legs: {
+            where: { type: "PARTNER_REFERRAL" },
+            take: 1,
+            select: { id: true, type: true, amount: true, currency: true, holdUntil: true, status: true, partnerProfileId: true },
+          },
           events: {
             orderBy: { createdAt: "desc" },
             take: 50,
@@ -318,6 +330,10 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
     const payment = order.paymentRequest;
     const settlement = order.connectSettlement;
     const partnerPayout = order.partnerPayouts[0] ?? null;
+    const partnerLeg = settlement?.legs[0] ?? null;
+    const hasPartnerAttribution = Boolean(settlement?.referralAttribution?.id && partnerLeg?.id && partnerLeg.partnerProfileId);
+    const partnerAttributionId = hasPartnerAttribution ? settlement?.referralAttribution?.id ?? null : null;
+    const partnerSettlementLegId = hasPartnerAttribution ? partnerLeg?.id ?? null : null;
     const sellerPayout = order.payout;
     // The persisted payment model has no separate buyer service-fee field.
     const buyerServiceFee = null;
@@ -414,6 +430,11 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
             adjustments: sellerPayout.adjustments,
           }
         : null,
+      hasPartnerAttribution,
+      partnerAttributionId,
+      partnerSettlementLegId,
+      partnerExpectedCommissionAmount: hasPartnerAttribution ? partnerLeg?.amount ?? 0 : 0,
+      partnerPreparationState: !hasPartnerAttribution ? "NOT_APPLICABLE" : partnerPayout ? "PREPARED" : "NOT_PREPARED",
       partnerPayout: partnerPayout
         ? {
             id: partnerPayout.id,
@@ -444,7 +465,7 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
             externalBankReference: partnerPayout.externalBankReference,
             partnerStatus: partnerPayout.partnerProfile.status,
             payoutProfileStatus: partnerPayout.payoutProfile?.status ?? null,
-            attributionId: settlement?.referralAttributionId ?? null,
+            attributionId: partnerAttributionId,
           }
         : null,
       reconciliation: {

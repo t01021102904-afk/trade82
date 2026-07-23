@@ -13,6 +13,7 @@ import { calculateAdminPayoutReconciliation } from "../src/lib/admin-payout-revi
 const partnerPayoutSource = await readFile(new URL("../src/lib/partner-payouts.ts", import.meta.url), "utf8");
 const adminPayoutRouteSource = await readFile(new URL("../src/app/api/admin/payouts/route.ts", import.meta.url), "utf8");
 const adminPayoutActionRouteSource = await readFile(new URL("../src/app/api/admin/partner-payouts/[id]/route.ts", import.meta.url), "utf8");
+const adminPayoutUiSource = await readFile(new URL("../src/components/admin-payout-management.tsx", import.meta.url), "utf8");
 
 const base = {
   now: new Date("2026-07-23T00:00:00.000Z"),
@@ -68,6 +69,13 @@ test("held leg is held", () => assert.equal(status({ leg: { status: "HOLD" } }),
 test("fully eligible partner payout remains ready after reconciliation amount changes", () => assert.equal(status({ finalPayoutAmount: 1 }), PartnerPayoutStatus.READY));
 test("admin listing has no partner payout preparation call", () => assert.doesNotMatch(adminPayoutRouteSource, /ensurePartnerPayoutsForAdminReview/));
 test("admin listing is explicitly no-store", () => assert.match(adminPayoutRouteSource, /Cache-Control.*no-store/));
+test("admin review classifies partner attribution independently of payout rows", () => {
+  assert.match(adminPayoutUiSource, /hasPartnerAttribution/);
+  assert.match(adminPayoutUiSource, /partnerPreparationState/);
+  assert.match(adminPayoutUiSource, /partnerSettlementLegId/);
+  assert.match(adminPayoutUiSource, /preparePartnerPayout/);
+  assert.match(adminPayoutUiSource, /\/api\/admin\/payouts\/reconcile/);
+});
 test("partner payout snapshots have a capture timestamp", () => assert.match(partnerPayoutSource, /snapshotCapturedAt/));
 test("partner payout snapshots are captured only from verified profiles", () => assert.match(partnerPayoutSource, /status === PartnerPayoutProfileStatus\.VERIFIED/));
 test("partner payout sent records preserve their existing status", () => assert.match(partnerPayoutSource, /PartnerPayoutStatus\.SENT/));
