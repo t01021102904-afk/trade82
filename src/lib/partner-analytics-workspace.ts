@@ -53,6 +53,14 @@ export const partnerAnalyticsGroupingOptions: Array<{
   { value: "monthly", key: "groupMonthly" },
 ];
 
+export function recommendedAnalyticsGrouping(
+  range: PartnerAnalyticsRange,
+): AnalyticsGrouping {
+  if (range === "90d") return "weekly";
+  if (range === "12m" || range === "all") return "monthly";
+  return "daily";
+}
+
 export const partnerAnalyticsMetrics: Array<{
   value: AnalyticsMetric;
   key: string;

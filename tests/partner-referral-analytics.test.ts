@@ -10,6 +10,7 @@ import {
   formatAnalyticsChartLabel,
   groupPartnerAnalyticsPoints,
   partnerAnalyticsMetrics,
+  recommendedAnalyticsGrouping,
 } from "../src/lib/partner-analytics-workspace.ts";
 import {
   applyReferralVisitorCookie,
@@ -326,6 +327,31 @@ test("analytics chart labels keep daily axes day-based with nearby period contex
   );
   assert.equal(analyticsPeriodContext([{ date: "2026-07" }], "monthly", "en"), null);
   assert.deepEqual([...analyticsChartLabelIndices(52, "weekly")], [0, 7, 14, 21, 28, 35, 42, 49, 51]);
+});
+
+test("analytics ranges choose contained defaults while manual grouping remains available", async () => {
+  assert.equal(recommendedAnalyticsGrouping("7d"), "daily");
+  assert.equal(recommendedAnalyticsGrouping("30d"), "daily");
+  assert.equal(recommendedAnalyticsGrouping("90d"), "weekly");
+  assert.equal(recommendedAnalyticsGrouping("12m"), "monthly");
+  assert.equal(recommendedAnalyticsGrouping("all"), "monthly");
+  assert.ok(analyticsChartLabelIndices(365, "daily").size < 365);
+
+  const componentSource = await readFile(
+    new URL("../src/components/partner-referral-analytics.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(componentSource, /minmax\(22px,\s*1fr\)/);
+  assert.match(componentSource, /minmax\(0,\s*1fr\)/);
+  assert.match(componentSource, /recommendedAnalyticsGrouping\(analytics\.range\)/);
+  assert.match(componentSource, /setGrouping\(event\.target\.value as AnalyticsGrouping\)/);
+  assert.match(componentSource, /w-full max-w-full min-w-0 overflow-hidden/);
+
+  assert.equal(formatAnalyticsChartLabel("2026-08-01", "monthly", "en"), "Aug");
+  assert.equal(
+    formatAnalyticsChartLabel("2026-08-03", "weekly", "en"),
+    "Week of Aug 3",
+  );
 });
 
 test("partner and admin dashboards render the unified white analytics workspace", async () => {

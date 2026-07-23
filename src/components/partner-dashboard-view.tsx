@@ -87,8 +87,8 @@ export function PartnerDashboardView({
   ] as const;
 
   return (
-    <main className="bm-grid-surface min-h-[calc(100vh-4rem)] theme-bg">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:px-8">
+    <main className="bm-grid-surface min-h-[calc(100vh-4rem)] min-w-0 w-full max-w-full overflow-x-hidden theme-bg">
+      <div className="mx-auto grid min-w-0 w-full max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:px-8">
         {adminReadonly ? (
           <div className="border px-4 py-3 text-sm theme-border theme-surface-muted">
             <p className="font-semibold theme-foreground">
