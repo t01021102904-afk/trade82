@@ -54,6 +54,26 @@ test("partner program mode is explicitly opt-in and otherwise fails closed", () 
   assert.equal(getPartnerProgramMode(" on "), "on");
 });
 
+test("partner enrollment form has translations for every static partnerProgram key", async () => {
+  const form = await readFile(
+    new URL("../src/components/partner-enrollment-form.tsx", import.meta.url),
+    "utf8",
+  );
+  const keys = [...form.matchAll(/t\("partnerProgram\.([A-Za-z0-9_]+)"\)/g)]
+    .map((match) => match[1])
+    .filter((key, index, all) => all.indexOf(key) === index);
+  const english = JSON.parse(await readFile(new URL("../messages/en.json", import.meta.url), "utf8"));
+  const korean = JSON.parse(await readFile(new URL("../messages/ko.json", import.meta.url), "utf8"));
+
+  assert.ok(keys.length > 0);
+  for (const key of keys) {
+    assert.equal(typeof english.partnerProgram[key], "string", `missing English key: ${key}`);
+    assert.equal(typeof korean.partnerProgram[key], "string", `missing Korean key: ${key}`);
+    assert.notEqual(english.partnerProgram[key], `partnerProgram.${key}`);
+    assert.notEqual(korean.partnerProgram[key], `partnerProgram.${key}`);
+  }
+});
+
 test("public navigation omits Partner even when the feature is enabled", () => {
   assert.equal(
     getPublicNavigationLinks(false).some((link) => (link.href as string) === "/partner"),
