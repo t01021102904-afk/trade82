@@ -14,6 +14,7 @@ import {
 import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
 import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
 import { evaluateSettlementReleaseEligibilityInTransaction } from "@/lib/stripe-connect-settlement-release";
+import { reconcilePartnerPayoutForSettlementLeg } from "@/lib/partner-payouts";
 
 type Tx = Prisma.TransactionClient;
 
@@ -140,6 +141,14 @@ async function loadLockedSettlement(tx: Tx, paymentRequestId: string) {
 }
 
 type LockedSettlement = NonNullable<Awaited<ReturnType<typeof loadLockedSettlement>>>;
+
+async function reconcilePartnerPayoutsForSettlement(tx: Tx, settlement: LockedSettlement) {
+  if (settlement.paymentFlow === "DIRECT_CHARGE") return;
+  const partnerLegs = settlement.legs.filter((leg) => leg.type === SettlementLegType.PARTNER_REFERRAL);
+  for (const leg of partnerLegs) {
+    await reconcilePartnerPayoutForSettlementLeg({ tx, settlementLegId: leg.id });
+  }
+}
 
 function hasExternalReversalPending(settlement: LockedSettlement) {
   return (
@@ -520,6 +529,8 @@ async function reconcileEconomicLoss(
     });
   }
 
+  await reconcilePartnerPayoutsForSettlement(tx, settlement);
+
   return {
     settlementId: settlement.id,
     fullLoss,
@@ -560,6 +571,7 @@ async function blockSettlementForOpenDispute(tx: Tx, source: DisputeReconciliati
     metadata: disputeAuditMetadata(source),
     idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:${source.stripeEventType === "charge.dispute.created" ? "opened" : "updated"}:status:${source.disputeStatus}`,
   });
+  await reconcilePartnerPayoutsForSettlement(tx, settlement);
   return { settlementId: settlement.id };
 }
 
@@ -617,6 +629,7 @@ async function restoreSettlementAfterWonDispute(tx: Tx, source: DisputeReconcili
     },
     idempotencyKey: `settlement:${settlement.id}:dispute:${source.stripeSourceId}:won:status:${source.disputeStatus}`,
   });
+  await reconcilePartnerPayoutsForSettlement(tx, settlement);
   return { settlementId: settlement.id };
 }
 

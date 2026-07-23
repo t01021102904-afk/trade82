@@ -138,6 +138,13 @@ type RevealedInstructions = {
   instructions: Record<string, unknown>;
 };
 
+type AdminPayoutReviewTransaction = {
+  orderId: string;
+  orderNumber: string;
+  sellerPayout: Payout | null;
+  partnerPayout: PartnerPayout | null;
+};
+
 function isActionableStatus(status: string) {
   return status === "READY" || status === "PROCESSING";
 }
@@ -146,6 +153,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
   const { locale, t } = useI18n();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [partnerPayouts, setPartnerPayouts] = useState<PartnerPayout[]>([]);
+  const [transactions, setTransactions] = useState<AdminPayoutReviewTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [revealed, setRevealed] = useState<RevealedInstructions | null>(null);
@@ -170,6 +178,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
       if (!response.ok) throw new Error(t("payouts.loadPayoutsError"));
       setPayouts(data.payouts ?? []);
       setPartnerPayouts(data.partnerPayouts ?? []);
+      setTransactions(data.transactions ?? []);
     } catch {
       setError(t("payouts.loadPayoutsError"));
     } finally {
@@ -201,39 +210,22 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
     [partnerPayouts, selectedId],
   );
 
-  const partnerCopy = locale === "ko"
-    ? {
-        title: "파트너 수동 지급",
-        subtitle: "추천 수수료 지급 검토",
-        transaction: "거래 요약",
-        buyer: "바이어 정보",
-        seller: "셀러 정보",
-        partner: "파트너 정보",
-        commission: "파트너 수수료",
-        trade82Retained: "Trade82 보유액",
-        holdUntil: "보류 종료",
-        payoutAccount: "지급 계좌",
-        noPartnerPayouts: "검토할 파트너 지급이 없습니다.",
-        reveal: "파트너 계좌 보기",
-        markSent: "파트너 지급 완료 기록",
-        warnings: "경고",
-      }
-    : {
-        title: "Partner manual payout",
-        subtitle: "Referral commission payout review",
-        transaction: "Transaction summary",
-        buyer: "Buyer information",
-        seller: "Seller information",
-        partner: "Partner information",
-        commission: "Partner commission",
-        trade82Retained: "Trade82 retained",
-        holdUntil: "Hold until",
-        payoutAccount: "Payout account",
-        noPartnerPayouts: "No partner payouts to review.",
-        reveal: "Reveal partner account",
-        markSent: "Record partner payout sent",
-        warnings: "Warnings",
-      };
+  const partnerCopy = {
+    title: t("payouts.partnerManualTitle"),
+    subtitle: t("payouts.partnerManualSubtitle"),
+    transaction: t("payouts.partnerTransaction"),
+    buyer: t("payouts.partnerBuyer"),
+    seller: t("payouts.partnerSeller"),
+    partner: t("payouts.partnerInformation"),
+    commission: t("payouts.partnerCommission"),
+    trade82Retained: t("payouts.trade82Retained"),
+    holdUntil: t("payouts.partnerHoldUntil"),
+    payoutAccount: t("payouts.partnerPayoutAccount"),
+    noPartnerPayouts: t("payouts.noPartnerPayouts"),
+    reveal: t("payouts.revealPartnerAccount"),
+    markSent: t("payouts.recordPartnerPayoutSent"),
+    warnings: t("payouts.partnerWarnings"),
+  };
 
   async function action(
     payout: Payout,
@@ -252,7 +244,6 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
                 externalTransferReference: reference,
                 externalBankReference: bankReference || undefined,
                 confirmation,
-                sentAt: new Date().toISOString(),
               }
             : { action: nextAction },
         ),
@@ -353,7 +344,6 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
                 externalTransferReference: reference,
                 externalBankReference: bankReference || undefined,
                 confirmation,
-                sentAt: new Date().toISOString(),
               }
             : { action: nextAction },
         ),
@@ -446,6 +436,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
   return (
     <section className="grid gap-4">
       {error ? <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
+      {transactions.length ? <p className="text-xs theme-muted">{t("payouts.transactionReviewCount").replace("{count}", String(transactions.length))}</p> : null}
       {visible.map((payout) => {
         const instructionsAreRevealed = activeReveal?.payoutId === payout.id;
         const bankPortalUrl = isSafeOfficialBankWebsite(payout.officialBankWebsiteSnapshot)
@@ -554,7 +545,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
               <div>
                 <p className="text-xs theme-muted">{order.orderNumber} · {payout.payoutNumber}</p>
                 <h2 className="mt-1 text-lg font-semibold theme-foreground">{partnerCopy.title}</h2>
-                <p className="mt-1 text-sm theme-muted">{payout.partnerDisplayNameSnapshot ?? payout.partnerLegalNameSnapshot ?? payout.partnerProfile.referralCode} · {partnerCopy.subtitle}</p>
+                <p className="mt-1 text-sm theme-muted">{payout.partnerDisplayNameSnapshot ?? payout.partnerLegalNameSnapshot ?? "—"} · {partnerCopy.subtitle}</p>
               </div>
               <span className="rounded-full border px-2.5 py-1 text-xs font-semibold theme-success-badge">{payoutStatusLabel(payout.status, t)}</span>
             </div>
@@ -599,7 +590,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
           </article>
         );
       })}
-      {!visible.length && !visiblePartnerPayouts.length ? <p className="rounded-xl border px-5 py-8 text-sm theme-muted">{t("payouts.noPayouts")}</p> : null}
+      {!transactions.length && !visible.length && !visiblePartnerPayouts.length ? <p className="rounded-xl border px-5 py-8 text-sm theme-muted">{t("payouts.noPayouts")}</p> : null}
       {activeReveal ? <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950"><div className="flex items-center justify-between gap-3"><p className="font-semibold">{t("payouts.revealedInstructions")}</p><button onClick={() => setRevealed(null)} className="inline-flex size-7 items-center justify-center rounded border" aria-label={t("payouts.hideRevealedInstructions")}><X className="size-4" /></button></div><p className="mt-1 text-xs">{t("payouts.revealExpiry")}</p><pre className="mt-2 overflow-auto whitespace-pre-wrap">{JSON.stringify(activeReveal.instructions, null, 2)}</pre></div> : null}
     </section>
   );

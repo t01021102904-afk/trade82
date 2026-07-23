@@ -1,7 +1,7 @@
 import { apiError } from "@/lib/api-response";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
-import { ensurePartnerPayoutsForAdminReview } from "@/lib/partner-payouts";
+import { listAdminPayoutReviewTransactions } from "@/lib/admin-payout-review";
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
 export async function GET(request: Request) {
@@ -13,8 +13,8 @@ export async function GET(request: Request) {
         { status: 403, headers: { "Cache-Control": "no-store" } },
       );
     }
-    await ensurePartnerPayoutsForAdminReview(user.id);
     const requestedId = new URL(request.url).searchParams.get("id")?.trim();
+    const transactions = await listAdminPayoutReviewTransactions(requestedId);
     const payouts = await getDb().sellerPayout.findMany({
       where: requestedId
         ? { id: requestedId }
@@ -148,8 +148,7 @@ export async function GET(request: Request) {
         partnerProfile: {
           select: {
             id: true,
-            referralCode: true,
-            status: true,
+              status: true,
             displayName: true,
             legalName: true,
             contactEmail: true,
@@ -168,7 +167,7 @@ export async function GET(request: Request) {
       return bDate.localeCompare(aDate);
     });
     return Response.json(
-      { payouts, partnerPayouts, unifiedPayouts },
+      { transactions, payouts, partnerPayouts, unifiedPayouts },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

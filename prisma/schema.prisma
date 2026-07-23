@@ -1823,6 +1823,7 @@ model PartnerPayout {
   partnerPhoneSnapshot            String?
   partnerResidenceCountrySnapshot String?
   preparedAt                      DateTime?
+  snapshotCapturedAt              DateTime?
   preparedByUserId                String?
   preparedByUser                  UserProfile?          @relation("PartnerPayoutPreparedBy", fields: [preparedByUserId], references: [id], onDelete: SetNull)
   sentAt                          DateTime?
@@ -1845,15 +1846,16 @@ model PartnerPayout {
 }
 
 model PartnerPayoutEvent {
-  id          String                 @id @default(cuid())
-  payoutId    String
-  payout      PartnerPayout          @relation(fields: [payoutId], references: [id], onDelete: Restrict)
-  actorUserId String?
-  actorUser   UserProfile?           @relation("PartnerPayoutEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
-  eventType   PartnerPayoutEventType
-  message     String?
-  metadata    Json                   @default("{}")
-  createdAt   DateTime               @default(now())
+  id             String                 @id @default(cuid())
+  payoutId       String
+  payout         PartnerPayout          @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+  actorUserId    String?
+  actorUser      UserProfile?           @relation("PartnerPayoutEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  eventType      PartnerPayoutEventType
+  message        String?
+  metadata       Json                   @default("{}")
+  idempotencyKey String?                @unique
+  createdAt      DateTime               @default(now())
 
   @@index([payoutId, createdAt])
   @@index([eventType, createdAt])

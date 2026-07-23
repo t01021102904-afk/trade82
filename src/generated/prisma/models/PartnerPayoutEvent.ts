@@ -30,6 +30,7 @@ export type PartnerPayoutEventMinAggregateOutputType = {
   actorUserId: string | null
   eventType: $Enums.PartnerPayoutEventType | null
   message: string | null
+  idempotencyKey: string | null
   createdAt: Date | null
 }
 
@@ -39,6 +40,7 @@ export type PartnerPayoutEventMaxAggregateOutputType = {
   actorUserId: string | null
   eventType: $Enums.PartnerPayoutEventType | null
   message: string | null
+  idempotencyKey: string | null
   createdAt: Date | null
 }
 
@@ -49,6 +51,7 @@ export type PartnerPayoutEventCountAggregateOutputType = {
   eventType: number
   message: number
   metadata: number
+  idempotencyKey: number
   createdAt: number
   _all: number
 }
@@ -60,6 +63,7 @@ export type PartnerPayoutEventMinAggregateInputType = {
   actorUserId?: true
   eventType?: true
   message?: true
+  idempotencyKey?: true
   createdAt?: true
 }
 
@@ -69,6 +73,7 @@ export type PartnerPayoutEventMaxAggregateInputType = {
   actorUserId?: true
   eventType?: true
   message?: true
+  idempotencyKey?: true
   createdAt?: true
 }
 
@@ -79,6 +84,7 @@ export type PartnerPayoutEventCountAggregateInputType = {
   eventType?: true
   message?: true
   metadata?: true
+  idempotencyKey?: true
   createdAt?: true
   _all?: true
 }
@@ -162,6 +168,7 @@ export type PartnerPayoutEventGroupByOutputType = {
   eventType: $Enums.PartnerPayoutEventType
   message: string | null
   metadata: runtime.JsonValue
+  idempotencyKey: string | null
   createdAt: Date
   _count: PartnerPayoutEventCountAggregateOutputType | null
   _min: PartnerPayoutEventMinAggregateOutputType | null
@@ -193,6 +200,7 @@ export type PartnerPayoutEventWhereInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFilter<"PartnerPayoutEvent"> | $Enums.PartnerPayoutEventType
   message?: Prisma.StringNullableFilter<"PartnerPayoutEvent"> | string | null
   metadata?: Prisma.JsonFilter<"PartnerPayoutEvent">
+  idempotencyKey?: Prisma.StringNullableFilter<"PartnerPayoutEvent"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerPayoutEvent"> | Date | string
   payout?: Prisma.XOR<Prisma.PartnerPayoutScalarRelationFilter, Prisma.PartnerPayoutWhereInput>
   actorUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
@@ -205,6 +213,7 @@ export type PartnerPayoutEventOrderByWithRelationInput = {
   eventType?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   payout?: Prisma.PartnerPayoutOrderByWithRelationInput
   actorUser?: Prisma.UserProfileOrderByWithRelationInput
@@ -212,6 +221,7 @@ export type PartnerPayoutEventOrderByWithRelationInput = {
 
 export type PartnerPayoutEventWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  idempotencyKey?: string
   AND?: Prisma.PartnerPayoutEventWhereInput | Prisma.PartnerPayoutEventWhereInput[]
   OR?: Prisma.PartnerPayoutEventWhereInput[]
   NOT?: Prisma.PartnerPayoutEventWhereInput | Prisma.PartnerPayoutEventWhereInput[]
@@ -223,7 +233,7 @@ export type PartnerPayoutEventWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"PartnerPayoutEvent"> | Date | string
   payout?: Prisma.XOR<Prisma.PartnerPayoutScalarRelationFilter, Prisma.PartnerPayoutWhereInput>
   actorUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
-}, "id">
+}, "id" | "idempotencyKey">
 
 export type PartnerPayoutEventOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -232,6 +242,7 @@ export type PartnerPayoutEventOrderByWithAggregationInput = {
   eventType?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
   metadata?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.PartnerPayoutEventCountOrderByAggregateInput
   _max?: Prisma.PartnerPayoutEventMaxOrderByAggregateInput
@@ -248,6 +259,7 @@ export type PartnerPayoutEventScalarWhereWithAggregatesInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeWithAggregatesFilter<"PartnerPayoutEvent"> | $Enums.PartnerPayoutEventType
   message?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayoutEvent"> | string | null
   metadata?: Prisma.JsonWithAggregatesFilter<"PartnerPayoutEvent">
+  idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayoutEvent"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PartnerPayoutEvent"> | Date | string
 }
 
@@ -256,6 +268,7 @@ export type PartnerPayoutEventCreateInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
   payout: Prisma.PartnerPayoutCreateNestedOneWithoutEventsInput
   actorUser?: Prisma.UserProfileCreateNestedOneWithoutPartnerPayoutEventsInput
@@ -268,6 +281,7 @@ export type PartnerPayoutEventUncheckedCreateInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -276,6 +290,7 @@ export type PartnerPayoutEventUpdateInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payout?: Prisma.PartnerPayoutUpdateOneRequiredWithoutEventsNestedInput
   actorUser?: Prisma.UserProfileUpdateOneWithoutPartnerPayoutEventsNestedInput
@@ -288,6 +303,7 @@ export type PartnerPayoutEventUncheckedUpdateInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -298,6 +314,7 @@ export type PartnerPayoutEventCreateManyInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -306,6 +323,7 @@ export type PartnerPayoutEventUpdateManyMutationInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -316,6 +334,7 @@ export type PartnerPayoutEventUncheckedUpdateManyInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -336,6 +355,7 @@ export type PartnerPayoutEventCountOrderByAggregateInput = {
   eventType?: Prisma.SortOrder
   message?: Prisma.SortOrder
   metadata?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -345,6 +365,7 @@ export type PartnerPayoutEventMaxOrderByAggregateInput = {
   actorUserId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -354,6 +375,7 @@ export type PartnerPayoutEventMinOrderByAggregateInput = {
   actorUserId?: Prisma.SortOrder
   eventType?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -450,6 +472,7 @@ export type PartnerPayoutEventCreateWithoutActorUserInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
   payout: Prisma.PartnerPayoutCreateNestedOneWithoutEventsInput
 }
@@ -460,6 +483,7 @@ export type PartnerPayoutEventUncheckedCreateWithoutActorUserInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -499,6 +523,7 @@ export type PartnerPayoutEventScalarWhereInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFilter<"PartnerPayoutEvent"> | $Enums.PartnerPayoutEventType
   message?: Prisma.StringNullableFilter<"PartnerPayoutEvent"> | string | null
   metadata?: Prisma.JsonFilter<"PartnerPayoutEvent">
+  idempotencyKey?: Prisma.StringNullableFilter<"PartnerPayoutEvent"> | string | null
   createdAt?: Prisma.DateTimeFilter<"PartnerPayoutEvent"> | Date | string
 }
 
@@ -507,6 +532,7 @@ export type PartnerPayoutEventCreateWithoutPayoutInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
   actorUser?: Prisma.UserProfileCreateNestedOneWithoutPartnerPayoutEventsInput
 }
@@ -517,6 +543,7 @@ export type PartnerPayoutEventUncheckedCreateWithoutPayoutInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -552,6 +579,7 @@ export type PartnerPayoutEventCreateManyActorUserInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -560,6 +588,7 @@ export type PartnerPayoutEventUpdateWithoutActorUserInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payout?: Prisma.PartnerPayoutUpdateOneRequiredWithoutEventsNestedInput
 }
@@ -570,6 +599,7 @@ export type PartnerPayoutEventUncheckedUpdateWithoutActorUserInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -579,6 +609,7 @@ export type PartnerPayoutEventUncheckedUpdateManyWithoutActorUserInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -588,6 +619,7 @@ export type PartnerPayoutEventCreateManyPayoutInput = {
   eventType: $Enums.PartnerPayoutEventType
   message?: string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: string | null
   createdAt?: Date | string
 }
 
@@ -596,6 +628,7 @@ export type PartnerPayoutEventUpdateWithoutPayoutInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   actorUser?: Prisma.UserProfileUpdateOneWithoutPartnerPayoutEventsNestedInput
 }
@@ -606,6 +639,7 @@ export type PartnerPayoutEventUncheckedUpdateWithoutPayoutInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -615,6 +649,7 @@ export type PartnerPayoutEventUncheckedUpdateManyWithoutPayoutInput = {
   eventType?: Prisma.EnumPartnerPayoutEventTypeFieldUpdateOperationsInput | $Enums.PartnerPayoutEventType
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -627,6 +662,7 @@ export type PartnerPayoutEventSelect<ExtArgs extends runtime.Types.Extensions.In
   eventType?: boolean
   message?: boolean
   metadata?: boolean
+  idempotencyKey?: boolean
   createdAt?: boolean
   payout?: boolean | Prisma.PartnerPayoutDefaultArgs<ExtArgs>
   actorUser?: boolean | Prisma.PartnerPayoutEvent$actorUserArgs<ExtArgs>
@@ -639,6 +675,7 @@ export type PartnerPayoutEventSelectCreateManyAndReturn<ExtArgs extends runtime.
   eventType?: boolean
   message?: boolean
   metadata?: boolean
+  idempotencyKey?: boolean
   createdAt?: boolean
   payout?: boolean | Prisma.PartnerPayoutDefaultArgs<ExtArgs>
   actorUser?: boolean | Prisma.PartnerPayoutEvent$actorUserArgs<ExtArgs>
@@ -651,6 +688,7 @@ export type PartnerPayoutEventSelectUpdateManyAndReturn<ExtArgs extends runtime.
   eventType?: boolean
   message?: boolean
   metadata?: boolean
+  idempotencyKey?: boolean
   createdAt?: boolean
   payout?: boolean | Prisma.PartnerPayoutDefaultArgs<ExtArgs>
   actorUser?: boolean | Prisma.PartnerPayoutEvent$actorUserArgs<ExtArgs>
@@ -663,10 +701,11 @@ export type PartnerPayoutEventSelectScalar = {
   eventType?: boolean
   message?: boolean
   metadata?: boolean
+  idempotencyKey?: boolean
   createdAt?: boolean
 }
 
-export type PartnerPayoutEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payoutId" | "actorUserId" | "eventType" | "message" | "metadata" | "createdAt", ExtArgs["result"]["partnerPayoutEvent"]>
+export type PartnerPayoutEventOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payoutId" | "actorUserId" | "eventType" | "message" | "metadata" | "idempotencyKey" | "createdAt", ExtArgs["result"]["partnerPayoutEvent"]>
 export type PartnerPayoutEventInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payout?: boolean | Prisma.PartnerPayoutDefaultArgs<ExtArgs>
   actorUser?: boolean | Prisma.PartnerPayoutEvent$actorUserArgs<ExtArgs>
@@ -693,6 +732,7 @@ export type $PartnerPayoutEventPayload<ExtArgs extends runtime.Types.Extensions.
     eventType: $Enums.PartnerPayoutEventType
     message: string | null
     metadata: runtime.JsonValue
+    idempotencyKey: string | null
     createdAt: Date
   }, ExtArgs["result"]["partnerPayoutEvent"]>
   composites: {}
@@ -1125,6 +1165,7 @@ export interface PartnerPayoutEventFieldRefs {
   readonly eventType: Prisma.FieldRef<"PartnerPayoutEvent", 'PartnerPayoutEventType'>
   readonly message: Prisma.FieldRef<"PartnerPayoutEvent", 'String'>
   readonly metadata: Prisma.FieldRef<"PartnerPayoutEvent", 'Json'>
+  readonly idempotencyKey: Prisma.FieldRef<"PartnerPayoutEvent", 'String'>
   readonly createdAt: Prisma.FieldRef<"PartnerPayoutEvent", 'DateTime'>
 }
     

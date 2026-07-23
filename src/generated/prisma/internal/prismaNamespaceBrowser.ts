@@ -1166,6 +1166,7 @@ export const PartnerPayoutScalarFieldEnum = {
   partnerPhoneSnapshot: 'partnerPhoneSnapshot',
   partnerResidenceCountrySnapshot: 'partnerResidenceCountrySnapshot',
   preparedAt: 'preparedAt',
+  snapshotCapturedAt: 'snapshotCapturedAt',
   preparedByUserId: 'preparedByUserId',
   sentAt: 'sentAt',
   sentByUserId: 'sentByUserId',
@@ -1189,6 +1190,7 @@ export const PartnerPayoutEventScalarFieldEnum = {
   eventType: 'eventType',
   message: 'message',
   metadata: 'metadata',
+  idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt'
 } as const
 

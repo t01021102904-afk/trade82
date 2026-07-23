@@ -1,69 +1,79 @@
 import { apiError } from "@/lib/api-response";
-import { idParam, readJsonObject } from "@/lib/api-security";
+import {
+  ApiValidationError,
+  assertSameOrigin,
+  idParam,
+  rateLimitOrResponse,
+  readJsonObject,
+  rejectUnexpectedFields,
+  stringField,
+  validationError,
+  validationErrorResponse,
+} from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { markPartnerPayoutSent, setPartnerPayoutStatus } from "@/lib/partner-payouts";
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
-function dateField(value: unknown) {
-  if (typeof value !== "string") throw new Error("sentAt is required.");
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) throw new Error("sentAt is invalid.");
-  return date;
-}
-
-function text(value: unknown, field: string, required = false, max = 500) {
-  if (value === undefined || value === null) {
-    if (required) throw new Error(`${field} is required.`);
-    return "";
-  }
-  if (typeof value !== "string") throw new Error(`${field} must be text.`);
-  const output = value.trim();
-  if (output.length > max) throw new Error(`${field} is too long.`);
-  if (required && !output) throw new Error(`${field} is required.`);
-  return output;
-}
+const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
+const fields = new Set([
+  "action",
+  "failureReason",
+  "externalTransferReference",
+  "confirmation",
+  "externalBankReference",
+]);
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    assertSameOrigin(request);
     const user = await requireAdmin();
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "admin-partner-payout-write",
+      userId: user.id,
+      limit: 60,
+      windowMs: 60 * 60_000,
+    });
+    if (rateLimited) return rateLimited;
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
-      return Response.json({ error: "Manual payouts are not enabled for this account." }, { status: 403 });
+      return Response.json({ error: "Manual payouts are not enabled for this account." }, { status: 403, headers: noStore });
     }
     const body = await readJsonObject(request);
+    rejectUnexpectedFields(body, fields);
     const payoutId = idParam((await params).id, "partnerPayoutId");
-    if (body.action === "hold" || body.action === "processing" || body.action === "failed" || body.action === "returned") {
+    const action = stringField(body, "action", { max: 32, required: true });
+    if (action === "hold" || action === "processing" || action === "failed" || action === "returned") {
       await setPartnerPayoutStatus({
         payoutId,
         actorUserId: user.id,
         status:
-          body.action === "hold"
+          action === "hold"
             ? "HOLD"
-            : body.action === "processing"
+            : action === "processing"
               ? "PROCESSING"
-              : body.action === "returned"
+              : action === "returned"
                 ? "RETURNED"
                 : "FAILED",
-        failureReason: text(body.failureReason, "failureReason", body.action === "failed" || body.action === "returned", 1_000),
+        failureReason: stringField(body, "failureReason", { max: 1_000, required: action === "failed" || action === "returned", fallback: null }) ?? undefined,
       });
-      return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+      return Response.json({ ok: true }, { headers: noStore });
     }
-    if (body.action === "mark_sent") {
+    if (action === "mark_sent") {
       const result = await markPartnerPayoutSent({
         payoutId,
         actorUserId: user.id,
-        externalTransferReference: text(body.externalTransferReference, "externalTransferReference", true, 240),
-        sentAt: dateField(body.sentAt),
-        confirmation: text(body.confirmation, "confirmation", true, 240),
-        externalBankReference: text(body.externalBankReference, "externalBankReference", false, 240) || undefined,
+        externalTransferReference: stringField(body, "externalTransferReference", { max: 240, required: true }) as string,
+        confirmation: stringField(body, "confirmation", { max: 240, required: true }) as string,
+        externalBankReference: stringField(body, "externalBankReference", { max: 240, fallback: null }) || undefined,
       });
       return Response.json(
         { ok: true, alreadySent: result.alreadySent },
-        { headers: { "Cache-Control": "no-store" } },
+        { headers: noStore },
       );
     }
-    return Response.json({ error: "Partner payout action is invalid." }, { status: 400 });
+    throw validationError("Partner payout action is invalid.");
   } catch (error) {
-    if (error instanceof Error) return Response.json({ error: error.message }, { status: 409 });
+    if (error instanceof ApiValidationError) return validationErrorResponse(error);
     return apiError(error);
   }
 }

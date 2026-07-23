@@ -70,6 +70,7 @@ export type PartnerPayoutMinAggregateOutputType = {
   partnerPhoneSnapshot: string | null
   partnerResidenceCountrySnapshot: string | null
   preparedAt: Date | null
+  snapshotCapturedAt: Date | null
   preparedByUserId: string | null
   sentAt: Date | null
   sentByUserId: string | null
@@ -115,6 +116,7 @@ export type PartnerPayoutMaxAggregateOutputType = {
   partnerPhoneSnapshot: string | null
   partnerResidenceCountrySnapshot: string | null
   preparedAt: Date | null
+  snapshotCapturedAt: Date | null
   preparedByUserId: string | null
   sentAt: Date | null
   sentByUserId: string | null
@@ -161,6 +163,7 @@ export type PartnerPayoutCountAggregateOutputType = {
   partnerPhoneSnapshot: number
   partnerResidenceCountrySnapshot: number
   preparedAt: number
+  snapshotCapturedAt: number
   preparedByUserId: number
   sentAt: number
   sentByUserId: number
@@ -220,6 +223,7 @@ export type PartnerPayoutMinAggregateInputType = {
   partnerPhoneSnapshot?: true
   partnerResidenceCountrySnapshot?: true
   preparedAt?: true
+  snapshotCapturedAt?: true
   preparedByUserId?: true
   sentAt?: true
   sentByUserId?: true
@@ -265,6 +269,7 @@ export type PartnerPayoutMaxAggregateInputType = {
   partnerPhoneSnapshot?: true
   partnerResidenceCountrySnapshot?: true
   preparedAt?: true
+  snapshotCapturedAt?: true
   preparedByUserId?: true
   sentAt?: true
   sentByUserId?: true
@@ -311,6 +316,7 @@ export type PartnerPayoutCountAggregateInputType = {
   partnerPhoneSnapshot?: true
   partnerResidenceCountrySnapshot?: true
   preparedAt?: true
+  snapshotCapturedAt?: true
   preparedByUserId?: true
   sentAt?: true
   sentByUserId?: true
@@ -444,6 +450,7 @@ export type PartnerPayoutGroupByOutputType = {
   partnerPhoneSnapshot: string | null
   partnerResidenceCountrySnapshot: string | null
   preparedAt: Date | null
+  snapshotCapturedAt: Date | null
   preparedByUserId: string | null
   sentAt: Date | null
   sentByUserId: string | null
@@ -513,6 +520,7 @@ export type PartnerPayoutWhereInput = {
   partnerPhoneSnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   partnerResidenceCountrySnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   preparedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
+  snapshotCapturedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   preparedByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   sentAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   sentByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
@@ -567,6 +575,7 @@ export type PartnerPayoutOrderByWithRelationInput = {
   partnerPhoneSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   partnerResidenceCountrySnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   preparedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  snapshotCapturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   preparedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   sentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sentByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -624,6 +633,7 @@ export type PartnerPayoutWhereUniqueInput = Prisma.AtLeast<{
   partnerPhoneSnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   partnerResidenceCountrySnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   preparedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
+  snapshotCapturedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   preparedByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   sentAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   sentByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
@@ -678,6 +688,7 @@ export type PartnerPayoutOrderByWithAggregationInput = {
   partnerPhoneSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   partnerResidenceCountrySnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   preparedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  snapshotCapturedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   preparedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   sentAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sentByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -732,6 +743,7 @@ export type PartnerPayoutScalarWhereWithAggregatesInput = {
   partnerPhoneSnapshot?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayout"> | string | null
   partnerResidenceCountrySnapshot?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayout"> | string | null
   preparedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerPayout"> | Date | string | null
+  snapshotCapturedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerPayout"> | Date | string | null
   preparedByUserId?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayout"> | string | null
   sentAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PartnerPayout"> | Date | string | null
   sentByUserId?: Prisma.StringNullableWithAggregatesFilter<"PartnerPayout"> | string | null
@@ -773,6 +785,7 @@ export type PartnerPayoutCreateInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -825,6 +838,7 @@ export type PartnerPayoutUncheckedCreateInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -867,6 +881,7 @@ export type PartnerPayoutUpdateInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -919,6 +934,7 @@ export type PartnerPayoutUncheckedUpdateInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -966,6 +982,7 @@ export type PartnerPayoutCreateManyInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -1007,6 +1024,7 @@ export type PartnerPayoutUpdateManyMutationInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1051,6 +1069,7 @@ export type PartnerPayoutUncheckedUpdateManyInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1112,6 +1131,7 @@ export type PartnerPayoutCountOrderByAggregateInput = {
   partnerPhoneSnapshot?: Prisma.SortOrder
   partnerResidenceCountrySnapshot?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
+  snapshotCapturedAt?: Prisma.SortOrder
   preparedByUserId?: Prisma.SortOrder
   sentAt?: Prisma.SortOrder
   sentByUserId?: Prisma.SortOrder
@@ -1163,6 +1183,7 @@ export type PartnerPayoutMaxOrderByAggregateInput = {
   partnerPhoneSnapshot?: Prisma.SortOrder
   partnerResidenceCountrySnapshot?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
+  snapshotCapturedAt?: Prisma.SortOrder
   preparedByUserId?: Prisma.SortOrder
   sentAt?: Prisma.SortOrder
   sentByUserId?: Prisma.SortOrder
@@ -1208,6 +1229,7 @@ export type PartnerPayoutMinOrderByAggregateInput = {
   partnerPhoneSnapshot?: Prisma.SortOrder
   partnerResidenceCountrySnapshot?: Prisma.SortOrder
   preparedAt?: Prisma.SortOrder
+  snapshotCapturedAt?: Prisma.SortOrder
   preparedByUserId?: Prisma.SortOrder
   sentAt?: Prisma.SortOrder
   sentByUserId?: Prisma.SortOrder
@@ -1565,6 +1587,7 @@ export type PartnerPayoutCreateWithoutPreparedByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -1616,6 +1639,7 @@ export type PartnerPayoutUncheckedCreateWithoutPreparedByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
   failedAt?: Date | string | null
@@ -1667,6 +1691,7 @@ export type PartnerPayoutCreateWithoutSentByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -1718,6 +1743,7 @@ export type PartnerPayoutUncheckedCreateWithoutSentByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
@@ -1793,6 +1819,7 @@ export type PartnerPayoutScalarWhereInput = {
   partnerPhoneSnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   partnerResidenceCountrySnapshot?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   preparedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
+  snapshotCapturedAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   preparedByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
   sentAt?: Prisma.DateTimeNullableFilter<"PartnerPayout"> | Date | string | null
   sentByUserId?: Prisma.StringNullableFilter<"PartnerPayout"> | string | null
@@ -1850,6 +1877,7 @@ export type PartnerPayoutCreateWithoutPartnerProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -1900,6 +1928,7 @@ export type PartnerPayoutUncheckedCreateWithoutPartnerProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -1968,6 +1997,7 @@ export type PartnerPayoutCreateWithoutSettlementInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -2018,6 +2048,7 @@ export type PartnerPayoutUncheckedCreateWithoutSettlementInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -2076,6 +2107,7 @@ export type PartnerPayoutUpdateWithoutSettlementInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2126,6 +2158,7 @@ export type PartnerPayoutUncheckedUpdateWithoutSettlementInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2168,6 +2201,7 @@ export type PartnerPayoutCreateWithoutSettlementLegInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -2218,6 +2252,7 @@ export type PartnerPayoutUncheckedCreateWithoutSettlementLegInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -2276,6 +2311,7 @@ export type PartnerPayoutUpdateWithoutSettlementLegInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2326,6 +2362,7 @@ export type PartnerPayoutUncheckedUpdateWithoutSettlementLegInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2368,6 +2405,7 @@ export type PartnerPayoutCreateWithoutOrderInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -2418,6 +2456,7 @@ export type PartnerPayoutUncheckedCreateWithoutOrderInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -2486,6 +2525,7 @@ export type PartnerPayoutCreateWithoutPayoutProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -2536,6 +2576,7 @@ export type PartnerPayoutUncheckedCreateWithoutPayoutProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -2604,6 +2645,7 @@ export type PartnerPayoutCreateWithoutEventsInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
   externalTransferReference?: string | null
@@ -2655,6 +2697,7 @@ export type PartnerPayoutUncheckedCreateWithoutEventsInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -2712,6 +2755,7 @@ export type PartnerPayoutUpdateWithoutEventsInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2763,6 +2807,7 @@ export type PartnerPayoutUncheckedUpdateWithoutEventsInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2809,6 +2854,7 @@ export type PartnerPayoutCreateManyPreparedByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
   failedAt?: Date | string | null
@@ -2854,6 +2900,7 @@ export type PartnerPayoutCreateManySentByUserInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   failedAt?: Date | string | null
@@ -2894,6 +2941,7 @@ export type PartnerPayoutUpdateWithoutPreparedByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2945,6 +2993,7 @@ export type PartnerPayoutUncheckedUpdateWithoutPreparedByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2991,6 +3040,7 @@ export type PartnerPayoutUncheckedUpdateManyWithoutPreparedByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3031,6 +3081,7 @@ export type PartnerPayoutUpdateWithoutSentByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3082,6 +3133,7 @@ export type PartnerPayoutUncheckedUpdateWithoutSentByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3128,6 +3180,7 @@ export type PartnerPayoutUncheckedUpdateManyWithoutSentByUserInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3172,6 +3225,7 @@ export type PartnerPayoutCreateManyPartnerProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -3213,6 +3267,7 @@ export type PartnerPayoutUpdateWithoutPartnerProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3263,6 +3318,7 @@ export type PartnerPayoutUncheckedUpdateWithoutPartnerProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3309,6 +3365,7 @@ export type PartnerPayoutUncheckedUpdateManyWithoutPartnerProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3354,6 +3411,7 @@ export type PartnerPayoutCreateManyOrderInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -3395,6 +3453,7 @@ export type PartnerPayoutUpdateWithoutOrderInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3445,6 +3504,7 @@ export type PartnerPayoutUncheckedUpdateWithoutOrderInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3491,6 +3551,7 @@ export type PartnerPayoutUncheckedUpdateManyWithoutOrderInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3536,6 +3597,7 @@ export type PartnerPayoutCreateManyPayoutProfileInput = {
   partnerPhoneSnapshot?: string | null
   partnerResidenceCountrySnapshot?: string | null
   preparedAt?: Date | string | null
+  snapshotCapturedAt?: Date | string | null
   preparedByUserId?: string | null
   sentAt?: Date | string | null
   sentByUserId?: string | null
@@ -3577,6 +3639,7 @@ export type PartnerPayoutUpdateWithoutPayoutProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   failedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   externalTransferReference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3627,6 +3690,7 @@ export type PartnerPayoutUncheckedUpdateWithoutPayoutProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3673,6 +3737,7 @@ export type PartnerPayoutUncheckedUpdateManyWithoutPayoutProfileInput = {
   partnerPhoneSnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   partnerResidenceCountrySnapshot?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preparedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  snapshotCapturedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   preparedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sentAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sentByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3750,6 +3815,7 @@ export type PartnerPayoutSelect<ExtArgs extends runtime.Types.Extensions.Interna
   partnerPhoneSnapshot?: boolean
   partnerResidenceCountrySnapshot?: boolean
   preparedAt?: boolean
+  snapshotCapturedAt?: boolean
   preparedByUserId?: boolean
   sentAt?: boolean
   sentByUserId?: boolean
@@ -3805,6 +3871,7 @@ export type PartnerPayoutSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   partnerPhoneSnapshot?: boolean
   partnerResidenceCountrySnapshot?: boolean
   preparedAt?: boolean
+  snapshotCapturedAt?: boolean
   preparedByUserId?: boolean
   sentAt?: boolean
   sentByUserId?: boolean
@@ -3858,6 +3925,7 @@ export type PartnerPayoutSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   partnerPhoneSnapshot?: boolean
   partnerResidenceCountrySnapshot?: boolean
   preparedAt?: boolean
+  snapshotCapturedAt?: boolean
   preparedByUserId?: boolean
   sentAt?: boolean
   sentByUserId?: boolean
@@ -3911,6 +3979,7 @@ export type PartnerPayoutSelectScalar = {
   partnerPhoneSnapshot?: boolean
   partnerResidenceCountrySnapshot?: boolean
   preparedAt?: boolean
+  snapshotCapturedAt?: boolean
   preparedByUserId?: boolean
   sentAt?: boolean
   sentByUserId?: boolean
@@ -3924,7 +3993,7 @@ export type PartnerPayoutSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PartnerPayoutOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "orderId" | "partnerProfileId" | "payoutProfileId" | "payoutNumber" | "status" | "currency" | "originalCommissionAmount" | "reversalAdjustmentAmount" | "finalPayoutAmount" | "holdUntil" | "accountCountrySnapshot" | "accountTypeSnapshot" | "payoutCurrencySnapshot" | "supportedCurrenciesSnapshot" | "bankNameSnapshot" | "accountHolderSnapshot" | "accountNumberSnapshotEncrypted" | "accountNumberSnapshotIv" | "accountNumberSnapshotAuthTag" | "accountNumberSnapshotKeyVersion" | "accountNumberLast4" | "accountNumberMasked" | "partnerLegalNameSnapshot" | "partnerDisplayNameSnapshot" | "partnerOrganizationSnapshot" | "partnerEmailSnapshot" | "partnerPhoneSnapshot" | "partnerResidenceCountrySnapshot" | "preparedAt" | "preparedByUserId" | "sentAt" | "sentByUserId" | "failedAt" | "externalTransferReference" | "externalBankReference" | "failureReason" | "internalNote" | "requiresManualReconciliation" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerPayout"]>
+export type PartnerPayoutOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settlementId" | "settlementLegId" | "orderId" | "partnerProfileId" | "payoutProfileId" | "payoutNumber" | "status" | "currency" | "originalCommissionAmount" | "reversalAdjustmentAmount" | "finalPayoutAmount" | "holdUntil" | "accountCountrySnapshot" | "accountTypeSnapshot" | "payoutCurrencySnapshot" | "supportedCurrenciesSnapshot" | "bankNameSnapshot" | "accountHolderSnapshot" | "accountNumberSnapshotEncrypted" | "accountNumberSnapshotIv" | "accountNumberSnapshotAuthTag" | "accountNumberSnapshotKeyVersion" | "accountNumberLast4" | "accountNumberMasked" | "partnerLegalNameSnapshot" | "partnerDisplayNameSnapshot" | "partnerOrganizationSnapshot" | "partnerEmailSnapshot" | "partnerPhoneSnapshot" | "partnerResidenceCountrySnapshot" | "preparedAt" | "snapshotCapturedAt" | "preparedByUserId" | "sentAt" | "sentByUserId" | "failedAt" | "externalTransferReference" | "externalBankReference" | "failureReason" | "internalNote" | "requiresManualReconciliation" | "createdAt" | "updatedAt", ExtArgs["result"]["partnerPayout"]>
 export type PartnerPayoutInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settlement?: boolean | Prisma.SettlementDefaultArgs<ExtArgs>
   settlementLeg?: boolean | Prisma.SettlementLegDefaultArgs<ExtArgs>
@@ -4000,6 +4069,7 @@ export type $PartnerPayoutPayload<ExtArgs extends runtime.Types.Extensions.Inter
     partnerPhoneSnapshot: string | null
     partnerResidenceCountrySnapshot: string | null
     preparedAt: Date | null
+    snapshotCapturedAt: Date | null
     preparedByUserId: string | null
     sentAt: Date | null
     sentByUserId: string | null
@@ -4474,6 +4544,7 @@ export interface PartnerPayoutFieldRefs {
   readonly partnerPhoneSnapshot: Prisma.FieldRef<"PartnerPayout", 'String'>
   readonly partnerResidenceCountrySnapshot: Prisma.FieldRef<"PartnerPayout", 'String'>
   readonly preparedAt: Prisma.FieldRef<"PartnerPayout", 'DateTime'>
+  readonly snapshotCapturedAt: Prisma.FieldRef<"PartnerPayout", 'DateTime'>
   readonly preparedByUserId: Prisma.FieldRef<"PartnerPayout", 'String'>
   readonly sentAt: Prisma.FieldRef<"PartnerPayout", 'DateTime'>
   readonly sentByUserId: Prisma.FieldRef<"PartnerPayout", 'String'>

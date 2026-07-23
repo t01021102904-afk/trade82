@@ -10,6 +10,7 @@ import {
   MERCHANT_MIGRATION,
   OPERATIONS_MIGRATION,
   PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION,
+  PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
@@ -22,7 +23,11 @@ import {
 
 const directUrl = `postgresql://postgres:credential-placeholder@db.${EXPECTED_SUPABASE_PROJECT}.supabase.co:5432/postgres`;
 const poolerUrl = `postgresql://postgres.${EXPECTED_SUPABASE_PROJECT}:credential-placeholder@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
-const localMigrations = readLocalMigrationNames();
+// These fixtures cover the pre-hardening runner contract. The real runner
+// reads the current directory, including the additive hardening migration.
+const localMigrations = readLocalMigrationNames().filter(
+  (name) => name !== "20260722140000_harden_partner_manual_payout_review",
+);
 const approvedNames = new Set([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
@@ -417,6 +422,7 @@ test("the approved batch is followed by operations, analytics, and partner payou
   assert.equal(localMigrations.at(-3), ANALYTICS_MIGRATION);
   assert.equal(localMigrations.at(-2), PARTNER_PAYOUT_MIGRATION);
   assert.equal(localMigrations.at(-1), PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION);
+  assert.ok(readLocalMigrationNames().includes(PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION));
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {

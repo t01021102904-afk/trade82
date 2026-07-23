@@ -20,12 +20,14 @@ export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_co
 export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
 export const PARTNER_PAYOUT_MIGRATION = "20260722100000_add_partner_payout_profiles";
 export const PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION = "20260722130000_add_partner_manual_payout_review";
+export const PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION = "20260722140000_harden_partner_manual_payout_review";
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION,
+  PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION,
 ]);
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
@@ -178,6 +180,8 @@ const ALLOWLISTED_PENDING_MIGRATION_STATES = Object.freeze([
   Object.freeze([ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
   Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
   Object.freeze([PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION]),
+  Object.freeze([PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION]),
+  Object.freeze([PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION, PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION]),
   Object.freeze([PARTNER_PAYOUT_MIGRATION, PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION]),
   Object.freeze([ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION, PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION]),
   Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION, PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION]),
@@ -223,6 +227,10 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const analyticsIndex = localMigrationNames.indexOf(ANALYTICS_MIGRATION);
   const partnerPayoutIndex = localMigrationNames.indexOf(PARTNER_PAYOUT_MIGRATION);
   const partnerManualPayoutReviewIndex = localMigrationNames.indexOf(PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION);
+  const partnerManualPayoutReviewHardeningIndex = localMigrationNames.indexOf(PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION);
+  const requiresPartnerManualPayoutReviewHardening = localMigrationNames.includes(
+    PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION,
+  );
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
@@ -230,7 +238,11 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     || analyticsIndex !== operationsIndex + 1
     || partnerPayoutIndex !== analyticsIndex + 1
     || partnerManualPayoutReviewIndex !== partnerPayoutIndex + 1
-    || partnerManualPayoutReviewIndex !== localMigrationNames.length - 1) {
+    || (requiresPartnerManualPayoutReviewHardening
+      && (partnerManualPayoutReviewHardeningIndex !== partnerManualPayoutReviewIndex + 1
+        || partnerManualPayoutReviewHardeningIndex !== localMigrationNames.length - 1))
+    || (!requiresPartnerManualPayoutReviewHardening
+      && partnerManualPayoutReviewIndex !== localMigrationNames.length - 1)) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -260,7 +272,9 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       || !databaseNames.has(OPERATIONS_MIGRATION)
       || !databaseNames.has(ANALYTICS_MIGRATION)
       || !databaseNames.has(PARTNER_PAYOUT_MIGRATION)
-      || !databaseNames.has(PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION)) {
+      || !databaseNames.has(PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION)
+      || (requiresPartnerManualPayoutReviewHardening
+        && !databaseNames.has(PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION))) {
       throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
@@ -2343,6 +2357,7 @@ export async function queryPartnerManualPayoutReviewMigrationSchema(client) {
         ('PartnerPayout', 'partnerPhoneSnapshot', 'text', 'text', 'YES'),
         ('PartnerPayout', 'partnerResidenceCountrySnapshot', 'text', 'text', 'YES'),
         ('PartnerPayout', 'preparedAt', 'timestamp without time zone', 'timestamp', 'YES'),
+        ('PartnerPayout', 'snapshotCapturedAt', 'timestamp without time zone', 'timestamp', 'YES'),
         ('PartnerPayout', 'preparedByUserId', 'text', 'text', 'YES'),
         ('PartnerPayout', 'sentAt', 'timestamp without time zone', 'timestamp', 'YES'),
         ('PartnerPayout', 'sentByUserId', 'text', 'text', 'YES'),
@@ -2360,6 +2375,7 @@ export async function queryPartnerManualPayoutReviewMigrationSchema(client) {
         ('PartnerPayoutEvent', 'eventType', 'USER-DEFINED', 'PartnerPayoutEventType', 'NO'),
         ('PartnerPayoutEvent', 'message', 'text', 'text', 'YES'),
         ('PartnerPayoutEvent', 'metadata', 'jsonb', 'jsonb', 'NO'),
+        ('PartnerPayoutEvent', 'idempotencyKey', 'text', 'text', 'YES'),
         ('PartnerPayoutEvent', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO')
     ),
     actual_columns AS (
@@ -2379,7 +2395,8 @@ export async function queryPartnerManualPayoutReviewMigrationSchema(client) {
         ('PartnerPayout_payoutProfileId_idx', ARRAY['payoutProfileId']::text[], false),
         ('PartnerPayout_orderId_idx', ARRAY['orderId']::text[], false),
         ('PartnerPayoutEvent_payoutId_createdAt_idx', ARRAY['payoutId', 'createdAt']::text[], false),
-        ('PartnerPayoutEvent_eventType_createdAt_idx', ARRAY['eventType', 'createdAt']::text[], false)
+        ('PartnerPayoutEvent_eventType_createdAt_idx', ARRAY['eventType', 'createdAt']::text[], false),
+        ('PartnerPayoutEvent_idempotencyKey_key', ARRAY['idempotencyKey']::text[], true)
     ),
     actual_indexes AS (
       SELECT expected.index_name, expected.key_columns, expected.is_unique,
@@ -2468,7 +2485,7 @@ export async function queryPartnerManualPayoutReviewMigrationSchema(client) {
           AND pg_enum.enumlabel IN ('CREATED', 'READY', 'HOLD', 'PROCESSING', 'SENT', 'FAILED', 'RETURNED', 'CANCELLED', 'ACCOUNT_REVEALED', 'RECONCILIATION_REQUIRED')
       ) AS partner_manual_event_enum,
       (
-        SELECT count(*) = 50 AND NOT EXISTS (
+        SELECT count(*) = 52 AND NOT EXISTS (
           SELECT 1
           FROM expected_columns expected
           LEFT JOIN actual_columns actual USING (table_name, column_name)
@@ -2480,7 +2497,7 @@ export async function queryPartnerManualPayoutReviewMigrationSchema(client) {
         FROM actual_columns
       ) AS partner_manual_columns,
       (
-        SELECT count(*) = 9 AND bool_and(
+        SELECT count(*) = 10 AND bool_and(
           COALESCE(indisvalid, false) AND COALESCE(indisready, false)
           AND indpred IS NULL AND indexprs IS NULL AND amname = 'btree'
           AND COALESCE(indisunique, false) = is_unique
@@ -3297,6 +3314,24 @@ export async function runProductionMigrations({
         source,
         "target_postverify_failed",
       );
+    }
+    if (localMigrationNames.includes(PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION)) {
+      try {
+        assertMigrationApplied(afterRecords, PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION);
+        const partnerManualPayoutReviewHardeningSchema = await queryPartnerManualPayoutReviewMigrationSchema(client);
+        if (!allEvidencePresent(
+          partnerManualPayoutReviewHardeningSchema,
+          PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION_SCHEMA_KEYS,
+        )) {
+          throw new Error("Partner manual payout review hardening schema post-verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "target_verification",
+          source,
+          "target_postverify_failed",
+        );
+      }
     }
     return "deployed";
   } finally {
