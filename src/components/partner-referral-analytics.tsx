@@ -6,7 +6,10 @@ import { useMemo, useState } from "react";
 import {
   buildPartnerAnalyticsWorkspaceModel,
   compareAnalyticsValue,
+  analyticsChartLabelIndices,
+  analyticsPeriodContext,
   groupPartnerAnalyticsPoints,
+  formatAnalyticsChartLabel,
   metricDefinition,
   parseAnalyticsDateKey,
   partnerAnalyticsGroupingOptions,
@@ -117,12 +120,14 @@ function buildRangeHref({
 
 function ChartPanel({
   locale,
+  grouping,
   metric,
   points,
   totalValue,
   currency,
 }: {
   locale: Locale;
+  grouping: AnalyticsGrouping;
   metric: AnalyticsMetric;
   points: AnalyticsPoint[];
   totalValue: number;
@@ -138,6 +143,18 @@ function ChartPanel({
         }));
   const maximum = Math.max(1, ...chartPoints.map((point) => point.value));
   const t = createTranslator(getDictionary(locale));
+  const labelIndices = analyticsChartLabelIndices(chartPoints.length, grouping);
+  const monthMarkers = grouping === "daily"
+    ? chartPoints.reduce<Array<{ date: string; index: number }>>((markers, point, index) => {
+        if (point.date === "total") return markers;
+        const currentMonth = point.date.slice(0, 7);
+        if (markers.at(-1)?.date.slice(0, 7) !== currentMonth) {
+          markers.push({ date: point.date, index });
+        }
+        return markers;
+      }, [])
+    : [];
+  const hasMonthBoundaries = monthMarkers.length > 1;
 
   if (definition.kind === "rate") {
     const width = 720;
@@ -215,10 +232,34 @@ function ChartPanel({
         >
           0%
         </text>
-        {chartPoints.map((point, index) =>
-          index === 0 ||
-          index === chartPoints.length - 1 ||
-          index === Math.floor((chartPoints.length - 1) / 2) ? (
+        {hasMonthBoundaries
+          ? monthMarkers.map((marker) => (
+              <g key={`${marker.date}-month-marker`}>
+                {marker.index > 0 ? (
+                  <line
+                    x1={x(marker.index)}
+                    x2={x(marker.index)}
+                    y1={top}
+                    y2={top + innerHeight}
+                    stroke="#D4D4D8"
+                    strokeDasharray="3 4"
+                  />
+                ) : null}
+                <text
+                  x={x(marker.index) + (marker.index > 0 ? 4 : 0)}
+                  y={12}
+                  textAnchor={marker.index > 0 ? "start" : "middle"}
+                  className="fill-zinc-400 text-[10px]"
+                >
+                  {new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
+                    month: "short",
+                    timeZone: "UTC",
+                  }).format(parseAnalyticsDateKey(marker.date))}
+                </text>
+              </g>
+            ))
+          : null}
+        {chartPoints.map((point, index) => labelIndices.has(index) ? (
             <text
               key={`${point.date}-label`}
               x={x(index)}
@@ -226,28 +267,47 @@ function ChartPanel({
               textAnchor="middle"
               className="fill-zinc-500 text-[11px]"
             >
-              {displayDate(point.date, locale)}
+              {formatAnalyticsChartLabel(point.date, grouping, locale)}
             </text>
-          ) : null,
-        )}
+          ) : null)}
       </svg>
     );
   }
 
   return (
-    <div
-      className="mt-6 grid min-w-[560px] items-end gap-2"
-      style={{
-        gridTemplateColumns: `repeat(${Math.max(
-          1,
-          chartPoints.length,
-        )}, minmax(22px, 1fr))`,
-      }}
-      role="img"
-      aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
-    >
-      {chartPoints.map((point) => (
-        <div key={point.date} className="grid gap-2">
+    <div className="mt-6 min-w-[560px]">
+      <div
+        className="grid items-end gap-2"
+        style={{
+          gridTemplateColumns: `repeat(${Math.max(
+            1,
+            chartPoints.length,
+          )}, minmax(22px, 1fr))`,
+        }}
+        role="img"
+        aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
+      >
+      {chartPoints.map((point, index) => {
+        const monthMarker = monthMarkers.find((marker) => marker.index === index);
+        return (
+        <div key={point.date} className="relative grid gap-2">
+          {hasMonthBoundaries && monthMarker ? (
+            <span
+              className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] text-zinc-400"
+              aria-hidden="true"
+            >
+              {new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
+                month: "short",
+                timeZone: "UTC",
+              }).format(parseAnalyticsDateKey(point.date))}
+            </span>
+          ) : null}
+          {hasMonthBoundaries && monthMarker && index > 0 ? (
+            <span
+              className="pointer-events-none absolute inset-y-0 -left-1 border-l border-dashed border-zinc-300"
+              aria-hidden="true"
+            />
+          ) : null}
           <div className="flex h-52 items-end rounded-t bg-zinc-50">
             <div
               className="w-full rounded-t"
@@ -263,10 +323,14 @@ function ChartPanel({
             />
           </div>
           <span className="truncate text-center text-[11px] text-zinc-500">
-            {displayDate(point.date, locale)}
+            {labelIndices.has(index)
+              ? formatAnalyticsChartLabel(point.date, grouping, locale)
+              : "\u00a0"}
           </span>
         </div>
-      ))}
+        );
+      })}
+      </div>
     </div>
   );
 }
@@ -312,6 +376,7 @@ export function PartnerReferralAnalyticsSection({
   const previousValue = safeAnalyticsNumber(
     model.comparisonTotals[selectedMetric],
   );
+  const periodContext = analyticsPeriodContext(groupedPoints, grouping, locale);
 
   return (
     <section
@@ -378,9 +443,16 @@ export function PartnerReferralAnalyticsSection({
       <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div>
-            <h3 className="text-base font-semibold text-zinc-950">
-              {t("partnerProgram.analyticsMainChart")}
-            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-semibold text-zinc-950">
+                {t("partnerProgram.analyticsMainChart")}
+              </h3>
+              {periodContext ? (
+                <span className="text-xs font-medium text-zinc-500">
+                  {periodContext}
+                </span>
+              ) : null}
+            </div>
             <p className="mt-1 text-sm text-zinc-600">
               {comparisonLabel({
                 current: selectedValue,
@@ -455,6 +527,7 @@ export function PartnerReferralAnalyticsSection({
         <div className="overflow-x-auto">
           <ChartPanel
             locale={locale}
+            grouping={grouping}
             metric={selectedMetric}
             points={groupedPoints}
             totalValue={selectedValue}

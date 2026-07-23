@@ -3,8 +3,11 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
 import {
+  analyticsChartLabelIndices,
+  analyticsPeriodContext,
   buildPartnerAnalyticsWorkspaceModel,
   compareAnalyticsValue,
+  formatAnalyticsChartLabel,
   groupPartnerAnalyticsPoints,
   partnerAnalyticsMetrics,
 } from "../src/lib/partner-analytics-workspace.ts";
@@ -298,6 +301,31 @@ test("unified partner analytics helpers provide safe comparison and grouped buck
   assert.equal(grouped[0]?.totalClicks, 10);
   assert.equal(grouped[0]?.uniqueVisitors, 5);
   assert.equal(grouped[0]?.signupConversionRate, 60);
+});
+
+test("analytics chart labels keep daily axes day-based with nearby period context", () => {
+  assert.equal(formatAnalyticsChartLabel("2026-07-01", "daily", "en"), "1");
+  assert.equal(formatAnalyticsChartLabel("2026-07-31", "daily", "ko"), "31");
+  assert.equal(formatAnalyticsChartLabel("2026-07-06", "weekly", "en"), "Week of Jul 6");
+  assert.equal(formatAnalyticsChartLabel("2026-07", "monthly", "en"), "Jul");
+  assert.equal(
+    analyticsPeriodContext(
+      [{ date: "2026-07-01" }, { date: "2026-07-21" }],
+      "daily",
+      "en",
+    ),
+    "Jul 2026",
+  );
+  assert.equal(
+    analyticsPeriodContext(
+      [{ date: "2026-06-25" }, { date: "2026-07-21" }],
+      "daily",
+      "en",
+    ),
+    "Jun 2026 - Jul 2026",
+  );
+  assert.equal(analyticsPeriodContext([{ date: "2026-07" }], "monthly", "en"), null);
+  assert.deepEqual([...analyticsChartLabelIndices(52, "weekly")], [0, 7, 14, 21, 28, 35, 42, 49, 51]);
 });
 
 test("partner and admin dashboards render the unified white analytics workspace", async () => {
