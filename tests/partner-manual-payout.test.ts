@@ -8,6 +8,7 @@ import {
   PartnerProfileStatus,
 } from "../src/generated/prisma/client.ts";
 import { partnerPayoutStatusForLeg } from "../src/lib/partner-payouts.ts";
+import { calculateAdminPayoutReconciliation } from "../src/lib/admin-payout-review.ts";
 
 const partnerPayoutSource = await readFile(new URL("../src/lib/partner-payouts.ts", import.meta.url), "utf8");
 const adminPayoutRouteSource = await readFile(new URL("../src/app/api/admin/payouts/route.ts", import.meta.url), "utf8");
@@ -84,3 +85,52 @@ test("partner admin action does not accept client sentAt", () => assert.doesNotM
 test("partner admin action requires same origin", () => assert.match(adminPayoutActionRouteSource, /assertSameOrigin/));
 test("partner admin action requires rate limiting", () => assert.match(adminPayoutActionRouteSource, /rateLimitOrResponse/));
 test("partner admin action requires administrator authorization", () => assert.match(adminPayoutActionRouteSource, /requireAdmin/));
+
+test("reconciliation allocates a no-referral transaction across seller and retained amounts", () => {
+  const result = calculateAdminPayoutReconciliation({
+    grossAmount: 10_000,
+    sellerAllocation: 9_500,
+    partnerAllocation: 0,
+    platformFeeAmount: 500,
+    trade82RetainedAmountBeforeStripeFees: 500,
+    paymentCurrency: "usd",
+    settlementCurrency: "USD",
+  });
+  assert.deepEqual(result, {
+    grossAllocationDifference: 0,
+    platformFeeAllocationDifference: 0,
+    grossAllocationBalanced: true,
+    platformFeeAllocationBalanced: true,
+    currencyMismatch: false,
+    balanced: true,
+  });
+});
+
+test("reconciliation allocates a referral transaction without subtracting Stripe fees", () => {
+  const result = calculateAdminPayoutReconciliation({
+    grossAmount: 10_000,
+    sellerAllocation: 9_500,
+    partnerAllocation: 50,
+    platformFeeAmount: 500,
+    trade82RetainedAmountBeforeStripeFees: 450,
+    paymentCurrency: "usd",
+    settlementCurrency: "usd",
+  });
+  assert.equal(result.grossAllocationDifference, 0);
+  assert.equal(result.platformFeeAllocationDifference, 0);
+  assert.equal(result.balanced, true);
+});
+
+test("reconciliation is unbalanced when settlement currency differs", () => {
+  const result = calculateAdminPayoutReconciliation({
+    grossAmount: 10_000,
+    sellerAllocation: 9_500,
+    partnerAllocation: 0,
+    platformFeeAmount: 500,
+    trade82RetainedAmountBeforeStripeFees: 500,
+    paymentCurrency: "usd",
+    settlementCurrency: "krw",
+  });
+  assert.equal(result.currencyMismatch, true);
+  assert.equal(result.balanced, false);
+});

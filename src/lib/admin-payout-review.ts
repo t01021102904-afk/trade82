@@ -11,9 +11,17 @@ export type AdminPayoutReviewTransaction = {
     paymentStatus: string;
     paymentFlow: string;
     paidAt: Date | null;
+    paymentDate: Date | null;
     currency: string;
     grossAmount: number;
+    merchandiseAmount: number;
+    totalBuyerCharge: number;
+    buyerServiceFee: number | null;
+    stripeProcessingFee: number | null;
+    refundAmount: number;
+    disputes: Array<{ id: string; status: string; amount: number }>;
     holdUntil: Date;
+    productName: string | null;
   };
   payment: {
     status: string;
@@ -31,8 +39,83 @@ export type AdminPayoutReviewTransaction = {
     phone: string | null;
     country: string;
   };
-  sellerPayout: Record<string, unknown> | null;
-  partnerPayout: Record<string, unknown> | null;
+  seller: {
+    company: string;
+    contactName: string | null;
+    email: string;
+    phone: string | null;
+    country: string;
+  };
+  sellerPayout: {
+    id: string;
+    payoutNumber: string;
+    status: string;
+    currency: string;
+    grossAmount: number;
+    platformFeeAmount: number;
+    sellerPayableAmount: number;
+    refundAdjustmentAmount: number;
+    manualAdjustmentAmount: number;
+    finalPayoutAmount: number;
+    processingFeeAmount: number | null;
+    legalCompanyName: string;
+    tradeName: string | null;
+    accountCountry: string;
+    accountHolder: string;
+    bankNameSnapshot: string;
+    accountNumberLast4: string | null;
+    swiftBicSnapshot: string | null;
+    officialBankWebsiteSnapshot: string | null;
+    payoutCurrency: string;
+    sentAt: Date | null;
+    failedAt: Date | null;
+    externalTransferReference: string | null;
+    externalBankReference: string | null;
+    approvedAt: Date | null;
+    preparedAt: Date | null;
+    adjustments: Array<{
+      id: string;
+      adjustmentType: string;
+      amount: number;
+      currency: string;
+      reason: string;
+      internalNote: string | null;
+      requiresManualReconciliation: boolean;
+      createdAt: Date;
+      createdByUser: { displayName: string; email: string };
+    }>;
+  } | null;
+  partnerPayout: {
+    id: string;
+    payoutNumber: string;
+    status: string;
+    currency: string;
+    originalCommissionAmount: number;
+    reversalAdjustmentAmount: number;
+    finalPayoutAmount: number;
+    holdUntil: Date;
+    accountCountrySnapshot: string | null;
+    bankNameSnapshot: string | null;
+    accountHolderSnapshot: string | null;
+    accountNumberLast4: string | null;
+    accountNumberMasked: string | null;
+    payoutCurrencySnapshot: string | null;
+    partnerLegalNameSnapshot: string | null;
+    partnerDisplayNameSnapshot: string | null;
+    partnerOrganizationSnapshot: string | null;
+    partnerEmailSnapshot: string | null;
+    partnerPhoneSnapshot: string | null;
+    partnerResidenceCountrySnapshot: string | null;
+    snapshotCapturedAt: Date | null;
+    requiresManualReconciliation: boolean;
+    sentAt: Date | null;
+    failedAt: Date | null;
+    externalTransferReference: string | null;
+    externalBankReference: string | null;
+    partnerStatus: string;
+    payoutProfileStatus: string | null;
+    attributionId: string | null;
+  } | null;
   reconciliation: {
     buyerTotalCharge: number;
     merchandiseAmount: number;
@@ -42,12 +125,46 @@ export type AdminPayoutReviewTransaction = {
     trade82Retained: number | null;
     stripeProcessingFee: number | null;
     refundAdjustment: number;
+    grossAllocationDifference: number | null;
+    platformFeeAllocationDifference: number | null;
+    grossAllocationBalanced: boolean;
+    platformFeeAllocationBalanced: boolean;
+    currencyMismatch: boolean;
     unexplainedDifference: number | null;
     balanced: boolean;
   };
   warnings: string[];
   auditEvents: Array<{ id: string; eventType: string; message: string | null; createdAt: Date }>;
 };
+
+export type AdminPayoutReconciliationInput = {
+  grossAmount: number;
+  sellerAllocation: number;
+  partnerAllocation: number;
+  platformFeeAmount: number;
+  trade82RetainedAmountBeforeStripeFees: number;
+  paymentCurrency: string;
+  settlementCurrency: string;
+};
+
+export function calculateAdminPayoutReconciliation(input: AdminPayoutReconciliationInput) {
+  const currencyMismatch = input.paymentCurrency.toLowerCase() !== input.settlementCurrency.toLowerCase();
+  const grossAllocationDifference =
+    input.grossAmount - input.sellerAllocation - input.partnerAllocation - input.trade82RetainedAmountBeforeStripeFees;
+  const platformFeeAllocationDifference =
+    input.platformFeeAmount - input.partnerAllocation - input.trade82RetainedAmountBeforeStripeFees;
+  const grossAllocationBalanced = !currencyMismatch && grossAllocationDifference === 0;
+  const platformFeeAllocationBalanced = !currencyMismatch && platformFeeAllocationDifference === 0;
+
+  return {
+    grossAllocationDifference,
+    platformFeeAllocationDifference,
+    grossAllocationBalanced,
+    platformFeeAllocationBalanced,
+    currencyMismatch,
+    balanced: grossAllocationBalanced && platformFeeAllocationBalanced,
+  };
+}
 
 export async function listAdminPayoutReviewTransactions(requestedId?: string | null) {
   const orders = await getDb().tradeOrder.findMany({
@@ -78,6 +195,12 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
       buyerEmail: true,
       buyerPhone: true,
       buyerCountry: true,
+      sellerCompanyName: true,
+      sellerContactName: true,
+      sellerEmail: true,
+      sellerPhone: true,
+      sellerCountry: true,
+      items: { take: 1, orderBy: { createdAt: "asc" }, select: { productName: true } },
       paymentRequest: {
         select: {
           id: true,
@@ -108,10 +231,29 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
           processingFeeAmount: true,
           bankNameSnapshot: true,
           accountNumberLast4: true,
+          swiftBicSnapshot: true,
+          officialBankWebsiteSnapshot: true,
           sentAt: true,
           failedAt: true,
           externalTransferReference: true,
           externalBankReference: true,
+          approvedAt: true,
+          preparedAt: true,
+          payoutProfile: { select: { country: true, accountHolder: true, payoutCurrency: true } },
+          adjustments: {
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              adjustmentType: true,
+              amount: true,
+              currency: true,
+              reason: true,
+              internalNote: true,
+              requiresManualReconciliation: true,
+              createdAt: true,
+              createdByUser: { select: { displayName: true, email: true } },
+            },
+          },
           sellerCompany: { select: { legalName: true, tradeName: true } },
         },
       },
@@ -131,6 +273,7 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
           accountHolderSnapshot: true,
           accountNumberLast4: true,
           accountNumberMasked: true,
+          accountCountrySnapshot: true,
           partnerLegalNameSnapshot: true,
           partnerDisplayNameSnapshot: true,
           partnerOrganizationSnapshot: true,
@@ -160,6 +303,7 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
           trade82RetainedAmountBeforeStripeFees: true,
           currency: true,
           holdUntil: true,
+          referralAttributionId: true,
           events: {
             orderBy: { createdAt: "desc" },
             take: 50,
@@ -177,9 +321,18 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
     const sellerPayout = order.payout;
     // The persisted payment model has no separate buyer service-fee field.
     const buyerServiceFee = null;
-    const unexplainedDifference = settlement
-      ? settlement.grossAmount - settlement.sellerPayableAmount - settlement.platformFeeAmount - settlement.partnerReferralAmount - settlement.trade82RetainedAmountBeforeStripeFees
+    const allocation = settlement
+      ? calculateAdminPayoutReconciliation({
+          grossAmount: settlement.grossAmount,
+          sellerAllocation: settlement.sellerPayableAmount,
+          partnerAllocation: settlement.partnerReferralAmount,
+          platformFeeAmount: settlement.platformFeeAmount,
+          trade82RetainedAmountBeforeStripeFees: settlement.trade82RetainedAmountBeforeStripeFees,
+          paymentCurrency: payment.currency,
+          settlementCurrency: settlement.currency,
+        })
       : null;
+    const unexplainedDifference = allocation?.grossAllocationDifference ?? null;
     const warnings = [
       payment.requiresManualReconciliation ? "reconciliation_required" : null,
       payment.refundAmount > 0 ? "refund_present" : null,
@@ -195,9 +348,17 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
         paymentStatus: order.paymentStatus,
         paymentFlow: settlement?.paymentFlow ?? "SCT",
         paidAt: payment.paidAt ?? order.paidAt,
+        paymentDate: payment.paidAt ?? order.paidAt,
         currency: payment.currency,
         grossAmount: payment.grossAmount,
+        merchandiseAmount: order.productAmount,
+        totalBuyerCharge: payment.grossAmount,
+        buyerServiceFee,
+        stripeProcessingFee: payment.stripeProcessingFeeAmount,
+        refundAmount: payment.refundAmount,
+        disputes: payment.disputes,
         holdUntil: settlement?.holdUntil ?? new Date(0),
+        productName: order.items[0]?.productName ?? null,
       },
       payment: {
         status: payment.status,
@@ -215,8 +376,77 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
         phone: order.buyerPhone,
         country: order.buyerCountry,
       },
-      sellerPayout: sellerPayout,
-      partnerPayout,
+      seller: {
+        company: order.sellerCompanyName,
+        contactName: order.sellerContactName,
+        email: order.sellerEmail,
+        phone: order.sellerPhone,
+        country: order.sellerCountry,
+      },
+      sellerPayout: sellerPayout
+        ? {
+            id: sellerPayout.id,
+            payoutNumber: sellerPayout.payoutNumber,
+            status: sellerPayout.status,
+            currency: sellerPayout.currency,
+            grossAmount: sellerPayout.grossAmount,
+            platformFeeAmount: sellerPayout.platformFeeAmount,
+            sellerPayableAmount: sellerPayout.sellerPayableAmount,
+            refundAdjustmentAmount: sellerPayout.refundAdjustmentAmount,
+            manualAdjustmentAmount: sellerPayout.manualAdjustmentAmount,
+            finalPayoutAmount: sellerPayout.finalPayoutAmount,
+            processingFeeAmount: sellerPayout.processingFeeAmount,
+            legalCompanyName: sellerPayout.sellerCompany.legalName,
+            tradeName: sellerPayout.sellerCompany.tradeName,
+            accountCountry: sellerPayout.payoutProfile.country,
+            accountHolder: sellerPayout.payoutProfile.accountHolder,
+            bankNameSnapshot: sellerPayout.bankNameSnapshot,
+            accountNumberLast4: sellerPayout.accountNumberLast4,
+            swiftBicSnapshot: sellerPayout.swiftBicSnapshot,
+            officialBankWebsiteSnapshot: sellerPayout.officialBankWebsiteSnapshot,
+            payoutCurrency: sellerPayout.payoutProfile.payoutCurrency,
+            sentAt: sellerPayout.sentAt,
+            failedAt: sellerPayout.failedAt,
+            externalTransferReference: sellerPayout.externalTransferReference,
+            externalBankReference: sellerPayout.externalBankReference,
+            approvedAt: sellerPayout.approvedAt,
+            preparedAt: sellerPayout.preparedAt,
+            adjustments: sellerPayout.adjustments,
+          }
+        : null,
+      partnerPayout: partnerPayout
+        ? {
+            id: partnerPayout.id,
+            payoutNumber: partnerPayout.payoutNumber,
+            status: partnerPayout.status,
+            currency: partnerPayout.currency,
+            originalCommissionAmount: partnerPayout.originalCommissionAmount,
+            reversalAdjustmentAmount: partnerPayout.reversalAdjustmentAmount,
+            finalPayoutAmount: partnerPayout.finalPayoutAmount,
+            holdUntil: partnerPayout.holdUntil,
+            accountCountrySnapshot: partnerPayout.accountCountrySnapshot,
+            bankNameSnapshot: partnerPayout.bankNameSnapshot,
+            accountHolderSnapshot: partnerPayout.accountHolderSnapshot,
+            accountNumberLast4: partnerPayout.accountNumberLast4,
+            accountNumberMasked: partnerPayout.accountNumberMasked,
+            payoutCurrencySnapshot: partnerPayout.payoutCurrencySnapshot,
+            partnerLegalNameSnapshot: partnerPayout.partnerLegalNameSnapshot,
+            partnerDisplayNameSnapshot: partnerPayout.partnerDisplayNameSnapshot,
+            partnerOrganizationSnapshot: partnerPayout.partnerOrganizationSnapshot,
+            partnerEmailSnapshot: partnerPayout.partnerEmailSnapshot,
+            partnerPhoneSnapshot: partnerPayout.partnerPhoneSnapshot,
+            partnerResidenceCountrySnapshot: partnerPayout.partnerResidenceCountrySnapshot,
+            snapshotCapturedAt: partnerPayout.snapshotCapturedAt,
+            requiresManualReconciliation: partnerPayout.requiresManualReconciliation,
+            sentAt: partnerPayout.sentAt,
+            failedAt: partnerPayout.failedAt,
+            externalTransferReference: partnerPayout.externalTransferReference,
+            externalBankReference: partnerPayout.externalBankReference,
+            partnerStatus: partnerPayout.partnerProfile.status,
+            payoutProfileStatus: partnerPayout.payoutProfile?.status ?? null,
+            attributionId: settlement?.referralAttributionId ?? null,
+          }
+        : null,
       reconciliation: {
         buyerTotalCharge: payment.grossAmount,
         merchandiseAmount: order.productAmount,
@@ -227,7 +457,12 @@ export async function listAdminPayoutReviewTransactions(requestedId?: string | n
         stripeProcessingFee: payment.stripeProcessingFeeAmount,
         refundAdjustment: payment.refundAmount,
         unexplainedDifference,
-        balanced: unexplainedDifference === 0,
+        grossAllocationDifference: allocation?.grossAllocationDifference ?? null,
+        platformFeeAllocationDifference: allocation?.platformFeeAllocationDifference ?? null,
+        grossAllocationBalanced: allocation?.grossAllocationBalanced ?? false,
+        platformFeeAllocationBalanced: allocation?.platformFeeAllocationBalanced ?? false,
+        currencyMismatch: allocation?.currencyMismatch ?? false,
+        balanced: allocation?.balanced ?? false,
       },
       warnings,
       auditEvents: settlement?.events ?? [],

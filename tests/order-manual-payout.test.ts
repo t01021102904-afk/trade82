@@ -35,6 +35,7 @@ const files = {
   orderListRoute: new URL("../src/app/api/orders/route.ts", import.meta.url),
   orderDetailRoute: new URL("../src/app/api/orders/[orderNumber]/route.ts", import.meta.url),
   adminPayoutRoute: new URL("../src/app/api/admin/payouts/route.ts", import.meta.url),
+  adminPayoutReview: new URL("../src/lib/admin-payout-review.ts", import.meta.url),
   adminPayoutActionRoute: new URL("../src/app/api/admin/payouts/[id]/route.ts", import.meta.url),
   payoutRevealRoute: new URL("../src/app/api/admin/payouts/[id]/reveal/route.ts", import.meta.url),
   partnerPayoutService: new URL("../src/lib/partner-payouts.ts", import.meta.url),
@@ -394,9 +395,9 @@ test("buyer order responses omit seller payout and beneficiary fields", () => {
 });
 
 test("admin payout list explicitly excludes encrypted snapshots and proof storage paths", () => {
-  assert.match(source.adminPayoutRoute, /Never serialize encrypted beneficiary snapshots/);
-  assert.doesNotMatch(source.adminPayoutRoute, /beneficiarySnapshotEncrypted/);
-  assert.doesNotMatch(source.adminPayoutRoute, /payoutProofStoragePath/);
+  assert.match(source.adminPayoutReview, /accountNumberLast4/);
+  assert.doesNotMatch(source.adminPayoutReview, /beneficiarySnapshotEncrypted/);
+  assert.doesNotMatch(source.adminPayoutReview, /payoutProofStoragePath/);
 });
 
 test("bank auto-fill only trusts verified directory values and safe HTTPS portals", async () => {
