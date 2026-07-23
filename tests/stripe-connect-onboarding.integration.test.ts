@@ -179,7 +179,7 @@ test("disposable PostgreSQL stores one partner enrollment with private consent e
     assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
     assert.equal(profile.contactEmail, user.email);
     assert.equal(profile.contactPhone, "+12125550199");
-    assert.equal(profile.status, "PENDING_REVIEW");
+    assert.equal(profile.status, "ACTIVE");
     assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
     assert.ok(profile.termsConsentedAt);
     assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);

@@ -23,6 +23,7 @@ import {
   type ResolvedClerkUser,
 } from "@/lib/clerk-identity";
 import { isExistingEmailDifferentClerkIdentityError } from "@/lib/fresh-user-profile";
+import { getOwnedPartnerProfile } from "@/lib/owned-partner-profile";
 
 type PublicMetadata = {
   role?: unknown;
@@ -181,13 +182,18 @@ export async function redirectSignedInUserFromSignup(
     onboardingComplete,
   );
 
-  if (role === "user" || canChangeRole) {
-    redirect(`${basePath}/onboarding/role`);
-  }
-
   if (role === "admin") {
     redirect(`${basePath}/admin`);
   }
+
+  if (role === "user") {
+    if (profile && await getOwnedPartnerProfile(profile.id)) {
+      redirect(`${basePath}/partner/dashboard`);
+    }
+    redirect(`${basePath}/onboarding/role`);
+  }
+
+  if (canChangeRole) redirect(`${basePath}/onboarding/role`);
 
   if (
     (role === "seller" || role === "buyer" || role === "both") &&
@@ -230,6 +236,9 @@ export async function requireAppProfile(redirectUrl: string) {
   );
 
   if (role === "user") {
+    if (await getOwnedPartnerProfile(profile.id)) {
+      redirect(`${prefix}/partner/dashboard`);
+    }
     redirect(`${prefix}/onboarding/role`);
   }
 
@@ -283,7 +292,17 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     onboardingComplete,
   );
 
-  if (role === "user" || canChangeRole) {
+  if (role === "user") {
+    if (await getOwnedPartnerProfile(profile.id)) {
+      redirect(`${prefix}/partner/dashboard`);
+    }
+    return {
+      role,
+      canChangeRole,
+      deletionPending: false,
+    };
+  }
+  if (canChangeRole) {
     return {
       role,
       canChangeRole,
@@ -334,6 +353,9 @@ export async function requireOnboardingRole(
   );
 
   if (role === "user") {
+    if (await getOwnedPartnerProfile(profile.id)) {
+      redirect(`${prefix}/partner/dashboard`);
+    }
     redirect(`${prefix}/onboarding/role`);
   }
 

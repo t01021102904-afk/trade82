@@ -409,15 +409,7 @@ test("partner payout and profile states use stable localized presentation keys",
   );
 });
 
-test("partner lifecycle transitions reject invalid direct status changes", () => {
-  assert.equal(
-    getPartnerLifecycleTransition("approve", PartnerProfileStatus.PENDING_REVIEW),
-    PartnerProfileStatus.ACTIVE,
-  );
-  assert.equal(
-    getPartnerLifecycleTransition("reject", PartnerProfileStatus.PENDING_REVIEW),
-    PartnerProfileStatus.REJECTED,
-  );
+test("partner lifecycle exposes only suspension controls", () => {
   assert.equal(
     getPartnerLifecycleTransition("suspend", PartnerProfileStatus.ACTIVE),
     PartnerProfileStatus.SUSPENDED,
@@ -426,20 +418,9 @@ test("partner lifecycle transitions reject invalid direct status changes", () =>
     getPartnerLifecycleTransition("reactivate", PartnerProfileStatus.SUSPENDED),
     PartnerProfileStatus.ACTIVE,
   );
-  assert.equal(
-    getPartnerLifecycleTransition("reactivate", PartnerProfileStatus.REJECTED),
-    PartnerProfileStatus.PENDING_REVIEW,
-  );
-  assert.equal(
-    getPartnerLifecycleTransition("approve", PartnerProfileStatus.REJECTED),
-    null,
-  );
+  assert.equal(getPartnerLifecycleTransition("reactivate", PartnerProfileStatus.REJECTED), null);
   assert.equal(
     getPartnerLifecycleTransition("suspend", PartnerProfileStatus.PENDING_REVIEW),
-    null,
-  );
-  assert.equal(
-    getPartnerLifecycleTransition("reject", PartnerProfileStatus.ACTIVE),
     null,
   );
 });

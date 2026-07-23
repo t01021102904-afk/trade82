@@ -101,7 +101,7 @@ export async function enrollPartnerProfile({
 
         const profileResult = existing
           ? { partnerProfile: { id: existing.id }, created: false }
-          : await createOrGetPartnerProfile(tx, userId, { status: PartnerProfileStatus.PENDING_REVIEW });
+          : await createOrGetPartnerProfile(tx, userId, { status: PartnerProfileStatus.ACTIVE });
 
         const partnerProfile = await tx.partnerProfile.update({
           where: { id: profileResult.partnerProfile.id },
@@ -123,8 +123,8 @@ export async function enrollPartnerProfile({
               existing?.privacyConsentVersion === PRIVACY_VERSION && existing.privacyConsentedAt
                 ? existing.privacyConsentedAt
                 : now,
-            ...(existing?.status === PartnerProfileStatus.REJECTED
-              ? { status: PartnerProfileStatus.PENDING_REVIEW }
+            ...(existing && existing.status !== PartnerProfileStatus.ACTIVE
+              ? { status: PartnerProfileStatus.ACTIVE }
               : {}),
           },
           select: { id: true, status: true, createdAt: true },

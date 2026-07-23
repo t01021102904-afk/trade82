@@ -9,6 +9,7 @@ import {
   LEGACY_ZERO_STEP_MIGRATIONS,
   MERCHANT_MIGRATION,
   OPERATIONS_MIGRATION,
+  PARTNER_ACTIVATION_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
@@ -27,7 +28,9 @@ const approvedNames = new Set([
   OPERATIONS_MIGRATION,
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
+  PARTNER_ACTIVATION_MIGRATION,
 ]);
+const legacyLocalMigrations = localMigrations.slice(0, -1);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
 function record(migrationName, overrides = {}) {
@@ -53,6 +56,7 @@ const appliedMerchant = record(MERCHANT_MIGRATION);
 const appliedOperations = record(OPERATIONS_MIGRATION);
 const appliedAnalytics = record(ANALYTICS_MIGRATION);
 const appliedPartnerPayout = record(PARTNER_PAYOUT_MIGRATION);
+const appliedPartnerActivation = record(PARTNER_ACTIVATION_MIGRATION);
 
 function legacySchemaEvidence(overrides = {}) {
   return {
@@ -290,7 +294,7 @@ function productionOptions(fake, overrides = {}) {
   return {
     environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
     createClient: () => fake.client,
-    localMigrationNames: localMigrations,
+    localMigrationNames: legacyLocalMigrations,
     ...overrides,
   };
 }
@@ -409,16 +413,39 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved batch is followed by operations, analytics, and partner payout migrations", () => {
+test("the approved batch is followed by operations, analytics, partner payout, and activation migrations", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-4), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-3), OPERATIONS_MIGRATION);
-  assert.equal(localMigrations.at(-2), ANALYTICS_MIGRATION);
-  assert.equal(localMigrations.at(-1), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-5), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-4), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-3), ANALYTICS_MIGRATION);
+  assert.equal(localMigrations.at(-2), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-1), PARTNER_ACTIVATION_MIGRATION);
+});
+
+test("partner activation migration is deployed and verified after partner payout", async () => {
+  const afterRecords = [
+    ...historicalRecords,
+    appliedFirst,
+    appliedTarget,
+    appliedMerchant,
+    appliedOperations,
+    appliedAnalytics,
+    appliedPartnerPayout,
+    appliedPartnerActivation,
+  ];
+  const fake = fakeClient(deploymentResponses(afterRecords));
+  let deploys = 0;
+  const result = await runProductionMigrations(productionOptions(fake, {
+    localMigrationNames: localMigrations,
+    deploy: () => { deploys += 1; },
+  }));
+  assert.equal(result, "deployed");
+  assert.equal(deploys, 1);
+  assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {

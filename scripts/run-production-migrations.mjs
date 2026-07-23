@@ -19,11 +19,13 @@ export const MERCHANT_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[2];
 export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_control_plane";
 export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
 export const PARTNER_PAYOUT_MIGRATION = "20260722100000_add_partner_payout_profiles";
+export const PARTNER_ACTIVATION_MIGRATION = "20260723100000_activate_pending_partner_profiles";
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
+  PARTNER_ACTIVATION_MIGRATION,
 ]);
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
@@ -176,6 +178,10 @@ const ALLOWLISTED_PENDING_MIGRATION_STATES = Object.freeze([
   Object.freeze([PARTNER_PAYOUT_MIGRATION]),
   Object.freeze([ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
   Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
+  Object.freeze([PARTNER_ACTIVATION_MIGRATION]),
+  Object.freeze([PARTNER_PAYOUT_MIGRATION, PARTNER_ACTIVATION_MIGRATION]),
+  Object.freeze([ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION, PARTNER_ACTIVATION_MIGRATION]),
+  Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION, PARTNER_ACTIVATION_MIGRATION]),
 ]);
 
 function hasExactMigrationList(actual, expected) {
@@ -217,13 +223,16 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const operationsIndex = localMigrationNames.indexOf(OPERATIONS_MIGRATION);
   const analyticsIndex = localMigrationNames.indexOf(ANALYTICS_MIGRATION);
   const partnerPayoutIndex = localMigrationNames.indexOf(PARTNER_PAYOUT_MIGRATION);
+  const partnerActivationIndex = localMigrationNames.indexOf(PARTNER_ACTIVATION_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
     || operationsIndex !== merchantIndex + 1
     || analyticsIndex !== operationsIndex + 1
     || partnerPayoutIndex !== analyticsIndex + 1
-    || partnerPayoutIndex !== localMigrationNames.length - 1) {
+    || (partnerActivationIndex !== -1
+      && (partnerActivationIndex !== partnerPayoutIndex + 1
+        || partnerActivationIndex !== localMigrationNames.length - 1))) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -252,7 +261,8 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       || !databaseNames.has(MERCHANT_MIGRATION)
       || !databaseNames.has(OPERATIONS_MIGRATION)
       || !databaseNames.has(ANALYTICS_MIGRATION)
-      || !databaseNames.has(PARTNER_PAYOUT_MIGRATION)) {
+      || !databaseNames.has(PARTNER_PAYOUT_MIGRATION)
+      || (partnerActivationIndex !== -1 && !databaseNames.has(PARTNER_ACTIVATION_MIGRATION))) {
       throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
@@ -265,26 +275,16 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     || !databaseNames.has(FIRST_APPROVED_MIGRATION)
     || !databaseNames.has(TARGET_MIGRATION)
     || !databaseNames.has(MERCHANT_MIGRATION)
+    || (partnerActivationIndex !== -1
+      && pendingMigrations.includes(PARTNER_ACTIVATION_MIGRATION)
+      && !databaseNames.has(PARTNER_PAYOUT_MIGRATION)
+      && !pendingMigrations.includes(PARTNER_PAYOUT_MIGRATION))
     || (pendingMigrations.includes(ANALYTICS_MIGRATION)
       && !databaseNames.has(OPERATIONS_MIGRATION)
-      && !hasExactMigrationList(
-        pendingMigrations,
-        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION],
-      )
-      && !hasExactMigrationList(
-        pendingMigrations,
-        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
-      ))
+      && !pendingMigrations.includes(OPERATIONS_MIGRATION))
     || (pendingMigrations.includes(PARTNER_PAYOUT_MIGRATION)
       && !databaseNames.has(ANALYTICS_MIGRATION)
-      && !hasExactMigrationList(
-        pendingMigrations,
-        [ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
-      )
-      && !hasExactMigrationList(
-        pendingMigrations,
-        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
-      ))) {
+      && !pendingMigrations.includes(ANALYTICS_MIGRATION))) {
     throw pendingSetError("Production has an unexpected pending migration.");
   }
 
@@ -2910,6 +2910,18 @@ export async function runProductionMigrations({
         source,
         "target_postverify_failed",
       );
+    }
+
+    if (localMigrationNames.includes(PARTNER_ACTIVATION_MIGRATION)) {
+      try {
+        assertMigrationApplied(afterRecords, PARTNER_ACTIVATION_MIGRATION);
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "target_verification",
+          source,
+          "target_postverify_failed",
+        );
+      }
     }
     return "deployed";
   } finally {

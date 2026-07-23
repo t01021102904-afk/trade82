@@ -21,9 +21,7 @@ import { lockPartnerProfileById } from "@/lib/partner-profile-locks";
 const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 const fields = new Set(["action", "reason"]);
 const actions = new Set<PartnerLifecycleAction>([
-  "approve",
   "reactivate",
-  "reject",
   "suspend",
 ]);
 
@@ -54,7 +52,7 @@ export async function POST(
       throw validationError("Action is invalid.");
     }
     const reason = stringField(body, "reason", { max: 500, fallback: null });
-    if ((action === "reject" || action === "suspend") && !reason) {
+    if (action === "suspend" && !reason) {
       throw validationError("A reason is required.");
     }
 
