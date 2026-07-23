@@ -15,6 +15,7 @@ import {
   partnerAnalyticsGroupingOptions,
   partnerAnalyticsMetrics,
   partnerAnalyticsRangeOptions,
+  recommendedAnalyticsGrouping,
   safeAnalyticsNumber,
   type AnalyticsGrouping,
   type AnalyticsMetric,
@@ -180,7 +181,7 @@ function ChartPanel({
 
     return (
       <svg
-        className="mt-6 h-auto w-full min-w-[560px]"
+        className="mt-6 h-auto w-full max-w-full min-w-0"
         viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
@@ -275,14 +276,14 @@ function ChartPanel({
   }
 
   return (
-    <div className="mt-6 min-w-[560px]">
+    <div className="mt-6 w-full max-w-full min-w-0 overflow-hidden">
       <div
         className="grid items-end gap-2"
         style={{
           gridTemplateColumns: `repeat(${Math.max(
             1,
             chartPoints.length,
-          )}, minmax(22px, 1fr))`,
+          )}, minmax(0, 1fr))`,
         }}
         role="img"
         aria-label={`${t(`partnerProgram.${definition.key}`)} ${t("partnerProgram.analyticsChart")}`}
@@ -356,7 +357,7 @@ export function PartnerReferralAnalyticsSection({
   const [selectedMetric, setSelectedMetric] =
     useState<AnalyticsMetric>("totalClicks");
   const [grouping, setGrouping] = useState<AnalyticsGrouping>(
-    analytics.range === "all" ? "monthly" : "daily",
+    recommendedAnalyticsGrouping(analytics.range),
   );
   const model = useMemo(
     () =>
@@ -381,7 +382,7 @@ export function PartnerReferralAnalyticsSection({
   return (
     <section
       aria-labelledby="partner-analytics-workspace"
-      className="rounded-[20px] border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm sm:p-5"
+      className="w-full max-w-full min-w-0 overflow-hidden rounded-[20px] border border-zinc-200 bg-white p-4 text-zinc-950 shadow-sm sm:p-5"
       data-testid="partner-analytics-workspace"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -410,13 +411,13 @@ export function PartnerReferralAnalyticsSection({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="mt-5 grid min-w-0 max-w-full gap-3 sm:grid-cols-2 xl:grid-cols-6">
         {kpiMetrics.map((metric) => {
           const definition = metricDefinition(metric);
           return (
             <article
               key={metric}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
+              className="min-w-0 max-w-full rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm"
             >
               <p className="text-xs font-medium text-zinc-500">
                 {t(`partnerProgram.${definition.key}`)}
@@ -440,8 +441,8 @@ export function PartnerReferralAnalyticsSection({
         })}
       </div>
 
-      <div className="mt-5 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div className="mt-5 w-full max-w-full min-w-0 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-base font-semibold text-zinc-950">
@@ -461,7 +462,7 @@ export function PartnerReferralAnalyticsSection({
               })}
             </p>
           </div>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid min-w-0 gap-2 sm:grid-cols-3">
             <label className="grid gap-1 text-xs font-medium text-zinc-600">
               {t("partnerProgram.analyticsMetric")}
               <select
@@ -524,7 +525,7 @@ export function PartnerReferralAnalyticsSection({
           </div>
         ) : null}
 
-        <div className="overflow-x-auto">
+        <div className="w-full max-w-full min-w-0 overflow-hidden">
           <ChartPanel
             locale={locale}
             grouping={grouping}
