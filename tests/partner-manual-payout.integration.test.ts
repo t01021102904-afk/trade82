@@ -160,6 +160,18 @@ async function createFixture({
       paidAt: paymentRequest.paidAt,
     },
   });
+  if (withDispute) {
+    await db.paymentDispute.create({
+      data: {
+        paymentRequestId: paymentRequest.id,
+        stripeDisputeId: `dp_${suffix}`,
+        amount: grossAmount,
+        status: "needs_response",
+        lastStripeEventCreatedAt: paymentRequest.paidAt!,
+        lastStripeEventId: `evt_${suffix}`,
+      },
+    });
+  }
   let partnerProfile: { id: string } | null = null;
   let attributionId: string | null = null;
   if (withPartner) {
@@ -304,9 +316,9 @@ async function createFixture({
         country: "KR",
         bankName: "Integration Bank",
         accountHolder: "Integration Partner",
-        accountNumberCiphertext: Buffer.from("partner-ciphertext"),
-        accountNumberIv: Buffer.from("partner-iv"),
-        accountNumberAuthTag: Buffer.from("partner-tag"),
+        accountNumberCiphertext: Buffer.from("ciphertext-fixture"),
+        accountNumberIv: Buffer.alloc(12, 2),
+        accountNumberAuthTag: Buffer.alloc(16, 3),
         accountNumberKeyVersion: "integration-test-v1",
         accountNumberLast4: "5678",
         accountNumberMasked: "••••5678",
@@ -389,7 +401,7 @@ test("returns referral allocation and immutable attribution without subtracting 
 
 test("flags a currency mismatch instead of declaring the allocation balanced", async () => {
   const fixture = await createFixture({ currency: "usd" });
-  await db.settlement.update({ where: { id: fixture.settlement.id }, data: { currency: "krw" } });
+  await db.paymentRequest.update({ where: { id: fixture.paymentRequest.id }, data: { currency: "krw" } });
   const [transaction] = await listAdminPayoutReviewTransactions(fixture.order.id);
   assert.ok(transaction);
   assert.equal(transaction.reconciliation.currencyMismatch, true);
