@@ -2864,9 +2864,11 @@ export async function runProductionMigrations({
       if (!allEvidencePresent(operationsSchema, OPERATIONS_MIGRATION_SCHEMA_KEYS)) {
         throw new Error("Settlement operations schema post-verification failed.");
       }
-      const operationsInitialState = await queryOperationsMigrationInitialState(client);
-      if (!allEvidencePresent(operationsInitialState, OPERATIONS_MIGRATION_INITIAL_STATE_KEYS)) {
-        throw new Error("Settlement operations initial state verification failed.");
+      if (state.pendingMigrations.includes(OPERATIONS_MIGRATION)) {
+        const operationsInitialState = await queryOperationsMigrationInitialState(client);
+        if (!allEvidencePresent(operationsInitialState, OPERATIONS_MIGRATION_INITIAL_STATE_KEYS)) {
+          throw new Error("Settlement operations initial state verification failed.");
+        }
       }
     } catch {
       throw new ProductionMigrationDiagnostic(
@@ -2882,9 +2884,11 @@ export async function runProductionMigrations({
       if (!allEvidencePresent(analyticsSchema, ANALYTICS_MIGRATION_SCHEMA_KEYS)) {
         throw new Error("Partner referral analytics schema post-verification failed.");
       }
-      const analyticsInitialState = await queryAnalyticsMigrationInitialState(client);
-      if (!allEvidencePresent(analyticsInitialState, ANALYTICS_MIGRATION_INITIAL_STATE_KEYS)) {
-        throw new Error("Partner referral analytics initial state verification failed.");
+      if (state.pendingMigrations.includes(ANALYTICS_MIGRATION)) {
+        const analyticsInitialState = await queryAnalyticsMigrationInitialState(client);
+        if (!allEvidencePresent(analyticsInitialState, ANALYTICS_MIGRATION_INITIAL_STATE_KEYS)) {
+          throw new Error("Partner referral analytics initial state verification failed.");
+        }
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

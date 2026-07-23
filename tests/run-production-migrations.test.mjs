@@ -267,15 +267,16 @@ function partnerPayoutSchema(overrides = {}) {
 }
 
 function fakeClient(responses) {
-  const calls = { connect: 0, query: 0, end: 0 };
+  const calls = { connect: 0, query: 0, end: 0, statements: [] };
   return {
     calls,
     client: {
       async connect() {
         calls.connect += 1;
       },
-      async query() {
+      async query(statement) {
         calls.query += 1;
+        calls.statements.push(statement);
         return { rows: responses.shift() ?? [] };
       },
       async end() {
@@ -332,6 +333,46 @@ function completedResponses() {
   return [
     [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics, appliedPartnerPayout],
     [legacySchemaEvidence()],
+    [prerequisiteSchema()],
+    [targetSchema()],
+    [firstSchema()],
+    [secondSchema()],
+    [merchantSchema()],
+    [operationsSchema()],
+    [analyticsSchema()],
+    [partnerPayoutSchema()],
+  ];
+}
+
+function partnerPayoutOnlyDeploymentResponses(afterRecords = [
+  ...historicalRecords,
+  appliedFirst,
+  appliedTarget,
+  appliedMerchant,
+  appliedOperations,
+  appliedAnalytics,
+  appliedPartnerPayout,
+]) {
+  const beforeRecords = [
+    ...historicalRecords,
+    appliedFirst,
+    appliedTarget,
+    appliedMerchant,
+    appliedOperations,
+    appliedAnalytics,
+  ];
+
+  return [
+    beforeRecords,
+    [legacySchemaEvidence()],
+    [prerequisiteSchema()],
+    [targetSchema()],
+    [firstSchema()],
+    [secondSchema()],
+    [merchantSchema()],
+    [operationsSchema()],
+    [partnerPayoutPreflight()],
+    afterRecords,
     [prerequisiteSchema()],
     [targetSchema()],
     [firstSchema()],
@@ -428,6 +469,52 @@ test("only approved migrations applied with operations and analytics pending run
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
   assert.equal(fake.calls.query, 21);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("operations_worker_run_zero_rows")
+  )), true);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("analytics_click_zero_rows")
+  )), true);
+  assert.equal(fake.calls.end, 1);
+});
+
+test("later partner payout deployment skips historical operations and analytics initial-state checks", async () => {
+  const fake = fakeClient(partnerPayoutOnlyDeploymentResponses());
+  let deploys = 0;
+  const result = await runProductionMigrations(productionOptions(fake, {
+    deploy: () => { deploys += 1; },
+  }));
+
+  assert.equal(result, "deployed");
+  assert.equal(deploys, 1);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("operations_worker_run_zero_rows")
+  )), false);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("analytics_click_zero_rows")
+  )), false);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("operations_worker_columns")
+  )), true);
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("analytics_tables")
+  )), true);
+  assert.equal(fake.calls.end, 1);
+});
+
+test("later partner payout deployment still fails on an analytics schema regression", async () => {
+  const responses = partnerPayoutOnlyDeploymentResponses();
+  responses[16] = [analyticsSchema({ analytics_constraints: false })];
+  const fake = fakeClient(responses);
+
+  await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
+    deploy: () => {},
+  })), {
+    stage: "target_verification", source: "DIRECT_URL", code: "target_postverify_failed",
+  });
+  assert.equal(fake.calls.statements.some((statement) => (
+    statement.includes("analytics_click_zero_rows")
+  )), false);
   assert.equal(fake.calls.end, 1);
 });
 
