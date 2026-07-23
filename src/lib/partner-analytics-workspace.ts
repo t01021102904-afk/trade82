@@ -143,6 +143,68 @@ export function parseAnalyticsDateKey(value: string) {
   return new Date(`${value}${value.length === 7 ? "-01" : ""}T00:00:00.000Z`);
 }
 
+export function formatAnalyticsChartLabel(
+  value: string,
+  grouping: AnalyticsGrouping,
+  locale: "en" | "ko",
+) {
+  if (value === "total") return locale === "ko" ? "합계" : "Total";
+  const date = parseAnalyticsDateKey(value);
+  if (grouping === "daily") return String(date.getUTCDate());
+  if (grouping === "monthly") {
+    return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
+      month: "short",
+      timeZone: "UTC",
+    }).format(date);
+  }
+  const weekStart = new Intl.DateTimeFormat(
+    locale === "ko" ? "ko-KR" : "en-US",
+    { month: "short", day: "numeric", timeZone: "UTC" },
+  ).format(date);
+  return locale === "ko" ? `${weekStart} 주` : `Week of ${weekStart}`;
+}
+
+export function analyticsPeriodContext(
+  points: Pick<AnalyticsPoint, "date">[],
+  grouping: AnalyticsGrouping,
+  locale: "en" | "ko",
+) {
+  if (grouping !== "daily" || points.length === 0) return null;
+  const dates = points
+    .filter((point) => point.date !== "total")
+    .map((point) => parseAnalyticsDateKey(point.date));
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  if (!first || !last) return null;
+  const format = (date: Date) => {
+    if (locale === "ko") {
+      return `${date.getUTCFullYear()}년 ${date.getUTCMonth() + 1}월`;
+    }
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(date);
+  };
+  const firstKey = `${first.getUTCFullYear()}-${first.getUTCMonth()}`;
+  const lastKey = `${last.getUTCFullYear()}-${last.getUTCMonth()}`;
+  return firstKey === lastKey ? format(first) : `${format(first)} - ${format(last)}`;
+}
+
+export function analyticsChartLabelIndices(
+  length: number,
+  grouping: AnalyticsGrouping,
+) {
+  if (length <= 0) return new Set<number>();
+  const maximumLabels = grouping === "weekly" ? 8 : grouping === "monthly" ? 12 : 31;
+  const step = Math.max(1, Math.ceil(length / maximumLabels));
+  return new Set(
+    Array.from({ length }, (_, index) => index).filter(
+      (index) => index % step === 0 || index === length - 1,
+    ),
+  );
+}
+
 function monthKey(value: Date) {
   return `${value.getUTCFullYear()}-${pad(value.getUTCMonth() + 1)}`;
 }
