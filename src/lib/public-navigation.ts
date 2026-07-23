@@ -1,10 +1,11 @@
 const basePublicNavigationLinks = [
   { href: "/marketplace", labelKey: "nav.marketplace" },
   { href: "/sellers", labelKey: "nav.sellers" },
+  { href: "/partner", labelKey: "nav.partnerProgram" },
 ] as const;
 
-// Partner onboarding is reached from the authenticated role-selection flow,
-// never from the public navigation surface.
+// The public landing page remains discoverable independently of the gated
+// partner enrollment and dashboard flows.
 export function getPublicNavigationLinks(_partnerProgramEnabled: boolean) {
   return [...basePublicNavigationLinks];
 }

@@ -87,13 +87,13 @@ test("public navigation and JSON-LD emphasize public discovery pages instead of 
   const headerSource = readSource("src/components/site-header.tsx");
   const seoSource = readSource("src/lib/seo.ts");
 
-  for (const href of ["/marketplace", "/sellers"]) {
+  for (const href of ["/marketplace", "/sellers", "/partner"]) {
     assert.match(navigationSource, new RegExp(`href: "${href}"`));
   }
   for (const href of ["/buyers", "/pricing"]) {
     assert.doesNotMatch(navigationSource, new RegExp(`href: "${href}"`));
   }
-  assert.match(headerSource, /publicNavigationLinks/);
+  assert.match(headerSource, /getPublicNavigationLinks/);
 
   const navigationJsonLd = seoSource.slice(seoSource.indexOf("export function siteNavigationJsonLd"));
   assert.match(navigationJsonLd, /"Marketplace"/);

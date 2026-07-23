@@ -74,23 +74,56 @@ test("partner enrollment form has translations for every static partnerProgram k
   }
 });
 
-test("public navigation omits Partner even when the feature is enabled", () => {
+test("public navigation includes the Partner Program landing page", () => {
+  const links = getPublicNavigationLinks(true);
+  assert.deepEqual(links, [
+    { href: "/marketplace", labelKey: "nav.marketplace" },
+    { href: "/sellers", labelKey: "nav.sellers" },
+    { href: "/partner", labelKey: "nav.partnerProgram" },
+  ]);
   assert.equal(
-    getPublicNavigationLinks(false).some((link) => (link.href as string) === "/partner"),
-    false,
+    getPublicNavigationLinks(false).some((link) => link.href === "/partner"),
+    true,
   );
+});
+
+test("public Partner Program navigation is locale-aware and keeps dashboard private", async () => {
+  const headerSource = await readFile(
+    new URL("../src/components/site-header.tsx", import.meta.url),
+    "utf8",
+  );
+  const footerSource = await readFile(
+    new URL("../src/components/site-footer.tsx", import.meta.url),
+    "utf8",
+  );
+  const english = JSON.parse(
+    await readFile(new URL("../messages/en.json", import.meta.url), "utf8"),
+  ) as { nav: Record<string, string>; footer: Record<string, string> };
+  const korean = JSON.parse(
+    await readFile(new URL("../messages/ko.json", import.meta.url), "utf8"),
+  ) as { nav: Record<string, string>; footer: Record<string, string> };
+
+  assert.equal(english.nav.partnerProgram, "Partner Program");
+  assert.equal(korean.nav.partnerProgram, "파트너 프로그램");
+  assert.equal(english.footer.partnerProgram, "Partner Program");
+  assert.equal(korean.footer.partnerProgram, "파트너 프로그램");
+  assert.match(headerSource, /href=\{withLocale\(link\.href, locale\)\}/);
+  assert.match(footerSource, /withLocale\("\/partner", locale\)/);
+  assert.match(headerSource, /partnerProfile/);
+  assert.match(headerSource, /partnerProfile\?\.status === "ACTIVE"/);
+  assert.match(headerSource, /nav\.partnerDashboard/);
+  assert.match(headerSource, /visibleNavLinks\.map/);
+  assert.doesNotMatch(headerSource, /partner\/dashboard.*getPublicNavigationLinks/);
+});
+
+test("public navigation omits private Buyers and Pricing links", () => {
+  const links = getPublicNavigationLinks(false) as readonly { href: string }[];
   assert.equal(
-    getPublicNavigationLinks(getPartnerProgramMode(" on ") === "on").some(
-      (link) => (link.href as string) === "/partner",
-    ),
-    false,
+    links.some((link) => link.href === "/partner"),
+    true,
   );
-  assert.equal(
-    getPublicNavigationLinks(getPartnerProgramMode("ON") === "on").some(
-      (link) => (link.href as string) === "/partner",
-    ),
-    false,
-  );
+  assert.equal(links.some((link) => link.href === "/buyers"), false);
+  assert.equal(links.some((link) => link.href === "/pricing"), false);
 });
 
 test("referral codes are normalized without accepting malformed input", () => {
