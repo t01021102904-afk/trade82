@@ -9,6 +9,8 @@ import {
   LEGACY_ZERO_STEP_MIGRATIONS,
   MERCHANT_MIGRATION,
   OPERATIONS_MIGRATION,
+  PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION,
+  PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   ProductionMigrationDiagnostic,
   TARGET_MIGRATION,
@@ -21,12 +23,17 @@ import {
 
 const directUrl = `postgresql://postgres:credential-placeholder@db.${EXPECTED_SUPABASE_PROJECT}.supabase.co:5432/postgres`;
 const poolerUrl = `postgresql://postgres.${EXPECTED_SUPABASE_PROJECT}:credential-placeholder@aws-0-us-east-1.pooler.supabase.com:6543/postgres`;
-const localMigrations = readLocalMigrationNames();
+// These fixtures cover the pre-hardening runner contract. The real runner
+// reads the current directory, including the additive hardening migration.
+const localMigrations = readLocalMigrationNames().filter(
+  (name) => name !== "20260722140000_harden_partner_manual_payout_review",
+);
 const approvedNames = new Set([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
+  PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION,
 ]);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
@@ -53,6 +60,7 @@ const appliedMerchant = record(MERCHANT_MIGRATION);
 const appliedOperations = record(OPERATIONS_MIGRATION);
 const appliedAnalytics = record(ANALYTICS_MIGRATION);
 const appliedPartnerPayout = record(PARTNER_PAYOUT_MIGRATION);
+const appliedPartnerManualPayoutReview = record(PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION);
 
 function legacySchemaEvidence(overrides = {}) {
   return {
@@ -266,6 +274,37 @@ function partnerPayoutSchema(overrides = {}) {
   };
 }
 
+function partnerManualPayoutReviewPreflight(overrides = {}) {
+  return {
+    partner_manual_payout_profile_table: true,
+    partner_manual_settlement_leg_table: true,
+    partner_manual_trade_order_table: true,
+    partner_manual_partner_profile_table: true,
+    partner_manual_user_profile_table: true,
+    partner_manual_account_type_enum: true,
+    partner_manual_enums_absent: true,
+    partner_manual_tables_absent: true,
+    partner_manual_anon_role: true,
+    partner_manual_authenticated_role: true,
+    ...overrides,
+  };
+}
+
+function partnerManualPayoutReviewSchema(overrides = {}) {
+  return {
+    partner_manual_tables: true,
+    partner_manual_status_enum: true,
+    partner_manual_event_enum: true,
+    partner_manual_columns: true,
+    partner_manual_indexes: true,
+    partner_manual_foreign_keys: true,
+    partner_manual_constraints: true,
+    partner_manual_rls: true,
+    partner_manual_public_access_revoked: true,
+    ...overrides,
+  };
+}
+
 function fakeClient(responses) {
   const calls = { connect: 0, query: 0, end: 0 };
   return {
@@ -302,6 +341,7 @@ function deploymentResponses(afterRecords = [
   appliedOperations,
   appliedAnalytics,
   appliedPartnerPayout,
+  appliedPartnerManualPayoutReview,
 ]) {
   return [
     [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant],
@@ -314,6 +354,7 @@ function deploymentResponses(afterRecords = [
     [operationsPreflight()],
     [analyticsPreflight()],
     [partnerPayoutPreflight()],
+    [partnerManualPayoutReviewPreflight()],
     afterRecords,
     [prerequisiteSchema()],
     [targetSchema()],
@@ -325,12 +366,13 @@ function deploymentResponses(afterRecords = [
     [analyticsSchema()],
     [analyticsInitialState()],
     [partnerPayoutSchema()],
+    [partnerManualPayoutReviewSchema()],
   ];
 }
 
 function completedResponses() {
   return [
-    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics, appliedPartnerPayout],
+    [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics, appliedPartnerPayout, appliedPartnerManualPayoutReview],
     [legacySchemaEvidence()],
     [prerequisiteSchema()],
     [targetSchema()],
@@ -340,6 +382,7 @@ function completedResponses() {
     [operationsSchema()],
     [analyticsSchema()],
     [partnerPayoutSchema()],
+    [partnerManualPayoutReviewSchema()],
   ];
 }
 
@@ -374,10 +417,12 @@ test("the approved batch is followed by operations, analytics, and partner payou
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-4), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-3), OPERATIONS_MIGRATION);
-  assert.equal(localMigrations.at(-2), ANALYTICS_MIGRATION);
-  assert.equal(localMigrations.at(-1), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-5), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-4), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-3), ANALYTICS_MIGRATION);
+  assert.equal(localMigrations.at(-2), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-1), PARTNER_MANUAL_PAYOUT_REVIEW_MIGRATION);
+  assert.ok(readLocalMigrationNames().includes(PARTNER_MANUAL_PAYOUT_REVIEW_HARDENING_MIGRATION));
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {
@@ -427,7 +472,7 @@ test("only approved migrations applied with operations and analytics pending run
   }));
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
-  assert.equal(fake.calls.query, 21);
+  assert.equal(fake.calls.query, 23);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -439,7 +484,7 @@ test("all approved migrations applied skips Prisma after complete verification",
   }));
   assert.equal(result, "already-applied");
   assert.equal(deploys, 0);
-  assert.equal(fake.calls.query, 10);
+  assert.equal(fake.calls.query, 11);
   assert.equal(fake.calls.end, 1);
 });
 
@@ -539,7 +584,7 @@ test("operations migration records are strict and legitimate operational rows do
 
   const completed = fakeClient(completedResponses());
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
-  assert.equal(completed.calls.query, 10, "already-applied verification must not require empty operational or analytics catalogs");
+  assert.equal(completed.calls.query, 11, "already-applied verification must not require empty operational or analytics catalogs");
 });
 
 test("merchant preflight fails closed for each fixed evidence field", async () => {
@@ -588,7 +633,7 @@ test("merchant post-verification fails closed for each schema field", async () =
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[15] = [merchantSchema({ [key]: false })];
+    responses[16] = [merchantSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -624,7 +669,7 @@ test("target preflight fails closed for each newly required dependency field", a
 
 test("operations deployment does not require merchant zero rows, while new operations rows fail initial-state verification", async () => {
   const responses = deploymentResponses();
-  responses[17] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
+  responses[18] = [operationsInitialState({ operations_worker_run_zero_rows: false })];
   const fake = fakeClient(responses);
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => {},
@@ -634,7 +679,7 @@ test("operations deployment does not require merchant zero rows, while new opera
 
   const completed = fakeClient(completedResponses());
   assert.equal(await runProductionMigrations(productionOptions(completed)), "already-applied");
-  assert.equal(completed.calls.query, 10);
+  assert.equal(completed.calls.query, 11);
 });
 
 test("analytics preflight fails closed for each fixed evidence field", async () => {
@@ -669,7 +714,7 @@ test("analytics post-verification fails closed for each schema field", async () 
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[18] = [analyticsSchema({ [key]: false })];
+    responses[19] = [analyticsSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -681,7 +726,7 @@ test("analytics post-verification fails closed for each schema field", async () 
 
 test("analytics initial-state verification requires an empty daily visitor table", async () => {
   const responses = deploymentResponses();
-  responses[19] = [analyticsInitialState({ analytics_click_zero_rows: false })];
+  responses[20] = [analyticsInitialState({ analytics_click_zero_rows: false })];
   const fake = fakeClient(responses);
   await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
     deploy: () => {},
@@ -732,7 +777,7 @@ test("partner payout migration post-verification fails closed for each schema fi
   ];
   for (const key of keys) {
     const responses = deploymentResponses();
-    responses[20] = [partnerPayoutSchema({ [key]: false })];
+    responses[21] = [partnerPayoutSchema({ [key]: false })];
     const fake = fakeClient(responses);
     await assertDiagnostic(runProductionMigrations(productionOptions(fake, {
       deploy: () => {},
@@ -764,7 +809,7 @@ test("legacy zero-step migrations remain accepted only with complete evidence", 
 
 test("approved migrations require exactly one applied step after deploy", async () => {
   for (const migrationName of APPROVED_PRODUCTION_MIGRATION_BATCH) {
-    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics, appliedPartnerPayout];
+    const afterRecords = [...historicalRecords, appliedFirst, appliedTarget, appliedMerchant, appliedOperations, appliedAnalytics, appliedPartnerPayout, appliedPartnerManualPayoutReview];
     const index = afterRecords.findIndex((entry) => entry.migration_name === migrationName);
     afterRecords[index] = zeroStepRecord(migrationName);
     const fake = fakeClient(deploymentResponses(afterRecords));

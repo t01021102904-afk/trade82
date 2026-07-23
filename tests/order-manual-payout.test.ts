@@ -35,8 +35,18 @@ const files = {
   orderListRoute: new URL("../src/app/api/orders/route.ts", import.meta.url),
   orderDetailRoute: new URL("../src/app/api/orders/[orderNumber]/route.ts", import.meta.url),
   adminPayoutRoute: new URL("../src/app/api/admin/payouts/route.ts", import.meta.url),
+  adminPayoutReview: new URL("../src/lib/admin-payout-review.ts", import.meta.url),
   adminPayoutActionRoute: new URL("../src/app/api/admin/payouts/[id]/route.ts", import.meta.url),
   payoutRevealRoute: new URL("../src/app/api/admin/payouts/[id]/reveal/route.ts", import.meta.url),
+  partnerPayoutService: new URL("../src/lib/partner-payouts.ts", import.meta.url),
+  partnerPayoutAdminRoute: new URL("../src/app/api/admin/partner-payouts/[id]/route.ts", import.meta.url),
+  partnerPayoutRevealRoute: new URL("../src/app/api/admin/partner-payouts/[id]/reveal/route.ts", import.meta.url),
+  partnerPayoutMigration: new URL("../prisma/migrations/20260722130000_add_partner_manual_payout_review/migration.sql", import.meta.url),
+  stripeConnectStartRoute: new URL("../src/app/api/stripe/connect/onboarding/[ownerType]/start/route.ts", import.meta.url),
+  stripeConnectStatusRoute: new URL("../src/app/api/stripe/connect/onboarding/[ownerType]/status/route.ts", import.meta.url),
+  stripeConnectRefreshRoute: new URL("../src/app/api/stripe/connect/onboarding/[ownerType]/refresh/route.ts", import.meta.url),
+  stripeConnectReturnRoute: new URL("../src/app/api/stripe/connect/onboarding/[ownerType]/return/route.ts", import.meta.url),
+  partnerDashboardUi: new URL("../src/components/partner-dashboard-view.tsx", import.meta.url),
   payoutProofRoute: new URL("../src/app/api/admin/payouts/[id]/proof/route.ts", import.meta.url),
   payoutProfileAdminRoute: new URL("../src/app/api/admin/payout-profiles/[id]/route.ts", import.meta.url),
   adminOrderRoute: new URL("../src/app/api/admin/orders/route.ts", import.meta.url),
@@ -385,9 +395,9 @@ test("buyer order responses omit seller payout and beneficiary fields", () => {
 });
 
 test("admin payout list explicitly excludes encrypted snapshots and proof storage paths", () => {
-  assert.match(source.adminPayoutRoute, /Never serialize encrypted beneficiary snapshots/);
-  assert.doesNotMatch(source.adminPayoutRoute, /beneficiarySnapshotEncrypted/);
-  assert.doesNotMatch(source.adminPayoutRoute, /payoutProofStoragePath/);
+  assert.match(source.adminPayoutReview, /accountNumberLast4/);
+  assert.doesNotMatch(source.adminPayoutReview, /beneficiarySnapshotEncrypted/);
+  assert.doesNotMatch(source.adminPayoutReview, /payoutProofStoragePath/);
 });
 
 test("bank auto-fill only trusts verified directory values and safe HTTPS portals", async () => {
@@ -423,7 +433,7 @@ test("Open Bank Portal is only a verified website link with noopener and norefer
   assert.match(source.payoutUi, /isSafeOfficialBankWebsite/);
   assert.match(source.payoutUi, /rel="noopener noreferrer"/);
   assert.match(source.payoutUi, /t\("payouts\.openBankPortal"\)/);
-  assert.match(source.payoutUi, /t\("payouts\.manualExternalNotice"\)/);
+  assert.doesNotMatch(source.payoutUi, /t\("payouts\.manualExternalNotice"\)/);
 });
 
 test("payout proof uploads use a private bucket, matching type and extension, and short signed URLs", () => {
@@ -482,6 +492,50 @@ test("manual payout UI records only external transfers and clears revealed bank 
   assert.match(source.payoutUi, /t\("payouts\.downloadInstructions"\)/);
   assert.match(source.payoutUi, /setRevealed\(null\)/);
   assert.match(source.payoutUi, /instructions-exported/);
+});
+
+test("admin payout bank reveal routes require same-origin, rate limiting, reason, no-store, and audit", () => {
+  for (const route of [source.payoutRevealRoute, source.partnerPayoutRevealRoute]) {
+    assert.match(route, /assertSameOrigin\(request\)/);
+    assert.match(route, /rateLimitOrResponse\(/);
+    assert.match(route, /Reveal reason must be between 3 and 500 characters/);
+    assert.match(route, /Cache-Control": "no-store, no-cache, must-revalidate"/);
+  }
+  assert.match(source.payoutRevealRoute, /BANK_DETAILS_REVEALED/);
+  assert.match(source.partnerPayoutService, /ACCOUNT_REVEALED/);
+});
+
+test("partner manual payouts are linked to settlement legs and never invoke Stripe or bank transfers", () => {
+  assert.match(source.partnerPayoutMigration, /CREATE TABLE "PartnerPayout"/);
+  assert.match(source.partnerPayoutMigration, /"PartnerPayout_settlementLegId_key"/);
+  assert.match(source.partnerPayoutMigration, /"PartnerPayout_settlementId_fkey"/);
+  assert.match(source.partnerPayoutMigration, /"PartnerPayout_orderId_fkey"/);
+  assert.match(source.partnerPayoutMigration, /"PartnerPayout_partnerProfileId_fkey"/);
+  assert.match(source.partnerPayoutMigration, /ALTER TABLE "PartnerPayout" ENABLE ROW LEVEL SECURITY/);
+  assert.match(source.partnerPayoutService, /Prisma\.TransactionIsolationLevel\.Serializable/);
+  assert.match(source.partnerPayoutService, /SettlementLegType\.PARTNER_REFERRAL/);
+  assert.match(source.partnerPayoutService, /paymentFlow === "DIRECT_CHARGE"/);
+  assert.match(source.partnerPayoutService, /PartnerPayoutStatus\.NOT_READY/);
+  assert.match(source.partnerPayoutService, /PartnerPayoutStatus\.HOLD/);
+  assert.match(source.partnerPayoutService, /PartnerPayoutStatus\.READY/);
+  assert.match(source.partnerPayoutService, /PartnerPayoutStatus\.CANCELLED/);
+  assert.match(source.partnerPayoutService, /leg\.partnerPayout\.status === PartnerPayoutStatus\.SENT/);
+  assert.doesNotMatch(source.partnerPayoutService, /stripe\.(transfers|payouts|refunds|paymentIntents|checkout)/);
+});
+
+test("partner Stripe onboarding requests are blocked before account-link work while seller routes remain present", () => {
+  for (const route of [source.stripeConnectStartRoute, source.stripeConnectStatusRoute, source.stripeConnectRefreshRoute]) {
+    const executableSource = route.slice(route.indexOf("function onboardingError"));
+    const partnerGuard = executableSource.search(/ownerType(?:Value)? === "partner"/);
+    const stripeWork = executableSource.search(/startStripeConnectOnboarding|getStripeConnectOnboardingStatus|refreshStripeConnectOnboarding/);
+    assert.ok(partnerGuard >= 0, "partner guard exists");
+    assert.ok(stripeWork === -1 || partnerGuard < stripeWork, "partner guard precedes Stripe Connect work");
+  }
+  assert.match(source.stripeConnectReturnRoute, /ownerType === "partner"/);
+  assert.match(source.stripeConnectReturnRoute, /\/onboarding\/partner\?edit=1/);
+  assert.match(source.partnerDashboardUi, /partnerProgram\.payoutSetupDescription/);
+  assert.equal(dictionaries.en.partnerProgram.payoutSetupDescription, "Referral earnings are paid to your registered payout account after Trade82 review.");
+  assert.equal(dictionaries.ko.partnerProgram.payoutSetupDescription, "추천 수익은 Trade82의 검토 후 등록한 정산 계좌로 지급됩니다.");
 });
 
 test("order and payout translation namespaces stay structurally aligned and localize financial states", () => {

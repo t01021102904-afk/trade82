@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { decryptPayoutData } from "@/lib/payout-crypto";
-import { idParam, readJsonObject } from "@/lib/api-security";
+import { assertSameOrigin, idParam, rateLimitOrResponse, readJsonObject } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { isManualPayoutSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
@@ -17,6 +17,15 @@ function revealReason(value: unknown) {
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAdmin();
+    assertSameOrigin(request);
+    const rateLimited = rateLimitOrResponse({
+      request,
+      scope: "admin-payout-reveal",
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+    });
+    if (rateLimited) return rateLimited;
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
       return Response.json({ error: "Manual payouts are not enabled for this account." }, { status: 403, headers: { "Cache-Control": "no-store" } });
     }

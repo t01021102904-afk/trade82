@@ -23,6 +23,9 @@ export async function GET(
     if (!isStripeConnectOwnerType(ownerType)) {
       throw new StripeConnectOnboardingError("Not found.", 404);
     }
+    if (ownerType === "partner") {
+      return Response.redirect(new URL("/onboarding/partner?edit=1", request.url), 303);
+    }
     await returnFromStripeConnectOnboarding({ userId: user.id, ownerType });
     const destination = ownerType === "seller"
       ? "/settings/payout-information?stripe_connect=returned"

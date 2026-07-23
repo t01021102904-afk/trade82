@@ -112,6 +112,14 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
         run: npm run test:admin-partners:integration
 
+      - name: Run partner manual payout review suite
+        run: npm run test:partner-manual-payout
+
+      - name: Run partner manual payout integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
+        run: npm run test:partner-manual-payout:integration
+
       - name: Run application tests
         run: npm test
 

@@ -243,6 +243,16 @@ export type SellerPayoutEvent = Prisma.SellerPayoutEventModel
  */
 export type SellerPayoutAdjustment = Prisma.SellerPayoutAdjustmentModel
 /**
+ * Model PartnerPayout
+ * 
+ */
+export type PartnerPayout = Prisma.PartnerPayoutModel
+/**
+ * Model PartnerPayoutEvent
+ * 
+ */
+export type PartnerPayoutEvent = Prisma.PartnerPayoutEventModel
+/**
  * Model SavedItem
  * 
  */

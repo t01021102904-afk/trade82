@@ -28,6 +28,12 @@ export async function GET(
   try {
     const user = await requireAuth();
     const ownerType = ownerTypeFromParams((await params).ownerType);
+    if (ownerType === "partner") {
+      return Response.json(
+        { enabled: false, account: null, error: "Partner manual payout review is used instead of Stripe onboarding." },
+        { status: 410, headers: { "Cache-Control": "no-store" } },
+      );
+    }
 
     if (getStripeConnectOnboardingMode() === "off") {
       return Response.json({ enabled: false, account: null });

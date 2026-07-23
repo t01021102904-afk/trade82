@@ -25,6 +25,9 @@ export async function POST(
     if (!isStripeConnectOwnerType(ownerType)) {
       throw new StripeConnectOnboardingError("Not found.", 404);
     }
+    if (ownerType === "partner") {
+      throw new StripeConnectOnboardingError("Partner Stripe onboarding has been replaced by manual Korean payout review.", 410);
+    }
     const rateLimited = rateLimitOrResponse({
       request,
       scope: `stripe-connect-onboarding-start:${ownerType}`,
