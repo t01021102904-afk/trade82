@@ -214,6 +214,7 @@ export function PartnerDashboardView({
 
         {showOperationalSections ? <>
           <PartnerReferralAnalyticsSection
+            key={data.analytics.range}
             locale={locale}
             analytics={data.analytics}
             qualifyingTransactions={data.counts.qualifyingTransactions}

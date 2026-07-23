@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   buildPartnerAnalyticsWorkspaceModel,
@@ -359,9 +359,6 @@ export function PartnerReferralAnalyticsSection({
   const [grouping, setGrouping] = useState<AnalyticsGrouping>(
     recommendedAnalyticsGrouping(analytics.range),
   );
-  useEffect(() => {
-    setGrouping(recommendedAnalyticsGrouping(analytics.range));
-  }, [analytics.range]);
   const model = useMemo(
     () =>
       buildPartnerAnalyticsWorkspaceModel({
