@@ -712,3 +712,92 @@ test("partner routes clear stale claims and gate active functionality server-sid
   assert.match(roleSelection, /partnerProgramEnabled/);
   assert.match(roleSelection, /partnerProgram\.joinAsPartner/);
 });
+
+test("public partner landing copy is present in both locales", async () => {
+  const landing = await readFile(
+    new URL("../src/components/partner-program-landing.tsx", import.meta.url),
+    "utf8",
+  );
+  const [english, korean] = await Promise.all(
+    ["en", "ko"].map(async (locale) => {
+      const source = await readFile(
+        new URL(`../messages/${locale}.json`, import.meta.url),
+        "utf8",
+      );
+      return JSON.parse(source) as {
+        partnerProgram?: Record<string, unknown>;
+      };
+    }),
+  );
+  const keys = [
+    "landingHeroEyebrow",
+    "landingHeroTitle",
+    "landingHeroDescription",
+    "landingPrimaryCta",
+    "landingSecondaryCta",
+    "landingSignIn",
+    "landingHeroAlt",
+    "visualReferralLink",
+    "visualEarnings",
+    "landingBenefitsEyebrow",
+    "landingBenefitsTitle",
+    "landingBenefitsDescription",
+    "benefitEasySignup",
+    "benefitEasySignupDescription",
+    "benefitShareLink",
+    "benefitShareLinkDescription",
+    "benefitEarn",
+    "benefitEarnDescription",
+    "benefitTracking",
+    "benefitTrackingDescription",
+    "landingHowEyebrow",
+    "landingHowTitle",
+    "landingHowDescription",
+    "howStep1Title",
+    "howStep1Description",
+    "howStep2Title",
+    "howStep2Description",
+    "howStep3Title",
+    "howStep3Description",
+    "howStep4Title",
+    "howStep4Description",
+    "landingAudienceEyebrow",
+    "landingAudienceTitle",
+    "landingAudienceDescription",
+    "audienceInfluencers",
+    "audienceInfluencersDescription",
+    "audienceConsultants",
+    "audienceConsultantsDescription",
+    "audienceAgencies",
+    "audienceAgenciesDescription",
+    "audienceConnectors",
+    "audienceConnectorsDescription",
+    "landingEarningsEyebrow",
+    "landingEarningsTitle",
+    "landingEarningsDescription",
+    "earningsRecorded",
+    "earningsRecordedDescription",
+    "earningsReview",
+    "earningsReviewDescription",
+    "earningsPayout",
+    "earningsPayoutDescription",
+    "landingPayoutNote",
+    "landingFaqEyebrow",
+    "landingFaqTitle",
+    ...Array.from({ length: 7 }, (_, index) => [
+      `faq${index + 1}Question`,
+      `faq${index + 1}Answer`,
+    ]).flat(),
+    "landingFinalEyebrow",
+    "landingFinalTitle",
+    "landingFinalDescription",
+    "landingFinalCta",
+  ];
+
+  assert.match(landing, /HomeFaqAccordion/);
+  assert.match(landing, /\/landing\/export-documents\.png/);
+  for (const key of keys) {
+    assert.equal(typeof english.partnerProgram?.[key], "string", `en: ${key}`);
+    assert.equal(typeof korean.partnerProgram?.[key], "string", `ko: ${key}`);
+  }
+});
