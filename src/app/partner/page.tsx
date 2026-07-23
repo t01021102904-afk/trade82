@@ -4,7 +4,6 @@ import { PartnerProgramLanding } from "@/components/partner-program-landing";
 import { getCurrentUserProfile } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
-import { PartnerProfileStatus } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +21,14 @@ export default async function PartnerPage() {
         select: { status: true },
       })
     : null;
-  return (
-    <PartnerProgramLanding
-      state={
-        partner?.status === PartnerProfileStatus.ACTIVE
+  const state = !partner
+    ? "eligible"
+    : partner.status === "PENDING_REVIEW"
+      ? "pendingReview"
+      : partner.status === "REJECTED"
+        ? "rejected"
+        : partner.status === "ACTIVE"
           ? "active"
-          : partner
-            ? "suspended"
-            : "eligible"
-      }
-    />
-  );
+          : "suspended";
+  return <PartnerProgramLanding state={state} />;
 }

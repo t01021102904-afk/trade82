@@ -2,10 +2,10 @@ import { apiError } from "@/lib/api-response";
 import {
   assertSameOrigin,
   enumField,
+  idField,
   readJsonObject,
   rejectUnexpectedFields,
   requiredStringField,
-  stringField,
   validationErrorResponse,
   ApiValidationError,
   rateLimitOrResponse,
@@ -13,12 +13,15 @@ import {
 import { requireAuth } from "@/lib/authz";
 import { enrollPartnerProfile } from "@/lib/partner-enrollment";
 import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
+import { assertKoreanPayoutConfiguration } from "@/lib/seller-payout-profile-rules";
+
+const noStore = { "Cache-Control": "no-store, no-cache, must-revalidate" };
 
 export async function POST(request: Request) {
   try {
     assertSameOrigin(request);
     if (!isPartnerProgramEnabled()) {
-      return Response.json({ error: "Partner program enrollment is not available." }, { status: 403 });
+      return Response.json({ error: "Partner program enrollment is not available." }, { status: 403, headers: noStore });
     }
     const user = await requireAuth();
     const rateLimited = rateLimitOrResponse({
@@ -31,50 +34,55 @@ export async function POST(request: Request) {
     if (rateLimited) return rateLimited;
 
     const body = await readJsonObject(request);
-    rejectUnexpectedFields(
-      body,
-      new Set([
-        "legalName",
-        "displayName",
-        "email",
-        "phone",
-        "country",
-        "preferredLanguage",
-        "organizationName",
-        "websiteOrSocialUrl",
-        "promotionDescription",
-        "agreeToTerms",
-        "acknowledgePrivacy",
-      ]),
-    );
-    const agreeToTerms = body.agreeToTerms === true;
-    const acknowledgePrivacy = body.acknowledgePrivacy === true;
+    rejectUnexpectedFields(body, new Set([
+      "fullName",
+      "phone",
+      "preferredLanguage",
+      "country",
+      "bankDirectoryId",
+      "accountHolder",
+      "accountNumber",
+      "accountType",
+      "payoutCurrency",
+      "supportedCurrencies",
+      "accountBelongsToPartner",
+      "agreeToTerms",
+      "acknowledgePayoutTerms",
+      "acknowledgePrivacy",
+    ]));
+    assertKoreanPayoutConfiguration({
+      country: body.country,
+      accountType: body.accountType,
+      payoutCurrency: body.payoutCurrency,
+      supportedCurrencies: body.supportedCurrencies,
+    });
     const result = await enrollPartnerProfile({
       userId: user.id,
+      email: user.email,
       input: {
-        legalName: requiredStringField(body, "legalName", 160),
-        displayName: stringField(body, "displayName", { max: 120, fallback: null }),
-        email: requiredStringField(body, "email", 320),
+        fullName: requiredStringField(body, "fullName", 160),
         phone: requiredStringField(body, "phone", 50),
-        country: requiredStringField(body, "country", 100),
         preferredLanguage: enumField(body, "preferredLanguage", ["en", "ko"] as const),
-        organizationName: stringField(body, "organizationName", { max: 160, fallback: null }),
-        websiteOrSocialUrl: stringField(body, "websiteOrSocialUrl", { max: 500, fallback: null }),
-        promotionDescription: stringField(body, "promotionDescription", { max: 1_500, fallback: null }),
-        agreeToTerms,
-        acknowledgePrivacy,
+        bankDirectoryId: idField(body, "bankDirectoryId", { required: true }) as string,
+        accountHolder: requiredStringField(body, "accountHolder", 240),
+        accountNumber: requiredStringField(body, "accountNumber", 128),
+        accountBelongsToPartner: body.accountBelongsToPartner === true,
+        agreeToTerms: body.agreeToTerms === true,
+        acknowledgePayoutTerms: body.acknowledgePayoutTerms === true,
+        acknowledgePrivacy: body.acknowledgePrivacy === true,
       },
     });
     return Response.json({
       partner: {
-        referralCode: result.partnerProfile.referralCode,
         status: result.partnerProfile.status,
         createdAt: result.partnerProfile.createdAt,
+        payoutProfile: result.payoutProfile,
       },
       created: result.created,
-    }, { headers: { "Cache-Control": "no-store" } });
+    }, { headers: noStore });
   } catch (error) {
     if (error instanceof ApiValidationError) return validationErrorResponse(error);
+    if (error instanceof Error) return Response.json({ error: "Unable to submit partner enrollment." }, { status: 400, headers: noStore });
     return apiError(error);
   }
 }

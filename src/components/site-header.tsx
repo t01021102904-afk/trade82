@@ -39,6 +39,9 @@ export function SiteHeader({
     isSignedIn && hasRole
       ? [
           ...getPublicNavigationLinks(partnerProgramEnabled),
+          ...(partnerProgramEnabled && context?.partnerProfile
+            ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
+            : []),
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),

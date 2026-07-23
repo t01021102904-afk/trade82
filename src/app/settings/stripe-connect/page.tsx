@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
 import { requireAuth } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
@@ -14,5 +13,5 @@ export default async function StripeConnectSettingsPage() {
     select: { id: true },
   });
   if (!partner) redirect("/dashboard");
-  return <StripeConnectOnboardingPanel ownerType="partner" />;
+  redirect("/onboarding/partner?edit=1");
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
-import { after, test } from "node:test";
+import { after, mock, test } from "node:test";
 
 import { PrismaClient } from "../src/generated/prisma/client.ts";
 
@@ -26,6 +26,22 @@ assertDisposableDatabase();
 process.env.DATABASE_POOL_MAX = "4";
 process.env.PARTNER_PROGRAM_MODE = "on";
 
+let routeAuthUser: { id: string; email: string } | null = null;
+let routeAdminUser: { id: string; email: string } | null = null;
+
+mock.module("@/lib/authz", {
+  namedExports: {
+    requireAuth: async () => {
+      if (!routeAuthUser) throw new Response("Unauthorized", { status: 401 });
+      return routeAuthUser;
+    },
+    requireAdmin: async () => {
+      if (!routeAdminUser) throw new Response("Unauthorized", { status: 401 });
+      return routeAdminUser;
+    },
+  },
+});
+
 const { getDb } = await import(
   new URL("../src/lib/db.ts", import.meta.url).href
 );
@@ -38,6 +54,21 @@ const referralAnalytics = await import(
 const referralConversions = await import(
   new URL("../src/lib/partner-referral-conversions.ts", import.meta.url).href
 );
+const partnerPayoutRoute = await import(
+  new URL("../src/app/api/account/partner-payout-profile/route.ts", import.meta.url).href,
+);
+const partnerEnrollRoute = await import(
+  new URL("../src/app/api/partner/enroll/route.ts", import.meta.url).href,
+);
+const adminPartnerRoute = await import(
+  new URL("../src/app/api/admin/partners/[partnerProfileId]/route.ts", import.meta.url).href,
+);
+const partnerProfileLocks = await import(
+  new URL("../src/lib/partner-profile-locks.ts", import.meta.url).href,
+);
+const partnerPayoutProfiles = await import(
+  new URL("../src/lib/partner-payout-profiles.ts", import.meta.url).href,
+);
 const db = getDb() as PrismaClient;
 
 after(async () => {
@@ -46,6 +77,105 @@ after(async () => {
 
 function suffix() {
   return randomBytes(8).toString("hex");
+}
+
+function payoutRequest(body: Record<string, unknown>) {
+  return new Request("https://trade82.test/api/account/partner-payout-profile", {
+    method: "PUT",
+    headers: {
+      origin: "https://trade82.test",
+      host: "trade82.test",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
+function koreanPayoutBody(bankDirectoryId: string, accountNumber = "123-456-7890") {
+  return {
+    country: "KR",
+    bankDirectoryId,
+    accountHolder: "Partner Owner",
+    accountNumber,
+    accountType: "LOCAL",
+    payoutCurrency: "krw",
+    supportedCurrencies: ["krw"],
+    accountBelongsToPartner: true,
+  };
+}
+
+function partnerAdminStatusRequest(action: string, reason = "Concurrency test") {
+  return new Request("https://trade82.test/api/admin/partners/test/status", {
+    method: "POST",
+    headers: {
+      origin: "https://trade82.test",
+      host: "trade82.test",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ action, reason }),
+  });
+}
+
+function deferred<T = void>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((innerResolve, innerReject) => {
+    resolve = innerResolve;
+    reject = innerReject;
+  });
+  return { promise, resolve, reject };
+}
+
+async function createPartnerPayoutFixture(status: "ACTIVE" | "PENDING_REVIEW" | "SUSPENDED" | "REJECTED") {
+  const id = suffix();
+  const user = await db.userProfile.create({
+    data: {
+      clerkUserId: `partner-payout-route-${id}`,
+      email: `partner-payout-route-${id}@example.test`,
+      displayName: "Partner Payout Owner",
+      role: "user",
+    },
+  });
+  const bank = await db.bankDirectory.create({
+    data: {
+      countryCode: "KR",
+      bankNameLocal: `테스트은행 ${id}`,
+      bankNameEnglish: `Test Bank ${id}`,
+      sourceType: "SEED",
+      isActive: true,
+    },
+    select: { id: true },
+  });
+  const partner = await db.partnerProfile.create({
+    data: {
+      userId: user.id,
+      referralCode: `T82-${id.toUpperCase()}`,
+      status,
+    },
+  });
+  const payout = await db.partnerPayoutProfile.create({
+    data: {
+      partnerProfileId: partner.id,
+      bankDirectoryId: bank.id,
+      country: "KR",
+      bankName: "Existing Test Bank",
+      accountHolder: "Existing Owner",
+      accountNumberCiphertext: Buffer.alloc(32, 7),
+      accountNumberIv: Buffer.alloc(12, 8),
+      accountNumberAuthTag: Buffer.alloc(16, 9),
+      accountNumberKeyVersion: "test-v1",
+      accountNumberLast4: "0000",
+      accountNumberMasked: "•••• 0000",
+      accountType: "LOCAL",
+      payoutCurrency: "krw",
+      supportedCurrencies: ["krw"],
+      accountBelongsToPartner: true,
+      status: "VERIFIED",
+      verifiedAt: new Date("2026-07-20T00:00:00.000Z"),
+      verifiedByUserId: user.id,
+    },
+  });
+  return { id, user, bank, partner, payout };
 }
 
 test("disposable PostgreSQL keeps raw referral secrets out of the database and enforces first attribution", async () => {
@@ -590,4 +720,425 @@ test("disposable PostgreSQL records seller and buyer conversions idempotently", 
       ["SELLER", seller.createdAt],
     ],
   );
+});
+
+test("owner payout writes allow active and pending-review partners and reset verification safely", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 19).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "route-test-v1";
+  const active = await createPartnerPayoutFixture("ACTIVE");
+  const pending = await createPartnerPayoutFixture("PENDING_REVIEW");
+
+  try {
+    for (const fixture of [active, pending]) {
+      routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+      const beforeAuditCount = await db.partnerPayoutProfileAuditEvent.count({
+        where: { payoutProfileId: fixture.payout.id },
+      });
+      const response = await partnerPayoutRoute.PUT(
+        payoutRequest(koreanPayoutBody(fixture.bank.id, "987-654-3210")),
+      );
+      assert.equal(response.status, 200);
+      const payload = (await response.json()) as {
+        profile: Record<string, unknown>;
+      };
+      assert.deepEqual(Object.keys(payload.profile).sort(), [
+        "accountHolder",
+        "accountNumberLast4",
+        "accountNumberMasked",
+        "bankName",
+        "id",
+        "payoutCurrency",
+        "status",
+        "updatedAt",
+        "verifiedAt",
+      ].sort());
+      assert.equal(payload.profile.accountNumberLast4, "3210");
+      assert.equal(payload.profile.status, "PENDING_VERIFICATION");
+      assert.equal(payload.profile.verifiedAt, null);
+      assert.equal("accountNumberCiphertext" in payload.profile, false);
+      assert.equal("partnerProfileId" in payload.profile, false);
+      assert.equal("bankDirectoryId" in payload.profile, false);
+
+      const [partnerAfter, payoutAfter, auditCount] = await Promise.all([
+        db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+        db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+        db.partnerPayoutProfileAuditEvent.count({
+          where: { payoutProfileId: fixture.payout.id },
+        }),
+      ]);
+      assert.equal(partnerAfter.status, fixture.partner.status);
+      assert.equal(payoutAfter.status, "PENDING_VERIFICATION");
+      assert.equal(payoutAfter.verifiedAt, null);
+      assert.equal(payoutAfter.verifiedByUserId, null);
+      assert.equal(auditCount, beforeAuditCount + 1);
+    }
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("owner payout writes reject suspended and rejected partners without side effects", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 21).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "blocked-route-test-v1";
+  const suspended = await createPartnerPayoutFixture("SUSPENDED");
+  const rejected = await createPartnerPayoutFixture("REJECTED");
+
+  try {
+    for (const [fixture, expectedStatus] of [
+      [suspended, 403],
+      [rejected, 409],
+    ] as const) {
+      routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+      const before = await db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { id: fixture.payout.id },
+      });
+      const beforeAuditCount = await db.partnerPayoutProfileAuditEvent.count({
+        where: { payoutProfileId: fixture.payout.id },
+      });
+      const response = await partnerPayoutRoute.PUT(
+        payoutRequest(koreanPayoutBody(fixture.bank.id, "111-222-3333")),
+      );
+      assert.equal(response.status, expectedStatus);
+      assert.match((await response.json()).error, /payout|enrollment/i);
+
+      const [partnerAfter, payoutAfter, auditCount, rejectedGet] = await Promise.all([
+        db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+        db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+        db.partnerPayoutProfileAuditEvent.count({
+          where: { payoutProfileId: fixture.payout.id },
+        }),
+        fixture.partner.status === "REJECTED" ? partnerPayoutRoute.GET() : Promise.resolve(null),
+      ]);
+      assert.equal(partnerAfter.status, fixture.partner.status);
+      assert.deepEqual(payoutAfter, before);
+      assert.equal(auditCount, beforeAuditCount);
+      if (rejectedGet) {
+        assert.equal(rejectedGet.status, 200);
+        assert.deepEqual(await rejectedGet.json(), {
+          profile: null,
+          partnerStatus: "REJECTED",
+        });
+      }
+    }
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("rejected partner enrollment resubmission changes status and payout atomically", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 23).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "resubmission-test-v1";
+  const fixture = await createPartnerPayoutFixture("REJECTED");
+  routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+
+  const enrollmentBody = (bankDirectoryId: string, accountNumber: string) => ({
+    fullName: "Resubmitted Partner",
+    phone: "+1 (212) 555-0199",
+    preferredLanguage: "en",
+    country: "KR",
+    bankDirectoryId,
+    accountHolder: "Resubmitted Partner",
+    accountNumber,
+    accountType: "LOCAL",
+    payoutCurrency: "krw",
+    supportedCurrencies: ["krw"],
+    accountBelongsToPartner: true,
+    agreeToTerms: true,
+    acknowledgePayoutTerms: true,
+    acknowledgePrivacy: true,
+  });
+
+  try {
+    const beforePayout = await db.partnerPayoutProfile.findUniqueOrThrow({
+      where: { id: fixture.payout.id },
+    });
+    const failed = await partnerEnrollRoute.POST(
+      new Request("https://trade82.test/api/partner/enroll", {
+        method: "POST",
+        headers: {
+          origin: "https://trade82.test",
+          host: "trade82.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(enrollmentBody(`missing-${fixture.id}`, "555-666-7777")),
+      }),
+    );
+    assert.equal(failed.status, 400);
+    const [afterFailedPartner, afterFailedPayout] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(afterFailedPartner.status, "REJECTED");
+    assert.deepEqual(afterFailedPayout, beforePayout);
+
+    const succeeded = await partnerEnrollRoute.POST(
+      new Request("https://trade82.test/api/partner/enroll", {
+        method: "POST",
+        headers: {
+          origin: "https://trade82.test",
+          host: "trade82.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(enrollmentBody(fixture.bank.id, "555-666-7777")),
+      }),
+    );
+    assert.equal(succeeded.status, 200);
+    const [afterPartner, afterPayout] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(afterPartner.status, "PENDING_REVIEW");
+    assert.equal(afterPayout.status, "PENDING_VERIFICATION");
+    assert.equal(afterPayout.accountNumberLast4, "7777");
+    assert.equal(afterPayout.verifiedAt, null);
+    assert.equal(afterPayout.verifiedByUserId, null);
+  } finally {
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("owner payout write is rejected when administrator suspension commits before the locked write", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 25).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "suspension-first-test-v1";
+  const fixture = await createPartnerPayoutFixture("ACTIVE");
+  routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+  const lockAcquired = deferred();
+  const releaseSuspension = deferred();
+
+  const suspensionTx = db.$transaction(async (tx) => {
+    await partnerProfileLocks.lockPartnerProfileById(tx, fixture.partner.id);
+    await tx.partnerProfile.update({
+      where: { id: fixture.partner.id },
+      data: { status: "SUSPENDED" },
+    });
+    lockAcquired.resolve();
+    await releaseSuspension.promise;
+  }, { timeout: 15_000 });
+
+  try {
+    await lockAcquired.promise;
+    const beforePayout = await db.partnerPayoutProfile.findUniqueOrThrow({
+      where: { id: fixture.payout.id },
+    });
+    const beforeAuditCount = await db.partnerPayoutProfileAuditEvent.count({
+      where: { payoutProfileId: fixture.payout.id },
+    });
+    const responsePromise = partnerPayoutRoute.PUT(
+      payoutRequest(koreanPayoutBody(fixture.bank.id, "222-333-4444")),
+    );
+    releaseSuspension.resolve();
+    await suspensionTx;
+
+    const response = await responsePromise;
+    assert.equal(response.status, 403);
+    const [afterPayout, auditCount, partnerAfter] = await Promise.all([
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+      db.partnerPayoutProfileAuditEvent.count({
+        where: { payoutProfileId: fixture.payout.id },
+      }),
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+    ]);
+    assert.deepEqual(afterPayout, beforePayout);
+    assert.equal(auditCount, beforeAuditCount);
+    assert.equal(partnerAfter.status, "SUSPENDED");
+  } finally {
+    releaseSuspension.resolve();
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("owner payout update commits before later administrator suspension when it owns the partner lock first", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 27).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "payout-first-test-v1";
+  const fixture = await createPartnerPayoutFixture("ACTIVE");
+  const admin = await db.userProfile.create({
+    data: {
+      clerkUserId: `partner-admin-${fixture.id}`,
+      email: `partner-admin-${fixture.id}@example.test`,
+      displayName: "Partner Admin",
+      role: "admin",
+    },
+  });
+  routeAdminUser = { id: admin.id, email: admin.email };
+  const lockAcquired = deferred();
+  const releasePayout = deferred();
+
+  const payoutTx = db.$transaction(async (tx) => {
+    const authorization = partnerProfileLocks.authorizePartnerPayoutWrite(
+      await partnerProfileLocks.lockOwnedPartnerProfile(tx, fixture.user.id),
+    );
+    assert.equal(authorization.ok, true);
+    lockAcquired.resolve();
+    await releasePayout.promise;
+    return partnerPayoutProfiles.savePartnerPayoutProfile({
+      db: tx,
+      partnerProfileId: fixture.partner.id,
+      actorUserId: fixture.user.id,
+      input: {
+        bankDirectoryId: fixture.bank.id,
+        accountHolder: "Partner Owner",
+        accountNumber: "333-444-5555",
+        accountBelongsToPartner: true,
+      },
+    });
+  }, { timeout: 15_000 });
+
+  try {
+    await lockAcquired.promise;
+    const adminResponsePromise = adminPartnerRoute.POST(
+      partnerAdminStatusRequest("suspend"),
+      { params: Promise.resolve({ partnerProfileId: fixture.partner.id }) },
+    );
+    releasePayout.resolve();
+    const [profile, adminResponse] = await Promise.all([payoutTx, adminResponsePromise]);
+    assert.equal(adminResponse.status, 200);
+    assert.equal(profile.status, "PENDING_VERIFICATION");
+    assert.equal(profile.accountNumberLast4, "5555");
+
+    const [partnerAfter, payoutAfter] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(partnerAfter.status, "SUSPENDED");
+    assert.equal(payoutAfter.accountNumberLast4, "5555");
+    assert.equal(payoutAfter.status, "PENDING_VERIFICATION");
+  } finally {
+    releasePayout.resolve();
+    routeAdminUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("rejected enrollment resubmission evaluates status after a concurrent lifecycle lock commits", async () => {
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY = Buffer.alloc(32, 29).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = "enrollment-lock-test-v1";
+  const fixture = await createPartnerPayoutFixture("REJECTED");
+  routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+  const lockAcquired = deferred();
+  const releaseAdmin = deferred();
+
+  const adminLifecycleTx = db.$transaction(async (tx) => {
+    await partnerProfileLocks.lockPartnerProfileById(tx, fixture.partner.id);
+    await tx.partnerProfile.update({
+      where: { id: fixture.partner.id },
+      data: { status: "PENDING_REVIEW" },
+    });
+    lockAcquired.resolve();
+    await releaseAdmin.promise;
+  }, { timeout: 15_000 });
+
+  try {
+    await lockAcquired.promise;
+    const responsePromise = partnerEnrollRoute.POST(
+      new Request("https://trade82.test/api/partner/enroll", {
+        method: "POST",
+        headers: {
+          origin: "https://trade82.test",
+          host: "trade82.test",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: "Serialized Partner",
+          phone: "+1 (212) 555-0188",
+          preferredLanguage: "en",
+          country: "KR",
+          bankDirectoryId: fixture.bank.id,
+          accountHolder: "Serialized Partner",
+          accountNumber: "444-555-6666",
+          accountType: "LOCAL",
+          payoutCurrency: "krw",
+          supportedCurrencies: ["krw"],
+          accountBelongsToPartner: true,
+          agreeToTerms: true,
+          acknowledgePayoutTerms: true,
+          acknowledgePrivacy: true,
+        }),
+      }),
+    );
+    releaseAdmin.resolve();
+    await adminLifecycleTx;
+    const response = await responsePromise;
+    assert.equal(response.status, 200);
+
+    const [partnerAfter, payoutAfter] = await Promise.all([
+      db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
+      db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
+    ]);
+    assert.equal(partnerAfter.status, "PENDING_REVIEW");
+    assert.equal(payoutAfter.accountNumberLast4, "6666");
+    assert.equal(payoutAfter.status, "PENDING_VERIFICATION");
+  } finally {
+    releaseAdmin.resolve();
+    routeAuthUser = null;
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("partner payout authorization fails closed for future statuses and blocked writes do not leak sensitive data", async () => {
+  const unsupported = partnerProfileLocks.authorizePartnerPayoutWrite({
+    id: "partner-future-status",
+    status: "ARCHIVED" as never,
+  });
+  assert.deepEqual(unsupported, {
+    ok: false,
+    status: 403,
+    error: "Partner profile status is not eligible for payout updates.",
+  });
+
+  const fixture = await createPartnerPayoutFixture("SUSPENDED");
+  routeAuthUser = { id: fixture.user.id, email: fixture.user.email };
+  const logs: string[] = [];
+  const originalError = console.error;
+  console.error = (...args: unknown[]) => {
+    logs.push(args.map(String).join(" "));
+  };
+  try {
+    const response = await partnerPayoutRoute.PUT(
+      payoutRequest(koreanPayoutBody(fixture.bank.id, "999-888-7777")),
+    );
+    assert.equal(response.status, 403);
+    const text = await response.text();
+    assert.equal(text.includes("999-888-7777"), false);
+    assert.equal(text.includes("accountNumberCiphertext"), false);
+    assert.equal(text.includes("accountNumberIv"), false);
+    assert.equal(text.includes("accountNumberAuthTag"), false);
+    assert.equal(logs.join("\n").includes("999-888-7777"), false);
+  } finally {
+    console.error = originalError;
+    routeAuthUser = null;
+  }
 });

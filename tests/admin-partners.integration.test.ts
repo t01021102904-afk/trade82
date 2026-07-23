@@ -193,12 +193,34 @@ test("admin partner list status and payout filters are server-backed", async () 
       country: "US",
     },
   });
-  await db.stripeConnectedAccount.create({
+  const bank = await db.bankDirectory.create({
+    data: {
+      countryCode: "KR",
+      bankNameLocal: `테스트은행 ${id}`,
+      bankNameEnglish: `Test Bank ${id}`,
+      sourceType: "SEED",
+      isActive: true,
+    },
+    select: { id: true },
+  });
+  await db.partnerPayoutProfile.create({
     data: {
       partnerProfileId: partner.id,
-      stripeAccountId: `acct_filter_${id}`,
-      status: "RESTRICTED",
-      onboardingComplete: false,
+      bankDirectoryId: bank.id,
+      country: "KR",
+      bankName: "Test Bank",
+      accountHolder: "Suspended Partner",
+      accountNumberCiphertext: Buffer.from([1]),
+      accountNumberIv: Buffer.alloc(12, 1),
+      accountNumberAuthTag: Buffer.alloc(16, 2),
+      accountNumberKeyVersion: "local-test-v1",
+      accountNumberLast4: "1234",
+      accountNumberMasked: "•••• 1234",
+      accountType: "LOCAL",
+      payoutCurrency: "krw",
+      supportedCurrencies: ["krw"],
+      accountBelongsToPartner: true,
+      status: "REJECTED",
     },
   });
 

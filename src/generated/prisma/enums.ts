@@ -446,11 +446,24 @@ export type BankDirectorySourceType = (typeof BankDirectorySourceType)[keyof typ
 
 
 export const PartnerProfileStatus = {
+  PENDING_REVIEW: 'PENDING_REVIEW',
   ACTIVE: 'ACTIVE',
-  SUSPENDED: 'SUSPENDED'
+  SUSPENDED: 'SUSPENDED',
+  REJECTED: 'REJECTED'
 } as const
 
 export type PartnerProfileStatus = (typeof PartnerProfileStatus)[keyof typeof PartnerProfileStatus]
+
+
+export const PartnerPayoutProfileStatus = {
+  DRAFT: 'DRAFT',
+  PENDING_VERIFICATION: 'PENDING_VERIFICATION',
+  VERIFIED: 'VERIFIED',
+  REJECTED: 'REJECTED',
+  DISABLED: 'DISABLED'
+} as const
+
+export type PartnerPayoutProfileStatus = (typeof PartnerPayoutProfileStatus)[keyof typeof PartnerPayoutProfileStatus]
 
 
 export const ReferralAttributionStatus = {

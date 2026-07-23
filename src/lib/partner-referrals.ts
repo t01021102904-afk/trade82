@@ -43,7 +43,7 @@ export async function createOrGetPartnerProfile(
         status: PartnerProfileStatus;
         createdAt: Date;
       } | null>;
-      create: (args: { data: { userId: string; referralCode: string } }) => Promise<{
+      create: (args: { data: { userId: string; referralCode: string; status?: PartnerProfileStatus } }) => Promise<{
         id: string;
         userId: string;
         referralCode: string;
@@ -53,6 +53,7 @@ export async function createOrGetPartnerProfile(
     };
   },
   userId: string,
+  options: { status?: PartnerProfileStatus } = {},
 ) {
   const existing = await db.partnerProfile.findUnique({ where: { userId } });
   if (existing) return { partnerProfile: existing, created: false };
@@ -60,7 +61,11 @@ export async function createOrGetPartnerProfile(
   for (let attempt = 0; attempt < MAX_REFERRAL_CODE_ATTEMPTS; attempt += 1) {
     try {
       const partnerProfile = await db.partnerProfile.create({
-        data: { userId, referralCode: createReferralCode() },
+        data: {
+          userId,
+          referralCode: createReferralCode(),
+          ...(options.status ? { status: options.status } : {}),
+        },
       });
       return { partnerProfile, created: true };
     } catch (error) {

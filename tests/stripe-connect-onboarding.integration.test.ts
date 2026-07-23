@@ -132,34 +132,191 @@ test("disposable PostgreSQL stores one partner enrollment with private consent e
       role: "user",
     },
   });
+  const bank = await db.bankDirectory.create({
+    data: {
+      countryCode: "KR",
+      bankNameLocal: `테스트은행 ${id}`,
+      bankNameEnglish: `Test Bank ${id}`,
+      sourceType: "SEED",
+      isActive: true,
+    },
+    select: { id: true },
+  });
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY ??= Buffer.alloc(32, 7).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-v1";
   const input = {
-    legalName: "Partner Enrollment LLC",
-    displayName: "Partner Enrollment",
-    email: `partner-contact-${id}@example.test`,
+    fullName: "Partner Enrollment",
     phone: "+1 (212) 555-0199",
-    country: "United States",
     preferredLanguage: "en" as const,
-    organizationName: "Partner Organization",
-    websiteOrSocialUrl: "https://example.test/partner",
-    promotionDescription: "Qualified B2B referral outreach.",
+    bankDirectoryId: bank.id,
+    accountHolder: "Partner Enrollment",
+    accountNumber: "123-456-7890",
+    accountBelongsToPartner: true,
     agreeToTerms: true,
+    acknowledgePayoutTerms: true,
     acknowledgePrivacy: true,
   };
-  const first = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
-  const repeated = await enrollment.enrollPartnerProfile({ userId: user.id, input, db });
-  const profile = await db.partnerProfile.findUniqueOrThrow({ where: { userId: user.id } });
+  try {
+    const first = await enrollment.enrollPartnerProfile({
+      userId: user.id,
+      email: user.email,
+      input,
+      db,
+    });
+    const repeated = await enrollment.enrollPartnerProfile({
+      userId: user.id,
+      email: user.email,
+      input,
+      db,
+    });
+    const profile = await db.partnerProfile.findUniqueOrThrow({ where: { userId: user.id } });
+    const payout = await db.partnerPayoutProfile.findUniqueOrThrow({ where: { partnerProfileId: profile.id } });
 
-  assert.equal(first.created, true);
-  assert.equal(repeated.created, false);
-  assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
-  assert.equal(profile.contactEmail, input.email);
-  assert.equal(profile.contactPhone, "+12125550199");
-  assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
-  assert.ok(profile.termsConsentedAt);
-  assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);
-  assert.ok(profile.privacyConsentedAt);
-  assert.equal(
-    await db.stripeConnectedAccount.count({ where: { partnerProfileId: profile.id } }),
-    0,
-  );
+    assert.equal(first.created, true);
+    assert.equal(repeated.created, false);
+    assert.equal(await db.partnerProfile.count({ where: { userId: user.id } }), 1);
+    assert.equal(profile.contactEmail, user.email);
+    assert.equal(profile.contactPhone, "+12125550199");
+    assert.equal(profile.status, "PENDING_REVIEW");
+    assert.equal(profile.termsConsentVersion, enrollment.partnerConsentVersions.terms);
+    assert.ok(profile.termsConsentedAt);
+    assert.equal(profile.privacyConsentVersion, enrollment.partnerConsentVersions.privacy);
+    assert.ok(profile.privacyConsentedAt);
+    assert.equal(payout.status, "PENDING_VERIFICATION");
+    assert.equal(payout.country, "KR");
+    assert.equal(payout.accountType, "LOCAL");
+    assert.equal(payout.payoutCurrency, "krw");
+    assert.equal(payout.accountNumberLast4, "7890");
+    assert.match(payout.accountNumberMasked, /7890$/);
+    assert.ok(payout.accountNumberCiphertext.length > 0);
+    assert.equal(
+      await db.stripeConnectedAccount.count({ where: { partnerProfileId: profile.id } }),
+      0,
+    );
+  } finally {
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
+});
+
+test("partner enrollment preserves US user and company countries for sellers and buyers", async () => {
+  const id = suffix();
+  const [sellerUser, buyerUser] = await Promise.all([
+    db.userProfile.create({
+      data: {
+        clerkUserId: `partner-country-seller-${id}`,
+        email: `partner-country-seller-${id}@example.test`,
+        displayName: "US Seller",
+        country: "US",
+        role: "seller",
+      },
+    }),
+    db.userProfile.create({
+      data: {
+        clerkUserId: `partner-country-buyer-${id}`,
+        email: `partner-country-buyer-${id}@example.test`,
+        displayName: "US Buyer",
+        country: "US",
+        role: "buyer",
+      },
+    }),
+  ]);
+  const [sellerCompany, buyerCompany, bank] = await Promise.all([
+    db.company.create({
+      data: {
+        ownerUserId: sellerUser.id,
+        companyRole: "seller",
+        legalName: `US Seller ${id}`,
+        country: "US",
+        businessAddress: "New York",
+      },
+    }),
+    db.company.create({
+      data: {
+        ownerUserId: buyerUser.id,
+        companyRole: "buyer",
+        legalName: `US Buyer ${id}`,
+        country: "US",
+        businessAddress: "California",
+      },
+    }),
+    db.bankDirectory.create({
+      data: {
+        countryCode: "KR",
+        bankNameLocal: `국내은행 ${id}`,
+        bankNameEnglish: `Korean Bank ${id}`,
+        sourceType: "SEED",
+        isActive: true,
+      },
+      select: { id: true },
+    }),
+  ]);
+  const previousPayoutKey = process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+  const previousPayoutKeyVersion = process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY ??= Buffer.alloc(32, 8).toString("base64");
+  process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION ??= "integration-test-country-v1";
+
+  const input = (name: string) => ({
+    fullName: name,
+    phone: "+1 (212) 555-0199",
+    preferredLanguage: "en" as const,
+    bankDirectoryId: bank.id,
+    accountHolder: name,
+    accountNumber: "321-654-0987",
+    accountBelongsToPartner: true,
+    agreeToTerms: true,
+    acknowledgePayoutTerms: true,
+    acknowledgePrivacy: true,
+  });
+
+  try {
+    const [sellerEnrollment, buyerEnrollment] = await Promise.all([
+      enrollment.enrollPartnerProfile({
+        userId: sellerUser.id,
+        email: sellerUser.email,
+        input: input("US Seller Partner"),
+        db,
+      }),
+      enrollment.enrollPartnerProfile({
+        userId: buyerUser.id,
+        email: buyerUser.email,
+        input: input("US Buyer Partner"),
+        db,
+      }),
+    ]);
+    const [sellerPayout, buyerPayout] = await Promise.all([
+      db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { partnerProfileId: sellerEnrollment.partnerProfile.id },
+      }),
+      db.partnerPayoutProfile.findUniqueOrThrow({
+        where: { partnerProfileId: buyerEnrollment.partnerProfile.id },
+      }),
+    ]);
+    const [sellerUserAfter, buyerUserAfter, sellerCompanyAfter, buyerCompanyAfter] = await Promise.all([
+      db.userProfile.findUniqueOrThrow({ where: { id: sellerUser.id } }),
+      db.userProfile.findUniqueOrThrow({ where: { id: buyerUser.id } }),
+      db.company.findUniqueOrThrow({ where: { id: sellerCompany.id } }),
+      db.company.findUniqueOrThrow({ where: { id: buyerCompany.id } }),
+    ]);
+
+    assert.equal(sellerUserAfter.country, "US");
+    assert.equal(buyerUserAfter.country, "US");
+    assert.equal(sellerCompanyAfter.country, "US");
+    assert.equal(buyerCompanyAfter.country, "US");
+    assert.equal(sellerPayout.country, "KR");
+    assert.equal(buyerPayout.country, "KR");
+    assert.equal(sellerPayout.accountType, "LOCAL");
+    assert.equal(buyerPayout.accountType, "LOCAL");
+    assert.equal(sellerPayout.payoutCurrency, "krw");
+    assert.equal(buyerPayout.payoutCurrency, "krw");
+  } finally {
+    if (previousPayoutKey === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY = previousPayoutKey;
+    if (previousPayoutKeyVersion === undefined) delete process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION;
+    else process.env.PAYOUT_DATA_ENCRYPTION_KEY_VERSION = previousPayoutKeyVersion;
+  }
 });

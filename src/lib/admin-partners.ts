@@ -10,7 +10,7 @@ import {
 export const ADMIN_PARTNER_DEFAULT_PAGE_SIZE = 25;
 export const ADMIN_PARTNER_MAX_PAGE_SIZE = 50;
 
-const statuses = ["all", "active", "suspended"] as const;
+const statuses = ["all", "pending_review", "active", "suspended", "rejected"] as const;
 const payoutSetups = [
   "all",
   "notStarted",
@@ -53,7 +53,6 @@ export type AdminPartnerListRow = {
   country: string | null;
   preferredLanguage: string | null;
   status: string;
-  referralCode: string;
   createdAt: Date;
   linkVisits: number;
   uniqueVisitors: number;
@@ -64,7 +63,6 @@ export type AdminPartnerListRow = {
   netCommissionUsd: number;
   hasNonUsdCommission: boolean;
   payoutSetup: AdminPartnerPayoutFilter;
-  stripeAccountStatus: string | null;
 };
 
 export type AdminPartnerListData = {
@@ -141,10 +139,11 @@ export function parseAdminPartnerDetailQuery(
 
 const payoutSetupExpression = Prisma.sql`
   CASE
-    WHEN sc."id" IS NULL THEN 'notStarted'
-    WHEN sc."status" = 'DISABLED' THEN 'disabled'
-    WHEN sc."status" = 'ENABLED' AND sc."onboardingComplete" = true THEN 'enabled'
-    WHEN sc."status" = 'PENDING' THEN 'pending'
+    WHEN pp."id" IS NULL THEN 'notStarted'
+    WHEN pp."status" = 'DISABLED' THEN 'disabled'
+    WHEN pp."status" = 'VERIFIED' THEN 'enabled'
+    WHEN pp."status" = 'PENDING_VERIFICATION' THEN 'pending'
+    WHEN pp."status" = 'REJECTED' THEN 'restricted'
     ELSE 'restricted'
   END
 `;
@@ -152,7 +151,7 @@ const payoutSetupExpression = Prisma.sql`
 function buildFilters(query: AdminPartnerListQuery) {
   const filters = [Prisma.sql`p."deletedAt" IS NULL`];
 
-  if (query.status === "active" || query.status === "suspended") {
+  if (query.status !== "all") {
     filters.push(Prisma.sql`p."status" = ${query.status.toUpperCase()}`);
   }
   if (query.country) {
@@ -264,7 +263,6 @@ export async function getAdminPartnerListData(
         p."country",
         p."preferredLanguage",
         p."status",
-        p."referralCode",
         p."createdAt",
         COALESCE(click_stats."linkVisits", 0)::bigint AS "linkVisits",
         COALESCE(click_stats."uniqueVisitors", 0)::bigint AS "uniqueVisitors",
@@ -274,11 +272,10 @@ export async function getAdminPartnerListData(
         COALESCE(qualifying_stats."qualifyingTransactions", 0)::bigint AS "qualifyingTransactions",
         COALESCE(commission_stats."netCommissionUsd", 0)::bigint AS "netCommissionUsd",
         COALESCE(commission_stats."hasNonUsdCommission", false) AS "hasNonUsdCommission",
-        ${payoutSetupExpression} AS "payoutSetup",
-        sc."status" AS "stripeAccountStatus"
+        ${payoutSetupExpression} AS "payoutSetup"
       FROM "PartnerProfile" p
       JOIN "UserProfile" u ON u."id" = p."userId"
-      LEFT JOIN "StripeConnectedAccount" sc ON sc."partnerProfileId" = p."id"
+      LEFT JOIN "PartnerPayoutProfile" pp ON pp."partnerProfileId" = p."id"
       LEFT JOIN click_stats ON click_stats."partnerProfileId" = p."id"
       LEFT JOIN attribution_stats ON attribution_stats."partnerProfileId" = p."id"
       LEFT JOIN conversion_stats ON conversion_stats."partnerProfileId" = p."id"
@@ -293,13 +290,13 @@ export async function getAdminPartnerListData(
       SELECT COUNT(*)::bigint AS count
       FROM "PartnerProfile" p
       JOIN "UserProfile" u ON u."id" = p."userId"
-      LEFT JOIN "StripeConnectedAccount" sc ON sc."partnerProfileId" = p."id"
+      LEFT JOIN "PartnerPayoutProfile" pp ON pp."partnerProfileId" = p."id"
       WHERE ${where}
     `),
     db.partnerProfile.findMany({
       where: {
         deletedAt: null,
-        status: { in: ["ACTIVE", "SUSPENDED"] },
+        status: { in: ["PENDING_REVIEW", "ACTIVE", "SUSPENDED", "REJECTED"] },
         country: { not: null },
       },
       distinct: ["country"],

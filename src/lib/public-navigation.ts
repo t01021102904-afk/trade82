@@ -3,17 +3,10 @@ const basePublicNavigationLinks = [
   { href: "/sellers", labelKey: "nav.sellers" },
 ] as const;
 
-const partnerProgramNavigationLink = {
-  href: "/partner",
-  labelKey: "nav.partnerProgram",
-} as const;
-
-// The server resolves the feature flag and passes this boolean to the client
-// header. Do not read process.env from public navigation code.
-export function getPublicNavigationLinks(partnerProgramEnabled: boolean) {
-  return partnerProgramEnabled
-    ? [...basePublicNavigationLinks, partnerProgramNavigationLink]
-    : [...basePublicNavigationLinks];
+// Partner onboarding is reached from the authenticated role-selection flow,
+// never from the public navigation surface.
+export function getPublicNavigationLinks(_partnerProgramEnabled: boolean) {
+  return [...basePublicNavigationLinks];
 }
 
 // A static consumer is fail-closed. The root layout opts in explicitly only

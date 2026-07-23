@@ -255,6 +255,7 @@ export type BankDirectoryWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"BankDirectory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BankDirectory"> | Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileListRelationFilter
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileListRelationFilter
 }
 
 export type BankDirectoryOrderByWithRelationInput = {
@@ -273,6 +274,7 @@ export type BankDirectoryOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   payoutProfiles?: Prisma.SellerPayoutProfileOrderByRelationAggregateInput
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileOrderByRelationAggregateInput
 }
 
 export type BankDirectoryWhereUniqueInput = Prisma.AtLeast<{
@@ -295,6 +297,7 @@ export type BankDirectoryWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"BankDirectory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"BankDirectory"> | Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileListRelationFilter
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileListRelationFilter
 }, "id" | "countryCode_bankNameEnglish">
 
 export type BankDirectoryOrderByWithAggregationInput = {
@@ -353,6 +356,7 @@ export type BankDirectoryCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutBankDirectoryInput
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileCreateNestedManyWithoutBankDirectoryInput
 }
 
 export type BankDirectoryUncheckedCreateInput = {
@@ -371,6 +375,7 @@ export type BankDirectoryUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutBankDirectoryInput
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedCreateNestedManyWithoutBankDirectoryInput
 }
 
 export type BankDirectoryUpdateInput = {
@@ -389,6 +394,7 @@ export type BankDirectoryUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutBankDirectoryNestedInput
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUpdateManyWithoutBankDirectoryNestedInput
 }
 
 export type BankDirectoryUncheckedUpdateInput = {
@@ -407,6 +413,7 @@ export type BankDirectoryUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryNestedInput
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryNestedInput
 }
 
 export type BankDirectoryCreateManyInput = {
@@ -521,6 +528,11 @@ export type BankDirectoryNullableScalarRelationFilter = {
   isNot?: Prisma.BankDirectoryWhereInput | null
 }
 
+export type BankDirectoryScalarRelationFilter = {
+  is?: Prisma.BankDirectoryWhereInput
+  isNot?: Prisma.BankDirectoryWhereInput
+}
+
 export type EnumBankDirectorySourceTypeFieldUpdateOperationsInput = {
   set?: $Enums.BankDirectorySourceType
 }
@@ -541,6 +553,20 @@ export type BankDirectoryUpdateOneWithoutPayoutProfilesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.BankDirectoryUpdateToOneWithWhereWithoutPayoutProfilesInput, Prisma.BankDirectoryUpdateWithoutPayoutProfilesInput>, Prisma.BankDirectoryUncheckedUpdateWithoutPayoutProfilesInput>
 }
 
+export type BankDirectoryCreateNestedOneWithoutPartnerPayoutProfilesInput = {
+  create?: Prisma.XOR<Prisma.BankDirectoryCreateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedCreateWithoutPartnerPayoutProfilesInput>
+  connectOrCreate?: Prisma.BankDirectoryCreateOrConnectWithoutPartnerPayoutProfilesInput
+  connect?: Prisma.BankDirectoryWhereUniqueInput
+}
+
+export type BankDirectoryUpdateOneRequiredWithoutPartnerPayoutProfilesNestedInput = {
+  create?: Prisma.XOR<Prisma.BankDirectoryCreateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedCreateWithoutPartnerPayoutProfilesInput>
+  connectOrCreate?: Prisma.BankDirectoryCreateOrConnectWithoutPartnerPayoutProfilesInput
+  upsert?: Prisma.BankDirectoryUpsertWithoutPartnerPayoutProfilesInput
+  connect?: Prisma.BankDirectoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BankDirectoryUpdateToOneWithWhereWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUpdateWithoutPartnerPayoutProfilesInput>, Prisma.BankDirectoryUncheckedUpdateWithoutPartnerPayoutProfilesInput>
+}
+
 export type BankDirectoryCreateWithoutPayoutProfilesInput = {
   id?: string
   countryCode: string
@@ -556,6 +582,7 @@ export type BankDirectoryCreateWithoutPayoutProfilesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileCreateNestedManyWithoutBankDirectoryInput
 }
 
 export type BankDirectoryUncheckedCreateWithoutPayoutProfilesInput = {
@@ -573,6 +600,7 @@ export type BankDirectoryUncheckedCreateWithoutPayoutProfilesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedCreateNestedManyWithoutBankDirectoryInput
 }
 
 export type BankDirectoryCreateOrConnectWithoutPayoutProfilesInput = {
@@ -606,6 +634,7 @@ export type BankDirectoryUpdateWithoutPayoutProfilesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUpdateManyWithoutBankDirectoryNestedInput
 }
 
 export type BankDirectoryUncheckedUpdateWithoutPayoutProfilesInput = {
@@ -623,6 +652,95 @@ export type BankDirectoryUncheckedUpdateWithoutPayoutProfilesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  partnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryNestedInput
+}
+
+export type BankDirectoryCreateWithoutPartnerPayoutProfilesInput = {
+  id?: string
+  countryCode: string
+  bankNameLocal: string
+  bankNameEnglish: string
+  bankCode?: string | null
+  defaultSwiftBic?: string | null
+  defaultBankAddress?: string | null
+  officialWebsite?: string | null
+  sourceUrl?: string | null
+  verifiedAt?: Date | string | null
+  sourceType?: $Enums.BankDirectorySourceType
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  payoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutBankDirectoryInput
+}
+
+export type BankDirectoryUncheckedCreateWithoutPartnerPayoutProfilesInput = {
+  id?: string
+  countryCode: string
+  bankNameLocal: string
+  bankNameEnglish: string
+  bankCode?: string | null
+  defaultSwiftBic?: string | null
+  defaultBankAddress?: string | null
+  officialWebsite?: string | null
+  sourceUrl?: string | null
+  verifiedAt?: Date | string | null
+  sourceType?: $Enums.BankDirectorySourceType
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  payoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutBankDirectoryInput
+}
+
+export type BankDirectoryCreateOrConnectWithoutPartnerPayoutProfilesInput = {
+  where: Prisma.BankDirectoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.BankDirectoryCreateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedCreateWithoutPartnerPayoutProfilesInput>
+}
+
+export type BankDirectoryUpsertWithoutPartnerPayoutProfilesInput = {
+  update: Prisma.XOR<Prisma.BankDirectoryUpdateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedUpdateWithoutPartnerPayoutProfilesInput>
+  create: Prisma.XOR<Prisma.BankDirectoryCreateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedCreateWithoutPartnerPayoutProfilesInput>
+  where?: Prisma.BankDirectoryWhereInput
+}
+
+export type BankDirectoryUpdateToOneWithWhereWithoutPartnerPayoutProfilesInput = {
+  where?: Prisma.BankDirectoryWhereInput
+  data: Prisma.XOR<Prisma.BankDirectoryUpdateWithoutPartnerPayoutProfilesInput, Prisma.BankDirectoryUncheckedUpdateWithoutPartnerPayoutProfilesInput>
+}
+
+export type BankDirectoryUpdateWithoutPartnerPayoutProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  bankNameLocal?: Prisma.StringFieldUpdateOperationsInput | string
+  bankNameEnglish?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultSwiftBic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultBankAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceType?: Prisma.EnumBankDirectorySourceTypeFieldUpdateOperationsInput | $Enums.BankDirectorySourceType
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutBankDirectoryNestedInput
+}
+
+export type BankDirectoryUncheckedUpdateWithoutPartnerPayoutProfilesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  countryCode?: Prisma.StringFieldUpdateOperationsInput | string
+  bankNameLocal?: Prisma.StringFieldUpdateOperationsInput | string
+  bankNameEnglish?: Prisma.StringFieldUpdateOperationsInput | string
+  bankCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultSwiftBic?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  defaultBankAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  officialWebsite?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  sourceUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sourceType?: Prisma.EnumBankDirectorySourceTypeFieldUpdateOperationsInput | $Enums.BankDirectorySourceType
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutBankDirectoryNestedInput
 }
 
 
@@ -632,10 +750,12 @@ export type BankDirectoryUncheckedUpdateWithoutPayoutProfilesInput = {
 
 export type BankDirectoryCountOutputType = {
   payoutProfiles: number
+  partnerPayoutProfiles: number
 }
 
 export type BankDirectoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payoutProfiles?: boolean | BankDirectoryCountOutputTypeCountPayoutProfilesArgs
+  partnerPayoutProfiles?: boolean | BankDirectoryCountOutputTypeCountPartnerPayoutProfilesArgs
 }
 
 /**
@@ -655,6 +775,13 @@ export type BankDirectoryCountOutputTypeCountPayoutProfilesArgs<ExtArgs extends 
   where?: Prisma.SellerPayoutProfileWhereInput
 }
 
+/**
+ * BankDirectoryCountOutputType without action
+ */
+export type BankDirectoryCountOutputTypeCountPartnerPayoutProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PartnerPayoutProfileWhereInput
+}
+
 
 export type BankDirectorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -672,6 +799,7 @@ export type BankDirectorySelect<ExtArgs extends runtime.Types.Extensions.Interna
   createdAt?: boolean
   updatedAt?: boolean
   payoutProfiles?: boolean | Prisma.BankDirectory$payoutProfilesArgs<ExtArgs>
+  partnerPayoutProfiles?: boolean | Prisma.BankDirectory$partnerPayoutProfilesArgs<ExtArgs>
   _count?: boolean | Prisma.BankDirectoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bankDirectory"]>
 
@@ -729,6 +857,7 @@ export type BankDirectorySelectScalar = {
 export type BankDirectoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "countryCode" | "bankNameLocal" | "bankNameEnglish" | "bankCode" | "defaultSwiftBic" | "defaultBankAddress" | "officialWebsite" | "sourceUrl" | "verifiedAt" | "sourceType" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["bankDirectory"]>
 export type BankDirectoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payoutProfiles?: boolean | Prisma.BankDirectory$payoutProfilesArgs<ExtArgs>
+  partnerPayoutProfiles?: boolean | Prisma.BankDirectory$partnerPayoutProfilesArgs<ExtArgs>
   _count?: boolean | Prisma.BankDirectoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BankDirectoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -738,6 +867,7 @@ export type $BankDirectoryPayload<ExtArgs extends runtime.Types.Extensions.Inter
   name: "BankDirectory"
   objects: {
     payoutProfiles: Prisma.$SellerPayoutProfilePayload<ExtArgs>[]
+    partnerPayoutProfiles: Prisma.$PartnerPayoutProfilePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1149,6 +1279,7 @@ readonly fields: BankDirectoryFieldRefs;
 export interface Prisma__BankDirectoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   payoutProfiles<T extends Prisma.BankDirectory$payoutProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BankDirectory$payoutProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SellerPayoutProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  partnerPayoutProfiles<T extends Prisma.BankDirectory$partnerPayoutProfilesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BankDirectory$partnerPayoutProfilesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PartnerPayoutProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1606,6 +1737,30 @@ export type BankDirectory$payoutProfilesArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.SellerPayoutProfileScalarFieldEnum | Prisma.SellerPayoutProfileScalarFieldEnum[]
+}
+
+/**
+ * BankDirectory.partnerPayoutProfiles
+ */
+export type BankDirectory$partnerPayoutProfilesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PartnerPayoutProfile
+   */
+  select?: Prisma.PartnerPayoutProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PartnerPayoutProfile
+   */
+  omit?: Prisma.PartnerPayoutProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PartnerPayoutProfileInclude<ExtArgs> | null
+  where?: Prisma.PartnerPayoutProfileWhereInput
+  orderBy?: Prisma.PartnerPayoutProfileOrderByWithRelationInput | Prisma.PartnerPayoutProfileOrderByWithRelationInput[]
+  cursor?: Prisma.PartnerPayoutProfileWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PartnerPayoutProfileScalarFieldEnum | Prisma.PartnerPayoutProfileScalarFieldEnum[]
 }
 
 /**

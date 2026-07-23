@@ -1491,10 +1491,6 @@ export type EnumWireFeeBearerFieldUpdateOperationsInput = {
   set?: $Enums.WireFeeBearer
 }
 
-export type BytesFieldUpdateOperationsInput = {
-  set?: runtime.Bytes
-}
-
 export type SellerPayoutCreateNestedOneWithoutEventsInput = {
   create?: Prisma.XOR<Prisma.SellerPayoutCreateWithoutEventsInput, Prisma.SellerPayoutUncheckedCreateWithoutEventsInput>
   connectOrCreate?: Prisma.SellerPayoutCreateOrConnectWithoutEventsInput

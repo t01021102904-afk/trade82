@@ -455,6 +455,10 @@ export async function cleanupTrade82AccountData(
         where: { id: partner.id },
         data: { status: "SUSPENDED", deletedAt: new Date() },
       });
+      await tx.partnerPayoutProfile.updateMany({
+        where: { partnerProfileId: partner.id },
+        data: { status: "DISABLED", verifiedAt: null, verifiedByUserId: null },
+      });
       await tx.stripeConnectedAccount.updateMany({
         where: { partnerProfileId: partner.id },
         data: {

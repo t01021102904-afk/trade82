@@ -18,10 +18,12 @@ export const TARGET_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[1];
 export const MERCHANT_MIGRATION = APPROVED_PRODUCTION_MIGRATION_BATCH[2];
 export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_control_plane";
 export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
+export const PARTNER_PAYOUT_MIGRATION = "20260722100000_add_partner_payout_profiles";
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
   ANALYTICS_MIGRATION,
+  PARTNER_PAYOUT_MIGRATION,
 ]);
 export const LEGACY_ZERO_STEP_MIGRATIONS = Object.freeze([
   "20260626010000_add_deal_progress_statuses",
@@ -171,6 +173,9 @@ const ALLOWLISTED_PENDING_MIGRATION_STATES = Object.freeze([
   Object.freeze([OPERATIONS_MIGRATION]),
   Object.freeze([ANALYTICS_MIGRATION]),
   Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION]),
+  Object.freeze([PARTNER_PAYOUT_MIGRATION]),
+  Object.freeze([ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
+  Object.freeze([OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION]),
 ]);
 
 function hasExactMigrationList(actual, expected) {
@@ -211,12 +216,14 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
   const merchantIndex = localMigrationNames.indexOf(MERCHANT_MIGRATION);
   const operationsIndex = localMigrationNames.indexOf(OPERATIONS_MIGRATION);
   const analyticsIndex = localMigrationNames.indexOf(ANALYTICS_MIGRATION);
+  const partnerPayoutIndex = localMigrationNames.indexOf(PARTNER_PAYOUT_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
     || operationsIndex !== merchantIndex + 1
     || analyticsIndex !== operationsIndex + 1
-    || analyticsIndex !== localMigrationNames.length - 1) {
+    || partnerPayoutIndex !== analyticsIndex + 1
+    || partnerPayoutIndex !== localMigrationNames.length - 1) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -244,7 +251,8 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       || !databaseNames.has(TARGET_MIGRATION)
       || !databaseNames.has(MERCHANT_MIGRATION)
       || !databaseNames.has(OPERATIONS_MIGRATION)
-      || !databaseNames.has(ANALYTICS_MIGRATION)) {
+      || !databaseNames.has(ANALYTICS_MIGRATION)
+      || !databaseNames.has(PARTNER_PAYOUT_MIGRATION)) {
       throw pendingSetError("The allowlisted production migration is not recorded.");
     }
     return { action: "skip", pendingMigrations };
@@ -262,6 +270,20 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       && !hasExactMigrationList(
         pendingMigrations,
         [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION],
+      )
+      && !hasExactMigrationList(
+        pendingMigrations,
+        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
+      ))
+    || (pendingMigrations.includes(PARTNER_PAYOUT_MIGRATION)
+      && !databaseNames.has(ANALYTICS_MIGRATION)
+      && !hasExactMigrationList(
+        pendingMigrations,
+        [ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
+      )
+      && !hasExactMigrationList(
+        pendingMigrations,
+        [OPERATIONS_MIGRATION, ANALYTICS_MIGRATION, PARTNER_PAYOUT_MIGRATION],
       ))) {
     throw pendingSetError("Production has an unexpected pending migration.");
   }
@@ -1911,6 +1933,289 @@ export async function queryAnalyticsMigrationInitialState(client) {
   return result.rows[0] ?? null;
 }
 
+export async function queryPartnerPayoutMigrationPreflight(client) {
+  const result = await client.query(`
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND table_type = 'BASE TABLE'
+      ) AS partner_payout_partner_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'BankDirectory'
+          AND table_type = 'BASE TABLE'
+      ) AS partner_payout_bank_directory_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND column_name = 'id'
+          AND data_type = 'text'
+      ) AS partner_payout_partner_id_text,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'PayoutAccountType'
+          AND pg_type.typtype = 'e'
+      ) AS partner_payout_account_type_enum,
+      NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'PartnerPayoutProfileStatus'
+      ) AS partner_payout_status_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name IN (
+            'PartnerPayoutProfile',
+            'PartnerPayoutProfileAuditEvent',
+            'PartnerProfileAuditEvent'
+          )
+      ) AS partner_payout_tables_absent,
+      NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND column_name IN ('payoutTermsConsentVersion', 'payoutTermsConsentedAt')
+      ) AS partner_payout_terms_absent,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'anon') AS partner_payout_anon_role,
+      EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'authenticated') AS partner_payout_authenticated_role
+  `);
+  return result.rows[0] ?? null;
+}
+
+export async function queryPartnerPayoutMigrationSchema(client) {
+  const result = await client.query(`
+    WITH expected_columns(table_name, column_name, data_type, udt_name, nullable) AS (
+      VALUES
+        ('PartnerPayoutProfile', 'id', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'partnerProfileId', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'bankDirectoryId', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'country', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'bankName', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'accountHolder', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberCiphertext', 'bytea', 'bytea', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberIv', 'bytea', 'bytea', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberAuthTag', 'bytea', 'bytea', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberKeyVersion', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberLast4', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'accountNumberMasked', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'accountType', 'USER-DEFINED', 'PayoutAccountType', 'NO'),
+        ('PartnerPayoutProfile', 'payoutCurrency', 'text', 'text', 'NO'),
+        ('PartnerPayoutProfile', 'supportedCurrencies', 'ARRAY', '_text', 'NO'),
+        ('PartnerPayoutProfile', 'accountBelongsToPartner', 'boolean', 'bool', 'NO'),
+        ('PartnerPayoutProfile', 'status', 'USER-DEFINED', 'PartnerPayoutProfileStatus', 'NO'),
+        ('PartnerPayoutProfile', 'verifiedAt', 'timestamp without time zone', 'timestamp', 'YES'),
+        ('PartnerPayoutProfile', 'verifiedByUserId', 'text', 'text', 'YES'),
+        ('PartnerPayoutProfile', 'createdAt', 'timestamp without time zone', 'timestamp', 'NO'),
+        ('PartnerPayoutProfile', 'updatedAt', 'timestamp without time zone', 'timestamp', 'NO')
+    ),
+    actual_columns AS (
+      SELECT column_row.table_name, column_row.column_name, column_row.data_type,
+        column_row.udt_name, column_row.is_nullable
+      FROM information_schema.columns column_row
+      WHERE column_row.table_schema = 'public'
+        AND column_row.table_name = 'PartnerPayoutProfile'
+    ),
+    expected_indexes(index_name, key_columns, is_unique) AS (
+      VALUES
+        ('PartnerPayoutProfile_partnerProfileId_key', ARRAY['partnerProfileId']::text[], true),
+        ('PartnerPayoutProfile_status_updatedAt_idx', ARRAY['status', 'updatedAt']::text[], false),
+        ('PartnerPayoutProfile_bankDirectoryId_idx', ARRAY['bankDirectoryId']::text[], false),
+        ('PartnerPayoutProfileAuditEvent_payoutProfileId_createdAt_idx', ARRAY['payoutProfileId', 'createdAt']::text[], false),
+        ('PartnerPayoutProfileAuditEvent_actorUserId_createdAt_idx', ARRAY['actorUserId', 'createdAt']::text[], false),
+        ('PartnerProfileAuditEvent_partnerProfileId_createdAt_idx', ARRAY['partnerProfileId', 'createdAt']::text[], false),
+        ('PartnerProfileAuditEvent_actorUserId_createdAt_idx', ARRAY['actorUserId', 'createdAt']::text[], false)
+    ),
+    actual_indexes AS (
+      SELECT expected.index_name, expected.key_columns, expected.is_unique,
+        index_meta.indisvalid, index_meta.indisready, index_meta.indpred, index_meta.indexprs,
+        index_meta.indisunique, index_meta.indnatts, index_meta.indnkeyatts, access_method.amname,
+        ARRAY(
+          SELECT attribute_row.attname::text
+          FROM unnest(index_meta.indkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute attribute_row ON attribute_row.attrelid = table_row.oid
+            AND attribute_row.attnum = key_row.attnum
+          WHERE key_row.ord <= index_meta.indnkeyatts
+          ORDER BY key_row.ord
+        ) AS actual_key_columns
+      FROM expected_indexes expected
+      LEFT JOIN pg_class index_row ON index_row.relname = expected.index_name
+        AND index_row.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_index index_meta ON index_meta.indexrelid = index_row.oid
+      LEFT JOIN pg_class table_row ON table_row.oid = index_meta.indrelid
+        LEFT JOIN pg_am access_method ON access_method.oid = index_row.relam
+    ),
+    expected_foreign_keys(table_name, constraint_name, child_column, parent_table) AS (
+      VALUES
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_bankDirectoryId_fkey', 'bankDirectoryId', 'BankDirectory'),
+        ('PartnerPayoutProfile', 'PartnerPayoutProfile_verifiedByUserId_fkey', 'verifiedByUserId', 'UserProfile'),
+        ('PartnerPayoutProfileAuditEvent', 'PartnerPayoutProfileAuditEvent_payoutProfileId_fkey', 'payoutProfileId', 'PartnerPayoutProfile'),
+        ('PartnerPayoutProfileAuditEvent', 'PartnerPayoutProfileAuditEvent_actorUserId_fkey', 'actorUserId', 'UserProfile'),
+        ('PartnerProfileAuditEvent', 'PartnerProfileAuditEvent_partnerProfileId_fkey', 'partnerProfileId', 'PartnerProfile'),
+        ('PartnerProfileAuditEvent', 'PartnerProfileAuditEvent_actorUserId_fkey', 'actorUserId', 'UserProfile')
+    ),
+    actual_foreign_keys AS (
+      SELECT expected.table_name, expected.constraint_name, expected.child_column,
+        expected.parent_table, constraint_row.contype, constraint_row.confdeltype,
+        constraint_row.confupdtype,
+        ARRAY(
+          SELECT child_attribute.attname::text
+          FROM unnest(constraint_row.conkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute child_attribute ON child_attribute.attrelid = child_table.oid
+            AND child_attribute.attnum = key_row.attnum
+          ORDER BY key_row.ord
+        ) AS child_columns,
+        ARRAY(
+          SELECT parent_attribute.attname::text
+          FROM unnest(constraint_row.confkey) WITH ORDINALITY AS key_row(attnum, ord)
+          JOIN pg_attribute parent_attribute ON parent_attribute.attrelid = parent_table.oid
+            AND parent_attribute.attnum = key_row.attnum
+          ORDER BY key_row.ord
+        ) AS parent_columns
+      FROM expected_foreign_keys expected
+      LEFT JOIN pg_class child_table ON child_table.relname = expected.table_name
+        AND child_table.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_class parent_table ON parent_table.relname = expected.parent_table
+        AND parent_table.relnamespace = 'public'::regnamespace
+      LEFT JOIN pg_constraint constraint_row ON constraint_row.conname = expected.constraint_name
+        AND constraint_row.conrelid = child_table.oid
+        AND constraint_row.confrelid = parent_table.oid
+    )
+    SELECT
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerPayoutProfile'
+          AND table_type = 'BASE TABLE'
+      ) AS partner_payout_profile_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerPayoutProfileAuditEvent'
+          AND table_type = 'BASE TABLE'
+      ) AS partner_payout_profile_audit_table,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.tables
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfileAuditEvent'
+          AND table_type = 'BASE TABLE'
+      ) AS partner_profile_audit_table,
+      EXISTS (
+        SELECT 1
+        FROM pg_type
+        JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+        WHERE pg_namespace.nspname = 'public'
+          AND pg_type.typname = 'PartnerPayoutProfileStatus'
+          AND pg_type.typtype = 'e'
+          AND (
+            SELECT count(*) = 5
+            FROM pg_enum
+            WHERE pg_enum.enumtypid = pg_type.oid
+              AND pg_enum.enumlabel IN ('DRAFT', 'PENDING_VERIFICATION', 'VERIFIED', 'REJECTED', 'DISABLED')
+          )
+      ) AS partner_payout_status_enum,
+      (
+        SELECT count(*) = 21 AND NOT EXISTS (
+          SELECT 1
+          FROM expected_columns expected
+          LEFT JOIN actual_columns actual USING (table_name, column_name)
+          WHERE actual.column_name IS NULL
+            OR actual.data_type <> expected.data_type
+            OR actual.udt_name <> expected.udt_name
+            OR actual.is_nullable <> expected.nullable
+        )
+        FROM actual_columns
+      ) AS partner_payout_profile_columns,
+      (
+        SELECT count(*) = 6
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerPayoutProfileAuditEvent'
+      ) AS partner_payout_profile_audit_columns,
+      (
+        SELECT count(*) = 6
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfileAuditEvent'
+      ) AS partner_profile_audit_columns,
+      (
+        SELECT count(*) = 7 AND bool_and(
+          COALESCE(indisvalid, false) AND COALESCE(indisready, false)
+          AND indpred IS NULL AND indexprs IS NULL AND amname = 'btree'
+          AND COALESCE(indisunique, false) = is_unique
+          AND COALESCE(indnatts, -1) = cardinality(key_columns)
+          AND COALESCE(indnkeyatts, -1) = cardinality(key_columns)
+          AND actual_key_columns = key_columns
+        )
+        FROM actual_indexes
+      ) AS partner_payout_indexes,
+      (
+        SELECT count(*) = 7
+          AND bool_and(
+            contype = 'f'
+            AND confdeltype = 'r'
+            AND confupdtype = 'c'
+            AND child_columns = ARRAY[child_column]::text[]
+            AND parent_columns = ARRAY['id']::text[]
+          )
+        FROM actual_foreign_keys
+      ) AS partner_payout_foreign_keys,
+      (
+        SELECT count(*) = 3 AND bool_and(contype = 'c')
+        FROM pg_constraint
+        JOIN pg_class table_row ON table_row.oid = pg_constraint.conrelid
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname = 'PartnerPayoutProfile'
+          AND pg_constraint.conname IN (
+            'PartnerPayoutProfile_korean_account_check',
+            'PartnerPayoutProfile_encryption_check',
+            'PartnerPayoutProfile_verification_check'
+          )
+      ) AS partner_payout_constraints,
+      (
+        SELECT count(*) = 3
+        FROM pg_class table_row
+        JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace
+        WHERE schema_row.nspname = 'public'
+          AND table_row.relname IN ('PartnerPayoutProfile', 'PartnerPayoutProfileAuditEvent', 'PartnerProfileAuditEvent')
+          AND table_row.relrowsecurity IS TRUE
+      ) AS partner_payout_rls,
+      NOT EXISTS (
+        SELECT 1
+        FROM (VALUES ('anon'::name), ('authenticated'::name)) roles(role_name)
+        CROSS JOIN (VALUES ('PartnerPayoutProfile'::text), ('PartnerPayoutProfileAuditEvent'::text), ('PartnerProfileAuditEvent'::text)) tables(table_name)
+        CROSS JOIN (VALUES ('SELECT'::text), ('INSERT'::text), ('UPDATE'::text), ('DELETE'::text), ('TRUNCATE'::text), ('REFERENCES'::text), ('TRIGGER'::text)) privileges(privilege_name)
+        WHERE has_table_privilege(roles.role_name, format('public.%I', tables.table_name), privileges.privilege_name)
+      ) AS partner_payout_public_access_revoked,
+      EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'PartnerProfile'
+          AND column_name IN ('payoutTermsConsentVersion', 'payoutTermsConsentedAt')
+      ) AS partner_payout_terms_columns
+  `);
+  return result.rows[0] ?? null;
+}
+
 function allEvidencePresent(evidence, keys) {
   return Boolean(evidence) && keys.every((key) => evidence[key] === true);
 }
@@ -2060,6 +2365,34 @@ const ANALYTICS_MIGRATION_SCHEMA_KEYS = [
 
 const ANALYTICS_MIGRATION_INITIAL_STATE_KEYS = [
   "analytics_click_zero_rows",
+];
+
+const PARTNER_PAYOUT_MIGRATION_PREFLIGHT_KEYS = [
+  "partner_payout_partner_table",
+  "partner_payout_bank_directory_table",
+  "partner_payout_partner_id_text",
+  "partner_payout_account_type_enum",
+  "partner_payout_status_absent",
+  "partner_payout_tables_absent",
+  "partner_payout_terms_absent",
+  "partner_payout_anon_role",
+  "partner_payout_authenticated_role",
+];
+
+const PARTNER_PAYOUT_MIGRATION_SCHEMA_KEYS = [
+  "partner_payout_profile_table",
+  "partner_payout_profile_audit_table",
+  "partner_profile_audit_table",
+  "partner_payout_status_enum",
+  "partner_payout_profile_columns",
+  "partner_payout_profile_audit_columns",
+  "partner_profile_audit_columns",
+  "partner_payout_indexes",
+  "partner_payout_foreign_keys",
+  "partner_payout_constraints",
+  "partner_payout_rls",
+  "partner_payout_public_access_revoked",
+  "partner_payout_terms_columns",
 ];
 
 function createProductionClient(connectionString) {
@@ -2251,6 +2584,20 @@ export async function runProductionMigrations({
           "target_preflight_failed",
         );
       }
+
+      try {
+        assertMigrationApplied(beforeRecords, PARTNER_PAYOUT_MIGRATION);
+        const partnerPayoutSchema = await queryPartnerPayoutMigrationSchema(client);
+        if (!allEvidencePresent(partnerPayoutSchema, PARTNER_PAYOUT_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Partner payout schema verification failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
       return "already-applied";
     }
 
@@ -2398,6 +2745,35 @@ export async function runProductionMigrations({
       }
     }
 
+    if (state.pendingMigrations.includes(PARTNER_PAYOUT_MIGRATION)) {
+      try {
+        const partnerPayoutPreflight = await queryPartnerPayoutMigrationPreflight(client);
+        if (!allEvidencePresent(partnerPayoutPreflight, PARTNER_PAYOUT_MIGRATION_PREFLIGHT_KEYS)) {
+          throw new Error("Partner payout migration preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+    } else {
+      try {
+        assertMigrationApplied(beforeRecords, PARTNER_PAYOUT_MIGRATION);
+        const partnerPayoutSchema = await queryPartnerPayoutMigrationSchema(client);
+        if (!allEvidencePresent(partnerPayoutSchema, PARTNER_PAYOUT_MIGRATION_SCHEMA_KEYS)) {
+          throw new Error("Partner payout schema recovery preflight failed.");
+        }
+      } catch {
+        throw new ProductionMigrationDiagnostic(
+          "migration_state_evaluation",
+          source,
+          "target_preflight_failed",
+        );
+      }
+    }
+
     try {
       deploy(environment);
     } catch (error) {
@@ -2509,6 +2885,20 @@ export async function runProductionMigrations({
       const analyticsInitialState = await queryAnalyticsMigrationInitialState(client);
       if (!allEvidencePresent(analyticsInitialState, ANALYTICS_MIGRATION_INITIAL_STATE_KEYS)) {
         throw new Error("Partner referral analytics initial state verification failed.");
+      }
+    } catch {
+      throw new ProductionMigrationDiagnostic(
+        "target_verification",
+        source,
+        "target_postverify_failed",
+      );
+    }
+
+    try {
+      assertMigrationApplied(afterRecords, PARTNER_PAYOUT_MIGRATION);
+      const partnerPayoutSchema = await queryPartnerPayoutMigrationSchema(client);
+      if (!allEvidencePresent(partnerPayoutSchema, PARTNER_PAYOUT_MIGRATION_SCHEMA_KEYS)) {
+        throw new Error("Partner payout schema post-verification failed.");
       }
     } catch {
       throw new ProductionMigrationDiagnostic(

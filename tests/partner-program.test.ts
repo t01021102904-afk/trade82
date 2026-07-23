@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
 import {
   PartnerProfileStatus,
+  PartnerPayoutProfileStatus,
   ReferralAttributionStatus,
   SettlementLegStatus,
   SettlementReversalStatus,
@@ -31,6 +33,13 @@ import {
   partnerProfileStatus,
 } from "../src/lib/partner-dashboard.ts";
 import {
+  partnerPayoutProfileAdminSummarySelect,
+  partnerPayoutProfileOwnerSelect,
+} from "../src/lib/partner-payout-profiles.ts";
+import {
+  getPartnerLifecycleTransition,
+} from "../src/lib/partner-lifecycle.ts";
+import {
   normalizePartnerEnrollment,
   normalizePartnerPhone,
   partnerConsentVersions,
@@ -45,20 +54,20 @@ test("partner program mode is explicitly opt-in and otherwise fails closed", () 
   assert.equal(getPartnerProgramMode(" on "), "on");
 });
 
-test("feature-off navigation omits Partner while an exact opt-in includes it", () => {
+test("public navigation omits Partner even when the feature is enabled", () => {
   assert.equal(
-    getPublicNavigationLinks(false).some((link) => link.href === "/partner"),
+    getPublicNavigationLinks(false).some((link) => (link.href as string) === "/partner"),
     false,
   );
   assert.equal(
     getPublicNavigationLinks(getPartnerProgramMode(" on ") === "on").some(
-      (link) => link.href === "/partner",
+      (link) => (link.href as string) === "/partner",
     ),
-    true,
+    false,
   );
   assert.equal(
     getPublicNavigationLinks(getPartnerProgramMode("ON") === "on").some(
-      (link) => link.href === "/partner",
+      (link) => (link.href as string) === "/partner",
     ),
     false,
   );
@@ -174,31 +183,28 @@ test("partner enrollment is idempotent and allocates a distinct referral code pe
   assert.notEqual(first.partnerProfile.referralCode, secondUser.partnerProfile.referralCode);
 });
 
-test("partner enrollment normalizes private contact data and requires recorded consent", () => {
+test("partner enrollment normalizes payout data and requires recorded consent", () => {
   const enrollment = normalizePartnerEnrollment({
-    legalName: "  Partner Legal Name  ",
-    displayName: "  Partner Name ",
-    email: "  PARTNER@example.test ",
+    fullName: "  Partner Name ",
     phone: "+1 (212) 555-0199",
-    country: " United States ",
     preferredLanguage: "en",
-    organizationName: "  Partner Organization ",
-    websiteOrSocialUrl: "https://example.test/profile",
-    promotionDescription: "  Share Trade82 with qualified buyers. ",
+    bankDirectoryId: " bank-1 ",
+    accountHolder: "  Partner Name  ",
+    accountNumber: " 123-456-7890 ",
+    accountBelongsToPartner: true,
     agreeToTerms: true,
+    acknowledgePayoutTerms: true,
     acknowledgePrivacy: true,
   });
 
   assert.deepEqual(enrollment, {
-    legalName: "Partner Legal Name",
-    displayName: "Partner Name",
-    email: "partner@example.test",
+    fullName: "Partner Name",
+    accountHolder: "Partner Name",
     phone: "+12125550199",
-    country: "United States",
     preferredLanguage: "en",
-    organizationName: "Partner Organization",
-    websiteOrSocialUrl: "https://example.test/profile",
-    promotionDescription: "Share Trade82 with qualified buyers.",
+    bankDirectoryId: "bank-1",
+    accountNumber: "123-456-7890",
+    accountBelongsToPartner: true,
   });
   assert.equal(normalizePartnerPhone("82-10-1234-5678"), "821012345678");
   assert.throws(() => normalizePartnerPhone("not-a-phone"));
@@ -206,6 +212,7 @@ test("partner enrollment normalizes private contact data and requires recorded c
     normalizePartnerEnrollment({
       ...enrollment,
       agreeToTerms: false,
+      acknowledgePayoutTerms: true,
       acknowledgePrivacy: true,
     }),
   );
@@ -340,24 +347,173 @@ test("partner payout and profile states use stable localized presentation keys",
   assert.equal(partnerProfileStatus("SUSPENDED"), "suspended");
   assert.equal(partnerPayoutSetupStatus(null), "notStarted");
   assert.equal(
-    partnerPayoutSetupStatus({ status: "PENDING", onboardingComplete: false }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.PENDING_VERIFICATION }),
     "pending",
   );
   assert.equal(
-    partnerPayoutSetupStatus({
-      status: "RESTRICTED",
-      onboardingComplete: true,
-    }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.REJECTED }),
     "restricted",
   );
   assert.equal(
-    partnerPayoutSetupStatus({ status: "ENABLED", onboardingComplete: true }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.VERIFIED }),
     "enabled",
   );
   assert.equal(
-    partnerPayoutSetupStatus({ status: "DISABLED", onboardingComplete: false }),
+    partnerPayoutSetupStatus({ status: PartnerPayoutProfileStatus.DISABLED }),
     "disabled",
   );
+});
+
+test("partner lifecycle transitions reject invalid direct status changes", () => {
+  assert.equal(
+    getPartnerLifecycleTransition("approve", PartnerProfileStatus.PENDING_REVIEW),
+    PartnerProfileStatus.ACTIVE,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("reject", PartnerProfileStatus.PENDING_REVIEW),
+    PartnerProfileStatus.REJECTED,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("suspend", PartnerProfileStatus.ACTIVE),
+    PartnerProfileStatus.SUSPENDED,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("reactivate", PartnerProfileStatus.SUSPENDED),
+    PartnerProfileStatus.ACTIVE,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("reactivate", PartnerProfileStatus.REJECTED),
+    PartnerProfileStatus.PENDING_REVIEW,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("approve", PartnerProfileStatus.REJECTED),
+    null,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("suspend", PartnerProfileStatus.PENDING_REVIEW),
+    null,
+  );
+  assert.equal(
+    getPartnerLifecycleTransition("reject", PartnerProfileStatus.ACTIVE),
+    null,
+  );
+});
+
+test("owner and administrator payout responses contain only safe fields", () => {
+  const safeFields = [
+    "accountHolder",
+    "accountNumberLast4",
+    "accountNumberMasked",
+    "bankName",
+    "id",
+    "payoutCurrency",
+    "status",
+    "updatedAt",
+    "verifiedAt",
+  ].sort();
+  assert.deepEqual(Object.keys(partnerPayoutProfileOwnerSelect).sort(), safeFields);
+  assert.deepEqual(
+    Object.keys(partnerPayoutProfileAdminSummarySelect).sort(),
+    safeFields,
+  );
+  for (const select of [
+    partnerPayoutProfileOwnerSelect,
+    partnerPayoutProfileAdminSummarySelect,
+  ]) {
+    assert.equal("accountNumberCiphertext" in select, false);
+    assert.equal("verifiedByUserId" in select, false);
+    assert.equal("partnerProfileId" in select, false);
+    assert.equal("bankDirectory" in select, false);
+  }
+});
+
+test("partner dashboard response honors pending and rejected visibility boundaries", async () => {
+  const now = new Date("2026-07-22T00:00:00.000Z");
+  const payout = {
+    id: "payout-1",
+    bankName: "Korean Bank",
+    accountHolder: "Partner",
+    accountNumberMasked: "•••• 7890",
+    accountNumberLast4: "7890",
+    payoutCurrency: "krw",
+    status: PartnerPayoutProfileStatus.PENDING_VERIFICATION,
+    verifiedAt: null,
+    updatedAt: now,
+  };
+  const database = {
+    partnerProfile: {
+      findFirst: async ({ where }: { where: { id: string } }) => ({
+        id: where.id,
+        displayName: "Partner",
+        legalName: null,
+        organizationName: null,
+        contactEmail: "partner@example.test",
+        contactPhone: null,
+        country: "US",
+        preferredLanguage: "en",
+        websiteOrSocialUrl: null,
+        promotionDescription: null,
+        status: where.id === "pending" ? "PENDING_REVIEW" : "REJECTED",
+        referralCode: "T82-SHOULD-NOT-BE-EXPOSED",
+        createdAt: now,
+        payoutProfile: where.id === "pending" ? payout : payout,
+        user: {
+          displayName: "Partner",
+          email: "partner@example.test",
+          preferredLanguage: "en",
+        },
+      }),
+    },
+  };
+  const getDatabase = () => database as never;
+  const pending = await getPartnerDashboardData({
+    partnerProfileId: "pending",
+    partnerProgramEnabled: true,
+    getDatabase: getDatabase as never,
+  });
+  const rejected = await getPartnerDashboardData({
+    partnerProfileId: "rejected",
+    partnerProgramEnabled: true,
+    getDatabase: getDatabase as never,
+  });
+
+  assert.ok(pending);
+  assert.equal(pending.partner.referralCode, null);
+  assert.deepEqual(pending.partner.payoutProfile, payout);
+  assert.equal(pending.counts.referredMembers, 0);
+  assert.equal(pending.commissionHistory.length, 0);
+  assert.equal(pending.analytics.totals.totalClicks, 0);
+  assert.ok(rejected);
+  assert.equal(rejected.partner.referralCode, null);
+  assert.equal(rejected.partner.payoutProfile, null);
+  assert.equal(rejected.counts.referredMembers, 0);
+  assert.equal(rejected.commissionHistory.length, 0);
+  assert.equal(rejected.analytics.totals.totalClicks, 0);
+});
+
+test("partner status panels render only the permitted pending and rejected content", () => {
+  const output = execFileSync(
+    process.execPath,
+    ["--experimental-strip-types", "tests/partner-dashboard-status.render.mjs"],
+    {
+      cwd: new URL("..", import.meta.url),
+      env: { ...process.env, NODE_OPTIONS: "" },
+      encoding: "utf8",
+    },
+  );
+  const rendered = JSON.parse(output) as {
+    pending: string;
+    rejected: string;
+  };
+  const pendingMarkup = rendered.pending;
+  assert.match(pendingMarkup, /Application under review/);
+  assert.match(pendingMarkup, /•••• 7890/);
+  assert.doesNotMatch(pendingMarkup, /referral|commission|member|T82-/i);
+
+  const rejectedMarkup = rendered.rejected;
+  assert.match(rejectedMarkup, /Application not approved/);
+  assert.match(rejectedMarkup, /Contact support/);
+  assert.doesNotMatch(rejectedMarkup, /payout|referral|commission|member/i);
 });
 
 test("feature-off dashboard access returns before any database query", async () => {
@@ -391,12 +547,13 @@ test("partner pending earnings come from partner settlement legs without Stripe 
     getDatabase: (() =>
       ({
         partnerProfile: {
-          findUniqueOrThrow: async () => ({
+          findFirst: async () => ({
             id: "partner-1",
             status: PartnerProfileStatus.ACTIVE,
             referralCode: "T82-PARTNER_123",
             createdAt: new Date("2026-07-01T00:00:00.000Z"),
-            stripeConnectedAccount: null,
+            payoutProfile: null,
+            user: null,
           }),
         },
         referralAttribution: {
@@ -409,7 +566,7 @@ test("partner pending earnings come from partner settlement legs without Stripe 
   });
 
   assert.ok(result);
-  assert.equal(result.partner.stripeAccount, null);
+  assert.equal(result.partner.payoutProfile, null);
   assert.equal(result.totals.pending, 500);
   assert.equal(result.totals.available, 0);
   assert.equal(result.commissionHistory[0]?.orderNumber, "T82-ORDER-1");
@@ -513,17 +670,11 @@ test("partner routes clear stale claims and gate active functionality server-sid
   );
   assert.match(dashboardData, /if \(!partnerProgramEnabled\) return null;/);
   assert.match(dashboardData, /type: SettlementLegType\.PARTNER_REFERRAL/);
-  assert.match(
-    authz,
-    /if \(existingByClerkId\) \{\s*return await updateExistingProfile\(existingByClerkId\);\s*\}/,
-  );
-  assert.match(
-    authz,
-    /if \(existingByEmail\) \{[\s\S]*?return await updateExistingProfile\(existingByEmail\);\s*\}/,
-  );
+  assert.match(authz, /if \(existingByClerkId\) \{[\s\S]*?isActiveUserProfile\(existingByClerkId\)/);
+  assert.doesNotMatch(authz, /existingByEmail/);
   assert.doesNotMatch(
     dashboardData,
-    /paymentMethod|stripeSecret|bankAccount|email:/,
+    /paymentMethod|stripeSecret|bankAccount|stripeAccount|accountNumberCiphertext/,
   );
   assert.match(enrollRoute, /readJsonObject\(request\)/);
   assert.match(enrollRoute, /assertSameOrigin\(request\)/);
@@ -532,9 +683,11 @@ test("partner routes clear stale claims and gate active functionality server-sid
     enrollRoute,
     /stripeConnectedAccount|SettlementLeg|ReferralAttribution|transfers\.create/,
   );
-  assert.match(enrollment, /user id comes exclusively from the authenticated server session/i);
+  assert.match(enrollment, /userId/);
+  assert.match(enrollRoute, /const user = await requireAuth\(\)/);
+  assert.doesNotMatch(enrollment, /existingByEmail|relink.*email/i);
   assert.doesNotMatch(enrollment, /stripe\.accounts|bankAccount|routingNumber|swift/i);
-  assert.match(joinPage, /\/partner\/join/);
+  assert.match(joinPage, /\/onboarding\/partner/);
   assert.match(joinPage, /partner\?\.status === "SUSPENDED"/);
   assert.match(roleSelection, /partnerProgramEnabled/);
   assert.match(roleSelection, /partnerProgram\.joinAsPartner/);

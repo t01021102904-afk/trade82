@@ -26,7 +26,7 @@ export default async function AdminPartnerDetailRoute({
       data={data}
       partnerProfileId={partnerProfileId}
       query={query}
-      referralUrl={`${getAppUrl().replace(/\/$/, "")}/r/${data.partner.referralCode}`}
+      referralUrl={data.partner.status === "ACTIVE" ? `${getAppUrl().replace(/\/$/, "")}/r/${data.partner.referralCode}` : ""}
     />
   );
 }
