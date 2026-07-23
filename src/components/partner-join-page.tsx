@@ -45,7 +45,6 @@ export async function PartnerJoinPage({
     redirect(withLocale("/partner/dashboard", locale));
   }
   if (partner?.status === "SUSPENDED") return <PartnerProgramLanding state="suspended" />;
-  if (partner?.status === "PENDING_REVIEW") return <PartnerProgramLanding state="pendingReview" />;
   const banks = await listActiveKoreanSellerPayoutBanks(getDb());
   const t = createTranslator(getDictionary(locale));
 

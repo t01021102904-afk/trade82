@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { after, mock, test } from "node:test";
 
 import { PrismaClient } from "../src/generated/prisma/client.ts";
@@ -70,6 +72,13 @@ const partnerPayoutProfiles = await import(
   new URL("../src/lib/partner-payout-profiles.ts", import.meta.url).href,
 );
 const db = getDb() as PrismaClient;
+const activatePendingPartnerProfilesSql = readFileSync(
+  fileURLToPath(new URL(
+    "../prisma/migrations/20260723100000_activate_pending_partner_profiles/migration.sql",
+    import.meta.url,
+  )),
+  "utf8",
+);
 
 after(async () => {
   await db.$disconnect();
@@ -177,6 +186,40 @@ async function createPartnerPayoutFixture(status: "ACTIVE" | "PENDING_REVIEW" | 
   });
   return { id, user, bank, partner, payout };
 }
+
+test("partner activation migration changes only non-deleted pending profiles", async () => {
+  const id = suffix();
+  await db.$transaction(async (tx) => {
+    const users = await Promise.all([
+      tx.userProfile.create({ data: { clerkUserId: `activation-active-${id}`, email: `activation-active-${id}@example.test`, displayName: "Active", role: "user" } }),
+      tx.userProfile.create({ data: { clerkUserId: `activation-suspended-${id}`, email: `activation-suspended-${id}@example.test`, displayName: "Suspended", role: "user" } }),
+      tx.userProfile.create({ data: { clerkUserId: `activation-pending-${id}`, email: `activation-pending-${id}@example.test`, displayName: "Pending", role: "user" } }),
+      tx.userProfile.create({ data: { clerkUserId: `activation-deleted-${id}`, email: `activation-deleted-${id}@example.test`, displayName: "Deleted", role: "user" } }),
+    ]);
+    const [active, suspended, pending, deleted] = await Promise.all([
+      tx.partnerProfile.create({ data: { userId: users[0].id, referralCode: `ACT-A-${id}`, status: "ACTIVE" } }),
+      tx.partnerProfile.create({ data: { userId: users[1].id, referralCode: `ACT-S-${id}`, status: "SUSPENDED" } }),
+      tx.partnerProfile.create({ data: { userId: users[2].id, referralCode: `ACT-P-${id}`, status: "PENDING_REVIEW" } }),
+      tx.partnerProfile.create({ data: { userId: users[3].id, referralCode: `ACT-D-${id}`, status: "PENDING_REVIEW", deletedAt: new Date() } }),
+    ]);
+
+    await tx.$executeRawUnsafe(activatePendingPartnerProfilesSql);
+
+    const statuses = await tx.partnerProfile.findMany({
+      where: { id: { in: [active.id, suspended.id, pending.id, deleted.id] } },
+      select: { id: true, status: true },
+    });
+    assert.deepEqual(
+      Object.fromEntries(statuses.map((profile) => [profile.id, profile.status])),
+      {
+        [active.id]: "ACTIVE",
+        [suspended.id]: "SUSPENDED",
+        [pending.id]: "ACTIVE",
+        [deleted.id]: "PENDING_REVIEW",
+      },
+    );
+  });
+});
 
 test("disposable PostgreSQL keeps raw referral secrets out of the database and enforces first attribution", async () => {
   const id = suffix();
@@ -901,7 +944,7 @@ test("rejected partner enrollment resubmission changes status and payout atomica
       db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
       db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
     ]);
-    assert.equal(afterPartner.status, "PENDING_REVIEW");
+    assert.equal(afterPartner.status, "ACTIVE");
     assert.equal(afterPayout.status, "PENDING_VERIFICATION");
     assert.equal(afterPayout.accountNumberLast4, "7777");
     assert.equal(afterPayout.verifiedAt, null);
@@ -1095,7 +1138,7 @@ test("rejected enrollment resubmission evaluates status after a concurrent lifec
       db.partnerProfile.findUniqueOrThrow({ where: { id: fixture.partner.id } }),
       db.partnerPayoutProfile.findUniqueOrThrow({ where: { id: fixture.payout.id } }),
     ]);
-    assert.equal(partnerAfter.status, "PENDING_REVIEW");
+    assert.equal(partnerAfter.status, "ACTIVE");
     assert.equal(payoutAfter.accountNumberLast4, "6666");
     assert.equal(payoutAfter.status, "PENDING_VERIFICATION");
   } finally {
