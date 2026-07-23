@@ -29,6 +29,7 @@ export function SiteHeader({
   const pathWithoutLocale = stripLocale(pathname);
   const role = context?.role ?? user?.publicMetadata?.role;
   const isAdmin = context?.isAdmin === true;
+  const hasActivePartnerProfile = context?.partnerProfile?.status === "ACTIVE";
   const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =
     role === "buyer" ||
@@ -39,7 +40,7 @@ export function SiteHeader({
     isSignedIn && hasRole
       ? [
           ...getPublicNavigationLinks(partnerProgramEnabled),
-          ...(partnerProgramEnabled && context?.partnerProfile
+          ...(partnerProgramEnabled && hasActivePartnerProfile
             ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
             : []),
           ...(role === "seller" || role === "both"
