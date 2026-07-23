@@ -321,7 +321,7 @@ async function createFixture({
         accountNumberAuthTag: Buffer.alloc(16, 3),
         accountNumberKeyVersion: "integration-test-v1",
         accountNumberLast4: "5678",
-        accountNumberMasked: "••••5678",
+        accountNumberMasked: "•••• 5678",
         status: "VERIFIED",
         verifiedAt: new Date("2026-07-20T13:00:00.000Z"),
         verifiedByUserId: admin.id,
