@@ -74,20 +74,16 @@ test("partner enrollment form has translations for every static partnerProgram k
   }
 });
 
-test("public navigation includes the Partner Program landing page", () => {
-  const links = getPublicNavigationLinks(true);
+test("public navigation keeps Partner Program out of the global navigation", () => {
+  const links = getPublicNavigationLinks() as readonly { href: string; labelKey: string }[];
   assert.deepEqual(links, [
     { href: "/marketplace", labelKey: "nav.marketplace" },
     { href: "/sellers", labelKey: "nav.sellers" },
-    { href: "/partner", labelKey: "nav.partnerProgram" },
   ]);
-  assert.equal(
-    getPublicNavigationLinks(false).some((link) => link.href === "/partner"),
-    true,
-  );
+  assert.equal(links.some((link) => link.href === "/partner"), false);
 });
 
-test("public Partner Program navigation is locale-aware and keeps dashboard private", async () => {
+test("public headers and footer keep Partner Program links out", async () => {
   const headerSource = await readFile(
     new URL("../src/components/site-header.tsx", import.meta.url),
     "utf8",
@@ -108,20 +104,16 @@ test("public Partner Program navigation is locale-aware and keeps dashboard priv
   assert.equal(english.footer.partnerProgram, "Partner Program");
   assert.equal(korean.footer.partnerProgram, "파트너 프로그램");
   assert.match(headerSource, /href=\{withLocale\(link\.href, locale\)\}/);
-  assert.match(footerSource, /withLocale\("\/partner", locale\)/);
-  assert.match(headerSource, /partnerProfile/);
-  assert.match(headerSource, /partnerProfile\?\.status === "ACTIVE"/);
-  assert.match(headerSource, /nav\.partnerDashboard/);
+  assert.doesNotMatch(footerSource, /withLocale\("\/partner", locale\)/);
+  assert.doesNotMatch(headerSource, /partnerProfile/);
+  assert.doesNotMatch(headerSource, /nav\.partnerDashboard/);
+  assert.doesNotMatch(headerSource, /\/partner\/dashboard/);
   assert.match(headerSource, /visibleNavLinks\.map/);
-  assert.doesNotMatch(headerSource, /partner\/dashboard.*getPublicNavigationLinks/);
 });
 
 test("public navigation omits private Buyers and Pricing links", () => {
-  const links = getPublicNavigationLinks(false) as readonly { href: string }[];
-  assert.equal(
-    links.some((link) => link.href === "/partner"),
-    true,
-  );
+  const links = getPublicNavigationLinks() as readonly { href: string }[];
+  assert.equal(links.some((link) => link.href === "/partner"), false);
   assert.equal(links.some((link) => link.href === "/buyers"), false);
   assert.equal(links.some((link) => link.href === "/pricing"), false);
 });
@@ -744,9 +736,10 @@ test("partner routes clear stale claims and gate active functionality server-sid
   assert.match(joinPage, /partner\?\.status === "SUSPENDED"/);
   assert.match(roleSelection, /partnerProgramEnabled/);
   assert.match(roleSelection, /partnerProgram\.joinAsPartner/);
+  assert.match(roleSelection, /withLocale\("\/partner", locale\)/);
 });
 
-test("public partner landing copy is present in both locales", async () => {
+test("public partner landing stays concise and localized", async () => {
   const landing = await readFile(
     new URL("../src/components/partner-program-landing.tsx", import.meta.url),
     "utf8",
@@ -763,74 +756,30 @@ test("public partner landing copy is present in both locales", async () => {
     }),
   );
   const keys = [
-    "landingHeroEyebrow",
     "landingHeroTitle",
     "landingHeroDescription",
+    "landingStep1",
+    "landingStep2",
+    "landingStep3",
+    "landingDisclosure",
     "landingPrimaryCta",
-    "landingSecondaryCta",
     "landingSignIn",
-    "landingHeroAlt",
-    "visualReferralLink",
-    "visualEarnings",
-    "landingBenefitsEyebrow",
-    "landingBenefitsTitle",
-    "landingBenefitsDescription",
-    "benefitEasySignup",
-    "benefitEasySignupDescription",
-    "benefitShareLink",
-    "benefitShareLinkDescription",
-    "benefitEarn",
-    "benefitEarnDescription",
-    "benefitTracking",
-    "benefitTrackingDescription",
-    "landingHowEyebrow",
-    "landingHowTitle",
-    "landingHowDescription",
-    "howStep1Title",
-    "howStep1Description",
-    "howStep2Title",
-    "howStep2Description",
-    "howStep3Title",
-    "howStep3Description",
-    "howStep4Title",
-    "howStep4Description",
-    "landingAudienceEyebrow",
-    "landingAudienceTitle",
-    "landingAudienceDescription",
-    "audienceInfluencers",
-    "audienceInfluencersDescription",
-    "audienceConsultants",
-    "audienceConsultantsDescription",
-    "audienceAgencies",
-    "audienceAgenciesDescription",
-    "audienceConnectors",
-    "audienceConnectorsDescription",
-    "landingEarningsEyebrow",
-    "landingEarningsTitle",
-    "landingEarningsDescription",
-    "earningsRecorded",
-    "earningsRecordedDescription",
-    "earningsReview",
-    "earningsReviewDescription",
-    "earningsPayout",
-    "earningsPayoutDescription",
-    "landingPayoutNote",
-    "landingFaqEyebrow",
-    "landingFaqTitle",
-    ...Array.from({ length: 7 }, (_, index) => [
-      `faq${index + 1}Question`,
-      `faq${index + 1}Answer`,
-    ]).flat(),
-    "landingFinalEyebrow",
-    "landingFinalTitle",
-    "landingFinalDescription",
-    "landingFinalCta",
   ];
 
-  assert.match(landing, /HomeFaqAccordion/);
-  assert.match(landing, /\/landing\/export-documents\.png/);
+  assert.doesNotMatch(landing, /HomeFaqAccordion|export-documents|landingBenefits|landingAudience|landingEarnings|landingFaq/);
+  assert.match(landing, /state === "guest"[\s\S]*signUpPath/);
+  assert.match(landing, /state === "eligible"[\s\S]*partnerJoinPath/);
+  assert.match(landing, /state === "active"[\s\S]*dashboardPath/);
   for (const key of keys) {
     assert.equal(typeof english.partnerProgram?.[key], "string", `en: ${key}`);
     assert.equal(typeof korean.partnerProgram?.[key], "string", `ko: ${key}`);
   }
+  assert.equal(
+    english.partnerProgram?.landingHeroTitle,
+    "Share Trade82 and earn from qualified transactions",
+  );
+  assert.equal(
+    korean.partnerProgram?.landingHeroTitle,
+    "Trade82를 공유하고 거래 수익을 받으세요",
+  );
 });

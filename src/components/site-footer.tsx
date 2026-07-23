@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useI18n } from "@/components/i18n-provider";
-import { withLocale } from "@/lib/i18n";
 
 const legalRoutes = ["/terms", "/privacy"] as const;
 
@@ -14,7 +13,7 @@ function legalPrefix(pathname: string) {
 }
 
 export function SiteFooter() {
-  const { locale, messages } = useI18n();
+  const { messages } = useI18n();
   const pathname = usePathname();
   const footer = messages.footer;
   const prefix = legalPrefix(pathname);
@@ -37,14 +36,6 @@ export function SiteFooter() {
               </Link>
             ))}
           </div>
-        </nav>
-        <nav className="mt-4" aria-label={footer.partnerProgram}>
-          <Link
-            href={withLocale("/partner", locale)}
-            className="relative z-10 inline-flex min-h-8 items-center rounded-md text-xs theme-muted underline-offset-4 transition hover:text-[var(--foreground)] hover:underline"
-          >
-            {footer.partnerProgram}
-          </Link>
         </nav>
         <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs theme-muted">
           <span>{footer.advertisingPartnerships}</span>

@@ -12,7 +12,6 @@ import {
   siteNavigationJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
-import { isPartnerProgramEnabled } from "@/lib/partner-program-feature";
 import "./globals.css";
 
 const structuredData = [
@@ -71,8 +70,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const partnerProgramEnabled = isPartnerProgramEnabled();
-
   return (
     <html
       lang="en"
@@ -89,7 +86,7 @@ export default function RootLayout({
         />
         <ClerkProvider>
           <I18nProvider>
-            <SiteHeader partnerProgramEnabled={partnerProgramEnabled} />
+            <SiteHeader />
             <main className="min-w-0 flex-1">{children}</main>
             <SiteFooter />
           </I18nProvider>
