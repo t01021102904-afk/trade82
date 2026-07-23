@@ -17,11 +17,7 @@ const appLinks = [
   { href: "/messages", labelKey: "nav.messages" },
 ];
 
-export function SiteHeader({
-  partnerProgramEnabled = false,
-}: {
-  partnerProgramEnabled?: boolean;
-}) {
+export function SiteHeader() {
   const pathname = usePathname();
   const { locale, t } = useI18n();
   const { context, isSignedIn, user } = useUserContext();
@@ -29,7 +25,6 @@ export function SiteHeader({
   const pathWithoutLocale = stripLocale(pathname);
   const role = context?.role ?? user?.publicMetadata?.role;
   const isAdmin = context?.isAdmin === true;
-  const hasActivePartnerProfile = context?.partnerProfile?.status === "ACTIVE";
   const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =
     role === "buyer" ||
@@ -39,16 +34,13 @@ export function SiteHeader({
   const visibleNavLinks =
     isSignedIn && hasRole
       ? [
-          ...getPublicNavigationLinks(partnerProgramEnabled),
-          ...(partnerProgramEnabled && hasActivePartnerProfile
-            ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
-            : []),
+          ...getPublicNavigationLinks(),
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
           ...appLinks,
         ]
-      : getPublicNavigationLinks(partnerProgramEnabled);
+      : getPublicNavigationLinks();
 
   return (
     <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
