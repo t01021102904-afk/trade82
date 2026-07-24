@@ -20,9 +20,10 @@ export async function AuthShell({
   const rolePath = `${basePath}/onboarding/role`;
   const dashboardPath = `${basePath}/dashboard`;
   const loginRedirectPath = safeInternalPath(redirectUrl, dashboardPath);
+  const signupRedirectPath = safeInternalPath(redirectUrl, rolePath);
 
   if (!isLogin) {
-    await redirectSignedInUserFromSignup(basePath);
+    await redirectSignedInUserFromSignup(basePath, signupRedirectPath);
   }
 
   return (
@@ -55,7 +56,7 @@ export async function AuthShell({
               routing="path"
               path={`${basePath}/signup`}
               signInUrl={`${basePath}/login`}
-              forceRedirectUrl={rolePath}
+              forceRedirectUrl={signupRedirectPath}
               fallbackRedirectUrl={rolePath}
             />
           )}

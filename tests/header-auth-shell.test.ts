@@ -32,7 +32,8 @@ test("all localized auth routes render the shared Clerk auth shell", () => {
   assert.match(authShell, /<SignUp/);
   assert.match(authShell, /routing="path"/);
   assert.match(authShell, /signUpForceRedirectUrl=\{rolePath\}/);
-  assert.match(authShell, /forceRedirectUrl=\{rolePath\}/);
+  assert.match(authShell, /forceRedirectUrl=\{signupRedirectPath\}/);
+  assert.match(authShell, /redirectSignedInUserFromSignup\(basePath, signupRedirectPath\)/);
   assert.match(authShell, /redirectSignedInUserFromSignup/);
 
   for (const [relativePath, locale, mode, basePath] of [
@@ -47,6 +48,10 @@ test("all localized auth routes render the shared Clerk auth shell", () => {
     assert.match(routeSource, new RegExp(`locale="${locale}"`));
     assert.match(routeSource, new RegExp(`mode="${mode}"`));
     assert.match(routeSource, new RegExp(`basePath="${basePath}"`));
+    if (mode === "signup") {
+      assert.match(routeSource, /searchParams/);
+      assert.match(routeSource, /redirectUrl/);
+    }
   }
 });
 

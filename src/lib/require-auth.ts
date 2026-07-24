@@ -154,6 +154,7 @@ export async function requireAuth(
 
 export async function redirectSignedInUserFromSignup(
   basePath: "" | "/en" | "/ko",
+  redirectUrl?: string,
 ) {
   const clerkUser = await resolveCurrentClerkUser();
   if (!clerkUser) return;
@@ -190,6 +191,7 @@ export async function redirectSignedInUserFromSignup(
     if (profile && await getOwnedPartnerProfile(profile.id)) {
       redirect(`${basePath}/partner/dashboard`);
     }
+    if (redirectUrl) redirect(safeInternalPath(redirectUrl, `${basePath}/onboarding/role`));
     redirect(`${basePath}/onboarding/role`);
   }
 
