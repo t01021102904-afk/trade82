@@ -32,6 +32,10 @@ async function openMarketplace(browserType, path) {
     waitUntil: "domcontentloaded",
     timeout: 30_000,
   });
+  if (new URL(page.url()).hostname === "vercel.com") {
+    await browser.close();
+    throw new Error(`Marketplace E2E access is blocked by Vercel Preview Protection: ${page.url()}`);
+  }
   await page.locator("article").first().waitFor({ state: "visible", timeout: 30_000 });
 
   return {

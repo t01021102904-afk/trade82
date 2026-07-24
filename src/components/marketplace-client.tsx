@@ -204,9 +204,10 @@ function MarketplaceClientContent({
           throw error;
         }
 
+        let mappedProducts: Product[];
         try {
-          setDatabaseProducts(
-            result.products.map((product) => databaseProductToCard(product, locale)),
+          mappedProducts = result.products.map((product) =>
+            databaseProductToCard(product, locale),
           );
         } catch (error) {
           console.error(
@@ -215,11 +216,21 @@ function MarketplaceClientContent({
           );
           throw error;
         }
-        setPagination(result.pagination);
-        setFilterOptions(
-          result.filterOptions ?? { certifications: [], shippingTerms: [] },
-        );
-        setDatabaseLoading(false);
+
+        try {
+          setDatabaseProducts(mappedProducts);
+          setPagination(result.pagination);
+          setFilterOptions(
+            result.filterOptions ?? { certifications: [], shippingTerms: [] },
+          );
+          setDatabaseLoading(false);
+        } catch (error) {
+          console.error(
+            "Marketplace results state update failed",
+            marketplaceErrorDetails(error),
+          );
+          throw error;
+        }
         abortManager.clear(request);
       })
       .catch((error: unknown) => {
