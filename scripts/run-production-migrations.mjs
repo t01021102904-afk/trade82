@@ -2912,7 +2912,7 @@ export async function runProductionMigrations({
       );
     }
 
-    if (localMigrationNames.includes(PARTNER_ACTIVATION_MIGRATION)) {
+    if (localNames.includes(PARTNER_ACTIVATION_MIGRATION)) {
       try {
         assertMigrationApplied(afterRecords, PARTNER_ACTIVATION_MIGRATION);
       } catch {
