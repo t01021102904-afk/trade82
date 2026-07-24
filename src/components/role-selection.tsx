@@ -189,7 +189,7 @@ export function RoleSelection({
                 disabled={pendingRole !== null}
                 onClick={() => chooseRole(card.role)}
                 className={cx(
-                  "group grid min-h-[176px] min-w-0 gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
+                  "group grid min-h-[176px] min-w-0 gap-4 overflow-hidden rounded-2xl border p-4 text-left whitespace-normal transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
                   loading
                     ? card.tone === "emerald"
                       ? "border-emerald-400/60 ring-4 ring-emerald-400/10"
@@ -217,11 +217,11 @@ export function RoleSelection({
                   <span className="block break-words text-base font-semibold theme-foreground">
                     {t(card.titleKey)}
                   </span>
-                  <span className="mt-2 block break-words text-sm leading-6 theme-muted">
+                  <span className="mt-2 block min-w-0 break-words text-sm leading-6 theme-muted [overflow-wrap:anywhere]">
                     {t(card.descriptionKey)}
                   </span>
                 </span>
-                <span className="inline-flex h-9 w-fit items-center justify-center rounded-xl border px-3 text-sm font-semibold theme-surface-muted transition group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)]">
+                <span className="inline-flex h-9 max-w-full w-fit items-center justify-center rounded-xl border px-3 text-sm font-semibold whitespace-normal theme-surface-muted transition group-hover:bg-[var(--primary)] group-hover:text-[var(--primary-foreground)]">
                   {loading ? t("onboarding.savingRole") : t(card.buttonKey)}
                 </span>
               </button>
