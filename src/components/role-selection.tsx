@@ -189,7 +189,7 @@ export function RoleSelection({
                 disabled={pendingRole !== null}
                 onClick={() => chooseRole(card.role)}
                 className={cx(
-                  "group grid min-h-[176px] gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
+                  "group grid min-h-[176px] min-w-0 gap-4 rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-400",
                   loading
                     ? card.tone === "emerald"
                       ? "border-emerald-400/60 ring-4 ring-emerald-400/10"
@@ -198,7 +198,7 @@ export function RoleSelection({
                   pendingRole !== null ? "cursor-wait opacity-80" : "",
                 )}
               >
-                <span className="flex items-start justify-between gap-3">
+                <span className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                   <span
                     className={cx(
                       "inline-flex size-9 items-center justify-center rounded-xl border text-sm font-semibold",
@@ -209,15 +209,15 @@ export function RoleSelection({
                   >
                     {card.role === "seller" ? "S" : "B"}
                   </span>
-                  <span className="rounded-full border px-2.5 py-1 text-[11px] font-semibold theme-surface-muted">
+                  <span className="max-w-full shrink-0 break-words rounded-full border px-2.5 py-1 text-[11px] font-semibold theme-surface-muted">
                     {t(card.eyebrowKey)}
                   </span>
                 </span>
-                <span>
-                  <span className="block text-base font-semibold theme-foreground">
+                <span className="min-w-0">
+                  <span className="block break-words text-base font-semibold theme-foreground">
                     {t(card.titleKey)}
                   </span>
-                  <span className="mt-2 block text-sm leading-6 theme-muted">
+                  <span className="mt-2 block break-words text-sm leading-6 theme-muted">
                     {t(card.descriptionKey)}
                   </span>
                 </span>

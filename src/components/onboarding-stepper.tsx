@@ -72,7 +72,7 @@ export function OnboardingStepper({
                 >
                   {index + 1}
                 </span>
-                <span className="min-w-0 truncate font-medium">{step.label}</span>
+                <span className="min-w-0 break-words font-medium leading-5 sm:truncate">{step.label}</span>
               </button>
               {index < steps.length - 1 ? (
                 <span className="hidden h-px flex-1 theme-surface-muted sm:block" />
