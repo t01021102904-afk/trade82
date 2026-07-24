@@ -16,18 +16,20 @@ export type MarketplaceHistoryMode = "push" | "replace";
 
 type MarketplaceHistoryLike = Pick<History, "state">;
 type MarketplaceHistoryMethod = History["pushState"];
+type MarketplaceHistoryPrototype = Pick<History, "pushState" | "replaceState">;
 
 export function updateMarketplaceHistory(
   history: MarketplaceHistoryLike,
   nextUrl: string,
   mode: MarketplaceHistoryMode,
-  historyPrototype: Pick<History, "pushState" | "replaceState"> =
-    History.prototype,
+  historyPrototype?: MarketplaceHistoryPrototype,
 ) {
+  const prototype =
+    historyPrototype ?? (Object.getPrototypeOf(history) as MarketplaceHistoryPrototype);
   const method: MarketplaceHistoryMethod =
     mode === "push"
-      ? historyPrototype.pushState
-      : historyPrototype.replaceState;
+      ? prototype.pushState
+      : prototype.replaceState;
   method.call(history, history.state, "", nextUrl);
 }
 
