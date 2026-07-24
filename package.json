@@ -16,6 +16,7 @@
     "test:localization": "node --experimental-strip-types --test tests/sitewide-localization-and-buttons.test.ts",
     "test:admin-partners:integration": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test --test-concurrency=1 tests/admin-partners.integration.test.ts",
     "test:partner-referral-analytics": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/partner-referral-analytics.test.ts",
+    "test:partner-routing:e2e": "node --test tests/partner-routing.e2e.test.mjs",
     "test:partner-referral-analytics:integration": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --experimental-test-module-mocks --test --test-concurrency=1 tests/partner-referral-route.integration.test.ts tests/partner-referral-retention.integration.test.ts tests/partner-program.integration.test.ts tests/account-deletion.integration.test.ts tests/partner-referral-analytics-timezone.integration.test.ts",
     "test:settlement-operations:catalog": "node --test tests/settlement-operations.integration.test.mjs",
     "test:settlement-operations:workers": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test --test-concurrency=1 tests/settlement-operations.worker.integration.test.ts",
@@ -49,6 +50,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "playwright": "^1.61.1",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"

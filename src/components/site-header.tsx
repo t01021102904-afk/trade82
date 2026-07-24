@@ -26,7 +26,16 @@ export function SiteHeader() {
   const { context, isSignedIn, user } = useUserContext();
   const [open, setOpen] = useState(false);
   const pathWithoutLocale = stripLocale(pathname);
-  const role = context?.role ?? user?.publicMetadata?.role;
+  const metadataRole = user?.publicMetadata?.role;
+  const role =
+    context?.role ??
+    (metadataRole === "buyer" ||
+    metadataRole === "seller" ||
+    metadataRole === "both" ||
+    metadataRole === "admin" ||
+    metadataRole === "user"
+      ? metadataRole
+      : undefined);
   const isAdmin = context?.isAdmin === true;
   const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =
@@ -36,8 +45,9 @@ export function SiteHeader() {
     role === "admin";
   const isPartnerOnly = isPartnerOnlyNavigationAccount({
     isSignedIn: isSignedIn === true,
-    role: context?.role,
+    role,
     partnerProfile: context?.partnerProfile,
+    companies: context?.companies ?? [],
   });
   const visibleNavLinks =
     isSignedIn && (hasRole || isPartnerOnly)
@@ -46,7 +56,7 @@ export function SiteHeader() {
           ...(isPartnerOnly
             ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
             : []),
-          ...(role === "seller" || role === "both"
+          ...(!isPartnerOnly && (role === "seller" || role === "both")
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
           ...(isPartnerOnly ? [] : appLinks),

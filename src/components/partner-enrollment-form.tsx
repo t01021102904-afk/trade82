@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 
 type PartnerBank = {
@@ -29,7 +29,7 @@ const fieldClassName = "mt-1 h-10 w-full rounded-md border border-zinc-300 bg-wh
 
 export function PartnerEnrollmentForm({ initial }: PartnerEnrollmentFormProps) {
   const { locale, t } = useI18n();
-  const router = useRouter();
+  const { refreshUserContext } = useUserContext();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -67,8 +67,8 @@ export function PartnerEnrollmentForm({ initial }: PartnerEnrollmentFormProps) {
         setError(payload?.error ?? t("partnerProgram.enrollError"));
         return;
       }
-      router.replace(withLocale("/partner/dashboard?joined=1", locale));
-      router.refresh();
+      await refreshUserContext();
+      window.location.replace(withLocale("/partner/dashboard?joined=1", locale));
     } catch {
       setError(t("partnerProgram.enrollError"));
     } finally {

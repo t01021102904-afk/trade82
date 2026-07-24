@@ -26,6 +26,7 @@ import {
 } from "../src/lib/referral-claim-response.ts";
 import {
   getPublicNavigationLinks,
+  isPartnerOnlyAccount,
   isPartnerOnlyNavigationAccount,
 } from "../src/lib/public-navigation.ts";
 import {
@@ -118,8 +119,14 @@ test("public headers and footer keep Partner Program links out", async () => {
 
 test("partner-only navigation requires the server-backed user context", () => {
   const partnerProfile = { id: "partner-1" };
+  const noCompanies: Array<{ companyRole: "seller" | "buyer" }> = [];
   assert.equal(
-    isPartnerOnlyNavigationAccount({ isSignedIn: true, role: "user", partnerProfile }),
+    isPartnerOnlyNavigationAccount({
+      isSignedIn: true,
+      role: "user",
+      partnerProfile,
+      companies: noCompanies,
+    }),
     true,
   );
 
@@ -129,21 +136,57 @@ test("partner-only navigation requires the server-backed user context", () => {
         isSignedIn: true,
         role: "user",
         partnerProfile: { id: `partner-${status}` },
+        companies: noCompanies,
+      }),
+      true,
+    );
+  }
+
+  for (const role of ["user", "buyer", "seller", "both"] as const) {
+    assert.equal(
+      isPartnerOnlyNavigationAccount({
+        isSignedIn: true,
+        role,
+        partnerProfile,
+        companies: noCompanies,
       }),
       true,
     );
   }
 
   for (const input of [
-    { isSignedIn: false, role: "user" as const, partnerProfile },
-    { isSignedIn: true, role: "user" as const, partnerProfile: null },
-    { isSignedIn: true, role: "buyer" as const, partnerProfile },
-    { isSignedIn: true, role: "seller" as const, partnerProfile },
-    { isSignedIn: true, role: "both" as const, partnerProfile },
-    { isSignedIn: true, role: "admin" as const, partnerProfile },
+    { isSignedIn: false, role: "user" as const, partnerProfile, companies: noCompanies },
+    { isSignedIn: true, role: "user" as const, partnerProfile: null, companies: noCompanies },
+    { isSignedIn: true, role: "admin" as const, partnerProfile, companies: noCompanies },
+    {
+      isSignedIn: true,
+      role: "buyer" as const,
+      partnerProfile,
+      companies: [{ companyRole: "buyer" as const }],
+    },
+    {
+      isSignedIn: true,
+      role: "seller" as const,
+      partnerProfile,
+      companies: [{ companyRole: "seller" as const }],
+    },
+    {
+      isSignedIn: true,
+      role: "both" as const,
+      partnerProfile,
+      companies: [{ companyRole: "buyer" as const }, { companyRole: "seller" as const }],
+    },
   ]) {
     assert.equal(isPartnerOnlyNavigationAccount(input), false);
   }
+
+  assert.equal(
+    isPartnerOnlyAccount({
+      partnerProfile,
+      companyState: { hasBuyerCompany: false, hasSellerCompany: false },
+    }),
+    true,
+  );
 });
 
 test("partner dashboard navigation uses the existing locale-aware link path", async () => {
@@ -153,6 +196,40 @@ test("partner dashboard navigation uses the existing locale-aware link path", as
   );
   assert.match(headerSource, /href=\{withLocale\(link\.href, locale\)\}/);
   assert.match(headerSource, /href: "\/partner\/dashboard"/);
+});
+
+test("partner-only routing is role-independent and company-aware", async () => {
+  const requireAuthSource = await readFile(
+    new URL("../src/lib/require-auth.ts", import.meta.url),
+    "utf8",
+  );
+  const roleSource = await readFile(
+    new URL("../src/components/role-selection.tsx", import.meta.url),
+    "utf8",
+  );
+  const stepperSource = await readFile(
+    new URL("../src/components/onboarding-stepper.tsx", import.meta.url),
+    "utf8",
+  );
+  const formSource = await readFile(
+    new URL("../src/components/partner-enrollment-form.tsx", import.meta.url),
+    "utf8",
+  );
+  const contextHookSource = await readFile(
+    new URL("../src/hooks/use-user-context.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(requireAuthSource, /const partnerOnly = isPartnerOnlyAccount/);
+  assert.match(requireAuthSource, /if \(partnerOnly\) \{\s*redirect\(`\$\{prefix\}\/partner\/dashboard`\)/);
+  assert.doesNotMatch(requireAuthSource, /if \(role === "user"\) \{[\s\S]{0,160}getOwnedPartnerProfile/);
+  assert.match(roleSource, /whitespace-normal/);
+  assert.match(roleSource, /\[overflow-wrap:anywhere\]/);
+  assert.doesNotMatch(stepperSource, /sm:truncate/);
+  assert.match(formSource, /await refreshUserContext\(\)/);
+  assert.match(formSource, /window\.location\.replace\(/);
+  assert.match(contextHookSource, /cache: "no-store"/);
+  assert.match(contextHookSource, /export function invalidateUserContext/);
 });
 
 test("public navigation omits private Buyers and Pricing links", () => {

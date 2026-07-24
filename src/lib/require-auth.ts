@@ -24,6 +24,7 @@ import {
 } from "@/lib/clerk-identity";
 import { isExistingEmailDifferentClerkIdentityError } from "@/lib/fresh-user-profile";
 import { getOwnedPartnerProfile } from "@/lib/owned-partner-profile";
+import { isPartnerOnlyAccount } from "@/lib/partner-account-routing";
 
 type PublicMetadata = {
   role?: unknown;
@@ -61,14 +62,21 @@ async function resolveOnboardingState(
   profile: Awaited<ReturnType<typeof getCurrentUserProfile>>,
   metadata: PublicMetadata = {},
 ) {
-  const companyState = profile
-    ? await getOnboardingCompanyState(profile.id)
-    : {
-        hasBuyerCompany: false,
-        hasSellerCompany: false,
-        hasSellerPayoutProfile: false,
-      };
+  const [companyState, partnerProfile] = profile
+    ? await Promise.all([
+        getOnboardingCompanyState(profile.id),
+        getOwnedPartnerProfile(profile.id),
+      ])
+    : [
+        {
+          hasBuyerCompany: false,
+          hasSellerCompany: false,
+          hasSellerPayoutProfile: false,
+        },
+        null,
+      ];
   const inferredRole = inferRoleFromCompanyState(companyState);
+  const partnerOnly = isPartnerOnlyAccount({ partnerProfile, companyState });
   let role = profile?.role ?? "user";
 
   if (profile && role === "user" && inferredRole) {
@@ -84,6 +92,7 @@ async function resolveOnboardingState(
     role !== "user" &&
     role !== "admin" &&
     !inferredRole &&
+    !partnerOnly &&
     !(
       metadata.role === role &&
       metadata.roleSelectionSource === ROLE_SELECTION_SOURCE
@@ -101,6 +110,8 @@ async function resolveOnboardingState(
     canChangeRole: role !== "admin" && !hasAnyOnboardingCompany(companyState),
     onboardingComplete: isOnboardingCompleteForRole(role, companyState),
     companyState,
+    partnerProfile,
+    partnerOnly,
   };
 }
 
@@ -171,7 +182,7 @@ export async function redirectSignedInUserFromSignup(
     throw error;
   }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete, partnerOnly } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -187,10 +198,11 @@ export async function redirectSignedInUserFromSignup(
     redirect(`${basePath}/admin`);
   }
 
+  if (partnerOnly) {
+    redirect(`${basePath}/partner/dashboard`);
+  }
+
   if (role === "user") {
-    if (profile && await getOwnedPartnerProfile(profile.id)) {
-      redirect(`${basePath}/partner/dashboard`);
-    }
     if (redirectUrl) redirect(safeInternalPath(redirectUrl, `${basePath}/onboarding/role`));
     redirect(`${basePath}/onboarding/role`);
   }
@@ -225,7 +237,7 @@ export async function requireAppProfile(redirectUrl: string) {
     redirect(`${prefix}/login`);
   }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, onboardingComplete } = await resolveOnboardingState(
+  const { role, onboardingComplete, partnerOnly } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -237,10 +249,15 @@ export async function requireAppProfile(redirectUrl: string) {
     onboardingComplete,
   );
 
+  if (role === "admin") {
+    redirect(`${prefix}/admin`);
+  }
+
+  if (partnerOnly) {
+    redirect(`${prefix}/partner/dashboard`);
+  }
+
   if (role === "user") {
-    if (await getOwnedPartnerProfile(profile.id)) {
-      redirect(`${prefix}/partner/dashboard`);
-    }
     redirect(`${prefix}/onboarding/role`);
   }
 
@@ -282,7 +299,7 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     redirect(`${prefix}/login`);
   }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, canChangeRole, onboardingComplete } = await resolveOnboardingState(
+  const { role, canChangeRole, onboardingComplete, partnerOnly } = await resolveOnboardingState(
     profile,
     metadata,
   );
@@ -294,10 +311,13 @@ export async function requireOnboardingEntry(redirectUrl: string) {
     onboardingComplete,
   );
 
+  if (role === "admin") redirect(`${prefix}/admin`);
+
+  if (partnerOnly) {
+    redirect(`${prefix}/partner/dashboard`);
+  }
+
   if (role === "user") {
-    if (await getOwnedPartnerProfile(profile.id)) {
-      redirect(`${prefix}/partner/dashboard`);
-    }
     return {
       role,
       canChangeRole,
@@ -311,8 +331,6 @@ export async function requireOnboardingEntry(redirectUrl: string) {
       deletionPending: false,
     };
   }
-  if (role === "admin") redirect(`${prefix}/admin`);
-
   if (onboardingComplete) {
     redirect(`${prefix}/dashboard`);
   }
@@ -341,7 +359,7 @@ export async function requireOnboardingRole(
     redirect(`${prefix}/login`);
   }
   const metadata = (clerkUser?.publicMetadata ?? {}) as PublicMetadata;
-  const { role, canChangeRole, onboardingComplete, companyState } =
+  const { role, canChangeRole, onboardingComplete, companyState, partnerOnly } =
     await resolveOnboardingState(
     profile,
     metadata,
@@ -354,15 +372,16 @@ export async function requireOnboardingRole(
     onboardingComplete,
   );
 
-  if (role === "user") {
-    if (await getOwnedPartnerProfile(profile.id)) {
-      redirect(`${prefix}/partner/dashboard`);
-    }
-    redirect(`${prefix}/onboarding/role`);
-  }
-
   if (role === "admin") {
     redirect(`${prefix}/admin`);
+  }
+
+  if (partnerOnly) {
+    redirect(`${prefix}/partner/dashboard`);
+  }
+
+  if (role === "user") {
+    redirect(`${prefix}/onboarding/role`);
   }
 
   if (role !== expectedRole && role !== "both") {
