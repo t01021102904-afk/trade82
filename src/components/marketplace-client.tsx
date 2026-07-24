@@ -18,6 +18,7 @@ import {
   marketplaceResultsViewState,
   marketplaceUrlWithUpdates,
   scheduleMarketplaceSearch,
+  updateMarketplaceHistory,
   type MarketplaceQueryUpdates,
 } from "@/lib/public-marketplace-client-state";
 import { databaseProductToCard } from "@/lib/public-marketplace-presenters";
@@ -195,36 +196,43 @@ function MarketplaceClientContent({
       updates: MarketplaceQueryUpdates,
       options: { history?: "push" | "replace"; scroll?: boolean } = {},
     ) => {
-      const currentUrl = new URL(window.location.href);
-      const nextUrl = marketplaceUrlWithUpdates({
-        pathname: currentUrl.pathname,
-        currentSearch: currentUrl.search,
-        updates,
-      });
-      const nextQueryState = marketplaceQueryFromUrl(nextUrl);
-
-      if (`${currentUrl.pathname}${currentUrl.search}` !== nextUrl) {
-        if (options.history === "push") {
-          window.history.pushState(window.history.state, "", nextUrl);
-        } else {
-          window.history.replaceState(window.history.state, "", nextUrl);
-        }
-      }
-
-      if (Object.prototype.hasOwnProperty.call(updates, "q")) {
-        setSearchInput(nextQueryState.q);
-      }
-      setQueryState((current) =>
-        sameMarketplaceQuery(current, nextQueryState) ? current : nextQueryState,
-      );
-
-      if (options.scroll) {
-        requestAnimationFrame(() => {
-          gridTopRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
+      try {
+        const currentUrl = new URL(window.location.href);
+        const nextUrl = marketplaceUrlWithUpdates({
+          pathname: currentUrl.pathname,
+          currentSearch: currentUrl.search,
+          updates,
         });
+        const nextQueryState = marketplaceQueryFromUrl(nextUrl);
+
+        if (`${currentUrl.pathname}${currentUrl.search}` !== nextUrl) {
+          updateMarketplaceHistory(
+            window.history,
+            nextUrl,
+            options.history === "push" ? "push" : "replace",
+          );
+        }
+
+        if (Object.prototype.hasOwnProperty.call(updates, "q")) {
+          setSearchInput(nextQueryState.q);
+        }
+        setQueryState((current) =>
+          sameMarketplaceQuery(current, nextQueryState)
+            ? current
+            : nextQueryState,
+        );
+
+        if (options.scroll) {
+          requestAnimationFrame(() => {
+            gridTopRef.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          });
+        }
+      } catch {
+        setRequestError(true);
+        setDatabaseLoading(false);
       }
     },
     [],
