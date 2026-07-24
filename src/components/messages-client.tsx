@@ -2653,7 +2653,7 @@ function PaymentRequestCard({
         {isSeller ? <PaymentCardMetric label={t("payments.platformFee")} value={formatPaymentMoney(paymentRequest.platformFeeAmount, paymentRequest.currency)} /> : null}
         {isSeller ? <PaymentCardMetric label={t("payments.sellerPayable")} value={formatPaymentMoney(paymentRequest.sellerPayableAmount, paymentRequest.currency)} strong /> : null}
         {paymentRequest.refundAmount > 0 ? <PaymentCardMetric label={t("payments.refundAmount")} value={formatPaymentMoney(paymentRequest.refundAmount, paymentRequest.currency)} /> : null}
-        {dispute ? <PaymentCardMetric label={t("payments.disputeStatus")} value={dispute.status} /> : null}
+        {dispute ? <PaymentCardMetric label={t("payments.disputeStatusLabel")} value={dispute.status} /> : null}
       </dl>
 
       <div className="mt-3">

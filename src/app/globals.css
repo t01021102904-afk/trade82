@@ -59,6 +59,10 @@ textarea {
   font: inherit;
 }
 
+button {
+  white-space: nowrap;
+}
+
 ::selection {
   background: var(--accent);
   color: var(--foreground);
@@ -153,11 +157,13 @@ textarea {
 .theme-primary {
   background: var(--primary);
   color: var(--primary-foreground);
+  white-space: nowrap;
 }
 
 .theme-secondary {
   background: var(--secondary);
   color: var(--secondary-foreground);
+  white-space: nowrap;
 }
 
 .theme-input {
@@ -182,6 +188,7 @@ textarea {
 .theme-primary-button {
   background: var(--primary);
   color: var(--primary-foreground);
+  white-space: nowrap;
 }
 
 .theme-primary-button:hover {
@@ -192,6 +199,7 @@ textarea {
   border-color: var(--border);
   background: var(--secondary);
   color: var(--secondary-foreground);
+  white-space: nowrap;
 }
 
 .theme-secondary-button:hover {
