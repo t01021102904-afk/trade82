@@ -24,7 +24,10 @@ import {
   applyReferralClaimCookie,
   getReferralClaimCookieOptions,
 } from "../src/lib/referral-claim-response.ts";
-import { getPublicNavigationLinks } from "../src/lib/public-navigation.ts";
+import {
+  getPublicNavigationLinks,
+  isPartnerOnlyNavigationAccount,
+} from "../src/lib/public-navigation.ts";
 import {
   getPartnerDashboardData,
   partnerCommissionPresentation,
@@ -105,10 +108,50 @@ test("public headers and footer keep Partner Program links out", async () => {
   assert.equal(korean.footer.partnerProgram, "파트너 프로그램");
   assert.match(headerSource, /href=\{withLocale\(link\.href, locale\)\}/);
   assert.doesNotMatch(footerSource, /withLocale\("\/partner", locale\)/);
-  assert.doesNotMatch(headerSource, /partnerProfile/);
-  assert.doesNotMatch(headerSource, /nav\.partnerDashboard/);
-  assert.doesNotMatch(headerSource, /\/partner\/dashboard/);
+  assert.match(headerSource, /isPartnerOnlyNavigationAccount/);
+  assert.match(headerSource, /partnerProfile: context\?\.partnerProfile/);
+  assert.match(headerSource, /nav\.partnerDashboard/);
+  assert.match(headerSource, /\/partner\/dashboard/);
   assert.match(headerSource, /visibleNavLinks\.map/);
+});
+
+test("partner-only navigation requires the server-backed user context", () => {
+  const partnerProfile = { id: "partner-1" };
+  assert.equal(
+    isPartnerOnlyNavigationAccount({ isSignedIn: true, role: "user", partnerProfile }),
+    true,
+  );
+
+  for (const status of ["ACTIVE", "SUSPENDED", "REJECTED", "PENDING_REVIEW"]) {
+    assert.equal(
+      isPartnerOnlyNavigationAccount({
+        isSignedIn: true,
+        role: "user",
+        partnerProfile: { id: `partner-${status}` },
+      }),
+      true,
+    );
+  }
+
+  for (const input of [
+    { isSignedIn: false, role: "user" as const, partnerProfile },
+    { isSignedIn: true, role: "user" as const, partnerProfile: null },
+    { isSignedIn: true, role: "buyer" as const, partnerProfile },
+    { isSignedIn: true, role: "seller" as const, partnerProfile },
+    { isSignedIn: true, role: "both" as const, partnerProfile },
+    { isSignedIn: true, role: "admin" as const, partnerProfile },
+  ]) {
+    assert.equal(isPartnerOnlyNavigationAccount(input), false);
+  }
+});
+
+test("partner dashboard navigation uses the existing locale-aware link path", async () => {
+  const headerSource = await readFile(
+    new URL("../src/components/site-header.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.match(headerSource, /href=\{withLocale\(link\.href, locale\)\}/);
+  assert.match(headerSource, /href: "\/partner\/dashboard"/);
 });
 
 test("public navigation omits private Buyers and Pricing links", () => {

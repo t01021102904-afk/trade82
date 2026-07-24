@@ -9,7 +9,10 @@ import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
-import { getPublicNavigationLinks } from "@/lib/public-navigation";
+import {
+  getPublicNavigationLinks,
+  isPartnerOnlyNavigationAccount,
+} from "@/lib/public-navigation";
 import { cx } from "@/lib/utils";
 
 const appLinks = [
@@ -31,10 +34,18 @@ export function SiteHeader() {
     role === "seller" ||
     role === "both" ||
     role === "admin";
+  const isPartnerOnly = isPartnerOnlyNavigationAccount({
+    isSignedIn: isSignedIn === true,
+    role: context?.role,
+    partnerProfile: context?.partnerProfile,
+  });
   const visibleNavLinks =
-    isSignedIn && hasRole
+    isSignedIn && (hasRole || isPartnerOnly)
       ? [
           ...getPublicNavigationLinks(),
+          ...(isPartnerOnly
+            ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
+            : []),
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
