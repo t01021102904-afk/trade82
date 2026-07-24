@@ -112,6 +112,7 @@ test("public headers and footer keep Partner Program links out", async () => {
   assert.match(headerSource, /partnerProfile: context\?\.partnerProfile/);
   assert.match(headerSource, /nav\.partnerDashboard/);
   assert.match(headerSource, /\/partner\/dashboard/);
+  assert.match(headerSource, /\.\.\.\(isPartnerOnly \? \[\] : appLinks\)/);
   assert.match(headerSource, /visibleNavLinks\.map/);
 });
 

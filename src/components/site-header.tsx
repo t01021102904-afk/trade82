@@ -49,7 +49,7 @@ export function SiteHeader() {
           ...(role === "seller" || role === "both"
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
-          ...appLinks,
+          ...(isPartnerOnly ? [] : appLinks),
         ]
       : getPublicNavigationLinks();
 
