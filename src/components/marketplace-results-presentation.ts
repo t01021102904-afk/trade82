@@ -46,7 +46,14 @@ export function MarketplaceResultsPresentation({
   renderEmpty: () => ReactNode;
   renderError: () => ReactNode;
 }) {
-  if (state === "error") return renderError();
+  if (state === "error") {
+    return createElement(
+      "div",
+      { className: "grid gap-4" },
+      renderError(),
+      products.length ? renderProducts(products) : null,
+    );
+  }
   if (state === "loading" && !products.length) return renderLoading();
   if (products.length) return renderProducts(products);
   return renderEmpty();

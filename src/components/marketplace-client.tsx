@@ -88,6 +88,25 @@ type MarketplaceApiResponse = {
   filterOptions?: MarketplaceProductFilterOptions;
 };
 
+function marketplaceErrorDetails(error: unknown) {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    };
+  }
+
+  return {
+    name: "UnknownError",
+    message: "Unknown marketplace error",
+  };
+}
+
+function isMarketplaceAbortError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
 function initialDataSignature({
   initialProducts,
   initialPagination,
@@ -160,18 +179,42 @@ function MarketplaceClientContent({
       signal: request.controller.signal,
     })
       .then(async (response) => {
-        if (!response.ok) throw new Error("Marketplace request failed");
-        return response.json() as Promise<MarketplaceApiResponse>;
+        if (!response.ok) {
+          throw new Error(`Marketplace request failed with status ${response.status}`);
+        }
+
+        try {
+          return (await response.json()) as MarketplaceApiResponse;
+        } catch (error) {
+          console.error(
+            "Marketplace response JSON parsing failed",
+            marketplaceErrorDetails(error),
+          );
+          throw error;
+        }
       })
       .then((result) => {
         if (!abortManager.isCurrent(request)) return;
         if (!Array.isArray(result.products) || !result.pagination) {
-          throw new Error("Marketplace response was incomplete");
+          const error = new Error("Marketplace response was incomplete");
+          console.error(
+            "Marketplace response validation failed",
+            marketplaceErrorDetails(error),
+          );
+          throw error;
         }
 
-        setDatabaseProducts(
-          result.products.map((product) => databaseProductToCard(product, locale)),
-        );
+        try {
+          setDatabaseProducts(
+            result.products.map((product) => databaseProductToCard(product, locale)),
+          );
+        } catch (error) {
+          console.error(
+            "Marketplace product mapping failed",
+            marketplaceErrorDetails(error),
+          );
+          throw error;
+        }
         setPagination(result.pagination);
         setFilterOptions(
           result.filterOptions ?? { certifications: [], shippingTerms: [] },
@@ -179,10 +222,15 @@ function MarketplaceClientContent({
         setDatabaseLoading(false);
         abortManager.clear(request);
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!abortManager.isCurrent(request)) return;
+        if (isMarketplaceAbortError(error)) return;
 
-        setDatabaseProducts([]);
+        console.error(
+          "Marketplace search request failed",
+          marketplaceErrorDetails(error),
+        );
+
         setRequestError(true);
         setDatabaseLoading(false);
         abortManager.clear(request);
@@ -230,7 +278,11 @@ function MarketplaceClientContent({
             });
           });
         }
-      } catch {
+      } catch (error) {
+        console.error(
+          "Marketplace URL update failed",
+          marketplaceErrorDetails(error),
+        );
         setRequestError(true);
         setDatabaseLoading(false);
       }
@@ -240,11 +292,20 @@ function MarketplaceClientContent({
 
   useEffect(() => {
     const handlePopState = () => {
-      const nextQueryState = marketplaceQueryFromUrl(window.location.href);
-      setSearchInput(nextQueryState.q);
-      setQueryState((current) =>
-        sameMarketplaceQuery(current, nextQueryState) ? current : nextQueryState,
-      );
+      try {
+        const nextQueryState = marketplaceQueryFromUrl(window.location.href);
+        setSearchInput(nextQueryState.q);
+        setQueryState((current) =>
+          sameMarketplaceQuery(current, nextQueryState) ? current : nextQueryState,
+        );
+      } catch (error) {
+        console.error(
+          "Marketplace browser history update failed",
+          marketplaceErrorDetails(error),
+        );
+        setRequestError(true);
+        setDatabaseLoading(false);
+      }
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -288,6 +349,7 @@ function MarketplaceClientContent({
           <span className="sr-only">{t("marketplace.searchProducts")}</span>
           <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 theme-muted" aria-hidden="true" />
           <input
+            data-testid="marketplace-search-input"
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder={t("marketplace.searchPlaceholder")}
