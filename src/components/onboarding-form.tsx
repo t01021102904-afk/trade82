@@ -1182,15 +1182,15 @@ function BuyerQuickSignupForm({
             className="mt-1 size-4 rounded theme-input"
           />
           <span>
-            {t("onboarding.acceptLegalPrefix")}{" "}
+            {t("onboarding.legalAgreementPrefix")}
             <Link className="font-medium theme-success-text hover:underline" href={withLocale("/terms", locale)}>
-              {t("footer.legalLinks.0.label")}
+              {t("onboarding.termsOfService")}
             </Link>{" "}
-            {t("onboarding.and")}{" "}
+            {t("onboarding.legalAgreementSeparator")}
             <Link className="font-medium theme-success-text hover:underline" href={withLocale("/privacy", locale)}>
-              {t("footer.legalLinks.2.label")}
+              {t("onboarding.privacyPolicy")}
             </Link>
-            .
+            {t("onboarding.legalAgreementSuffix")}
           </span>
         </label>
         {errors.terms ? <p className="text-xs text-red-300">{errors.terms}</p> : null}
@@ -1203,7 +1203,7 @@ function BuyerQuickSignupForm({
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex h-11 items-center justify-center rounded-xl px-5 text-sm font-semibold transition theme-primary hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-xl px-5 text-sm font-semibold transition theme-primary hover:opacity-90 disabled:cursor-wait disabled:opacity-70"
         >
           {saving ? t("settings.saving") : t("onboarding.saveBuyer")}
         </button>
