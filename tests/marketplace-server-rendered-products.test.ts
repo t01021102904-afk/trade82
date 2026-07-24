@@ -235,6 +235,23 @@ test("History updates use the native prototype method with the live history obje
   ]);
 });
 
+test("History updates do not require a global History constructor", () => {
+  const calls: string[] = [];
+  const historyPrototype = {
+    replaceState(this: unknown, _state: unknown, _title: string, url: string) {
+      calls.push(url);
+    },
+    pushState(this: unknown, _state: unknown, _title: string, url: string) {
+      calls.push(url);
+    },
+  };
+  const history = Object.assign(Object.create(historyPrototype), { state: null });
+
+  updateMarketplaceHistory(history, "/marketplace?q=serum", "replace");
+
+  assert.deepEqual(calls, ["/marketplace?q=serum"]);
+});
+
 test("actual static marketplace results HTML contains product content and the real total", () => {
   const state = marketplaceResultsViewState({
     loading: false,
@@ -386,9 +403,9 @@ test("Marketplace pages preserve server data, locale ItemList JSON-LD, and clien
   assert.match(koreanPage, /marketplaceItemListJsonLd\(initialData\.products, "ko"\)/);
   assert.match(clientSource, /MarketplaceRequestCoordinator/);
   assert.match(clientSource, /updateMarketplaceHistory/);
-  assert.match(clientStateSource, /History\.prototype/);
-  assert.match(clientStateSource, /historyPrototype\.replaceState/);
-  assert.match(clientStateSource, /historyPrototype\.pushState/);
+  assert.match(clientStateSource, /Object\.getPrototypeOf\(history\)/);
+  assert.match(clientStateSource, /prototype\.replaceState/);
+  assert.match(clientStateSource, /prototype\.pushState/);
   assert.match(clientSource, /setRequestError\(true\)/);
   assert.match(clientSource, /scheduleMarketplaceSearch/);
   assert.match(clientSource, /key=\{initialDataSignature\(props\)\}/);
