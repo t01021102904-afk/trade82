@@ -17,7 +17,7 @@ test("public header navigation only exposes Marketplace and Sellers", () => {
   assert.match(navigationSource, /href: "\/sellers"/);
   assert.doesNotMatch(navigationSource, /href: "\/buyers"/);
   assert.doesNotMatch(navigationSource, /href: "\/pricing"/);
-  assert.match(headerSource, /publicNavigationLinks/);
+  assert.match(headerSource, /getPublicNavigationLinks/);
   assert.match(headerSource, /locale\.english/);
   assert.match(headerSource, /locale\.korean/);
   assert.match(headerSource, /common\.signIn/);
