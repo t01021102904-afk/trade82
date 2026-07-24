@@ -151,8 +151,8 @@ type MarketplaceTimerApi = {
 };
 
 const browserTimerApi: MarketplaceTimerApi = {
-  setTimeout,
-  clearTimeout,
+  setTimeout: (callback, delay) => globalThis.setTimeout(callback, delay),
+  clearTimeout: (timer) => globalThis.clearTimeout(timer),
 };
 
 export function scheduleMarketplaceSearch({

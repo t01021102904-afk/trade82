@@ -187,6 +187,44 @@ test("search URL updates are debounced and the latest request cancels the previo
   assert.equal(abortManager.isCurrent(latestRequest), true);
 });
 
+test("browser search scheduling preserves the global timer receiver", () => {
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const receiverSensitiveSetTimeout = function (
+    this: unknown,
+    callback: () => void,
+    delay: number,
+  ) {
+    if (this !== globalThis) {
+      throw new TypeError("Illegal invocation");
+    }
+    return originalSetTimeout(callback, delay);
+  };
+  const receiverSensitiveClearTimeout = function (
+    this: unknown,
+    timer: ReturnType<typeof setTimeout>,
+  ) {
+    if (this !== globalThis) {
+      throw new TypeError("Illegal invocation");
+    }
+    originalClearTimeout(timer);
+  };
+
+  globalThis.setTimeout = receiverSensitiveSetTimeout as typeof globalThis.setTimeout;
+  globalThis.clearTimeout = receiverSensitiveClearTimeout as typeof globalThis.clearTimeout;
+
+  try {
+    const cancel = scheduleMarketplaceSearch({
+      value: "serum",
+      onCommit: () => undefined,
+    });
+    cancel();
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+  }
+});
+
 test("History API URL updates preserve filter values and reset pagination safely", () => {
   const url = marketplaceUrlWithUpdates({
     pathname: "/marketplace",
