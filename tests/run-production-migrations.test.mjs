@@ -448,6 +448,30 @@ test("partner activation migration is deployed and verified after partner payout
   assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
 });
 
+test("production-style invocation reads and verifies the committed activation migration", async () => {
+  const afterRecords = [
+    ...historicalRecords,
+    appliedFirst,
+    appliedTarget,
+    appliedMerchant,
+    appliedOperations,
+    appliedAnalytics,
+    appliedPartnerPayout,
+    appliedPartnerActivation,
+  ];
+  const fake = fakeClient(deploymentResponses(afterRecords));
+  let deploys = 0;
+  const result = await runProductionMigrations({
+    environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
+    createClient: () => fake.client,
+    deploy: () => { deploys += 1; },
+  });
+
+  assert.equal(result, "deployed");
+  assert.equal(deploys, 1);
+  assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
+});
+
 test("missing or malformed Production URLs fail closed without connecting", async () => {
   await assertDiagnostic(runProductionMigrations({
     environment: { VERCEL_ENV: "production" },
