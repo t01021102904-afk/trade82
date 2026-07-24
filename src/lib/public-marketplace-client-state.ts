@@ -12,6 +12,25 @@ export type MarketplaceQueryUpdates = Partial<
   >
 >;
 
+export type MarketplaceHistoryMode = "push" | "replace";
+
+type MarketplaceHistoryLike = Pick<History, "state">;
+type MarketplaceHistoryMethod = History["pushState"];
+
+export function updateMarketplaceHistory(
+  history: MarketplaceHistoryLike,
+  nextUrl: string,
+  mode: MarketplaceHistoryMode,
+  historyPrototype: Pick<History, "pushState" | "replaceState"> =
+    History.prototype,
+) {
+  const method: MarketplaceHistoryMethod =
+    mode === "push"
+      ? historyPrototype.pushState
+      : historyPrototype.replaceState;
+  method.call(history, history.state, "", nextUrl);
+}
+
 export type MarketplaceRequestPlan = "server" | "client" | "none";
 
 export function marketplaceQueryKey(query: MarketplaceQueryState) {

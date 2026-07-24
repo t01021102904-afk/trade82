@@ -18,6 +18,7 @@ import {
   marketplaceResultsViewState,
   marketplaceUrlWithUpdates,
   scheduleMarketplaceSearch,
+  updateMarketplaceHistory,
 } from "../src/lib/public-marketplace-client-state.ts";
 import {
   marketplacePagination,
@@ -96,6 +97,7 @@ test("the first marketplace page keeps 24 products and the real total for pagina
 
   assert.equal(requestParams.get("page"), "1");
   assert.equal(requestParams.get("pageSize"), "24");
+  assert.equal(requestParams.get("resource"), "products");
   assert.equal(pagination.total, 66);
   assert.equal(pagination.totalPages, 3);
   assert.equal(pagination.hasNextPage, true);
@@ -202,6 +204,35 @@ test("History API URL updates preserve filter values and reset pagination safely
     shipping: "all",
     page: 1,
   });
+});
+
+test("History updates use the native prototype method with the live history object", () => {
+  const calls: Array<{ mode: string; context: unknown; url: string }> = [];
+  const history = {
+    state: { __next: true },
+    replaceState() {
+      throw new Error("patched replaceState should not be used");
+    },
+    pushState() {
+      throw new Error("patched pushState should not be used");
+    },
+  };
+  const historyPrototype = {
+    replaceState(this: unknown, _state: unknown, _title: string, url: string) {
+      calls.push({ mode: "replace", context: this, url });
+    },
+    pushState(this: unknown, _state: unknown, _title: string, url: string) {
+      calls.push({ mode: "push", context: this, url });
+    },
+  };
+
+  updateMarketplaceHistory(history, "/marketplace?q=serum", "replace", historyPrototype);
+  updateMarketplaceHistory(history, "/marketplace?page=2", "push", historyPrototype);
+
+  assert.deepEqual(calls, [
+    { mode: "replace", context: history, url: "/marketplace?q=serum" },
+    { mode: "push", context: history, url: "/marketplace?page=2" },
+  ]);
 });
 
 test("actual static marketplace results HTML contains product content and the real total", () => {
@@ -354,8 +385,11 @@ test("Marketplace pages preserve server data, locale ItemList JSON-LD, and clien
   assert.match(englishPage, /marketplaceItemListJsonLd\(initialData\.products, "en"\)/);
   assert.match(koreanPage, /marketplaceItemListJsonLd\(initialData\.products, "ko"\)/);
   assert.match(clientSource, /MarketplaceRequestCoordinator/);
-  assert.match(clientSource, /window\.history\.replaceState/);
-  assert.match(clientSource, /window\.history\.pushState/);
+  assert.match(clientSource, /updateMarketplaceHistory/);
+  assert.match(clientStateSource, /History\.prototype/);
+  assert.match(clientStateSource, /historyPrototype\.replaceState/);
+  assert.match(clientStateSource, /historyPrototype\.pushState/);
+  assert.match(clientSource, /setRequestError\(true\)/);
   assert.match(clientSource, /scheduleMarketplaceSearch/);
   assert.match(clientSource, /key=\{initialDataSignature\(props\)\}/);
   assert.match(clientSource, /<ProductCard key=\{product\.id\} product=\{product\} \/>/);
