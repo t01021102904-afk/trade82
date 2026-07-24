@@ -206,18 +206,10 @@ test("History API URL updates preserve filter values and reset pagination safely
   });
 });
 
-test("History updates use the native prototype method with the live history object", () => {
+test("History updates call the live history methods without bypassing Next.js", () => {
   const calls: Array<{ mode: string; context: unknown; url: string }> = [];
   const history = {
     state: { __next: true },
-    replaceState() {
-      throw new Error("patched replaceState should not be used");
-    },
-    pushState() {
-      throw new Error("patched pushState should not be used");
-    },
-  };
-  const historyPrototype = {
     replaceState(this: unknown, _state: unknown, _title: string, url: string) {
       calls.push({ mode: "replace", context: this, url });
     },
@@ -226,8 +218,8 @@ test("History updates use the native prototype method with the live history obje
     },
   };
 
-  updateMarketplaceHistory(history, "/marketplace?q=serum", "replace", historyPrototype);
-  updateMarketplaceHistory(history, "/marketplace?page=2", "push", historyPrototype);
+  updateMarketplaceHistory(history, "/marketplace?q=serum", "replace");
+  updateMarketplaceHistory(history, "/marketplace?page=2", "push");
 
   assert.deepEqual(calls, [
     { mode: "replace", context: history, url: "/marketplace?q=serum" },
@@ -237,7 +229,8 @@ test("History updates use the native prototype method with the live history obje
 
 test("History updates do not require a global History constructor", () => {
   const calls: string[] = [];
-  const historyPrototype = {
+  const history = {
+    state: null,
     replaceState(this: unknown, _state: unknown, _title: string, url: string) {
       calls.push(url);
     },
@@ -245,7 +238,6 @@ test("History updates do not require a global History constructor", () => {
       calls.push(url);
     },
   };
-  const history = Object.assign(Object.create(historyPrototype), { state: null });
 
   updateMarketplaceHistory(history, "/marketplace?q=serum", "replace");
 
@@ -320,6 +312,29 @@ test("request errors never render an empty-results count or empty-state copy", (
   assert.match(html, /Products temporarily unavailable/);
   assert.doesNotMatch(html, /0 products found/);
   assert.doesNotMatch(html, /No products found/);
+});
+
+test("request errors keep existing product cards visible", () => {
+  const state = marketplaceResultsViewState({
+    loading: false,
+    requestError: true,
+    productCount: 1,
+  });
+  const html = renderToStaticMarkup(
+    createElement(MarketplaceResultsPresentation, {
+      state,
+      products: [productFixture],
+      renderLoading: () => createElement("p", null, "Loading products"),
+      renderProducts: renderProductCards,
+      renderEmpty: () => createElement("p", null, "No products found"),
+      renderError: () =>
+        createElement("p", null, "Products temporarily unavailable"),
+    }),
+  );
+
+  assert.match(html, /Products temporarily unavailable/);
+  assert.match(html, /Korean Serum/);
+  assert.match(html, /Sample Seller/);
 });
 
 test("only genuinely empty results render the zero count and empty-state copy", () => {
@@ -403,9 +418,9 @@ test("Marketplace pages preserve server data, locale ItemList JSON-LD, and clien
   assert.match(koreanPage, /marketplaceItemListJsonLd\(initialData\.products, "ko"\)/);
   assert.match(clientSource, /MarketplaceRequestCoordinator/);
   assert.match(clientSource, /updateMarketplaceHistory/);
-  assert.match(clientStateSource, /Object\.getPrototypeOf\(history\)/);
-  assert.match(clientStateSource, /prototype\.replaceState/);
-  assert.match(clientStateSource, /prototype\.pushState/);
+  assert.doesNotMatch(clientStateSource, /Object\.getPrototypeOf\(history\)/);
+  assert.match(clientStateSource, /history\.replaceState/);
+  assert.match(clientStateSource, /history\.pushState/);
   assert.match(clientSource, /setRequestError\(true\)/);
   assert.match(clientSource, /scheduleMarketplaceSearch/);
   assert.match(clientSource, /key=\{initialDataSignature\(props\)\}/);
