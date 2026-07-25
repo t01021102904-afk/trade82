@@ -24,6 +24,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: DEFAULT_HOME_TITLE,
   description: DEFAULT_HOME_DESCRIPTION,
+  verification: {
+    other: {
+      "naver-site-verification":
+        "f6d0a0dcd74cd888a45a7ecd402c50e097615748",
+    },
+  },
   alternates: {
     canonical: SITE_URL,
     languages: {
