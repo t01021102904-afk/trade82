@@ -32,7 +32,9 @@ export function SiteHeader() {
   const pathWithoutLocale = stripLocale(pathname);
   const role = context?.role;
   const isAuthenticated = isLoaded && isSignedIn === true;
-  const isGuest = isLoaded && isSignedIn === false;
+  // Keep public navigation usable when Clerk is still booting or unavailable.
+  // Authenticated actions remain gated by both Clerk and the server-backed context.
+  const isGuest = !isAuthenticated;
   const isAdmin = context?.isAdmin === true;
   const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =

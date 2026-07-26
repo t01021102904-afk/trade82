@@ -22,6 +22,7 @@ test("public header navigation keeps guest discovery links and role-backed actio
   assert.match(headerSource, /locale\.korean/);
   assert.match(headerSource, /common\.signIn/);
   assert.match(headerSource, /common\.signUp/);
+  assert.match(headerSource, /const isGuest = !isAuthenticated/);
   assert.doesNotMatch(headerSource, /primaryCta/);
   assert.match(headerSource, /getSignedInHeaderAction/);
   assert.doesNotMatch(headerSource, /nav\.browseProducts/);
