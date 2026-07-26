@@ -47,6 +47,20 @@ test("public mobile navigation is an accessible, focus-managed dialog", () => {
   assert.match(dialogHookSource, /returnFocus\?\.focus\(\)/);
 });
 
+test("Root layout derives document language from the proxy-provided locale", () => {
+  const layoutSource = readSource("src/app/layout.tsx");
+  const proxySource = readSource("src/proxy.ts");
+
+  assert.match(layoutSource, /import \{ headers \} from "next\/headers"/);
+  assert.match(layoutSource, /await headers\(\)/);
+  assert.match(layoutSource, /get\("x-trade82-locale"\) === "ko"/);
+  assert.match(layoutSource, /lang=\{locale\}/);
+  assert.match(proxySource, /requestHeaders\.set\(\s*"x-trade82-locale"/);
+  assert.match(proxySource, /pathname === "\/ko"/);
+  assert.match(proxySource, /pathname\.startsWith\("\/ko\/"\)/);
+  assert.match(proxySource, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/);
+});
+
 test("all localized auth routes render the shared Clerk auth shell", () => {
   const authShell = readSource("src/components/auth-shell.tsx");
 
