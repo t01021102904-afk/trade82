@@ -207,6 +207,14 @@ export const MarketingExposureStatus = {
 export type MarketingExposureStatus = (typeof MarketingExposureStatus)[keyof typeof MarketingExposureStatus]
 
 
+export const HomepagePromotionMediaType = {
+  IMAGE: 'IMAGE',
+  PDF: 'PDF'
+} as const
+
+export type HomepagePromotionMediaType = (typeof HomepagePromotionMediaType)[keyof typeof HomepagePromotionMediaType]
+
+
 export const PaymentRequestStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',

@@ -1,4 +1,8 @@
 import { apiError } from "@/lib/api-response";
+import {
+  countryLookupKeys,
+  normalizeCountryList,
+} from "@/lib/country-normalization";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 import { getDb } from "@/lib/db";
 import { getCurrentUserProfile, isAdminUser } from "@/lib/authz";
@@ -254,8 +258,14 @@ function buildCompanyQuery(searchParams: URLSearchParams) {
     conditions.push(Prisma.sql`FALSE`);
   }
   if (exportCountry && exportCountry !== "all") {
+    const lookupKeys = countryLookupKeys(exportCountry);
     conditions.push(
-      Prisma.sql`${exportCountry} = ANY(COALESCE(sp."exportCountries", ARRAY[]::text[]))`,
+      Prisma.sql`EXISTS (
+        SELECT 1
+        FROM unnest(COALESCE(sp."exportCountries", ARRAY[]::text[])) AS export_country(value)
+        WHERE lower(regexp_replace(export_country.value, '[^a-zA-Z0-9]', '', 'g'))
+          IN (${Prisma.join(lookupKeys.map((key) => Prisma.sql`${key}`))})
+      )`,
     );
   }
 
@@ -290,7 +300,9 @@ async function getCompanyFilterOptions() {
   ]);
   return {
     states: stateRows.map((row) => row.value),
-    exportCountries: exportCountryRows.map((row) => row.value),
+    exportCountries: normalizeCountryList(
+      exportCountryRows.map((row) => row.value),
+    ).map((country) => country.label),
   };
 }
 

@@ -518,9 +518,11 @@ test("public directory filters stay within their columns and export countries us
   assert.match(marketplaceSource, /w-full min-w-0 max-w-full/);
   assert.match(sellersSource, /searchParams\.get\("exportCountry"\)/);
   assert.match(sellersSource, /setQueryParam\(requestParams, "exportCountry", exportCountry\)/);
-  assert.match(sellersSource, /countryLabel\(item, locale\)/);
+  assert.match(sellersSource, /<CountryFilterSelect/);
+  assert.match(sellersSource, /<CountryFlag country=\{filter\.country\}/);
   assert.match(sellersSource, /sellers\.allExportCountries/);
   assert.match(apiSource, /unnest\(sp\."exportCountries"\)/);
-  assert.match(apiSource, /\$\{exportCountry\} = ANY/);
+  assert.match(apiSource, /countryLookupKeys\(exportCountry\)/);
+  assert.match(apiSource, /regexp_replace\(export_country\.value/);
   assert.doesNotMatch(apiSource, /INSERT INTO|UPDATE "SellerProfile"/);
 });

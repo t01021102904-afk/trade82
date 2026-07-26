@@ -13,6 +13,7 @@ import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import {
   getPublicNavigationLinks,
+  getSignedInHeaderAction,
   isPartnerOnlyNavigationAccount,
 } from "@/lib/public-navigation";
 import { cx } from "@/lib/utils";
@@ -25,20 +26,13 @@ const appLinks = [
 export function SiteHeader() {
   const pathname = usePathname();
   const { locale, t } = useI18n();
-  const { context, isSignedIn, user } = useUserContext();
+  const { context, isLoaded, isSignedIn } = useUserContext();
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const pathWithoutLocale = stripLocale(pathname);
-  const metadataRole = user?.publicMetadata?.role;
-  const role =
-    context?.role ??
-    (metadataRole === "buyer" ||
-    metadataRole === "seller" ||
-    metadataRole === "both" ||
-    metadataRole === "admin" ||
-    metadataRole === "user"
-      ? metadataRole
-      : undefined);
+  const role = context?.role;
+  const isAuthenticated = isLoaded && isSignedIn === true;
+  const isGuest = isLoaded && isSignedIn === false;
   const isAdmin = context?.isAdmin === true;
   const unreadMessageCount = normalizeUnreadCount(context?.unreadMessageCount);
   const hasRole =
@@ -47,19 +41,29 @@ export function SiteHeader() {
     role === "both" ||
     role === "admin";
   const isPartnerOnly = isPartnerOnlyNavigationAccount({
-    isSignedIn: isSignedIn === true,
+    isSignedIn: isAuthenticated,
     role,
     partnerProfile: context?.partnerProfile,
     companies: context?.companies ?? [],
   });
-  const publicDiscoveryLinks = [
-    ...getPublicNavigationLinks(),
-    { href: "/how-it-works", labelKey: "nav.howItWorks" },
-  ];
+  const roleAction = context ? getSignedInHeaderAction({
+    role,
+    isAdmin,
+    isPartnerOnly,
+  }) : null;
+  const publicDiscoveryLinks = getPublicNavigationLinks();
+  const contextualLink = isAuthenticated
+    ? roleAction
+      ? [roleAction]
+      : []
+    : isGuest
+      ? [{ href: "/how-it-works", labelKey: "nav.howItWorks" } as const]
+      : [];
   const visibleNavLinks =
-    isSignedIn && (hasRole || isPartnerOnly)
+    isAuthenticated && (hasRole || isPartnerOnly)
       ? [
           ...publicDiscoveryLinks,
+          ...contextualLink,
           ...(isPartnerOnly
             ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
             : []),
@@ -74,7 +78,7 @@ export function SiteHeader() {
             : []),
           ...(isPartnerOnly ? [] : appLinks),
         ]
-      : publicDiscoveryLinks;
+      : [...publicDiscoveryLinks, ...contextualLink];
   const closeMenu = useCallback(() => setOpen(false), []);
 
   useAccessibleDialog({
@@ -148,7 +152,7 @@ export function SiteHeader() {
               </Link>
             ))}
           </div>
-          {isSignedIn && isAdmin ? (
+          {isAuthenticated && isAdmin ? (
             <Link
               href="/admin"
               className={cx(
@@ -161,16 +165,24 @@ export function SiteHeader() {
               Admin Console
             </Link>
           ) : null}
-          {isSignedIn ? (
+          {isAuthenticated ? (
             <ClerkUserButton />
-          ) : (
-            <Link
-              href={withLocale("/login", locale)}
-              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-950"
-            >
-              {t("common.signIn")}
-            </Link>
-          )}
+          ) : isGuest ? (
+            <>
+              <Link
+                href={withLocale("/login", locale)}
+                className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-950"
+              >
+                {t("common.signIn")}
+              </Link>
+              <Link
+                href={withLocale("/signup", locale)}
+                className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-800 transition hover:border-zinc-400 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40"
+              >
+                {t("common.signUp")}
+              </Link>
+            </>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-1.5 lg:hidden">
@@ -258,7 +270,7 @@ export function SiteHeader() {
             >
               {t("locale.korean")}
             </Link>
-            {isSignedIn && isAdmin ? (
+            {isAuthenticated && isAdmin ? (
               <Link
                 href="/admin"
                 onClick={closeMenu}
@@ -267,11 +279,11 @@ export function SiteHeader() {
                 Admin Console
               </Link>
             ) : null}
-            {isSignedIn ? (
+            {isAuthenticated ? (
               <div className="flex justify-end px-3 py-2">
                 <ClerkUserButton />
               </div>
-            ) : (
+            ) : isGuest ? (
               <>
                 <Link
                   href={withLocale("/login", locale)}
@@ -288,7 +300,7 @@ export function SiteHeader() {
                   {t("common.signUp")}
                 </Link>
               </>
-            )}
+            ) : null}
             </nav>
           </div>
         </div>

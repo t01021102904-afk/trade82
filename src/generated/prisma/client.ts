@@ -107,6 +107,11 @@ export type RfqSellerQuote = Prisma.RfqSellerQuoteModel
  */
 export type MarketingExposure = Prisma.MarketingExposureModel
 /**
+ * Model HomepagePromotion
+ * 
+ */
+export type HomepagePromotion = Prisma.HomepagePromotionModel
+/**
  * Model PaymentRequest
  * 
  */

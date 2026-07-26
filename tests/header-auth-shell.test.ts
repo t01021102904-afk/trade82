@@ -9,7 +9,7 @@ function readSource(relativePath: string) {
   return readFileSync(path.join(repositoryRoot, relativePath), "utf8");
 }
 
-test("public header navigation only exposes Marketplace and Sellers", () => {
+test("public header navigation keeps guest discovery links and role-backed actions", () => {
   const navigationSource = readSource("src/lib/public-navigation.ts");
   const headerSource = readSource("src/components/site-header.tsx");
 
@@ -23,9 +23,12 @@ test("public header navigation only exposes Marketplace and Sellers", () => {
   assert.match(headerSource, /common\.signIn/);
   assert.match(headerSource, /common\.signUp/);
   assert.doesNotMatch(headerSource, /primaryCta/);
-  assert.doesNotMatch(headerSource, /nav\.listProduct/);
+  assert.match(headerSource, /getSignedInHeaderAction/);
   assert.doesNotMatch(headerSource, /nav\.browseProducts/);
-  assert.doesNotMatch(headerSource, /href: "\/sell"/);
+  assert.match(navigationSource, /href: "\/sell"/);
+  assert.match(navigationSource, /href: "\/dashboard\/rfqs\/new"/);
+  assert.match(navigationSource, /role === "seller" \|\| role === "both"/);
+  assert.match(navigationSource, /isAdmin \|\| isPartnerOnly/);
 });
 
 test("public mobile navigation is an accessible, focus-managed dialog", () => {

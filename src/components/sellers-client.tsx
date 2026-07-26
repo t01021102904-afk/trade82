@@ -5,10 +5,12 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { CountryFilterSelect } from "@/components/country-filter-select";
+import { CountryFlag } from "@/components/country-flag";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SellerCard } from "@/components/seller-card";
 import { marketplaceCategoryMessageKey } from "@/lib/home-product-categories";
-import { countryLabel } from "@/lib/company-select-options";
+import { localizedCountryLabel } from "@/lib/country-normalization";
 import { marketplaceCategories } from "@/lib/marketplace";
 import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
 import type { Seller } from "@/lib/types";
@@ -146,10 +148,14 @@ function SellersClientContent() {
     exportCountry !== "all"
       ? {
           key: "exportCountry",
-          label: countryLabel(exportCountry, locale),
+          label: localizedCountryLabel(exportCountry, locale),
+          country: exportCountry,
         }
       : null,
-  ].filter((filter): filter is { key: string; label: string } => Boolean(filter));
+  ].filter(
+    (filter): filter is { key: string; label: string; country?: string } =>
+      Boolean(filter),
+  );
 
   const updateFilters = (
     updates: Record<string, string>,
@@ -240,19 +246,15 @@ function SellersClientContent() {
               { label: t("sellers.markets3"), value: "multi" },
             ]}
           />
-          <SelectField
+          <CountryFilterSelect
             label={t("sellers.exportCountry")}
+            allLabel={t("sellers.allExportCountries")}
             value={exportCountry}
+            countries={exportCountries}
+            locale={locale}
             onChange={(value) =>
               updateFilters({ exportCountry: value }, { replace: false })
             }
-            options={[
-              { label: t("sellers.allExportCountries"), value: "all" },
-              ...exportCountries.map((item) => ({
-                label: countryLabel(item, locale),
-                value: item,
-              })),
-            ]}
           />
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-zinc-200 pt-3 text-sm text-zinc-600">
@@ -290,6 +292,7 @@ function SellersClientContent() {
                 className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border border-[#34B386]/40 bg-[#34B386]/10 px-3 text-xs font-semibold text-zinc-800"
                 aria-label={`${t("marketplace.removeFilter")}: ${filter.label}`}
               >
+                {filter.country ? <CountryFlag country={filter.country} /> : null}
                 <span className="truncate">{filter.label}</span>
                 <X className="size-3.5 shrink-0 text-zinc-700" aria-hidden="true" />
               </button>

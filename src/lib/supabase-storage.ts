@@ -27,6 +27,10 @@ const IMAGE_MIME_TYPES = new Set([
   "image/webp",
   "image/avif",
 ]);
+const PUBLIC_STORAGE_MIME_TYPES = new Set([
+  ...IMAGE_MIME_TYPES,
+  "application/pdf",
+]);
 const HEIC_EXTENSIONS = new Set(["heic", "heif"]);
 const HEIC_MIME_TYPES = new Set(["image/heic", "image/heif"]);
 const DOCUMENT_EXTENSIONS = new Set([
@@ -324,10 +328,9 @@ export async function deleteStorageFile(
   if (error) throw new Error(error.message);
 }
 
-export async function ensureStorageBuckets() {
+export async function ensurePublicStorageBucket() {
   const client = getSupabaseAdminClient();
   const publicBucket = getPublicStorageBucket();
-  const privateBucket = getPrivateStorageBucket();
   const { data, error } = await client.storage.listBuckets();
   if (error) throw new Error(error.message);
 
@@ -336,17 +339,28 @@ export async function ensureStorageBuckets() {
     const result = await client.storage.createBucket(publicBucket, {
       public: true,
       fileSizeLimit: 50 * MB,
-      allowedMimeTypes: [...IMAGE_MIME_TYPES],
+      allowedMimeTypes: [...PUBLIC_STORAGE_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
-  } else if (!buckets.get(publicBucket)?.public) {
+  } else {
     const result = await client.storage.updateBucket(publicBucket, {
       public: true,
       fileSizeLimit: 50 * MB,
-      allowedMimeTypes: [...IMAGE_MIME_TYPES],
+      allowedMimeTypes: [...PUBLIC_STORAGE_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
   }
+
+  return publicBucket;
+}
+
+export async function ensureStorageBuckets() {
+  const publicBucket = await ensurePublicStorageBucket();
+  const client = getSupabaseAdminClient();
+  const privateBucket = getPrivateStorageBucket();
+  const { data, error } = await client.storage.listBuckets();
+  if (error) throw new Error(error.message);
+  const buckets = new Map(data.map((bucket) => [bucket.name, bucket]));
 
   if (!buckets.has(privateBucket)) {
     const result = await client.storage.createBucket(privateBucket, {

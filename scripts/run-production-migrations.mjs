@@ -20,6 +20,7 @@ export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_co
 export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
 export const PARTNER_PAYOUT_MIGRATION = "20260722100000_add_partner_payout_profiles";
 export const PARTNER_ACTIVATION_MIGRATION = "20260723100000_activate_pending_partner_profiles";
+export const DEFERRED_APPLICATION_MIGRATION = "20260726120000_add_homepage_promotions";
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
@@ -206,6 +207,18 @@ function assertApprovedMigrationRecordOrder(databaseRecords) {
 }
 
 function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
+  const hasDeferredApplicationMigration = localMigrationNames.includes(
+    DEFERRED_APPLICATION_MIGRATION,
+  );
+  if (
+    hasDeferredApplicationMigration &&
+    localMigrationNames.at(-1) !== DEFERRED_APPLICATION_MIGRATION
+  ) {
+    throw pendingSetError("The deferred application migration must be the final local migration.");
+  }
+  const deployableLocalMigrationNames = hasDeferredApplicationMigration
+    ? localMigrationNames.slice(0, -1)
+    : localMigrationNames;
   const localNames = new Set(localMigrationNames);
   const databaseNames = new Set();
 
@@ -217,13 +230,13 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     throw pendingSetError("Local migration history is not in canonical order.");
   }
 
-  const firstApprovedIndex = localMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
-  const targetIndex = localMigrationNames.indexOf(TARGET_MIGRATION);
-  const merchantIndex = localMigrationNames.indexOf(MERCHANT_MIGRATION);
-  const operationsIndex = localMigrationNames.indexOf(OPERATIONS_MIGRATION);
-  const analyticsIndex = localMigrationNames.indexOf(ANALYTICS_MIGRATION);
-  const partnerPayoutIndex = localMigrationNames.indexOf(PARTNER_PAYOUT_MIGRATION);
-  const partnerActivationIndex = localMigrationNames.indexOf(PARTNER_ACTIVATION_MIGRATION);
+  const firstApprovedIndex = deployableLocalMigrationNames.indexOf(FIRST_APPROVED_MIGRATION);
+  const targetIndex = deployableLocalMigrationNames.indexOf(TARGET_MIGRATION);
+  const merchantIndex = deployableLocalMigrationNames.indexOf(MERCHANT_MIGRATION);
+  const operationsIndex = deployableLocalMigrationNames.indexOf(OPERATIONS_MIGRATION);
+  const analyticsIndex = deployableLocalMigrationNames.indexOf(ANALYTICS_MIGRATION);
+  const partnerPayoutIndex = deployableLocalMigrationNames.indexOf(PARTNER_PAYOUT_MIGRATION);
+  const partnerActivationIndex = deployableLocalMigrationNames.indexOf(PARTNER_ACTIVATION_MIGRATION);
   if (firstApprovedIndex === -1
     || targetIndex !== firstApprovedIndex + 1
     || merchantIndex !== targetIndex + 1
@@ -232,7 +245,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
     || partnerPayoutIndex !== analyticsIndex + 1
     || (partnerActivationIndex !== -1
       && (partnerActivationIndex !== partnerPayoutIndex + 1
-        || partnerActivationIndex !== localMigrationNames.length - 1))) {
+        || partnerActivationIndex !== deployableLocalMigrationNames.length - 1))) {
     throw pendingSetError("The approved migration batch is not the final local migration suffix.");
   }
 
@@ -252,7 +265,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
 
   assertApprovedMigrationRecordOrder(databaseRecords);
 
-  const pendingMigrations = localMigrationNames.filter((name) => !databaseNames.has(name));
+  const pendingMigrations = deployableLocalMigrationNames.filter((name) => !databaseNames.has(name));
 
   if (pendingMigrations.length === 0) {
     if (!databaseNames.has(PREREQUISITE_MIGRATION)
@@ -286,6 +299,15 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
       && !databaseNames.has(ANALYTICS_MIGRATION)
       && !pendingMigrations.includes(ANALYTICS_MIGRATION))) {
     throw pendingSetError("Production has an unexpected pending migration.");
+  }
+
+  if (
+    hasDeferredApplicationMigration &&
+    !databaseNames.has(DEFERRED_APPLICATION_MIGRATION)
+  ) {
+    throw pendingSetError(
+      "Production deploy is blocked while an application migration is intentionally deferred.",
+    );
   }
 
   return { action: "deploy", pendingMigrations };

@@ -12,6 +12,7 @@ import {
   siteNavigationJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
+import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
 
 const structuredData = [

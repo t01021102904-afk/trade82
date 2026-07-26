@@ -115,7 +115,7 @@ export function HomeCategoryVisualScroller() {
             <Link
               key={item.id}
               href={homeCategoryHref(item.category, locale)}
-              className="home-category-visual-item group flex w-[108px] shrink-0 snap-start flex-col items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center transition hover:border-[#34B386] hover:bg-white focus-visible:border-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/35 sm:w-[132px] sm:px-3 sm:py-3 lg:w-[140px]"
+              className="home-category-visual-item group flex w-[108px] shrink-0 snap-start flex-col items-center justify-center rounded-md border border-zinc-200 bg-white px-2 py-2.5 text-center transition hover:border-[#34B386] hover:shadow-sm focus-visible:border-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/35 sm:w-[132px] sm:px-3 sm:py-3 lg:w-[140px]"
             >
               <Image
                 src={item.imageSrc}

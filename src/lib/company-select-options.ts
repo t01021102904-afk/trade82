@@ -14,7 +14,7 @@ export type SelectOption = {
 export const UNITED_STATES = "United States";
 export const SOUTH_KOREA = "South Korea";
 
-const countryCodes = [
+export const countryCodes = [
   "AF",
   "AX",
   "AL",

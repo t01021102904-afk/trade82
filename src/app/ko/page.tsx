@@ -7,6 +7,8 @@ import {
   publicPageMetadata,
 } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = publicPageMetadata({
   title: KOREAN_HOME_TITLE,
   description: KOREAN_HOME_DESCRIPTION,

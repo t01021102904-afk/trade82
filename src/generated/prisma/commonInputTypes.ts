@@ -514,6 +514,23 @@ export type EnumMarketingExposureStatusWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumMarketingExposureStatusFilter<$PrismaModel>
 }
 
+export type EnumHomepagePromotionMediaTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.HomepagePromotionMediaType | Prisma.EnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel> | $Enums.HomepagePromotionMediaType
+}
+
+export type EnumHomepagePromotionMediaTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.HomepagePromotionMediaType | Prisma.EnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumHomepagePromotionMediaTypeWithAggregatesFilter<$PrismaModel> | $Enums.HomepagePromotionMediaType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel>
+}
+
 export type EnumStripeFeeSyncStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.StripeFeeSyncStatus | Prisma.EnumStripeFeeSyncStatusFieldRefInput<$PrismaModel>
   in?: $Enums.StripeFeeSyncStatus[] | Prisma.ListEnumStripeFeeSyncStatusFieldRefInput<$PrismaModel>
@@ -1875,6 +1892,23 @@ export type NestedEnumMarketingExposureStatusWithAggregatesFilter<$PrismaModel =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumMarketingExposureStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumMarketingExposureStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.HomepagePromotionMediaType | Prisma.EnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel> | $Enums.HomepagePromotionMediaType
+}
+
+export type NestedEnumHomepagePromotionMediaTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.HomepagePromotionMediaType | Prisma.EnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.HomepagePromotionMediaType[] | Prisma.ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumHomepagePromotionMediaTypeWithAggregatesFilter<$PrismaModel> | $Enums.HomepagePromotionMediaType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumHomepagePromotionMediaTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumStripeFeeSyncStatusFilter<$PrismaModel = never> = {

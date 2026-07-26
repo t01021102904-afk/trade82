@@ -9,6 +9,7 @@ import { BackButton } from "@/components/back-button";
 import { Badge } from "@/components/badge";
 import { CompanyReviewsSection } from "@/components/company-reviews";
 import { ContactModal } from "@/components/contact-modal";
+import { CountryFlag } from "@/components/country-flag";
 import { DetailTable } from "@/components/detail-table";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
@@ -44,6 +45,7 @@ import {
   SOUTH_KOREA,
   UNITED_STATES,
 } from "@/lib/company-select-options";
+import { localizedCountryLabel } from "@/lib/country-normalization";
 import { withLocale } from "@/lib/i18n";
 import {
   localizedArray,
@@ -318,7 +320,6 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
   ]);
   const capabilityRows = compactRows([
     { label: t("settings.productCategories"), value: joinList(profile?.productCategories.length ? profile.productCategories : company.categories) },
-    { label: t("settings.exportCountries"), value: joinList(profile?.exportCountries) },
     { label: t("settings.exportExperience"), value: localizedSellerExportExperience(profile, locale) },
     { label: t("settings.minimumOrderQuantity"), value: profile?.minimumOrderQuantity },
     { label: t("settings.leadTime"), value: profile?.leadTime },
@@ -346,6 +347,24 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
           <div>
             <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("company.capabilities")}</h2>
             <DetailTable rows={capabilityRows} />
+          </div>
+        ) : null}
+        {profile?.exportCountries.length ? (
+          <div>
+            <h2 className="mb-3 text-lg font-semibold text-zinc-950">
+              {t("company.mainExportMarkets")}
+            </h2>
+            <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 bg-white p-4">
+              {profile.exportCountries.map((country) => (
+                <span
+                  key={country}
+                  className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800"
+                >
+                  <CountryFlag country={country} size="md" />
+                  {localizedCountryLabel(country, locale)}
+                </span>
+              ))}
+            </div>
           </div>
         ) : null}
       </div>
