@@ -324,6 +324,7 @@ export type UserProfileWhereInput = {
   buyerRfqRequests?: Prisma.RfqRequestListRelationFilter
   reviewedRfqRequests?: Prisma.RfqRequestListRelationFilter
   marketingExposures?: Prisma.MarketingExposureListRelationFilter
+  createdHomepagePromotions?: Prisma.HomepagePromotionListRelationFilter
   createdPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   releasedPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   paymentRequestEvents?: Prisma.PaymentRequestEventListRelationFilter
@@ -383,6 +384,7 @@ export type UserProfileOrderByWithRelationInput = {
   buyerRfqRequests?: Prisma.RfqRequestOrderByRelationAggregateInput
   reviewedRfqRequests?: Prisma.RfqRequestOrderByRelationAggregateInput
   marketingExposures?: Prisma.MarketingExposureOrderByRelationAggregateInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionOrderByRelationAggregateInput
   createdPaymentRequests?: Prisma.PaymentRequestOrderByRelationAggregateInput
   releasedPaymentRequests?: Prisma.PaymentRequestOrderByRelationAggregateInput
   paymentRequestEvents?: Prisma.PaymentRequestEventOrderByRelationAggregateInput
@@ -445,6 +447,7 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   buyerRfqRequests?: Prisma.RfqRequestListRelationFilter
   reviewedRfqRequests?: Prisma.RfqRequestListRelationFilter
   marketingExposures?: Prisma.MarketingExposureListRelationFilter
+  createdHomepagePromotions?: Prisma.HomepagePromotionListRelationFilter
   createdPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   releasedPaymentRequests?: Prisma.PaymentRequestListRelationFilter
   paymentRequestEvents?: Prisma.PaymentRequestEventListRelationFilter
@@ -558,6 +561,7 @@ export type UserProfileCreateInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -617,6 +621,7 @@ export type UserProfileUncheckedCreateInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -676,6 +681,7 @@ export type UserProfileUpdateInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -735,6 +741,7 @@ export type UserProfileUncheckedUpdateInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -1040,6 +1047,20 @@ export type UserProfileUpdateOneRequiredWithoutMarketingExposuresNestedInput = {
   upsert?: Prisma.UserProfileUpsertWithoutMarketingExposuresInput
   connect?: Prisma.UserProfileWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutMarketingExposuresInput, Prisma.UserProfileUpdateWithoutMarketingExposuresInput>, Prisma.UserProfileUncheckedUpdateWithoutMarketingExposuresInput>
+}
+
+export type UserProfileCreateNestedOneWithoutCreatedHomepagePromotionsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedCreateWithoutCreatedHomepagePromotionsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutCreatedHomepagePromotionsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutCreatedHomepagePromotionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedCreateWithoutCreatedHomepagePromotionsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutCreatedHomepagePromotionsInput
+  upsert?: Prisma.UserProfileUpsertWithoutCreatedHomepagePromotionsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUpdateWithoutCreatedHomepagePromotionsInput>, Prisma.UserProfileUncheckedUpdateWithoutCreatedHomepagePromotionsInput>
 }
 
 export type UserProfileCreateNestedOneWithoutCreatedPaymentRequestsInput = {
@@ -1499,6 +1520,7 @@ export type UserProfileCreateWithoutCompaniesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -1557,6 +1579,7 @@ export type UserProfileUncheckedCreateWithoutCompaniesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -1631,6 +1654,7 @@ export type UserProfileUpdateWithoutCompaniesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -1689,6 +1713,7 @@ export type UserProfileUncheckedUpdateWithoutCompaniesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -1747,6 +1772,7 @@ export type UserProfileCreateWithoutRequestedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -1805,6 +1831,7 @@ export type UserProfileUncheckedCreateWithoutRequestedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -1868,6 +1895,7 @@ export type UserProfileCreateWithoutReviewedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -1926,6 +1954,7 @@ export type UserProfileUncheckedCreateWithoutReviewedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -2000,6 +2029,7 @@ export type UserProfileUpdateWithoutRequestedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -2058,6 +2088,7 @@ export type UserProfileUncheckedUpdateWithoutRequestedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -2127,6 +2158,7 @@ export type UserProfileUpdateWithoutReviewedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -2185,6 +2217,7 @@ export type UserProfileUncheckedUpdateWithoutReviewedVerificationsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -2243,6 +2276,7 @@ export type UserProfileCreateWithoutSentInquiriesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -2301,6 +2335,7 @@ export type UserProfileUncheckedCreateWithoutSentInquiriesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -2375,6 +2410,7 @@ export type UserProfileUpdateWithoutSentInquiriesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -2433,6 +2469,7 @@ export type UserProfileUncheckedUpdateWithoutSentInquiriesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -2491,6 +2528,7 @@ export type UserProfileCreateWithoutBuyerRfqRequestsInput = {
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -2549,6 +2587,7 @@ export type UserProfileUncheckedCreateWithoutBuyerRfqRequestsInput = {
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -2612,6 +2651,7 @@ export type UserProfileCreateWithoutReviewedRfqRequestsInput = {
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -2670,6 +2710,7 @@ export type UserProfileUncheckedCreateWithoutReviewedRfqRequestsInput = {
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -2744,6 +2785,7 @@ export type UserProfileUpdateWithoutBuyerRfqRequestsInput = {
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -2802,6 +2844,7 @@ export type UserProfileUncheckedUpdateWithoutBuyerRfqRequestsInput = {
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -2871,6 +2914,7 @@ export type UserProfileUpdateWithoutReviewedRfqRequestsInput = {
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -2929,6 +2973,7 @@ export type UserProfileUncheckedUpdateWithoutReviewedRfqRequestsInput = {
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -2987,6 +3032,7 @@ export type UserProfileCreateWithoutMarketingExposuresInput = {
   createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -3045,6 +3091,7 @@ export type UserProfileUncheckedCreateWithoutMarketingExposuresInput = {
   createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -3119,6 +3166,7 @@ export type UserProfileUpdateWithoutMarketingExposuresInput = {
   createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -3177,6 +3225,259 @@ export type UserProfileUncheckedUpdateWithoutMarketingExposuresInput = {
   createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  verifiedPartnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedUpdateManyWithoutVerifiedByUserNestedInput
+  partnerPayoutProfileAuditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  partnerProfileAuditEvents?: Prisma.PartnerProfileAuditEventUncheckedUpdateManyWithoutActorUserNestedInput
+  settlementEvents?: Prisma.SettlementEventUncheckedUpdateManyWithoutActorUserNestedInput
+  approvedSettlements?: Prisma.SettlementUncheckedUpdateManyWithoutApprovedByUserNestedInput
+  partnerProfile?: Prisma.PartnerProfileUncheckedUpdateOneWithoutUserNestedInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUncheckedUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedUpdateManyWithoutConsumedByUserNestedInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedUpdateManyWithoutRecipientUserNestedInput
+  acknowledgedSettlementAlerts?: Prisma.SettlementOperationalAlertUncheckedUpdateManyWithoutAcknowledgedByUserNestedInput
+}
+
+export type UserProfileCreateWithoutCreatedHomepagePromotionsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+  verifiedPartnerPayoutProfiles?: Prisma.PartnerPayoutProfileCreateNestedManyWithoutVerifiedByUserInput
+  partnerPayoutProfileAuditEvents?: Prisma.PartnerPayoutProfileAuditEventCreateNestedManyWithoutActorUserInput
+  partnerProfileAuditEvents?: Prisma.PartnerProfileAuditEventCreateNestedManyWithoutActorUserInput
+  settlementEvents?: Prisma.SettlementEventCreateNestedManyWithoutActorUserInput
+  approvedSettlements?: Prisma.SettlementCreateNestedManyWithoutApprovedByUserInput
+  partnerProfile?: Prisma.PartnerProfileCreateNestedOneWithoutUserInput
+  referredReferralAttribution?: Prisma.ReferralAttributionCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenCreateNestedManyWithoutConsumedByUserInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegCreateNestedManyWithoutRecipientUserInput
+  acknowledgedSettlementAlerts?: Prisma.SettlementOperationalAlertCreateNestedManyWithoutAcknowledgedByUserInput
+}
+
+export type UserProfileUncheckedCreateWithoutCreatedHomepagePromotionsInput = {
+  id?: string
+  clerkUserId: string
+  email: string
+  displayName: string
+  avatarOriginalUrl?: string | null
+  avatarUrl?: string | null
+  companyAffiliation?: string
+  jobTitle?: string
+  department?: string
+  bio?: string
+  phoneNumber?: string
+  linkedinUrl?: string
+  country?: string
+  city?: string
+  role: $Enums.AccountRole
+  preferredLanguage?: $Enums.PreferredLanguage
+  deletionStatus?: $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutOwnerInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutRequestedByInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedCreateNestedManyWithoutReviewedByInput
+  sentInquiries?: Prisma.InquiryUncheckedCreateNestedManyWithoutSenderInput
+  sentMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.MessageUncheckedCreateNestedManyWithoutReceiverInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedCreateNestedManyWithoutCreatedByUserInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedCreateNestedManyWithoutUploadedByUserInput
+  savedItems?: Prisma.SavedItemUncheckedCreateNestedManyWithoutUserInput
+  createdDeals?: Prisma.DealUncheckedCreateNestedManyWithoutCreatedByInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUncheckedCreateNestedManyWithoutActorUserInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUncheckedCreateNestedManyWithoutCreatedByUserInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutPreparedByUserInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutApprovedByUserInput
+  sentSellerPayouts?: Prisma.SellerPayoutUncheckedCreateNestedManyWithoutSentByUserInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  verifiedPartnerPayoutProfiles?: Prisma.PartnerPayoutProfileUncheckedCreateNestedManyWithoutVerifiedByUserInput
+  partnerPayoutProfileAuditEvents?: Prisma.PartnerPayoutProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  partnerProfileAuditEvents?: Prisma.PartnerProfileAuditEventUncheckedCreateNestedManyWithoutActorUserInput
+  settlementEvents?: Prisma.SettlementEventUncheckedCreateNestedManyWithoutActorUserInput
+  approvedSettlements?: Prisma.SettlementUncheckedCreateNestedManyWithoutApprovedByUserInput
+  partnerProfile?: Prisma.PartnerProfileUncheckedCreateNestedOneWithoutUserInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUncheckedCreateNestedOneWithoutReferredUserInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUncheckedCreateNestedManyWithoutConsumedByUserInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUncheckedCreateNestedManyWithoutRecipientUserInput
+  acknowledgedSettlementAlerts?: Prisma.SettlementOperationalAlertUncheckedCreateNestedManyWithoutAcknowledgedByUserInput
+}
+
+export type UserProfileCreateOrConnectWithoutCreatedHomepagePromotionsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedCreateWithoutCreatedHomepagePromotionsInput>
+}
+
+export type UserProfileUpsertWithoutCreatedHomepagePromotionsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedUpdateWithoutCreatedHomepagePromotionsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedCreateWithoutCreatedHomepagePromotionsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutCreatedHomepagePromotionsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutCreatedHomepagePromotionsInput, Prisma.UserProfileUncheckedUpdateWithoutCreatedHomepagePromotionsInput>
+}
+
+export type UserProfileUpdateWithoutCreatedHomepagePromotionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
+  releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
+  paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
+  tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutEvents?: Prisma.SellerPayoutEventUpdateManyWithoutActorUserNestedInput
+  sellerPayoutAdjustments?: Prisma.SellerPayoutAdjustmentUpdateManyWithoutCreatedByUserNestedInput
+  preparedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutPreparedByUserNestedInput
+  approvedSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutApprovedByUserNestedInput
+  sentSellerPayouts?: Prisma.SellerPayoutUpdateManyWithoutSentByUserNestedInput
+  verifiedSellerPayoutProfiles?: Prisma.SellerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  sellerPayoutProfileAuditEvents?: Prisma.SellerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+  verifiedPartnerPayoutProfiles?: Prisma.PartnerPayoutProfileUpdateManyWithoutVerifiedByUserNestedInput
+  partnerPayoutProfileAuditEvents?: Prisma.PartnerPayoutProfileAuditEventUpdateManyWithoutActorUserNestedInput
+  partnerProfileAuditEvents?: Prisma.PartnerProfileAuditEventUpdateManyWithoutActorUserNestedInput
+  settlementEvents?: Prisma.SettlementEventUpdateManyWithoutActorUserNestedInput
+  approvedSettlements?: Prisma.SettlementUpdateManyWithoutApprovedByUserNestedInput
+  partnerProfile?: Prisma.PartnerProfileUpdateOneWithoutUserNestedInput
+  referredReferralAttribution?: Prisma.ReferralAttributionUpdateOneWithoutReferredUserNestedInput
+  consumedReferralClaimTokens?: Prisma.ReferralClaimTokenUpdateManyWithoutConsumedByUserNestedInput
+  settlementLegRecipientUsers?: Prisma.SettlementLegUpdateManyWithoutRecipientUserNestedInput
+  acknowledgedSettlementAlerts?: Prisma.SettlementOperationalAlertUpdateManyWithoutAcknowledgedByUserNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutCreatedHomepagePromotionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  clerkUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  avatarOriginalUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyAffiliation?: Prisma.StringFieldUpdateOperationsInput | string
+  jobTitle?: Prisma.StringFieldUpdateOperationsInput | string
+  department?: Prisma.StringFieldUpdateOperationsInput | string
+  bio?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  linkedinUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumAccountRoleFieldUpdateOperationsInput | $Enums.AccountRole
+  preferredLanguage?: Prisma.EnumPreferredLanguageFieldUpdateOperationsInput | $Enums.PreferredLanguage
+  deletionStatus?: Prisma.EnumAccountDeletionStatusFieldUpdateOperationsInput | $Enums.AccountDeletionStatus
+  deletionRequestedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutOwnerNestedInput
+  requestedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutRequestedByNestedInput
+  reviewedVerifications?: Prisma.VerificationRequestUncheckedUpdateManyWithoutReviewedByNestedInput
+  sentInquiries?: Prisma.InquiryUncheckedUpdateManyWithoutSenderNestedInput
+  sentMessages?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.MessageUncheckedUpdateManyWithoutReceiverNestedInput
+  uploadedMessageAttachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  createdDocumentFolders?: Prisma.DocumentFolderUncheckedUpdateManyWithoutCreatedByUserNestedInput
+  uploadedTradeDocuments?: Prisma.TradeDocumentUncheckedUpdateManyWithoutUploadedByUserNestedInput
+  savedItems?: Prisma.SavedItemUncheckedUpdateManyWithoutUserNestedInput
+  createdDeals?: Prisma.DealUncheckedUpdateManyWithoutCreatedByNestedInput
+  buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
+  reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
+  marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -3236,6 +3537,7 @@ export type UserProfileCreateWithoutCreatedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
@@ -3294,6 +3596,7 @@ export type UserProfileUncheckedCreateWithoutCreatedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -3357,6 +3660,7 @@ export type UserProfileCreateWithoutReleasedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
@@ -3415,6 +3719,7 @@ export type UserProfileUncheckedCreateWithoutReleasedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -3489,6 +3794,7 @@ export type UserProfileUpdateWithoutCreatedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
@@ -3547,6 +3853,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -3616,6 +3923,7 @@ export type UserProfileUpdateWithoutReleasedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
@@ -3674,6 +3982,7 @@ export type UserProfileUncheckedUpdateWithoutReleasedPaymentRequestsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -3732,6 +4041,7 @@ export type UserProfileCreateWithoutPaymentRequestEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventCreateNestedManyWithoutActorUserInput
@@ -3790,6 +4100,7 @@ export type UserProfileUncheckedCreateWithoutPaymentRequestEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -3864,6 +4175,7 @@ export type UserProfileUpdateWithoutPaymentRequestEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUpdateManyWithoutActorUserNestedInput
@@ -3922,6 +4234,7 @@ export type UserProfileUncheckedUpdateWithoutPaymentRequestEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   tradeOrderEvents?: Prisma.TradeOrderEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -3980,6 +4293,7 @@ export type UserProfileCreateWithoutPartnerProfileInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -4038,6 +4352,7 @@ export type UserProfileUncheckedCreateWithoutPartnerProfileInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -4112,6 +4427,7 @@ export type UserProfileUpdateWithoutPartnerProfileInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -4170,6 +4486,7 @@ export type UserProfileUncheckedUpdateWithoutPartnerProfileInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -4228,6 +4545,7 @@ export type UserProfileCreateWithoutConsumedReferralClaimTokensInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -4286,6 +4604,7 @@ export type UserProfileUncheckedCreateWithoutConsumedReferralClaimTokensInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -4360,6 +4679,7 @@ export type UserProfileUpdateWithoutConsumedReferralClaimTokensInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -4418,6 +4738,7 @@ export type UserProfileUncheckedUpdateWithoutConsumedReferralClaimTokensInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -4476,6 +4797,7 @@ export type UserProfileCreateWithoutReferredReferralAttributionInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -4534,6 +4856,7 @@ export type UserProfileUncheckedCreateWithoutReferredReferralAttributionInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -4608,6 +4931,7 @@ export type UserProfileUpdateWithoutReferredReferralAttributionInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -4666,6 +4990,7 @@ export type UserProfileUncheckedUpdateWithoutReferredReferralAttributionInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -4724,6 +5049,7 @@ export type UserProfileCreateWithoutApprovedSettlementsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -4782,6 +5108,7 @@ export type UserProfileUncheckedCreateWithoutApprovedSettlementsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -4856,6 +5183,7 @@ export type UserProfileUpdateWithoutApprovedSettlementsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -4914,6 +5242,7 @@ export type UserProfileUncheckedUpdateWithoutApprovedSettlementsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -4972,6 +5301,7 @@ export type UserProfileCreateWithoutSettlementLegRecipientUsersInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -5030,6 +5360,7 @@ export type UserProfileUncheckedCreateWithoutSettlementLegRecipientUsersInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -5104,6 +5435,7 @@ export type UserProfileUpdateWithoutSettlementLegRecipientUsersInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -5162,6 +5494,7 @@ export type UserProfileUncheckedUpdateWithoutSettlementLegRecipientUsersInput = 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -5220,6 +5553,7 @@ export type UserProfileCreateWithoutSettlementEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -5278,6 +5612,7 @@ export type UserProfileUncheckedCreateWithoutSettlementEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -5352,6 +5687,7 @@ export type UserProfileUpdateWithoutSettlementEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -5410,6 +5746,7 @@ export type UserProfileUncheckedUpdateWithoutSettlementEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -5468,6 +5805,7 @@ export type UserProfileCreateWithoutAcknowledgedSettlementAlertsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -5526,6 +5864,7 @@ export type UserProfileUncheckedCreateWithoutAcknowledgedSettlementAlertsInput =
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -5600,6 +5939,7 @@ export type UserProfileUpdateWithoutAcknowledgedSettlementAlertsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -5658,6 +5998,7 @@ export type UserProfileUncheckedUpdateWithoutAcknowledgedSettlementAlertsInput =
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -5716,6 +6057,7 @@ export type UserProfileCreateWithoutTradeOrderEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -5774,6 +6116,7 @@ export type UserProfileUncheckedCreateWithoutTradeOrderEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -5848,6 +6191,7 @@ export type UserProfileUpdateWithoutTradeOrderEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -5906,6 +6250,7 @@ export type UserProfileUncheckedUpdateWithoutTradeOrderEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -5964,6 +6309,7 @@ export type UserProfileCreateWithoutVerifiedSellerPayoutProfilesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -6022,6 +6368,7 @@ export type UserProfileUncheckedCreateWithoutVerifiedSellerPayoutProfilesInput =
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -6096,6 +6443,7 @@ export type UserProfileUpdateWithoutVerifiedSellerPayoutProfilesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -6154,6 +6502,7 @@ export type UserProfileUncheckedUpdateWithoutVerifiedSellerPayoutProfilesInput =
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -6212,6 +6561,7 @@ export type UserProfileCreateWithoutSellerPayoutProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -6270,6 +6620,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutProfileAuditEventsInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -6344,6 +6695,7 @@ export type UserProfileUpdateWithoutSellerPayoutProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -6402,6 +6754,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutProfileAuditEventsInput
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -6460,6 +6813,7 @@ export type UserProfileCreateWithoutVerifiedPartnerPayoutProfilesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -6518,6 +6872,7 @@ export type UserProfileUncheckedCreateWithoutVerifiedPartnerPayoutProfilesInput 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -6592,6 +6947,7 @@ export type UserProfileUpdateWithoutVerifiedPartnerPayoutProfilesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -6650,6 +7006,7 @@ export type UserProfileUncheckedUpdateWithoutVerifiedPartnerPayoutProfilesInput 
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -6708,6 +7065,7 @@ export type UserProfileCreateWithoutPartnerPayoutProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -6766,6 +7124,7 @@ export type UserProfileUncheckedCreateWithoutPartnerPayoutProfileAuditEventsInpu
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -6840,6 +7199,7 @@ export type UserProfileUpdateWithoutPartnerPayoutProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -6898,6 +7258,7 @@ export type UserProfileUncheckedUpdateWithoutPartnerPayoutProfileAuditEventsInpu
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -6956,6 +7317,7 @@ export type UserProfileCreateWithoutPartnerProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -7014,6 +7376,7 @@ export type UserProfileUncheckedCreateWithoutPartnerProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -7088,6 +7451,7 @@ export type UserProfileUpdateWithoutPartnerProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -7146,6 +7510,7 @@ export type UserProfileUncheckedUpdateWithoutPartnerProfileAuditEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -7204,6 +7569,7 @@ export type UserProfileCreateWithoutPreparedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -7262,6 +7628,7 @@ export type UserProfileUncheckedCreateWithoutPreparedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -7325,6 +7692,7 @@ export type UserProfileCreateWithoutApprovedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -7383,6 +7751,7 @@ export type UserProfileUncheckedCreateWithoutApprovedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -7446,6 +7815,7 @@ export type UserProfileCreateWithoutSentSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -7504,6 +7874,7 @@ export type UserProfileUncheckedCreateWithoutSentSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -7578,6 +7949,7 @@ export type UserProfileUpdateWithoutPreparedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -7636,6 +8008,7 @@ export type UserProfileUncheckedUpdateWithoutPreparedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -7705,6 +8078,7 @@ export type UserProfileUpdateWithoutApprovedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -7763,6 +8137,7 @@ export type UserProfileUncheckedUpdateWithoutApprovedSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -7832,6 +8207,7 @@ export type UserProfileUpdateWithoutSentSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -7890,6 +8266,7 @@ export type UserProfileUncheckedUpdateWithoutSentSellerPayoutsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -7948,6 +8325,7 @@ export type UserProfileCreateWithoutSellerPayoutEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -8006,6 +8384,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -8080,6 +8459,7 @@ export type UserProfileUpdateWithoutSellerPayoutEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -8138,6 +8518,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutEventsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -8196,6 +8577,7 @@ export type UserProfileCreateWithoutSellerPayoutAdjustmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -8254,6 +8636,7 @@ export type UserProfileUncheckedCreateWithoutSellerPayoutAdjustmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -8328,6 +8711,7 @@ export type UserProfileUpdateWithoutSellerPayoutAdjustmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -8386,6 +8770,7 @@ export type UserProfileUncheckedUpdateWithoutSellerPayoutAdjustmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -8443,6 +8828,7 @@ export type UserProfileCreateWithoutSavedItemsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -8501,6 +8887,7 @@ export type UserProfileUncheckedCreateWithoutSavedItemsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -8575,6 +8962,7 @@ export type UserProfileUpdateWithoutSavedItemsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -8633,6 +9021,7 @@ export type UserProfileUncheckedUpdateWithoutSavedItemsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -8691,6 +9080,7 @@ export type UserProfileCreateWithoutSentMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -8749,6 +9139,7 @@ export type UserProfileUncheckedCreateWithoutSentMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -8812,6 +9203,7 @@ export type UserProfileCreateWithoutReceivedMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -8870,6 +9262,7 @@ export type UserProfileUncheckedCreateWithoutReceivedMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -8944,6 +9337,7 @@ export type UserProfileUpdateWithoutSentMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -9002,6 +9396,7 @@ export type UserProfileUncheckedUpdateWithoutSentMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -9071,6 +9466,7 @@ export type UserProfileUpdateWithoutReceivedMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -9129,6 +9525,7 @@ export type UserProfileUncheckedUpdateWithoutReceivedMessagesInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -9187,6 +9584,7 @@ export type UserProfileCreateWithoutUploadedMessageAttachmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -9245,6 +9643,7 @@ export type UserProfileUncheckedCreateWithoutUploadedMessageAttachmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -9319,6 +9718,7 @@ export type UserProfileUpdateWithoutUploadedMessageAttachmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -9377,6 +9777,7 @@ export type UserProfileUncheckedUpdateWithoutUploadedMessageAttachmentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -9435,6 +9836,7 @@ export type UserProfileCreateWithoutCreatedDocumentFoldersInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -9493,6 +9895,7 @@ export type UserProfileUncheckedCreateWithoutCreatedDocumentFoldersInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -9567,6 +9970,7 @@ export type UserProfileUpdateWithoutCreatedDocumentFoldersInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -9625,6 +10029,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedDocumentFoldersInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -9683,6 +10088,7 @@ export type UserProfileCreateWithoutUploadedTradeDocumentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -9741,6 +10147,7 @@ export type UserProfileUncheckedCreateWithoutUploadedTradeDocumentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -9815,6 +10222,7 @@ export type UserProfileUpdateWithoutUploadedTradeDocumentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -9873,6 +10281,7 @@ export type UserProfileUncheckedUpdateWithoutUploadedTradeDocumentsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -9931,6 +10340,7 @@ export type UserProfileCreateWithoutCreatedDealsInput = {
   buyerRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventCreateNestedManyWithoutActorUserInput
@@ -9989,6 +10399,7 @@ export type UserProfileUncheckedCreateWithoutCreatedDealsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutBuyerUserInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedCreateNestedManyWithoutReviewedByUserInput
   marketingExposures?: Prisma.MarketingExposureUncheckedCreateNestedManyWithoutUserInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedCreateNestedManyWithoutCreatedByInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutCreatedByUserInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedCreateNestedManyWithoutReleasedByUserInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedCreateNestedManyWithoutActorUserInput
@@ -10063,6 +10474,7 @@ export type UserProfileUpdateWithoutCreatedDealsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUpdateManyWithoutActorUserNestedInput
@@ -10121,6 +10533,7 @@ export type UserProfileUncheckedUpdateWithoutCreatedDealsInput = {
   buyerRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutBuyerUserNestedInput
   reviewedRfqRequests?: Prisma.RfqRequestUncheckedUpdateManyWithoutReviewedByUserNestedInput
   marketingExposures?: Prisma.MarketingExposureUncheckedUpdateManyWithoutUserNestedInput
+  createdHomepagePromotions?: Prisma.HomepagePromotionUncheckedUpdateManyWithoutCreatedByNestedInput
   createdPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutCreatedByUserNestedInput
   releasedPaymentRequests?: Prisma.PaymentRequestUncheckedUpdateManyWithoutReleasedByUserNestedInput
   paymentRequestEvents?: Prisma.PaymentRequestEventUncheckedUpdateManyWithoutActorUserNestedInput
@@ -10164,6 +10577,7 @@ export type UserProfileCountOutputType = {
   buyerRfqRequests: number
   reviewedRfqRequests: number
   marketingExposures: number
+  createdHomepagePromotions: number
   createdPaymentRequests: number
   releasedPaymentRequests: number
   paymentRequestEvents: number
@@ -10200,6 +10614,7 @@ export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Exten
   buyerRfqRequests?: boolean | UserProfileCountOutputTypeCountBuyerRfqRequestsArgs
   reviewedRfqRequests?: boolean | UserProfileCountOutputTypeCountReviewedRfqRequestsArgs
   marketingExposures?: boolean | UserProfileCountOutputTypeCountMarketingExposuresArgs
+  createdHomepagePromotions?: boolean | UserProfileCountOutputTypeCountCreatedHomepagePromotionsArgs
   createdPaymentRequests?: boolean | UserProfileCountOutputTypeCountCreatedPaymentRequestsArgs
   releasedPaymentRequests?: boolean | UserProfileCountOutputTypeCountReleasedPaymentRequestsArgs
   paymentRequestEvents?: boolean | UserProfileCountOutputTypeCountPaymentRequestEventsArgs
@@ -10327,6 +10742,13 @@ export type UserProfileCountOutputTypeCountReviewedRfqRequestsArgs<ExtArgs exten
  */
 export type UserProfileCountOutputTypeCountMarketingExposuresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MarketingExposureWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountCreatedHomepagePromotionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HomepagePromotionWhereInput
 }
 
 /**
@@ -10499,6 +10921,7 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   buyerRfqRequests?: boolean | Prisma.UserProfile$buyerRfqRequestsArgs<ExtArgs>
   reviewedRfqRequests?: boolean | Prisma.UserProfile$reviewedRfqRequestsArgs<ExtArgs>
   marketingExposures?: boolean | Prisma.UserProfile$marketingExposuresArgs<ExtArgs>
+  createdHomepagePromotions?: boolean | Prisma.UserProfile$createdHomepagePromotionsArgs<ExtArgs>
   createdPaymentRequests?: boolean | Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>
   releasedPaymentRequests?: boolean | Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>
   paymentRequestEvents?: boolean | Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>
@@ -10611,6 +11034,7 @@ export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.Internal
   buyerRfqRequests?: boolean | Prisma.UserProfile$buyerRfqRequestsArgs<ExtArgs>
   reviewedRfqRequests?: boolean | Prisma.UserProfile$reviewedRfqRequestsArgs<ExtArgs>
   marketingExposures?: boolean | Prisma.UserProfile$marketingExposuresArgs<ExtArgs>
+  createdHomepagePromotions?: boolean | Prisma.UserProfile$createdHomepagePromotionsArgs<ExtArgs>
   createdPaymentRequests?: boolean | Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>
   releasedPaymentRequests?: boolean | Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>
   paymentRequestEvents?: boolean | Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>
@@ -10654,6 +11078,7 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     buyerRfqRequests: Prisma.$RfqRequestPayload<ExtArgs>[]
     reviewedRfqRequests: Prisma.$RfqRequestPayload<ExtArgs>[]
     marketingExposures: Prisma.$MarketingExposurePayload<ExtArgs>[]
+    createdHomepagePromotions: Prisma.$HomepagePromotionPayload<ExtArgs>[]
     createdPaymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
     releasedPaymentRequests: Prisma.$PaymentRequestPayload<ExtArgs>[]
     paymentRequestEvents: Prisma.$PaymentRequestEventPayload<ExtArgs>[]
@@ -11106,6 +11531,7 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
   buyerRfqRequests<T extends Prisma.UserProfile$buyerRfqRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$buyerRfqRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RfqRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewedRfqRequests<T extends Prisma.UserProfile$reviewedRfqRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$reviewedRfqRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RfqRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   marketingExposures<T extends Prisma.UserProfile$marketingExposuresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$marketingExposuresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MarketingExposurePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdHomepagePromotions<T extends Prisma.UserProfile$createdHomepagePromotionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$createdHomepagePromotionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomepagePromotionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   createdPaymentRequests<T extends Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$createdPaymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   releasedPaymentRequests<T extends Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$releasedPaymentRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentRequestEvents<T extends Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$paymentRequestEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentRequestEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -11903,6 +12329,30 @@ export type UserProfile$marketingExposuresArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.MarketingExposureScalarFieldEnum | Prisma.MarketingExposureScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.createdHomepagePromotions
+ */
+export type UserProfile$createdHomepagePromotionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HomepagePromotion
+   */
+  select?: Prisma.HomepagePromotionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HomepagePromotion
+   */
+  omit?: Prisma.HomepagePromotionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomepagePromotionInclude<ExtArgs> | null
+  where?: Prisma.HomepagePromotionWhereInput
+  orderBy?: Prisma.HomepagePromotionOrderByWithRelationInput | Prisma.HomepagePromotionOrderByWithRelationInput[]
+  cursor?: Prisma.HomepagePromotionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HomepagePromotionScalarFieldEnum | Prisma.HomepagePromotionScalarFieldEnum[]
 }
 
 /**

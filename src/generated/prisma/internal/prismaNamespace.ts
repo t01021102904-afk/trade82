@@ -397,6 +397,7 @@ export const ModelName = {
   RfqMatchedProduct: 'RfqMatchedProduct',
   RfqSellerQuote: 'RfqSellerQuote',
   MarketingExposure: 'MarketingExposure',
+  HomepagePromotion: 'HomepagePromotion',
   PaymentRequest: 'PaymentRequest',
   PaymentRefund: 'PaymentRefund',
   PaymentDispute: 'PaymentDispute',
@@ -452,7 +453,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "referralClickDailyVisitor" | "referralConversion" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "partnerPayoutProfile" | "partnerPayoutProfileAuditEvent" | "partnerProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
+    modelProps: "userProfile" | "company" | "sellerProfile" | "buyerProfile" | "product" | "productImage" | "category" | "verificationRequest" | "inquiry" | "rfqRequest" | "rfqMatchedProduct" | "rfqSellerQuote" | "marketingExposure" | "homepagePromotion" | "paymentRequest" | "paymentRefund" | "paymentDispute" | "paymentRequestEvent" | "paymentRequestWebhookEvent" | "partnerProfile" | "referralClaimToken" | "referralAttribution" | "referralClickDailyVisitor" | "referralConversion" | "stripeConnectedAccount" | "sellerStripeMerchantAccount" | "settlement" | "settlementLeg" | "settlementEvent" | "settlementReversal" | "settlementWorkerRun" | "settlementOperationalAlert" | "orderNumberCounter" | "tradeOrder" | "tradeOrderItem" | "tradeOrderShipment" | "tradeOrderEvent" | "bankDirectory" | "sellerPayoutProfile" | "sellerPayoutProfileAuditEvent" | "partnerPayoutProfile" | "partnerPayoutProfileAuditEvent" | "partnerProfileAuditEvent" | "sellerPayout" | "sellerPayoutEvent" | "sellerPayoutAdjustment" | "savedItem" | "message" | "messageAttachment" | "documentFolder" | "tradeDocument" | "deal" | "review" | "companyReview"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1415,6 +1416,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MarketingExposureCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MarketingExposureCountAggregateOutputType> | number
+        }
+      }
+    }
+    HomepagePromotion: {
+      payload: Prisma.$HomepagePromotionPayload<ExtArgs>
+      fields: Prisma.HomepagePromotionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.HomepagePromotionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.HomepagePromotionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        findFirst: {
+          args: Prisma.HomepagePromotionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.HomepagePromotionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        findMany: {
+          args: Prisma.HomepagePromotionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>[]
+        }
+        create: {
+          args: Prisma.HomepagePromotionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        createMany: {
+          args: Prisma.HomepagePromotionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.HomepagePromotionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>[]
+        }
+        delete: {
+          args: Prisma.HomepagePromotionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        update: {
+          args: Prisma.HomepagePromotionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        deleteMany: {
+          args: Prisma.HomepagePromotionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.HomepagePromotionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.HomepagePromotionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>[]
+        }
+        upsert: {
+          args: Prisma.HomepagePromotionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$HomepagePromotionPayload>
+        }
+        aggregate: {
+          args: Prisma.HomepagePromotionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateHomepagePromotion>
+        }
+        groupBy: {
+          args: Prisma.HomepagePromotionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HomepagePromotionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.HomepagePromotionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.HomepagePromotionCountAggregateOutputType> | number
         }
       }
     }
@@ -4741,6 +4816,32 @@ export const MarketingExposureScalarFieldEnum = {
 export type MarketingExposureScalarFieldEnum = (typeof MarketingExposureScalarFieldEnum)[keyof typeof MarketingExposureScalarFieldEnum]
 
 
+export const HomepagePromotionScalarFieldEnum = {
+  id: 'id',
+  adminTitle: 'adminTitle',
+  altTextEn: 'altTextEn',
+  altTextKo: 'altTextKo',
+  mediaType: 'mediaType',
+  thumbnailUrl: 'thumbnailUrl',
+  thumbnailStoragePath: 'thumbnailStoragePath',
+  pdfUrl: 'pdfUrl',
+  pdfStoragePath: 'pdfStoragePath',
+  destinationUrl: 'destinationUrl',
+  openInNewTab: 'openInNewTab',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdByUserId: 'createdByUserId',
+  pendingStorageCleanupPaths: 'pendingStorageCleanupPaths',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomepagePromotionScalarFieldEnum = (typeof HomepagePromotionScalarFieldEnum)[keyof typeof HomepagePromotionScalarFieldEnum]
+
+
 export const PaymentRequestScalarFieldEnum = {
   id: 'id',
   inquiryId: 'inquiryId',
@@ -5889,6 +5990,20 @@ export type ListEnumMarketingExposureStatusFieldRefInput<$PrismaModel> = FieldRe
 
 
 /**
+ * Reference to a field of type 'HomepagePromotionMediaType'
+ */
+export type EnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HomepagePromotionMediaType'>
+    
+
+
+/**
+ * Reference to a field of type 'HomepagePromotionMediaType[]'
+ */
+export type ListEnumHomepagePromotionMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'HomepagePromotionMediaType[]'>
+    
+
+
+/**
  * Reference to a field of type 'StripeFeeSyncStatus'
  */
 export type EnumStripeFeeSyncStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StripeFeeSyncStatus'>
@@ -6640,6 +6755,7 @@ export type GlobalOmitConfig = {
   rfqMatchedProduct?: Prisma.RfqMatchedProductOmit
   rfqSellerQuote?: Prisma.RfqSellerQuoteOmit
   marketingExposure?: Prisma.MarketingExposureOmit
+  homepagePromotion?: Prisma.HomepagePromotionOmit
   paymentRequest?: Prisma.PaymentRequestOmit
   paymentRefund?: Prisma.PaymentRefundOmit
   paymentDispute?: Prisma.PaymentDisputeOmit

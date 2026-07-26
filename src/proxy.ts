@@ -54,6 +54,16 @@ export default clerkMiddleware(async (auth, request) => {
 
     await auth.protect({ unauthenticatedUrl: loginUrl.toString() });
   }
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(
+    "x-trade82-locale",
+    request.nextUrl.pathname === "/ko" || request.nextUrl.pathname.startsWith("/ko/")
+      ? "ko"
+      : "en",
+  );
+
+  return NextResponse.next({ request: { headers: requestHeaders } });
 });
 
 export const config = {

@@ -145,6 +145,11 @@ enum MarketingExposureStatus {
   CANCELLED
 }
 
+enum HomepagePromotionMediaType {
+  IMAGE
+  PDF
+}
+
 enum PaymentRequestStatus {
   PENDING
   PAID
@@ -527,6 +532,7 @@ model UserProfile {
   buyerRfqRequests                RfqRequest[]                     @relation("BuyerRfqRequests")
   reviewedRfqRequests             RfqRequest[]                     @relation("ReviewedRfqRequests")
   marketingExposures              MarketingExposure[]
+  createdHomepagePromotions       HomepagePromotion[]              @relation("HomepagePromotionCreatedBy")
   createdPaymentRequests          PaymentRequest[]                 @relation("PaymentRequestCreator")
   releasedPaymentRequests         PaymentRequest[]                 @relation("PaymentRequestReleasedBy")
   paymentRequestEvents            PaymentRequestEvent[]            @relation("PaymentRequestEventActor")
@@ -923,6 +929,33 @@ model MarketingExposure {
   @@index([companyId, status])
   @@index([productId, status])
   @@index([status, startsAt, endsAt])
+}
+
+model HomepagePromotion {
+  id                         String                     @id @default(cuid())
+  adminTitle                 String
+  altTextEn                  String
+  altTextKo                  String
+  mediaType                  HomepagePromotionMediaType
+  thumbnailUrl               String
+  thumbnailStoragePath       String
+  pdfUrl                     String?
+  pdfStoragePath             String?
+  destinationUrl             String?
+  openInNewTab               Boolean                    @default(false)
+  displayOrder               Int
+  isActive                   Boolean                    @default(true)
+  startsAt                   DateTime?
+  endsAt                     DateTime?
+  createdByUserId            String
+  createdBy                  UserProfile                @relation("HomepagePromotionCreatedBy", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  pendingStorageCleanupPaths String[]                   @default([])
+  deletedAt                  DateTime?
+  createdAt                  DateTime                   @default(now())
+  updatedAt                  DateTime                   @updatedAt
+
+  @@index([isActive, deletedAt, startsAt, endsAt, displayOrder])
+  @@index([createdByUserId, createdAt])
 }
 
 model PaymentRequest {

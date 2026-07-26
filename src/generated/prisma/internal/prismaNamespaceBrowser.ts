@@ -64,6 +64,7 @@ export const ModelName = {
   RfqMatchedProduct: 'RfqMatchedProduct',
   RfqSellerQuote: 'RfqSellerQuote',
   MarketingExposure: 'MarketingExposure',
+  HomepagePromotion: 'HomepagePromotion',
   PaymentRequest: 'PaymentRequest',
   PaymentRefund: 'PaymentRefund',
   PaymentDispute: 'PaymentDispute',
@@ -444,6 +445,32 @@ export const MarketingExposureScalarFieldEnum = {
 } as const
 
 export type MarketingExposureScalarFieldEnum = (typeof MarketingExposureScalarFieldEnum)[keyof typeof MarketingExposureScalarFieldEnum]
+
+
+export const HomepagePromotionScalarFieldEnum = {
+  id: 'id',
+  adminTitle: 'adminTitle',
+  altTextEn: 'altTextEn',
+  altTextKo: 'altTextKo',
+  mediaType: 'mediaType',
+  thumbnailUrl: 'thumbnailUrl',
+  thumbnailStoragePath: 'thumbnailStoragePath',
+  pdfUrl: 'pdfUrl',
+  pdfStoragePath: 'pdfStoragePath',
+  destinationUrl: 'destinationUrl',
+  openInNewTab: 'openInNewTab',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdByUserId: 'createdByUserId',
+  pendingStorageCleanupPaths: 'pendingStorageCleanupPaths',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomepagePromotionScalarFieldEnum = (typeof HomepagePromotionScalarFieldEnum)[keyof typeof HomepagePromotionScalarFieldEnum]
 
 
 export const PaymentRequestScalarFieldEnum = {

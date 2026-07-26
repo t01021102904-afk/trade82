@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   APPROVED_PRODUCTION_MIGRATION_BATCH,
   ANALYTICS_MIGRATION,
+  DEFERRED_APPLICATION_MIGRATION,
   EXPECTED_SUPABASE_PROJECT,
   FIRST_APPROVED_MIGRATION,
   LEGACY_ZERO_STEP_MIGRATIONS,
@@ -29,8 +30,12 @@ const approvedNames = new Set([
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   PARTNER_ACTIVATION_MIGRATION,
+  DEFERRED_APPLICATION_MIGRATION,
 ]);
-const legacyLocalMigrations = localMigrations.slice(0, -1);
+const productionMigrationNames = localMigrations.filter(
+  (name) => name !== DEFERRED_APPLICATION_MIGRATION,
+);
+const legacyLocalMigrations = productionMigrationNames.slice(0, -1);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
 
 function record(migrationName, overrides = {}) {
@@ -413,17 +418,18 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved batch is followed by operations, analytics, partner payout, and activation migrations", () => {
+test("the approved batch is followed by operations, analytics, partner payout, activation, and the deferred application migration", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-5), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-4), OPERATIONS_MIGRATION);
-  assert.equal(localMigrations.at(-3), ANALYTICS_MIGRATION);
-  assert.equal(localMigrations.at(-2), PARTNER_PAYOUT_MIGRATION);
-  assert.equal(localMigrations.at(-1), PARTNER_ACTIVATION_MIGRATION);
+  assert.equal(localMigrations.at(-6), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-5), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-4), ANALYTICS_MIGRATION);
+  assert.equal(localMigrations.at(-3), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-2), PARTNER_ACTIVATION_MIGRATION);
+  assert.equal(localMigrations.at(-1), DEFERRED_APPLICATION_MIGRATION);
 });
 
 test("partner activation migration is deployed and verified after partner payout", async () => {
@@ -440,7 +446,7 @@ test("partner activation migration is deployed and verified after partner payout
   const fake = fakeClient(deploymentResponses(afterRecords));
   let deploys = 0;
   const result = await runProductionMigrations(productionOptions(fake, {
-    localMigrationNames: localMigrations,
+    localMigrationNames: productionMigrationNames,
     deploy: () => { deploys += 1; },
   }));
   assert.equal(result, "deployed");
@@ -448,7 +454,7 @@ test("partner activation migration is deployed and verified after partner payout
   assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
 });
 
-test("production-style invocation reads and verifies the committed activation migration", async () => {
+test("production-style activation verification can run before the application migration is approved", async () => {
   const afterRecords = [
     ...historicalRecords,
     appliedFirst,
@@ -464,12 +470,34 @@ test("production-style invocation reads and verifies the committed activation mi
   const result = await runProductionMigrations({
     environment: { VERCEL_ENV: "production", DIRECT_URL: directUrl },
     createClient: () => fake.client,
+    localMigrationNames: productionMigrationNames,
     deploy: () => { deploys += 1; },
   });
 
   assert.equal(result, "deployed");
   assert.equal(deploys, 1);
   assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
+});
+
+test("the homepage promotion migration remains deferred from Production deploy", async () => {
+  const fake = fakeClient(deploymentResponses());
+  let deploys = 0;
+  await assertDiagnostic(
+    runProductionMigrations(
+      productionOptions(fake, {
+        localMigrationNames: localMigrations,
+        deploy: () => {
+          deploys += 1;
+        },
+      }),
+    ),
+    {
+      stage: "migration_state_evaluation",
+      source: "DIRECT_URL",
+      code: "pending_set_mismatch",
+    },
+  );
+  assert.equal(deploys, 0);
 });
 
 test("missing or malformed Production URLs fail closed without connecting", async () => {

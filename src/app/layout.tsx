@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { ClerkProvider } from "@clerk/nextjs";
 import { I18nProvider } from "@/components/i18n-provider";
 import { SiteFooter } from "@/components/site-footer";
@@ -12,6 +13,7 @@ import {
   siteNavigationJsonLd,
   websiteJsonLd,
 } from "@/lib/seo";
+import "flag-icons/css/flag-icons.min.css";
 import "./globals.css";
 
 const structuredData = [
@@ -71,14 +73,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = (await headers()).get("x-trade82-locale") === "ko" ? "ko" : "en";
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className="h-full"
       data-theme="light"
       data-theme-preference="light"

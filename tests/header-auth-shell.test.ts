@@ -9,7 +9,7 @@ function readSource(relativePath: string) {
   return readFileSync(path.join(repositoryRoot, relativePath), "utf8");
 }
 
-test("public header navigation only exposes Marketplace and Sellers", () => {
+test("public header navigation keeps guest discovery links and role-backed actions", () => {
   const navigationSource = readSource("src/lib/public-navigation.ts");
   const headerSource = readSource("src/components/site-header.tsx");
 
@@ -22,10 +22,14 @@ test("public header navigation only exposes Marketplace and Sellers", () => {
   assert.match(headerSource, /locale\.korean/);
   assert.match(headerSource, /common\.signIn/);
   assert.match(headerSource, /common\.signUp/);
+  assert.match(headerSource, /const isGuest = !isAuthenticated/);
   assert.doesNotMatch(headerSource, /primaryCta/);
-  assert.doesNotMatch(headerSource, /nav\.listProduct/);
+  assert.match(headerSource, /getSignedInHeaderAction/);
   assert.doesNotMatch(headerSource, /nav\.browseProducts/);
-  assert.doesNotMatch(headerSource, /href: "\/sell"/);
+  assert.match(navigationSource, /href: "\/sell"/);
+  assert.match(navigationSource, /href: "\/dashboard\/rfqs\/new"/);
+  assert.match(navigationSource, /role === "seller" \|\| role === "both"/);
+  assert.match(navigationSource, /isAdmin \|\| isPartnerOnly/);
 });
 
 test("public mobile navigation is an accessible, focus-managed dialog", () => {
@@ -41,6 +45,20 @@ test("public mobile navigation is an accessible, focus-managed dialog", () => {
   assert.match(dialogHookSource, /event\.key !== "Tab"/);
   assert.match(dialogHookSource, /document\.body\.style\.overflow = "hidden"/);
   assert.match(dialogHookSource, /returnFocus\?\.focus\(\)/);
+});
+
+test("Root layout derives document language from the proxy-provided locale", () => {
+  const layoutSource = readSource("src/app/layout.tsx");
+  const proxySource = readSource("src/proxy.ts");
+
+  assert.match(layoutSource, /import \{ headers \} from "next\/headers"/);
+  assert.match(layoutSource, /await headers\(\)/);
+  assert.match(layoutSource, /get\("x-trade82-locale"\) === "ko"/);
+  assert.match(layoutSource, /lang=\{locale\}/);
+  assert.match(proxySource, /requestHeaders\.set\(\s*"x-trade82-locale"/);
+  assert.match(proxySource, /pathname === "\/ko"/);
+  assert.match(proxySource, /pathname\.startsWith\("\/ko\/"\)/);
+  assert.match(proxySource, /NextResponse\.next\(\{ request: \{ headers: requestHeaders \} \}\)/);
 });
 
 test("all localized auth routes render the shared Clerk auth shell", () => {
