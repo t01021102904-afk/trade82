@@ -6,9 +6,9 @@ import { SellersClient } from "@/components/sellers-client";
 import { breadcrumbJsonLd, publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Sellers | Trade82",
+  title: "한국 공급사 | Trade82",
   description:
-    "Browse Korean seller companies and discover export-ready products on Trade82.",
+    "Trade82에서 검증된 한국 제조사, 브랜드사와 유통사의 회사 정보, 수출 경험, 인증 및 등록 상품을 확인하세요.",
   path: "/ko/sellers",
   languages: {
     en: "/sellers",

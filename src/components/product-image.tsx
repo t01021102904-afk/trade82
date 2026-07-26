@@ -41,7 +41,7 @@ export function ProductImage({
           fill
           sizes={sizes}
           unoptimized
-          className={cx("object-cover", imageClassName)}
+          className={imageClassName ?? "object-cover"}
           onError={() => {
             setFailedUrls((current) =>
               current.includes(activeUrl) ? current : [...current, activeUrl],

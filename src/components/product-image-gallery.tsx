@@ -49,6 +49,7 @@ export function ProductImageGallery({
                 alt=""
                 sizes="120px"
                 className="size-full rounded-none"
+                imageClassName="bg-white object-contain p-1"
                 placeholderClassName="p-1"
                 showLabel={false}
               />

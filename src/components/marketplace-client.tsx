@@ -23,6 +23,10 @@ import {
 import { PaginationControls } from "@/components/pagination-controls";
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
 import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
+import {
+  complianceClaimLabel,
+  incotermLabel,
+} from "@/lib/company-select-options";
 import { marketplaceCategoryMessageKey } from "@/lib/home-product-categories";
 import { marketplaceCategories } from "@/lib/marketplace";
 import {
@@ -173,10 +177,12 @@ function MarketplaceClientContent({
         try {
           return (await response.json()) as MarketplaceApiResponse;
         } catch (error) {
-          console.error(
-            "Marketplace response JSON parsing failed",
-            marketplaceErrorDetails(error),
-          );
+          if (!isMarketplaceAbortError(error)) {
+            console.error(
+              "Marketplace response JSON parsing failed",
+              marketplaceErrorDetails(error),
+            );
+          }
           throw error;
         }
       })
@@ -321,7 +327,7 @@ function MarketplaceClientContent({
     requestError,
     productCount: databaseProducts.length,
   });
-  const activeFilters = marketplaceActiveFilters(queryState, t);
+  const activeFilters = marketplaceActiveFilters(queryState, locale, t);
   const advancedFilterCount = activeFilters.filter(
     (filter) => filter.key !== "q" && filter.key !== "category",
   ).length;
@@ -347,6 +353,7 @@ function MarketplaceClientContent({
       query={queryState}
       certifications={certifications}
       shippingTerms={shippingTerms}
+      locale={locale}
       updateQuery={updateQuery}
       t={t}
     />
@@ -592,12 +599,14 @@ function MarketplaceFilterPanel({
   query,
   certifications,
   shippingTerms,
+  locale,
   updateQuery,
   t,
 }: {
   query: MarketplaceQueryState;
   certifications: string[];
   shippingTerms: string[];
+  locale: "en" | "ko";
   updateQuery: (updates: MarketplaceQueryUpdates) => void;
   t: (key: string) => string;
 }) {
@@ -631,7 +640,10 @@ function MarketplaceFilterPanel({
         onChange={(value) => updateQuery({ certification: value })}
         options={[
           { label: t("marketplace.anyCertification"), value: "all" },
-          ...certifications.map((item) => ({ label: item, value: item })),
+          ...certifications.map((item) => ({
+            label: complianceClaimLabel(item, locale),
+            value: item,
+          })),
         ]}
       />
       <SelectField
@@ -640,7 +652,10 @@ function MarketplaceFilterPanel({
         onChange={(value) => updateQuery({ shipping: value })}
         options={[
           { label: t("marketplace.anyTerm"), value: "all" },
-          ...shippingTerms.map((item) => ({ label: item, value: item })),
+          ...shippingTerms.map((item) => ({
+            label: incotermLabel(item, locale),
+            value: item,
+          })),
         ]}
       />
     </div>
@@ -678,6 +693,7 @@ function SelectField({
 
 function marketplaceActiveFilters(
   query: MarketplaceQueryState,
+  locale: "en" | "ko",
   t: (key: string) => string,
 ) {
   const labels: Array<{
@@ -721,12 +737,12 @@ function marketplaceActiveFilters(
     {
       key: "certification",
       value: query.certification,
-      label: query.certification,
+      label: complianceClaimLabel(query.certification, locale),
     },
     {
       key: "shipping",
       value: query.shipping,
-      label: query.shipping,
+      label: incotermLabel(query.shipping, locale),
     },
   ];
   return labels.filter(

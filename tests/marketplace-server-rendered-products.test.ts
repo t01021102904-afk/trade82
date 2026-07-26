@@ -452,6 +452,7 @@ test("Marketplace pages preserve server data, locale ItemList JSON-LD, and clien
   const clientSource = readSource("src/components/marketplace-client.tsx");
   const clientStateSource = readSource("src/lib/public-marketplace-client-state.ts");
   const productCardSource = readSource("src/components/product-card.tsx");
+  const productImageSource = readSource("src/components/product-image.tsx");
   assert.match(englishPage, /marketplaceItemListJsonLd\(initialData\.products, "en"\)/);
   assert.match(koreanPage, /marketplaceItemListJsonLd\(initialData\.products, "ko"\)/);
   assert.match(clientSource, /MarketplaceRequestCoordinator/);
@@ -465,9 +466,19 @@ test("Marketplace pages preserve server data, locale ItemList JSON-LD, and clien
   assert.match(clientSource, /<ProductCard key=\{product\.id\} product=\{product\} \/>/);
   assert.match(productCardSource, /withLocale\(`\/products\/\$\{product\.id\}`, locale\)/);
   assert.match(productCardSource, /alt=\{product\.name\}/);
+  assert.match(productCardSource, /imageClassName="bg-white object-contain/);
+  assert.match(productImageSource, /imageClassName \?\? "object-cover"/);
+  assert.doesNotMatch(
+    productImageSource,
+    /className=\{cx\("object-cover", imageClassName\)\}/,
+  );
   assert.match(clientStateSource, /AbortController/);
   assert.doesNotMatch(clientSource, /useSearchParams/);
   assert.doesNotMatch(clientSource, /router\.replace/);
+  assert.match(
+    clientSource,
+    /if \(!isMarketplaceAbortError\(error\)\) \{\s*console\.error\(\s*"Marketplace response JSON parsing failed"/,
+  );
 });
 
 test("the API and client reuse the shared product query and keep errors distinct from genuine emptiness", () => {
