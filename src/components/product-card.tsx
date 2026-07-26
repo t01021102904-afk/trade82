@@ -11,56 +11,62 @@ import { withLocale } from "@/lib/i18n";
 import type { Product } from "@/lib/types";
 
 export function ProductCard({ product }: { product: Product }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const href = withLocale(`/products/${product.id}`, locale);
 
   return (
-    <article className="bm-premium-card group min-w-0 rounded-lg border p-3 theme-surface">
-      <div className="relative aspect-square overflow-hidden rounded-md">
+    <article className="group flex min-w-0 flex-col border border-zinc-200 bg-white p-3 transition-colors hover:border-zinc-400">
+      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-50">
         <Link href={href} className="relative block size-full">
           <ProductImage
             urls={[product.imagePlaceholder, ...(product.imageUrls ?? [])]}
             alt={product.name}
             sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
-            className="size-full rounded-md"
-            imageClassName="bg-white object-contain p-2 transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.02]"
+            className="size-full rounded-none"
+            imageClassName="bg-white object-contain p-3 transition-transform duration-[180ms] ease-out motion-safe:group-hover:scale-[1.015]"
           />
         </Link>
         <SaveButton
           id={product.id}
           kind="product"
           iconOnly
-          className="absolute right-2 top-2 theme-secondary-button shadow-sm backdrop-blur"
+          className="absolute right-2 top-2 min-h-10 min-w-10 border border-zinc-200 bg-white/95 shadow-sm backdrop-blur"
         />
       </div>
 
-      <div className="relative z-10 grid min-w-0 gap-1.5 pt-3">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col pt-4">
+        <p className="mb-2 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
+          {product.category}
+        </p>
         <Link href={href} className="min-w-0">
-          <h3 className="line-clamp-2 text-sm font-semibold leading-5 theme-foreground transition-colors group-hover:text-[var(--accent-foreground)]">
+          <h3 className="line-clamp-2 min-h-11 text-[15px] font-semibold leading-[1.4] text-zinc-950 transition-colors group-hover:text-emerald-800">
             {product.name}
           </h3>
         </Link>
         <WholesalePriceGate
           value={product.wholesalePrice}
-          className="max-w-full"
-          valueClassName="truncate text-base font-semibold theme-foreground"
+          className="mt-3 max-w-full"
+          valueClassName="truncate text-base font-semibold text-zinc-950"
           gateClassName="text-sm"
         />
+        {product.moq ? (
+          <p className="mt-1 truncate text-xs text-zinc-500">
+            <span className="font-medium text-zinc-700">{t("marketplace.moq")}:</span>{" "}
+            {product.moq}
+          </p>
+        ) : null}
+        <div className="mt-4 border-t border-zinc-200 pt-3">
         <Link
-          href={withLocale(`/stores/${product.sellerId}`, locale)}
-          className="flex min-w-0 items-center gap-1.5 text-xs theme-muted hover:text-[var(--accent-foreground)]"
+          href={withLocale(`/companies/${product.sellerId}`, locale)}
+          className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-emerald-800"
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
         </Link>
-        <div className="flex min-w-0 items-center gap-2 overflow-hidden text-xs theme-muted">
-          <span className="truncate">
-            {product.sellerLocation || product.category}
-          </span>
-          <span aria-hidden="true">·</span>
-          <time dateTime={product.createdAt} className="shrink-0">
-            {formatCreatedTime(product.createdAt, locale)}
-          </time>
+        <div className="mt-1 flex min-w-0 items-center justify-between gap-2 overflow-hidden text-xs text-zinc-500">
+          <span className="truncate">{product.sellerLocation}</span>
+          <span className="shrink-0 text-emerald-700">{t("product.verifiedSupplier")}</span>
+        </div>
         </div>
       </div>
     </article>
@@ -69,30 +75,17 @@ export function ProductCard({ product }: { product: Product }) {
 
 export function ProductCardSkeleton() {
   return (
-    <div className="animate-pulse" aria-hidden="true">
-      <div className="aspect-square rounded-md theme-surface-muted" />
-      <div className="grid gap-2 pt-3">
-        <div className="h-5 w-4/5 rounded bg-[var(--muted)]" />
-        <div className="h-6 w-2/5 rounded bg-[var(--muted)]" />
-        <div className="h-4 w-3/5 rounded bg-[var(--muted)]" />
-        <div className="h-3 w-1/2 rounded bg-[var(--muted)]" />
+    <div className="animate-pulse border border-zinc-200 bg-white p-3" aria-hidden="true">
+      <div className="aspect-[4/3] bg-zinc-100" />
+      <div className="grid gap-2 pt-4">
+        <div className="h-3 w-2/5 rounded bg-zinc-100" />
+        <div className="h-5 w-4/5 rounded bg-zinc-100" />
+        <div className="h-5 w-3/5 rounded bg-zinc-100" />
+        <div className="mt-2 h-6 w-2/5 rounded bg-zinc-100" />
+        <div className="h-4 w-3/5 rounded bg-zinc-100" />
+        <div className="mt-3 h-px bg-zinc-100" />
+        <div className="h-4 w-1/2 rounded bg-zinc-100" />
       </div>
     </div>
   );
-}
-
-function formatCreatedTime(value: string | undefined, locale: "en" | "ko") {
-  if (!value) return locale === "ko" ? "최근 등록" : "Recently listed";
-
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) {
-    return locale === "ko" ? "최근 등록" : "Recently listed";
-  }
-
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  const day = date.getUTCDate();
-  return locale === "ko"
-    ? `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`
-    : `${month}/${day}/${year}`;
 }

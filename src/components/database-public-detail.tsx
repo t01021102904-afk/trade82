@@ -37,7 +37,6 @@ import {
   priceUnitLabel,
   privateLabelAvailabilityLabel,
   salesChannelLabel,
-  sampleAvailabilityLabel,
   sellerDocumentLabel,
   sellerSupplierTypeLabel,
   sourcingTimelineLabel,
@@ -61,6 +60,7 @@ import {
   type ProductFieldVisibilityKey,
   type ProductFieldVisibilityLevel,
 } from "@/lib/product-field-visibility";
+import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
 import type { Product, VerificationStatus } from "@/lib/types";
 
 type PublicCompany = {
@@ -162,14 +162,22 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
   if (!company) return <PublicUnavailable />;
   const companyName = localizedCompanyName(company, locale);
   const companyDescription = localizedCompanyDescription(company, locale);
+  const seller =
+    company.companyRole === "seller"
+      ? databaseCompanyToSeller(
+          company as unknown as Record<string, unknown>,
+          locale,
+        )
+      : null;
   return (
-    <div className="bg-zinc-50">
+    <div className="bg-white">
       <ViewTracker id={company.id} type="company" />
-      <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6">
+      <div className="mx-auto grid max-w-[1440px] gap-9 px-4 py-8 sm:px-6 lg:px-8">
         <BackButton
           fallbackHref={company.companyRole === "buyer" ? "/buyers" : "/sellers"}
         />
-        <section className="flex min-w-0 flex-col gap-5 rounded-lg border border-zinc-200 bg-white p-5 sm:flex-row">
+        <section className="grid min-w-0 gap-6 border-y border-zinc-200 py-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
+          <div className="flex min-w-0 flex-col gap-5 sm:flex-row">
           <CompanyLogo
             companyName={companyName}
             logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? company.logoOriginalUrl ?? undefined}
@@ -180,32 +188,58 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
             ]}
             useDefaultLogo={company.useDefaultLogo}
             size="lg"
-            shape="circle"
+            shape="square"
           />
           <div className="min-w-0">
             <VerificationBadge status={company.verificationStatus} subject={company.companyRole} />
             <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-              <h1 className="break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{companyName}</h1>
+              <h1 className="break-words text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">{companyName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
             </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
-            <p className="mt-4 max-w-3xl break-words leading-7 text-zinc-600">{companyDescription}</p>
+            <p className="mt-4 max-w-3xl break-words text-sm leading-6 text-zinc-600 sm:text-base">{companyDescription}</p>
           </div>
+          </div>
+          {seller ? (
+            <div className="grid gap-3">
+              <ContactModal
+                context={{ type: "seller", seller }}
+                buttonLabel={t("common.contactCompany")}
+                className="min-h-11 w-full bg-emerald-700 font-semibold hover:bg-emerald-800"
+              />
+              <p className="text-xs leading-5 text-zinc-500">
+                {t("company.contactGuidance")}
+              </p>
+            </div>
+          ) : null}
         </section>
         {company.companyRole === "buyer" ? (
           <BuyerProfileDetail company={company} />
         ) : (
           <SellerProfileDetail company={company} />
         )}
-        <section>
-          <h2 className="text-lg font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
-          <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length}</p>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {company.reviewsReceived.map((review) => <ReviewCard key={review.id} review={review} />)}
-          </div>
-        </section>
-        <CompanyReviewsSection companyId={company.id} companyRole={company.companyRole} />
-        {companyProducts.length ? <section className="min-w-0"><h2 className="mb-4 text-lg font-semibold text-zinc-950">Products</h2><div className="grid min-w-0 grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">{companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div></section> : null}
+        {company.reviewsReceived.length ? (
+          <>
+            <section>
+              <h2 className="text-lg font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
+              <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length}</p>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {company.reviewsReceived.map((review) => <ReviewCard key={review.id} review={review} />)}
+              </div>
+            </section>
+            <CompanyReviewsSection companyId={company.id} companyRole={company.companyRole} />
+          </>
+        ) : null}
+        {companyProducts.length ? (
+          <section className="min-w-0 border-t border-zinc-200 pt-8">
+            <h2 className="mb-5 text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
+              {t("company.products")}
+            </h2>
+            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+            </div>
+          </section>
+        ) : null}
       </div>
     </div>
   );
@@ -513,24 +547,44 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   }
 
   return (
-    <div className="bg-zinc-50">
+    <div className="bg-white">
       <ViewTracker id={id} type="product" />
-      <div className="mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-8 sm:px-6 lg:px-8">
         <BackButton fallbackHref="/marketplace" />
-        <section className="grid gap-6 rounded-lg border border-zinc-200 bg-white p-5 lg:grid-cols-[0.9fr_1.1fr]">
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(380px,0.88fr)] lg:items-start">
           <ProductImageGallery
             images={product.imageUrls?.length ? product.imageUrls : [product.imagePlaceholder]}
             productName={product.name}
           />
-          <div className="flex min-w-0 flex-col justify-between gap-8">
+          <div className="sticky top-24 flex min-w-0 flex-col justify-between gap-7 border border-zinc-200 bg-white p-5 sm:p-7">
             <div className="min-w-0">
               <VerificationBadge status={product.verificationStatus ?? "verified"} subject="seller" />
-              <p className="mt-5 break-words text-sm font-medium text-blue-700">{product.category}</p>
-              <h1 className="mt-2 break-words text-2xl font-semibold text-zinc-950 sm:text-3xl">{product.name}</h1>
-              <p className="mt-4 max-w-2xl break-words text-base leading-7 text-zinc-600">
+              <p className="mt-5 break-words text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">{product.category}</p>
+              <h1 className="mt-3 break-words text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl">{product.name}</h1>
+              <p className="mt-4 max-w-2xl break-words text-sm leading-6 text-zinc-600">
                 {product.shortDescription || product.longDescription}
               </p>
-              <div className="mt-5 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
+              <dl className="mt-7 divide-y divide-zinc-200 border-y border-zinc-200">
+                {[
+                  { label: t("productDetail.wholesalePrice"), value: priceDisplay },
+                  { label: t("marketplace.moq"), value: moq },
+                  { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
+                  {
+                    label: t("productDetail.incoterms"),
+                    value: displayField("incoterms", joinList(incoterms) || notProvided),
+                  },
+                  {
+                    label: t("productDetail.compliance"),
+                    value: joinList(product.certifications) || notProvided,
+                  },
+                ].map(({ label, value }) => (
+                  <div key={label} className="grid grid-cols-[132px_minmax(0,1fr)] gap-4 py-3 text-sm">
+                    <dt className="text-zinc-500">{label}</dt>
+                    <dd className="break-words text-right font-semibold text-zinc-950">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-6 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
                 <CompanyLogo
                   companyName={product.sellerName}
                   logoUrl={product.sellerLogoUrl}
@@ -545,6 +599,14 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   <p className="break-words">{product.sellerLocation}</p>
                 </div>
               </div>
+              {sellerCompanyId ? (
+                <Link
+                  href={withLocale(`/companies/${sellerCompanyId}`, locale)}
+                  className="mt-3 inline-flex text-sm font-semibold text-emerald-800 hover:text-zinc-950"
+                >
+                  {t("productDetail.viewCompanyProfile")}
+                </Link>
+              ) : null}
             </div>
             {isOwner ? (
               <div className="grid gap-2">
@@ -594,40 +656,22 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 {t("common.loading")}
               </div>
             ) : (
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <ContactModal
+                  context={{ type: "product", product }}
+                  buttonLabel={t("productDetail.contactSeller")}
+                  className="min-h-11 w-full bg-emerald-700 font-semibold hover:bg-emerald-800"
+                />
+                <SaveButton id={product.id} kind="product" />
                 <ProductShareButton
                   title={product.name}
                   description={shareDescription}
                   imageUrl={shareImageUrl}
+                  className="h-11 sm:col-span-2"
                 />
-                <SaveButton id={product.id} kind="product" />
-                <ContactModal context={{ type: "product", product }} buttonLabel={t("productDetail.contactSeller")} />
               </div>
             )}
           </div>
-        </section>
-
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[
-            { label: t("productDetail.wholesalePrice"), value: priceDisplay },
-            { label: t("marketplace.moq"), value: moq },
-            { label: t("settings.leadTime"), value: leadTime },
-            { label: t("productDetail.monthlyCapacity"), value: monthlyCapacity },
-            {
-              label: t("productDetail.sampleAvailability"),
-              value: displayField(
-                "sampleAvailability",
-                sampleAvailabilityLabel(String(richRows.sampleAvailability ?? ""), locale) ||
-                  notProvided,
-              ),
-            },
-            { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
-          ].map(({ label, value }) => (
-            <div key={label} className="rounded-lg border border-zinc-200 bg-white p-5">
-              <p className="text-sm text-zinc-500">{label}</p>
-              <p className="mt-2 break-words text-lg font-semibold text-zinc-950">{value}</p>
-            </div>
-          ))}
         </section>
         {requestableHiddenFields.length ? (
           <section className="flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">

@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 
-import { BackButton } from "@/components/back-button";
 import { JsonLd } from "@/components/json-ld";
 import { SellersSeoContent } from "@/components/public-marketplace-seo-content";
 import { SellersClient } from "@/components/sellers-client";
 import { breadcrumbJsonLd, publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
-  title: "Sellers | Trade82",
+  title: "한국 공급사 | Trade82",
   description:
-    "Browse Korean seller companies and discover export-ready products on Trade82.",
+    "Trade82에서 검증된 한국 제조사, 브랜드사와 유통사의 회사 정보, 수출 경험, 인증 및 등록 상품을 확인하세요.",
   path: "/ko/sellers",
   languages: {
     en: "/sellers",
@@ -19,18 +18,17 @@ export const metadata: Metadata = publicPageMetadata({
 
 export default function KoSellersPage() {
   return (
-    <div className="bm-grid-surface theme-bg">
+    <main className="min-h-screen bg-white text-zinc-950">
       <JsonLd
         data={breadcrumbJsonLd([
           { name: "홈", path: "/ko" },
           { name: "셀러", path: "/ko/sellers" },
         ])}
       />
-      <div className="mx-auto grid max-w-7xl gap-5 px-4 py-6 sm:px-6 lg:px-8">
-        <BackButton fallbackHref="/" />
+      <div className="mx-auto grid max-w-[1440px] gap-7 px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
         <SellersSeoContent locale="ko" />
         <SellersClient />
       </div>
-    </div>
+    </main>
   );
 }

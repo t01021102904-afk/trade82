@@ -75,8 +75,8 @@ export function HomeCategoryVisualScroller() {
   };
 
   return (
-    <section className="relative border-t py-8 theme-border sm:py-10" aria-labelledby="home-category-heading">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative border-t border-zinc-200 bg-white py-8 sm:py-10" aria-labelledby="home-category-heading">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-center justify-between gap-4 sm:mb-5">
           <h2 id="home-category-heading" className="text-lg font-semibold tracking-[-0.01em] theme-foreground sm:text-xl">
             {t("home.categorySection.title")}
@@ -107,6 +107,7 @@ export function HomeCategoryVisualScroller() {
           ref={trackRef}
           onWheel={handleWheel}
           tabIndex={0}
+          role="group"
           aria-label={t("home.categorySection.scrollRegion")}
           className="home-category-visual-scroll -mr-4 flex gap-3 overflow-x-auto pr-4 pb-1 outline-none sm:-mr-6 sm:gap-4 sm:pr-6 lg:-mr-8 lg:pr-8"
         >
@@ -114,7 +115,7 @@ export function HomeCategoryVisualScroller() {
             <Link
               key={item.id}
               href={homeCategoryHref(item.category, locale)}
-              className="home-category-visual-item group flex w-[116px] shrink-0 snap-start flex-col items-center justify-center rounded-[23px] border px-2 py-3 text-center transition hover:-translate-y-0.5 hover:border-[#34B386] focus-visible:-translate-y-0.5 focus-visible:border-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/35 sm:w-[145px] sm:px-3 sm:py-4 lg:w-[152px] theme-surface-elevated"
+              className="home-category-visual-item group flex w-[116px] shrink-0 snap-start flex-col items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-3 text-center transition hover:border-emerald-600 hover:bg-white focus-visible:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/35 sm:w-[145px] sm:px-3 sm:py-4 lg:w-[152px]"
             >
               <Image
                 src={item.imageSrc}
