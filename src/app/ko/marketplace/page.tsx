@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = publicPageMetadata({
   title: "한국 B2B 상품 마켓플레이스 | Trade82",
   description:
-    "검증된 공급사의 한국 상품을 도매 소싱 목적으로 확인하세요. 문의 전에 상품 정보, 최소주문수량, 가격 공개 여부, 배송 조건, 인증 정보와 셀러 프로필을 비교할 수 있습니다.",
+    "한국 상품을 도매 소싱 목적으로 확인하세요. 문의 전에 상품 정보, 최소주문수량, 가격 공개 여부, 배송 조건, 인증 정보와 셀러 프로필을 비교할 수 있습니다.",
   path: "/ko/marketplace",
   languages: {
     en: "/marketplace",
@@ -49,7 +49,7 @@ export default async function KoMarketplacePage({
       {initialData?.products.length ? (
         <JsonLd data={marketplaceItemListJsonLd(initialData.products, "ko")} />
       ) : null}
-      <div className="mx-auto grid max-w-[1440px] gap-7 px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto grid max-w-[1240px] gap-5 px-4 py-7 sm:px-5 sm:py-8 lg:px-6">
         <MarketplaceSeoContent locale="ko" />
         <MarketplaceClient
           initialProducts={initialData?.products}

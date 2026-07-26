@@ -208,11 +208,11 @@ export function SaveButton({
         }}
         disabled={pending || waitingForSession}
         className={cx(
-          "inline-flex min-h-11 w-full items-center justify-center rounded-md border text-sm font-medium transition disabled:cursor-wait disabled:opacity-70",
-          iconOnly ? "min-w-11 p-2.5" : "px-3.5 py-2",
+          "inline-flex min-h-10 w-full items-center justify-center rounded-md border text-sm font-medium transition disabled:cursor-wait disabled:opacity-70",
+          iconOnly ? "min-w-10 p-2.5" : "px-3.5 py-2",
           visibleSaved
-            ? "border-blue-200 bg-blue-50 text-blue-700"
-            : "border-zinc-200 bg-white text-zinc-700 hover:border-blue-200 hover:text-blue-700",
+            ? "border-[#34B386] bg-[#34B386]/10 text-zinc-950"
+            : "border-zinc-200 bg-white text-zinc-700 hover:border-[#34B386] hover:text-zinc-950",
         )}
         aria-label={label}
         aria-pressed={visibleSaved}

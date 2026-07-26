@@ -8,7 +8,7 @@ import { breadcrumbJsonLd, publicPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = publicPageMetadata({
   title: "Marketplace | Trade82",
-  description: "Discover Korean products from verified sellers for global B2B sourcing.",
+  description: "Discover Korean products and seller profiles for global B2B sourcing.",
   path: "/en/marketplace",
   languages: {
     en: "/en/marketplace",

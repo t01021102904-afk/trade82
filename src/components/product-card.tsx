@@ -34,18 +34,18 @@ export function ProductCard({ product }: { product: Product }) {
         />
       </div>
 
-      <div className="relative z-10 flex min-w-0 flex-1 flex-col pt-4">
-        <p className="mb-2 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-700">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col pt-3">
+        <p className="mb-1.5 truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-600">
           {product.category}
         </p>
         <Link href={href} className="min-w-0">
-          <h3 className="line-clamp-2 min-h-11 text-[15px] font-semibold leading-[1.4] text-zinc-950 transition-colors group-hover:text-emerald-800">
+          <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-zinc-950 transition-colors group-hover:text-[#34B386]">
             {product.name}
           </h3>
         </Link>
         <WholesalePriceGate
           value={product.wholesalePrice}
-          className="mt-3 max-w-full"
+          className="mt-2.5 max-w-full"
           valueClassName="truncate text-base font-semibold text-zinc-950"
           gateClassName="text-sm"
         />
@@ -55,17 +55,16 @@ export function ProductCard({ product }: { product: Product }) {
             {product.moq}
           </p>
         ) : null}
-        <div className="mt-4 border-t border-zinc-200 pt-3">
+        <div className="mt-3 border-t border-zinc-200 pt-2.5">
         <Link
           href={withLocale(`/companies/${product.sellerId}`, locale)}
-          className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-emerald-800"
+          className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-[#34B386]"
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
         </Link>
-        <div className="mt-1 flex min-w-0 items-center justify-between gap-2 overflow-hidden text-xs text-zinc-500">
+        <div className="mt-1 min-w-0 overflow-hidden text-xs text-zinc-500">
           <span className="truncate">{product.sellerLocation}</span>
-          <span className="shrink-0 text-emerald-700">{t("product.verifiedSupplier")}</span>
         </div>
         </div>
       </div>

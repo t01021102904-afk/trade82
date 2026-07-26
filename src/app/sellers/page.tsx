@@ -25,7 +25,7 @@ export default function SellersPage() {
           { name: "Sellers", path: "/sellers" },
         ])}
       />
-      <div className="mx-auto grid max-w-[1440px] gap-7 px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto grid max-w-[1240px] gap-5 px-4 py-7 sm:px-5 sm:py-8 lg:px-6">
         <SellersSeoContent locale="en" />
         <SellersClient />
       </div>

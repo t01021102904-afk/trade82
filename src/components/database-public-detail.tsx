@@ -16,7 +16,6 @@ import { ProductCard } from "@/components/product-card";
 import { ProductImage } from "@/components/product-image";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { ProductShareButton } from "@/components/product-share-button";
-import { VerificationBadge } from "@/components/verification-badge";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
 import { WholesalePriceGate } from "@/components/wholesale-price-gate";
@@ -172,12 +171,12 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
   return (
     <div className="bg-white">
       <ViewTracker id={company.id} type="company" />
-      <div className="mx-auto grid max-w-[1440px] gap-9 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-[1240px] gap-6 px-4 py-6 sm:px-5 lg:px-6">
         <BackButton
           fallbackHref={company.companyRole === "buyer" ? "/buyers" : "/sellers"}
         />
-        <section className="grid min-w-0 gap-6 border-y border-zinc-200 py-7 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
-          <div className="flex min-w-0 flex-col gap-5 sm:flex-row">
+        <section className="grid min-w-0 gap-5 border-y border-zinc-200 py-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row">
           <CompanyLogo
             companyName={companyName}
             logoUrl={company.logoThumbnailUrl ?? company.logoUrl ?? company.logoOriginalUrl ?? undefined}
@@ -191,9 +190,8 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
             shape="square"
           />
           <div className="min-w-0">
-            <VerificationBadge status={company.verificationStatus} subject={company.companyRole} />
-            <div className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-              <h1 className="break-words text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl">{companyName}</h1>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <h1 className="break-words text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl">{companyName}</h1>
               {company.isTrade82Team ? <AdminBadge /> : null}
             </div>
             <p className="mt-2 break-words text-sm text-zinc-500">{company.city}, {company.country}</p>
@@ -205,7 +203,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
               <ContactModal
                 context={{ type: "seller", seller }}
                 buttonLabel={t("common.contactCompany")}
-                className="min-h-11 w-full bg-emerald-700 font-semibold hover:bg-emerald-800"
+                className="min-h-10 w-full bg-zinc-950 font-semibold hover:bg-zinc-800"
               />
               <p className="text-xs leading-5 text-zinc-500">
                 {t("company.contactGuidance")}
@@ -231,11 +229,11 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
           </>
         ) : null}
         {companyProducts.length ? (
-          <section className="min-w-0 border-t border-zinc-200 pt-8">
-            <h2 className="mb-5 text-2xl font-semibold tracking-[-0.03em] text-zinc-950">
+          <section className="min-w-0 border-t border-zinc-200 pt-6">
+            <h2 className="mb-4 text-xl font-semibold tracking-[-0.03em] text-zinc-950">
               {t("company.products")}
             </h2>
-            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {companyProducts.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
           </section>
@@ -274,8 +272,8 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
   ]);
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="grid gap-6">
+    <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-5">
         {rows.length ? (
           <div>
             <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("buyer.requirements")}</h2>
@@ -283,22 +281,22 @@ function BuyerProfileDetail({ company }: { company: PublicCompany }) {
           </div>
         ) : null}
         {companyDescription.trim() ? (
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <div className="rounded-lg border border-zinc-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-zinc-950">{t("buyer.marketStrategy")}</h2>
             <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{companyDescription}</p>
           </div>
         ) : null}
       </div>
-      <aside className="grid h-fit gap-5">
+      <aside className="grid h-fit gap-4">
         {categoryLabels.length ? (
-          <BadgeList title={t("buyer.interestedCategories")} values={categoryLabels} tone="blue" />
+          <BadgeList title={t("buyer.interestedCategories")} values={categoryLabels} />
         ) : null}
         {salesChannelLabels.length ? (
           <BadgeList title={t("buyer.salesChannels")} values={salesChannelLabels} />
         ) : null}
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
-          <h2 className="font-semibold text-blue-950">{t("buyer.sellerGuidance")}</h2>
-          <p className="mt-2 text-sm leading-6 text-blue-800">{t("buyer.sellerGuidanceText")}</p>
+        <div className="rounded-lg border border-[#34B386]/40 bg-[#34B386]/10 p-4">
+          <h2 className="font-semibold text-zinc-950">{t("buyer.sellerGuidance")}</h2>
+          <p className="mt-2 text-sm leading-6 text-zinc-700">{t("buyer.sellerGuidanceText")}</p>
         </div>
       </aside>
     </section>
@@ -330,8 +328,8 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
   ]);
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <div className="grid gap-6">
+    <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-5">
         {companyRows.length ? (
           <div>
             <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("company.profile")}</h2>
@@ -339,7 +337,7 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
           </div>
         ) : null}
         {companyDescription.trim() ? (
-          <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <div className="rounded-lg border border-zinc-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-zinc-950">{t("company.about")}</h2>
             <p className="mt-3 break-words text-sm leading-6 text-zinc-600">{companyDescription}</p>
           </div>
@@ -351,16 +349,16 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
           </div>
         ) : null}
       </div>
-      <aside className="grid h-fit gap-5">
+      <aside className="grid h-fit gap-4">
         {profile?.productCategories.length || company.categories.length ? (
-          <BadgeList title={t("company.productCategories")} values={profile?.productCategories.length ? profile.productCategories : company.categories} tone="blue" />
+          <BadgeList title={t("company.productCategories")} values={profile?.productCategories.length ? profile.productCategories : company.categories} />
         ) : null}
         {profile?.certifications.length ? (
-          <BadgeList title={t("company.certifications")} values={profile.certifications} tone="green" />
+          <BadgeList title={t("company.certifications")} values={profile.certifications} accent />
         ) : null}
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-5">
-          <h2 className="font-semibold text-blue-950">{t("company.tradeNote")}</h2>
-          <p className="mt-2 text-sm leading-6 text-blue-800">{t("company.tradeNoteText")}</p>
+        <div className="rounded-lg border border-[#34B386]/40 bg-[#34B386]/10 p-4">
+          <h2 className="font-semibold text-zinc-950">{t("company.tradeNote")}</h2>
+          <p className="mt-2 text-sm leading-6 text-zinc-700">{t("company.tradeNoteText")}</p>
         </div>
       </aside>
     </section>
@@ -370,18 +368,21 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
 function BadgeList({
   title,
   values,
-  tone,
+  accent = false,
 }: {
   title: string;
   values: string[];
-  tone?: "blue" | "green";
+  accent?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-5">
+    <div className="rounded-lg border border-zinc-200 bg-white p-4">
       <h2 className="text-lg font-semibold text-zinc-950">{title}</h2>
       <div className="mt-4 flex flex-wrap gap-2">
         {values.map((value) => (
-          <Badge key={value} tone={tone}>
+          <Badge
+            key={value}
+            className={accent ? "border-[#34B386]/50 bg-[#34B386]/10 text-zinc-800" : undefined}
+          >
             {value}
           </Badge>
         ))}
@@ -549,22 +550,21 @@ export function DatabaseProductDetail({ id }: { id: string }) {
   return (
     <div className="bg-white">
       <ViewTracker id={id} type="product" />
-      <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-[1240px] gap-7 px-4 py-6 sm:px-5 lg:px-6">
         <BackButton fallbackHref="/marketplace" />
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(380px,0.88fr)] lg:items-start">
+        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(360px,0.88fr)] lg:items-start">
           <ProductImageGallery
             images={product.imageUrls?.length ? product.imageUrls : [product.imagePlaceholder]}
             productName={product.name}
           />
-          <div className="sticky top-24 flex min-w-0 flex-col justify-between gap-7 border border-zinc-200 bg-white p-5 sm:p-7">
+          <div className="sticky top-20 flex min-w-0 flex-col justify-between gap-5 border border-zinc-200 bg-white p-4 sm:p-5">
             <div className="min-w-0">
-              <VerificationBadge status={product.verificationStatus ?? "verified"} subject="seller" />
-              <p className="mt-5 break-words text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">{product.category}</p>
-              <h1 className="mt-3 break-words text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-4xl">{product.name}</h1>
+              <p className="break-words text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">{product.category}</p>
+              <h1 className="mt-2 break-words text-2xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-3xl">{product.name}</h1>
               <p className="mt-4 max-w-2xl break-words text-sm leading-6 text-zinc-600">
                 {product.shortDescription || product.longDescription}
               </p>
-              <dl className="mt-7 divide-y divide-zinc-200 border-y border-zinc-200">
+              <dl className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
                 {[
                   { label: t("productDetail.wholesalePrice"), value: priceDisplay },
                   { label: t("marketplace.moq"), value: moq },
@@ -584,7 +584,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   </div>
                 ))}
               </dl>
-              <div className="mt-6 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
+              <div className="mt-5 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
                 <CompanyLogo
                   companyName={product.sellerName}
                   logoUrl={product.sellerLogoUrl}
@@ -602,7 +602,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               {sellerCompanyId ? (
                 <Link
                   href={withLocale(`/companies/${sellerCompanyId}`, locale)}
-                  className="mt-3 inline-flex text-sm font-semibold text-emerald-800 hover:text-zinc-950"
+                  className="mt-3 inline-flex text-sm font-semibold text-zinc-800 underline decoration-[#34B386] decoration-2 underline-offset-4 hover:text-zinc-950"
                 >
                   {t("productDetail.viewCompanyProfile")}
                 </Link>
@@ -613,7 +613,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 <div className="flex flex-wrap gap-1.5">
                   <Link
                     href={withLocale("/dashboard/seller?section=products", locale)}
-                    className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white hover:bg-blue-700"
+                    className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white hover:bg-zinc-800"
                   >
                     {t("settings.editProduct")}
                   </Link>
@@ -641,7 +641,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   />
                 </div>
                 {ownerNotice ? (
-                  <p role="status" className="text-sm font-medium text-emerald-700">
+                  <p role="status" className="text-sm font-medium text-zinc-700">
                     {ownerNotice}
                   </p>
                 ) : null}
@@ -660,22 +660,22 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 <ContactModal
                   context={{ type: "product", product }}
                   buttonLabel={t("productDetail.contactSeller")}
-                  className="min-h-11 w-full bg-emerald-700 font-semibold hover:bg-emerald-800"
+                  className="min-h-10 w-full bg-zinc-950 font-semibold hover:bg-zinc-800"
                 />
                 <SaveButton id={product.id} kind="product" />
                 <ProductShareButton
                   title={product.name}
                   description={shareDescription}
                   imageUrl={shareImageUrl}
-                  className="h-11 sm:col-span-2"
+                  className="h-10 sm:col-span-2"
                 />
               </div>
             )}
           </div>
         </section>
         {requestableHiddenFields.length ? (
-          <section className="flex flex-col gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-6 text-blue-900">
+          <section className="flex flex-col gap-3 rounded-lg border border-[#34B386]/40 bg-[#34B386]/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-6 text-zinc-800">
               {t("productDetail.hiddenFieldsHelp")}
             </p>
             <ContactModal
@@ -685,9 +685,9 @@ export function DatabaseProductDetail({ id }: { id: string }) {
           </section>
         ) : null}
 
-        <section className="grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="grid gap-6">
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+        <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
+          <div className="grid gap-5">
+            <div className="rounded-lg border border-zinc-200 bg-white p-4">
               <h2 className="text-lg font-semibold text-zinc-950">{t("productDetail.overview")}</h2>
               <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
                 {product.longDescription || notProvided}
@@ -769,15 +769,15 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
                 </div>
               ) : (
-                <div className="rounded-lg border border-zinc-200 bg-white p-5 text-sm text-zinc-600">
+                <div className="rounded-lg border border-zinc-200 bg-white p-4 text-sm text-zinc-600">
                   {t("productDetail.noReviewsYet")}
                 </div>
               )}
             </div>
           </div>
 
-          <aside className="grid h-fit gap-5">
-            <div className="rounded-lg border border-zinc-200 bg-white p-5">
+          <aside className="grid h-fit gap-4">
+            <div className="rounded-lg border border-zinc-200 bg-white p-4">
               <div className="flex items-center gap-3">
                 <CompanyLogo
                   companyName={product.sellerName}
@@ -807,14 +807,14 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               {sellerCompanyId ? (
                 <Link
                   href={withLocale(`/companies/${sellerCompanyId}`, locale)}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-blue-200 hover:text-blue-700"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-md border border-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:border-[#34B386] hover:text-zinc-950"
                 >
                   {t("productDetail.viewCompanyProfile")}
                 </Link>
               ) : null}
             </div>
 
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
               <h2 className="font-semibold text-amber-950">{t("productDetail.importReviewReminder")}</h2>
               <p className="mt-2 text-sm leading-6 text-amber-800">
                 {t("productDetail.importReminderText")}
@@ -894,13 +894,13 @@ function CompactRelatedProductCard({ product }: { product: Product }) {
       </div>
       <div className="grid min-w-0 gap-1.5 pt-2.5">
         <Link href={href} className="min-w-0">
-          <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-zinc-950 transition-colors group-hover:text-blue-700">
+          <h3 className="line-clamp-2 text-sm font-semibold leading-5 text-zinc-950 transition-colors group-hover:text-[#34B386]">
             {product.name}
           </h3>
         </Link>
         <Link
           href={withLocale(`/companies/${product.sellerId}`, locale)}
-          className="flex min-w-0 items-center gap-1 text-xs text-zinc-500 hover:text-blue-700"
+          className="flex min-w-0 items-center gap-1 text-xs text-zinc-500 hover:text-[#34B386]"
         >
           <span className="truncate">{product.sellerName}</span>
           {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
@@ -1030,7 +1030,7 @@ function sortableCreatedAt(value: string | undefined) {
 }
 
 function ReviewCard({ review }: { review: PublicCompany["reviewsReceived"][number] }) {
-  return <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5"><div className="flex min-w-0 flex-wrap gap-2"><Badge tone="green">Completed Deal Review</Badge><Badge tone="blue">{review.rating}/5</Badge></div><p className="mt-4 break-words text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 break-words text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)}</p></article>;
+  return <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-4"><div className="flex min-w-0 flex-wrap gap-2"><Badge>Completed Deal Review</Badge><Badge>{review.rating}/5</Badge></div><p className="mt-4 break-words text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 break-words text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)}</p></article>;
 }
 
 function compactRows(

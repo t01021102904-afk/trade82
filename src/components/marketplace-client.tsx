@@ -348,20 +348,9 @@ function MarketplaceClientContent({
     setRetryVersion((value) => value + 1);
   }, []);
 
-  const filterPanel = (
-    <MarketplaceFilterPanel
-      query={queryState}
-      certifications={certifications}
-      shippingTerms={shippingTerms}
-      locale={locale}
-      updateQuery={updateQuery}
-      t={t}
-    />
-  );
-
   return (
-    <div className="grid min-w-0 gap-7">
-      <div className="grid gap-5 border-y border-zinc-200 py-5">
+    <div className="grid min-w-0 gap-5">
+      <div className="grid min-w-0 gap-4 border-y border-zinc-200 py-4">
         <label className="relative block">
           <span className="sr-only">{t("marketplace.searchProducts")}</span>
           <Search
@@ -374,7 +363,7 @@ function MarketplaceClientContent({
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder={t("marketplace.searchPlaceholder")}
-            className="h-14 w-full rounded-md border border-zinc-300 bg-white pl-12 pr-4 text-base text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+            className="h-11 w-full rounded-md border border-zinc-300 bg-white pl-11 pr-4 text-sm text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-[#34B386] focus:ring-2 focus:ring-[#34B386]/20"
           />
         </label>
 
@@ -395,9 +384,9 @@ function MarketplaceClientContent({
                 key={item.value}
                 type="button"
                 onClick={() => updateQuery({ category: item.value })}
-                className={`min-h-10 rounded-full border px-4 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/35 ${
+                className={`min-h-9 rounded-full border px-3 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/35 ${
                   queryState.category === item.value
-                    ? "border-zinc-950 bg-zinc-950 text-white"
+                    ? "border-[#34B386] bg-[#34B386]/10 text-zinc-950"
                     : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 hover:text-zinc-950"
                 }`}
                 aria-pressed={queryState.category === item.value}
@@ -410,26 +399,34 @@ function MarketplaceClientContent({
       </div>
 
       <div ref={gridTopRef} className="scroll-mt-24" />
-      <div className="grid min-w-0 gap-7 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
-        <aside className="hidden border-r border-zinc-200 pr-6 lg:block">
-          <div className="sticky top-24">
-            <div className="mb-5 flex items-center justify-between">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
+        <aside className="hidden min-w-0 border-r border-zinc-200 pr-5 lg:block">
+          <div className="sticky top-20 min-w-0">
+            <div className="mb-4 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-sm font-semibold text-zinc-950">
                 <SlidersHorizontal className="size-4" aria-hidden="true" />
                 {t("marketplace.filters")}
               </h2>
               {advancedFilterCount ? (
-                <span className="text-xs font-semibold text-emerald-700">
+                <span className="text-xs font-semibold text-zinc-700">
                   {advancedFilterCount}
                 </span>
               ) : null}
             </div>
-            {filterPanel}
+            <MarketplaceFilterPanel
+              mode="desktop"
+              query={queryState}
+              certifications={certifications}
+              shippingTerms={shippingTerms}
+              locale={locale}
+              updateQuery={updateQuery}
+              t={t}
+            />
             {activeFilters.length ? (
               <button
                 type="button"
                 onClick={clearFilters}
-                className="mt-6 min-h-10 text-sm font-semibold text-emerald-800 hover:text-zinc-950"
+                className="mt-5 min-h-9 text-sm font-semibold text-zinc-700 hover:text-zinc-950"
               >
                 {t("common.clearFilters")}
               </button>
@@ -441,7 +438,7 @@ function MarketplaceClientContent({
           <h2 id="marketplace-results-heading" className="sr-only">
             {t("marketplace.results")}
           </h2>
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-4">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 pb-3">
             <p className="text-sm font-medium text-zinc-700">
               <MarketplaceResultsSummary
                 locale={locale}
@@ -460,7 +457,7 @@ function MarketplaceClientContent({
               <Filter className="size-4" aria-hidden="true" />
               {t("marketplace.filters")}
               {advancedFilterCount ? (
-                <span className="inline-flex size-5 items-center justify-center rounded-full bg-emerald-700 text-[11px] text-white">
+                <span className="inline-flex size-5 items-center justify-center rounded-full bg-[#34B386] text-[11px] font-bold text-zinc-950">
                   {advancedFilterCount}
                 </span>
               ) : null}
@@ -468,7 +465,7 @@ function MarketplaceClientContent({
           </div>
 
           {activeFilters.length ? (
-            <div className="mb-6 flex flex-wrap items-center gap-2" aria-label={t("marketplace.activeFilters")}>
+            <div className="mb-4 flex flex-wrap items-center gap-2" aria-label={t("marketplace.activeFilters")}>
               {activeFilters.map((filter) => (
                 <button
                   key={filter.key}
@@ -479,7 +476,7 @@ function MarketplaceClientContent({
                         filter.key === "q" ? "" : "all",
                     } as MarketplaceQueryUpdates)
                   }
-                  className="inline-flex min-h-9 items-center gap-2 rounded-full bg-emerald-50 px-3 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
+                  className="inline-flex min-h-8 max-w-full items-center gap-2 rounded-full border border-[#34B386]/40 bg-[#34B386]/10 px-3 text-xs font-semibold text-zinc-800 hover:bg-[#34B386]/15"
                   aria-label={`${t("marketplace.removeFilter")}: ${filter.label}`}
                 >
                   {filter.label}
@@ -500,7 +497,7 @@ function MarketplaceClientContent({
             state={resultState}
             products={databaseProducts}
             renderLoading={() => (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {Array.from({ length: 9 }, (_, index) => (
                   <ProductCardSkeleton key={index} />
                 ))}
@@ -508,7 +505,7 @@ function MarketplaceClientContent({
             )}
             renderProducts={(products) => (
               <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                   {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -555,7 +552,7 @@ function MarketplaceClientContent({
             aria-modal="true"
             aria-labelledby="marketplace-filter-title"
             tabIndex={-1}
-            className="absolute inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-2xl bg-white p-5 outline-none"
+            className="absolute inset-x-0 bottom-0 max-h-[88vh] overflow-y-auto rounded-t-2xl bg-white p-4 outline-none"
           >
             <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
               <h2 id="marketplace-filter-title" className="text-lg font-semibold text-zinc-950">
@@ -570,19 +567,29 @@ function MarketplaceClientContent({
                 <X className="size-5" aria-hidden="true" />
               </button>
             </div>
-            <div className="py-5">{filterPanel}</div>
-            <div className="sticky bottom-0 grid grid-cols-2 gap-2 border-t border-zinc-200 bg-white py-4">
+            <div className="py-4">
+              <MarketplaceFilterPanel
+                mode="mobile"
+                query={queryState}
+                certifications={certifications}
+                shippingTerms={shippingTerms}
+                locale={locale}
+                updateQuery={updateQuery}
+                t={t}
+              />
+            </div>
+            <div className="sticky bottom-0 grid grid-cols-2 gap-2 border-t border-zinc-200 bg-white py-3">
               <button
                 type="button"
                 onClick={clearFilters}
-                className="min-h-11 rounded-md border border-zinc-300 text-sm font-semibold text-zinc-800"
+                className="min-h-10 rounded-md border border-zinc-300 text-sm font-semibold text-zinc-800"
               >
                 {t("common.clearFilters")}
               </button>
               <button
                 type="button"
                 onClick={closeFilters}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-emerald-700 text-sm font-semibold text-white"
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 text-sm font-semibold text-white hover:bg-zinc-800"
               >
                 <Check className="size-4" aria-hidden="true" />
                 {t("marketplace.applyFilters")}
@@ -596,6 +603,7 @@ function MarketplaceClientContent({
 }
 
 function MarketplaceFilterPanel({
+  mode,
   query,
   certifications,
   shippingTerms,
@@ -603,6 +611,7 @@ function MarketplaceFilterPanel({
   updateQuery,
   t,
 }: {
+  mode: "desktop" | "mobile";
   query: MarketplaceQueryState;
   certifications: string[];
   shippingTerms: string[];
@@ -611,7 +620,7 @@ function MarketplaceFilterPanel({
   t: (key: string) => string;
 }) {
   return (
-    <div className="grid gap-5">
+    <div className="grid min-w-0 gap-4" data-filter-layout={mode}>
       <SelectField
         label={t("marketplace.price")}
         value={query.price}
@@ -674,12 +683,12 @@ function SelectField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm">
+    <label className="grid min-w-0 gap-1.5 text-sm">
       <span className="font-semibold text-zinc-950">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-zinc-800 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+        className="h-10 w-full min-w-0 max-w-full rounded-md border border-zinc-300 bg-white px-3 text-zinc-800 outline-none focus:border-[#34B386] focus:ring-2 focus:ring-[#34B386]/20"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
