@@ -1,12 +1,14 @@
 "use client";
 
+import { Menu, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { ClerkUserButton } from "@/components/clerk-user-button";
 import { useI18n } from "@/components/i18n-provider";
+import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 import { useUserContext } from "@/hooks/use-user-context";
 import { stripLocale, withLocale } from "@/lib/i18n";
 import {
@@ -25,6 +27,7 @@ export function SiteHeader() {
   const { locale, t } = useI18n();
   const { context, isSignedIn, user } = useUserContext();
   const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
   const pathWithoutLocale = stripLocale(pathname);
   const metadataRole = user?.publicMetadata?.role;
   const role =
@@ -49,26 +52,53 @@ export function SiteHeader() {
     partnerProfile: context?.partnerProfile,
     companies: context?.companies ?? [],
   });
+  const publicDiscoveryLinks = [
+    ...getPublicNavigationLinks(),
+    { href: "/how-it-works", labelKey: "nav.howItWorks" },
+  ];
   const visibleNavLinks =
     isSignedIn && (hasRole || isPartnerOnly)
       ? [
-          ...getPublicNavigationLinks(),
+          ...publicDiscoveryLinks,
           ...(isPartnerOnly
             ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
             : []),
           ...(!isPartnerOnly && (role === "seller" || role === "both")
             ? [{ href: "/sell", labelKey: "nav.sell" }]
             : []),
+          ...(!isPartnerOnly &&
+          (role === "buyer" || role === "both" || role === "admin")
+            ? [
+                {
+                  href: "/dashboard/buyer?section=saved-products",
+                  labelKey: "nav.saved",
+                },
+              ]
+            : []),
           ...(isPartnerOnly ? [] : appLinks),
         ]
-      : getPublicNavigationLinks();
+      : publicDiscoveryLinks;
+  const closeMenu = useCallback(() => setOpen(false), []);
+
+  useAccessibleDialog({
+    open,
+    dialogRef: drawerRef,
+    onClose: closeMenu,
+  });
+
+  const primaryCta =
+    role === "buyer" || role === "both"
+      ? { href: "/dashboard/rfqs/new", label: t("nav.submitRfq") }
+      : role === "seller"
+        ? { href: "/sell", label: t("nav.listProduct") }
+        : { href: "/marketplace", label: t("nav.browseProducts") };
 
   return (
-    <header className="sticky top-0 z-40 border-b theme-border theme-header backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white text-zinc-950">
+      <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link
           href={withLocale("/", locale)}
-          className="flex min-w-0 items-center gap-2 theme-foreground"
+          className="flex min-w-0 items-center gap-2.5 text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
         >
           <Image
             src="/trade82-logo.png"
@@ -78,21 +108,21 @@ export function SiteHeader() {
             priority
             className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9"
           />
-          <span className="truncate text-sm font-semibold tracking-tight">
+          <span className="truncate text-[15px] font-semibold tracking-[-0.02em]">
             Trade82
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label={t("nav.primary")}>
           {visibleNavLinks.map((link) => (
             <Link
               key={link.href}
               href={withLocale(link.href, locale)}
               className={cx(
-                "relative rounded-md px-3 py-2 text-sm font-medium transition",
-                pathWithoutLocale === link.href
-                  ? "theme-surface-muted theme-foreground"
-                  : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
+                "relative rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40",
+                pathWithoutLocale === link.href.split("?")[0]
+                  ? "bg-emerald-50 text-emerald-800"
+                  : "hover:bg-zinc-100 hover:text-zinc-950",
               )}
             >
               {t(link.labelKey)}
@@ -107,28 +137,27 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            href={withLocale(pathWithoutLocale, "en")}
-            className={cx(
-              "rounded-md px-3 py-2 text-sm font-medium",
-              locale === "en"
-                ? "theme-surface-muted theme-foreground"
-                : "theme-muted hover:text-[var(--accent-foreground)]",
-            )}
+          <div
+            className="flex items-center rounded-md border border-zinc-200 p-0.5"
+            role="group"
+            aria-label={t("nav.language")}
           >
-            {t("locale.english")}
-          </Link>
-          <Link
-            href={withLocale(pathWithoutLocale, "ko")}
-            className={cx(
-              "rounded-md px-3 py-2 text-sm font-medium",
-              locale === "ko"
-                ? "theme-surface-muted theme-foreground"
-                : "theme-muted hover:text-[var(--accent-foreground)]",
-            )}
-          >
-            {t("locale.korean")}
-          </Link>
+            {(["en", "ko"] as const).map((nextLocale) => (
+              <Link
+                key={nextLocale}
+                href={withLocale(pathWithoutLocale, nextLocale)}
+                aria-current={locale === nextLocale ? "page" : undefined}
+                className={cx(
+                  "rounded px-2.5 py-1.5 text-xs font-semibold transition",
+                  locale === nextLocale
+                    ? "bg-zinc-950 text-white"
+                    : "text-zinc-500 hover:text-zinc-950",
+                )}
+              >
+                {nextLocale === "en" ? "EN" : "KO"}
+              </Link>
+            ))}
+          </div>
           {isSignedIn && isAdmin ? (
             <Link
               href="/admin"
@@ -145,47 +174,81 @@ export function SiteHeader() {
           {isSignedIn ? (
             <ClerkUserButton />
           ) : (
-            <>
-              <Link
-                href={withLocale("/login", locale)}
-                className="rounded-md border px-3.5 py-2 text-sm font-medium theme-border theme-muted hover:text-[var(--accent-foreground)]"
-              >
-                {t("common.signIn")}
-              </Link>
-              <Link
-                href={withLocale("/signup", locale)}
-                className="rounded-md px-3.5 py-2 text-sm font-medium theme-primary-button"
-              >
-                {t("common.signUp")}
-              </Link>
-            </>
+            <Link
+              href={withLocale("/login", locale)}
+              className="rounded-md px-3 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-950"
+            >
+              {t("common.signIn")}
+            </Link>
           )}
+          <Link
+            href={withLocale(primaryCta.href, locale)}
+            className="inline-flex min-h-10 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40 focus-visible:ring-offset-2"
+          >
+            {primaryCta.label}
+          </Link>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
-          className="inline-flex h-9 min-w-[4.25rem] shrink-0 items-center justify-center rounded-md border px-3 text-xs font-semibold theme-border theme-muted lg:hidden"
-          aria-label="Toggle navigation"
-          aria-expanded={open}
-        >
-          {open ? t("nav.close") : t("nav.menu")}
-        </button>
+        <div className="flex items-center gap-1.5 lg:hidden">
+          <Link
+            href={withLocale("/marketplace", locale)}
+            aria-label={t("marketplace.searchProducts")}
+            className="inline-flex size-10 items-center justify-center rounded-md text-zinc-700 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+          >
+            <Search className="size-5" aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-zinc-200 text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+            aria-label={t("nav.menu")}
+            aria-expanded={open}
+            aria-controls="public-mobile-navigation"
+          >
+            <Menu className="size-5" aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {open ? (
-        <div className="border-t theme-border theme-bg lg:hidden">
-          <nav className="mx-auto grid max-w-7xl gap-1 px-4 py-4 sm:px-6">
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-zinc-950/35"
+            aria-label={t("nav.close")}
+            onClick={closeMenu}
+          />
+          <div
+            ref={drawerRef}
+            id="public-mobile-navigation"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("nav.primary")}
+            tabIndex={-1}
+            className="absolute inset-y-0 right-0 flex w-[min(88vw,360px)] flex-col overflow-y-auto bg-white p-5 shadow-2xl outline-none"
+          >
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
+              <span className="text-sm font-semibold text-zinc-950">{t("nav.menu")}</span>
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label={t("nav.close")}
+                className="inline-flex size-10 items-center justify-center rounded-md hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+              >
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            </div>
+            <nav className="grid gap-1 py-5" aria-label={t("nav.primary")}>
             {visibleNavLinks.map((link) => (
               <Link
                 key={link.href}
                 href={withLocale(link.href, locale)}
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 className={cx(
                   "relative rounded-md px-3 py-3 text-sm font-medium",
-                  pathWithoutLocale === link.href
-                    ? "theme-surface-muted theme-foreground"
-                    : "theme-muted hover:bg-[var(--muted)] hover:text-[var(--foreground)]",
+                  pathWithoutLocale === link.href.split("?")[0]
+                    ? "bg-emerald-50 text-emerald-800"
+                    : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950",
                 )}
               >
                 {t(link.labelKey)}
@@ -199,20 +262,22 @@ export function SiteHeader() {
             ))}
             <Link
               href={withLocale(pathWithoutLocale, "en")}
-              className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+              onClick={closeMenu}
+              className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
             >
               {t("locale.english")}
             </Link>
             <Link
               href={withLocale(pathWithoutLocale, "ko")}
-              className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+              onClick={closeMenu}
+              className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
             >
               {t("locale.korean")}
             </Link>
             {isSignedIn && isAdmin ? (
               <Link
                 href="/admin"
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 className="rounded-md px-3 py-3 text-sm font-medium text-[var(--accent-foreground)] hover:bg-[var(--muted)]"
               >
                 Admin Console
@@ -226,19 +291,29 @@ export function SiteHeader() {
               <>
                 <Link
                   href={withLocale("/login", locale)}
-                  className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+                  onClick={closeMenu}
+                  className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
                 >
                   {t("common.signIn")}
                 </Link>
                 <Link
                   href={withLocale("/signup", locale)}
-                  className="rounded-md px-3 py-3 text-sm font-medium theme-muted hover:text-[var(--foreground)]"
+                  onClick={closeMenu}
+                  className="rounded-md px-3 py-3 text-sm font-medium text-zinc-700 hover:bg-zinc-100"
                 >
                   {t("common.signUp")}
                 </Link>
               </>
             )}
-          </nav>
+            </nav>
+            <Link
+              href={withLocale(primaryCta.href, locale)}
+              onClick={closeMenu}
+              className="mt-auto inline-flex min-h-11 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800"
+            >
+              {primaryCta.label}
+            </Link>
+          </div>
         </div>
       ) : null}
     </header>

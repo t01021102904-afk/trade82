@@ -38,6 +38,16 @@ export const homeProductCategories = [
   { id: "other", category: "Other", imageSrc: "/categories/other.png" },
 ] as const satisfies readonly HomeProductCategory[];
 
+export function marketplaceCategoryMessageKey(
+  category: MarketplaceCategory,
+) {
+  const item = homeProductCategories.find(
+    (candidate) => candidate.category === category,
+  );
+
+  return `home.categorySection.items.${item?.id ?? "other"}`;
+}
+
 export function homeCategoryHref(category: MarketplaceCategory, locale: Locale) {
   const url = new URL(locale === "ko" ? "/ko/marketplace" : "/marketplace", "https://trade82.com");
   url.searchParams.set("category", category);

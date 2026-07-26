@@ -15,12 +15,14 @@ const marketplaceCopy = {
 
 const sellersCopy = {
   en: {
-    title: "Sellers",
-    description: "Browse Korean sellers and manufacturers.",
+    title: "Korean Suppliers",
+    description:
+      "Review verified Korean manufacturers, brand owners, distributors, their products, export experience, certifications, and company information before making contact.",
   },
   ko: {
-    title: "셀러",
-    description: "한국 셀러와 제조사를 둘러보세요.",
+    title: "한국 공급사",
+    description:
+      "검증된 한국 제조사, 브랜드사, 유통사의 상품, 수출 경험, 인증 및 회사 정보를 검토한 뒤 문의하세요.",
   },
 } as const;
 
@@ -58,14 +60,16 @@ function CompactPageHeader({
   description: string;
 }) {
   return (
-    <header className="max-w-3xl" aria-labelledby={headingId}>
+    <header className="grid gap-4 border-b border-zinc-200 pb-7 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
       <h1
         id={headingId}
-        className="text-2xl font-semibold tracking-tight theme-foreground sm:text-3xl"
+        className="text-3xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-5xl"
       >
         {title}
       </h1>
-      <p className="mt-2 text-sm leading-6 theme-muted">{description}</p>
+      <p className="max-w-2xl text-sm leading-6 text-zinc-600 sm:text-base">
+        {description}
+      </p>
     </header>
   );
 }

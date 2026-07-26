@@ -25,7 +25,7 @@ export function SiteFooter() {
           <p className="text-xs font-semibold theme-foreground">
             {footer.legalLinksTitle}
           </p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs theme-muted">
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-700">
             {footer.legalLinks.map((link, index) => (
               <Link
                 key={link.label}
@@ -37,7 +37,7 @@ export function SiteFooter() {
             ))}
           </div>
         </nav>
-        <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs theme-muted">
+        <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-slate-700">
           <span>{footer.advertisingPartnerships}</span>
           <a
             href="mailto:contact@trade82.com"
@@ -46,7 +46,7 @@ export function SiteFooter() {
             contact@trade82.com
           </a>
         </p>
-        <p className="mt-4 text-xs theme-muted">{footer.copyright}</p>
+        <p className="mt-4 text-xs text-slate-700">{footer.copyright}</p>
       </div>
     </footer>
   );

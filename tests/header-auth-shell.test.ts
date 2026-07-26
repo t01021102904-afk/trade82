@@ -24,6 +24,21 @@ test("public header navigation only exposes Marketplace and Sellers", () => {
   assert.match(headerSource, /common\.signUp/);
 });
 
+test("public mobile navigation is an accessible, focus-managed dialog", () => {
+  const headerSource = readSource("src/components/site-header.tsx");
+  const dialogHookSource = readSource("src/hooks/use-accessible-dialog.ts");
+
+  assert.match(headerSource, /useAccessibleDialog/);
+  assert.match(headerSource, /aria-expanded=\{open\}/);
+  assert.match(headerSource, /aria-controls="public-mobile-navigation"/);
+  assert.match(headerSource, /role="dialog"/);
+  assert.match(headerSource, /aria-modal="true"/);
+  assert.match(dialogHookSource, /event\.key === "Escape"/);
+  assert.match(dialogHookSource, /event\.key !== "Tab"/);
+  assert.match(dialogHookSource, /document\.body\.style\.overflow = "hidden"/);
+  assert.match(dialogHookSource, /returnFocus\?\.focus\(\)/);
+});
+
 test("all localized auth routes render the shared Clerk auth shell", () => {
   const authShell = readSource("src/components/auth-shell.tsx");
 

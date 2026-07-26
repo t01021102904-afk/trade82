@@ -483,3 +483,15 @@ test("the API and client reuse the shared product query and keep errors distinct
   assert.match(clientSource, /MarketplaceUnavailable/);
   assert.doesNotMatch(clientSource, /products: \[\], pagination: DEFAULT_PAGINATION/);
 });
+
+test("mobile marketplace filters expose an accessible drawer and real retry path", () => {
+  const clientSource = readSource("src/components/marketplace-client.tsx");
+
+  assert.match(clientSource, /useAccessibleDialog/);
+  assert.match(clientSource, /aria-expanded=\{filtersOpen\}/);
+  assert.match(clientSource, /aria-controls="marketplace-filter-dialog"/);
+  assert.match(clientSource, /role="dialog"/);
+  assert.match(clientSource, /aria-modal="true"/);
+  assert.match(clientSource, /setRetryVersion\(\(value\) => value \+ 1\)/);
+  assert.match(clientSource, /<MarketplaceUnavailable locale=\{locale\} onRetry=\{retry\} t=\{t\} \/>/);
+});
