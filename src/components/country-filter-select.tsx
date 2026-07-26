@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { CountryFlag } from "@/components/country-flag";
 import { localizedCountryLabel } from "@/lib/country-normalization";
@@ -27,6 +27,9 @@ export function CountryFilterSelect({
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const controlId = useId();
+  const labelId = `${controlId}-label`;
+  const listboxId = `${controlId}-options`;
   const options = ["all", ...countries];
   const selectedLabel =
     value === "all" ? allLabel : localizedCountryLabel(value, locale);
@@ -48,13 +51,16 @@ export function CountryFilterSelect({
 
   return (
     <div ref={rootRef} className="relative grid min-w-0 gap-1.5 text-sm">
-      <span className="font-semibold text-zinc-950">{label}</span>
+      <span id={labelId} className="font-semibold text-zinc-950">
+        {label}
+      </span>
       <button
         ref={buttonRef}
         type="button"
         role="combobox"
+        aria-labelledby={labelId}
         aria-expanded={open}
-        aria-controls="seller-export-country-options"
+        aria-controls={listboxId}
         aria-haspopup="listbox"
         onClick={() => {
           setActiveIndex(Math.max(0, options.indexOf(value)));
@@ -90,7 +96,7 @@ export function CountryFilterSelect({
       </button>
       {open ? (
         <div
-          id="seller-export-country-options"
+          id={listboxId}
           role="listbox"
           aria-label={label}
           className="absolute top-full z-30 mt-1 max-h-64 w-full min-w-[220px] overflow-y-auto rounded-md border border-zinc-200 bg-white p-1 shadow-xl"

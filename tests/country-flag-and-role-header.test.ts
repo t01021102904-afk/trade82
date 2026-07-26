@@ -69,8 +69,9 @@ test("signed-in header actions follow seller-first both-role priority", () => {
 });
 
 test("country flags are local SVG graphics and never emoji text", async () => {
-  const [flag, sellers, detail, layout, notice] = await Promise.all([
+  const [flag, countrySelect, sellers, detail, layout, notice] = await Promise.all([
     readFile(new URL("../src/components/country-flag.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../src/components/country-filter-select.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/components/sellers-client.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/components/database-public-detail.tsx", import.meta.url), "utf8"),
     readFile(new URL("../src/app/layout.tsx", import.meta.url), "utf8"),
@@ -80,6 +81,8 @@ test("country flags are local SVG graphics and never emoji text", async () => {
   assert.match(flag, /fi-\$\{code\.toLowerCase\(\)\}/);
   assert.match(layout, /flag-icons\/css\/flag-icons\.min\.css/);
   assert.match(sellers, /CountryFilterSelect/);
+  assert.match(countrySelect, /aria-labelledby=\{labelId\}/);
+  assert.match(countrySelect, /aria-controls=\{listboxId\}/);
   assert.match(detail, /company\.mainExportMarkets/);
   assert.doesNotMatch(source, /[\u{1F1E6}-\u{1F1FF}]{2}/u);
   assert.match(notice, /MIT/);
