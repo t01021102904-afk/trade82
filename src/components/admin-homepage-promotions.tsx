@@ -143,7 +143,15 @@ export function AdminHomepagePromotions({ locale }: { locale: Locale }) {
   }, [copy.loadError]);
 
   useEffect(() => {
-    void load();
+    let active = true;
+    queueMicrotask(() => {
+      if (active) {
+        void load();
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, [load]);
 
   const openNew = () => {
@@ -515,19 +523,38 @@ export function AdminHomepagePromotions({ locale }: { locale: Locale }) {
 }
 
 function useObjectUrl(file: File | null) {
-  const [url, setUrl] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{
+    file: File;
+    url: string;
+  } | null>(null);
+
   useEffect(() => {
+    let active = true;
     if (!file) {
-      setUrl(null);
-      return;
+      queueMicrotask(() => {
+        if (active) {
+          setPreview(null);
+        }
+      });
+      return () => {
+        active = false;
+      };
     }
+
     const nextUrl = URL.createObjectURL(file);
-    setUrl(nextUrl);
+    queueMicrotask(() => {
+      if (active) {
+        setPreview({ file, url: nextUrl });
+      }
+    });
+
     return () => {
+      active = false;
       URL.revokeObjectURL(nextUrl);
     };
   }, [file]);
-  return url;
+
+  return preview?.file === file ? preview.url : null;
 }
 
 function PromotionPreview({
