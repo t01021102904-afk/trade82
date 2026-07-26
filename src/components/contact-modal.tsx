@@ -201,8 +201,8 @@ export function ContactModal({
         className={cx(
           "inline-flex items-center justify-center rounded-md px-3.5 py-2 text-sm font-medium transition disabled:cursor-wait disabled:opacity-70",
           variant === "primary"
-            ? "bg-zinc-950 text-white hover:bg-blue-700"
-            : "border border-zinc-200 bg-white text-zinc-700 hover:border-blue-200 hover:text-blue-700",
+            ? "bg-zinc-950 text-white hover:bg-zinc-800"
+            : "border border-zinc-200 bg-white text-zinc-700 hover:border-[#34B386] hover:text-zinc-950",
           className,
         )}
       >

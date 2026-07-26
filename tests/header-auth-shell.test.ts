@@ -22,6 +22,10 @@ test("public header navigation only exposes Marketplace and Sellers", () => {
   assert.match(headerSource, /locale\.korean/);
   assert.match(headerSource, /common\.signIn/);
   assert.match(headerSource, /common\.signUp/);
+  assert.doesNotMatch(headerSource, /primaryCta/);
+  assert.doesNotMatch(headerSource, /nav\.listProduct/);
+  assert.doesNotMatch(headerSource, /nav\.browseProducts/);
+  assert.doesNotMatch(headerSource, /href: "\/sell"/);
 });
 
 test("public mobile navigation is an accessible, focus-managed dialog", () => {

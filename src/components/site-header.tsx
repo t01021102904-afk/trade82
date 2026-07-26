@@ -63,9 +63,6 @@ export function SiteHeader() {
           ...(isPartnerOnly
             ? [{ href: "/partner/dashboard", labelKey: "nav.partnerDashboard" }]
             : []),
-          ...(!isPartnerOnly && (role === "seller" || role === "both")
-            ? [{ href: "/sell", labelKey: "nav.sell" }]
-            : []),
           ...(!isPartnerOnly &&
           (role === "buyer" || role === "both" || role === "admin")
             ? [
@@ -86,19 +83,12 @@ export function SiteHeader() {
     onClose: closeMenu,
   });
 
-  const primaryCta =
-    role === "buyer" || role === "both"
-      ? { href: "/dashboard/rfqs/new", label: t("nav.submitRfq") }
-      : role === "seller"
-        ? { href: "/sell", label: t("nav.listProduct") }
-        : { href: "/marketplace", label: t("nav.browseProducts") };
-
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white text-zinc-950">
-      <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full max-w-[1240px] items-center justify-between gap-3 px-4 sm:px-5 lg:px-6">
         <Link
           href={withLocale("/", locale)}
-          className="flex min-w-0 items-center gap-2.5 text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+          className="flex min-w-0 items-center gap-2 text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40"
         >
           <Image
             src="/trade82-logo.png"
@@ -106,7 +96,7 @@ export function SiteHeader() {
             width={40}
             height={40}
             priority
-            className="h-8 w-8 shrink-0 object-contain sm:h-9 sm:w-9"
+            className="size-7 shrink-0 object-contain"
           />
           <span className="truncate text-[15px] font-semibold tracking-[-0.02em]">
             Trade82
@@ -119,9 +109,9 @@ export function SiteHeader() {
               key={link.href}
               href={withLocale(link.href, locale)}
               className={cx(
-                "relative rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40",
+                "relative rounded-md px-2.5 py-1.5 text-[13px] font-medium text-zinc-600 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40",
                 pathWithoutLocale === link.href.split("?")[0]
-                  ? "bg-emerald-50 text-emerald-800"
+                  ? "bg-[#34B386]/10 text-zinc-950"
                   : "hover:bg-zinc-100 hover:text-zinc-950",
               )}
             >
@@ -181,26 +171,20 @@ export function SiteHeader() {
               {t("common.signIn")}
             </Link>
           )}
-          <Link
-            href={withLocale(primaryCta.href, locale)}
-            className="inline-flex min-h-10 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40 focus-visible:ring-offset-2"
-          >
-            {primaryCta.label}
-          </Link>
         </div>
 
         <div className="flex items-center gap-1.5 lg:hidden">
           <Link
             href={withLocale("/marketplace", locale)}
             aria-label={t("marketplace.searchProducts")}
-            className="inline-flex size-10 items-center justify-center rounded-md text-zinc-700 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+            className="inline-flex size-9 items-center justify-center rounded-md text-zinc-700 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40"
           >
             <Search className="size-5" aria-hidden="true" />
           </Link>
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-zinc-200 text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-zinc-200 text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40"
             aria-label={t("nav.menu")}
             aria-expanded={open}
             aria-controls="public-mobile-navigation"
@@ -225,7 +209,7 @@ export function SiteHeader() {
             aria-modal="true"
             aria-label={t("nav.primary")}
             tabIndex={-1}
-            className="absolute inset-y-0 right-0 flex w-[min(88vw,360px)] flex-col overflow-y-auto bg-white p-5 shadow-2xl outline-none"
+            className="absolute inset-y-0 right-0 flex w-[min(88vw,360px)] flex-col overflow-y-auto bg-white p-4 shadow-2xl outline-none"
           >
             <div className="flex items-center justify-between border-b border-zinc-200 pb-4">
               <span className="text-sm font-semibold text-zinc-950">{t("nav.menu")}</span>
@@ -233,7 +217,7 @@ export function SiteHeader() {
                 type="button"
                 onClick={closeMenu}
                 aria-label={t("nav.close")}
-                className="inline-flex size-10 items-center justify-center rounded-md hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/40"
+                className="inline-flex size-10 items-center justify-center rounded-md hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40"
               >
                 <X className="size-5" aria-hidden="true" />
               </button>
@@ -247,7 +231,7 @@ export function SiteHeader() {
                 className={cx(
                   "relative rounded-md px-3 py-3 text-sm font-medium",
                   pathWithoutLocale === link.href.split("?")[0]
-                    ? "bg-emerald-50 text-emerald-800"
+                    ? "bg-[#34B386]/10 text-zinc-950"
                     : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950",
                 )}
               >
@@ -306,13 +290,6 @@ export function SiteHeader() {
               </>
             )}
             </nav>
-            <Link
-              href={withLocale(primaryCta.href, locale)}
-              onClick={closeMenu}
-              className="mt-auto inline-flex min-h-11 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800"
-            >
-              {primaryCta.label}
-            </Link>
           </div>
         </div>
       ) : null}
@@ -343,7 +320,7 @@ function UnreadMessageBadge({
     <span
       aria-label={`${count} unread messages`}
       className={cx(
-        "absolute inline-flex items-center justify-center rounded-full bg-[#64AF8B] text-[10px] font-semibold leading-none text-white shadow-sm",
+        "absolute inline-flex items-center justify-center rounded-full bg-[#34B386] text-[10px] font-bold leading-none text-zinc-950 shadow-sm",
         count > 99 ? "size-6 text-[9px]" : "size-5",
         className,
       )}

@@ -73,13 +73,14 @@ export function HomePublicPreviews() {
 
   return (
     <>
-      <section className="mx-auto grid max-w-[1440px] gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <section className="mx-auto grid max-w-[1240px] gap-6 px-4 py-10 sm:px-5 sm:py-12 lg:px-6">
         <SectionHeader
           label={t("home.featuredProducts")}
           title={t("home.catalogPreview")}
           description={t("home.catalogDescription")}
+          labelClassName="text-zinc-700"
           action={
-            <Link href={withLocale("/marketplace", locale)} className="text-sm font-semibold text-emerald-800">
+            <Link href={withLocale("/marketplace", locale)} className="text-sm font-semibold text-zinc-800 hover:text-zinc-950">
               {t("home.viewAllProducts")}
             </Link>
           }
@@ -91,13 +92,13 @@ export function HomePublicPreviews() {
             onRetry={retry}
           />
         ) : isLoading ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {Array.from({ length: 4 }, (_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>
         ) : products.length ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -108,13 +109,14 @@ export function HomePublicPreviews() {
       </section>
 
       <section className="border-t border-zinc-200 bg-zinc-50">
-        <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="mx-auto grid max-w-[1240px] gap-6 px-4 py-10 sm:px-5 sm:py-12 lg:px-6">
           <SectionHeader
             label={t("home.featuredSellers")}
             title={t("home.sellerPreview")}
             description={t("home.sellerDescription")}
+            labelClassName="text-zinc-700"
             action={
-              <Link href={withLocale("/sellers", locale)} className="text-sm font-semibold text-emerald-800">
+              <Link href={withLocale("/sellers", locale)} className="text-sm font-semibold text-zinc-800 hover:text-zinc-950">
                 {t("home.viewAllSellers")}
               </Link>
             }
@@ -126,7 +128,7 @@ export function HomePublicPreviews() {
               onRetry={retry}
             />
           ) : isLoading ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 3 }, (_, index) => (
                 <div
                   key={index}
@@ -136,7 +138,7 @@ export function HomePublicPreviews() {
               ))}
             </div>
           ) : sellers.length ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {sellers.map((seller) => (
                 <SellerCard key={seller.id} seller={seller} />
               ))}

@@ -213,6 +213,7 @@ function buildCompanyQuery(searchParams: URLSearchParams) {
   const state = cleanQuery(searchParams.get("state"));
   const verified = cleanQuery(searchParams.get("verified"));
   const exportExperience = cleanQuery(searchParams.get("exportExperience"));
+  const exportCountry = cleanQuery(searchParams.get("exportCountry"));
   const conditions: Prisma.Sql[] = [
     Prisma.sql`c."companyRole" = 'seller'::"CompanyRole"`,
     Prisma.sql`c."verificationStatus" = 'verified'::"CompanyVerificationStatus"`,
@@ -252,6 +253,11 @@ function buildCompanyQuery(searchParams: URLSearchParams) {
   } else if (exportExperience === "fast") {
     conditions.push(Prisma.sql`FALSE`);
   }
+  if (exportCountry && exportCountry !== "all") {
+    conditions.push(
+      Prisma.sql`${exportCountry} = ANY(COALESCE(sp."exportCountries", ARRAY[]::text[]))`,
+    );
+  }
 
   return {
     from: Prisma.sql`FROM "Company" c LEFT JOIN "SellerProfile" sp ON sp."companyId" = c."id"`,
@@ -260,16 +266,32 @@ function buildCompanyQuery(searchParams: URLSearchParams) {
 }
 
 async function getCompanyFilterOptions() {
-  const rows = await getDb().$queryRaw<Array<{ value: string }>>`
-    SELECT DISTINCT COALESCE(NULLIF(c."stateOrProvince", ''), c."city") AS value
-    FROM "Company" c
-    WHERE c."companyRole" = 'seller'::"CompanyRole"
-      AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
-      AND c."legalName" <> ${DELETED_COMPANY_NAME}
-      AND COALESCE(NULLIF(c."stateOrProvince", ''), c."city") <> ''
-    ORDER BY value ASC
-  `;
-  return { states: rows.map((row) => row.value) };
+  const [stateRows, exportCountryRows] = await Promise.all([
+    getDb().$queryRaw<Array<{ value: string }>>`
+      SELECT DISTINCT COALESCE(NULLIF(c."stateOrProvince", ''), c."city") AS value
+      FROM "Company" c
+      WHERE c."companyRole" = 'seller'::"CompanyRole"
+        AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
+        AND c."legalName" <> ${DELETED_COMPANY_NAME}
+        AND COALESCE(NULLIF(c."stateOrProvince", ''), c."city") <> ''
+      ORDER BY value ASC
+    `,
+    getDb().$queryRaw<Array<{ value: string }>>`
+      SELECT DISTINCT export_country.value AS value
+      FROM "Company" c
+      JOIN "SellerProfile" sp ON sp."companyId" = c."id"
+      CROSS JOIN LATERAL unnest(sp."exportCountries") AS export_country(value)
+      WHERE c."companyRole" = 'seller'::"CompanyRole"
+        AND c."verificationStatus" = 'verified'::"CompanyVerificationStatus"
+        AND c."legalName" <> ${DELETED_COMPANY_NAME}
+        AND export_country.value <> ''
+      ORDER BY value ASC
+    `,
+  ]);
+  return {
+    states: stateRows.map((row) => row.value),
+    exportCountries: exportCountryRows.map((row) => row.value),
+  };
 }
 
 function cleanQuery(value: string | null) {

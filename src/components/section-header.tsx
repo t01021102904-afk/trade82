@@ -5,17 +5,19 @@ export function SectionHeader({
   title,
   description,
   action,
+  labelClassName = "text-blue-700",
 }: {
   label?: string;
   title: string;
   description?: string;
   action?: ReactNode;
+  labelClassName?: string;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0 max-w-2xl">
         {label ? (
-          <p className="mb-2 text-sm font-medium text-blue-700">{label}</p>
+          <p className={`mb-2 text-sm font-medium ${labelClassName}`}>{label}</p>
         ) : null}
         <h2 className="break-words text-xl font-semibold theme-foreground sm:text-2xl">{title}</h2>
         {description ? (

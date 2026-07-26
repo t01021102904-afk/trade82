@@ -58,10 +58,10 @@ export function HomeMarketingExposureStrip() {
 
   return (
     <section className="border-t theme-border">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <div className="mx-auto max-w-[1240px] px-4 py-8 sm:px-5 lg:px-6">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] theme-success-text">
+            <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-700">
               {text.label}
             </p>
             <h2 className="mt-2 text-xl font-semibold tracking-[-0.01em] theme-foreground sm:text-2xl">
@@ -71,7 +71,7 @@ export function HomeMarketingExposureStrip() {
           </div>
           <Link
             href={withLocale("/marketplace", locale)}
-            className="text-sm font-semibold theme-muted hover:text-[var(--accent-foreground)]"
+            className="text-sm font-semibold text-zinc-700 hover:text-zinc-950"
           >
             {text.viewAll}
           </Link>
@@ -79,7 +79,7 @@ export function HomeMarketingExposureStrip() {
 
         <div className="product-exposure-marquee-mask">
           {isLoading ? (
-            <div className="flex gap-4 overflow-hidden">
+            <div className="flex gap-3 overflow-hidden">
               {Array.from({ length: 6 }, (_, index) => (
                 <div
                   key={index}
@@ -116,7 +116,7 @@ function ProductMarqueeGroup({
   keyPrefix?: string;
 }) {
   return (
-    <div className="flex gap-4 pr-4">
+    <div className="flex gap-3 pr-3">
       {products.map((product) => (
         <div
           key={`${keyPrefix}-${product.id}`}

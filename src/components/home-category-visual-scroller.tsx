@@ -75,8 +75,8 @@ export function HomeCategoryVisualScroller() {
   };
 
   return (
-    <section className="relative border-t border-zinc-200 bg-white py-8 sm:py-10" aria-labelledby="home-category-heading">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+    <section className="relative border-t border-zinc-200 bg-white py-7 sm:py-8" aria-labelledby="home-category-heading">
+      <div className="mx-auto max-w-[1240px] px-4 sm:px-5 lg:px-6">
         <div className="mb-4 flex items-center justify-between gap-4 sm:mb-5">
           <h2 id="home-category-heading" className="text-lg font-semibold tracking-[-0.01em] theme-foreground sm:text-xl">
             {t("home.categorySection.title")}
@@ -87,7 +87,7 @@ export function HomeCategoryVisualScroller() {
               onClick={() => moveTrack(-1)}
               disabled={!availability.previous}
               aria-label={t("home.categorySection.previous")}
-              className="inline-flex size-9 items-center justify-center rounded-full border transition hover:border-[#34B386] hover:text-[#16785a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40 disabled:cursor-not-allowed disabled:opacity-35 theme-surface-elevated"
+              className="inline-flex size-9 items-center justify-center rounded-full border transition hover:border-[#34B386] hover:text-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40 disabled:cursor-not-allowed disabled:opacity-35 theme-surface-elevated"
             >
               <ChevronLeft className="size-4" aria-hidden="true" />
             </button>
@@ -96,7 +96,7 @@ export function HomeCategoryVisualScroller() {
               onClick={() => moveTrack(1)}
               disabled={!availability.next}
               aria-label={t("home.categorySection.next")}
-              className="inline-flex size-9 items-center justify-center rounded-full border transition hover:border-[#34B386] hover:text-[#16785a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40 disabled:cursor-not-allowed disabled:opacity-35 theme-surface-elevated"
+              className="inline-flex size-9 items-center justify-center rounded-full border transition hover:border-[#34B386] hover:text-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/40 disabled:cursor-not-allowed disabled:opacity-35 theme-surface-elevated"
             >
               <ChevronRight className="size-4" aria-hidden="true" />
             </button>
@@ -115,7 +115,7 @@ export function HomeCategoryVisualScroller() {
             <Link
               key={item.id}
               href={homeCategoryHref(item.category, locale)}
-              className="home-category-visual-item group flex w-[116px] shrink-0 snap-start flex-col items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-3 text-center transition hover:border-emerald-600 hover:bg-white focus-visible:border-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600/35 sm:w-[145px] sm:px-3 sm:py-4 lg:w-[152px]"
+              className="home-category-visual-item group flex w-[108px] shrink-0 snap-start flex-col items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 px-2 py-2.5 text-center transition hover:border-[#34B386] hover:bg-white focus-visible:border-[#34B386] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34B386]/35 sm:w-[132px] sm:px-3 sm:py-3 lg:w-[140px]"
             >
               <Image
                 src={item.imageSrc}

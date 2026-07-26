@@ -506,3 +506,21 @@ test("mobile marketplace filters expose an accessible drawer and real retry path
   assert.match(clientSource, /setRetryVersion\(\(value\) => value \+ 1\)/);
   assert.match(clientSource, /<MarketplaceUnavailable locale=\{locale\} onRetry=\{retry\} t=\{t\} \/>/);
 });
+
+test("public directory filters stay within their columns and export countries use real seller data", () => {
+  const marketplaceSource = readSource("src/components/marketplace-client.tsx");
+  const sellersSource = readSource("src/components/sellers-client.tsx");
+  const apiSource = readSource("src/app/api/public/marketplace/route.ts");
+
+  assert.match(marketplaceSource, /mode="desktop"/);
+  assert.match(marketplaceSource, /mode="mobile"/);
+  assert.match(marketplaceSource, /lg:grid-cols-\[220px_minmax\(0,1fr\)\]/);
+  assert.match(marketplaceSource, /w-full min-w-0 max-w-full/);
+  assert.match(sellersSource, /searchParams\.get\("exportCountry"\)/);
+  assert.match(sellersSource, /setQueryParam\(requestParams, "exportCountry", exportCountry\)/);
+  assert.match(sellersSource, /countryLabel\(item, locale\)/);
+  assert.match(sellersSource, /sellers\.allExportCountries/);
+  assert.match(apiSource, /unnest\(sp\."exportCountries"\)/);
+  assert.match(apiSource, /\$\{exportCountry\} = ANY/);
+  assert.doesNotMatch(apiSource, /INSERT INTO|UPDATE "SellerProfile"/);
+});

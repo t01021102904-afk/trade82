@@ -1,13 +1,14 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { PaginationControls } from "@/components/pagination-controls";
 import { SellerCard } from "@/components/seller-card";
 import { marketplaceCategoryMessageKey } from "@/lib/home-product-categories";
+import { countryLabel } from "@/lib/company-select-options";
 import { marketplaceCategories } from "@/lib/marketplace";
 import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
 import type { Seller } from "@/lib/types";
@@ -47,8 +48,12 @@ function SellersClientContent() {
   const [databaseSellers, setDatabaseSellers] = useState<Seller[]>([]);
   const [pagination, setPagination] =
     useState<PaginationState>(DEFAULT_PAGINATION);
-  const [filterOptions, setFilterOptions] = useState<{ states: string[] }>({
+  const [filterOptions, setFilterOptions] = useState<{
+    states: string[];
+    exportCountries: string[];
+  }>({
     states: [],
+    exportCountries: [],
   });
   const [databaseLoading, setDatabaseLoading] = useState(true);
   const [requestError, setRequestError] = useState(false);
@@ -57,6 +62,7 @@ function SellersClientContent() {
   const category = searchParams.get("category") ?? "all";
   const state = searchParams.get("state") ?? "all";
   const exportExperience = searchParams.get("exportExperience") ?? "all";
+  const exportCountry = searchParams.get("exportCountry") ?? "all";
   const page = parsePositiveInteger(searchParams.get("page"));
 
   useEffect(() => {
@@ -69,6 +75,7 @@ function SellersClientContent() {
     setQueryParam(requestParams, "category", category);
     setQueryParam(requestParams, "state", state);
     setQueryParam(requestParams, "exportExperience", exportExperience);
+    setQueryParam(requestParams, "exportCountry", exportCountry);
 
     const controller = new AbortController();
     void fetch(`/api/public/marketplace?${requestParams.toString()}`, {
@@ -84,7 +91,7 @@ function SellersClientContent() {
         (result: {
           companies?: Array<Record<string, unknown>>;
           pagination?: PaginationState;
-          filterOptions?: { states?: string[] };
+          filterOptions?: { states?: string[]; exportCountries?: string[] };
         }) => {
           if (controller.signal.aborted) return;
           setDatabaseSellers(
@@ -93,7 +100,10 @@ function SellersClientContent() {
             ),
           );
           setPagination(result.pagination ?? DEFAULT_PAGINATION);
-          setFilterOptions({ states: result.filterOptions?.states ?? [] });
+          setFilterOptions({
+            states: result.filterOptions?.states ?? [],
+            exportCountries: result.filterOptions?.exportCountries ?? [],
+          });
           setDatabaseLoading(false);
         },
       )
@@ -105,9 +115,41 @@ function SellersClientContent() {
       });
 
     return () => controller.abort();
-  }, [category, exportExperience, locale, page, retryVersion, search, state]);
+  }, [category, exportCountry, exportExperience, locale, page, retryVersion, search, state]);
 
-  const states = useMemo(() => filterOptions.states, [filterOptions.states]);
+  const states = filterOptions.states;
+  const exportCountries = filterOptions.exportCountries;
+  const activeFilters = [
+    search
+      ? { key: "q", label: search }
+      : null,
+    category !== "all"
+      ? {
+          key: "category",
+          label: t(
+            marketplaceCategoryMessageKey(
+              category as (typeof marketplaceCategories)[number],
+            ),
+          ),
+        }
+      : null,
+    state !== "all" ? { key: "state", label: state } : null,
+    exportExperience !== "all"
+      ? {
+          key: "exportExperience",
+          label:
+            exportExperience === "multi"
+              ? t("sellers.markets3")
+              : t("sellers.exportsToKorea"),
+        }
+      : null,
+    exportCountry !== "all"
+      ? {
+          key: "exportCountry",
+          label: countryLabel(exportCountry, locale),
+        }
+      : null,
+  ].filter((filter): filter is { key: string; label: string } => Boolean(filter));
 
   const updateFilters = (
     updates: Record<string, string>,
@@ -142,10 +184,10 @@ function SellersClientContent() {
   };
 
   return (
-    <div className="grid gap-7">
-      <div className="border-y border-zinc-200 py-5">
-        <div className="grid gap-4 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
-          <label className="relative grid gap-2 text-sm">
+    <div className="grid min-w-0 gap-5">
+      <div className="min-w-0 border-y border-zinc-200 py-4">
+        <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
+          <label className="relative grid min-w-0 gap-1.5 text-sm">
             <span className="font-semibold text-zinc-950">
               {t("sellers.search")}
             </span>
@@ -158,13 +200,15 @@ function SellersClientContent() {
               value={search}
               onChange={(event) => updateFilters({ q: event.target.value })}
               placeholder={t("sellers.searchPlaceholder")}
-              className="h-11 rounded-md border border-zinc-300 pl-10 pr-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+              className="h-10 min-w-0 rounded-md border border-zinc-300 pl-10 pr-3 outline-none focus:border-[#34B386] focus:ring-2 focus:ring-[#34B386]/20"
             />
           </label>
           <SelectField
             label={t("marketplace.category")}
             value={category}
-            onChange={(value) => updateFilters({ category: value })}
+            onChange={(value) =>
+              updateFilters({ category: value }, { replace: false })
+            }
             options={[
               { label: t("marketplace.allCategories"), value: "all" },
               ...marketplaceCategories.map((item) => ({
@@ -176,7 +220,9 @@ function SellersClientContent() {
           <SelectField
             label={t("sellers.state")}
             value={state}
-            onChange={(value) => updateFilters({ state: value })}
+            onChange={(value) =>
+              updateFilters({ state: value }, { replace: false })
+            }
             options={[
               { label: t("sellers.allStates"), value: "all" },
               ...states.map((item) => ({ label: item, value: item })),
@@ -185,15 +231,31 @@ function SellersClientContent() {
           <SelectField
             label={t("sellers.exportExperience")}
             value={exportExperience}
-            onChange={(value) => updateFilters({ exportExperience: value })}
+            onChange={(value) =>
+              updateFilters({ exportExperience: value }, { replace: false })
+            }
             options={[
               { label: t("sellers.anyExperience"), value: "all" },
               { label: t("sellers.exportsToKorea"), value: "korea" },
               { label: t("sellers.markets3"), value: "multi" },
             ]}
           />
+          <SelectField
+            label={t("sellers.exportCountry")}
+            value={exportCountry}
+            onChange={(value) =>
+              updateFilters({ exportCountry: value }, { replace: false })
+            }
+            options={[
+              { label: t("sellers.allExportCountries"), value: "all" },
+              ...exportCountries.map((item) => ({
+                label: countryLabel(item, locale),
+                value: item,
+              })),
+            ]}
+          />
         </div>
-        <div className="mt-5 flex items-center justify-between border-t border-zinc-200 pt-4 text-sm text-zinc-600">
+        <div className="mt-4 flex items-center justify-between border-t border-zinc-200 pt-3 text-sm text-zinc-600">
           <span>
             {pagination.total} {t("sellers.sellerFound")}
           </span>
@@ -205,13 +267,35 @@ function SellersClientContent() {
                 category: "all",
                 state: "all",
                 exportExperience: "all",
-              })
+                exportCountry: "all",
+              }, { replace: false })
             }
-            className="min-h-10 font-semibold text-emerald-800 hover:text-zinc-950"
+            className="min-h-9 font-semibold text-zinc-700 hover:text-zinc-950"
           >
             {t("common.clearFilters")}
           </button>
         </div>
+        {activeFilters.length ? (
+          <div className="mt-3 flex min-w-0 flex-wrap gap-2" aria-label={t("marketplace.activeFilters")}>
+            {activeFilters.map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                onClick={() =>
+                  updateFilters(
+                    { [filter.key]: filter.key === "q" ? "" : "all" },
+                    { replace: false },
+                  )
+                }
+                className="inline-flex min-h-8 max-w-full items-center gap-1.5 rounded-full border border-[#34B386]/40 bg-[#34B386]/10 px-3 text-xs font-semibold text-zinc-800"
+                aria-label={`${t("marketplace.removeFilter")}: ${filter.label}`}
+              >
+                <span className="truncate">{filter.label}</span>
+                <X className="size-3.5 shrink-0 text-zinc-700" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div ref={gridTopRef} className="scroll-mt-24" />
@@ -234,7 +318,7 @@ function SellersClientContent() {
         <SellersSkeleton cardsOnly />
       ) : databaseSellers.length ? (
         <>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {databaseSellers.map((seller) => (
               <SellerCard key={seller.id} seller={seller} />
             ))}
@@ -277,12 +361,12 @@ function SelectField({
   onChange: (value: string) => void;
 }) {
   return (
-    <label className="grid gap-2 text-sm">
+    <label className="grid min-w-0 gap-1.5 text-sm">
       <span className="font-semibold text-zinc-950">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 rounded-md border border-zinc-300 bg-white px-3 text-zinc-800 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+        className="h-10 w-full min-w-0 max-w-full rounded-md border border-zinc-300 bg-white px-3 text-zinc-800 outline-none focus:border-[#34B386] focus:ring-2 focus:ring-[#34B386]/20"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>

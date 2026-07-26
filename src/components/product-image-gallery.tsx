@@ -38,7 +38,7 @@ export function ProductImageGallery({
               onClick={() => setSelected(index)}
               className={`relative aspect-square w-16 shrink-0 overflow-hidden border-2 ${
                 selected === index
-                  ? "border-emerald-700"
+                  ? "border-[#34B386]"
                   : "border-zinc-200 hover:border-zinc-400"
               }`}
               aria-label={`${productName} - ${t("productDetail.viewImage")} ${index + 1}`}

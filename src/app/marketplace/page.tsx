@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = publicPageMetadata({
   title: "Marketplace | Trade82",
   description:
-    "Browse Korean products from verified suppliers for wholesale sourcing. Compare product information, minimum order quantities, pricing availability, shipping terms, certifications, and seller profiles before starting an inquiry.",
+    "Browse Korean products for wholesale sourcing. Compare product information, minimum order quantities, pricing availability, shipping terms, certifications, and seller profiles before starting an inquiry.",
   path: "/marketplace",
   languages: {
     en: "/marketplace",
@@ -49,7 +49,7 @@ export default async function MarketplacePage({
       {initialData?.products.length ? (
         <JsonLd data={marketplaceItemListJsonLd(initialData.products, "en")} />
       ) : null}
-      <div className="mx-auto grid max-w-[1440px] gap-7 px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
+      <div className="mx-auto grid max-w-[1240px] gap-5 px-4 py-7 sm:px-5 sm:py-8 lg:px-6">
         <MarketplaceSeoContent locale="en" />
         <MarketplaceClient
           initialProducts={initialData?.products}
