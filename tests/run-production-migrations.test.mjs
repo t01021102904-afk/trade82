@@ -5,6 +5,7 @@ import {
   APPROVED_PRODUCTION_MIGRATION_BATCH,
   ANALYTICS_MIGRATION,
   DEFERRED_APPLICATION_MIGRATION,
+  DEFERRED_APPLICATION_MIGRATIONS,
   EXPECTED_SUPABASE_PROJECT,
   FIRST_APPROVED_MIGRATION,
   LEGACY_ZERO_STEP_MIGRATIONS,
@@ -30,10 +31,10 @@ const approvedNames = new Set([
   ANALYTICS_MIGRATION,
   PARTNER_PAYOUT_MIGRATION,
   PARTNER_ACTIVATION_MIGRATION,
-  DEFERRED_APPLICATION_MIGRATION,
+  ...DEFERRED_APPLICATION_MIGRATIONS,
 ]);
 const productionMigrationNames = localMigrations.filter(
-  (name) => name !== DEFERRED_APPLICATION_MIGRATION,
+  (name) => !DEFERRED_APPLICATION_MIGRATIONS.includes(name),
 );
 const legacyLocalMigrations = productionMigrationNames.slice(0, -1);
 const historicalMigrationNames = localMigrations.filter((name) => !approvedNames.has(name));
@@ -418,17 +419,18 @@ test("local and Preview builds skip without opening a database connection", asyn
   assert.equal(connections, 0);
 });
 
-test("the approved batch is followed by operations, analytics, partner payout, activation, and the deferred application migration", () => {
+test("the approved batch is followed by operations, analytics, partner payout, activation, and deferred application migrations", () => {
   assert.deepEqual(APPROVED_PRODUCTION_MIGRATION_BATCH, [
     "20260718100000_add_settlement_transfer_reversals",
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-6), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-5), OPERATIONS_MIGRATION);
-  assert.equal(localMigrations.at(-4), ANALYTICS_MIGRATION);
-  assert.equal(localMigrations.at(-3), PARTNER_PAYOUT_MIGRATION);
-  assert.equal(localMigrations.at(-2), PARTNER_ACTIVATION_MIGRATION);
+  assert.equal(localMigrations.at(-7), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-6), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-5), ANALYTICS_MIGRATION);
+  assert.equal(localMigrations.at(-4), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-3), PARTNER_ACTIVATION_MIGRATION);
+  assert.equal(localMigrations.at(-2), DEFERRED_APPLICATION_MIGRATIONS[0]);
   assert.equal(localMigrations.at(-1), DEFERRED_APPLICATION_MIGRATION);
 });
 
@@ -479,7 +481,7 @@ test("production-style activation verification can run before the application mi
   assert.equal(fake.calls.statements.some((statement) => statement.includes("analytics_click_zero_rows")), true);
 });
 
-test("the homepage promotion migration remains deferred from Production deploy", async () => {
+test("application migrations remain deferred from Production deploy", async () => {
   const fake = fakeClient(deploymentResponses());
   let deploys = 0;
   await assertDiagnostic(

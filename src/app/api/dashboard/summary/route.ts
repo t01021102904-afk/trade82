@@ -45,8 +45,6 @@ export async function GET(request: Request) {
         inquiryCount,
         companyReviews,
         dealReviews,
-        companyReviewStats,
-        dealReviewStats,
         deals,
       ] = await Promise.all([
         getDb().product.findMany({
@@ -82,7 +80,7 @@ export async function GET(request: Request) {
           },
           orderBy: { createdAt: "desc" },
           take: 5,
-          select: { id: true, rating: true, comment: true, createdAt: true },
+          select: { id: true, comment: true, createdAt: true },
         }),
         getDb().review.findMany({
           where: {
@@ -94,28 +92,9 @@ export async function GET(request: Request) {
           take: 5,
           select: {
             id: true,
-            rating: true,
             reviewText: true,
             createdAt: true,
           },
-        }),
-        getDb().companyReview.aggregate({
-          where: {
-            reviewedCompanyId: company.id,
-            isPublic: true,
-            deletedAt: null,
-          },
-          _count: true,
-          _avg: { rating: true },
-        }),
-        getDb().review.aggregate({
-          where: {
-            reviewedCompanyId: company.id,
-            isPublic: true,
-            adminApproved: true,
-          },
-          _count: true,
-          _avg: { rating: true },
         }),
         getDb().deal.findMany({
           where: {
@@ -131,10 +110,6 @@ export async function GET(request: Request) {
           },
         }),
       ]);
-      const reviewCount = companyReviewStats._count + dealReviewStats._count;
-      const ratingTotal =
-        (companyReviewStats._avg.rating ?? 0) * companyReviewStats._count +
-        (dealReviewStats._avg.rating ?? 0) * dealReviewStats._count;
       const completedDeals = deals.filter(
         (deal) => deal.dealStatus === "completed",
       );
@@ -153,8 +128,6 @@ export async function GET(request: Request) {
           reviewRequests: completedDeals.filter(
             (deal) => deal.reviews.length === 0,
           ).length,
-          reviewCount,
-          averageRating: reviewCount ? ratingTotal / reviewCount : 0,
           productCount: products.length,
           listedProductCount: products.filter((item) => item.status === "active")
             .length,
@@ -162,13 +135,11 @@ export async function GET(request: Request) {
         recentReviews: [
           ...companyReviews.map((item) => ({
             id: item.id,
-            rating: item.rating,
             text: item.comment,
             createdAt: item.createdAt,
           })),
           ...dealReviews.map((item) => ({
             id: item.id,
-            rating: item.rating,
             text: item.reviewText,
             createdAt: item.createdAt,
           })),

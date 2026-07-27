@@ -198,8 +198,6 @@ export type Seller = {
   contactEmail: string;
   website: string;
   languages: string[];
-  rating: number;
-  reviewCount: number;
   productCount?: number;
   verified: boolean;
   verificationStatus?: VerificationStatus;

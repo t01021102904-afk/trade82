@@ -68,7 +68,14 @@ export async function GET(request: Request) {
               adminApproved: true,
               reviewerCompany: { deletedAt: null },
             },
-            include: {
+            select: {
+              id: true,
+              reviewTitle: true,
+              reviewText: true,
+              contractValue: true,
+              currency: true,
+              publicValueDisplay: true,
+              createdAt: true,
               reviewerCompany: {
                 select: { legalName: true, tradeName: true },
               },
@@ -183,7 +190,14 @@ function publicCompanyInclude() {
         adminApproved: true,
         reviewerCompany: { deletedAt: null },
       },
-      include: {
+      select: {
+        id: true,
+        reviewTitle: true,
+        reviewText: true,
+        contractValue: true,
+        currency: true,
+        publicValueDisplay: true,
+        createdAt: true,
         reviewerCompany: {
           select: { legalName: true, tradeName: true },
         },

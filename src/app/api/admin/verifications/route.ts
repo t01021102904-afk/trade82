@@ -97,7 +97,7 @@ export async function GET(request: Request) {
     ]);
     return Response.json({
       requests,
-      reviews: reviews.map((review) => ({
+      reviews: reviews.map(({ rating: _rating, ...review }) => ({
         ...review,
         contractValue: review.contractValue.toString(),
         deal: {

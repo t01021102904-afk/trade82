@@ -207,7 +207,7 @@ export type CompanyReviewGroupByOutputType = {
   id: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating: number | null
   comment: string
   isPublic: boolean
   deletedAt: Date | null
@@ -242,7 +242,7 @@ export type CompanyReviewWhereInput = {
   id?: Prisma.StringFilter<"CompanyReview"> | string
   reviewerCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
   reviewedCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
-  rating?: Prisma.IntFilter<"CompanyReview"> | number
+  rating?: Prisma.IntNullableFilter<"CompanyReview"> | number | null
   comment?: Prisma.StringFilter<"CompanyReview"> | string
   isPublic?: Prisma.BoolFilter<"CompanyReview"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"CompanyReview"> | Date | string | null
@@ -256,7 +256,7 @@ export type CompanyReviewOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   reviewerCompanyId?: Prisma.SortOrder
   reviewedCompanyId?: Prisma.SortOrder
-  rating?: Prisma.SortOrder
+  rating?: Prisma.SortOrderInput | Prisma.SortOrder
   comment?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -273,7 +273,7 @@ export type CompanyReviewWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CompanyReviewWhereInput | Prisma.CompanyReviewWhereInput[]
   reviewerCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
   reviewedCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
-  rating?: Prisma.IntFilter<"CompanyReview"> | number
+  rating?: Prisma.IntNullableFilter<"CompanyReview"> | number | null
   comment?: Prisma.StringFilter<"CompanyReview"> | string
   isPublic?: Prisma.BoolFilter<"CompanyReview"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"CompanyReview"> | Date | string | null
@@ -287,7 +287,7 @@ export type CompanyReviewOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   reviewerCompanyId?: Prisma.SortOrder
   reviewedCompanyId?: Prisma.SortOrder
-  rating?: Prisma.SortOrder
+  rating?: Prisma.SortOrderInput | Prisma.SortOrder
   comment?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -307,7 +307,7 @@ export type CompanyReviewScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"CompanyReview"> | string
   reviewerCompanyId?: Prisma.StringWithAggregatesFilter<"CompanyReview"> | string
   reviewedCompanyId?: Prisma.StringWithAggregatesFilter<"CompanyReview"> | string
-  rating?: Prisma.IntWithAggregatesFilter<"CompanyReview"> | number
+  rating?: Prisma.IntNullableWithAggregatesFilter<"CompanyReview"> | number | null
   comment?: Prisma.StringWithAggregatesFilter<"CompanyReview"> | string
   isPublic?: Prisma.BoolWithAggregatesFilter<"CompanyReview"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CompanyReview"> | Date | string | null
@@ -317,7 +317,7 @@ export type CompanyReviewScalarWhereWithAggregatesInput = {
 
 export type CompanyReviewCreateInput = {
   id?: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -331,7 +331,7 @@ export type CompanyReviewUncheckedCreateInput = {
   id?: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -341,7 +341,7 @@ export type CompanyReviewUncheckedCreateInput = {
 
 export type CompanyReviewUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -355,7 +355,7 @@ export type CompanyReviewUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -367,7 +367,7 @@ export type CompanyReviewCreateManyInput = {
   id?: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -377,7 +377,7 @@ export type CompanyReviewCreateManyInput = {
 
 export type CompanyReviewUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -389,7 +389,7 @@ export type CompanyReviewUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -537,7 +537,7 @@ export type CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyNestedInput = 
 
 export type CompanyReviewCreateWithoutReviewerCompanyInput = {
   id?: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -549,7 +549,7 @@ export type CompanyReviewCreateWithoutReviewerCompanyInput = {
 export type CompanyReviewUncheckedCreateWithoutReviewerCompanyInput = {
   id?: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -569,7 +569,7 @@ export type CompanyReviewCreateManyReviewerCompanyInputEnvelope = {
 
 export type CompanyReviewCreateWithoutReviewedCompanyInput = {
   id?: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -581,7 +581,7 @@ export type CompanyReviewCreateWithoutReviewedCompanyInput = {
 export type CompanyReviewUncheckedCreateWithoutReviewedCompanyInput = {
   id?: string
   reviewerCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -622,7 +622,7 @@ export type CompanyReviewScalarWhereInput = {
   id?: Prisma.StringFilter<"CompanyReview"> | string
   reviewerCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
   reviewedCompanyId?: Prisma.StringFilter<"CompanyReview"> | string
-  rating?: Prisma.IntFilter<"CompanyReview"> | number
+  rating?: Prisma.IntNullableFilter<"CompanyReview"> | number | null
   comment?: Prisma.StringFilter<"CompanyReview"> | string
   isPublic?: Prisma.BoolFilter<"CompanyReview"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"CompanyReview"> | Date | string | null
@@ -649,7 +649,7 @@ export type CompanyReviewUpdateManyWithWhereWithoutReviewedCompanyInput = {
 export type CompanyReviewCreateManyReviewerCompanyInput = {
   id?: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -660,7 +660,7 @@ export type CompanyReviewCreateManyReviewerCompanyInput = {
 export type CompanyReviewCreateManyReviewedCompanyInput = {
   id?: string
   reviewerCompanyId: string
-  rating: number
+  rating?: number | null
   comment: string
   isPublic?: boolean
   deletedAt?: Date | string | null
@@ -670,7 +670,7 @@ export type CompanyReviewCreateManyReviewedCompanyInput = {
 
 export type CompanyReviewUpdateWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -682,7 +682,7 @@ export type CompanyReviewUpdateWithoutReviewerCompanyInput = {
 export type CompanyReviewUncheckedUpdateWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -693,7 +693,7 @@ export type CompanyReviewUncheckedUpdateWithoutReviewerCompanyInput = {
 export type CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -703,7 +703,7 @@ export type CompanyReviewUncheckedUpdateManyWithoutReviewerCompanyInput = {
 
 export type CompanyReviewUpdateWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -715,7 +715,7 @@ export type CompanyReviewUpdateWithoutReviewedCompanyInput = {
 export type CompanyReviewUncheckedUpdateWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -726,7 +726,7 @@ export type CompanyReviewUncheckedUpdateWithoutReviewedCompanyInput = {
 export type CompanyReviewUncheckedUpdateManyWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   comment?: Prisma.StringFieldUpdateOperationsInput | string
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -814,7 +814,7 @@ export type $CompanyReviewPayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     reviewerCompanyId: string
     reviewedCompanyId: string
-    rating: number
+    rating: number | null
     comment: string
     isPublic: boolean
     deletedAt: Date | null

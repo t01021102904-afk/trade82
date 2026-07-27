@@ -7,7 +7,6 @@ import {
   Handshake,
   MessageCircle,
   ShoppingBag,
-  Star,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -71,7 +70,6 @@ type Summary = {
   metrics: Record<string, number>;
   recentReviews: Array<{
     id: string;
-    rating: number;
     text: string;
     createdAt: string;
   }>;
@@ -106,8 +104,7 @@ type MetricIconKey =
   | "messages"
   | "deals"
   | "reviews"
-  | "products"
-  | "rating";
+  | "products";
 
 const metricIcons: Record<MetricIconKey, LucideIcon> = {
   productViews: Eye,
@@ -116,7 +113,6 @@ const metricIcons: Record<MetricIconKey, LucideIcon> = {
   deals: Handshake,
   reviews: ClipboardCheck,
   products: ShoppingBag,
-  rating: Star,
 };
 
 export function DashboardClient({
@@ -146,8 +142,6 @@ export function DashboardClient({
   const recentInquiries = summary.recentInquiries ?? [];
   const recentSavedItems = summary.recentSavedItems ?? [];
   const savedProducts = recentSavedItems.filter((item) => item.type === "product");
-  const reviewCount = summary.metrics.reviewCount ?? 0;
-  const averageRating = Number(summary.metrics.averageRating ?? 0).toFixed(1);
   const metrics: Metric[] =
     role === "seller"
       ? [
@@ -186,12 +180,6 @@ export function DashboardClient({
             value: summary.metrics.listedProductCount ?? 0,
             section: "products",
             icon: "products",
-          },
-          {
-            label: t("dashboard.averageRating"),
-            value: `${averageRating} (${reviewCount})`,
-            section: "overview",
-            icon: "rating",
           },
         ]
       : [
@@ -700,8 +688,7 @@ function ReviewsPanel({
             key={review.id}
             className="min-w-0 rounded-md border p-3 theme-surface-muted"
           >
-            <p className="text-sm font-medium text-amber-700">{review.rating}/5</p>
-            <p className="mt-1 line-clamp-3 break-words text-sm theme-muted">
+            <p className="line-clamp-3 break-words text-sm theme-muted">
               {review.text}
             </p>
           </article>
