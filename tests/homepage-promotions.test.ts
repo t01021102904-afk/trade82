@@ -92,6 +92,40 @@ test("public DTO excludes admin and storage internals", async () => {
   assert.doesNotMatch(publicSelect, /StoragePath: true/);
 });
 
+test("public company and product details omit repetitive trade warning cards", async () => {
+  const [detail, en, ko] = await Promise.all([
+    readFile(new URL("../src/components/database-public-detail.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../messages/en.json", import.meta.url), "utf8"),
+    readFile(new URL("../messages/ko.json", import.meta.url), "utf8"),
+  ]);
+
+  for (const key of [
+    "company.tradeNote",
+    "company.tradeNoteText",
+    "productDetail.sellerProvidedNotice",
+    "productDetail.importReviewReminder",
+    "productDetail.importReminderText",
+  ]) {
+    assert.doesNotMatch(detail, new RegExp(key.replace(".", "\\.")));
+  }
+
+  for (const messageFile of [en, ko]) {
+    assert.doesNotMatch(messageFile, /"tradeNote"/);
+    assert.doesNotMatch(messageFile, /"tradeNoteText"/);
+    assert.doesNotMatch(messageFile, /"sellerProvidedNotice"/);
+    assert.doesNotMatch(messageFile, /"importReviewReminder"/);
+  }
+
+  assert.match(detail, /productDetail\.complianceDocuments/);
+  assert.match(detail, /productDetail\.documents/);
+  assert.match(detail, /productDetail\.compliance/);
+  assert.match(detail, /productDetail\.sellerInformation/);
+  assert.match(detail, /company\.productCategories/);
+  assert.match(detail, /company\.certifications/);
+  assert.match(detail, /const hasSellerSidebar/);
+  assert.match(detail, /hasSellerSidebar \? "grid gap-5 lg:grid-cols-\[1fr_340px\]" : "grid gap-5"/);
+});
+
 test("carousel covers timing, pause, visibility, reduced motion, swipe, and safe links", async () => {
   const source = await readFile(
     new URL("../src/components/home-promotion-carousel.tsx", import.meta.url),

@@ -327,9 +327,12 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
     { label: t("settings.shippingTerms"), value: joinList(profile?.shippingTerms) },
     { label: t("settings.paymentTerms"), value: joinList(profile?.paymentTerms) },
   ]);
+  const hasSellerSidebar = Boolean(
+    profile?.productCategories.length || company.categories.length || profile?.certifications.length,
+  );
 
   return (
-    <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
+    <section className={hasSellerSidebar ? "grid gap-5 lg:grid-cols-[1fr_340px]" : "grid gap-5"}>
       <div className="grid gap-5">
         {companyRows.length ? (
           <div>
@@ -368,18 +371,16 @@ function SellerProfileDetail({ company }: { company: PublicCompany }) {
           </div>
         ) : null}
       </div>
-      <aside className="grid h-fit gap-4">
-        {profile?.productCategories.length || company.categories.length ? (
-          <BadgeList title={t("company.productCategories")} values={profile?.productCategories.length ? profile.productCategories : company.categories} />
-        ) : null}
-        {profile?.certifications.length ? (
-          <BadgeList title={t("company.certifications")} values={profile.certifications} accent />
-        ) : null}
-        <div className="rounded-lg border border-[#34B386]/40 bg-[#34B386]/10 p-4">
-          <h2 className="font-semibold text-zinc-950">{t("company.tradeNote")}</h2>
-          <p className="mt-2 text-sm leading-6 text-zinc-700">{t("company.tradeNoteText")}</p>
-        </div>
-      </aside>
+      {hasSellerSidebar ? (
+        <aside className="grid h-fit gap-4">
+          {profile?.productCategories.length || company.categories.length ? (
+            <BadgeList title={t("company.productCategories")} values={profile?.productCategories.length ? profile.productCategories : company.categories} />
+          ) : null}
+          {profile?.certifications.length ? (
+            <BadgeList title={t("company.certifications")} values={profile.certifications} accent />
+          ) : null}
+        </aside>
+      ) : null}
     </section>
   );
 }
@@ -757,9 +758,6 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   { label: t("settings.ingredientsMaterials"), value: displayField("ingredientsMaterials", String(richRows.ingredientsOrMaterials ?? "") || notProvided) },
                 ])}
               />
-              <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-                {t("productDetail.sellerProvidedNotice")}
-              </p>
             </div>
 
             <div>
@@ -831,13 +829,6 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   {t("productDetail.viewCompanyProfile")}
                 </Link>
               ) : null}
-            </div>
-
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <h2 className="font-semibold text-amber-950">{t("productDetail.importReviewReminder")}</h2>
-              <p className="mt-2 text-sm leading-6 text-amber-800">
-                {t("productDetail.importReminderText")}
-              </p>
             </div>
           </aside>
         </section>
