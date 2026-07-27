@@ -129,11 +129,6 @@ export function databaseCompanyToSeller(
 ): Seller {
   const profile = (company.sellerProfile ?? {}) as Record<string, unknown>;
   const count = (company._count ?? {}) as Record<string, unknown>;
-  const reviews = Array.isArray(company.reviewsReceived)
-    ? (company.reviewsReceived as Array<Record<string, unknown>>)
-    : [];
-  const ratingTotal = reviews.reduce((sum, review) => sum + Number(review.rating ?? 0), 0);
-  const averageRating = reviews.length ? ratingTotal / reviews.length : 0;
 
   return {
     id: String(company.id),
@@ -158,8 +153,6 @@ export function databaseCompanyToSeller(
     contactEmail: "",
     website: String(company.website ?? ""),
     languages: ["Korean", "English"],
-    rating: averageRating,
-    reviewCount: reviews.length,
     productCount: typeof count.products === "number" ? count.products : 0,
     verified: true,
     verificationStatus: "verified",

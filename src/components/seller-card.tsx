@@ -52,14 +52,6 @@ export function SellerCard({ seller }: { seller: Seller }) {
           <dt className="truncate text-xs text-zinc-500">{t("sellers.products")}</dt>
           <dd className="mt-1 line-clamp-2 break-words font-medium text-zinc-950">{seller.productCount ?? notProvided}</dd>
         </div>
-        {seller.reviewCount > 0 ? (
-          <div className="col-span-2 min-w-0">
-            <dt className="truncate text-xs text-zinc-500">{t("sellers.rating")}</dt>
-            <dd className="mt-1 line-clamp-2 break-words font-medium text-zinc-950">
-              {seller.rating.toFixed(1)} ({seller.reviewCount})
-            </dd>
-          </div>
-        ) : null}
       </dl>
 
       <p className="mt-3 line-clamp-3 min-h-[3.75rem] break-words text-sm leading-5 text-zinc-600">

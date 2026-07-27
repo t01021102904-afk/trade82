@@ -66,7 +66,6 @@ type VerificationRequest = {
 
 type PendingReview = {
   id: string;
-  rating: number;
   reviewTitle: string | null;
   reviewText: string;
   reviewerCompany: { legalName: string; companyRole: string };
@@ -75,7 +74,6 @@ type PendingReview = {
 
 type AnonymousReview = {
   id: string;
-  rating: number;
   comment: string;
   createdAt: string;
   reviewerCompanyRole: string;
@@ -380,7 +378,7 @@ export function AdminVerifications() {
       <section>
         <h2 className="text-lg font-semibold text-zinc-950">{admin.dealReviewsWaiting}</h2>
         <div className="mt-3 grid gap-2">
-          {reviews.map((review) => <article key={review.id} className="rounded-md border border-zinc-200 bg-white p-4"><div className="flex flex-wrap gap-1.5"><Badge tone="blue">{review.rating}/5</Badge><Badge>{review.reviewerCompany.legalName} → {review.reviewedCompany.legalName}</Badge></div><p className="mt-2 text-sm text-zinc-700">{review.reviewText}</p><div className="mt-3 flex gap-1.5"><button type="button" onClick={() => void moderateReview(review.id, true)} className="h-8 rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white">{admin.showReview}</button><button type="button" onClick={() => void moderateReview(review.id, false)} className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700">{admin.hideReview}</button></div></article>)}
+          {reviews.map((review) => <article key={review.id} className="rounded-md border border-zinc-200 bg-white p-4"><div className="flex flex-wrap gap-1.5"><Badge>{review.reviewerCompany.legalName} → {review.reviewedCompany.legalName}</Badge></div>{review.reviewTitle ? <h3 className="mt-2 text-sm font-semibold text-zinc-950">{review.reviewTitle}</h3> : null}<p className="mt-2 text-sm text-zinc-700">{review.reviewText}</p><div className="mt-3 flex gap-1.5"><button type="button" onClick={() => void moderateReview(review.id, true)} className="h-8 rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white">{admin.showReview}</button><button type="button" onClick={() => void moderateReview(review.id, false)} className="h-8 rounded-md border border-red-200 px-2.5 text-xs font-medium text-red-700">{admin.hideReview}</button></div></article>)}
           {!reviews.length ? <p className="rounded-md border border-dashed border-zinc-300 bg-white p-4 text-sm text-zinc-600">{admin.noDealReviews}</p> : null}
         </div>
       </section>
@@ -391,7 +389,6 @@ export function AdminVerifications() {
           {companyReviews.map((review) => (
             <article key={review.id} className="rounded-md border border-zinc-200 bg-white p-4">
               <div className="flex flex-wrap gap-1.5">
-                <Badge tone="blue">{review.rating}/5</Badge>
                 <Badge>{review.reviewedCompany.tradeName || review.reviewedCompany.legalName}</Badge>
                 <Badge tone="amber">{review.reviewerCompanyRole}</Badge>
               </div>

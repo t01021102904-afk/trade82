@@ -63,8 +63,6 @@ export function submissionToSeller(
     contactEmail: submission.userEmail,
     website: submission.website,
     languages: ["Korean", "English"],
-    rating: 0,
-    reviewCount: 0,
     verified: true,
     verificationStatus: "verified",
     description:

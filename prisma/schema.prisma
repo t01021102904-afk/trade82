@@ -1938,7 +1938,7 @@ model Review {
   reviewerCompany      Company            @relation("ReviewWriter", fields: [reviewerCompanyId], references: [id])
   reviewedCompanyId    String
   reviewedCompany      Company            @relation("ReviewRecipient", fields: [reviewedCompanyId], references: [id])
-  rating               Int
+  rating               Int?
   reviewTitle          String?
   reviewText           String
   contractValue        Decimal            @db.Decimal(16, 2)
@@ -1960,7 +1960,7 @@ model CompanyReview {
   reviewerCompany   Company   @relation("CompanyReviewWriter", fields: [reviewerCompanyId], references: [id], onDelete: Cascade)
   reviewedCompanyId String
   reviewedCompany   Company   @relation("CompanyReviewRecipient", fields: [reviewedCompanyId], references: [id], onDelete: Cascade)
-  rating            Int
+  rating            Int?
   comment           String
   isPublic          Boolean   @default(true)
   deletedAt         DateTime?

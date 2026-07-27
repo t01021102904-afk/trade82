@@ -35,7 +35,6 @@ export async function GET(request: Request) {
 
     if (!company || !canViewPublicCompany(company)) {
       return Response.json({
-        averageRating: 0,
         canReview: false,
         reviews: [],
       });
@@ -51,7 +50,6 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
-        rating: true,
         comment: true,
         createdAt: true,
         reviewerCompany: {
@@ -60,18 +58,13 @@ export async function GET(request: Request) {
       },
     });
 
-    const averageRating = reviews.length
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-      : 0;
     const canReview = await currentViewerCanReview(company);
 
     return Response.json({
       companyRole: company.companyRole,
-      averageRating,
       canReview,
       reviews: reviews.map((review) => ({
         id: review.id,
-        rating: review.rating,
         comment: review.comment,
         createdAt: review.createdAt,
         reviewerCompanyRole: review.reviewerCompany.companyRole,
@@ -144,12 +137,7 @@ export async function POST(request: Request) {
 
     const body = await readJsonObject(request);
     const reviewedCompanyId = requiredIdField(body, "reviewedCompanyId");
-    const rating = Number(body.rating);
     const comment = requiredStringField(body, "comment", 2_000);
-
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      return Response.json({ error: "Rating must be between 1 and 5." }, { status: 400 });
-    }
 
     const reviewedCompany = await getDb().company.findUnique({
       where: { id: reviewedCompanyId },
@@ -213,7 +201,7 @@ export async function POST(request: Request) {
       data: {
         reviewerCompanyId: reviewerCompany.id,
         reviewedCompanyId,
-        rating,
+        rating: null,
         comment,
       },
     });

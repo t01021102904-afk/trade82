@@ -20,7 +20,11 @@ export const OPERATIONS_MIGRATION = "20260719100000_add_settlement_operations_co
 export const ANALYTICS_MIGRATION = "20260721100000_add_partner_referral_analytics";
 export const PARTNER_PAYOUT_MIGRATION = "20260722100000_add_partner_payout_profiles";
 export const PARTNER_ACTIVATION_MIGRATION = "20260723100000_activate_pending_partner_profiles";
-export const DEFERRED_APPLICATION_MIGRATION = "20260726120000_add_homepage_promotions";
+export const DEFERRED_APPLICATION_MIGRATIONS = Object.freeze([
+  "20260726120000_add_homepage_promotions",
+  "20260727210000_make_review_ratings_nullable",
+]);
+export const DEFERRED_APPLICATION_MIGRATION = DEFERRED_APPLICATION_MIGRATIONS.at(-1);
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([
   ...APPROVED_PRODUCTION_MIGRATION_BATCH,
   OPERATIONS_MIGRATION,
@@ -207,17 +211,30 @@ function assertApprovedMigrationRecordOrder(databaseRecords) {
 }
 
 function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
-  const hasDeferredApplicationMigration = localMigrationNames.includes(
-    DEFERRED_APPLICATION_MIGRATION,
+  const deferredApplicationMigrations = localMigrationNames.filter((name) =>
+    DEFERRED_APPLICATION_MIGRATIONS.includes(name),
   );
+  const hasDeferredApplicationMigration = deferredApplicationMigrations.length > 0;
   if (
     hasDeferredApplicationMigration &&
-    localMigrationNames.at(-1) !== DEFERRED_APPLICATION_MIGRATION
+    !hasExactMigrationList(
+      deferredApplicationMigrations,
+      DEFERRED_APPLICATION_MIGRATIONS,
+    )
   ) {
-    throw pendingSetError("The deferred application migration must be the final local migration.");
+    throw pendingSetError("Deferred application migrations are incomplete or out of order.");
+  }
+  if (
+    hasDeferredApplicationMigration &&
+    !hasExactMigrationList(
+      localMigrationNames.slice(-DEFERRED_APPLICATION_MIGRATIONS.length),
+      DEFERRED_APPLICATION_MIGRATIONS,
+    )
+  ) {
+    throw pendingSetError("Deferred application migrations must be the final local migration suffix.");
   }
   const deployableLocalMigrationNames = hasDeferredApplicationMigration
-    ? localMigrationNames.slice(0, -1)
+    ? localMigrationNames.slice(0, -DEFERRED_APPLICATION_MIGRATIONS.length)
     : localMigrationNames;
   const localNames = new Set(localMigrationNames);
   const databaseNames = new Set();
@@ -303,7 +320,7 @@ function migrationState(localMigrationNames, databaseRecords, schemaEvidence) {
 
   if (
     hasDeferredApplicationMigration &&
-    !databaseNames.has(DEFERRED_APPLICATION_MIGRATION)
+    DEFERRED_APPLICATION_MIGRATIONS.some((migration) => !databaseNames.has(migration))
   ) {
     throw pendingSetError(
       "Production deploy is blocked while an application migration is intentionally deferred.",

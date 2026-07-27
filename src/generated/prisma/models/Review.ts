@@ -248,7 +248,7 @@ export type ReviewGroupByOutputType = {
   dealId: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating: number | null
   reviewTitle: string | null
   reviewText: string
   contractValue: runtime.Decimal
@@ -289,7 +289,7 @@ export type ReviewWhereInput = {
   dealId?: Prisma.StringFilter<"Review"> | string
   reviewerCompanyId?: Prisma.StringFilter<"Review"> | string
   reviewedCompanyId?: Prisma.StringFilter<"Review"> | string
-  rating?: Prisma.IntFilter<"Review"> | number
+  rating?: Prisma.IntNullableFilter<"Review"> | number | null
   reviewTitle?: Prisma.StringNullableFilter<"Review"> | string | null
   reviewText?: Prisma.StringFilter<"Review"> | string
   contractValue?: Prisma.DecimalFilter<"Review"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -310,7 +310,7 @@ export type ReviewOrderByWithRelationInput = {
   dealId?: Prisma.SortOrder
   reviewerCompanyId?: Prisma.SortOrder
   reviewedCompanyId?: Prisma.SortOrder
-  rating?: Prisma.SortOrder
+  rating?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewText?: Prisma.SortOrder
   contractValue?: Prisma.SortOrder
@@ -335,7 +335,7 @@ export type ReviewWhereUniqueInput = Prisma.AtLeast<{
   dealId?: Prisma.StringFilter<"Review"> | string
   reviewerCompanyId?: Prisma.StringFilter<"Review"> | string
   reviewedCompanyId?: Prisma.StringFilter<"Review"> | string
-  rating?: Prisma.IntFilter<"Review"> | number
+  rating?: Prisma.IntNullableFilter<"Review"> | number | null
   reviewTitle?: Prisma.StringNullableFilter<"Review"> | string | null
   reviewText?: Prisma.StringFilter<"Review"> | string
   contractValue?: Prisma.DecimalFilter<"Review"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -356,7 +356,7 @@ export type ReviewOrderByWithAggregationInput = {
   dealId?: Prisma.SortOrder
   reviewerCompanyId?: Prisma.SortOrder
   reviewedCompanyId?: Prisma.SortOrder
-  rating?: Prisma.SortOrder
+  rating?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewTitle?: Prisma.SortOrderInput | Prisma.SortOrder
   reviewText?: Prisma.SortOrder
   contractValue?: Prisma.SortOrder
@@ -382,7 +382,7 @@ export type ReviewScalarWhereWithAggregatesInput = {
   dealId?: Prisma.StringWithAggregatesFilter<"Review"> | string
   reviewerCompanyId?: Prisma.StringWithAggregatesFilter<"Review"> | string
   reviewedCompanyId?: Prisma.StringWithAggregatesFilter<"Review"> | string
-  rating?: Prisma.IntWithAggregatesFilter<"Review"> | number
+  rating?: Prisma.IntNullableWithAggregatesFilter<"Review"> | number | null
   reviewTitle?: Prisma.StringNullableWithAggregatesFilter<"Review"> | string | null
   reviewText?: Prisma.StringWithAggregatesFilter<"Review"> | string
   contractValue?: Prisma.DecimalWithAggregatesFilter<"Review"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -397,7 +397,7 @@ export type ReviewScalarWhereWithAggregatesInput = {
 
 export type ReviewCreateInput = {
   id?: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -418,7 +418,7 @@ export type ReviewUncheckedCreateInput = {
   dealId: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -433,7 +433,7 @@ export type ReviewUncheckedCreateInput = {
 
 export type ReviewUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -454,7 +454,7 @@ export type ReviewUncheckedUpdateInput = {
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -472,7 +472,7 @@ export type ReviewCreateManyInput = {
   dealId: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -487,7 +487,7 @@ export type ReviewCreateManyInput = {
 
 export type ReviewUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -505,7 +505,7 @@ export type ReviewUncheckedUpdateManyInput = {
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -725,7 +725,7 @@ export type ReviewUncheckedUpdateManyWithoutDealNestedInput = {
 
 export type ReviewCreateWithoutReviewerCompanyInput = {
   id?: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -744,7 +744,7 @@ export type ReviewUncheckedCreateWithoutReviewerCompanyInput = {
   id?: string
   dealId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -769,7 +769,7 @@ export type ReviewCreateManyReviewerCompanyInputEnvelope = {
 
 export type ReviewCreateWithoutReviewedCompanyInput = {
   id?: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -788,7 +788,7 @@ export type ReviewUncheckedCreateWithoutReviewedCompanyInput = {
   id?: string
   dealId: string
   reviewerCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -835,7 +835,7 @@ export type ReviewScalarWhereInput = {
   dealId?: Prisma.StringFilter<"Review"> | string
   reviewerCompanyId?: Prisma.StringFilter<"Review"> | string
   reviewedCompanyId?: Prisma.StringFilter<"Review"> | string
-  rating?: Prisma.IntFilter<"Review"> | number
+  rating?: Prisma.IntNullableFilter<"Review"> | number | null
   reviewTitle?: Prisma.StringNullableFilter<"Review"> | string | null
   reviewText?: Prisma.StringFilter<"Review"> | string
   contractValue?: Prisma.DecimalFilter<"Review"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -866,7 +866,7 @@ export type ReviewUpdateManyWithWhereWithoutReviewedCompanyInput = {
 
 export type ReviewCreateWithoutDealInput = {
   id?: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -885,7 +885,7 @@ export type ReviewUncheckedCreateWithoutDealInput = {
   id?: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -928,7 +928,7 @@ export type ReviewCreateManyReviewerCompanyInput = {
   id?: string
   dealId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -945,7 +945,7 @@ export type ReviewCreateManyReviewedCompanyInput = {
   id?: string
   dealId: string
   reviewerCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -960,7 +960,7 @@ export type ReviewCreateManyReviewedCompanyInput = {
 
 export type ReviewUpdateWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -979,7 +979,7 @@ export type ReviewUncheckedUpdateWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -996,7 +996,7 @@ export type ReviewUncheckedUpdateManyWithoutReviewerCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1011,7 +1011,7 @@ export type ReviewUncheckedUpdateManyWithoutReviewerCompanyInput = {
 
 export type ReviewUpdateWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1030,7 +1030,7 @@ export type ReviewUncheckedUpdateWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1047,7 +1047,7 @@ export type ReviewUncheckedUpdateManyWithoutReviewedCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   dealId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1064,7 +1064,7 @@ export type ReviewCreateManyDealInput = {
   id?: string
   reviewerCompanyId: string
   reviewedCompanyId: string
-  rating: number
+  rating?: number | null
   reviewTitle?: string | null
   reviewText: string
   contractValue: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1079,7 +1079,7 @@ export type ReviewCreateManyDealInput = {
 
 export type ReviewUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1098,7 +1098,7 @@ export type ReviewUncheckedUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1115,7 +1115,7 @@ export type ReviewUncheckedUpdateManyWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   reviewerCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
   reviewedCompanyId?: Prisma.StringFieldUpdateOperationsInput | string
-  rating?: Prisma.IntFieldUpdateOperationsInput | number
+  rating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   reviewTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   reviewText?: Prisma.StringFieldUpdateOperationsInput | string
   contractValue?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1240,7 +1240,7 @@ export type $ReviewPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     dealId: string
     reviewerCompanyId: string
     reviewedCompanyId: string
-    rating: number
+    rating: number | null
     reviewTitle: string | null
     reviewText: string
     contractValue: runtime.Decimal

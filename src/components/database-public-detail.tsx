@@ -112,7 +112,7 @@ type PublicCompany = {
   _count?: { products: number };
   reviewsReceived: Array<{
     id: string;
-    rating: number;
+    reviewTitle: string | null;
     reviewText: string;
     contractValue: string;
     currency: string;
@@ -154,10 +154,6 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
   const companyProducts = payload.products
     .filter((item) => (item.sellerCompany as { id?: string })?.id === id)
     .map((item) => publicProductToCard(item, locale));
-  const average = company?.reviewsReceived.length
-    ? company.reviewsReceived.reduce((sum, review) => sum + review.rating, 0) /
-      company.reviewsReceived.length
-    : 0;
 
   if (!loaded) return <PublicLoading />;
   if (!company) return <PublicUnavailable />;
@@ -221,8 +217,7 @@ export function DatabaseCompanyDetail({ id }: { id: string }) {
         {company.reviewsReceived.length ? (
           <>
             <section>
-              <h2 className="text-lg font-semibold text-zinc-950">{t("company.completedDealReviews")}</h2>
-              <p className="mt-1 text-sm text-zinc-500">{average.toFixed(1)}/5 · {company.reviewsReceived.length}</p>
+              <h2 className="text-lg font-semibold text-zinc-950">{t("company.completedDealFeedback")}</h2>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 {company.reviewsReceived.map((review) => <ReviewCard key={review.id} review={review} />)}
               </div>
@@ -780,7 +775,7 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             </div>
 
             <div>
-              <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("productDetail.buyerReviews")}</h2>
+              <h2 className="mb-3 text-lg font-semibold text-zinc-950">{t("productDetail.buyerFeedback")}</h2>
               {reviews.length ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
@@ -1040,7 +1035,18 @@ function sortableCreatedAt(value: string | undefined) {
 }
 
 function ReviewCard({ review }: { review: PublicCompany["reviewsReceived"][number] }) {
-  return <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-4"><div className="flex min-w-0 flex-wrap gap-2"><Badge>Completed Deal Review</Badge><Badge>{review.rating}/5</Badge></div><p className="mt-4 break-words text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 break-words text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)}</p></article>;
+  const { locale, t } = useI18n();
+  return <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-4"><Badge>{t("reviews.verifiedDeal")}</Badge>{review.reviewTitle ? <h3 className="mt-4 break-words text-base font-semibold text-zinc-950">{review.reviewTitle}</h3> : null}<p className="mt-4 break-words text-sm leading-6 text-zinc-700">{review.reviewText}</p><p className="mt-3 break-words text-xs text-zinc-500">{review.reviewerCompany.tradeName || review.reviewerCompany.legalName} · {formatContract(review)} · {formatFeedbackDate(review.createdAt, locale)}</p></article>;
+}
+
+function formatFeedbackDate(value: string, locale: "en" | "ko") {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "";
+  return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
 }
 
 function compactRows(

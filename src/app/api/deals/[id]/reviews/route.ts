@@ -56,14 +56,7 @@ export async function POST(
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
     const body = await readJsonObject(request);
-    const rating = Number(body.rating);
     const reviewText = requiredStringField(body, "reviewText", 2_000);
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      return Response.json(
-        { error: "Rating must be between 1 and 5." },
-        { status: 400 },
-      );
-    }
     const reviewedCompanyId =
       reviewer.id === deal.buyerCompanyId
         ? deal.sellerCompanyId
@@ -73,7 +66,7 @@ export async function POST(
         dealId: deal.id,
         reviewerCompanyId: reviewer.id,
         reviewedCompanyId,
-        rating,
+        rating: null,
         reviewTitle:
           stringField(body, "reviewTitle", { max: 160, fallback: null }) ||
           null,
@@ -91,8 +84,9 @@ export async function POST(
         adminApproved: false,
       },
     });
+    const { rating: _rating, ...publicReview } = review;
     return Response.json(
-      { ...review, contractValue: review.contractValue.toString() },
+      { ...publicReview, contractValue: review.contractValue.toString() },
       { status: 201 },
     );
   } catch (error) {

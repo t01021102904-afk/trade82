@@ -20,7 +20,6 @@ export async function GET() {
     return Response.json({
       reviews: reviews.map((review) => ({
         id: review.id,
-        rating: review.rating,
         comment: review.comment,
         createdAt: review.createdAt,
         reviewerCompanyRole: review.reviewerCompany.companyRole,
