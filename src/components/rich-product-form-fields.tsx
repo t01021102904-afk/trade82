@@ -18,7 +18,6 @@ import {
   getSalesChannelOptions,
   getSellerDocumentOptions,
   getSellerProductCategoryOptions,
-  parseMoqValue,
   SOUTH_KOREA,
   type SelectOption,
 } from "@/lib/company-select-options";
@@ -32,9 +31,17 @@ import {
   type ProductFieldVisibilityKey,
   type ProductFieldVisibilityLevel,
 } from "@/lib/product-field-visibility";
+import { validateProductPricing } from "@/lib/product-pricing-validation";
 import { cx } from "@/lib/utils";
 
 type ProductFormVariant = "default" | "dashboard";
+
+const currencyOptions: SelectOption[] = [
+  { value: "USD", label: "USD" },
+  { value: "KRW", label: "KRW" },
+  { value: "EUR", label: "EUR" },
+  { value: "JPY", label: "JPY" },
+];
 
 export type RichProductFormValue = {
   images: UploadedListingImage[];
@@ -88,8 +95,11 @@ export type RichProductFormErrors = Partial<
     | "images"
     | "name"
     | "category"
-    | "price"
-    | "moq"
+    | "retailPrice"
+    | "wholesalePrice"
+    | "currency"
+    | "moqQuantity"
+    | "moqUnit"
     | "leadTime"
     | "description"
     | "sampleAvailability"
@@ -126,10 +136,10 @@ export const emptyRichProductForm: RichProductFormValue = {
   detailedDescriptionEn: "",
   priceMin: "",
   priceMax: "",
-  currency: "USD",
+  currency: "",
   priceUnit: "unit",
   moqQuantity: "",
-  moqUnit: "Units",
+  moqUnit: "",
   leadTime: "",
   sampleAvailability: "",
   privateLabelAvailability: "",
@@ -161,7 +171,11 @@ export const emptyRichProductForm: RichProductFormValue = {
 };
 
 export function productPayloadFromForm(product: RichProductFormValue) {
-  const normalized = normalizeProductFieldVisibility(product.fieldVisibility);
+  const normalized = {
+    ...normalizeProductFieldVisibility(product.fieldVisibility),
+    minimumUnitPrice: "public" as const,
+    moq: "public" as const,
+  };
   const visibleProduct = applyProductVisibilityToFormValue({
     ...product,
     fieldVisibility: normalized,
@@ -174,9 +188,7 @@ export function productPayloadFromForm(product: RichProductFormValue) {
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
-  const moq = productFieldRequiresValue(normalized, "moq")
-    ? formatMoqValue(visibleProduct.moqQuantity, visibleProduct.moqUnit)
-    : "";
+  const moq = formatMoqValue(visibleProduct.moqQuantity, visibleProduct.moqUnit);
 
   return {
     ...visibleProduct,
@@ -199,13 +211,6 @@ export function applyProductVisibilityToFormValue(
   const fieldVisibility = normalizeProductFieldVisibility(product.fieldVisibility);
   const next: RichProductFormValue = { ...product, fieldVisibility };
 
-  if (!productFieldRequiresValue(fieldVisibility, "minimumUnitPrice")) {
-    next.priceMin = "";
-    next.priceMax = "";
-  }
-  if (!productFieldRequiresValue(fieldVisibility, "moq")) {
-    next.moqQuantity = "";
-  }
   if (!productFieldRequiresValue(fieldVisibility, "leadTime")) {
     next.leadTime = "";
   }
@@ -270,7 +275,6 @@ export function validateRichProductForm(
   options: { requireImages?: boolean } = {},
 ): RichProductFormErrors {
   const nextErrors: RichProductFormErrors = {};
-  const fieldVisibility = normalizeProductFieldVisibility(product.fieldVisibility);
   const publicRequired = t("listing.errors.publicFieldRequired");
 
   if (options.requireImages && !product.images.length) {
@@ -281,19 +285,17 @@ export function validateRichProductForm(
   if (!product.detailedDescription.trim()) {
     nextErrors.description = t("listing.errors.description");
   }
-  if (
-    productFieldRequiresValue(fieldVisibility, "minimumUnitPrice") &&
-    (!product.priceMin || Number(product.priceMin) <= 0)
-  ) {
-    nextErrors.price = t("listing.errors.price");
+  const pricing = validateProductPricing({
+    retailPrice: product.priceMax,
+    wholesalePrice: product.priceMin,
+    currency: product.currency,
+    moqQuantity: product.moqQuantity,
+    moqUnit: product.moqUnit,
+  });
+  for (const [field, code] of Object.entries(pricing.errors)) {
+    nextErrors[field as keyof RichProductFormErrors] = t(`listing.errors.${code}`);
   }
-  if (
-    productFieldRequiresValue(fieldVisibility, "moq") &&
-    product.moqUnit !== "Not fixed" &&
-    (!product.moqQuantity || Number(product.moqQuantity) <= 0)
-  ) {
-    nextErrors.moq = t("listing.errors.moq");
-  }
+  const fieldVisibility = normalizeProductFieldVisibility(product.fieldVisibility);
   if (productFieldRequiresValue(fieldVisibility, "leadTime") && !product.leadTime) {
     nextErrors.leadTime = t("listing.errors.leadTime");
   }
@@ -392,7 +394,6 @@ export function validateRichProductForm(
 }
 
 export function formFromProductRecord(product: Record<string, unknown>): RichProductFormValue {
-  const parsedMoq = parseMoqValue(String(product.moq ?? ""));
   return {
     ...emptyRichProductForm,
     images: Array.isArray(product.images)
@@ -409,10 +410,10 @@ export function formFromProductRecord(product: Record<string, unknown>): RichPro
     detailedDescriptionEn: String(product.detailedDescriptionEn ?? ""),
     priceMin: product.priceMin == null ? "" : String(product.priceMin),
     priceMax: product.priceMax == null ? "" : String(product.priceMax),
-    currency: String(product.currency ?? "USD"),
+    currency: typeof product.currency === "string" ? product.currency : "",
     priceUnit: String(product.priceUnit ?? "unit"),
-    moqQuantity: String(product.moqQuantity ?? parsedMoq.quantity),
-    moqUnit: String(product.moqUnit ?? parsedMoq.unit),
+    moqQuantity: typeof product.moqQuantity === "string" ? product.moqQuantity : "",
+    moqUnit: typeof product.moqUnit === "string" ? product.moqUnit : "",
     leadTime: String(product.leadTimeCode ?? product.leadTime ?? ""),
     sampleAvailability: String(product.sampleAvailability ?? ""),
     privateLabelAvailability: String(product.privateLabelAvailability ?? ""),
@@ -495,10 +496,6 @@ export function RichProductFormFields({
   );
   const requiresValue = (key: ProductFieldVisibilityKey) =>
     productFieldRequiresValue(fieldVisibility, key);
-  const parsedMoq = {
-    quantity: value.moqQuantity || parseMoqValue(formatMoqValue(value.moqQuantity, value.moqUnit)).quantity,
-    unit: value.moqUnit || "Units",
-  };
   const hasProductSourceContent = Boolean(
     value.name.trim() ||
       value.shortDescription.trim() ||
@@ -715,32 +712,11 @@ export function RichProductFormFields({
       </Section>
 
       <Section id="pricing-order-terms" title={t("productForm.pricingTerms")} variant={variant}>
-        <NumberWithSelect
-          label={t("settings.priceMin")}
-          value={value.priceMin}
-          selectValue={value.priceUnit}
-          onValueChange={(nextValue) => onChange("priceMin", nextValue)}
-          onSelectChange={(nextValue) => onChange("priceUnit", nextValue)}
-          options={getPriceUnitOptions(locale)}
-          error={errors.price}
-          required={requiresValue("minimumUnitPrice")}
-          prefix={value.currency}
-          helper={t("settings.minimumUnitPriceHelper")}
-          visibility={visibilityControl("minimumUnitPrice")}
-          variant={variant}
-        />
-        <NumberWithSelect
-          label={t("marketplace.moq")}
-          value={parsedMoq.quantity}
-          selectValue={parsedMoq.unit}
-          onValueChange={(nextValue) => onChange("moqQuantity", nextValue)}
-          onSelectChange={(nextValue) => onChange("moqUnit", nextValue)}
-          options={getMoqUnitOptions(locale)}
-          error={errors.moq}
-          required={requiresValue("moq")}
-          visibility={visibilityControl("moq")}
-          variant={variant}
-        />
+        <TextField label={t("listing.retailPrice")} value={value.priceMax} onChange={(nextValue) => onChange("priceMax", nextValue)} type="number" min={0.01} step="0.01" error={errors.retailPrice} required variant={variant} />
+        <TextField label={t("listing.wholesalePrice")} value={value.priceMin} onChange={(nextValue) => onChange("priceMin", nextValue)} type="number" min={0.01} step="0.01" error={errors.wholesalePrice} required variant={variant} />
+        <SelectField label={t("listing.currency")} value={value.currency} onChange={(nextValue) => onChange("currency", nextValue)} options={currencyOptions} placeholder={t("onboarding.select")} error={errors.currency} required variant={variant} />
+        <TextField label={t("listing.moqQuantity")} value={value.moqQuantity} onChange={(nextValue) => onChange("moqQuantity", nextValue)} type="number" min={1} step="1" error={errors.moqQuantity} required variant={variant} />
+        <SelectField label={t("listing.moqUnit")} value={value.moqUnit} onChange={(nextValue) => onChange("moqUnit", nextValue)} options={getMoqUnitOptions(locale).filter((option) => option.value !== "Not fixed")} placeholder={t("onboarding.select")} error={errors.moqUnit} required variant={variant} />
         <SelectField
           label={t("settings.leadTime")}
           value={value.leadTime}
@@ -1057,6 +1033,8 @@ function TextField({
   error,
   required = false,
   maxLength,
+  min,
+  step,
   visibility,
   variant = "default",
 }: {
@@ -1069,6 +1047,8 @@ function TextField({
   error?: string;
   required?: boolean;
   maxLength?: number;
+  min?: number;
+  step?: string;
   visibility?: React.ReactNode;
   variant?: ProductFormVariant;
 }) {
@@ -1080,6 +1060,8 @@ function TextField({
         value={value}
         required={required}
         maxLength={maxLength}
+        min={min}
+        step={step}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className={inputClass(variant)}

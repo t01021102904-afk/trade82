@@ -425,12 +425,13 @@ test("the approved batch is followed by operations, analytics, partner payout, a
     "20260718110000_harden_settlement_reversal_states",
     "20260718120000_add_seller_stripe_merchant_accounts",
   ]);
-  assert.equal(localMigrations.at(-7), MERCHANT_MIGRATION);
-  assert.equal(localMigrations.at(-6), OPERATIONS_MIGRATION);
-  assert.equal(localMigrations.at(-5), ANALYTICS_MIGRATION);
-  assert.equal(localMigrations.at(-4), PARTNER_PAYOUT_MIGRATION);
-  assert.equal(localMigrations.at(-3), PARTNER_ACTIVATION_MIGRATION);
-  assert.equal(localMigrations.at(-2), DEFERRED_APPLICATION_MIGRATIONS[0]);
+  assert.equal(localMigrations.at(-8), MERCHANT_MIGRATION);
+  assert.equal(localMigrations.at(-7), OPERATIONS_MIGRATION);
+  assert.equal(localMigrations.at(-6), ANALYTICS_MIGRATION);
+  assert.equal(localMigrations.at(-5), PARTNER_PAYOUT_MIGRATION);
+  assert.equal(localMigrations.at(-4), PARTNER_ACTIVATION_MIGRATION);
+  assert.equal(localMigrations.at(-3), DEFERRED_APPLICATION_MIGRATIONS[0]);
+  assert.equal(localMigrations.at(-2), DEFERRED_APPLICATION_MIGRATIONS[1]);
   assert.equal(localMigrations.at(-1), DEFERRED_APPLICATION_MIGRATION);
 });
 

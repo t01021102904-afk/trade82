@@ -43,10 +43,11 @@ export function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
+        {product.retailPrice ? <p className="mt-2.5 truncate text-xs text-zinc-500"><span className="font-medium">{t("listing.retailPrice")}:</span> <s>{product.retailPrice}</s></p> : null}
         <WholesalePriceGate
-          value={product.wholesalePrice}
-          className="mt-2.5 max-w-full"
-          valueClassName="truncate text-base font-semibold text-zinc-950"
+          value={`${t("listing.wholesalePrice")}: ${product.wholesalePrice}`}
+          className="mt-1 max-w-full"
+          valueClassName="truncate text-base font-semibold text-[#34B386]"
           gateClassName="text-sm"
         />
         {product.moq ? (

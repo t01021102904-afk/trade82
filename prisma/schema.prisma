@@ -685,6 +685,7 @@ model Product {
   shortDescriptionEn       String              @default("")
   detailedDescription      String
   detailedDescriptionEn    String              @default("")
+  // Nullable only for historical listings; DB checks enforce values on every new write.
   priceMin                 Decimal?            @db.Decimal(14, 2)
   priceMax                 Decimal?            @db.Decimal(14, 2)
   currency                 String              @default("USD")

@@ -27,6 +27,7 @@ import {
   parseProductFieldVisibilityInput,
   productFieldRequiresValue,
 } from "@/lib/product-field-visibility";
+import { hasProductPricingErrors, validateProductPricing } from "@/lib/product-pricing-validation";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -59,6 +60,10 @@ function optionalPositiveText(value: unknown, maxLength = 80) {
   if (!text) return "";
   const number = Number(text);
   return Number.isFinite(number) && number >= 0 ? text : "";
+}
+
+function currencyOptions(): SelectOption[] {
+  return ["USD", "KRW", "EUR", "JPY"].map((value) => ({ value, label: value }));
 }
 
 function publicFieldRequiredResponse() {
@@ -102,17 +107,15 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const fieldVisibility =
+    const submittedFieldVisibility =
       body.fieldVisibility === undefined
         ? undefined
         : parseProductFieldVisibilityInput(body.fieldVisibility);
-    const effectiveFieldVisibility =
-      fieldVisibility ?? normalizeProductFieldVisibility(existing.fieldVisibility);
-    const priceIsPublic = productFieldRequiresValue(
-      effectiveFieldVisibility,
-      "minimumUnitPrice",
-    );
-    const moqIsPublic = productFieldRequiresValue(effectiveFieldVisibility, "moq");
+    const effectiveFieldVisibility = {
+      ...(submittedFieldVisibility ?? normalizeProductFieldVisibility(existing.fieldVisibility)),
+      minimumUnitPrice: "public" as const,
+      moq: "public" as const,
+    };
     const leadTimeIsPublic = productFieldRequiresValue(
       effectiveFieldVisibility,
       "leadTime",
@@ -123,41 +126,16 @@ export async function PATCH(
       typeof body.category === "string"
         ? cleanPlainText(body.category, 80)
         : undefined;
-    const priceMin =
-      body.priceMin === undefined
-        ? fieldVisibility && !priceIsPublic
-          ? null
-          : undefined
-        : !priceIsPublic ||
-            body.priceMin === null ||
-            body.priceMin === ""
-          ? null
-          : Number(body.priceMin);
-    const priceMax =
-      body.priceMax === undefined
-        ? fieldVisibility && !priceIsPublic
-          ? null
-          : undefined
-        : !priceIsPublic ||
-            body.priceMax === null ||
-            body.priceMax === ""
-          ? null
-          : Number(body.priceMax);
-    const moqQuantity =
-      body.moqQuantity === undefined
-        ? fieldVisibility && !moqIsPublic
-          ? ""
-          : undefined
-        : moqIsPublic
-          ? optionalPositiveText(body.moqQuantity)
-          : "";
-    const moqUnit =
-      body.moqUnit === undefined
-        ? undefined
-        : allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
+    const pricing = validateProductPricing({
+      retailPrice: body.priceMax ?? existing.priceMax?.toString(),
+      wholesalePrice: body.priceMin ?? existing.priceMin?.toString(),
+      currency: allowedOption(body.currency ?? existing.currency, currencyOptions()),
+      moqQuantity: body.moqQuantity ?? existing.moqQuantity,
+      moqUnit: allowedOption(body.moqUnit ?? existing.moqUnit, getMoqUnitOptions("en")),
+    });
     const leadTime =
       body.leadTime === undefined
-        ? fieldVisibility && !leadTimeIsPublic
+        ? submittedFieldVisibility && !leadTimeIsPublic
           ? ""
           : undefined
         : leadTimeIsPublic
@@ -170,34 +148,16 @@ export async function PATCH(
     ) {
       return Response.json({ error: "카테고리를 선택해 주시기 바랍니다." }, { status: 400 });
     }
-    if (
-      priceIsPublic &&
-      priceMin !== null &&
-      priceMin !== undefined &&
-      (!Number.isFinite(priceMin) || priceMin <= 0)
-    ) {
-      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (
-      priceIsPublic &&
-      priceMax !== null &&
-      priceMax !== undefined &&
-      (!Number.isFinite(priceMax) || priceMax < 0)
-    ) {
-      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (
-      moqIsPublic &&
-      moqUnit !== undefined &&
-      moqUnit !== "Not fixed" &&
-      (!moqQuantity || Number(moqQuantity) <= 0)
-    ) {
-      return Response.json({ error: "MOQ를 입력해 주시기 바랍니다." }, { status: 400 });
+    if (hasProductPricingErrors(pricing)) {
+      return Response.json(
+        { error: "Valid retail price, wholesale price, currency, and MOQ are required.", fieldErrors: pricing.errors },
+        { status: 400 },
+      );
     }
     if (leadTimeIsPublic && leadTime !== undefined && !leadTime) {
       return Response.json({ error: "리드타임을 선택해 주시기 바랍니다." }, { status: 400 });
     }
-    if (fieldVisibility) {
+    if (submittedFieldVisibility) {
       if (
         productFieldRequiresValue(effectiveFieldVisibility, "sampleAvailability") &&
         !allowedOption(
@@ -345,38 +305,16 @@ export async function PATCH(
           typeof body.detailedDescriptionEn === "string"
             ? cleanPlainText(body.detailedDescriptionEn, 5000)
             : undefined,
-        priceMin:
-          priceMin === undefined
-            ? undefined
-            : priceMin === null
-              ? null
-              : String(priceMin),
-        priceMax:
-          priceMax === undefined
-            ? undefined
-            : priceMax === null
-              ? null
-              : String(priceMax),
-        currency:
-          typeof body.currency === "string"
-            ? cleanPlainText(body.currency, 8)
-            : undefined,
+        priceMin: String(pricing.wholesalePrice),
+        priceMax: String(pricing.retailPrice),
+        currency: pricing.currency,
         priceUnit:
           body.priceUnit === undefined
             ? undefined
             : allowedOption(body.priceUnit, getPriceUnitOptions("en"), "unit"),
-        moq:
-          !moqIsPublic && fieldVisibility
-            ? ""
-            : typeof body.moq === "string"
-              ? cleanPlainText(body.moq, 120)
-              : moqQuantity !== undefined && moqUnit !== undefined
-                ? moqUnit === "Not fixed"
-                  ? "Not fixed"
-                  : `${moqQuantity} ${moqUnit}`
-              : undefined,
-        moqQuantity,
-        moqUnit,
+        moq: `${pricing.moqQuantity} ${pricing.moqUnit}`,
+        moqQuantity: pricing.moqQuantity ?? "",
+        moqUnit: pricing.moqUnit,
         leadTime:
           leadTime === undefined
             ? undefined
@@ -384,7 +322,7 @@ export async function PATCH(
         leadTimeCode: leadTime,
         sampleAvailability:
           !productFieldRequiresValue(effectiveFieldVisibility, "sampleAvailability") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : body.sampleAvailability === undefined
               ? undefined
@@ -393,14 +331,14 @@ export async function PATCH(
           !productFieldRequiresValue(
             effectiveFieldVisibility,
             "privateLabelAvailability",
-          ) && fieldVisibility
+          ) && submittedFieldVisibility
             ? ""
             : body.privateLabelAvailability === undefined
               ? undefined
               : allowedOption(body.privateLabelAvailability, getPrivateLabelOptions("en")),
         monthlyCapacity:
           !productFieldRequiresValue(effectiveFieldVisibility, "monthlySupplyCapacity") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : body.monthlyCapacity === undefined
               ? undefined
@@ -418,42 +356,42 @@ export async function PATCH(
             : allowedOption(body.shippingOriginRegion, getKoreanRegionOptions("en")),
         incoterms:
           !productFieldRequiresValue(effectiveFieldVisibility, "incoterms") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? []
             : body.incoterms === undefined
               ? undefined
               : allowedList(body.incoterms, getIncotermOptions("en")),
         hsCode:
           !productFieldRequiresValue(effectiveFieldVisibility, "hsCode") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.hsCode === "string"
               ? cleanPlainText(body.hsCode, 40)
               : undefined,
         shelfLife:
           !productFieldRequiresValue(effectiveFieldVisibility, "shelfLife") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.shelfLife === "string"
               ? cleanPlainText(body.shelfLife, 120)
               : undefined,
         storageRequirements:
           !productFieldRequiresValue(effectiveFieldVisibility, "storageRequirements") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.storageRequirements === "string"
               ? cleanPlainText(body.storageRequirements, 1000)
               : undefined,
         documentsAvailable:
           !productFieldRequiresValue(effectiveFieldVisibility, "documents") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? []
             : body.documentsAvailable === undefined
               ? undefined
               : allowedList(body.documentsAvailable, getSellerDocumentOptions("en")),
         complianceClaims:
           !productFieldRequiresValue(effectiveFieldVisibility, "complianceInfo") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? []
             : body.complianceClaims === undefined
               ? undefined
@@ -472,7 +410,7 @@ export async function PATCH(
             : strings(body.riskNotes).map((item) => cleanPlainText(item, 300)).filter(Boolean),
         certifications:
           !productFieldRequiresValue(effectiveFieldVisibility, "complianceInfo") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? []
             : body.complianceClaims
               ? allowedList(body.complianceClaims, getComplianceClaimOptions("en"))
@@ -481,56 +419,56 @@ export async function PATCH(
                 : undefined,
         ingredientsOrMaterials:
           !productFieldRequiresValue(effectiveFieldVisibility, "ingredientsMaterials") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.ingredientsOrMaterials === "string"
               ? cleanPlainText(body.ingredientsOrMaterials, 1000)
               : undefined,
         packaging:
           !productFieldRequiresValue(effectiveFieldVisibility, "packaging") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.packaging === "string"
               ? cleanPlainText(body.packaging, 1000)
               : undefined,
         packageSize:
           !productFieldRequiresValue(effectiveFieldVisibility, "packageSize") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.packageSize === "string"
               ? cleanPlainText(body.packageSize, 120)
               : undefined,
         unitsPerCarton:
           !productFieldRequiresValue(effectiveFieldVisibility, "unitsPerCarton") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : body.unitsPerCarton === undefined
               ? undefined
               : optionalPositiveText(body.unitsPerCarton),
         cartonWeight:
           !productFieldRequiresValue(effectiveFieldVisibility, "cartonWeight") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.cartonWeight === "string"
               ? cleanPlainText(body.cartonWeight, 120)
               : undefined,
         cartonDimensions:
           !productFieldRequiresValue(effectiveFieldVisibility, "cartonDimensions") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.cartonDimensions === "string"
               ? cleanPlainText(body.cartonDimensions, 120)
               : undefined,
         palletQuantity:
           !productFieldRequiresValue(effectiveFieldVisibility, "palletQuantity") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : body.palletQuantity === undefined
               ? undefined
               : optionalPositiveText(body.palletQuantity),
         storageTemperature:
           !productFieldRequiresValue(effectiveFieldVisibility, "storageTemperature") &&
-          fieldVisibility
+          submittedFieldVisibility
             ? ""
             : typeof body.storageTemperature === "string"
               ? cleanPlainText(body.storageTemperature, 120)
@@ -539,8 +477,7 @@ export async function PATCH(
           body.suggestedUsChannels === undefined
             ? undefined
             : allowedList(body.suggestedUsChannels, getSalesChannelOptions("en")),
-        fieldVisibility:
-          fieldVisibility,
+        fieldVisibility: submittedFieldVisibility ? effectiveFieldVisibility : undefined,
         exportReadiness:
           typeof body.exportReadiness === "boolean"
             ? body.exportReadiness
