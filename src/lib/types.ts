@@ -150,6 +150,7 @@ export type Product = {
   longDescription: string;
   wholesalePrice: string;
   wholesalePriceValue: number;
+  retailPrice?: string;
   moq: string;
   moqUnits: number;
   leadTime: string;

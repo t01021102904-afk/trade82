@@ -60,8 +60,8 @@ export const productFieldVisibilityLevels: ProductFieldVisibilityLevel[] = [
 ];
 
 export const defaultProductFieldVisibility: ProductFieldVisibility = {
-  minimumUnitPrice: "inquiry_required",
-  moq: "inquiry_required",
+  minimumUnitPrice: "public",
+  moq: "public",
   leadTime: "inquiry_required",
   sampleAvailability: "public",
   privateLabelAvailability: "inquiry_required",

@@ -8,6 +8,7 @@ import {
   localizedText,
 } from "@/lib/multilingual-content";
 import { normalizeProductFieldVisibility } from "@/lib/product-field-visibility";
+import { formatProductPrice } from "@/lib/product-price-display";
 
 export function databaseProductToCard(
   value: Record<string, unknown>,
@@ -23,17 +24,14 @@ export function databaseProductToCard(
       ? value.imageUrl.trim()
       : "";
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
-  const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
+  const priceMax = value.priceMax ? Number(value.priceMax) : 0;
   const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
   const currency = String(value.currency ?? "USD");
-  const price =
-    priceMin && priceMax !== priceMin
-      ? `${currency} ${priceMin}-${priceMax}`
-      : priceMin
-        ? `${currency} ${priceMin}`
-        : fieldVisibility.minimumUnitPrice === "private"
-          ? "Private to seller"
-          : "Price available upon inquiry";
+  const price = priceMin
+    ? formatProductPrice(priceMin, currency)
+    : fieldVisibility.minimumUnitPrice === "private"
+      ? "Private to seller"
+      : "Price available upon inquiry";
 
   return {
     id: String(value.id),
@@ -68,6 +66,7 @@ export function databaseProductToCard(
     }),
     wholesalePrice: price,
     wholesalePriceValue: priceMin,
+    retailPrice: priceMax ? formatProductPrice(priceMax, currency) : undefined,
     moq:
       String(value.moq ?? "") ||
       (fieldVisibility.moq === "private"

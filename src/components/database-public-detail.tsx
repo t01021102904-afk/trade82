@@ -62,6 +62,7 @@ import {
   type ProductFieldVisibilityLevel,
 } from "@/lib/product-field-visibility";
 import { databaseCompanyToSeller } from "@/lib/public-marketplace-presenters";
+import { formatProductPrice as formatPrice } from "@/lib/product-price-display";
 import type { Product, VerificationStatus } from "@/lib/types";
 
 type PublicCompany = {
@@ -581,7 +582,8 @@ export function DatabaseProductDetail({ id }: { id: string }) {
               </p>
               <dl className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
                 {[
-                  { label: t("productDetail.wholesalePrice"), value: priceDisplay },
+                  { label: t("listing.retailPrice"), value: product.retailPrice ? <s>{product.retailPrice}</s> : notProvided },
+                  { label: t("listing.wholesalePrice"), value: <span className="text-[#34B386]">{priceDisplay}</span> },
                   { label: t("marketplace.moq"), value: moq },
                   { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
                   {
@@ -1079,14 +1081,11 @@ function formatProductPrice(
   fallback: string,
 ) {
   const priceMin = product.priceMin ? Number(product.priceMin) : 0;
-  const priceMax = product.priceMax ? Number(product.priceMax) : 0;
   if (!priceMin) return fallback;
   const currency = String(product.currency ?? "USD");
   const unit = priceUnitLabel(String(product.priceUnit ?? "unit"), locale);
-  const range = priceMax && priceMax !== priceMin
-    ? `${priceMin}-${priceMax}`
-    : String(priceMin);
-  return unit ? `${currency} ${range} / ${unit}` : `${currency} ${range}`;
+  const formatted = formatPrice(priceMin, currency);
+  return unit ? `${formatted} / ${unit}` : formatted;
 }
 
 function formatProductMoq(
@@ -1211,7 +1210,7 @@ function publicProductToCard(
       ? value.imageUrl.trim()
       : "";
   const priceMin = value.priceMin ? Number(value.priceMin) : 0;
-  const priceMax = value.priceMax ? Number(value.priceMax) : priceMin;
+  const priceMax = value.priceMax ? Number(value.priceMax) : 0;
   const fieldVisibility = normalizeProductFieldVisibility(value.fieldVisibility);
   const moqQuantity = String(value.moqQuantity ?? "").trim();
   const moq = moqQuantity && value.moqUnit
@@ -1249,11 +1248,12 @@ function publicProductToCard(
       english: value.detailedDescriptionEn,
     }),
     wholesalePrice: priceMin
-      ? `${String(value.currency ?? "USD")} ${priceMin}${priceMax !== priceMin ? `-${priceMax}` : ""}`
+      ? formatPrice(priceMin, value.currency)
       : fieldVisibility.minimumUnitPrice === "private"
         ? "Private to seller"
         : "Price available upon inquiry",
     wholesalePriceValue: priceMin,
+    retailPrice: priceMax ? formatPrice(priceMax, value.currency) : undefined,
     moq:
       moq ||
       (fieldVisibility.moq === "private"

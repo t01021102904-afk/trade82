@@ -27,6 +27,10 @@ import {
   parseProductFieldVisibilityInput,
   productFieldRequiresValue,
 } from "@/lib/product-field-visibility";
+import {
+  hasProductPricingErrors,
+  validateProductPricing,
+} from "@/lib/product-pricing-validation";
 
 function strings(value: unknown) {
   return Array.isArray(value)
@@ -59,6 +63,10 @@ function optionalPositiveText(value: unknown, maxLength = 80) {
   if (!text) return "";
   const number = Number(text);
   return Number.isFinite(number) && number >= 0 ? text : "";
+}
+
+function currencyOptions(): SelectOption[] {
+  return ["USD", "KRW", "EUR", "JPY"].map((value) => ({ value, label: value }));
 }
 
 function publicFieldRequiredResponse() {
@@ -138,20 +146,19 @@ export async function POST(request: Request) {
     const category = cleanPlainText(body.category, 80);
     const detailedDescription = cleanPlainText(body.detailedDescription, 5000);
     const detailedDescriptionEn = cleanPlainText(body.detailedDescriptionEn, 5000);
-    const fieldVisibility = parseProductFieldVisibilityInput(body.fieldVisibility);
-    const priceIsPublic = productFieldRequiresValue(fieldVisibility, "minimumUnitPrice");
-    const moqIsPublic = productFieldRequiresValue(fieldVisibility, "moq");
+    const fieldVisibility = {
+      ...parseProductFieldVisibilityInput(body.fieldVisibility),
+      minimumUnitPrice: "public" as const,
+      moq: "public" as const,
+    };
     const leadTimeIsPublic = productFieldRequiresValue(fieldVisibility, "leadTime");
-    const priceMin = priceIsPublic ? Number(body.priceMin) : null;
-    const priceMax =
-      !priceIsPublic ||
-      body.priceMax === null ||
-      body.priceMax === undefined ||
-      body.priceMax === ""
-        ? null
-        : Number(body.priceMax);
-    const moqQuantity = moqIsPublic ? optionalPositiveText(body.moqQuantity) : "";
-    const moqUnit = allowedOption(body.moqUnit, getMoqUnitOptions("en"), "Units");
+    const pricing = validateProductPricing({
+      retailPrice: body.priceMax,
+      wholesalePrice: body.priceMin,
+      currency: allowedOption(body.currency, currencyOptions()),
+      moqQuantity: body.moqQuantity,
+      moqUnit: allowedOption(body.moqUnit, getMoqUnitOptions("en")),
+    });
     const leadTime = leadTimeIsPublic
       ? allowedOption(body.leadTime, getLeadTimeOptions("en"))
       : "";
@@ -181,14 +188,11 @@ export async function POST(request: Request) {
     if (!isMarketplaceCategory(category)) {
       return Response.json({ error: "카테고리를 선택해 주시기 바랍니다." }, { status: 400 });
     }
-    if (priceIsPublic && (priceMin === null || !Number.isFinite(priceMin) || priceMin <= 0)) {
-      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (priceIsPublic && priceMax !== null && (!Number.isFinite(priceMax) || priceMax < 0)) {
-      return Response.json({ error: "올바른 가격을 입력해 주시기 바랍니다." }, { status: 400 });
-    }
-    if (moqIsPublic && moqUnit !== "Not fixed" && (!moqQuantity || Number(moqQuantity) <= 0)) {
-      return Response.json({ error: "MOQ를 입력해 주시기 바랍니다." }, { status: 400 });
+    if (hasProductPricingErrors(pricing)) {
+      return Response.json(
+        { error: "Valid retail price, wholesale price, currency, and MOQ are required.", fieldErrors: pricing.errors },
+        { status: 400 },
+      );
     }
     if (leadTimeIsPublic && !leadTime) {
       return Response.json({ error: "리드타임을 선택해 주시기 바랍니다." }, { status: 400 });
@@ -318,17 +322,14 @@ export async function POST(request: Request) {
         shortDescriptionEn: cleanPlainText(body.shortDescriptionEn, 240),
         detailedDescription,
         detailedDescriptionEn,
-        priceMin: priceMin === null ? null : String(priceMin),
-        priceMax: priceMax === null ? null : String(priceMax),
-        currency: cleanPlainText(body.currency, 8) || "USD",
+        priceMin: String(pricing.wholesalePrice),
+        priceMax: String(pricing.retailPrice),
+        currency: pricing.currency,
         priceUnit: allowedOption(body.priceUnit, getPriceUnitOptions("en"), "unit"),
         moq:
-          moqIsPublic
-            ? cleanPlainText(body.moq, 120) ||
-              (moqUnit === "Not fixed" ? "Not fixed" : `${moqQuantity} ${moqUnit}`)
-            : "",
-        moqQuantity,
-        moqUnit,
+          `${pricing.moqQuantity} ${pricing.moqUnit}`,
+        moqQuantity: pricing.moqQuantity ?? "",
+        moqUnit: pricing.moqUnit,
         leadTime,
         leadTimeCode: leadTime,
         sampleAvailability: productFieldRequiresValue(fieldVisibility, "sampleAvailability")
