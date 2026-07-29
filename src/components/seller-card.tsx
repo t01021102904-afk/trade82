@@ -7,12 +7,15 @@ import { Badge } from "@/components/badge";
 import { ContactModal } from "@/components/contact-modal";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
+import { UntitledRectangleCountryFlag } from "@/components/untitled-rectangle-country-flag";
+import { localizedCountryLabel } from "@/lib/country-normalization";
 import { withLocale } from "@/lib/i18n";
 import type { Seller } from "@/lib/types";
 
 export function SellerCard({ seller }: { seller: Seller }) {
   const { locale, t } = useI18n();
   const notProvided = t("common.notProvided");
+  const mainCountries = seller.exportCountries.slice(0, 2);
 
   return (
     <article className="flex h-full min-w-0 flex-col border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-400">
@@ -49,8 +52,28 @@ export function SellerCard({ seller }: { seller: Seller }) {
           <dd className="mt-1 line-clamp-2 break-words font-medium text-zinc-950">{seller.businessType || notProvided}</dd>
         </div>
         <div className="min-w-0">
-          <dt className="truncate text-xs text-zinc-500">{t("sellers.products")}</dt>
-          <dd className="mt-1 line-clamp-2 break-words font-medium text-zinc-950">{seller.productCount ?? notProvided}</dd>
+          <dt className="truncate text-xs text-zinc-500">
+            {t("sellers.mainCountries")}
+          </dt>
+          <dd className="mt-1 grid min-w-0 gap-1">
+            {mainCountries.length ? (
+              mainCountries.map((country) => (
+                <span
+                  key={country}
+                  className="flex min-w-0 items-center gap-1.5 text-xs font-medium text-zinc-950"
+                >
+                  <UntitledRectangleCountryFlag country={country} />
+                  <span className="truncate">
+                    {localizedCountryLabel(country, locale)}
+                  </span>
+                </span>
+              ))
+            ) : (
+              <span className="text-sm font-medium text-zinc-950">
+                {notProvided}
+              </span>
+            )}
+          </dd>
         </div>
       </dl>
 
