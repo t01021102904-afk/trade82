@@ -1,5 +1,12 @@
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
+}
+
+export function cn(...classes: ClassValue[]) {
+  return twMerge(clsx(classes));
 }
 
 export function formatDate(value: string) {
