@@ -1,160 +1,160 @@
-"use client";
+"use client"
 
-import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { MouseEvent } from "react"
 
-import { cx } from "@/lib/utils";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
-type PaginationItem = number | "ellipsis";
+type PaginationControlsProps = {
+  page: number
+  totalPages: number
+  locale: "en" | "ko"
+  onPageChange: (page: number) => void | Promise<void>
+}
+
+type PaginationEntry = number | "start-ellipsis" | "end-ellipsis"
+
+function paginationEntries(
+  page: number,
+  totalPages: number,
+): PaginationEntry[] {
+  if (totalPages <= 7) {
+    return Array.from(
+      { length: totalPages },
+      (_, index) => index + 1,
+    )
+  }
+
+  if (page <= 4) {
+    return [1, 2, 3, 4, 5, "end-ellipsis", totalPages]
+  }
+
+  if (page >= totalPages - 3) {
+    return [
+      1,
+      "start-ellipsis",
+      totalPages - 4,
+      totalPages - 3,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    ]
+  }
+
+  return [
+    1,
+    "start-ellipsis",
+    page - 1,
+    page,
+    page + 1,
+    "end-ellipsis",
+    totalPages,
+  ]
+}
 
 export function PaginationControls({
   page,
   totalPages,
-  onPageChange,
   locale,
-}: {
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  locale: "en" | "ko";
-}) {
-  if (totalPages <= 1) return null;
+  onPageChange,
+}: PaginationControlsProps) {
+  if (totalPages <= 1) return null
 
-  const previousDisabled = page <= 1;
-  const nextDisabled = page >= totalPages;
+  const safePage = Math.min(Math.max(1, page), totalPages)
+  const entries = paginationEntries(safePage, totalPages)
+  const previousDisabled = safePage <= 1
+  const nextDisabled = safePage >= totalPages
+  const previousLabel = locale === "ko" ? "이전" : "Previous"
+  const nextLabel = locale === "ko" ? "다음" : "Next"
+  const morePagesLabel =
+    locale === "ko" ? "더 많은 페이지" : "More pages"
+
+  function activate(
+    event: MouseEvent<HTMLAnchorElement>,
+    targetPage: number,
+    disabled = false,
+  ) {
+    event.preventDefault()
+
+    if (
+      disabled ||
+      targetPage === safePage ||
+      targetPage < 1 ||
+      targetPage > totalPages
+    ) {
+      return
+    }
+
+    void onPageChange(targetPage)
+  }
 
   return (
-    <nav
-      className="flex items-center justify-center"
-      aria-label={locale === "ko" ? "페이지 이동" : "Pagination"}
-    >
-      <div className="hidden items-center gap-1 sm:flex">
-        <PaginationButton
-          label={locale === "ko" ? "이전 페이지" : "Previous page"}
-          disabled={previousDisabled}
-          onClick={() => onPageChange(Math.max(1, page - 1))}
-        >
-          <ChevronLeft className="size-4" aria-hidden="true" />
-        </PaginationButton>
-        {paginationItems(page, totalPages).map((item, index) =>
-          item === "ellipsis" ? (
-            <span
-              key={`ellipsis-${index}`}
-              className="inline-flex h-9 min-w-9 items-center justify-center px-2 text-sm theme-muted"
-              aria-hidden="true"
-            >
-              ...
-            </span>
+    <Pagination className="mt-8">
+      <PaginationContent>
+        <PaginationItem>
+          <PaginationPrevious
+            href="#"
+            label={previousLabel}
+            aria-disabled={previousDisabled}
+            tabIndex={previousDisabled ? -1 : undefined}
+            className={
+              previousDisabled
+                ? "pointer-events-none opacity-50"
+                : undefined
+            }
+            onClick={(event) =>
+              activate(event, safePage - 1, previousDisabled)
+            }
+          />
+        </PaginationItem>
+
+        {entries.map((entry) =>
+          typeof entry === "number" ? (
+            <PaginationItem key={entry}>
+              <PaginationLink
+                href="#"
+                isActive={entry === safePage}
+                aria-label={
+                  locale === "ko"
+                    ? `${entry}페이지로 이동`
+                    : `Go to page ${entry}`
+                }
+                onClick={(event) => activate(event, entry)}
+              >
+                {entry}
+              </PaginationLink>
+            </PaginationItem>
           ) : (
-            <PaginationButton
-              key={item}
-              active={item === page}
-              label={
-                locale === "ko"
-                  ? `${item}페이지로 이동`
-                  : `Go to page ${item}`
-              }
-              onClick={() => onPageChange(item)}
-            >
-              {item}
-            </PaginationButton>
+            <PaginationItem key={entry}>
+              <PaginationEllipsis label={morePagesLabel} />
+            </PaginationItem>
           ),
         )}
-        <PaginationButton
-          label={locale === "ko" ? "다음 페이지" : "Next page"}
-          disabled={nextDisabled}
-          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-        >
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </PaginationButton>
-      </div>
 
-      <div className="flex w-full items-center justify-between gap-3 sm:hidden">
-        <PaginationButton
-          label={locale === "ko" ? "이전 페이지" : "Previous page"}
-          disabled={previousDisabled}
-          onClick={() => onPageChange(Math.max(1, page - 1))}
-        >
-          <ChevronLeft className="size-4" aria-hidden="true" />
-        </PaginationButton>
-        <span className="text-sm font-medium theme-muted">
-          {locale === "ko"
-            ? `${page} / ${totalPages} 페이지`
-            : `Page ${page} of ${totalPages}`}
-        </span>
-        <PaginationButton
-          label={locale === "ko" ? "다음 페이지" : "Next page"}
-          disabled={nextDisabled}
-          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-        >
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </PaginationButton>
-      </div>
-    </nav>
-  );
-}
-
-function PaginationButton({
-  children,
-  label,
-  active = false,
-  disabled = false,
-  onClick,
-}: {
-  children: ReactNode;
-  label: string;
-  active?: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      aria-current={active ? "page" : undefined}
-      disabled={disabled || active}
-      onClick={onClick}
-      className={cx(
-        "inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-45",
-        active
-          ? "border-slate-950 bg-slate-950 text-white"
-          : "theme-secondary-button hover:-translate-y-0.5",
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-function paginationItems(page: number, totalPages: number): PaginationItem[] {
-  if (totalPages <= 7) {
-    return Array.from({ length: totalPages }, (_, index) => index + 1);
-  }
-
-  const pages = new Set([1, totalPages, page, page - 1, page + 1]);
-  if (page <= 3) {
-    pages.add(2);
-    pages.add(3);
-    pages.add(4);
-  }
-  if (page >= totalPages - 2) {
-    pages.add(totalPages - 1);
-    pages.add(totalPages - 2);
-    pages.add(totalPages - 3);
-  }
-
-  const sorted = Array.from(pages)
-    .filter((item) => item >= 1 && item <= totalPages)
-    .sort((left, right) => left - right);
-  const items: PaginationItem[] = [];
-
-  sorted.forEach((item, index) => {
-    const previous = sorted[index - 1];
-    if (previous && item - previous > 1) {
-      items.push("ellipsis");
-    }
-    items.push(item);
-  });
-
-  return items;
+        <PaginationItem>
+          <PaginationNext
+            href="#"
+            label={nextLabel}
+            aria-disabled={nextDisabled}
+            tabIndex={nextDisabled ? -1 : undefined}
+            className={
+              nextDisabled
+                ? "pointer-events-none opacity-50"
+                : undefined
+            }
+            onClick={(event) =>
+              activate(event, safePage + 1, nextDisabled)
+            }
+          />
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
+  )
 }
