@@ -15,7 +15,6 @@ import { useI18n } from "@/components/i18n-provider"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/seller-dashboard-site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { useIsMobile } from "@/hooks/use-mobile"
 import { withLocale } from "@/lib/i18n"
 import {
   getSellerDashboardKpis,
@@ -60,7 +59,6 @@ export function SellerDashboardShell() {
   const [state, setState] = React.useState<SummaryState>({ status: "loading", summary: null })
   const [timeRange, setTimeRange] = React.useState<SellerSalesTimeRange>("30d")
   const [selectedCurrency, setSelectedCurrency] = React.useState<string | null>(null)
-  const isMobile = useIsMobile()
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -78,18 +76,10 @@ export function SellerDashboardShell() {
     return () => controller.abort()
   }, [])
 
-  React.useEffect(() => {
-    if (isMobile) setTimeRange("7d")
-  }, [isMobile])
-
   const summary = state.status === "ready" ? state.summary : null
   const currencySeries = summary?.sellerDashboard?.currencySeries ?? emptyCurrencySeries
   const currencies = React.useMemo(() => currencySeries.map((series) => series.currency), [currencySeries])
   const defaultCurrency = summary?.sellerDashboard?.defaultCurrency ?? currencies[0] ?? null
-
-  React.useEffect(() => {
-    setSelectedCurrency((current) => current && currencies.includes(current) ? current : defaultCurrency)
-  }, [currencies, defaultCurrency])
 
   const currency = selectedCurrency && currencies.includes(selectedCurrency)
     ? selectedCurrency
