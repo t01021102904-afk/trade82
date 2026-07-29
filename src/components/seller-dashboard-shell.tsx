@@ -145,7 +145,7 @@ export function SellerDashboardShell() {
                   <DataTable data={leads} status={state.status} />
                 </>
               ) : activeSection === "messages" ? (
-                <div className="flex min-h-[calc(100dvh_-_var(--header-height)_-_2rem)] flex-1 px-4 lg:px-6">
+                <div className="flex h-[calc(100dvh_-_var(--header-height)_-_2rem)] max-h-[calc(100dvh_-_var(--header-height)_-_2rem)] min-h-0 flex-1 flex-col overflow-hidden px-4 md:h-[calc(100dvh_-_var(--header-height)_-_3rem)] md:max-h-[calc(100dvh_-_var(--header-height)_-_3rem)] lg:px-6">
                   <MessagesClient initialInquiryId={inquiryId} />
                 </div>
               ) : (
