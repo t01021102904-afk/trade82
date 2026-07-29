@@ -1,13 +1,31 @@
 "use client";
 
-
-import { CometSpinner } from "@/components/ui/comet-spinner"
 import { Landmark, Save, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
-import { StripeConnectOnboardingPanel } from "@/components/stripe-connect-onboarding-panel";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CometSpinner } from "@/components/ui/comet-spinner";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { withLocale } from "@/lib/i18n";
 import {
   formatTradeDateTime,
@@ -29,9 +47,6 @@ type Profile = {
   updatedAt: string;
 };
 
-const inputClassName =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-950 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:bg-zinc-100";
-
 const emptyProfile: Profile = {
   bankDirectoryId: null,
   accountHolder: "",
@@ -45,7 +60,11 @@ function onlyAccountNumberCharacters(value: string) {
   return value.replace(/[^0-9-]/g, "");
 }
 
-export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" | "ko" }) {
+export function PayoutInformationClient({
+  locale: pageLocale,
+}: {
+  locale?: "en" | "ko";
+}) {
   const { locale: contextLocale, t } = useI18n();
   const locale = pageLocale ?? contextLocale;
   const [profile, setProfile] = useState<Profile>(emptyProfile);
@@ -62,17 +81,26 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
   useEffect(() => {
     let active = true;
     void fetch("/api/account/payout-profile", { cache: "no-store" })
-      .then(async (response) => ({ response, data: await response.json().catch(() => null) }))
+      .then(async (response) => ({
+        response,
+        data: await response.json().catch(() => null),
+      }))
       .then(({ response, data }) => {
         if (!active) return;
         if (!response.ok) {
           setError(t("payouts.loadError"));
           return;
         }
-        if (data?.profile) setProfile({ ...emptyProfile, ...data.profile });
+        if (data?.profile) {
+          setProfile({ ...emptyProfile, ...data.profile });
+        }
       })
-      .catch(() => active && setError(t("payouts.loadError")))
-      .finally(() => active && setLoading(false));
+      .catch(() => {
+        if (active) setError(t("payouts.loadError"));
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     return () => {
       active = false;
@@ -82,7 +110,10 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
   useEffect(() => {
     let active = true;
     void fetch("/api/account/payout-banks", { cache: "no-store" })
-      .then(async (response) => ({ response, data: await response.json().catch(() => null) }))
+      .then(async (response) => ({
+        response,
+        data: await response.json().catch(() => null),
+      }))
       .then(({ response, data }) => {
         if (!active) return;
         if (!response.ok) {
@@ -91,8 +122,12 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
         }
         setBanks(data?.banks ?? []);
       })
-      .catch(() => active && setError(t("payouts.bankLoadError")))
-      .finally(() => active && setBanksLoading(false));
+      .catch(() => {
+        if (active) setError(t("payouts.bankLoadError"));
+      })
+      .finally(() => {
+        if (active) setBanksLoading(false);
+      });
 
     return () => {
       active = false;
@@ -108,7 +143,12 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
-    if (!profile.accountBelongsToCompany || !termsAccepted || !privacyAccepted) {
+
+    if (
+      !profile.accountBelongsToCompany ||
+      !termsAccepted ||
+      !privacyAccepted
+    ) {
       setError(t("payouts.requiredConsents"));
       return;
     }
@@ -116,6 +156,7 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
     setSaving(true);
     setError("");
     setNotice("");
+
     try {
       const response = await fetch("/api/account/payout-profile", {
         method: "PUT",
@@ -134,10 +175,12 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
         }),
       });
       const data = await response.json().catch(() => null);
+
       if (!response.ok) {
         setError(t("payouts.saveError"));
         return;
       }
+
       setProfile({ ...emptyProfile, ...data.profile });
       setAccountNumber("");
       setNotice(t("payouts.savedNotice"));
@@ -150,78 +193,332 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
 
   if (loading) {
     return (
-      <div className="flex min-h-48 items-center justify-center" aria-label={t("payouts.loading")}>
+      <div
+        className="flex min-h-48 items-center justify-center"
+        aria-label={t("payouts.loading")}
+      >
         <CometSpinner size="xs" />
       </div>
     );
   }
 
+  const bankSelectionDisabled =
+    saving || banksLoading || banks.length === 0;
+
   return (
-    <>
-    <section className="mx-auto grid max-w-4xl gap-5 px-4 py-8 sm:px-6">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[.18em] theme-success-text">{t("payouts.sellerSettings")}</p>
-        <h1 className="mt-2 text-2xl font-semibold theme-foreground">{t("payouts.informationTitle")}</h1>
-        <p className="mt-2 text-sm theme-muted">{t("payouts.informationDescription")}</p>
+    <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {t("payouts.informationTitle")}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {t("payouts.informationDescription")}
+        </p>
       </div>
 
-      {error ? <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p> : null}
-      {notice ? <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</p> : null}
+      {error ? (
+        <p
+          role="alert"
+          className="mt-5 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
+          {error}
+        </p>
+      ) : null}
 
-      <form className="grid gap-5 rounded-2xl border p-5 theme-surface-elevated" onSubmit={save}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span className="flex size-10 items-center justify-center rounded-full border theme-surface-muted">
-              <Landmark className="size-5 theme-success-text" />
-            </span>
-            <div>
-              <h2 className="font-semibold theme-foreground">{t("payouts.beneficiaryDetails")}</h2>
-              <p className="text-sm theme-muted">
-                {profile.accountNumberMasked
-                  ? `${t("payouts.savedAccount")}: ${profile.accountNumberMasked}`
-                  : t("payouts.enterAccountNumber")}
-              </p>
+      {notice ? (
+        <p className="mt-5 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground">
+          {notice}
+        </p>
+      ) : null}
+
+      <form
+        className="mt-6 rounded-xl border border-border bg-card p-5 text-card-foreground shadow-sm"
+        onSubmit={save}
+      >
+        <FieldGroup>
+          <FieldSet>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-muted">
+                  <Landmark className="size-5 text-muted-foreground" />
+                </span>
+                <div className="min-w-0 space-y-1">
+                  <FieldLegend>{t("payouts.beneficiaryDetails")}</FieldLegend>
+                  <FieldDescription>
+                    {profile.accountNumberMasked
+                      ? `${t("payouts.savedAccount")}: ${profile.accountNumberMasked}`
+                      : t("payouts.enterAccountNumber")}
+                  </FieldDescription>
+                </div>
+              </div>
+
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                <ShieldCheck className="size-3.5" />
+                {payoutProfileStatusLabel(profile.status, t)}
+              </span>
             </div>
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold theme-success-badge">
-            <ShieldCheck className="size-3.5" />
-            {payoutProfileStatusLabel(profile.status, t)}
-          </span>
-        </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Label label={t("payouts.country")}><input value={t("payouts.korea")} readOnly className={inputClassName} aria-readonly="true" /></Label>
-          <Label label={t("payouts.bank")}>
-            <select value={profile.bankDirectoryId ?? ""} onChange={(event) => update("bankDirectoryId", event.target.value || null)} className={inputClassName} required disabled={saving || banksLoading || banks.length === 0}>
-              <option value="">{banksLoading ? t("payouts.loadingBanks") : t("payouts.selectBank")}</option>
-              {banks.map((bank) => <option key={bank.id} value={bank.id}>{bank.bankNameEnglish} ({bank.bankNameLocal})</option>)}
-            </select>
-            {!banksLoading && banks.length === 0 ? <span className="text-xs text-red-700">{t("payouts.noBanksAvailable")}</span> : null}
-          </Label>
-          <Label label={t("payouts.accountHolder")}><input value={profile.accountHolder} onChange={(event) => update("accountHolder", event.target.value)} className={inputClassName} required maxLength={240} disabled={saving} /></Label>
-          <Label label={profile.accountNumberMasked ? t("payouts.replaceAccountNumber") : t("payouts.accountNumber")}><input value={accountNumber} onChange={(event) => setAccountNumber(onlyAccountNumberCharacters(event.target.value))} autoComplete="off" inputMode="numeric" pattern="[0-9-]*" className={inputClassName} placeholder={profile.accountNumberMasked ?? ""} minLength={profile.accountNumberMasked ? undefined : 4} maxLength={127} required={!profile.accountNumberMasked} disabled={saving} /></Label>
-          <Label label={t("payouts.payoutCurrency")}><input value="KRW" readOnly className={inputClassName} aria-readonly="true" /></Label>
-        </div>
+            <FieldGroup className="grid gap-4 sm:grid-cols-2">
+              <Field>
+                <FieldLabel htmlFor="settlement-country">
+                  {t("payouts.country")}
+                </FieldLabel>
+                <Input
+                  id="settlement-country"
+                  value={t("payouts.korea")}
+                  readOnly
+                  aria-readonly="true"
+                />
+              </Field>
 
-        <ConsentCheckbox checked={profile.accountBelongsToCompany} disabled={saving} onChange={(checked) => update("accountBelongsToCompany", checked)}>{t("payouts.accountBelongsToCompany")}</ConsentCheckbox>
-        <ConsentCheckbox checked={termsAccepted} disabled={saving} onChange={setTermsAccepted}>{locale === "ko" ? <><a href={withLocale("/terms", locale)} target="_blank" rel="noopener noreferrer" className="underline">이용약관</a>에 동의합니다. (필수)</> : <>I agree to the <a href={withLocale("/terms", locale)} target="_blank" rel="noopener noreferrer" className="underline">Terms of Service</a>. (Required)</>}</ConsentCheckbox>
-        <ConsentCheckbox checked={privacyAccepted} disabled={saving} onChange={setPrivacyAccepted}>{locale === "ko" ? <><a href={withLocale("/privacy", locale)} target="_blank" rel="noopener noreferrer" className="underline">개인정보처리방침</a>을 확인했습니다. (필수)</> : <>I acknowledge the <a href={withLocale("/privacy", locale)} target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>. (Required)</>}</ConsentCheckbox>
+              <Field>
+                <FieldLabel htmlFor="settlement-bank">
+                  {t("payouts.bank")}
+                </FieldLabel>
+                <Select
+                  value={profile.bankDirectoryId ?? ""}
+                  onValueChange={(value) =>
+                    update("bankDirectoryId", value || null)
+                  }
+                  disabled={bankSelectionDisabled}
+                  required
+                >
+                  <SelectTrigger
+                    id="settlement-bank"
+                    className="w-full"
+                    aria-label={t("payouts.bank")}
+                  >
+                    <SelectValue
+                      placeholder={
+                        banksLoading
+                          ? t("payouts.loadingBanks")
+                          : t("payouts.selectBank")
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent align="start">
+                    <SelectGroup>
+                      {banks.map((bank) => (
+                        <SelectItem key={bank.id} value={bank.id}>
+                          {bank.bankNameEnglish} ({bank.bankNameLocal})
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                {!banksLoading && banks.length === 0 ? (
+                  <FieldDescription className="text-destructive">
+                    {t("payouts.noBanksAvailable")}
+                  </FieldDescription>
+                ) : null}
+              </Field>
 
-        <div className="flex items-center justify-between gap-3 border-t pt-4 theme-border">
-          <p className="text-xs theme-muted">{profile.updatedAt ? `${t("payouts.lastUpdated")}: ${formatTradeDateTime(profile.updatedAt, locale)}` : ""}</p>
-          <button type="submit" disabled={saving || banksLoading || banks.length === 0} className="inline-flex h-10 items-center gap-2 rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:opacity-60"><Save className="size-4" />{saving ? t("payouts.saving") : t("payouts.save")}</button>
-        </div>
+              <Field>
+                <FieldLabel htmlFor="settlement-account-holder">
+                  {t("payouts.accountHolder")}
+                </FieldLabel>
+                <Input
+                  id="settlement-account-holder"
+                  value={profile.accountHolder}
+                  onChange={(event) =>
+                    update("accountHolder", event.target.value)
+                  }
+                  required
+                  maxLength={240}
+                  disabled={saving}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="settlement-account-number">
+                  {profile.accountNumberMasked
+                    ? t("payouts.replaceAccountNumber")
+                    : t("payouts.accountNumber")}
+                </FieldLabel>
+                <Input
+                  id="settlement-account-number"
+                  value={accountNumber}
+                  onChange={(event) =>
+                    setAccountNumber(
+                      onlyAccountNumberCharacters(event.target.value)
+                    )
+                  }
+                  autoComplete="off"
+                  inputMode="numeric"
+                  pattern="[0-9-]*"
+                  placeholder={profile.accountNumberMasked ?? ""}
+                  minLength={profile.accountNumberMasked ? undefined : 4}
+                  maxLength={127}
+                  required={!profile.accountNumberMasked}
+                  disabled={saving}
+                />
+              </Field>
+
+              <Field>
+                <FieldLabel htmlFor="settlement-currency">
+                  {t("payouts.payoutCurrency")}
+                </FieldLabel>
+                <Input
+                  id="settlement-currency"
+                  value="KRW"
+                  readOnly
+                  aria-readonly="true"
+                />
+              </Field>
+            </FieldGroup>
+          </FieldSet>
+
+          <FieldSeparator />
+
+          <FieldSet>
+            <div className="space-y-1">
+              <FieldLegend>
+                {t("payouts.requiredConfirmations")}
+              </FieldLegend>
+              <FieldDescription>
+                {t("payouts.requiredConfirmationsDescription")}
+              </FieldDescription>
+            </div>
+
+            <FieldGroup className="gap-3">
+              <ConsentField
+                id="settlement-account-ownership"
+                checked={profile.accountBelongsToCompany}
+                disabled={saving}
+                onChange={(checked) =>
+                  update("accountBelongsToCompany", checked)
+                }
+              >
+                {t("payouts.accountBelongsToCompany")}
+              </ConsentField>
+
+              <ConsentField
+                id="settlement-terms"
+                checked={termsAccepted}
+                disabled={saving}
+                onChange={setTermsAccepted}
+              >
+                {locale === "ko" ? (
+                  <>
+                    <a
+                      href={withLocale("/terms", locale)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="underline underline-offset-4"
+                    >
+                      이용약관
+                    </a>
+                    에 동의합니다. (필수)
+                  </>
+                ) : (
+                  <>
+                    I agree to the{" "}
+                    <a
+                      href={withLocale("/terms", locale)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="underline underline-offset-4"
+                    >
+                      Terms of Service
+                    </a>
+                    . (Required)
+                  </>
+                )}
+              </ConsentField>
+
+              <ConsentField
+                id="settlement-privacy"
+                checked={privacyAccepted}
+                disabled={saving}
+                onChange={setPrivacyAccepted}
+              >
+                {locale === "ko" ? (
+                  <>
+                    <a
+                      href={withLocale("/privacy", locale)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="underline underline-offset-4"
+                    >
+                      개인정보처리방침
+                    </a>
+                    을 확인했습니다. (필수)
+                  </>
+                ) : (
+                  <>
+                    I acknowledge the{" "}
+                    <a
+                      href={withLocale("/privacy", locale)}
+                      target="_blank" rel="noopener noreferrer"
+                      className="underline underline-offset-4"
+                    >
+                      Privacy Policy
+                    </a>
+                    . (Required)
+                  </>
+                )}
+              </ConsentField>
+            </FieldGroup>
+          </FieldSet>
+
+          <FieldSeparator />
+
+          <Field
+            orientation="horizontal"
+            className="flex-wrap items-center justify-between gap-3"
+          >
+            <FieldDescription>
+              {profile.updatedAt
+                ? `${t("payouts.lastUpdated")}: ${formatTradeDateTime(
+                    profile.updatedAt,
+                    locale
+                  )}`
+                : ""}
+            </FieldDescription>
+            <Button
+              type="submit"
+              size="lg"
+              disabled={saving || banksLoading || banks.length === 0}
+            >
+              <Save data-icon="inline-start" />
+              {saving ? t("payouts.saving") : t("payouts.save")}
+            </Button>
+          </Field>
+        </FieldGroup>
       </form>
     </section>
-    <StripeConnectOnboardingPanel ownerType="seller" />
-    </>
   );
 }
 
-function Label({ label, children }: { label: string; children: ReactNode }) {
-  return <label className="grid gap-1.5 text-sm font-medium theme-foreground"><span>{label}</span>{children}</label>;
-}
-
-function ConsentCheckbox({ checked, disabled, onChange, children }: { checked: boolean; disabled: boolean; onChange: (checked: boolean) => void; children: ReactNode }) {
-  return <label className="flex items-start gap-3 rounded-lg border p-3 text-sm theme-surface-muted"><input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1" required disabled={disabled} /><span>{children}</span></label>;
+function ConsentField({
+  id,
+  checked,
+  disabled,
+  onChange,
+  children,
+}: {
+  id: string;
+  checked: boolean;
+  disabled: boolean;
+  onChange: (checked: boolean) => void;
+  children: ReactNode;
+}) {
+  return (
+    <Field
+      orientation="horizontal"
+      className="rounded-lg border border-border bg-muted/40 p-3"
+    >
+      <Checkbox
+        id={id}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        required
+        disabled={disabled}
+        className="mt-0.5"
+      />
+      <FieldLabel
+        htmlFor={id}
+        className="min-w-0 font-normal leading-5"
+      >
+        <span>{children}</span>
+      </FieldLabel>
+    </Field>
+  );
 }

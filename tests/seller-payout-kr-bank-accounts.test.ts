@@ -46,8 +46,14 @@ test("seller payout bank list is restricted to active Korean BankDirectory entri
 });
 
 test("payout screens remove account-type, IBAN, optional bank details, and manual bank entry", () => {
+  assert.match(onboardingUi, /border border-zinc-300 bg-white/);
+  assert.match(settingsUi, /@\/components\/ui\/field/);
+  assert.match(settingsUi, /@\/components\/ui\/checkbox/);
+  assert.match(settingsUi, /@\/components\/ui\/select/);
+  assert.match(settingsUi, /@\/components\/ui\/input/);
+  assert.match(settingsUi, /@\/components\/ui\/button/);
+
   for (const source of [onboardingUi, settingsUi]) {
-    assert.match(source, /border border-zinc-300 bg-white/);
     assert.match(source, /inputMode="numeric"/);
     assert.match(source, /pattern="\[0-9-\]\*"/);
     assert.match(source, /onlyAccountNumberCharacters/);
@@ -60,6 +66,22 @@ test("payout screens remove account-type, IBAN, optional bank details, and manua
     assert.doesNotMatch(source, /swiftBic/);
     assert.doesNotMatch(source, /intermediaryBank/);
   }
+});
+
+test("settlement account settings use shadcn fields without Stripe onboarding", () => {
+  assert.match(settingsUi, /<FieldGroup>/);
+  assert.match(settingsUi, /<FieldSet>/);
+  assert.match(settingsUi, /<FieldLegend>/);
+  assert.match(settingsUi, /<FieldSeparator \/>/);
+  assert.match(settingsUi, /<Select/);
+  assert.match(settingsUi, /<Checkbox/);
+  assert.match(settingsUi, /<Button/);
+  assert.doesNotMatch(settingsUi, /StripeConnectOnboardingPanel/);
+  assert.doesNotMatch(settingsUi, /payouts\.sellerSettings/);
+  assert.doesNotMatch(
+    settingsUi,
+    /theme-|bm-|#34B386|#34b386|emerald-|green-|zinc-|slate-/,
+  );
 });
 
 test("payout screens require ownership, terms, and privacy acknowledgements with localized links", () => {
