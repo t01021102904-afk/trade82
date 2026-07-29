@@ -1,7 +1,7 @@
 "use client"
 
 import { useClerk } from "@clerk/nextjs"
-import { Building2, EllipsisVertical, LogOut, Settings2 } from "lucide-react"
+import { Building2, CircleHelp, EllipsisVertical, LogOut, Settings2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { useI18n } from "@/components/i18n-provider"
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
@@ -31,6 +30,7 @@ export function NavUser({
   user,
   companyProfileUrl,
   settingsUrl,
+  helpUrl,
 }: {
   user: {
     name: string
@@ -39,6 +39,7 @@ export function NavUser({
   }
   companyProfileUrl: string
   settingsUrl: string
+  helpUrl: string
 }) {
   const { isMobile } = useSidebar()
   const { locale, t } = useI18n()
@@ -51,31 +52,26 @@ export function NavUser({
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                type="button"
-                size="lg"
-                className="aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground"
-              />
-            }
+            type="button"
+            className="flex min-h-12 w-full items-center gap-2 overflow-hidden rounded-lg p-2 text-left text-sm outline-none transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring data-[popup-open]:bg-sidebar-accent data-[popup-open]:text-sidebar-accent-foreground"
           >
-            <Avatar className="h-8 w-8 rounded-lg grayscale">
+            <Avatar className="h-9 w-9 rounded-lg grayscale">
               <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
             </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
+            <div className="grid min-w-0 flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{user.name}</span>
               <span className="truncate text-xs text-muted-foreground">
                 {user.email}
               </span>
             </div>
-            <EllipsisVertical className="ml-auto size-4" />
+            <EllipsisVertical className="ml-auto size-4 shrink-0" />
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            className="min-w-64 rounded-xl p-1 shadow-lg"
+            side={isMobile ? "top" : "right"}
             align="end"
-            sideOffset={4}
+            sideOffset={8}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
@@ -93,17 +89,35 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.push(companyProfileUrl)}>
+              <DropdownMenuItem
+                className="gap-3 rounded-lg py-2.5"
+                onClick={() => router.push(companyProfileUrl)}
+              >
                 <Building2 />
                 {t("sellerDashboard.navCompanyProfile")}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push(settingsUrl)}>
+              <DropdownMenuItem
+                className="gap-3 rounded-lg py-2.5"
+                onClick={() => router.push(settingsUrl)}
+              >
                 <Settings2 />
                 {t("sellerDashboard.navSettings")}
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="gap-3 rounded-lg py-2.5"
+                onClick={() => router.push(helpUrl)}
+              >
+                <CircleHelp />
+                {t("sellerDashboard.navHelp")}
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => void signOut({ redirectUrl: withLocale("/", locale) })}>
+            <DropdownMenuItem
+              className="gap-3 rounded-lg py-2.5"
+              onClick={() =>
+                void signOut({ redirectUrl: withLocale("/", locale) })
+              }
+            >
               <LogOut />
               {t("settings.signOut")}
             </DropdownMenuItem>
