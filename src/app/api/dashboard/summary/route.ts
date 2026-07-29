@@ -4,6 +4,8 @@ import { buyerCategoryLabel } from "@/lib/company-select-options";
 import { getDb } from "@/lib/db";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
 
+const noStoreHeaders = { "Cache-Control": "no-store" };
+
 function normalizeText(value: string | null | undefined) {
   return (value ?? "")
     .toLowerCase()
@@ -35,7 +37,10 @@ export async function GET(request: Request) {
     const role = url.searchParams.get("role") === "seller" ? "seller" : "buyer";
     const company = await getUserCompany(user.id, role);
     if (!company) {
-      return Response.json({ company: null, metrics: {}, recentReviews: [] });
+      return Response.json(
+        { company: null, metrics: {}, recentReviews: [] },
+        { headers: noStoreHeaders },
+      );
     }
 
     if (role === "seller") {
@@ -43,6 +48,9 @@ export async function GET(request: Request) {
         products,
         inquiries,
         inquiryCount,
+        newLeadCount,
+        quotesInProgressCount,
+        paidOrderCount,
         companyReviews,
         dealReviews,
         deals,
@@ -63,6 +71,11 @@ export async function GET(request: Request) {
             buyerCompany: true,
             product: true,
             sender: { select: { avatarUrl: true } },
+            messages: {
+              orderBy: { createdAt: "desc" },
+              take: 1,
+              select: { body: true },
+            },
           },
         }),
         getDb().inquiry.count({
@@ -70,6 +83,26 @@ export async function GET(request: Request) {
             sellerCompanyId: company.id,
             buyerCompany: { deletedAt: null },
             product: { deletedAt: null },
+          },
+        }),
+        getDb().inquiry.count({
+          where: {
+            sellerCompanyId: company.id,
+            status: "sent",
+            buyerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
+        }),
+        getDb().rfqSellerQuote.count({
+          where: {
+            sellerCompanyId: company.id,
+            status: { in: ["REQUESTED", "SUBMITTED", "NEGOTIATING"] },
+          },
+        }),
+        getDb().tradeOrder.count({
+          where: {
+            sellerCompanyId: company.id,
+            paymentStatus: "PAID",
           },
         }),
         getDb().companyReview.findMany({
@@ -124,6 +157,9 @@ export async function GET(request: Request) {
           companyViews: company.viewCount,
           inquiryCount,
           receivedInquiries: inquiryCount,
+          newLeads: newLeadCount,
+          quotesInProgress: quotesInProgressCount,
+          paidOrders: paidOrderCount,
           completedDeals: completedDeals.length,
           reviewRequests: completedDeals.filter(
             (deal) => deal.reviews.length === 0,
@@ -152,16 +188,20 @@ export async function GET(request: Request) {
         recentInquiries: inquiries.map((item) => ({
           id: item.id,
           message: item.message,
+          lastMessage: item.messages[0]?.body || item.message,
+          status: item.status,
+          createdAt: item.createdAt,
           updatedAt: item.updatedAt,
           companyName:
             item.buyerCompany.tradeName || item.buyerCompany.legalName,
+          country: item.buyerCompany.country,
           companyLogoThumbnailUrl: item.buyerCompany.logoThumbnailUrl,
           companyLogoUrl: item.buyerCompany.logoUrl,
           useDefaultLogo: item.buyerCompany.useDefaultLogo,
           senderAvatarUrl: item.sender.avatarUrl,
           productName: item.product?.name || null,
         })),
-      });
+      }, { headers: noStoreHeaders });
     }
 
     const [
@@ -359,7 +399,7 @@ export async function GET(request: Request) {
         productName: item.product?.name || null,
       })),
       recentReviews: [],
-    });
+    }, { headers: noStoreHeaders });
   } catch (error) {
     return apiError(error);
   }
