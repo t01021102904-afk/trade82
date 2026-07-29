@@ -110,8 +110,8 @@ test("seller user menu is a button and exposes explicit profile routes", () => {
 
   assert.match(navUser, /type="button"/);
   assert.doesNotMatch(navUser, /DropdownMenuItem render=\{<Link/);
-  assert.match(navUser, /router\.push\(companyProfileUrl\)/);
-  assert.match(navUser, /router\.push\(settingsUrl\)/);
+  assert.match(navUser, /navigate\(companyProfileUrl\)/);
+  assert.match(navUser, /navigate\(settingsUrl\)/);
 });
 
 test("public header remains visible while the seller dashboard footer stays hidden", () => {
