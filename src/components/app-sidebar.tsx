@@ -59,11 +59,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       { title: t("sellerDashboard.navOverview"), url: overviewUrl, icon: LayoutDashboard, active: isOverview },
       { title: t("sellerDashboard.navProducts"), url: `${overviewUrl}?section=products`, icon: Package, active: path === "/dashboard/seller" && section === "products" },
       { title: t("sellerDashboard.navQuotes"), icon: Handshake, disabled: true },
-      { title: t("sellerDashboard.navOrders"), url: href("/orders"), icon: ShoppingCart, active: path === "/orders" },
+      { title: t("sellerDashboard.navOrders"), url: `${overviewUrl}?section=orders`, icon: ShoppingCart, active: path === "/dashboard/seller" && section === "orders" },
     ],
     operations: [
       { name: t("sellerDashboard.navDocuments"), url: `${overviewUrl}?section=documents`, icon: FileText, active: path === "/dashboard/seller" && section === "documents" },
-      { name: t("sellerDashboard.navPayouts"), url: href("/settings/payout-information"), icon: ReceiptText, active: path === "/settings/payout-information" },
+      { name: t("sellerDashboard.navPayouts"), url: `${overviewUrl}?section=payouts`, icon: ReceiptText, active: path === "/dashboard/seller" && section === "payouts" },
     ],
     growth: [
       { name: t("sellerDashboard.navMarketing"), url: `${overviewUrl}?section=marketing`, icon: Megaphone, active: path === "/dashboard/seller" && section === "marketing" },

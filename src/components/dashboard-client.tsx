@@ -13,6 +13,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
+import { SellerOrdersSection } from "@/components/seller-orders-section";
+import { SellerPayoutInformationSection } from "@/components/seller-payout-information-section";
 import { CompanyLogo } from "@/components/profile-identity";
 import { SellerDocumentsSection } from "@/components/seller-documents-section";
 import {
@@ -36,6 +38,8 @@ export type DashboardSection =
   | "messages"
   | "products"
   | "documents"
+  | "orders"
+  | "payouts"
   | "marketing";
 
 type Summary = {
@@ -134,6 +138,14 @@ export function DashboardClient({
       .then((response) => (response.ok ? response.json() : null))
       .then((value: Summary | null) => setSummary(value));
   }, [role]);
+
+  if (role === "seller" && activeSection === "orders") {
+    return <SellerOrdersSection />;
+  }
+
+  if (role === "seller" && activeSection === "payouts") {
+    return <SellerPayoutInformationSection />;
+  }
 
   if (!summary) {
     return <p className="text-sm text-zinc-600">{t("common.loading")}</p>;
