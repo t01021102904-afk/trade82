@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: Product }) {
         <WholesalePriceGate
           value={`${t("listing.wholesalePrice")}: ${product.wholesalePrice}`}
           className="mt-1 max-w-full"
-          valueClassName="truncate text-base font-semibold text-[#34B386]"
+          valueClassName="truncate text-xs font-semibold text-[#34B386]"
           gateClassName="text-sm"
         />
         {product.moq ? (
