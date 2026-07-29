@@ -3,6 +3,10 @@ import { getUserCompany, requireAuth } from "@/lib/authz";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
 import { getDb } from "@/lib/db";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
+import {
+  buildSellerDashboardCurrencySeries,
+  SELLER_DASHBOARD_HISTORY_DAYS,
+} from "@/lib/seller-dashboard-net-sales";
 
 const noStoreHeaders = { "Cache-Control": "no-store" };
 
@@ -44,6 +48,15 @@ export async function GET(request: Request) {
     }
 
     if (role === "seller") {
+      // Dashboard accounting buckets are deliberately UTC. There is no seller
+      // timezone on the Company model, so this avoids server-local-date drift.
+      const now = new Date();
+      const sellerDashboardStart = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+      );
+      sellerDashboardStart.setUTCDate(
+        sellerDashboardStart.getUTCDate() - (SELLER_DASHBOARD_HISTORY_DAYS - 1),
+      );
       const [
         products,
         inquiries,
@@ -54,6 +67,10 @@ export async function GET(request: Request) {
         companyReviews,
         dealReviews,
         deals,
+        paidSales,
+        successfulRefunds,
+        newLeads,
+        quotesInProgress,
       ] = await Promise.all([
         getDb().product.findMany({
           where: { sellerCompanyId: company.id, deletedAt: null },
@@ -142,10 +159,82 @@ export async function GET(request: Request) {
             },
           },
         }),
+        // TradeOrder is one-to-one with PaymentRequest, so each confirmed
+        // payment is represented once. Refunded orders remain here to retain
+        // their original paid event; the successful refund is recorded below
+        // on its own actual event date.
+        getDb().tradeOrder.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            paymentStatus: { in: ["PAID", "PARTIALLY_REFUNDED", "REFUNDED"] },
+            orderStatus: { not: "CANCELLED" },
+            paidAt: { gte: sellerDashboardStart, lte: now },
+          },
+          select: {
+            paidAt: true,
+            grossAmount: true,
+            currency: true,
+          },
+        }),
+        // PaymentRefund has one row per unique Stripe refund ID. Only the
+        // terminal Stripe status is a financial event, and the relation keeps
+        // the query scoped to this authenticated seller's company.
+        getDb().paymentRefund.findMany({
+          where: {
+            status: "succeeded",
+            lastStripeEventCreatedAt: { gte: sellerDashboardStart, lte: now },
+            paymentRequest: {
+              sellerCompanyId: company.id,
+              tradeOrderByPaymentRequest: { is: { orderStatus: { not: "CANCELLED" } } },
+            },
+          },
+          select: {
+            amount: true,
+            lastStripeEventCreatedAt: true,
+            paymentRequest: { select: { currency: true } },
+          },
+        }),
+        getDb().inquiry.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            status: "sent",
+            createdAt: { gte: sellerDashboardStart, lte: now },
+            buyerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
+          select: { createdAt: true },
+        }),
+        getDb().rfqSellerQuote.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            status: { in: ["REQUESTED", "SUBMITTED", "NEGOTIATING"] },
+            createdAt: { gte: sellerDashboardStart, lte: now },
+          },
+          select: { createdAt: true },
+        }),
       ]);
       const completedDeals = deals.filter(
         (deal) => deal.dealStatus === "completed",
       );
+      const sellerDashboard = buildSellerDashboardCurrencySeries({
+        now,
+        payments: paidSales.flatMap((order) =>
+          order.paidAt
+            ? [{
+                occurredAt: order.paidAt,
+                currency: order.currency,
+                minorUnits: order.grossAmount,
+              }]
+            : [],
+        ),
+        refunds: successfulRefunds.map((refund) => ({
+          occurredAt: refund.lastStripeEventCreatedAt,
+          currency: refund.paymentRequest.currency,
+          minorUnits: refund.amount,
+        })),
+        newLeads: newLeads.map((lead) => ({ occurredAt: lead.createdAt })),
+        quotesInProgress: quotesInProgress.map((quote) => ({ occurredAt: quote.createdAt })),
+      });
       return Response.json({
         company: {
           id: company.id,
@@ -167,6 +256,16 @@ export async function GET(request: Request) {
           productCount: products.length,
           listedProductCount: products.filter((item) => item.status === "active")
             .length,
+        },
+        sellerDashboard: {
+          // Currency values stay separated—there is no exchange-rate snapshot
+          // in the product, so no cross-currency conversion is attempted.
+          defaultCurrency:
+            sellerDashboard.currencySeries.find((series) => series.currency === "USD")?.currency
+            ?? sellerDashboard.currencySeries[0]?.currency
+            ?? null,
+          currencySeries: sellerDashboard.currencySeries,
+          activitySeries: sellerDashboard.activitySeries,
         },
         recentReviews: [
           ...companyReviews.map((item) => ({
