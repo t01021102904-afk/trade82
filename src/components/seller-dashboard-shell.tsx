@@ -46,7 +46,7 @@ type SummaryState =
   | { status: "error"; summary: null }
   | { status: "ready"; summary: Summary }
 
-const sellerSections = new Set<DashboardSection>(["products", "documents", "marketing"])
+const sellerSections = new Set<DashboardSection>(["products", "documents", "marketing", "orders", "payouts"])
 const emptyCurrencySeries: SellerDashboardCurrencySeries[] = []
 const emptyActivitySeries: SellerDashboardSeriesPoint[] = []
 
