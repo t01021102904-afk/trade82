@@ -109,6 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           user={data.user}
           companyProfileUrl={href("/settings/company")}
           settingsUrl={href("/dashboard/settings")}
+          helpUrl={href("/how-it-works")}
         />
       </SidebarFooter>
     </Sidebar>
