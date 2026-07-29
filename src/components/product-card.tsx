@@ -30,7 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
           id={product.id}
           kind="product"
           iconOnly
-          className="absolute right-2 top-2 min-h-10 min-w-10 border border-zinc-200 bg-white/95 shadow-sm backdrop-blur"
+          className="absolute right-2 top-2 min-h-10 min-w-10 backdrop-blur"
         />
       </div>
 
