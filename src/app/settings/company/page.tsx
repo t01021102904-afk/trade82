@@ -1,7 +1,9 @@
-import { SettingsPage } from "@/components/settings-page";
-import { requireAppProfile } from "@/lib/require-auth";
+import { CompanyProfileSettings } from "@/components/company-profile-settings";
 
-export default async function CompanySettingsPage() {
-  const { role } = await requireAppProfile("/settings/company");
-  return <SettingsPage locale="en" mode="company" role={role} />;
+export default function CompanySettingsPage() {
+  return (
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+      <CompanyProfileSettings />
+    </main>
+  );
 }
