@@ -218,13 +218,16 @@ export function SaveButton({
         )}
         aria-label={label}
         aria-pressed={visibleSaved}
-        title={label}
-      >
-        {iconOnly ? (
-          <AnimatedBookmarkIcon saved={Boolean(saved)} />
-        ) : (
-          label
-        )}
+
+
+      style={{
+              backgroundColor: "transparent",
+              borderColor: "transparent",
+              boxShadow: "none",
+              opacity: 1,
+            }}
+      data-icon-only={iconOnly ? "true" : "false"}>
+        <AnimatedBookmarkIcon saved={Boolean(saved)} />
       </button>
       {feedback ? (
         <span
