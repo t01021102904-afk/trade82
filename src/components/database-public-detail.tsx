@@ -896,7 +896,7 @@ function CompactRelatedProductCard({ product }: { product: Product }) {
           id={product.id}
           kind="product"
           iconOnly
-          className="absolute right-1.5 top-1.5 h-8 w-8 border border-zinc-200 bg-white/95 shadow-sm"
+          className="absolute right-1.5 top-1.5 h-8 w-8"
         />
       </div>
       <div className="grid min-w-0 gap-1.5 pt-2.5">

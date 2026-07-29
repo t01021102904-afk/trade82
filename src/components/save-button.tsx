@@ -209,24 +209,29 @@ export function SaveButton({
           requestToggle();
         }}
         disabled={pending || waitingForSession}
-        className={cx(
+        className={cx(cx(
           "inline-flex min-h-10 w-full items-center justify-center rounded-md border text-sm font-medium transition disabled:cursor-wait disabled:opacity-70",
           iconOnly ? "min-w-10 p-2.5" : "px-3.5 py-2",
           visibleSaved
             ? "border-[#34B386] bg-[#34B386]/10 text-zinc-950"
             : "border-zinc-200 bg-white text-zinc-700 hover:border-[#34B386] hover:text-zinc-950",
-        )}
+        ), "!border-0 !bg-transparent !p-0 !shadow-none !ring-0 !outline-none hover:!bg-transparent focus:!ring-0 focus-visible:!ring-0 focus-visible:!outline-none disabled:!opacity-100")}
         aria-label={label}
         aria-pressed={visibleSaved}
 
 
+
+      data-icon-only={iconOnly ? "true" : "false"}
       style={{
-              backgroundColor: "transparent",
-              borderColor: "transparent",
-              boxShadow: "none",
-              opacity: 1,
-            }}
-      data-icon-only={iconOnly ? "true" : "false"}>
+        appearance: "none",
+        WebkitAppearance: "none",
+        background: "transparent",
+        border: 0,
+        boxShadow: "none",
+        outline: "none",
+        padding: 0,
+      }}
+      data-save-icon-only="true">
         <AnimatedBookmarkIcon saved={Boolean(saved)} />
       </button>
       {feedback ? (
