@@ -33,6 +33,7 @@ export type MessageMinAggregateOutputType = {
   receiverCompanyId: string | null
   body: string | null
   contentHash: string | null
+  clientMessageId: string | null
   createdAt: Date | null
 }
 
@@ -45,6 +46,7 @@ export type MessageMaxAggregateOutputType = {
   receiverCompanyId: string | null
   body: string | null
   contentHash: string | null
+  clientMessageId: string | null
   createdAt: Date | null
 }
 
@@ -57,6 +59,7 @@ export type MessageCountAggregateOutputType = {
   receiverCompanyId: number
   body: number
   contentHash: number
+  clientMessageId: number
   createdAt: number
   _all: number
 }
@@ -71,6 +74,7 @@ export type MessageMinAggregateInputType = {
   receiverCompanyId?: true
   body?: true
   contentHash?: true
+  clientMessageId?: true
   createdAt?: true
 }
 
@@ -83,6 +87,7 @@ export type MessageMaxAggregateInputType = {
   receiverCompanyId?: true
   body?: true
   contentHash?: true
+  clientMessageId?: true
   createdAt?: true
 }
 
@@ -95,6 +100,7 @@ export type MessageCountAggregateInputType = {
   receiverCompanyId?: true
   body?: true
   contentHash?: true
+  clientMessageId?: true
   createdAt?: true
   _all?: true
 }
@@ -180,6 +186,7 @@ export type MessageGroupByOutputType = {
   receiverCompanyId: string | null
   body: string
   contentHash: string
+  clientMessageId: string | null
   createdAt: Date
   _count: MessageCountAggregateOutputType | null
   _min: MessageMinAggregateOutputType | null
@@ -213,6 +220,7 @@ export type MessageWhereInput = {
   receiverCompanyId?: Prisma.StringNullableFilter<"Message"> | string | null
   body?: Prisma.StringFilter<"Message"> | string
   contentHash?: Prisma.StringFilter<"Message"> | string
+  clientMessageId?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   inquiry?: Prisma.XOR<Prisma.InquiryNullableScalarRelationFilter, Prisma.InquiryWhereInput> | null
   sender?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -231,6 +239,7 @@ export type MessageOrderByWithRelationInput = {
   receiverCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
   body?: Prisma.SortOrder
   contentHash?: Prisma.SortOrder
+  clientMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   inquiry?: Prisma.InquiryOrderByWithRelationInput
   sender?: Prisma.UserProfileOrderByWithRelationInput
@@ -242,6 +251,7 @@ export type MessageOrderByWithRelationInput = {
 
 export type MessageWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  senderCompanyId_clientMessageId?: Prisma.MessageSenderCompanyIdClientMessageIdCompoundUniqueInput
   AND?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
@@ -252,6 +262,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   receiverCompanyId?: Prisma.StringNullableFilter<"Message"> | string | null
   body?: Prisma.StringFilter<"Message"> | string
   contentHash?: Prisma.StringFilter<"Message"> | string
+  clientMessageId?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   inquiry?: Prisma.XOR<Prisma.InquiryNullableScalarRelationFilter, Prisma.InquiryWhereInput> | null
   sender?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
@@ -259,7 +270,7 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   senderCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   receiverCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   attachments?: Prisma.MessageAttachmentListRelationFilter
-}, "id">
+}, "id" | "senderCompanyId_clientMessageId">
 
 export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -270,6 +281,7 @@ export type MessageOrderByWithAggregationInput = {
   receiverCompanyId?: Prisma.SortOrderInput | Prisma.SortOrder
   body?: Prisma.SortOrder
   contentHash?: Prisma.SortOrder
+  clientMessageId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.MessageCountOrderByAggregateInput
   _max?: Prisma.MessageMaxOrderByAggregateInput
@@ -288,6 +300,7 @@ export type MessageScalarWhereWithAggregatesInput = {
   receiverCompanyId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   body?: Prisma.StringWithAggregatesFilter<"Message"> | string
   contentHash?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  clientMessageId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
 }
 
@@ -295,6 +308,7 @@ export type MessageCreateInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
@@ -313,6 +327,7 @@ export type MessageUncheckedCreateInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -321,6 +336,7 @@ export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
@@ -339,6 +355,7 @@ export type MessageUncheckedUpdateInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -352,6 +369,7 @@ export type MessageCreateManyInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -359,6 +377,7 @@ export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -371,6 +390,7 @@ export type MessageUncheckedUpdateManyInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -384,6 +404,11 @@ export type MessageOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type MessageSenderCompanyIdClientMessageIdCompoundUniqueInput = {
+  senderCompanyId: string
+  clientMessageId: string
+}
+
 export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   inquiryId?: Prisma.SortOrder
@@ -393,6 +418,7 @@ export type MessageCountOrderByAggregateInput = {
   receiverCompanyId?: Prisma.SortOrder
   body?: Prisma.SortOrder
   contentHash?: Prisma.SortOrder
+  clientMessageId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -405,6 +431,7 @@ export type MessageMaxOrderByAggregateInput = {
   receiverCompanyId?: Prisma.SortOrder
   body?: Prisma.SortOrder
   contentHash?: Prisma.SortOrder
+  clientMessageId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -417,6 +444,7 @@ export type MessageMinOrderByAggregateInput = {
   receiverCompanyId?: Prisma.SortOrder
   body?: Prisma.SortOrder
   contentHash?: Prisma.SortOrder
+  clientMessageId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -655,6 +683,7 @@ export type MessageCreateWithoutSenderInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   receiver?: Prisma.UserProfileCreateNestedOneWithoutReceivedMessagesInput
@@ -671,6 +700,7 @@ export type MessageUncheckedCreateWithoutSenderInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -689,6 +719,7 @@ export type MessageCreateWithoutReceiverInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
@@ -705,6 +736,7 @@ export type MessageUncheckedCreateWithoutReceiverInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -747,6 +779,7 @@ export type MessageScalarWhereInput = {
   receiverCompanyId?: Prisma.StringNullableFilter<"Message"> | string | null
   body?: Prisma.StringFilter<"Message"> | string
   contentHash?: Prisma.StringFilter<"Message"> | string
+  clientMessageId?: Prisma.StringNullableFilter<"Message"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
 
@@ -770,6 +803,7 @@ export type MessageCreateWithoutSenderCompanyInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
@@ -786,6 +820,7 @@ export type MessageUncheckedCreateWithoutSenderCompanyInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -804,6 +839,7 @@ export type MessageCreateWithoutReceiverCompanyInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
@@ -820,6 +856,7 @@ export type MessageUncheckedCreateWithoutReceiverCompanyInput = {
   senderCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -870,6 +907,7 @@ export type MessageCreateWithoutInquiryInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
   receiver?: Prisma.UserProfileCreateNestedOneWithoutReceivedMessagesInput
@@ -886,6 +924,7 @@ export type MessageUncheckedCreateWithoutInquiryInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   attachments?: Prisma.MessageAttachmentUncheckedCreateNestedManyWithoutMessageInput
 }
@@ -920,6 +959,7 @@ export type MessageCreateWithoutAttachmentsInput = {
   id?: string
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
   inquiry?: Prisma.InquiryCreateNestedOneWithoutMessagesInput
   sender: Prisma.UserProfileCreateNestedOneWithoutSentMessagesInput
@@ -937,6 +977,7 @@ export type MessageUncheckedCreateWithoutAttachmentsInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -960,6 +1001,7 @@ export type MessageUpdateWithoutAttachmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
@@ -977,6 +1019,7 @@ export type MessageUncheckedUpdateWithoutAttachmentsInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -988,6 +1031,7 @@ export type MessageCreateManySenderInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -999,6 +1043,7 @@ export type MessageCreateManyReceiverInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -1006,6 +1051,7 @@ export type MessageUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   receiver?: Prisma.UserProfileUpdateOneWithoutReceivedMessagesNestedInput
@@ -1022,6 +1068,7 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1034,6 +1081,7 @@ export type MessageUncheckedUpdateManyWithoutSenderInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1041,6 +1089,7 @@ export type MessageUpdateWithoutReceiverInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
@@ -1057,6 +1106,7 @@ export type MessageUncheckedUpdateWithoutReceiverInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1069,6 +1119,7 @@ export type MessageUncheckedUpdateManyWithoutReceiverInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1080,6 +1131,7 @@ export type MessageCreateManySenderCompanyInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -1091,6 +1143,7 @@ export type MessageCreateManyReceiverCompanyInput = {
   senderCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -1098,6 +1151,7 @@ export type MessageUpdateWithoutSenderCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
@@ -1114,6 +1168,7 @@ export type MessageUncheckedUpdateWithoutSenderCompanyInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1126,6 +1181,7 @@ export type MessageUncheckedUpdateManyWithoutSenderCompanyInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1133,6 +1189,7 @@ export type MessageUpdateWithoutReceiverCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inquiry?: Prisma.InquiryUpdateOneWithoutMessagesNestedInput
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
@@ -1149,6 +1206,7 @@ export type MessageUncheckedUpdateWithoutReceiverCompanyInput = {
   senderCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1161,6 +1219,7 @@ export type MessageUncheckedUpdateManyWithoutReceiverCompanyInput = {
   senderCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1172,6 +1231,7 @@ export type MessageCreateManyInquiryInput = {
   receiverCompanyId?: string | null
   body: string
   contentHash?: string
+  clientMessageId?: string | null
   createdAt?: Date | string
 }
 
@@ -1179,6 +1239,7 @@ export type MessageUpdateWithoutInquiryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sender?: Prisma.UserProfileUpdateOneRequiredWithoutSentMessagesNestedInput
   receiver?: Prisma.UserProfileUpdateOneWithoutReceivedMessagesNestedInput
@@ -1195,6 +1256,7 @@ export type MessageUncheckedUpdateWithoutInquiryInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   attachments?: Prisma.MessageAttachmentUncheckedUpdateManyWithoutMessageNestedInput
 }
@@ -1207,6 +1269,7 @@ export type MessageUncheckedUpdateManyWithoutInquiryInput = {
   receiverCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   body?: Prisma.StringFieldUpdateOperationsInput | string
   contentHash?: Prisma.StringFieldUpdateOperationsInput | string
+  clientMessageId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1250,6 +1313,7 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   receiverCompanyId?: boolean
   body?: boolean
   contentHash?: boolean
+  clientMessageId?: boolean
   createdAt?: boolean
   inquiry?: boolean | Prisma.Message$inquiryArgs<ExtArgs>
   sender?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1269,6 +1333,7 @@ export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   receiverCompanyId?: boolean
   body?: boolean
   contentHash?: boolean
+  clientMessageId?: boolean
   createdAt?: boolean
   inquiry?: boolean | Prisma.Message$inquiryArgs<ExtArgs>
   sender?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1286,6 +1351,7 @@ export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   receiverCompanyId?: boolean
   body?: boolean
   contentHash?: boolean
+  clientMessageId?: boolean
   createdAt?: boolean
   inquiry?: boolean | Prisma.Message$inquiryArgs<ExtArgs>
   sender?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1303,10 +1369,11 @@ export type MessageSelectScalar = {
   receiverCompanyId?: boolean
   body?: boolean
   contentHash?: boolean
+  clientMessageId?: boolean
   createdAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "inquiryId" | "senderUserId" | "receiverUserId" | "senderCompanyId" | "receiverCompanyId" | "body" | "contentHash" | "createdAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "inquiryId" | "senderUserId" | "receiverUserId" | "senderCompanyId" | "receiverCompanyId" | "body" | "contentHash" | "clientMessageId" | "createdAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   inquiry?: boolean | Prisma.Message$inquiryArgs<ExtArgs>
   sender?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
@@ -1350,6 +1417,7 @@ export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     receiverCompanyId: string | null
     body: string
     contentHash: string
+    clientMessageId: string | null
     createdAt: Date
   }, ExtArgs["result"]["message"]>
   composites: {}
@@ -1788,6 +1856,7 @@ export interface MessageFieldRefs {
   readonly receiverCompanyId: Prisma.FieldRef<"Message", 'String'>
   readonly body: Prisma.FieldRef<"Message", 'String'>
   readonly contentHash: Prisma.FieldRef<"Message", 'String'>
+  readonly clientMessageId: Prisma.FieldRef<"Message", 'String'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
 }
     

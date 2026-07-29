@@ -1140,6 +1140,8 @@
     "pdfDocument": "PDF document",
     "sendBlockedWhileUploading": "Please wait for attachments to finish uploading.",
     "messageSendFailed": "Unable to send this message. Please try again.",
+    "sending": "Sending",
+    "failed": "Not sent",
     "chatRoomActions": "Chat room actions",
     "menuOpenChatRoom": "Open Chat Room",
     "menuRenameChatRoom": "Rename Chat Room",

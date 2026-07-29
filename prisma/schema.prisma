@@ -1821,10 +1821,12 @@ model Message {
   receiverCompany   Company?            @relation("MessageReceiverCompany", fields: [receiverCompanyId], references: [id])
   body              String
   contentHash       String              @default("")
+  clientMessageId   String?
   attachments       MessageAttachment[]
   createdAt         DateTime            @default(now())
 
   @@index([inquiryId, createdAt])
+  @@unique([senderCompanyId, clientMessageId])
 }
 
 model MessageAttachment {
