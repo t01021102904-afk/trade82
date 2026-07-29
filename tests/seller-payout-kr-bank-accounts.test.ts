@@ -98,3 +98,15 @@ test("payout screens require ownership, terms, and privacy acknowledgements with
     assert.match(source, /개인정보처리방침/);
   }
 });
+
+test("settlement bank select maps stored bank ids to visible bank names", () => {
+  assert.match(settingsUi, /const bankOptions = banks\.map/);
+  assert.match(settingsUi, /items=\{bankOptions\}/);
+  assert.match(settingsUi, /bank\.bankNameLocal/);
+  assert.match(settingsUi, /bank\.bankNameEnglish/);
+  assert.match(settingsUi, /\{bank\.label\}/);
+  assert.doesNotMatch(
+    settingsUi,
+    /<SelectItem key=\{bank\.id\} value=\{bank\.id\}>/,
+  );
+});
