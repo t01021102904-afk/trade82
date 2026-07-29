@@ -204,6 +204,13 @@ export function PayoutInformationClient({
 
   const bankSelectionDisabled =
     saving || banksLoading || banks.length === 0;
+  const bankOptions = banks.map((bank) => ({
+    value: bank.id,
+    label:
+      locale === "ko"
+        ? `${bank.bankNameLocal} (${bank.bankNameEnglish})`
+        : `${bank.bankNameEnglish} (${bank.bankNameLocal})`,
+  }));
 
   return (
     <section className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
@@ -276,6 +283,7 @@ export function PayoutInformationClient({
                   {t("payouts.bank")}
                 </FieldLabel>
                 <Select
+                  items={bankOptions}
                   value={profile.bankDirectoryId ?? ""}
                   onValueChange={(value) =>
                     update("bankDirectoryId", value || null)
@@ -298,9 +306,9 @@ export function PayoutInformationClient({
                   </SelectTrigger>
                   <SelectContent align="start">
                     <SelectGroup>
-                      {banks.map((bank) => (
-                        <SelectItem key={bank.id} value={bank.id}>
-                          {bank.bankNameEnglish} ({bank.bankNameLocal})
+                      {bankOptions.map((bank) => (
+                        <SelectItem key={bank.value} value={bank.value}>
+                          {bank.label}
                         </SelectItem>
                       ))}
                     </SelectGroup>
