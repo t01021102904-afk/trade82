@@ -18,6 +18,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -509,10 +510,7 @@ function ConsentField({
   children: ReactNode;
 }) {
   return (
-    <Field
-      orientation="horizontal"
-      className="rounded-lg border border-border bg-muted/40 p-3"
-    >
+    <div className="flex items-start gap-2">
       <Checkbox
         id={id}
         checked={checked}
@@ -521,12 +519,12 @@ function ConsentField({
         disabled={disabled}
         className="mt-0.5"
       />
-      <FieldLabel
+      <Label
         htmlFor={id}
-        className="min-w-0 font-normal leading-5"
+        className="min-w-0 cursor-pointer text-sm font-normal leading-5 text-foreground"
       >
-        <span>{children}</span>
-      </FieldLabel>
-    </Field>
+        {children}
+      </Label>
+    </div>
   );
 }

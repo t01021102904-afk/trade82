@@ -110,3 +110,22 @@ test("settlement bank select maps stored bank ids to visible bank names", () => 
     /<SelectItem key=\{bank\.id\} value=\{bank\.id\}>/,
   );
 });
+
+test("all settlement consent rows use the simple Checkbox and Label pattern", () => {
+  assert.match(
+    settingsUi,
+    /import \{ Checkbox \} from "@\/components\/ui\/checkbox"/,
+  );
+  assert.match(
+    settingsUi,
+    /import \{ Label \} from "@\/components\/ui\/label"/,
+  );
+  assert.match(settingsUi, /<div className="flex items-start gap-2">/);
+  assert.match(settingsUi, /<Label[\s\S]*htmlFor=\{id\}/);
+  assert.match(settingsUi, /<Checkbox[\s\S]*id=\{id\}/);
+  assert.doesNotMatch(
+    settingsUi,
+    /rounded-lg border border-border bg-muted\/40 p-3/,
+  );
+  assert.doesNotMatch(settingsUi, /<span>\{children\}<\/span>/);
+});
