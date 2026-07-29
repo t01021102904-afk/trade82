@@ -1,8 +1,8 @@
 "use client"
 
 import { useClerk } from "@clerk/nextjs"
-import Link from "next/link"
-import { EllipsisVertical, LogOut, UserCircle } from "lucide-react"
+import { Building2, EllipsisVertical, LogOut, Settings2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { useI18n } from "@/components/i18n-provider"
 import {
@@ -29,6 +29,7 @@ import { withLocale } from "@/lib/i18n"
 
 export function NavUser({
   user,
+  companyProfileUrl,
   settingsUrl,
 }: {
   user: {
@@ -36,11 +37,13 @@ export function NavUser({
     email: string
     avatar: string
   }
+  companyProfileUrl: string
   settingsUrl: string
 }) {
   const { isMobile } = useSidebar()
   const { locale, t } = useI18n()
   const { signOut } = useClerk()
+  const router = useRouter()
   const initials = user.name.trim().slice(0, 2).toUpperCase() || "T"
 
   return (
@@ -50,6 +53,7 @@ export function NavUser({
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
+                type="button"
                 size="lg"
                 className="aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground"
               />
@@ -89,8 +93,12 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem render={<Link href={settingsUrl} />}>
-                <UserCircle />
+              <DropdownMenuItem onClick={() => router.push(companyProfileUrl)}>
+                <Building2 />
+                {t("sellerDashboard.navCompanyProfile")}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push(settingsUrl)}>
+                <Settings2 />
                 {t("sellerDashboard.navSettings")}
               </DropdownMenuItem>
             </DropdownMenuGroup>
