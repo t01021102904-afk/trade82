@@ -1,0 +1,9 @@
+Untitled UI free country flag icons - Rectangle shape
+
+Source:
+https://www.untitledui.com/resources/flag-icons
+
+Asset URL pattern:
+https://www.untitledui.com/images/flags/rectangle/{ISO_CODE}.svg
+
+These files are the original Rectangle SVG assets from the source above.

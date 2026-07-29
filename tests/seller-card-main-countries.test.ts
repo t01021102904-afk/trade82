@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
@@ -9,15 +9,8 @@ function source(relativePath: string) {
   return readFileSync(path.join(root, relativePath), "utf8");
 }
 
-test("seller cards replace product count with the first two export countries", () => {
+test("seller cards use the first two main export countries", () => {
   const card = source("src/components/seller-card.tsx");
-  const flag = source(
-    "src/components/untitled-rectangle-country-flag.tsx",
-  );
-  const presenter = source("src/lib/public-marketplace-presenters.ts");
-  const packageJson = JSON.parse(source("package.json"));
-  const en = JSON.parse(source("messages/en.json"));
-  const ko = JSON.parse(source("messages/ko.json"));
 
   assert.match(card, /seller\.exportCountries\.slice\(0, 2\)/);
   assert.match(card, /sellers\.mainCountries/);
@@ -25,23 +18,65 @@ test("seller cards replace product count with the first two export countries", (
   assert.match(card, /localizedCountryLabel\(country, locale\)/);
   assert.doesNotMatch(card, /sellers\.products/);
   assert.doesNotMatch(card, /seller\.productCount/);
+});
 
-  assert.match(flag, /@untitledui\/country-flags/);
-  assert.match(flag, /`Flag\$\{code\.charAt\(0\)\}/);
-  assert.match(flag, /data-slot="untitled-rectangle-country-flag"/);
-  assert.match(flag, /h-3\.5 w-5/);
-  assert.match(flag, /overflow-hidden/);
-  assert.match(flag, /size=\{24\}/);
-  assert.match(flag, /scale-\[0\.833333\]/);
+test("country flags use Untitled UI original Rectangle SVG assets", () => {
+  const flag = source(
+    "src/components/untitled-rectangle-country-flag.tsx",
+  );
+  const packageJson = JSON.parse(source("package.json"));
+  const flagDirectory = path.join(
+    root,
+    "public/flags/rectangle",
+  );
+  const files = readdirSync(flagDirectory).filter((file) =>
+    file.endsWith(".svg"),
+  );
 
   assert.match(
-    presenter,
-    /exportCountries: \(profile\.exportCountries as string\[\]\) \?\? \[\]/,
+    flag,
+    /https:\/\/www\.untitledui\.com\/resources\/flag-icons/,
   );
+  assert.match(flag, /`\/flags\/rectangle\/\$\{code\}\.svg`/);
+  assert.match(flag, /width=\{21\}/);
+  assert.match(flag, /height=\{14\}/);
+  assert.match(flag, /unoptimized/);
+  assert.match(flag, /untitledRectangleFlagCodes/);
+  assert.match(flag, /availableFlagCodes\.has\(code\)/);
+  assert.doesNotMatch(flag, /@untitledui\/country-flags/);
+  assert.doesNotMatch(flag, /scale-\[0\.833333\]/);
+
   assert.equal(
-    packageJson.dependencies["@untitledui/country-flags"],
-    "0.0.17",
+    packageJson.dependencies?.["@untitledui/country-flags"],
+    undefined,
   );
+  assert.ok(files.length >= 200);
+  assert.equal(
+    existsSync(
+      path.join(
+        root,
+        "src/lib/untitled-rectangle-flag-codes.ts",
+      ),
+    ),
+    true,
+  );
+
+  for (const code of ["US", "KR", "JP"]) {
+    const relativePath = `public/flags/rectangle/${code}.svg`;
+    assert.equal(existsSync(path.join(root, relativePath)), true);
+    assert.match(source(relativePath), /<svg/i);
+  }
+
+  assert.match(
+    source("public/flags/rectangle/SOURCE.txt"),
+    /www\.untitledui\.com\/resources\/flag-icons/,
+  );
+});
+
+test("main-country translations remain available", () => {
+  const en = JSON.parse(source("messages/en.json"));
+  const ko = JSON.parse(source("messages/ko.json"));
+
   assert.equal(en.sellers.mainCountries, "Main countries");
   assert.equal(ko.sellers.mainCountries, "주요 국가");
 });

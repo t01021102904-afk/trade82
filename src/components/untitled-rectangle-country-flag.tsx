@@ -1,20 +1,11 @@
 "use client";
 
-import * as UntitledCountryFlags from "@untitledui/country-flags";
-import type { ComponentType, SVGProps } from "react";
+import Image from "next/image";
 
 import { countryCodes } from "@/lib/company-select-options";
-
-type UntitledFlagComponent = ComponentType<
-  SVGProps<SVGSVGElement> & { size?: number | string }
->;
+import { untitledRectangleFlagCodes } from "@/lib/untitled-rectangle-flag-codes";
 
 type CountryCodeEntry = string | Record<string, unknown>;
-
-const untitledFlags = UntitledCountryFlags as unknown as Record<
-  string,
-  UntitledFlagComponent | undefined
->;
 
 const regionNamesEn = new Intl.DisplayNames(["en"], { type: "region" });
 const regionNamesKo = new Intl.DisplayNames(["ko"], { type: "region" });
@@ -47,7 +38,9 @@ function nestedStrings(value: unknown): string[] {
   if (typeof value === "string") return [value];
   if (Array.isArray(value)) return value.flatMap(nestedStrings);
   if (value && typeof value === "object") {
-    return Object.values(value as Record<string, unknown>).flatMap(nestedStrings);
+    return Object.values(value as Record<string, unknown>).flatMap(
+      nestedStrings,
+    );
   }
   return [];
 }
@@ -59,9 +52,18 @@ function entryCode(entry: CountryCodeEntry) {
       : null;
   }
 
-  for (const key of ["code", "value", "countryCode", "iso2", "alpha2"]) {
+  for (const key of [
+    "code",
+    "value",
+    "countryCode",
+    "iso2",
+    "alpha2",
+  ]) {
     const candidate = entry[key];
-    if (typeof candidate === "string" && /^[a-z]{2}$/i.test(candidate.trim())) {
+    if (
+      typeof candidate === "string" &&
+      /^[a-z]{2}$/i.test(candidate.trim())
+    ) {
       return candidate.trim().toUpperCase();
     }
   }
@@ -70,6 +72,7 @@ function entryCode(entry: CountryCodeEntry) {
 }
 
 const countryEntries = countryCodes as unknown as CountryCodeEntry[];
+const availableFlagCodes = new Set<string>(untitledRectangleFlagCodes);
 
 function resolveCountryCode(country: string) {
   const raw = country.trim();
@@ -94,7 +97,8 @@ function resolveCountryCode(country: string) {
     if (
       Array.from(aliases).some(
         (candidate) =>
-          candidate && normalizeLookupValue(candidate) === normalized,
+          candidate &&
+          normalizeLookupValue(candidate) === normalized,
       )
     ) {
       return code;
@@ -104,26 +108,25 @@ function resolveCountryCode(country: string) {
   return null;
 }
 
-function flagExportName(code: string) {
-  return `Flag${code.charAt(0)}${code.slice(1).toLowerCase()}`;
-}
-
+/**
+ * Original Rectangle SVG assets from:
+ * https://www.untitledui.com/resources/flag-icons
+ */
 export function UntitledRectangleCountryFlag({
   country,
 }: {
   country: string;
 }) {
   const code = resolveCountryCode(country);
-  const Flag = code ? untitledFlags[flagExportName(code)] : undefined;
 
-  if (!Flag) {
+  if (!code || !availableFlagCodes.has(code)) {
     return (
       <span
         aria-hidden="true"
         data-slot="untitled-rectangle-country-flag"
-        className="inline-flex h-3.5 w-5 shrink-0 items-center justify-center rounded-[2px] border border-zinc-200 bg-zinc-50 text-[8px] font-semibold text-zinc-500"
+        className="inline-flex h-3.5 w-[21px] shrink-0 items-center justify-center rounded-[2px] border border-zinc-200 bg-zinc-50 text-[8px] font-semibold text-zinc-500"
       >
-        {code ?? "—"}
+        —
       </span>
     );
   }
@@ -132,11 +135,15 @@ export function UntitledRectangleCountryFlag({
     <span
       aria-hidden="true"
       data-slot="untitled-rectangle-country-flag"
-      className="relative inline-flex h-3.5 w-5 shrink-0 overflow-hidden rounded-[2px] ring-1 ring-inset ring-black/10"
+      className="inline-flex h-3.5 w-[21px] shrink-0 overflow-hidden rounded-[2px] ring-1 ring-inset ring-black/10"
     >
-      <Flag
-        size={24}
-        className="absolute left-1/2 top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 scale-[0.833333]"
+      <Image
+        src={`/flags/rectangle/${code}.svg`}
+        alt=""
+        width={21}
+        height={14}
+        unoptimized
+        className="h-3.5 w-[21px] object-cover"
       />
     </span>
   );
