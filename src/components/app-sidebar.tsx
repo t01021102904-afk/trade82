@@ -95,10 +95,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain
           items={data.navMain}
           label={t("sellerDashboard.main")}
-          addProductUrl={href("/sell")}
-          leadsUrl={href("/messages")}
-          addProductLabel={t("sellerDashboard.addProduct")}
-          leadsLabel={t("sellerDashboard.navLeads")}
         />
         <NavDocuments items={data.operations} label={t("sellerDashboard.operations")} />
         <NavDocuments items={data.growth} label={t("sellerDashboard.growth")} />

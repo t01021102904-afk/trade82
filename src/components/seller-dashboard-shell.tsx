@@ -4,17 +4,28 @@ import * as React from "react"
 import { useSearchParams } from "next/navigation"
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive, type SellerChartPoint } from "@/components/chart-area-interactive"
+import {
+  ChartAreaInteractive,
+  type SellerRevenuePoint,
+  type SellerRevenueTimeRange,
+} from "@/components/chart-area-interactive"
 import { DashboardClient, type DashboardSection } from "@/components/dashboard-client"
 import { DataTable, type RecentLead } from "@/components/data-table"
 import { useI18n } from "@/components/i18n-provider"
-import { SectionCards, type SellerKpis } from "@/components/section-cards"
+import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/seller-dashboard-site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { withLocale } from "@/lib/i18n"
+import {
+  getSellerDashboardKpis,
+  type SellerDashboardSeriesPoint,
+} from "@/lib/seller-dashboard-analytics"
 
 type Summary = {
   metrics: Record<string, number>
+  sellerDashboard?: {
+    series: SellerDashboardSeriesPoint[]
+  }
   recentInquiries?: Array<{
     id: string
     companyName: string
@@ -40,6 +51,8 @@ export function SellerDashboardShell() {
   const requestedSection = searchParams.get("section") as DashboardSection | null
   const activeSection = requestedSection && sellerSections.has(requestedSection) ? requestedSection : "overview"
   const [state, setState] = React.useState<SummaryState>({ status: "loading", summary: null })
+  const [revenueTimeRange, setRevenueTimeRange] =
+    React.useState<SellerRevenueTimeRange>("90d")
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -58,12 +71,11 @@ export function SellerDashboardShell() {
   }, [])
 
   const summary = state.status === "ready" ? state.summary : null
-  const kpis: SellerKpis | null = summary ? {
-    productViews: summary.metrics.productViews ?? 0,
-    newLeads: summary.metrics.newLeads ?? 0,
-    quotesInProgress: summary.metrics.quotesInProgress ?? 0,
-    paidOrders: summary.metrics.paidOrders ?? 0,
-  } : null
+  const dashboardSeries = summary?.sellerDashboard?.series ?? null
+  const periodDays = revenueTimeRange === "7d" ? 7 : revenueTimeRange === "30d" ? 30 : 90
+  const kpis = dashboardSeries
+    ? getSellerDashboardKpis(dashboardSeries, periodDays)
+    : null
   const messagesUrl = withLocale("/messages", locale)
   const leads: RecentLead[] = (summary?.recentInquiries ?? []).map((lead) => ({
     id: lead.id,
@@ -77,7 +89,11 @@ export function SellerDashboardShell() {
     lastMessage: lead.lastMessage || lead.message,
     actionHref: messagesUrl,
   }))
-  const chartData: SellerChartPoint[] | null = null
+  const chartData: SellerRevenuePoint[] | null = dashboardSeries?.map((point) => ({
+    date: point.date,
+    netRevenueCents: point.netRevenueCents,
+    revenueEvents: point.revenueEvents,
+  })) ?? null
 
   return (
     <SidebarProvider
@@ -98,7 +114,12 @@ export function SellerDashboardShell() {
                 <>
                   <SectionCards kpis={kpis} status={state.status} />
                   <div className="px-4 lg:px-6">
-                    <ChartAreaInteractive data={chartData} status={state.status} />
+                    <ChartAreaInteractive
+                      data={chartData}
+                      status={state.status}
+                      timeRange={revenueTimeRange}
+                      onTimeRangeChange={setRevenueTimeRange}
+                    />
                   </div>
                   <DataTable data={leads} status={state.status} />
                 </>

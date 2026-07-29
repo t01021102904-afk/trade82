@@ -48,11 +48,20 @@ test("seller sidebar preserves localized active routes and safe disabled control
   assert.match(documents, /item\.disabled \|\| !item\.url \? undefined : <Link href=\{item\.url\}/);
 });
 
-test("seller summary is company-scoped and returns concrete KPI fields without caching", () => {
+test("seller summary is company-scoped and returns the read-only revenue series without caching", () => {
   const api = source("src/app/api/dashboard/summary/route.ts");
 
   assert.match(api, /getUserCompany\(user\.id, role\)/);
   assert.match(api, /sellerCompanyId: company\.id/);
+  assert.match(api, /SELLER_DASHBOARD_HISTORY_DAYS/);
+  assert.match(api, /buildSellerDashboardSeries/);
+  assert.match(api, /paidAt: \{ gte: sellerDashboardStart \}/);
+  assert.match(api, /grossAmount: true/);
+  assert.match(api, /paymentRefund\.findMany/);
+  assert.match(api, /status: "succeeded"/);
+  assert.match(api, /lastStripeEventCreatedAt: \{ gte: sellerDashboardStart \}/);
+  assert.match(api, /paymentRequest: \{ sellerCompanyId: company\.id \}/);
+  assert.match(api, /sellerDashboard: \{\s*series: sellerDashboardSeries/);
   assert.match(api, /status: "sent"/);
   assert.match(api, /status: \{ in: \["REQUESTED", "SUBMITTED", "NEGOTIATING"\] \}/);
   assert.match(api, /paymentStatus: "PAID"/);
@@ -64,9 +73,11 @@ test("seller summary is company-scoped and returns concrete KPI fields without c
   assert.match(api, /lastMessage: item\.messages\[0\]\?\.body \|\| item\.message/);
 });
 
-test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failures from zeros", () => {
+test("seller shell keeps the dashboard-01 hierarchy and uses the selected range for KPIs and revenue", () => {
   const shell = source("src/components/seller-dashboard-shell.tsx");
   const header = source("src/components/seller-dashboard-site-header.tsx");
+  const publicHeader = source("src/components/site-header.tsx");
+  const footer = source("src/components/site-footer.tsx");
   const cards = source("src/components/section-cards.tsx");
   const table = source("src/components/data-table.tsx");
   const chart = source("src/components/chart-area-interactive.tsx");
@@ -80,11 +91,20 @@ test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failu
   assert.match(shell, /<DataTable/);
   assert.match(shell, /status: "error"/);
   assert.match(shell, /<DashboardClient role="seller" activeSection=\{activeSection\}/);
-  assert.match(cards, /newLeads: number/);
+  assert.match(shell, /getSellerDashboardKpis\(dashboardSeries, periodDays\)/);
+  assert.match(shell, /netRevenueCents: point\.netRevenueCents/);
+  assert.match(shell, /revenueEvents: point\.revenueEvents/);
+  assert.match(cards, /sellerDashboard\.netRevenue/);
+  assert.doesNotMatch(cards, /sellerDashboard\.live/);
   assert.match(table, /status === "error"/);
-  assert.match(chart, /noTimeSeries/);
-  assert.match(shell, /const chartData: SellerChartPoint\[\] \| null = null/);
+  assert.match(chart, /sellerDashboard\.noRevenue/);
+  assert.match(chart, /h-\[250px\] w-full items-center justify-center/);
+  assert.match(chart, /fillNetRevenue/);
+  assert.match(chart, /value="90d"/);
   assert.match(header, /SidebarTrigger/);
+  assert.match(publicHeader, /isSellerDashboard = pathWithoutLocale === "\/dashboard\/seller"/);
+  assert.match(publicHeader, /if \(isSellerDashboard\) return null/);
+  assert.match(footer, /stripLocale\(pathname\) === "\/dashboard\/seller"/);
   assert.match(cards, /bg-gradient-to-t/);
   assert.match(cards, /@xl\/main:grid-cols-2/);
   assert.match(cards, /@5xl\/main:grid-cols-4/);
@@ -125,4 +145,6 @@ test("seller dashboard English and Korean labels stay in parity", () => {
   assert.equal(ko.navOverview, "개요");
   assert.equal(en.newLeads, "New Leads");
   assert.equal(ko.newLeads, "새 리드");
+  assert.equal(en.netRevenue, "Net Revenue");
+  assert.equal(ko.netRevenue, "순매출");
 });

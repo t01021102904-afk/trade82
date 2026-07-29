@@ -3,6 +3,10 @@ import { getUserCompany, requireAuth } from "@/lib/authz";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
 import { getDb } from "@/lib/db";
 import { DELETED_COMPANY_NAME } from "@/lib/deletion-markers";
+import {
+  SELLER_DASHBOARD_HISTORY_DAYS,
+  buildSellerDashboardSeries,
+} from "@/lib/seller-dashboard-analytics";
 
 const noStoreHeaders = { "Cache-Control": "no-store" };
 
@@ -44,6 +48,13 @@ export async function GET(request: Request) {
     }
 
     if (role === "seller") {
+      const now = new Date();
+      const sellerDashboardStart = new Date(
+        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+      );
+      sellerDashboardStart.setUTCDate(
+        sellerDashboardStart.getUTCDate() - (SELLER_DASHBOARD_HISTORY_DAYS - 1),
+      );
       const [
         products,
         inquiries,
@@ -54,6 +65,10 @@ export async function GET(request: Request) {
         companyReviews,
         dealReviews,
         deals,
+        paidRevenueOrders,
+        completedRefunds,
+        dashboardLeads,
+        dashboardQuotes,
       ] = await Promise.all([
         getDb().product.findMany({
           where: { sellerCompanyId: company.id, deletedAt: null },
@@ -142,10 +157,62 @@ export async function GET(request: Request) {
             },
           },
         }),
+        getDb().tradeOrder.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            paidAt: { gte: sellerDashboardStart },
+          },
+          select: {
+            paidAt: true,
+            grossAmount: true,
+          },
+        }),
+        getDb().paymentRefund.findMany({
+          where: {
+            status: "succeeded",
+            lastStripeEventCreatedAt: { gte: sellerDashboardStart },
+            paymentRequest: { sellerCompanyId: company.id },
+          },
+          select: {
+            amount: true,
+            lastStripeEventCreatedAt: true,
+          },
+        }),
+        getDb().inquiry.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            createdAt: { gte: sellerDashboardStart },
+            buyerCompany: { deletedAt: null },
+            product: { deletedAt: null },
+          },
+          select: { createdAt: true },
+        }),
+        getDb().rfqSellerQuote.findMany({
+          where: {
+            sellerCompanyId: company.id,
+            createdAt: { gte: sellerDashboardStart },
+            status: { in: ["REQUESTED", "SUBMITTED", "NEGOTIATING"] },
+          },
+          select: { createdAt: true },
+        }),
       ]);
       const completedDeals = deals.filter(
         (deal) => deal.dealStatus === "completed",
       );
+      const sellerDashboardSeries = buildSellerDashboardSeries({
+        now,
+        paidOrders: paidRevenueOrders.flatMap((order) =>
+          order.paidAt
+            ? [{ occurredAt: order.paidAt, amount: order.grossAmount }]
+            : [],
+        ),
+        refunds: completedRefunds.map((refund) => ({
+          occurredAt: refund.lastStripeEventCreatedAt,
+          amount: refund.amount,
+        })),
+        newLeads: dashboardLeads.map((lead) => ({ occurredAt: lead.createdAt })),
+        quotesInProgress: dashboardQuotes.map((quote) => ({ occurredAt: quote.createdAt })),
+      });
       return Response.json({
         company: {
           id: company.id,
@@ -167,6 +234,9 @@ export async function GET(request: Request) {
           productCount: products.length,
           listedProductCount: products.filter((item) => item.status === "active")
             .length,
+        },
+        sellerDashboard: {
+          series: sellerDashboardSeries,
         },
         recentReviews: [
           ...companyReviews.map((item) => ({
