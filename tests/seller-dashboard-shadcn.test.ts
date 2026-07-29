@@ -68,17 +68,21 @@ test("seller summary is company-scoped and returns concrete KPI fields without c
   assert.match(api, /currencySeries: sellerDashboard\.currencySeries/);
 });
 
-test("seller shell keeps the dashboard-01 hierarchy with standalone messages", () => {
+test("seller shell keeps the dashboard-01 hierarchy below the public header", () => {
   const shell = source("src/components/seller-dashboard-shell.tsx");
-  const header = source("src/components/seller-dashboard-site-header.tsx");
+  const publicHeader = source("src/components/site-header.tsx");
   const cards = source("src/components/section-cards.tsx");
   const table = source("src/components/data-table.tsx");
   const chart = source("src/components/chart-area-interactive.tsx");
 
   assert.match(shell, /<SidebarProvider/);
-  assert.match(shell, /<AppSidebar variant="inset"/);
+  assert.match(shell, /min-h-\[calc\(100svh-3\.5rem\)\]/);
+  assert.match(shell, /<AppSidebar/);
+  assert.match(shell, /md:top-14/);
+  assert.match(shell, /md:h-\[calc\(100svh-3\.5rem\)\]/);
   assert.match(shell, /<SidebarInset>/);
-  assert.match(shell, /<SiteHeader/);
+  assert.doesNotMatch(shell, /seller-dashboard-site-header/);
+  assert.doesNotMatch(shell, /<SiteHeader/);
   assert.match(shell, /<SectionCards/);
   assert.match(shell, /<ChartAreaInteractive/);
   assert.match(shell, /<DataTable/);
@@ -88,11 +92,10 @@ test("seller shell keeps the dashboard-01 hierarchy with standalone messages", (
   assert.match(table, /status === "error"/);
   assert.match(chart, /noNetSales/);
   assert.match(shell, /const chartData: SellerNetSalesChartPoint\[\] \| null/);
-  assert.match(header, /SidebarTrigger/);
-  assert.match(header, /\/marketplace/);
-  assert.match(header, /\/sellers/);
-  assert.match(header, /\/sell/);
-  assert.match(header, /\/dashboard\/seller/);
+  assert.match(publicHeader, /trade82-logo\.png/);
+  assert.match(publicHeader, /getPublicNavigationLinks/);
+  assert.match(publicHeader, /ClerkUserButton/);
+  assert.match(publicHeader, /const appLinks =/);
   assert.match(cards, /bg-gradient-to-t/);
   assert.match(cards, /@xl\/main:grid-cols-2/);
   assert.match(cards, /@5xl\/main:grid-cols-4/);
@@ -111,12 +114,15 @@ test("seller user menu is a button and exposes explicit profile routes", () => {
   assert.match(navUser, /router\.push\(settingsUrl\)/);
 });
 
-test("public chrome is hidden only inside the seller dashboard shell", () => {
+test("public header remains visible while the seller dashboard footer stays hidden", () => {
+  const layout = source("src/app/layout.tsx");
   const header = source("src/components/site-header.tsx");
   const footer = source("src/components/site-footer.tsx");
 
+  assert.match(layout, /<SiteHeader \/>/);
   assert.match(header, /stripLocale\(pathname\)/);
-  assert.match(header, /pathWithoutLocale === "\/dashboard\/seller"/);
+  assert.doesNotMatch(header, /isSellerDashboard/);
+  assert.doesNotMatch(header, /if \(isSellerDashboard\) return null/);
   assert.match(footer, /stripLocale\(pathname\) === "\/dashboard\/seller"/);
 });
 
