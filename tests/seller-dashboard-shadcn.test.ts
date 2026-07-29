@@ -45,6 +45,7 @@ test("seller sidebar preserves localized active routes and safe disabled control
   assert.match(main, /disabled=\{item\.disabled\}/);
   assert.match(main, /aria-disabled=\{item\.disabled \|\| undefined\}/);
   assert.match(main, /item\.disabled \|\| !item\.url \? undefined : <Link href=\{item\.url\}/);
+  assert.doesNotMatch(main, /CirclePlus|addProductUrl|leadsUrl/);
   assert.match(documents, /item\.disabled \|\| !item\.url \? undefined : <Link href=\{item\.url\}/);
 });
 
@@ -62,6 +63,9 @@ test("seller summary is company-scoped and returns concrete KPI fields without c
   assert.match(api, /Cache-Control": "no-store"/);
   assert.match(api, /messages: \{/);
   assert.match(api, /lastMessage: item\.messages\[0\]\?\.body \|\| item\.message/);
+  assert.match(api, /buildSellerDashboardCurrencySeries/);
+  assert.match(api, /sellerDashboard: \{/);
+  assert.match(api, /currencySeries: sellerDashboard\.currencySeries/);
 });
 
 test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failures from zeros", () => {
@@ -80,17 +84,27 @@ test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failu
   assert.match(shell, /<DataTable/);
   assert.match(shell, /status: "error"/);
   assert.match(shell, /<DashboardClient role="seller" activeSection=\{activeSection\}/);
-  assert.match(cards, /newLeads: number/);
+  assert.match(cards, /SellerDashboardKpis/);
   assert.match(table, /status === "error"/);
-  assert.match(chart, /noTimeSeries/);
-  assert.match(shell, /const chartData: SellerChartPoint\[\] \| null = null/);
+  assert.match(chart, /noNetSales/);
+  assert.match(shell, /const chartData: SellerNetSalesChartPoint\[\] \| null/);
   assert.match(header, /SidebarTrigger/);
   assert.match(cards, /bg-gradient-to-t/);
   assert.match(cards, /@xl\/main:grid-cols-2/);
   assert.match(cards, /@5xl\/main:grid-cols-4/);
   assert.match(chart, /aspect-auto h-\[250px\] w-full/);
+  assert.match(chart, /last3Months/);
   assert.match(table, /overflow-hidden rounded-lg border/);
   assert.match(table, /SheetContent side=\{isMobile \? "bottom" : "right"\}/);
+});
+
+test("public chrome is hidden only inside the seller dashboard shell", () => {
+  const header = source("src/components/site-header.tsx");
+  const footer = source("src/components/site-footer.tsx");
+
+  assert.match(header, /stripLocale\(pathname\)/);
+  assert.match(header, /pathWithoutLocale === "\/dashboard\/seller"/);
+  assert.match(footer, /stripLocale\(pathname\) === "\/dashboard\/seller"/);
 });
 
 test("seller dashboard has no shadcn dashboard-01 sample data", () => {

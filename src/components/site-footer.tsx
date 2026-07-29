@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { useI18n } from "@/components/i18n-provider";
+import { stripLocale } from "@/lib/i18n";
 
 const legalRoutes = ["/terms", "/privacy"] as const;
 
@@ -15,8 +16,11 @@ function legalPrefix(pathname: string) {
 export function SiteFooter() {
   const { messages } = useI18n();
   const pathname = usePathname();
+  const isSellerDashboard = stripLocale(pathname) === "/dashboard/seller";
   const footer = messages.footer;
   const prefix = legalPrefix(pathname);
+
+  if (isSellerDashboard) return null;
 
   return (
     <footer className="relative z-10 border-t theme-border theme-bg">

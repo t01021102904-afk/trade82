@@ -4,17 +4,32 @@ import * as React from "react"
 import { useSearchParams } from "next/navigation"
 
 import { AppSidebar } from "@/components/app-sidebar"
-import { ChartAreaInteractive, type SellerChartPoint } from "@/components/chart-area-interactive"
+import {
+  ChartAreaInteractive,
+  type SellerNetSalesChartPoint,
+  type SellerSalesTimeRange,
+} from "@/components/chart-area-interactive"
 import { DashboardClient, type DashboardSection } from "@/components/dashboard-client"
 import { DataTable, type RecentLead } from "@/components/data-table"
 import { useI18n } from "@/components/i18n-provider"
-import { SectionCards, type SellerKpis } from "@/components/section-cards"
+import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/seller-dashboard-site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { withLocale } from "@/lib/i18n"
+import {
+  getSellerDashboardKpis,
+  sellerDashboardChartValue,
+  type SellerDashboardCurrencySeries,
+  type SellerDashboardSeriesPoint,
+} from "@/lib/seller-dashboard-net-sales"
 
 type Summary = {
   metrics: Record<string, number>
+  sellerDashboard?: {
+    defaultCurrency: string | null
+    currencySeries: SellerDashboardCurrencySeries[]
+    activitySeries: SellerDashboardSeriesPoint[]
+  }
   recentInquiries?: Array<{
     id: string
     companyName: string
@@ -33,6 +48,8 @@ type SummaryState =
   | { status: "ready"; summary: Summary }
 
 const sellerSections = new Set<DashboardSection>(["products", "documents", "marketing"])
+const emptyCurrencySeries: SellerDashboardCurrencySeries[] = []
+const emptyActivitySeries: SellerDashboardSeriesPoint[] = []
 
 export function SellerDashboardShell() {
   const { locale, t } = useI18n()
@@ -40,6 +57,8 @@ export function SellerDashboardShell() {
   const requestedSection = searchParams.get("section") as DashboardSection | null
   const activeSection = requestedSection && sellerSections.has(requestedSection) ? requestedSection : "overview"
   const [state, setState] = React.useState<SummaryState>({ status: "loading", summary: null })
+  const [timeRange, setTimeRange] = React.useState<SellerSalesTimeRange>("30d")
+  const [selectedCurrency, setSelectedCurrency] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     const controller = new AbortController()
@@ -58,12 +77,18 @@ export function SellerDashboardShell() {
   }, [])
 
   const summary = state.status === "ready" ? state.summary : null
-  const kpis: SellerKpis | null = summary ? {
-    productViews: summary.metrics.productViews ?? 0,
-    newLeads: summary.metrics.newLeads ?? 0,
-    quotesInProgress: summary.metrics.quotesInProgress ?? 0,
-    paidOrders: summary.metrics.paidOrders ?? 0,
-  } : null
+  const currencySeries = summary?.sellerDashboard?.currencySeries ?? emptyCurrencySeries
+  const currencies = React.useMemo(() => currencySeries.map((series) => series.currency), [currencySeries])
+  const defaultCurrency = summary?.sellerDashboard?.defaultCurrency ?? currencies[0] ?? null
+
+  const currency = selectedCurrency && currencies.includes(selectedCurrency)
+    ? selectedCurrency
+    : defaultCurrency
+  const netSalesSeries = currencySeries.find((series) => series.currency === currency)?.series ?? null
+  const activitySeries = summary?.sellerDashboard?.activitySeries ?? emptyActivitySeries
+  const kpis = summary?.sellerDashboard
+    ? getSellerDashboardKpis(netSalesSeries, activitySeries, timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90)
+    : null
   const messagesUrl = withLocale("/messages", locale)
   const leads: RecentLead[] = (summary?.recentInquiries ?? []).map((lead) => ({
     id: lead.id,
@@ -77,7 +102,14 @@ export function SellerDashboardShell() {
     lastMessage: lead.lastMessage || lead.message,
     actionHref: messagesUrl,
   }))
-  const chartData: SellerChartPoint[] | null = null
+  const chartData: SellerNetSalesChartPoint[] | null = netSalesSeries && currency
+    ? netSalesSeries.map((point) => ({
+        date: point.date,
+        netSalesMinorUnits: point.netSalesMinorUnits,
+        revenueEvents: point.revenueEvents,
+        netSalesChartValue: sellerDashboardChartValue(point.netSalesMinorUnits, currency),
+      }))
+    : null
 
   return (
     <SidebarProvider
@@ -96,9 +128,17 @@ export function SellerDashboardShell() {
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               {activeSection === "overview" ? (
                 <>
-                  <SectionCards kpis={kpis} status={state.status} />
+                  <SectionCards kpis={kpis} currency={currency} status={state.status} />
                   <div className="px-4 lg:px-6">
-                    <ChartAreaInteractive data={chartData} status={state.status} />
+                    <ChartAreaInteractive
+                      data={chartData}
+                      currency={currency}
+                      currencies={currencies}
+                      onCurrencyChange={setSelectedCurrency}
+                      timeRange={timeRange}
+                      onTimeRangeChange={setTimeRange}
+                      status={state.status}
+                    />
                   </div>
                   <DataTable data={leads} status={state.status} />
                 </>

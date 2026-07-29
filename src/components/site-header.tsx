@@ -30,6 +30,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const pathWithoutLocale = stripLocale(pathname);
+  const isSellerDashboard = pathWithoutLocale === "/dashboard/seller";
   const role = context?.role;
   const isAuthenticated = isLoaded && isSignedIn === true;
   // Keep public navigation usable when Clerk is still booting or unavailable.
@@ -88,6 +89,10 @@ export function SiteHeader() {
     dialogRef: drawerRef,
     onClose: closeMenu,
   });
+
+  // The seller workspace supplies its own dashboard-01 SiteHeader inside the
+  // inset shell. Rendering the public header here would duplicate navigation.
+  if (isSellerDashboard) return null;
 
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white text-zinc-950">
