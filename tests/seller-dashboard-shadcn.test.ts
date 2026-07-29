@@ -36,11 +36,12 @@ test("seller sidebar preserves localized active routes and safe disabled control
 
   assert.match(sidebar, /withLocale/);
   assert.match(sidebar, /section=products/);
+  assert.match(sidebar, /section=messages/);
   assert.match(sidebar, /section=documents/);
   assert.match(sidebar, /section=marketing/);
-  assert.match(sidebar, /href\("\/messages"\)/);
-  assert.match(sidebar, /href\("\/settings\/company"\)/);
-  assert.match(sidebar, /href\("\/dashboard\/settings"\)/);
+  assert.doesNotMatch(sidebar, /href\("\/messages"\)/);
+  assert.match(sidebar, /companyProfileUrl=\{href\("\/settings\/company"\)\}/);
+  assert.match(sidebar, /settingsUrl=\{href\("\/dashboard\/settings"\)\}/);
   assert.match(main, /isActive=\{item\.active\}/);
   assert.match(main, /disabled=\{item\.disabled\}/);
   assert.match(main, /aria-disabled=\{item\.disabled \|\| undefined\}/);
@@ -68,7 +69,7 @@ test("seller summary is company-scoped and returns concrete KPI fields without c
   assert.match(api, /currencySeries: sellerDashboard\.currencySeries/);
 });
 
-test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failures from zeros", () => {
+test("seller shell keeps the dashboard-01 hierarchy and embeds seller messages", () => {
   const shell = source("src/components/seller-dashboard-shell.tsx");
   const header = source("src/components/seller-dashboard-site-header.tsx");
   const cards = source("src/components/section-cards.tsx");
@@ -83,12 +84,19 @@ test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failu
   assert.match(shell, /<ChartAreaInteractive/);
   assert.match(shell, /<DataTable/);
   assert.match(shell, /status: "error"/);
+  assert.match(shell, /"messages"/);
+  assert.match(shell, /<MessagesClient initialInquiryId=\{inquiryId\}/);
+  assert.match(shell, /section=messages&inquiryId=/);
   assert.match(shell, /<DashboardClient role="seller" activeSection=\{activeSection\}/);
   assert.match(cards, /SellerDashboardKpis/);
   assert.match(table, /status === "error"/);
   assert.match(chart, /noNetSales/);
   assert.match(shell, /const chartData: SellerNetSalesChartPoint\[\] \| null/);
   assert.match(header, /SidebarTrigger/);
+  assert.match(header, /\/marketplace/);
+  assert.match(header, /\/sellers/);
+  assert.match(header, /\/sell/);
+  assert.match(header, /\/dashboard\/seller/);
   assert.match(cards, /bg-gradient-to-t/);
   assert.match(cards, /@xl\/main:grid-cols-2/);
   assert.match(cards, /@5xl\/main:grid-cols-4/);
@@ -96,6 +104,15 @@ test("seller shell keeps the dashboard-01 hierarchy and distinguishes load failu
   assert.match(chart, /last3Months/);
   assert.match(table, /overflow-hidden rounded-lg border/);
   assert.match(table, /SheetContent side=\{isMobile \? "bottom" : "right"\}/);
+});
+
+test("seller user menu is a button and exposes explicit profile routes", () => {
+  const navUser = source("src/components/nav-user.tsx");
+
+  assert.match(navUser, /type="button"/);
+  assert.doesNotMatch(navUser, /DropdownMenuItem render=\{<Link/);
+  assert.match(navUser, /router\.push\(companyProfileUrl\)/);
+  assert.match(navUser, /router\.push\(settingsUrl\)/);
 });
 
 test("public chrome is hidden only inside the seller dashboard shell", () => {

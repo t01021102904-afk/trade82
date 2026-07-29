@@ -10,6 +10,7 @@ import {
   Handshake,
   LayoutDashboard,
   Megaphone,
+  MessageSquare,
   Package,
   PanelTop,
   ReceiptText,
@@ -57,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       { title: t("sellerDashboard.navOverview"), url: overviewUrl, icon: LayoutDashboard, active: isOverview },
       { title: t("sellerDashboard.navProducts"), url: `${overviewUrl}?section=products`, icon: Package, active: path === "/dashboard/seller" && section === "products" },
-      { title: t("sellerDashboard.navLeads"), url: href("/messages"), icon: Users, active: path === "/messages" },
+      { title: t("nav.messages"), url: `${overviewUrl}?section=messages`, icon: MessageSquare, active: path === "/dashboard/seller" && section === "messages" },
       { title: t("sellerDashboard.navQuotes"), icon: Handshake, disabled: true },
       { title: t("sellerDashboard.navOrders"), url: href("/orders"), icon: ShoppingCart, active: path === "/orders" },
     ],
@@ -105,7 +106,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} settingsUrl={href("/dashboard/settings")} />
+        <NavUser
+          user={data.user}
+          companyProfileUrl={href("/settings/company")}
+          settingsUrl={href("/dashboard/settings")}
+        />
       </SidebarFooter>
     </Sidebar>
   )
