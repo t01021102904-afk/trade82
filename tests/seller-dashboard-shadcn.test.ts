@@ -36,7 +36,6 @@ test("seller sidebar preserves localized active routes and safe disabled control
 
   assert.match(sidebar, /withLocale/);
   assert.match(sidebar, /section=products/);
-  assert.match(sidebar, /section=messages/);
   assert.match(sidebar, /section=documents/);
   assert.match(sidebar, /section=marketing/);
   assert.doesNotMatch(sidebar, /href\("\/messages"\)/);
@@ -69,7 +68,7 @@ test("seller summary is company-scoped and returns concrete KPI fields without c
   assert.match(api, /currencySeries: sellerDashboard\.currencySeries/);
 });
 
-test("seller shell keeps the dashboard-01 hierarchy and embeds seller messages", () => {
+test("seller shell keeps the dashboard-01 hierarchy with standalone messages", () => {
   const shell = source("src/components/seller-dashboard-shell.tsx");
   const header = source("src/components/seller-dashboard-site-header.tsx");
   const cards = source("src/components/section-cards.tsx");
@@ -84,9 +83,6 @@ test("seller shell keeps the dashboard-01 hierarchy and embeds seller messages",
   assert.match(shell, /<ChartAreaInteractive/);
   assert.match(shell, /<DataTable/);
   assert.match(shell, /status: "error"/);
-  assert.match(shell, /"messages"/);
-  assert.match(shell, /<MessagesClient initialInquiryId=\{inquiryId\}/);
-  assert.match(shell, /section=messages&inquiryId=/);
   assert.match(shell, /<DashboardClient role="seller" activeSection=\{activeSection\}/);
   assert.match(cards, /SellerDashboardKpis/);
   assert.match(table, /status === "error"/);
