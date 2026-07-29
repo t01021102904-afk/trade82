@@ -1,6 +1,14 @@
 "use client";
 
-import { CreditCard, ExternalLink, Landmark, RefreshCw, X } from "lucide-react";
+
+import {
+  CometSpinner } from "@/components/ui/comet-spinner"
+import { CreditCard,
+  ExternalLink,
+  Landmark,
+  RefreshCw,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -256,7 +264,7 @@ export function AdminPaymentRequests() {
                     disabled={refreshingFeeId === paymentRequest.id || !paymentRequest.stripePaymentIntentId}
                     className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-semibold text-zinc-800 transition hover:border-zinc-950 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <RefreshCw className={`size-4 ${refreshingFeeId === paymentRequest.id ? "animate-spin" : ""}`} />
+                    <CometSpinner size="xs" />
                     {t("payments.refreshStripeFee")}
                   </button>
                   {canRelease ? (

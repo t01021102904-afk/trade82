@@ -1,6 +1,8 @@
 "use client";
 
-import { Landmark, Loader2, ShieldCheck } from "lucide-react";
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { Landmark, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -226,7 +228,7 @@ export function SellerPayoutOnboardingStep({
   if (loading) {
     return (
       <div className="flex min-h-56 items-center justify-center">
-        <Loader2 className="size-5 animate-spin theme-muted" aria-label={t("payouts.loading")} />
+        <CometSpinner size="xs" />
       </div>
     );
   }

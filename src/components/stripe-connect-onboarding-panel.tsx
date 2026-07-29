@@ -1,6 +1,8 @@
 "use client";
 
-import { CreditCard, Loader2, ShieldCheck } from "lucide-react";
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { CreditCard, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -102,7 +104,7 @@ export function StripeConnectOnboardingPanel({ ownerType }: { ownerType: OwnerTy
           ) : null}
         </div>
 
-        {loading ? <div className="mt-4 flex items-center gap-2 text-sm theme-muted"><Loader2 className="size-4 animate-spin" />{t("stripeConnectOnboarding.loading")}</div> : null}
+        {loading ? <div className="mt-4 flex items-center gap-2 text-sm theme-muted"><CometSpinner size="xs" />{t("stripeConnectOnboarding.loading")}</div> : null}
         {error ? <p role="alert" className="mt-4 text-sm text-red-700">{error}</p> : null}
         {!loading && response?.enabled === false ? <p className="mt-4 text-sm theme-muted">{t("stripeConnectOnboarding.maintenance")}</p> : null}
         {!loading && response?.enabled && account ? (
@@ -120,7 +122,7 @@ export function StripeConnectOnboardingPanel({ ownerType }: { ownerType: OwnerTy
             disabled={starting || account?.onboardingComplete || account?.status === "DISABLED"}
             className="mt-4 inline-flex h-10 items-center gap-2 rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {starting ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+            {starting ? <CometSpinner size="xs" /> : null}
             {account?.exists ? t("stripeConnectOnboarding.continue") : t("stripeConnectOnboarding.setup")}
           </button>
         ) : null}
