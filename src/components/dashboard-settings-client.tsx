@@ -1,11 +1,12 @@
 "use client";
 
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
 import {
   ArrowRight,
   Building2,
   CreditCard,
   FileText,
-  Loader2,
   Package,
   ShieldCheck,
   SlidersHorizontal,
@@ -196,7 +197,7 @@ function SettingsActionCard({
       </span>
       <span className="ml-2 inline-flex shrink-0 items-center gap-1 text-sm font-semibold theme-muted">
         {loading ? (
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <CometSpinner size="xs" />
         ) : (
           <>
             {rightLabel}

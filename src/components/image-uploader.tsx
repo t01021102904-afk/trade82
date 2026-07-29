@@ -1,8 +1,18 @@
 "use client";
 
+
+import {
+  CometSpinner } from "@/components/ui/comet-spinner"
 import type { PointerEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, GripVertical, X } from "lucide-react";
+import { useEffect,
+  useMemo,
+  useRef,
+  useState } from "react";
+import { ArrowLeft,
+  ArrowRight,
+  GripVertical,
+  X,
+} from "lucide-react";
 
 import { useI18n } from "@/components/i18n-provider";
 import type { UploadedListingImage } from "@/lib/marketplace";
@@ -607,7 +617,7 @@ export function ListingImageUploader({
                     : "bg-white/75 text-zinc-700",
                 )}
               >
-                <span className="size-7 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <CometSpinner size="xs" />
                 <span>{copy.uploading}</span>
               </span>
             ) : null}

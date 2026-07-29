@@ -1,10 +1,11 @@
 "use client";
 
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
 import {
   ClipboardCopy,
   Download,
   ExternalLink,
-  Loader2,
   Send,
   ShieldAlert,
   X,
@@ -255,7 +256,7 @@ export function AdminPayoutManagement({ selectedId }: { selectedId?: string }) {
     }
   }
 
-  if (loading) return <Loader2 className="size-5 animate-spin theme-muted" />;
+  if (loading) return <CometSpinner size="xs" />;
 
   return (
     <section className="grid gap-4">

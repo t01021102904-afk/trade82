@@ -1,6 +1,8 @@
 "use client";
 
-import { ArrowUpRight, CheckCircle2, CircleAlert, LoaderCircle } from "lucide-react";
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { ArrowUpRight, CheckCircle2, CircleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -156,7 +158,7 @@ export function SellerStripeMerchantAccountPanel() {
             disabled={disabled}
             className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {starting && <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" />}
+            {starting && <CometSpinner size="xs" />}
             {account.exists
               ? t("stripeDirectChargeMerchant.continue")
               : t("stripeDirectChargeMerchant.start")}

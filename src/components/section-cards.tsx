@@ -1,6 +1,8 @@
 "use client"
 
-import { LoaderCircle, TrendingDown, TrendingUp } from "lucide-react"
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { TrendingDown, TrendingUp } from "lucide-react";
 
 import { useI18n } from "@/components/i18n-provider"
 import { Badge } from "@/components/ui/badge"
@@ -21,7 +23,7 @@ function KpiBadge({ kpi, status }: { kpi: SellerDashboardKpi | null; status: Das
   if (status === "loading") {
     return (
       <Badge variant="outline">
-        <LoaderCircle className="animate-spin" />
+        <CometSpinner size="xs" />
         {t("sellerDashboard.loading")}
       </Badge>
     )

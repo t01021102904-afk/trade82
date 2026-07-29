@@ -1,6 +1,8 @@
 "use client";
 
-import { Landmark, Loader2, Save, ShieldCheck } from "lucide-react";
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { Landmark, Save, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 
@@ -149,7 +151,7 @@ export function PayoutInformationClient({ locale: pageLocale }: { locale?: "en" 
   if (loading) {
     return (
       <div className="flex min-h-48 items-center justify-center" aria-label={t("payouts.loading")}>
-        <Loader2 className="size-5 animate-spin theme-muted" />
+        <CometSpinner size="xs" />
       </div>
     );
   }

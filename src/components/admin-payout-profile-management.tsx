@@ -1,6 +1,8 @@
 "use client";
 
-import { Check, Loader2, X } from "lucide-react";
+
+import { CometSpinner } from "@/components/ui/comet-spinner"
+import { Check, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
@@ -73,7 +75,7 @@ export function AdminPayoutProfileManagement() {
   return (
     <section className="grid gap-4">
       {error ? <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
-      {loading ? <Loader2 className="size-5 animate-spin" aria-label={t("payouts.loading")} /> : (
+      {loading ? <CometSpinner size="xs" /> : (
         <div className="overflow-x-auto rounded-xl border">
           <table className="min-w-[800px] text-left text-sm">
             <thead className="border-b theme-surface-muted"><tr>{headers.map((label, index) => <th key={`${label}-${index}`} className="px-3 py-3 font-semibold">{label}</th>)}</tr></thead>
