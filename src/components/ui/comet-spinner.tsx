@@ -6,25 +6,27 @@ import { cn } from "@/lib/utils"
 
 type CometSpinnerSize = "xs" | "sm" | "md" | "lg"
 
-const sizeClasses: Record<
-  CometSpinnerSize,
-  { outer: string; inner: string }
-> = {
-  xs: { outer: "size-4", inner: "size-3" },
-  sm: { outer: "size-5", inner: "size-4" },
-  md: { outer: "size-8", inner: "size-6" },
-  lg: { outer: "size-10", inner: "size-8" },
-}
-
-export function CometSpinner({
-  size = "lg",
-  className,
-  label,
-}: {
+type IOSSpinnerProps = {
   size?: CometSpinnerSize
   className?: string
   label?: string
-}) {
+}
+
+const sizeClasses: Record<
+  CometSpinnerSize,
+  { outer: string; bar: string }
+> = {
+  xs: { outer: "size-4", bar: "h-1 w-px" },
+  sm: { outer: "size-5", bar: "h-[5px] w-[1.5px]" },
+  md: { outer: "size-8", bar: "h-[7px] w-[2px]" },
+  lg: { outer: "size-10", bar: "h-2 w-[2px]" },
+}
+
+export function IOSSpinner({
+  size = "md",
+  className,
+  label,
+}: IOSSpinnerProps) {
   const classes = sizeClasses[size]
 
   return (
@@ -32,28 +34,44 @@ export function CometSpinner({
       role={label ? "status" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      className={cn(
-        "relative flex shrink-0 items-center justify-center rounded-full border border-zinc-200 dark:border-zinc-800",
-        classes.outer,
-        className,
-      )}
+      className={cn("relative shrink-0", classes.outer, className)}
     >
-      <motion.div
-        className="absolute size-full rounded-full"
-        style={{
-          background:
-            "conic-gradient(from 0deg, transparent 0%, rgba(39, 39, 42, 0.1) 60%, rgba(39, 39, 42, 1) 100%)",
-        }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-      />
-      <div
-        className={cn(
-          "absolute rounded-full bg-white dark:bg-zinc-950",
-          classes.inner,
-        )}
-      />
+      {Array.from({ length: 12 }).map((_, index) => (
+        <motion.div
+          key={index}
+          className="absolute inset-0"
+          style={{ rotate: index * 30 }}
+        >
+          <motion.div
+            className={cn(
+              "mx-auto rounded-full bg-foreground",
+              classes.bar,
+            )}
+            animate={{ opacity: [1, 0.2] }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              delay: index * (1 / 12),
+              ease: "linear",
+            }}
+          />
+        </motion.div>
+      ))}
     </div>
+  )
+}
+
+export function CometSpinner({
+  size = "lg",
+  className,
+  label,
+}: IOSSpinnerProps) {
+  return (
+    <IOSSpinner
+      size={size}
+      className={className}
+      label={label}
+    />
   )
 }
 
