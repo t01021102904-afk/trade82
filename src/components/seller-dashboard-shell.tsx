@@ -12,7 +12,6 @@ import {
 import { DashboardClient, type DashboardSection } from "@/components/dashboard-client"
 import { DataTable, type RecentLead } from "@/components/data-table"
 import { useI18n } from "@/components/i18n-provider"
-import { MessagesClient } from "@/components/messages-client"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/seller-dashboard-site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -48,7 +47,7 @@ type SummaryState =
   | { status: "error"; summary: null }
   | { status: "ready"; summary: Summary }
 
-const sellerSections = new Set<DashboardSection>(["products", "documents", "marketing", "messages"])
+const sellerSections = new Set<DashboardSection>(["products", "documents", "marketing"])
 const emptyCurrencySeries: SellerDashboardCurrencySeries[] = []
 const emptyActivitySeries: SellerDashboardSeriesPoint[] = []
 
@@ -57,7 +56,6 @@ export function SellerDashboardShell() {
   const searchParams = useSearchParams()
   const requestedSection = searchParams.get("section") as DashboardSection | null
   const activeSection = requestedSection && sellerSections.has(requestedSection) ? requestedSection : "overview"
-  const inquiryId = searchParams.get("inquiryId")
   const [state, setState] = React.useState<SummaryState>({ status: "loading", summary: null })
   const [timeRange, setTimeRange] = React.useState<SellerSalesTimeRange>("30d")
   const [selectedCurrency, setSelectedCurrency] = React.useState<string | null>(null)
@@ -91,7 +89,7 @@ export function SellerDashboardShell() {
   const kpis = summary?.sellerDashboard
     ? getSellerDashboardKpis(netSalesSeries, activitySeries, timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90)
     : null
-  const overviewUrl = withLocale("/dashboard/seller", locale)
+  const messagesUrl = withLocale("/messages", locale)
   const leads: RecentLead[] = (summary?.recentInquiries ?? []).map((lead) => ({
     id: lead.id,
     buyer: lead.companyName,
@@ -102,7 +100,7 @@ export function SellerDashboardShell() {
       : "—",
     status: lead.status === "replied" ? t("sellerDashboard.leadReplied") : lead.status === "closed" ? t("sellerDashboard.leadClosed") : t("sellerDashboard.newLeadStatus"),
     lastMessage: lead.lastMessage || lead.message,
-    actionHref: `${overviewUrl}?section=messages&inquiryId=${encodeURIComponent(lead.id)}`,
+    actionHref: `${messagesUrl}?inquiryId=${encodeURIComponent(lead.id)}`,
   }))
   const chartData: SellerNetSalesChartPoint[] | null = netSalesSeries && currency
     ? netSalesSeries.map((point) => ({
@@ -144,10 +142,6 @@ export function SellerDashboardShell() {
                   </div>
                   <DataTable data={leads} status={state.status} />
                 </>
-              ) : activeSection === "messages" ? (
-                <div className="flex min-h-[calc(100dvh_-_var(--header-height)_-_2rem)] flex-1 px-4 lg:px-6">
-                  <MessagesClient initialInquiryId={inquiryId} />
-                </div>
               ) : (
                 <div className="px-4 lg:px-6">
                   <DashboardClient role="seller" activeSection={activeSection} />

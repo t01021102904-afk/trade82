@@ -279,6 +279,7 @@ export function MessagesClient({
   const draftAttachmentsRef = useRef<DraftAttachment[]>([]);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressTriggeredRef = useRef(false);
+  const messagesViewportRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mobileMessagesEndRef = useRef<HTMLDivElement>(null);
   const mobileChatOpenRef = useRef(mobileChatOpen);
@@ -393,7 +394,10 @@ export function MessagesClient({
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ block: "end" });
+    const desktopViewport = messagesViewportRef.current;
+    if (desktopViewport) {
+      desktopViewport.scrollTop = desktopViewport.scrollHeight;
+    }
     mobileMessagesEndRef.current?.scrollIntoView({ block: "end" });
   }, [lastMessageId, selected?.id]);
 
@@ -883,7 +887,7 @@ export function MessagesClient({
         ) : null}
       </div>
 
-      <div className="hidden min-h-0 flex-1 overflow-hidden rounded-lg border theme-surface-elevated md:grid md:grid-cols-[280px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)_300px]">
+      <div className="hidden h-full min-h-0 w-full flex-1 overflow-hidden rounded-lg border theme-surface-elevated md:grid md:grid-cols-[280px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)_300px]">
         <aside className="flex min-h-0 flex-col border-r theme-border">
           <div className="border-b p-3 theme-border">
             <label className="flex h-9 items-center gap-2 rounded-md border border-zinc-200 bg-white px-2.5 text-sm text-zinc-500 focus-within:border-[#34B386] focus-within:ring-2 focus-within:ring-[#34B386]/10">
@@ -896,7 +900,7 @@ export function MessagesClient({
               />
             </label>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
           {desktopVisibleThreads.map((thread) => {
             const company = getCounterparty(thread);
             const companyName = getCompanyDisplayName(company, t);
@@ -937,9 +941,9 @@ export function MessagesClient({
           </div>
         </aside>
         {selected ? (
-          <section className="flex min-h-0 flex-col">
+          <section className="flex min-h-0 flex-col overflow-hidden">
             <ConversationHeader thread={selected} />
-            <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto bg-[var(--muted)] p-5">
+            <div ref={messagesViewportRef} className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain bg-[var(--muted)] p-5">
               <MessageTimeline
                 thread={selected}
                 paymentFeatureEnabled={paymentFeatureEnabled}
@@ -1169,7 +1173,7 @@ function MobileConversationList({
           ))}
         </div>
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {threads.length ? (
           threads.map((thread) => {
             const company = getCounterparty(thread);
