@@ -16,6 +16,7 @@ import { CompanyLogo } from "@/components/profile-identity";
 import { ProductCard } from "@/components/product-card";
 import { ProductImage } from "@/components/product-image";
 import { ProductImageGallery } from "@/components/product-image-gallery";
+import { ProductInquiryComposer } from "@/components/product-inquiry-composer";
 import { ProductShareButton } from "@/components/product-share-button";
 import { ViewTracker } from "@/components/view-tracker";
 import { SaveButton } from "@/components/save-button";
@@ -56,7 +57,6 @@ import {
 } from "@/lib/multilingual-content";
 import {
   normalizeProductFieldVisibility,
-  productFieldVisibilityKeys,
   type ProductFieldVisibility,
   type ProductFieldVisibilityKey,
   type ProductFieldVisibilityLevel,
@@ -506,9 +506,6 @@ export function DatabaseProductDetail({ id }: { id: string }) {
       notProvided,
     ),
   );
-  const requestableHiddenFields = productFieldVisibilityKeys.filter(
-    (key) => !canViewSensitiveFields && fieldVisibility[key] === "inquiry_required",
-  );
   const checkingOwner = Boolean(isSignedIn && !userContext);
   const shareImageUrl = product.imageUrls?.[0] || product.imagePlaceholder;
   const shareDescription = product.shortDescription || product.longDescription || product.name;
@@ -573,60 +570,50 @@ export function DatabaseProductDetail({ id }: { id: string }) {
             images={product.imageUrls?.length ? product.imageUrls : [product.imagePlaceholder]}
             productName={product.name}
           />
-          <div className="sticky top-20 flex min-w-0 flex-col justify-between gap-5 border border-zinc-200 bg-white p-4 sm:p-5">
-            <div className="min-w-0">
-              <p className="break-words text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">{product.category}</p>
-              <h1 className="mt-2 break-words text-2xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-3xl">{product.name}</h1>
-              <p className="mt-4 max-w-2xl break-words text-sm leading-6 text-zinc-600">
-                {product.shortDescription || product.longDescription}
+          <div className="sticky top-20 min-w-0 border border-zinc-200 bg-white p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <p className="break-words text-xs font-semibold uppercase tracking-[0.14em] text-zinc-600">
+                {product.category}
               </p>
-              <dl className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
-                {[
-                  { label: t("listing.retailPrice"), value: product.retailPrice ? <s>{product.retailPrice}</s> : notProvided },
-                  { label: t("listing.wholesalePrice"), value: <span className="text-[#34B386]">{priceDisplay}</span> },
-                  { label: t("marketplace.moq"), value: moq },
-                  { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
-                  {
-                    label: t("productDetail.incoterms"),
-                    value: displayField("incoterms", joinList(incoterms) || notProvided),
-                  },
-                  {
-                    label: t("productDetail.compliance"),
-                    value: joinList(product.certifications) || notProvided,
-                  },
-                ].map(({ label, value }) => (
-                  <div key={label} className="grid grid-cols-[132px_minmax(0,1fr)] gap-4 py-3 text-sm">
-                    <dt className="text-zinc-500">{label}</dt>
-                    <dd className="break-words text-right font-semibold text-zinc-950">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-5 flex min-w-0 items-center gap-3 text-sm text-zinc-600">
-                <CompanyLogo
-                  companyName={product.sellerName}
-                  logoUrl={product.sellerLogoUrl}
-                  useDefaultLogo={product.sellerUseDefaultLogo ?? true}
-                  size="sm"
+              <div className="flex shrink-0 items-center gap-3">
+                <SaveButton id={product.id} kind="product" iconOnly />
+                <ProductShareButton
+                  title={product.name}
+                  description={shareDescription}
+                  imageUrl={shareImageUrl}
+                  className="!h-auto !border-0 !bg-transparent !px-0 !py-0 !shadow-none hover:!bg-transparent"
                 />
-                <div className="min-w-0">
-                  <p className="flex min-w-0 flex-wrap items-center gap-1.5 break-words font-semibold text-zinc-950">
-                    <span>{product.sellerName}</span>
-                    {product.sellerIsTrade82Team ? <AdminBadge compact /> : null}
-                  </p>
-                  <p className="break-words">{product.sellerLocation}</p>
-                </div>
               </div>
-              {sellerCompanyId ? (
-                <Link
-                  href={withLocale(`/companies/${sellerCompanyId}`, locale)}
-                  className="mt-3 inline-flex text-sm font-semibold text-zinc-800 underline decoration-[#34B386] decoration-2 underline-offset-4 hover:text-zinc-950"
-                >
-                  {t("productDetail.viewCompanyProfile")}
-                </Link>
-              ) : null}
             </div>
+            <h1 className="mt-2 break-words text-2xl font-semibold tracking-[-0.04em] text-zinc-950 sm:text-3xl">
+              {product.name}
+            </h1>
+            <p className="mt-4 max-w-2xl break-words text-sm leading-6 text-zinc-600">
+              {product.shortDescription || product.longDescription}
+            </p>
+            <dl className="mt-5 divide-y divide-zinc-200 border-y border-zinc-200">
+              {[
+                { label: t("listing.retailPrice"), value: product.retailPrice ? <s>{product.retailPrice}</s> : notProvided },
+                { label: t("listing.wholesalePrice"), value: <span className="text-[#34B386]">{priceDisplay}</span> },
+                { label: t("marketplace.moq"), value: moq },
+                { label: t("productDetail.shippingOrigin"), value: shippingOrigin },
+                {
+                  label: t("productDetail.incoterms"),
+                  value: displayField("incoterms", joinList(incoterms) || notProvided),
+                },
+                {
+                  label: t("productDetail.compliance"),
+                  value: joinList(product.certifications) || notProvided,
+                },
+              ].map(({ label, value }) => (
+                <div key={label} className="grid grid-cols-[132px_minmax(0,1fr)] gap-4 py-3 text-sm">
+                  <dt className="text-zinc-500">{label}</dt>
+                  <dd className="break-words text-right font-semibold text-zinc-950">{value}</dd>
+                </div>
+              ))}
+            </dl>
             {isOwner ? (
-              <div className="grid gap-2">
+              <div className="mt-5 grid gap-2 border-t border-border pt-5">
                 <div className="flex flex-wrap gap-1.5">
                   <Link
                     href={withLocale("/dashboard/seller?section=products", locale)}
@@ -650,12 +637,6 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                   >
                     {ownerActionPending ? t("settings.saving") : t("settings.deleteProduct")}
                   </button>
-                  <ProductShareButton
-                    title={product.name}
-                    description={shareDescription}
-                    imageUrl={shareImageUrl}
-                    className="h-8 px-2.5 text-xs"
-                  />
                 </div>
                 {ownerNotice ? (
                   <p role="status" className="text-sm font-medium text-zinc-700">
@@ -669,38 +650,17 @@ export function DatabaseProductDetail({ id }: { id: string }) {
                 ) : null}
               </div>
             ) : checkingOwner ? (
-              <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+              <div className="mt-5 border-t border-border pt-5 text-sm text-muted-foreground">
                 {t("common.loading")}
               </div>
             ) : (
-              <div className="grid gap-2 sm:grid-cols-2">
-                <ContactModal
-                  context={{ type: "product", product }}
-                  buttonLabel={t("productDetail.contactSeller")}
-                  className="min-h-10 w-full bg-zinc-950 font-semibold hover:bg-zinc-800"
-                />
-                <SaveButton id={product.id} kind="product" />
-                <ProductShareButton
-                  title={product.name}
-                  description={shareDescription}
-                  imageUrl={shareImageUrl}
-                  className="h-10 sm:col-span-2"
-                />
-              </div>
+              <ProductInquiryComposer
+                product={product}
+                className="mt-5 border-t border-border pt-5"
+              />
             )}
           </div>
         </section>
-        {requestableHiddenFields.length ? (
-          <section className="flex flex-col gap-3 rounded-lg border border-[#34B386]/40 bg-[#34B386]/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-6 text-zinc-800">
-              {t("productDetail.hiddenFieldsHelp")}
-            </p>
-            <ContactModal
-              context={{ type: "product", product }}
-              buttonLabel={t("productDetail.requestDetails")}
-            />
-          </section>
-        ) : null}
 
         <section className="grid gap-5 lg:grid-cols-[1fr_340px]">
           <div className="grid gap-5">

@@ -2295,6 +2295,8 @@
     "expectedOrderQuantity": "예상 주문 수량",
     "targetDate": "목표 수입 또는 구매일",
     "message": "메시지",
+    "messageDescription": "아래에 메시지를 입력하세요.",
+    "send": "보내기",
     "messagePlaceholder": "수량, 판매 채널, 필요 문서, 목표 일정, 질문을 입력하세요.",
     "sendInquiry": "문의 보내기",
     "inquirySaved": "문의가 저장되었습니다",
