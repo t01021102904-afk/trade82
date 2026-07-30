@@ -58,7 +58,6 @@ export function SaveButton({
   const [pending, setPending] = useState(false);
   const [waitingForSession, setWaitingForSession] = useState(false);
   const [loadedSavedKey, setLoadedSavedKey] = useState("");
-  const [feedback, setFeedback] = useState("");
   const interacted = useRef(false);
   const queuedToggle = useRef(false);
   const redirecting = useRef(false);
@@ -71,8 +70,6 @@ export function SaveButton({
   const userId = isSignedIn && canUseSavedItems ? user?.id : "";
   const savedItemsKey = userId ? `${userId}:${id}` : "";
   const savedItemsReady = !userId || loadedSavedKey === savedItemsKey;
-  const savedFeedback = t("common.saved");
-  const removedFeedback = t("common.removed");
 
   useEffect(() => {
     interacted.current = false;
@@ -113,7 +110,6 @@ export function SaveButton({
     const optimistic = !previous;
     setSaved(optimistic);
     setPending(true);
-    setFeedback(optimistic ? savedFeedback : removedFeedback);
 
     try {
       const response = await fetch("/api/saved-items", {
@@ -126,7 +122,6 @@ export function SaveButton({
         | null;
       if (!response.ok || typeof result?.saved !== "boolean") {
         setSaved(previous);
-        setFeedback(result?.error || t("common.saveError"));
       } else {
         setSaved(result.saved);
         if (userId) {
@@ -135,14 +130,11 @@ export function SaveButton({
           else cached.delete(id);
           savedItemsByUser.set(userId, cached);
         }
-        setFeedback(result.saved ? savedFeedback : removedFeedback);
       }
     } catch {
       setSaved(previous);
-      setFeedback(t("common.saveError"));
     } finally {
       setPending(false);
-      window.setTimeout(() => setFeedback(""), 1800);
     }
   }, [
     id,
@@ -150,9 +142,7 @@ export function SaveButton({
     kind,
     pending,
     redirectToLogin,
-    removedFeedback,
     saved,
-    savedFeedback,
     t,
     userId,
   ]);
@@ -164,7 +154,6 @@ export function SaveButton({
     queuedToggle.current = false;
     queueMicrotask(() => {
       setWaitingForSession(false);
-      setFeedback("");
       void toggleSave();
     });
   }, [
@@ -182,7 +171,6 @@ export function SaveButton({
     if (!isLoaded || (isSignedIn && canUseSavedItems && !savedItemsReady)) {
       queuedToggle.current = true;
       setWaitingForSession(true);
-      setFeedback(t("common.loading"));
       return;
     }
 
@@ -234,14 +222,6 @@ export function SaveButton({
       data-save-icon-only="true">
         <AnimatedBookmarkIcon saved={Boolean(saved)} />
       </button>
-      {feedback ? (
-        <span
-          role="status"
-          className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded bg-zinc-950 px-2 py-1 text-xs text-white shadow"
-        >
-          {feedback}
-        </span>
-      ) : null}
     </div>
   );
 }

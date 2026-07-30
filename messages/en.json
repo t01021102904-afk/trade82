@@ -2295,6 +2295,8 @@
     "expectedOrderQuantity": "Expected order quantity",
     "targetDate": "Target import or buying date",
     "message": "Message",
+    "messageDescription": "Enter your message below.",
+    "send": "Send",
     "messagePlaceholder": "Share quantity, market channel, required documents, target timeline, and questions.",
     "sendInquiry": "Send Inquiry",
     "inquirySaved": "Inquiry saved",
