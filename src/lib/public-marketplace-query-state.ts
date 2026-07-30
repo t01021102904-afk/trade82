@@ -1,9 +1,12 @@
 export const PUBLIC_MARKETPLACE_PAGE_SIZE = 24;
+export const MARKETPLACE_MIN_PRICE = 1;
+export const MARKETPLACE_MAX_PRICE = 800;
 
 export type MarketplaceQueryState = {
   q: string;
   category: string;
-  price: string;
+  minPrice: number;
+  maxPrice: number;
   moq: string;
   certification: string;
   shipping: string;
@@ -36,10 +39,20 @@ export type MarketplaceRouteSearchParams = Record<
 export function marketplaceQueryState(
   searchParams: SearchParamsReader,
 ): MarketplaceQueryState {
+  const parsedMin = parseMarketplacePrice(
+    searchParams.get("minPrice"),
+    MARKETPLACE_MIN_PRICE,
+  );
+  const parsedMax = parseMarketplacePrice(
+    searchParams.get("maxPrice"),
+    MARKETPLACE_MAX_PRICE,
+  );
+
   return {
     q: searchParams.get("q") ?? "",
     category: searchParams.get("category") ?? "all",
-    price: searchParams.get("price") ?? "all",
+    minPrice: Math.min(parsedMin, parsedMax),
+    maxPrice: Math.max(parsedMin, parsedMax),
     moq: searchParams.get("moq") ?? "all",
     certification: searchParams.get("certification") ?? "all",
     shipping: searchParams.get("shipping") ?? "all",
@@ -67,7 +80,18 @@ export function marketplaceSearchParams(query: MarketplaceQueryState) {
 
   setMarketplaceQueryParam(searchParams, "q", query.q);
   setMarketplaceQueryParam(searchParams, "category", query.category);
-  setMarketplaceQueryParam(searchParams, "price", query.price);
+  setMarketplacePriceParam(
+    searchParams,
+    "minPrice",
+    query.minPrice,
+    MARKETPLACE_MIN_PRICE,
+  );
+  setMarketplacePriceParam(
+    searchParams,
+    "maxPrice",
+    query.maxPrice,
+    MARKETPLACE_MAX_PRICE,
+  );
   setMarketplaceQueryParam(searchParams, "moq", query.moq);
   setMarketplaceQueryParam(searchParams, "certification", query.certification);
   setMarketplaceQueryParam(searchParams, "shipping", query.shipping);
@@ -82,7 +106,8 @@ export function sameMarketplaceQuery(
   return (
     left.q === right.q &&
     left.category === right.category &&
-    left.price === right.price &&
+    left.minPrice === right.minPrice &&
+    left.maxPrice === right.maxPrice &&
     left.moq === right.moq &&
     left.certification === right.certification &&
     left.shipping === right.shipping &&
@@ -127,6 +152,25 @@ export function parseMarketplacePage(value: string | null) {
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : 1;
 }
 
+export function parseMarketplacePrice(value: string | null, fallback: number) {
+  if (value == null || !value.trim()) return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(
+    MARKETPLACE_MAX_PRICE,
+    Math.max(MARKETPLACE_MIN_PRICE, Math.round(parsed)),
+  );
+}
+
+export function isDefaultMarketplacePriceRange({
+  minPrice,
+  maxPrice,
+}: Pick<MarketplaceQueryState, "minPrice" | "maxPrice">) {
+  return (
+    minPrice === MARKETPLACE_MIN_PRICE && maxPrice === MARKETPLACE_MAX_PRICE
+  );
+}
+
 function setMarketplaceQueryParam(
   searchParams: URLSearchParams,
   key: string,
@@ -134,4 +178,14 @@ function setMarketplaceQueryParam(
 ) {
   if (!value || value === "all" || (key === "q" && !value.trim())) return;
   searchParams.set(key, value);
+}
+
+function setMarketplacePriceParam(
+  searchParams: URLSearchParams,
+  key: "minPrice" | "maxPrice",
+  value: number,
+  defaultValue: number,
+) {
+  if (value === defaultValue) return;
+  searchParams.set(key, String(value));
 }

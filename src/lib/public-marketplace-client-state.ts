@@ -7,7 +7,14 @@ export const MARKETPLACE_SEARCH_DEBOUNCE_MS = 300;
 
 export type MarketplaceQueryUpdates = Partial<
   Record<
-    "q" | "category" | "price" | "moq" | "certification" | "shipping" | "page",
+    | "q"
+    | "category"
+    | "minPrice"
+    | "maxPrice"
+    | "moq"
+    | "certification"
+    | "shipping"
+    | "page",
     string
   >
 >;
@@ -37,7 +44,8 @@ export function marketplaceQueryKey(query: MarketplaceQueryState) {
   return JSON.stringify([
     query.q,
     query.category,
-    query.price,
+    query.minPrice,
+    query.maxPrice,
     query.moq,
     query.certification,
     query.shipping,
@@ -55,11 +63,21 @@ export function marketplaceUrlWithUpdates({
   updates: MarketplaceQueryUpdates;
 }) {
   const searchParams = new URLSearchParams(currentSearch);
+  searchParams.delete("price");
 
   for (const [key, value] of Object.entries(updates) as Array<
     [keyof MarketplaceQueryUpdates, string]
   >) {
-    if (!value || value === "all" || (key === "q" && !value.trim())) {
+    const isDefaultMinPrice = key === "minPrice" && value === "1";
+    const isDefaultMaxPrice = key === "maxPrice" && value === "800";
+
+    if (
+      !value ||
+      value === "all" ||
+      (key === "q" && !value.trim()) ||
+      isDefaultMinPrice ||
+      isDefaultMaxPrice
+    ) {
       searchParams.delete(key);
     } else {
       searchParams.set(key, value);

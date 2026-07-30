@@ -22,6 +22,7 @@ import {
 } from "@/components/marketplace-results-presentation";
 import { PaginationControls } from "@/components/pagination-controls";
 import { ProductCard, ProductCardSkeleton } from "@/components/product-card";
+import { Slider } from "@/components/ui/slider";
 import { useAccessibleDialog } from "@/hooks/use-accessible-dialog";
 import {
   complianceClaimLabel,
@@ -41,6 +42,9 @@ import {
 } from "@/lib/public-marketplace-client-state";
 import { databaseProductToCard } from "@/lib/public-marketplace-presenters";
 import {
+  isDefaultMarketplacePriceRange,
+  MARKETPLACE_MAX_PRICE,
+  MARKETPLACE_MIN_PRICE,
   marketplaceQueryState,
   marketplaceSearchParams,
   sameMarketplaceQuery,
@@ -336,7 +340,8 @@ function MarketplaceClientContent({
     updateQuery({
       q: "",
       category: "all",
-      price: "all",
+      minPrice: String(MARKETPLACE_MIN_PRICE),
+      maxPrice: String(MARKETPLACE_MAX_PRICE),
       moq: "all",
       certification: "all",
       shipping: "all",
@@ -470,12 +475,7 @@ function MarketplaceClientContent({
                 <button
                   key={filter.key}
                   type="button"
-                  onClick={() =>
-                    updateQuery({
-                      [filter.key]:
-                        filter.key === "q" ? "" : "all",
-                    } as MarketplaceQueryUpdates)
-                  }
+                  onClick={() => updateQuery(filter.reset)}
                   className="inline-flex min-h-8 max-w-full items-center gap-2 rounded-full border border-[#34B386]/40 bg-[#34B386]/10 px-3 text-xs font-semibold text-zinc-800 hover:bg-[#34B386]/15"
                   aria-label={`${t("marketplace.removeFilter")}: ${filter.label}`}
                 >
@@ -621,16 +621,12 @@ function MarketplaceFilterPanel({
 }) {
   return (
     <div className="grid min-w-0 gap-4" data-filter-layout={mode}>
-      <SelectField
-        label={t("marketplace.price")}
-        value={query.price}
-        onChange={(value) => updateQuery({ price: value })}
-        options={[
-          { label: t("marketplace.anyPrice"), value: "all" },
-          { label: t("marketplace.under3"), value: "under-3" },
-          { label: t("marketplace.threeToEight"), value: "3-8" },
-          { label: t("marketplace.eightPlus"), value: "8-plus" },
-        ]}
+      <PriceRangeField
+        key={`${query.minPrice}-${query.maxPrice}`}
+        minPrice={query.minPrice}
+        maxPrice={query.maxPrice}
+        updateQuery={updateQuery}
+        t={t}
       />
       <SelectField
         label={t("marketplace.moq")}
@@ -671,6 +667,79 @@ function MarketplaceFilterPanel({
   );
 }
 
+function PriceRangeField({
+  minPrice,
+  maxPrice,
+  updateQuery,
+  t,
+}: {
+  minPrice: number;
+  maxPrice: number;
+  updateQuery: (updates: MarketplaceQueryUpdates) => void;
+  t: (key: string) => string;
+}) {
+  const [draftRange, setDraftRange] = useState<[number, number]>([
+    minPrice,
+    maxPrice,
+  ]);
+
+  const commitRange = useCallback(
+    (value: number | readonly number[]) => {
+      const nextRange = normalizePriceRange(value);
+      setDraftRange(nextRange);
+      updateQuery({
+        minPrice: String(nextRange[0]),
+        maxPrice: String(nextRange[1]),
+      });
+    },
+    [updateQuery],
+  );
+
+  return (
+    <div className="grid min-w-0 gap-3" data-testid="marketplace-price-range">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-semibold text-foreground">
+          {t("marketplace.price")}
+        </span>
+        <span className="shrink-0 text-sm tabular-nums text-muted-foreground">
+          ${draftRange[0]} – ${draftRange[1]}
+        </span>
+      </div>
+      <Slider
+        min={MARKETPLACE_MIN_PRICE}
+        max={MARKETPLACE_MAX_PRICE}
+        step={1}
+        minStepsBetweenValues={1}
+        thumbCollisionBehavior="none"
+        value={draftRange}
+        onValueChange={(value) => setDraftRange(normalizePriceRange(value))}
+        onValueCommitted={commitRange}
+        thumbLabels={[
+          t("marketplace.minimumPrice"),
+          t("marketplace.maximumPrice"),
+        ]}
+      />
+      <div className="flex justify-between text-xs tabular-nums text-muted-foreground">
+        <span>${MARKETPLACE_MIN_PRICE}</span>
+        <span>${MARKETPLACE_MAX_PRICE}</span>
+      </div>
+    </div>
+  );
+}
+
+function normalizePriceRange(value: number | readonly number[]): [number, number] {
+  const values = Array.isArray(value) ? value : [value, value];
+  const first = Math.min(
+    MARKETPLACE_MAX_PRICE,
+    Math.max(MARKETPLACE_MIN_PRICE, Math.round(values[0] ?? MARKETPLACE_MIN_PRICE)),
+  );
+  const second = Math.min(
+    MARKETPLACE_MAX_PRICE,
+    Math.max(MARKETPLACE_MIN_PRICE, Math.round(values[1] ?? first)),
+  );
+  return [Math.min(first, second), Math.max(first, second)];
+}
+
 function SelectField({
   label,
   value,
@@ -706,11 +775,12 @@ function marketplaceActiveFilters(
   t: (key: string) => string,
 ) {
   const labels: Array<{
-    key: keyof MarketplaceQueryUpdates;
+    key: string;
     value: string;
     label: string;
+    reset: MarketplaceQueryUpdates;
   }> = [
-    { key: "q", value: query.q, label: query.q },
+    { key: "q", value: query.q, label: query.q, reset: { q: "" } },
     {
       key: "category",
       value: query.category,
@@ -722,16 +792,18 @@ function marketplaceActiveFilters(
                 query.category as (typeof marketplaceCategories)[number],
               ),
             ),
+      reset: { category: "all" },
     },
     {
-      key: "price",
-      value: query.price,
-      label:
-        query.price === "under-3"
-          ? t("marketplace.under3")
-          : query.price === "3-8"
-            ? t("marketplace.threeToEight")
-            : t("marketplace.eightPlus"),
+      key: "priceRange",
+      value: isDefaultMarketplacePriceRange(query)
+        ? "all"
+        : `${query.minPrice}-${query.maxPrice}`,
+      label: `${t("marketplace.price")}: $${query.minPrice} – $${query.maxPrice}`,
+      reset: {
+        minPrice: String(MARKETPLACE_MIN_PRICE),
+        maxPrice: String(MARKETPLACE_MAX_PRICE),
+      },
     },
     {
       key: "moq",
@@ -742,16 +814,19 @@ function marketplaceActiveFilters(
           : query.moq === "5000"
             ? t("marketplace.moq5000")
             : t("marketplace.moq10000"),
+      reset: { moq: "all" },
     },
     {
       key: "certification",
       value: query.certification,
       label: complianceClaimLabel(query.certification, locale),
+      reset: { certification: "all" },
     },
     {
       key: "shipping",
       value: query.shipping,
       label: incotermLabel(query.shipping, locale),
+      reset: { shipping: "all" },
     },
   ];
   return labels.filter(

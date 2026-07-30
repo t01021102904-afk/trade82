@@ -7,6 +7,8 @@ import { cleanPlainText } from "@/lib/marketplace";
 import { maskProductFieldsForViewer } from "@/lib/product-field-visibility";
 import { isTrade82TeamAccount } from "@/lib/trade82-team";
 import {
+  MARKETPLACE_MAX_PRICE,
+  MARKETPLACE_MIN_PRICE,
   marketplacePagination,
   PUBLIC_MARKETPLACE_PAGE_SIZE,
   type MarketplacePagination,
@@ -135,10 +137,29 @@ export function serializePublicMarketplaceProducts(
   });
 }
 
+function cleanPrice(value: string | null, fallback: number) {
+  if (value == null || !value.trim()) return fallback;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(
+    MARKETPLACE_MAX_PRICE,
+    Math.max(MARKETPLACE_MIN_PRICE, Math.round(parsed)),
+  );
+}
+
 function buildProductQuery(searchParams: URLSearchParams) {
   const query = cleanSearch(searchParams.get("q"));
   const category = cleanQuery(searchParams.get("category"));
-  const price = cleanQuery(searchParams.get("price"));
+  const minPrice = cleanPrice(
+    searchParams.get("minPrice"),
+    MARKETPLACE_MIN_PRICE,
+  );
+  const maxPrice = cleanPrice(
+    searchParams.get("maxPrice"),
+    MARKETPLACE_MAX_PRICE,
+  );
+  const selectedMinPrice = Math.min(minPrice, maxPrice);
+  const selectedMaxPrice = Math.max(minPrice, maxPrice);
   const moq = cleanQuery(searchParams.get("moq"));
   const certification = cleanQuery(searchParams.get("certification"));
   const shipping = cleanQuery(searchParams.get("shipping"));
@@ -168,12 +189,14 @@ function buildProductQuery(searchParams: URLSearchParams) {
   if (category && category !== "all") {
     conditions.push(Prisma.sql`p."category" = ${category}`);
   }
-  if (price === "under-3") {
-    conditions.push(Prisma.sql`p."priceMin" IS NOT NULL AND p."priceMin" < 3`);
-  } else if (price === "3-8") {
-    conditions.push(Prisma.sql`p."priceMin" IS NOT NULL AND p."priceMin" >= 3 AND p."priceMin" <= 8`);
-  } else if (price === "8-plus") {
-    conditions.push(Prisma.sql`p."priceMin" IS NOT NULL AND p."priceMin" > 8`);
+  if (
+    selectedMinPrice > MARKETPLACE_MIN_PRICE ||
+    selectedMaxPrice < MARKETPLACE_MAX_PRICE
+  ) {
+    conditions.push(Prisma.sql`
+      COALESCE(p."priceMax", p."priceMin") >= ${selectedMinPrice}
+      AND COALESCE(p."priceMin", p."priceMax") <= ${selectedMaxPrice}
+    `);
   }
   if (moq !== "all" && Number.isFinite(Number(moq))) {
     conditions.push(Prisma.sql`
