@@ -12,7 +12,6 @@ import {
   Megaphone,
   MessageSquare,
   Package,
-  PanelTop,
   ReceiptText,
   Settings2,
   ShoppingCart,
@@ -33,8 +32,63 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {
+  loadAccountCompanies,
+  type AccountCompanyRecord,
+} from "@/hooks/use-account-companies"
 import { useUserContext } from "@/hooks/use-user-context"
 import { stripLocale, withLocale } from "@/lib/i18n"
+
+function accountCompanyLogoUrl(company: AccountCompanyRecord | undefined) {
+  if (!company || company.useDefaultLogo === true) return ""
+
+  for (const field of [
+    "logoThumbnailUrl",
+    "logoUrl",
+    "logoOriginalUrl",
+  ] as const) {
+    const value = company[field]
+    if (typeof value === "string" && value.trim()) return value.trim()
+  }
+
+  return ""
+}
+
+function SidebarCompanyLogo({ logoUrl }: { logoUrl: string }) {
+  const [failedLogoUrl, setFailedLogoUrl] = React.useState<string | null>(null)
+  const showImage = Boolean(logoUrl && failedLogoUrl !== logoUrl)
+
+  return (
+    <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-sm text-sidebar-foreground">
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl}
+          alt=""
+          className="size-full object-contain"
+          onError={() => setFailedLogoUrl(logoUrl)}
+        />
+      ) : (
+        <svg
+          width={24}
+          height={24}
+          viewBox="0 0 24 24"
+          fill="none"
+          className="size-6"
+          aria-hidden="true"
+        >
+          <path
+            d="M13 11H17.8C18.9201 11 19.4802 11 19.908 11.218C20.2843 11.4097 20.5903 11.7157 20.782 12.092C21 12.5198 21 13.0799 21 14.2V21M13 21V6.2C13 5.0799 13 4.51984 12.782 4.09202C12.5903 3.71569 12.2843 3.40973 11.908 3.21799C11.4802 3 10.9201 3 9.8 3H6.2C5.0799 3 4.51984 3 4.09202 3.21799C3.71569 3.40973 3.40973 3.71569 3.21799C3 4.51984 3 5.0799 3 6.2V21M22 21H2M6.5 7H9.5M6.5 11H9.5M6.5 15H9.5"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      )}
+    </span>
+  )
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useUser()
@@ -42,9 +96,31 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { locale, t } = useI18n()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [accountCompanies, setAccountCompanies] = React.useState<
+    AccountCompanyRecord[]
+  >([])
+
+  React.useEffect(() => {
+    const userId = user?.id
+    if (!userId) return
+
+    let cancelled = false
+    void loadAccountCompanies(userId).then((companies) => {
+      if (!cancelled) setAccountCompanies(companies)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id])
+
   const path = stripLocale(pathname)
   const section = searchParams.get("section") ?? "overview"
   const company = context?.companies?.find((item) => item.companyRole === "seller")
+  const accountCompany = accountCompanies.find(
+    (item) => item.companyRole === "seller",
+  )
+  const companyLogoUrl = accountCompanyLogoUrl(accountCompany)
   const href = (path: string) => withLocale(path, locale)
   const overviewUrl = href("/dashboard/seller")
   const isOverview = path === "/dashboard/seller" && section === "overview"
@@ -85,8 +161,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
               render={<a href={overviewUrl} />}
             >
-              <PanelTop className="size-5!" />
-              <span className="text-base font-semibold">{data.user.name}</span>
+              <SidebarCompanyLogo logoUrl={companyLogoUrl} />
+              <span className="truncate text-base font-semibold">
+                {data.user.name}
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

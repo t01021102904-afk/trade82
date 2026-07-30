@@ -35,6 +35,15 @@ test("seller sidebar preserves localized active routes and safe disabled control
   const documents = source("src/components/nav-documents.tsx");
 
   assert.match(sidebar, /withLocale/);
+  assert.doesNotMatch(sidebar, /PanelTop/);
+  assert.match(sidebar, /loadAccountCompanies\(userId\)\.then/);
+  assert.match(sidebar, /accountCompanyLogoUrl\(accountCompany\)/);
+  assert.match(sidebar, /logoThumbnailUrl/);
+  assert.match(sidebar, /logoOriginalUrl/);
+  assert.match(sidebar, /<SidebarCompanyLogo logoUrl=\{companyLogoUrl\}/);
+  assert.match(sidebar, /M13 11H17\.8/);
+  assert.match(sidebar, /size-full object-contain/);
+  assert.match(sidebar, /className="size-6"/);
   assert.match(sidebar, /section=products/);
   assert.match(sidebar, /section=documents/);
   assert.match(sidebar, /section=marketing/);
