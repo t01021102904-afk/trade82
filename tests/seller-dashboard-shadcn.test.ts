@@ -159,3 +159,27 @@ test("seller dashboard English and Korean labels stay in parity", () => {
   assert.equal(en.newLeads, "New Leads");
   assert.equal(ko.newLeads, "새 리드");
 });
+
+test("seller products use a shadcn management table with menu actions", () => {
+  const dashboard = source("src/components/dashboard-client.tsx");
+  const table = source("src/components/seller-products-table.tsx");
+  const editor = source("src/components/product-management.tsx");
+
+  assert.match(dashboard, /<SellerProductsTable/);
+  assert.doesNotMatch(dashboard, /<SellerProductCard/);
+  assert.match(dashboard, /<Sheet/);
+  assert.match(dashboard, /<ProductEditor[\s\S]*embedded/);
+  for (const component of ["TableHeader", "TableBody", "TableCell", "DropdownMenu", "DropdownMenuItem", "Badge"]) {
+    assert.match(table, new RegExp(`<${component}`));
+  }
+  assert.match(table, /productTableHeader/);
+  assert.match(table, /productTableTarget/);
+  assert.match(table, /productTableLimit/);
+  assert.match(table, /productTableViews/);
+  assert.match(table, /onSetPreparing/);
+  assert.match(table, /onPublish/);
+  assert.match(table, /onDelete/);
+  assert.match(table, /ProductImage/);
+  assert.match(table, /productTermsRequired/);
+  assert.match(editor, /embedded = false/);
+});
