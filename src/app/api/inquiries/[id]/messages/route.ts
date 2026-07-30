@@ -1,3 +1,6 @@
+import { after } from "next/server";
+
+import { Prisma } from "@/generated/prisma/client";
 import { apiError } from "@/lib/api-response";
 import {
   ApiValidationError,
@@ -13,8 +16,65 @@ import { isAdminUser } from "@/lib/authz";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 import { sendNewMessageNotification } from "@/lib/message-email-notifications";
+import { getInquiryParticipant } from "@/lib/message-attachments";
 import { sha256Hex } from "@/lib/message-attachments";
 import { MESSAGE_ATTACHMENT_LIMITS } from "@/lib/message-attachment-rules";
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const user = await requireCurrentAppUser();
+    const { id: rawId } = await params;
+    const inquiryId = idParam(rawId, "inquiryId");
+    const participant = await getInquiryParticipant({
+      inquiryId,
+      userId: user.id,
+      allowAdmin: true,
+    });
+    if (!participant) return Response.json({ error: "Not found" }, { status: 404 });
+
+    const afterId = new URL(request.url).searchParams.get("after")?.trim();
+    const afterMessage = afterId
+      ? await getDb().message.findFirst({
+          where: { id: afterId, inquiryId },
+          select: { id: true, createdAt: true },
+        })
+      : null;
+    if (afterId && !afterMessage) {
+      return Response.json({ error: "Message cursor was not found." }, { status: 404 });
+    }
+    const messages = await getDb().message.findMany({
+      where: {
+        inquiryId,
+        ...(afterMessage
+          ? {
+              OR: [
+                { createdAt: { gt: afterMessage.createdAt } },
+                { createdAt: afterMessage.createdAt, id: { gt: afterMessage.id } },
+              ],
+            }
+          : {}),
+      },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: 50,
+      include: {
+        attachments: {
+          where: { status: "active" },
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+    return Response.json(
+      { messages },
+      { headers: { "Cache-Control": "private, no-store" } },
+    );
+  } catch (error) {
+    if (error instanceof ApiValidationError) return validationErrorResponse(error);
+    return apiError(error);
+  }
+}
 
 export async function POST(
   request: Request,
@@ -71,6 +131,10 @@ export async function POST(
       max: 2_000,
       fallback: "",
     }) ?? "";
+    const clientMessageId = stringField(body, "clientMessageId", {
+      max: 128,
+      fallback: "",
+    })?.trim() || null;
     const attachmentIds = stringArrayField(body, "attachmentIds", {
       maxItems: MESSAGE_ATTACHMENT_LIMITS.maxFilesPerMessage,
       maxLength: 128,
@@ -99,6 +163,22 @@ export async function POST(
     if (!activeSenderCompany) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
+    if (clientMessageId) {
+      const existing = await getDb().message.findFirst({
+        where: {
+          inquiryId: inquiry.id,
+          senderCompanyId: activeSenderCompany.id,
+          clientMessageId,
+        },
+        include: {
+          attachments: {
+            where: { status: "active" },
+            orderBy: { createdAt: "asc" },
+          },
+        },
+      });
+      if (existing) return Response.json(existing);
+    }
     const receiverCompanyId =
       activeSenderCompany.id === inquiry.buyerCompanyId
         ? inquiry.sellerCompanyId
@@ -124,7 +204,9 @@ export async function POST(
       throw validationError("Attachments are too large for one message.");
     }
 
-    const message = await getDb().$transaction(async (tx) => {
+    let message;
+    try {
+      message = await getDb().$transaction(async (tx) => {
       const created = await tx.message.create({
         data: {
           inquiryId: inquiry.id,
@@ -133,6 +215,7 @@ export async function POST(
           receiverCompanyId,
           body: messageBody.trim(),
           contentHash: sha256Hex(messageBody.trim()),
+          clientMessageId,
         },
       });
 
@@ -167,19 +250,44 @@ export async function POST(
           },
         },
       });
-    });
+      });
+    } catch (error) {
+      if (
+        clientMessageId &&
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        const existing = await getDb().message.findFirstOrThrow({
+          where: {
+            inquiryId: inquiry.id,
+            senderCompanyId: activeSenderCompany.id,
+            clientMessageId,
+          },
+          include: {
+            attachments: {
+              where: { status: "active" },
+              orderBy: { createdAt: "asc" },
+            },
+          },
+        });
+        return Response.json(existing);
+      }
+      throw error;
+    }
 
-    await sendNewMessageNotification({
-      messageId: message.id,
-      inquiryId: inquiry.id,
-      senderUserId: user.id,
-      senderCompanyName: activeSenderCompany.tradeName || activeSenderCompany.legalName,
-      receiverCompanyId,
-      body: message.body,
-      attachmentCount: message.attachments.length,
-    }).catch((error) => {
-      console.error("Message notification email failed.", {
-        name: error instanceof Error ? error.name : typeof error,
+    after(async () => {
+      await sendNewMessageNotification({
+        messageId: message.id,
+        inquiryId: inquiry.id,
+        senderUserId: user.id,
+        senderCompanyName: activeSenderCompany.tradeName || activeSenderCompany.legalName,
+        receiverCompanyId,
+        body: message.body,
+        attachmentCount: message.attachments.length,
+      }).catch((error) => {
+        console.error("Message notification email failed.", {
+          name: error instanceof Error ? error.name : typeof error,
+        });
       });
     });
 

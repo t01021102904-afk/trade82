@@ -33,6 +33,7 @@ import {
 import { AdminBadge } from "@/components/admin-badge";
 import { useI18n } from "@/components/i18n-provider";
 import { CompanyLogo } from "@/components/profile-identity";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUserContext } from "@/hooks/use-user-context";
 import { withLocale } from "@/lib/i18n";
 import {
@@ -141,6 +142,8 @@ type InquiryThread = {
     createdAt: string;
     senderCompanyId: string | null;
     attachments: MessageAttachment[];
+    clientMessageId?: string | null;
+    deliveryStatus?: "sending" | "failed";
   }>;
   deals?: DealSummary[];
   paymentRequests?: PaymentRequestSummary[];
@@ -250,6 +253,7 @@ export function MessagesClient({
 }) {
   const { locale, t } = useI18n();
   const [threads, setThreads] = useState<InquiryThread[]>([]);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [paymentFeatureEnabled, setPaymentFeatureEnabled] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -307,6 +311,7 @@ export function MessagesClient({
         if (!active) return;
         setThreads(result.inquiries);
         setPaymentFeatureEnabled(result.paymentFeature.enabled);
+        setInitialLoading(false);
       })
       .catch((error) => {
         if (!active) return;
@@ -315,6 +320,7 @@ export function MessagesClient({
             ? error.message
             : t("messages.loadFailed", "Unable to load conversations. Please refresh and try again."),
         );
+        setInitialLoading(false);
       });
     return () => {
       active = false;
@@ -332,6 +338,10 @@ export function MessagesClient({
   const lastMessageId =
     selected?.messages.at(-1)?.id ??
     (selected?.message.trim() ? selected.id : "");
+  const selectedThreadId = selected?.id;
+  const latestServerMessageId = [...(selected?.messages ?? [])]
+    .reverse()
+    .find((message) => !message.id.startsWith("pending-"))?.id;
   const libraryAttachments = useMemo(() => {
     if (!selected) return [];
     const search = librarySearch.trim().toLowerCase();
@@ -402,6 +412,55 @@ export function MessagesClient({
   }, [lastMessageId, selected?.id]);
 
   useEffect(() => {
+    if (!selectedThreadId || !latestServerMessageId) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let abortController: AbortController | null = null;
+
+    const poll = async () => {
+      if (stopped || document.visibilityState !== "visible") return;
+      abortController?.abort();
+      abortController = new AbortController();
+      try {
+        const response = await fetch(
+          `/api/inquiries/${selectedThreadId}/messages?after=${encodeURIComponent(latestServerMessageId)}`,
+          { signal: abortController.signal, cache: "no-store" },
+        );
+        const result = (await response.json().catch(() => null)) as
+          | { messages?: InquiryThread["messages"] }
+          | null;
+        if (!response.ok || !result?.messages?.length || stopped) return;
+        setThreads((current) => current.map((thread) => {
+          if (thread.id !== selectedThreadId) return thread;
+          const known = new Set(thread.messages.map((message) => message.id));
+          const additions = result.messages!.filter((message) => !known.has(message.id));
+          if (!additions.length) return thread;
+          return {
+            ...thread,
+            messages: [...thread.messages, ...additions],
+            updatedAt: additions.at(-1)?.createdAt ?? thread.updatedAt,
+          };
+        }));
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+      } finally {
+        if (!stopped) timer = setTimeout(() => void poll(), 3_000);
+      }
+    };
+    void poll();
+    const resume = () => {
+      if (document.visibilityState === "visible") void poll();
+    };
+    document.addEventListener("visibilitychange", resume);
+    return () => {
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      abortController?.abort();
+      document.removeEventListener("visibilitychange", resume);
+    };
+  }, [latestServerMessageId, selectedThreadId]);
+
+  useEffect(() => {
     mobileChatOpenRef.current = mobileChatOpen;
   }, [mobileChatOpen]);
 
@@ -434,23 +493,112 @@ export function MessagesClient({
       setComposerError(t("messages.uploadFailed"));
       return;
     }
+    const clientMessageId = crypto.randomUUID();
+    const optimisticMessage = {
+      id: `pending-${clientMessageId}`,
+      clientMessageId,
+      body: reply.trim(),
+      createdAt: new Date().toISOString(),
+      senderCompanyId: getViewerCompanyId(selected),
+      attachments: uploadedAttachments,
+      deliveryStatus: "sending" as const,
+    };
+    setThreads((current) => current.map((thread) =>
+      thread.id === selected.id
+        ? {
+            ...thread,
+            messages: [...thread.messages, optimisticMessage],
+            updatedAt: optimisticMessage.createdAt,
+          }
+        : thread,
+    ));
+    setReply("");
+    clearDraftAttachments();
+    setComposerError("");
     const response = await fetch(`/api/inquiries/${selected.id}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        body: reply.trim(),
+        body: optimisticMessage.body,
         attachmentIds: uploadedAttachments.map((attachment) => attachment.id),
+        clientMessageId,
       }),
     });
     if (response.ok) {
-      setReply("");
-      clearDraftAttachments();
-      setComposerError("");
-      await load();
+      const message = (await response.json()) as InquiryThread["messages"][number];
+      setThreads((current) => current.map((thread) =>
+        thread.id === selected.id
+          ? {
+              ...thread,
+              messages: thread.messages.map((item) =>
+                item.clientMessageId === clientMessageId ? message : item,
+              ),
+              message: message.body || thread.message,
+              updatedAt: message.createdAt,
+              status: "replied",
+            }
+          : thread,
+      ));
     } else {
       const result = (await response.json().catch(() => null)) as { error?: string } | null;
+      setThreads((current) => current.map((thread) =>
+        thread.id === selected.id
+          ? {
+              ...thread,
+              messages: thread.messages.map((item) =>
+                item.clientMessageId === clientMessageId
+                  ? { ...item, deliveryStatus: "failed" as const }
+                  : item,
+              ),
+            }
+          : thread,
+      ));
       setComposerError(result?.error ?? t("messages.messageSendFailed"));
     }
+  }
+
+  async function retryMessage(clientMessageId: string) {
+    if (!selected) return;
+    const pending = selected.messages.find((message) => message.clientMessageId === clientMessageId);
+    if (!pending) return;
+    setThreads((current) => current.map((thread) => thread.id === selected.id ? {
+      ...thread,
+      messages: thread.messages.map((message) => message.clientMessageId === clientMessageId
+        ? { ...message, deliveryStatus: "sending" as const }
+        : message),
+    } : thread));
+    try {
+      const response = await fetch(`/api/inquiries/${selected.id}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          body: pending.body,
+          attachmentIds: pending.attachments.map((attachment) => attachment.id),
+          clientMessageId,
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as InquiryThread["messages"][number] | { error?: string } | null;
+      if (!response.ok || !result || !("id" in result)) throw new Error("send failed");
+      setThreads((current) => current.map((thread) => thread.id === selected.id ? {
+        ...thread,
+        messages: thread.messages.map((message) => message.clientMessageId === clientMessageId ? result : message),
+      } : thread));
+    } catch {
+      setThreads((current) => current.map((thread) => thread.id === selected.id ? {
+        ...thread,
+        messages: thread.messages.map((message) => message.clientMessageId === clientMessageId
+          ? { ...message, deliveryStatus: "failed" as const }
+          : message),
+      } : thread));
+    }
+  }
+
+  function removeFailedMessage(clientMessageId: string) {
+    if (!selected) return;
+    setThreads((current) => current.map((thread) => thread.id === selected.id ? {
+      ...thread,
+      messages: thread.messages.filter((message) => message.clientMessageId !== clientMessageId),
+    } : thread));
   }
 
   function clearDraftAttachments() {
@@ -800,6 +948,10 @@ export function MessagesClient({
     }
   }
 
+  if (initialLoading) {
+    return <MessagesLoadingSkeleton />;
+  }
+
   if (!visibleThreads.length) {
     return (
       <>
@@ -869,6 +1021,8 @@ export function MessagesClient({
             onRemoveDraftAttachment={removeDraftAttachment}
             onRetryDraftAttachment={retryDraftAttachment}
             onOpenAttachment={openAttachment}
+            onRetryMessage={retryMessage}
+            onRemoveMessage={removeFailedMessage}
             onJumpToMessage={jumpToMessage}
             onFilterFiles={setLibraryFilter}
             onSearchFiles={setLibrarySearch}
@@ -949,6 +1103,8 @@ export function MessagesClient({
                 paymentFeatureEnabled={paymentFeatureEnabled}
                 onOpenAttachment={openAttachment}
                 onPaymentUpdated={() => void load()}
+                onRetryMessage={retryMessage}
+                onRemoveMessage={removeFailedMessage}
               />
               <div ref={messagesEndRef} aria-hidden="true" />
             </div>
@@ -1101,6 +1257,28 @@ function normalizeUnreadCount(value: unknown) {
     : 0;
 }
 
+function MessagesLoadingSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading conversations" className="grid min-h-0 flex-1 overflow-hidden rounded-lg border theme-surface-elevated md:grid-cols-[280px_minmax(0,1fr)]">
+      <aside className="hidden border-r p-3 md:block theme-border">
+        <Skeleton className="h-9 w-full" />
+        <div className="mt-4 grid gap-3">
+          {Array.from({ length: 5 }, (_, index) => <Skeleton key={index} className="h-16 w-full" />)}
+        </div>
+      </aside>
+      <section className="flex min-h-0 flex-col p-4">
+        <Skeleton className="h-10 w-2/5" />
+        <div className="mt-8 grid gap-3">
+          <Skeleton className="h-16 w-3/5" />
+          <Skeleton className="ml-auto h-20 w-2/5" />
+          <Skeleton className="h-14 w-1/2" />
+        </div>
+        <Skeleton className="mt-auto h-24 w-full" />
+      </section>
+    </div>
+  );
+}
+
 function formatUnreadCount(count: number) {
   return count > 99 ? "99+" : String(count);
 }
@@ -1246,6 +1424,8 @@ function MobileChatDetail({
   onRemoveDraftAttachment,
   onRetryDraftAttachment,
   onOpenAttachment,
+  onRetryMessage,
+  onRemoveMessage,
   onJumpToMessage,
   onFilterFiles,
   onSearchFiles,
@@ -1281,6 +1461,8 @@ function MobileChatDetail({
   onRemoveDraftAttachment: (id: string) => void;
   onRetryDraftAttachment: (id: string) => void;
   onOpenAttachment: (attachment: MessageAttachment) => void;
+  onRetryMessage: (clientMessageId: string) => void;
+  onRemoveMessage: (clientMessageId: string) => void;
   onJumpToMessage: (messageId: string | null) => void;
   onFilterFiles: (value: "all" | "image" | "pdf") => void;
   onSearchFiles: (value: string) => void;
@@ -1346,6 +1528,8 @@ function MobileChatDetail({
           paymentFeatureEnabled={paymentFeatureEnabled}
           onOpenAttachment={onOpenAttachment}
           onPaymentUpdated={onPaymentUpdated}
+          onRetryMessage={onRetryMessage}
+          onRemoveMessage={onRemoveMessage}
         />
         <div ref={messagesEndRef} aria-hidden="true" />
       </div>
@@ -1830,6 +2014,8 @@ type TimelineMessage = {
   createdAt: string;
   senderCompanyId: string | null;
   attachments: MessageAttachment[];
+  clientMessageId?: string | null;
+  deliveryStatus?: "sending" | "failed";
 };
 
 type TimelineEntry =
@@ -1847,11 +2033,15 @@ function MessageTimeline({
   paymentFeatureEnabled,
   onOpenAttachment,
   onPaymentUpdated,
+  onRetryMessage,
+  onRemoveMessage,
 }: {
   thread: InquiryThread;
   paymentFeatureEnabled: boolean;
   onOpenAttachment: (attachment: MessageAttachment) => void;
   onPaymentUpdated: () => void;
+  onRetryMessage: (clientMessageId: string) => void;
+  onRemoveMessage: (clientMessageId: string) => void;
 }) {
   const { locale } = useI18n();
   const messages: TimelineMessage[] = [
@@ -1873,6 +2063,8 @@ function MessageTimeline({
       createdAt: message.createdAt,
       senderCompanyId: message.senderCompanyId,
       attachments: message.attachments,
+      clientMessageId: message.clientMessageId,
+      deliveryStatus: message.deliveryStatus,
     })),
   ];
   const timeline: TimelineEntry[] = [
@@ -1924,6 +2116,9 @@ function MessageTimeline({
                 thread={thread}
                 attachments={entry.item.attachments}
                 onOpenAttachment={onOpenAttachment}
+                deliveryStatus={entry.item.deliveryStatus}
+                onRetry={entry.item.clientMessageId ? () => onRetryMessage(entry.item.clientMessageId!) : undefined}
+                onRemove={entry.item.clientMessageId ? () => onRemoveMessage(entry.item.clientMessageId!) : undefined}
               />
             ) : entry.kind === "payment" ? (
               <PaymentRequestCard
@@ -1979,6 +2174,9 @@ function ChatBubble({
   thread,
   attachments,
   onOpenAttachment,
+  deliveryStatus,
+  onRetry,
+  onRemove,
 }: {
   id?: string;
   body: string;
@@ -1987,6 +2185,9 @@ function ChatBubble({
   thread: InquiryThread;
   attachments: MessageAttachment[];
   onOpenAttachment: (attachment: MessageAttachment) => void;
+  deliveryStatus?: "sending" | "failed";
+  onRetry?: () => void;
+  onRemove?: () => void;
 }) {
   const { locale, t } = useI18n();
   const { context: userContext } = useUserContext();
@@ -2047,6 +2248,17 @@ function ChatBubble({
                     onOpen={() => onOpenAttachment(attachment)}
                   />
                 ))}
+              </div>
+            ) : null}
+            {deliveryStatus ? (
+              <div className="mt-1.5 flex items-center justify-end gap-2 text-[11px] text-primary-foreground/80">
+                <span>{deliveryStatus === "sending" ? t("messages.sending") : t("messages.failed")}</span>
+                {deliveryStatus === "failed" && onRetry && onRemove ? (
+                  <>
+                    <button type="button" onClick={onRetry} className="font-medium underline underline-offset-2">{t("common.retry", "Retry")}</button>
+                    <button type="button" onClick={onRemove} className="font-medium underline underline-offset-2">{t("common.remove", "Remove")}</button>
+                  </>
+                ) : null}
               </div>
             ) : null}
           </div>

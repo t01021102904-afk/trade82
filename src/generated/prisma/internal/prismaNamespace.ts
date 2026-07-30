@@ -5552,6 +5552,7 @@ export const MessageScalarFieldEnum = {
   receiverCompanyId: 'receiverCompanyId',
   body: 'body',
   contentHash: 'contentHash',
+  clientMessageId: 'clientMessageId',
   createdAt: 'createdAt'
 } as const
 

@@ -1218,6 +1218,8 @@
     "pdfDocument": "PDF 문서",
     "sendBlockedWhileUploading": "첨부파일 업로드가 끝난 뒤 보내 주세요.",
     "messageSendFailed": "메시지를 보내지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "sending": "전송 중",
+    "failed": "전송되지 않음",
     "chatRoomActions": "채팅방 작업",
     "menuOpenChatRoom": "채팅방 열기",
     "menuRenameChatRoom": "채팅방 이름 변경",
