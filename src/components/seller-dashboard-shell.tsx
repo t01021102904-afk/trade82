@@ -50,9 +50,14 @@ const sellerSections = new Set<DashboardSection>(["products", "documents", "mark
 const emptyCurrencySeries: SellerDashboardCurrencySeries[] = []
 const emptyActivitySeries: SellerDashboardSeriesPoint[] = []
 
-export function SellerDashboardShell() {
+export function SellerDashboardShell({
+  content,
+}: {
+  content?: React.ReactNode
+} = {}) {
   const { locale, t } = useI18n()
   const searchParams = useSearchParams()
+  const hasStandaloneContent = content !== undefined
   const requestedSection = searchParams.get("section") as DashboardSection | null
   const activeSection = requestedSection && sellerSections.has(requestedSection) ? requestedSection : "overview"
   const [state, setState] = React.useState<SummaryState>({ status: "loading", summary: null })
@@ -60,6 +65,7 @@ export function SellerDashboardShell() {
   const [selectedCurrency, setSelectedCurrency] = React.useState<string | null>(null)
 
   React.useEffect(() => {
+    if (hasStandaloneContent) return
     const controller = new AbortController()
     void fetch("/api/dashboard/summary?role=seller", { cache: "no-store", signal: controller.signal })
       .then(async (response) => {
@@ -73,7 +79,7 @@ export function SellerDashboardShell() {
         }
       })
     return () => controller.abort()
-  }, [])
+  }, [hasStandaloneContent])
 
   const summary = state.status === "ready" ? state.summary : null
   const currencySeries = summary?.sellerDashboard?.currencySeries ?? emptyCurrencySeries
@@ -127,7 +133,9 @@ export function SellerDashboardShell() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              {activeSection === "overview" ? (
+              {hasStandaloneContent ? (
+                <div className="px-4 lg:px-6">{content}</div>
+              ) : activeSection === "overview" ? (
                 <>
                   <SectionCards kpis={kpis} currency={currency} status={state.status} />
                   <div className="px-4 lg:px-6">

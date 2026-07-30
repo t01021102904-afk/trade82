@@ -132,7 +132,8 @@ test("public header remains visible while the seller dashboard footer stays hidd
   assert.match(header, /stripLocale\(pathname\)/);
   assert.doesNotMatch(header, /isSellerDashboard/);
   assert.doesNotMatch(header, /if \(isSellerDashboard\) return null/);
-  assert.match(footer, /stripLocale\(pathname\) === "\/dashboard\/seller"/);
+  assert.match(footer, /path === "\/dashboard\/seller"/);
+  assert.match(footer, /path\.startsWith\("\/dashboard\/seller\/"\)/);
 });
 
 test("seller dashboard has no shadcn dashboard-01 sample data", () => {

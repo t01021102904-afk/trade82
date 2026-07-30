@@ -16,7 +16,9 @@ function legalPrefix(pathname: string) {
 export function SiteFooter() {
   const { messages } = useI18n();
   const pathname = usePathname();
-  const isSellerDashboard = stripLocale(pathname) === "/dashboard/seller";
+  const path = stripLocale(pathname);
+  const isSellerDashboard =
+    path === "/dashboard/seller" || path.startsWith("/dashboard/seller/");
   const footer = messages.footer;
   const prefix = legalPrefix(pathname);
 
