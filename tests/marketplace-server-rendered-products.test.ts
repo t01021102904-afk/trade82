@@ -21,6 +21,8 @@ import {
   updateMarketplaceHistory,
 } from "../src/lib/public-marketplace-client-state.ts";
 import {
+  MARKETPLACE_MAX_PRICE,
+  MARKETPLACE_MIN_PRICE,
   marketplacePagination,
   marketplaceQueryState,
   marketplaceSearchParams,
@@ -236,7 +238,8 @@ test("History API URL updates preserve filter values and reset pagination safely
   assert.deepEqual(marketplaceQueryFromUrl(url), {
     q: "serum",
     category: "Food & Snacks",
-    price: "all",
+    minPrice: MARKETPLACE_MIN_PRICE,
+    maxPrice: MARKETPLACE_MAX_PRICE,
     moq: "all",
     certification: "all",
     shipping: "all",
@@ -525,4 +528,86 @@ test("public directory filters stay within their columns and export countries us
   assert.match(apiSource, /countryLookupKeys\(exportCountry\)/);
   assert.match(apiSource, /regexp_replace\(export_country\.value/);
   assert.doesNotMatch(apiSource, /INSERT INTO|UPDATE "SellerProfile"/);
+});
+
+test("marketplace price range defaults to $1-$800 and serializes only narrowed values", () => {
+  const defaultQuery = marketplaceQueryState(new URLSearchParams());
+  const defaultParams = marketplaceSearchParams(defaultQuery);
+
+  assert.equal(defaultQuery.minPrice, MARKETPLACE_MIN_PRICE);
+  assert.equal(defaultQuery.maxPrice, MARKETPLACE_MAX_PRICE);
+  assert.equal(defaultParams.get("minPrice"), null);
+  assert.equal(defaultParams.get("maxPrice"), null);
+
+  const narrowedQuery = marketplaceQueryState(
+    new URLSearchParams("minPrice=25&maxPrice=300"),
+  );
+  const narrowedParams = marketplaceSearchParams(narrowedQuery);
+
+  assert.equal(narrowedQuery.minPrice, 25);
+  assert.equal(narrowedQuery.maxPrice, 300);
+  assert.equal(narrowedParams.get("minPrice"), "25");
+  assert.equal(narrowedParams.get("maxPrice"), "300");
+});
+
+test("marketplace price range clamps and orders malformed URL values", () => {
+  assert.deepEqual(
+    marketplaceQueryState(
+      new URLSearchParams("minPrice=900&maxPrice=-10"),
+    ),
+    {
+      q: "",
+      category: "all",
+      minPrice: MARKETPLACE_MIN_PRICE,
+      maxPrice: MARKETPLACE_MAX_PRICE,
+      moq: "all",
+      certification: "all",
+      shipping: "all",
+      page: 1,
+    },
+  );
+});
+
+test("marketplace price range URL updates reset pagination and remove default bounds", () => {
+  const narrowed = marketplaceUrlWithUpdates({
+    pathname: "/marketplace",
+    currentSearch: "?page=4",
+    updates: { minPrice: "25", maxPrice: "300" },
+  });
+  assert.equal(narrowed, "/marketplace?minPrice=25&maxPrice=300");
+
+  const reset = marketplaceUrlWithUpdates({
+    pathname: "/marketplace",
+    currentSearch: "?minPrice=25&maxPrice=300&page=4",
+    updates: {
+      minPrice: String(MARKETPLACE_MIN_PRICE),
+      maxPrice: String(MARKETPLACE_MAX_PRICE),
+    },
+  });
+  assert.equal(reset, "/marketplace");
+});
+
+test("marketplace renders a committed dual-thumb price slider instead of price presets", () => {
+  const clientSource = readSource("src/components/marketplace-client.tsx");
+  const sliderSource = readSource("src/components/ui/slider.tsx");
+  const dataSource = readSource("src/lib/public-marketplace-data.ts");
+
+  assert.match(clientSource, /data-testid="marketplace-price-range"/);
+  assert.match(clientSource, /min=\{MARKETPLACE_MIN_PRICE\}/);
+  assert.match(clientSource, /max=\{MARKETPLACE_MAX_PRICE\}/);
+  assert.match(
+    clientSource,
+    /key=\{`\$\{query\.minPrice\}-\$\{query\.maxPrice\}`\}/,
+  );
+  assert.match(clientSource, /onValueCommitted=\{commitRange\}/);
+  assert.match(clientSource, /onValueChange=\{\(value\) => setDraftRange/);
+  assert.doesNotMatch(
+    clientSource,
+    /useEffect\(\(\) => \{\s*setDraftRange/,
+  );
+  assert.doesNotMatch(clientSource, /under-3|3-8|8-plus/);
+  assert.match(sliderSource, /SliderPrimitive\.Thumb/);
+  assert.match(sliderSource, /Array\.from\(\{ length: thumbCount \}/);
+  assert.match(dataSource, /COALESCE\(p\."priceMax", p\."priceMin"\) >=/);
+  assert.match(dataSource, /COALESCE\(p\."priceMin", p\."priceMax"\) <=/);
 });
