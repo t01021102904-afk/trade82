@@ -939,13 +939,13 @@ function SellerProductsPanel({
           if (!open) setEditing(null);
         }}
       >
-        <SheetContent className="w-full overflow-y-auto p-0 sm:max-w-3xl">
+        <SheetContent className="w-[calc(100vw-1rem)] overflow-y-auto p-0 data-[side=right]:w-[calc(100vw-1rem)] data-[side=right]:sm:w-[calc(100vw-2rem)] data-[side=right]:sm:max-w-[1180px]">
           <SheetHeader className="sr-only">
             <SheetTitle>{t("listing.editProduct")}</SheetTitle>
             <SheetDescription>{t("dashboard.productManagementHelp")}</SheetDescription>
           </SheetHeader>
           {editing ? (
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2 sm:px-6">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-12 sm:px-6 lg:px-8">
               <ProductEditor
                 key={String(editing.id)}
                 embedded

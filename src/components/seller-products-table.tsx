@@ -53,15 +53,15 @@ export function SellerProductsTable({
 
   return (
     <div className="overflow-hidden rounded-lg border">
-      <Table>
+      <Table className="table-fixed">
         <TableHeader className="bg-muted/40">
           <TableRow className="hover:bg-transparent">
-            <TableHead className="min-w-[260px] px-4">{t("dashboard.productTableHeader")}</TableHead>
-            <TableHead className="min-w-[170px]">{t("dashboard.productTableSectionType")}</TableHead>
-            <TableHead className="min-w-[120px]">{t("dashboard.productTableStatus")}</TableHead>
-            <TableHead className="min-w-[130px]">{t("dashboard.productTableTarget")}</TableHead>
-            <TableHead className="min-w-[150px]">{t("dashboard.productTableLimit")}</TableHead>
-            <TableHead className="min-w-[90px] text-right">{t("dashboard.productTableViews")}</TableHead>
+            <TableHead className="w-[36%] px-4">{t("dashboard.productTableHeader")}</TableHead>
+            <TableHead className="w-[17%]">{t("dashboard.productTableSectionType")}</TableHead>
+            <TableHead className="w-[11%]">{t("dashboard.productTableStatus")}</TableHead>
+            <TableHead className="w-[11%]">{t("dashboard.productTableTarget")}</TableHead>
+            <TableHead className="w-[13%]">{t("dashboard.productTableLimit")}</TableHead>
+            <TableHead className="w-[7%] text-right">{t("dashboard.productTableViews")}</TableHead>
             <TableHead className="w-12 px-2 text-right">
               <span className="sr-only">{t("dashboard.productTableActions")}</span>
             </TableHead>
@@ -76,7 +76,7 @@ export function SellerProductsTable({
 
             return (
               <TableRow key={product.id} className="group">
-                <TableCell className="whitespace-normal px-4 py-3">
+                <TableCell className="px-4 py-2.5">
                   <div className="flex min-w-0 items-center gap-3">
                     <ProductImage
                       urls={[product.images[0]?.cardUrl, product.imageUrl]}
@@ -88,11 +88,8 @@ export function SellerProductsTable({
                       showLabel={false}
                     />
                     <div className="min-w-0">
-                      <p className="line-clamp-2 text-sm font-medium leading-5 text-foreground">
+                      <p className="truncate text-sm font-medium leading-5 text-foreground">
                         {product.name}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                        {product.shortDescription || category}
                       </p>
                     </div>
                   </div>
