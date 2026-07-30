@@ -35,6 +35,8 @@ export type DbProduct = {
   priceMax: string | null;
   currency: string;
   moq: string;
+  moqQuantity: string;
+  moqUnit: string;
   leadTime: string;
   status: "active" | "inactive" | "draft";
   viewCount?: number;
@@ -301,10 +303,12 @@ export function ProductEditor({
   initialProduct,
   onCancel,
   onSaved,
+  embedded = false,
 }: {
   initialProduct: EditableProduct;
   onCancel: () => void;
   onSaved: (message?: string) => void;
+  embedded?: boolean;
 }) {
   const { locale, t } = useI18n();
   const [product, setProduct] = useState<RichProductFormValue>(() =>
@@ -409,7 +413,12 @@ export function ProductEditor({
   return (
     <form
       onSubmit={submit}
-      className="grid gap-5 rounded-[22px] border p-4 shadow-sm theme-surface-elevated sm:p-5"
+      className={cx(
+        "grid gap-5 theme-foreground",
+        embedded
+          ? "border-0 p-0 shadow-none"
+          : "rounded-[22px] border p-4 shadow-sm theme-surface-elevated sm:p-5",
+      )}
       autoComplete="off"
       noValidate
     >

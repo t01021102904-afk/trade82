@@ -19,18 +19,21 @@ import { CompanyLogo } from "@/components/profile-identity";
 import { SellerDocumentsSection } from "@/components/seller-documents-section";
 import {
   ProductEditor,
-  ProductListStatusIndicator,
-  productDeleteButtonClass,
-  productEditButtonClass,
-  productPreparingButtonClass,
-  productPublishButtonClass,
   type DbProduct,
   type EditableProduct,
 } from "@/components/product-management";
 import { ProductImage } from "@/components/product-image";
+import { SellerProductsTable } from "@/components/seller-products-table";
 import { SellerMarketingPage } from "@/components/seller-marketing-page";
 import { withLocale } from "@/lib/i18n";
 import { buyerCategoryLabel } from "@/lib/company-select-options";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export type DashboardSection =
   | "overview"
@@ -930,19 +933,34 @@ function SellerProductsPanel({
         </p>
       ) : null}
 
-      {editing ? (
-        <div className="mt-4">
-          <ProductEditor
-            initialProduct={editing}
-            onCancel={() => setEditing(null)}
-            onSaved={async () => {
-              setEditing(null);
-              setNotice(t("dashboard.productUpdated"));
-              await refreshProducts();
-            }}
-          />
-        </div>
-      ) : null}
+      <Sheet
+        open={Boolean(editing)}
+        onOpenChange={(open) => {
+          if (!open) setEditing(null);
+        }}
+      >
+        <SheetContent className="w-full overflow-y-auto p-0 sm:max-w-3xl">
+          <SheetHeader className="sr-only">
+            <SheetTitle>{t("listing.editProduct")}</SheetTitle>
+            <SheetDescription>{t("dashboard.productManagementHelp")}</SheetDescription>
+          </SheetHeader>
+          {editing ? (
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-2 sm:px-6">
+              <ProductEditor
+                key={String(editing.id)}
+                embedded
+                initialProduct={editing}
+                onCancel={() => setEditing(null)}
+                onSaved={async () => {
+                  setEditing(null);
+                  setNotice(t("dashboard.productUpdated"));
+                  await refreshProducts();
+                }}
+              />
+            </div>
+          ) : null}
+        </SheetContent>
+      </Sheet>
 
       <div className="mt-4 grid gap-2">
         {products === null ? (
@@ -950,17 +968,15 @@ function SellerProductsPanel({
             <Empty text={t("common.loading")} />
           </div>
         ) : productList.length ? (
-          productList.map((product) => (
-            <SellerProductCard
-              key={product.id}
-              product={product}
-              pending={pendingId === product.id}
-              onEdit={() => setEditing({ ...product })}
-              onSetPreparing={() => void setPreparing(product)}
-              onPublish={() => void publishProduct(product)}
-              onDelete={() => void deleteProduct(product)}
-            />
-          ))
+          <SellerProductsTable
+            products={productList}
+            pendingId={pendingId}
+            emptyText={emptyText}
+            onEdit={(product) => setEditing({ ...product })}
+            onSetPreparing={(product) => void setPreparing(product)}
+            onPublish={(product) => void publishProduct(product)}
+            onDelete={(product) => void deleteProduct(product)}
+          />
         ) : (
           <div className="md:col-span-2 xl:col-span-3">
             <Empty text={emptyText} />
@@ -969,114 +985,6 @@ function SellerProductsPanel({
       </div>
     </section>
   );
-}
-
-function SellerProductCard({
-  product,
-  pending,
-  onEdit,
-  onSetPreparing,
-  onPublish,
-  onDelete,
-}: {
-  product: DbProduct;
-  pending: boolean;
-  onEdit: () => void;
-  onSetPreparing: () => void;
-  onPublish: () => void;
-  onDelete: () => void;
-}) {
-  const { t } = useI18n();
-  const price = formatDashboardProductPrice(product, t("dashboard.priceOnRequest"));
-
-  return (
-    <article className="grid min-w-0 gap-3 rounded-md border p-3 theme-surface-muted sm:grid-cols-[72px_minmax(0,1fr)] xl:grid-cols-[72px_minmax(0,1fr)_auto] xl:items-center">
-      <ProductImage
-        urls={[product.images[0]?.cardUrl, product.imageUrl]}
-        alt={product.name}
-        sizes="72px"
-        className="aspect-square rounded-md sm:size-[72px]"
-        imageClassName="bg-white object-contain p-1"
-        placeholderClassName="p-1"
-        showLabel={false}
-      />
-
-      <div className="min-w-0">
-        <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
-          <h3 className="min-w-0 flex-1 break-words text-sm font-semibold theme-foreground">
-            {product.name}
-          </h3>
-        </div>
-        <p className="mt-0.5 truncate text-xs theme-muted">{product.category}</p>
-
-        <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-          <div className="flex min-w-0 gap-1.5">
-            <dt className="theme-muted">{t("dashboard.price")}</dt>
-            <dd className="truncate font-medium text-zinc-900">{price}</dd>
-          </div>
-          <div className="flex min-w-0 gap-1.5">
-            <dt className="theme-muted">{t("marketplace.moq")}</dt>
-            <dd className="truncate font-medium text-zinc-900">
-              {product.moq || t("productDetail.notProvided")}
-            </dd>
-          </div>
-          <div className="flex min-w-0 gap-1.5">
-            <dt className="theme-muted">{t("dashboard.productViews")}</dt>
-            <dd className="font-medium text-zinc-900">{Number(product.viewCount ?? 0)}</dd>
-          </div>
-        </dl>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-1.5 sm:col-start-2 xl:col-start-auto xl:justify-end">
-        <ProductListStatusIndicator product={product} />
-        <button
-          type="button"
-          onClick={onEdit}
-          className={productEditButtonClass}
-        >
-          {t("settings.editProduct")}
-        </button>
-        {product.status === "active" ? (
-          <button
-            type="button"
-            disabled={pending}
-            onClick={onSetPreparing}
-            className={productPreparingButtonClass}
-          >
-            {pending ? t("settings.saving") : t("dashboard.setPreparing")}
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={pending}
-            onClick={onPublish}
-            className={productPublishButtonClass}
-          >
-            {pending ? t("settings.saving") : t("listing.publishProduct")}
-          </button>
-        )}
-        <button
-          type="button"
-          disabled={pending}
-          onClick={onDelete}
-          className={productDeleteButtonClass}
-        >
-          {pending ? t("settings.saving") : t("settings.deleteProduct")}
-        </button>
-      </div>
-    </article>
-  );
-}
-
-function formatDashboardProductPrice(
-  product: Pick<DbProduct, "priceMin" | "priceMax" | "currency">,
-  fallback: string,
-) {
-  if (!product.priceMin && !product.priceMax) return fallback;
-  if (product.priceMin === product.priceMax || !product.priceMax) {
-    return `${product.currency} ${product.priceMin}`;
-  }
-  return `${product.currency} ${product.priceMin}-${product.priceMax}`;
 }
 
 function Empty({ text }: { text: string }) {
