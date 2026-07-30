@@ -180,6 +180,14 @@ test("seller products use a shadcn management table with menu actions", () => {
   assert.match(table, /onPublish/);
   assert.match(table, /onDelete/);
   assert.match(table, /ProductImage/);
+  assert.match(table, /table-fixed/);
+  assert.doesNotMatch(table, /product\.shortDescription/);
+  assert.match(table, /truncate text-sm font-medium/);
   assert.match(table, /productTermsRequired/);
+  assert.match(
+    dashboard,
+    /data-\[side=right\]:sm:max-w-\[1180px\]/,
+  );
+  assert.match(dashboard, /pt-12/);
   assert.match(editor, /embedded = false/);
 });
