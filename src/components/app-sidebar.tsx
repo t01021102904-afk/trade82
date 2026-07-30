@@ -124,6 +124,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const href = (path: string) => withLocale(path, locale)
   const overviewUrl = href("/dashboard/seller")
   const isOverview = path === "/dashboard/seller" && section === "overview"
+  const isProducts =
+    path === "/dashboard/seller/products/bulk" ||
+    (path === "/dashboard/seller" && section === "products")
 
   const data = {
     user: {
@@ -133,7 +136,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: [
       { title: t("sellerDashboard.navOverview"), url: overviewUrl, icon: LayoutDashboard, active: isOverview },
-      { title: t("sellerDashboard.navProducts"), url: `${overviewUrl}?section=products`, icon: Package, active: path === "/dashboard/seller" && section === "products" },
+      { title: t("sellerDashboard.navProducts"), url: `${overviewUrl}?section=products`, icon: Package, active: isProducts },
       { title: t("sellerDashboard.navQuotes"), icon: Handshake, disabled: true },
       { title: t("sellerDashboard.navOrders"), url: `${overviewUrl}?section=orders`, icon: ShoppingCart, active: path === "/dashboard/seller" && section === "orders" },
     ],
