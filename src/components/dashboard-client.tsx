@@ -891,7 +891,7 @@ function SellerProductsPanel({
           </p>
         </div>
         <Link
-          href={withLocale("/sell", locale)}
+          href={withLocale("/dashboard/seller/products/new", locale)}
           className="inline-flex h-8 shrink-0 items-center justify-center rounded-md px-2.5 text-xs font-medium theme-primary-button"
         >
           {t("settings.addProduct")}

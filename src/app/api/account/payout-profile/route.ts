@@ -5,7 +5,7 @@ import {
   readJsonObject,
   rejectUnexpectedFields,
 } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
   saveSellerPayoutProfile,
@@ -87,7 +87,7 @@ async function payoutInput(
 
 export async function GET() {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
       return Response.json({ error: manualPayoutMaintenanceMessage }, { status: 503, headers: noStore });
     }
@@ -105,7 +105,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   try {
     assertSameOrigin(request);
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!isManualPayoutSystemEnabledForClerkUser(user.clerkUserId)) {
       return Response.json({ error: manualPayoutMaintenanceMessage }, { status: 503, headers: noStore });
     }

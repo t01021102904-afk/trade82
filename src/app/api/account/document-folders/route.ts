@@ -9,7 +9,7 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -57,7 +57,7 @@ function folderPayload(folder: {
 
 export async function POST(request: Request) {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json(
         { error: "Create a company profile before creating folders." },
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const { company } = await requireSeller();
+    const { company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json(
         { error: "Create a company profile before managing folders." },
@@ -157,7 +157,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const { company } = await requireSeller();
+    const { company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json(
         { error: "Create a company profile before managing folders." },

@@ -4,7 +4,7 @@ import {
   isAdminUser,
   requireAuth,
   requireCompanyOwner,
-  requireSeller,
+  requireApprovedSupplierCapability,
 } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
@@ -237,7 +237,7 @@ async function authorizeUpload({
   }
 
   if (type === "product_image") {
-    const { company } = await requireSeller();
+    const { company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       throw new Response("Seller company required", { status: 403 });
     }

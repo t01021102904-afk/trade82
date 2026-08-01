@@ -75,6 +75,119 @@ export const VerificationRequestStatus = {
 export type VerificationRequestStatus = (typeof VerificationRequestStatus)[keyof typeof VerificationRequestStatus]
 
 
+export const SupplierApplicationStatus = {
+  DRAFT: 'DRAFT',
+  SUBMITTED: 'SUBMITTED',
+  BUSINESS_VERIFICATION: 'BUSINESS_VERIFICATION',
+  PRODUCT_AUTHENTICITY_VERIFICATION: 'PRODUCT_AUTHENTICITY_VERIFICATION',
+  OPERATIONS_VERIFICATION: 'OPERATIONS_VERIFICATION',
+  SETTLEMENT_VERIFICATION: 'SETTLEMENT_VERIFICATION',
+  ADDITIONAL_INFORMATION_REQUIRED: 'ADDITIONAL_INFORMATION_REQUIRED',
+  ADDITIONAL_DOCUMENTS_REQUIRED: 'ADDITIONAL_DOCUMENTS_REQUIRED',
+  INVENTORY_VERIFICATION_REQUIRED: 'INVENTORY_VERIFICATION_REQUIRED',
+  TEST_ORDER_REQUIRED: 'TEST_ORDER_REQUIRED',
+  CONDITIONALLY_APPROVED: 'CONDITIONALLY_APPROVED',
+  APPROVED: 'APPROVED',
+  ON_HOLD: 'ON_HOLD',
+  REJECTED: 'REJECTED',
+  WITHDRAWN: 'WITHDRAWN',
+  SUSPENDED: 'SUSPENDED'
+} as const
+
+export type SupplierApplicationStatus = (typeof SupplierApplicationStatus)[keyof typeof SupplierApplicationStatus]
+
+
+export const SupplierApplicationSection = {
+  BASIC_INFORMATION: 'BASIC_INFORMATION',
+  BUSINESS_VERIFICATION: 'BUSINESS_VERIFICATION',
+  STAKEHOLDERS: 'STAKEHOLDERS',
+  WAREHOUSES: 'WAREHOUSES',
+  SUPPLY_CHAIN: 'SUPPLY_CHAIN',
+  BRANDS: 'BRANDS',
+  INVENTORY_SAMPLE: 'INVENTORY_SAMPLE',
+  OPERATIONS: 'OPERATIONS',
+  SETTLEMENT: 'SETTLEMENT',
+  DOCUMENTS: 'DOCUMENTS',
+  FINAL_REVIEW: 'FINAL_REVIEW'
+} as const
+
+export type SupplierApplicationSection = (typeof SupplierApplicationSection)[keyof typeof SupplierApplicationSection]
+
+
+export const SupplierReviewStatus = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  ADDITIONAL_INFORMATION_REQUIRED: 'ADDITIONAL_INFORMATION_REQUIRED',
+  INVALID_DOCUMENT: 'INVALID_DOCUMENT',
+  EXPIRED_DOCUMENT: 'EXPIRED_DOCUMENT',
+  UNABLE_TO_VERIFY: 'UNABLE_TO_VERIFY',
+  REJECTED: 'REJECTED'
+} as const
+
+export type SupplierReviewStatus = (typeof SupplierReviewStatus)[keyof typeof SupplierReviewStatus]
+
+
+export const SupplierBrandVerificationStatus = {
+  PENDING: 'PENDING',
+  VERIFIED: 'VERIFIED',
+  ADDITIONAL_EVIDENCE_REQUIRED: 'ADDITIONAL_EVIDENCE_REQUIRED',
+  RESTRICTED: 'RESTRICTED',
+  REJECTED: 'REJECTED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type SupplierBrandVerificationStatus = (typeof SupplierBrandVerificationStatus)[keyof typeof SupplierBrandVerificationStatus]
+
+
+export const SupplierSupplyChainType = {
+  BRAND_DIRECT: 'BRAND_DIRECT',
+  OFFICIAL_DISTRIBUTOR: 'OFFICIAL_DISTRIBUTOR',
+  AUTHORIZED_WHOLESALER: 'AUTHORIZED_WHOLESALER',
+  DOMESTIC_WHOLESALER: 'DOMESTIC_WHOLESALER',
+  INTERNATIONAL_WHOLESALER: 'INTERNATIONAL_WHOLESALER',
+  OWN_MANUFACTURING: 'OWN_MANUFACTURING',
+  SOURCED_AFTER_ORDER: 'SOURCED_AFTER_ORDER'
+} as const
+
+export type SupplierSupplyChainType = (typeof SupplierSupplyChainType)[keyof typeof SupplierSupplyChainType]
+
+
+export const SupplierApplicationDocumentType = {
+  BUSINESS_REGISTRATION: 'BUSINESS_REGISTRATION',
+  COMPANY_AUTHORITY: 'COMPANY_AUTHORITY',
+  TAX_DOCUMENT: 'TAX_DOCUMENT',
+  WAREHOUSE_EXTERIOR: 'WAREHOUSE_EXTERIOR',
+  WAREHOUSE_ENTRANCE: 'WAREHOUSE_ENTRANCE',
+  WAREHOUSE_STORAGE_AREA: 'WAREHOUSE_STORAGE_AREA',
+  WAREHOUSE_PACKING_AREA: 'WAREHOUSE_PACKING_AREA',
+  WAREHOUSE_DISPATCH_AREA: 'WAREHOUSE_DISPATCH_AREA',
+  SUPPLIER_INVOICE: 'SUPPLIER_INVOICE',
+  BRAND_AUTHORIZATION: 'BRAND_AUTHORIZATION',
+  BANK_DOCUMENT: 'BANK_DOCUMENT',
+  TEST_ORDER_EVIDENCE: 'TEST_ORDER_EVIDENCE',
+  OTHER: 'OTHER'
+} as const
+
+export type SupplierApplicationDocumentType = (typeof SupplierApplicationDocumentType)[keyof typeof SupplierApplicationDocumentType]
+
+
+export const SupplierInventorySampleFormat = {
+  XLSX: 'XLSX',
+  CSV: 'CSV'
+} as const
+
+export type SupplierInventorySampleFormat = (typeof SupplierInventorySampleFormat)[keyof typeof SupplierInventorySampleFormat]
+
+
+export const SupplierLegacyClassification = {
+  LEGACY_CONDITIONALLY_APPROVED: 'LEGACY_CONDITIONALLY_APPROVED',
+  REVERIFICATION_REQUIRED: 'REVERIFICATION_REQUIRED',
+  APPLICATION_REQUIRED: 'APPLICATION_REQUIRED'
+} as const
+
+export type SupplierLegacyClassification = (typeof SupplierLegacyClassification)[keyof typeof SupplierLegacyClassification]
+
+
 export const InquiryStatus = {
   sent: 'sent',
   replied: 'replied',

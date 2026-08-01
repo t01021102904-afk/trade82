@@ -14,6 +14,9 @@ const isProtectedRoute = createRouteMatcher([
   "/ko/dashboard(.*)",
   "/ko/messages(.*)",
   "/ko/onboarding(.*)",
+  "/seller(.*)",
+  "/en/seller(.*)",
+  "/ko/seller(.*)",
   "/admin(.*)",
   "/en/admin(.*)",
   "/ko/admin(.*)",
@@ -22,12 +25,6 @@ const isProtectedRoute = createRouteMatcher([
   "/settings(.*)",
   "/en/settings(.*)",
   "/ko/settings(.*)",
-  "/sell",
-  "/sell/(.*)",
-  "/en/sell",
-  "/en/sell/(.*)",
-  "/ko/sell",
-  "/ko/sell/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

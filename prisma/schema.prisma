@@ -52,6 +52,95 @@ enum VerificationRequestStatus {
   rejected
 }
 
+enum SupplierApplicationStatus {
+  DRAFT
+  SUBMITTED
+  BUSINESS_VERIFICATION
+  PRODUCT_AUTHENTICITY_VERIFICATION
+  OPERATIONS_VERIFICATION
+  SETTLEMENT_VERIFICATION
+  ADDITIONAL_INFORMATION_REQUIRED
+  ADDITIONAL_DOCUMENTS_REQUIRED
+  INVENTORY_VERIFICATION_REQUIRED
+  TEST_ORDER_REQUIRED
+  CONDITIONALLY_APPROVED
+  APPROVED
+  ON_HOLD
+  REJECTED
+  WITHDRAWN
+  SUSPENDED
+}
+
+enum SupplierApplicationSection {
+  BASIC_INFORMATION
+  BUSINESS_VERIFICATION
+  STAKEHOLDERS
+  WAREHOUSES
+  SUPPLY_CHAIN
+  BRANDS
+  INVENTORY_SAMPLE
+  OPERATIONS
+  SETTLEMENT
+  DOCUMENTS
+  FINAL_REVIEW
+}
+
+enum SupplierReviewStatus {
+  PENDING
+  VERIFIED
+  ADDITIONAL_INFORMATION_REQUIRED
+  INVALID_DOCUMENT
+  EXPIRED_DOCUMENT
+  UNABLE_TO_VERIFY
+  REJECTED
+}
+
+enum SupplierBrandVerificationStatus {
+  PENDING
+  VERIFIED
+  ADDITIONAL_EVIDENCE_REQUIRED
+  RESTRICTED
+  REJECTED
+  EXPIRED
+}
+
+enum SupplierSupplyChainType {
+  BRAND_DIRECT
+  OFFICIAL_DISTRIBUTOR
+  AUTHORIZED_WHOLESALER
+  DOMESTIC_WHOLESALER
+  INTERNATIONAL_WHOLESALER
+  OWN_MANUFACTURING
+  SOURCED_AFTER_ORDER
+}
+
+enum SupplierApplicationDocumentType {
+  BUSINESS_REGISTRATION
+  COMPANY_AUTHORITY
+  TAX_DOCUMENT
+  WAREHOUSE_EXTERIOR
+  WAREHOUSE_ENTRANCE
+  WAREHOUSE_STORAGE_AREA
+  WAREHOUSE_PACKING_AREA
+  WAREHOUSE_DISPATCH_AREA
+  SUPPLIER_INVOICE
+  BRAND_AUTHORIZATION
+  BANK_DOCUMENT
+  TEST_ORDER_EVIDENCE
+  OTHER
+}
+
+enum SupplierInventorySampleFormat {
+  XLSX
+  CSV
+}
+
+enum SupplierLegacyClassification {
+  LEGACY_CONDITIONALLY_APPROVED
+  REVERIFICATION_REQUIRED
+  APPLICATION_REQUIRED
+}
+
 enum InquiryStatus {
   sent
   replied
@@ -499,63 +588,72 @@ enum SettlementReversalStatus {
 }
 
 model UserProfile {
-  id                              String                           @id @default(cuid())
-  clerkUserId                     String                           @unique
-  email                           String                           @unique
-  displayName                     String
-  avatarOriginalUrl               String?
-  avatarUrl                       String?
-  companyAffiliation              String                           @default("")
-  jobTitle                        String                           @default("")
-  department                      String                           @default("")
-  bio                             String                           @default("")
-  phoneNumber                     String                           @default("")
-  linkedinUrl                     String                           @default("")
-  country                         String                           @default("")
-  city                            String                           @default("")
-  role                            AccountRole
-  preferredLanguage               PreferredLanguage                @default(en)
-  deletionStatus                  AccountDeletionStatus            @default(ACTIVE)
-  deletionRequestedAt             DateTime?
-  deletedAt                       DateTime?
-  companies                       Company[]
-  requestedVerifications          VerificationRequest[]            @relation("RequestedVerification")
-  reviewedVerifications           VerificationRequest[]            @relation("ReviewedVerification")
-  sentInquiries                   Inquiry[]                        @relation("InquirySender")
-  sentMessages                    Message[]                        @relation("MessageSender")
-  receivedMessages                Message[]                        @relation("MessageReceiver")
-  uploadedMessageAttachments      MessageAttachment[]              @relation("MessageAttachmentUploader")
-  createdDocumentFolders          DocumentFolder[]                 @relation("CreatedDocumentFolders")
-  uploadedTradeDocuments          TradeDocument[]                  @relation("UploadedTradeDocuments")
-  savedItems                      SavedItem[]
-  createdDeals                    Deal[]                           @relation("DealCreator")
-  buyerRfqRequests                RfqRequest[]                     @relation("BuyerRfqRequests")
-  reviewedRfqRequests             RfqRequest[]                     @relation("ReviewedRfqRequests")
-  marketingExposures              MarketingExposure[]
-  createdHomepagePromotions       HomepagePromotion[]              @relation("HomepagePromotionCreatedBy")
-  createdPaymentRequests          PaymentRequest[]                 @relation("PaymentRequestCreator")
-  releasedPaymentRequests         PaymentRequest[]                 @relation("PaymentRequestReleasedBy")
-  paymentRequestEvents            PaymentRequestEvent[]            @relation("PaymentRequestEventActor")
-  tradeOrderEvents                TradeOrderEvent[]                @relation("TradeOrderEventActor")
-  sellerPayoutEvents              SellerPayoutEvent[]              @relation("SellerPayoutEventActor")
-  sellerPayoutAdjustments         SellerPayoutAdjustment[]         @relation("SellerPayoutAdjustmentActor")
-  preparedSellerPayouts           SellerPayout[]                   @relation("SellerPayoutPreparedBy")
-  approvedSellerPayouts           SellerPayout[]                   @relation("SellerPayoutApprovedBy")
-  sentSellerPayouts               SellerPayout[]                   @relation("SellerPayoutSentBy")
-  verifiedSellerPayoutProfiles    SellerPayoutProfile[]            @relation("SellerPayoutProfileVerifiedBy")
-  sellerPayoutProfileAuditEvents  SellerPayoutProfileAuditEvent[]  @relation("SellerPayoutProfileAuditActor")
-  verifiedPartnerPayoutProfiles   PartnerPayoutProfile[]           @relation("PartnerPayoutProfileVerifiedBy")
-  partnerPayoutProfileAuditEvents PartnerPayoutProfileAuditEvent[] @relation("PartnerPayoutProfileAuditActor")
-  partnerProfileAuditEvents       PartnerProfileAuditEvent[]       @relation("PartnerProfileAuditActor")
-  settlementEvents                SettlementEvent[]                @relation("SettlementEventActor")
-  approvedSettlements             Settlement[]                     @relation("SettlementApprovedBy")
-  partnerProfile                  PartnerProfile?                  @relation("UserPartnerProfile")
-  referredReferralAttribution     ReferralAttribution?             @relation("ReferredUserAttribution")
-  consumedReferralClaimTokens     ReferralClaimToken[]             @relation("ReferralClaimConsumedByUser")
-  settlementLegRecipientUsers     SettlementLeg[]                  @relation("SettlementLegRecipientUser")
-  acknowledgedSettlementAlerts    SettlementOperationalAlert[]     @relation("SettlementOperationalAlertAcknowledgedBy")
-  createdAt                       DateTime                         @default(now())
-  updatedAt                       DateTime                         @updatedAt
+  id                                  String                             @id @default(cuid())
+  clerkUserId                         String                             @unique
+  email                               String                             @unique
+  displayName                         String
+  avatarOriginalUrl                   String?
+  avatarUrl                           String?
+  companyAffiliation                  String                             @default("")
+  jobTitle                            String                             @default("")
+  department                          String                             @default("")
+  bio                                 String                             @default("")
+  phoneNumber                         String                             @default("")
+  linkedinUrl                         String                             @default("")
+  country                             String                             @default("")
+  city                                String                             @default("")
+  role                                AccountRole
+  preferredLanguage                   PreferredLanguage                  @default(en)
+  deletionStatus                      AccountDeletionStatus              @default(ACTIVE)
+  deletionRequestedAt                 DateTime?
+  deletedAt                           DateTime?
+  companies                           Company[]
+  requestedVerifications              VerificationRequest[]              @relation("RequestedVerification")
+  reviewedVerifications               VerificationRequest[]              @relation("ReviewedVerification")
+  sentInquiries                       Inquiry[]                          @relation("InquirySender")
+  sentMessages                        Message[]                          @relation("MessageSender")
+  receivedMessages                    Message[]                          @relation("MessageReceiver")
+  uploadedMessageAttachments          MessageAttachment[]                @relation("MessageAttachmentUploader")
+  createdDocumentFolders              DocumentFolder[]                   @relation("CreatedDocumentFolders")
+  uploadedTradeDocuments              TradeDocument[]                    @relation("UploadedTradeDocuments")
+  savedItems                          SavedItem[]
+  createdDeals                        Deal[]                             @relation("DealCreator")
+  buyerRfqRequests                    RfqRequest[]                       @relation("BuyerRfqRequests")
+  reviewedRfqRequests                 RfqRequest[]                       @relation("ReviewedRfqRequests")
+  marketingExposures                  MarketingExposure[]
+  createdHomepagePromotions           HomepagePromotion[]                @relation("HomepagePromotionCreatedBy")
+  createdPaymentRequests              PaymentRequest[]                   @relation("PaymentRequestCreator")
+  releasedPaymentRequests             PaymentRequest[]                   @relation("PaymentRequestReleasedBy")
+  paymentRequestEvents                PaymentRequestEvent[]              @relation("PaymentRequestEventActor")
+  tradeOrderEvents                    TradeOrderEvent[]                  @relation("TradeOrderEventActor")
+  sellerPayoutEvents                  SellerPayoutEvent[]                @relation("SellerPayoutEventActor")
+  sellerPayoutAdjustments             SellerPayoutAdjustment[]           @relation("SellerPayoutAdjustmentActor")
+  preparedSellerPayouts               SellerPayout[]                     @relation("SellerPayoutPreparedBy")
+  approvedSellerPayouts               SellerPayout[]                     @relation("SellerPayoutApprovedBy")
+  sentSellerPayouts                   SellerPayout[]                     @relation("SellerPayoutSentBy")
+  verifiedSellerPayoutProfiles        SellerPayoutProfile[]              @relation("SellerPayoutProfileVerifiedBy")
+  sellerPayoutProfileAuditEvents      SellerPayoutProfileAuditEvent[]    @relation("SellerPayoutProfileAuditActor")
+  verifiedPartnerPayoutProfiles       PartnerPayoutProfile[]             @relation("PartnerPayoutProfileVerifiedBy")
+  partnerPayoutProfileAuditEvents     PartnerPayoutProfileAuditEvent[]   @relation("PartnerPayoutProfileAuditActor")
+  partnerProfileAuditEvents           PartnerProfileAuditEvent[]         @relation("PartnerProfileAuditActor")
+  settlementEvents                    SettlementEvent[]                  @relation("SettlementEventActor")
+  approvedSettlements                 Settlement[]                       @relation("SettlementApprovedBy")
+  partnerProfile                      PartnerProfile?                    @relation("UserPartnerProfile")
+  referredReferralAttribution         ReferralAttribution?               @relation("ReferredUserAttribution")
+  consumedReferralClaimTokens         ReferralClaimToken[]               @relation("ReferralClaimConsumedByUser")
+  settlementLegRecipientUsers         SettlementLeg[]                    @relation("SettlementLegRecipientUser")
+  acknowledgedSettlementAlerts        SettlementOperationalAlert[]       @relation("SettlementOperationalAlertAcknowledgedBy")
+  supplierApplications                SupplierApplication[]              @relation("SupplierApplicationApplicant")
+  assignedSupplierApplications        SupplierApplication[]              @relation("SupplierApplicationAssignedAdmin")
+  supplierApplicationStatusEvents     SupplierApplicationStatusHistory[] @relation("SupplierApplicationStatusActor")
+  supplierApplicationReviews          SupplierApplicationReview[]        @relation("SupplierApplicationReviewAdmin")
+  supplierInformationRequests         SupplierInformationRequest[]       @relation("SupplierInformationRequestAdmin")
+  resolvedSupplierInformationRequests SupplierInformationRequest[]       @relation("SupplierInformationRequestResolver")
+  supplierApplicationRiskOverrides    SupplierApplication[]              @relation("SupplierApplicationRiskOverrideAdmin")
+  supplierApplicationAuditEvents      SupplierApplicationAuditEvent[]    @relation("SupplierApplicationAuditActor")
+  supplierApplicationDocuments        SupplierApplicationDocument[]      @relation("SupplierApplicationDocumentUploader")
+  createdAt                           DateTime                           @default(now())
+  updatedAt                           DateTime                           @updatedAt
 
   @@index([deletionStatus, deletedAt])
 }
@@ -628,6 +726,8 @@ model Company {
   reviewsReceived                   Review[]                     @relation("ReviewRecipient")
   companyReviewsWritten             CompanyReview[]              @relation("CompanyReviewWriter")
   companyReviewsReceived            CompanyReview[]              @relation("CompanyReviewRecipient")
+  legacySupplierApplications        SupplierApplication[]        @relation("SupplierApplicationLegacyCompany")
+  approvedSupplierApplications      SupplierApplication[]        @relation("SupplierApplicationApprovedCompany")
   createdAt                         DateTime                     @default(now())
   updatedAt                         DateTime                     @updatedAt
 
@@ -791,6 +891,373 @@ model VerificationRequest {
   updatedAt         DateTime                  @updatedAt
 
   @@index([status, createdAt])
+}
+
+// SupplierApplication is the pre-approval domain. A live seller Company and
+// SellerProfile are created or linked only by the audited approval service.
+model SupplierApplication {
+  id                   String                             @id @default(cuid())
+  applicationNumber    String                             @unique
+  applicantUserId      String
+  applicant            UserProfile                        @relation("SupplierApplicationApplicant", fields: [applicantUserId], references: [id], onDelete: Restrict)
+  legacyCompanyId      String?                            @unique
+  legacyCompany        Company?                           @relation("SupplierApplicationLegacyCompany", fields: [legacyCompanyId], references: [id], onDelete: SetNull)
+  approvedCompanyId    String?                            @unique
+  approvedCompany      Company?                           @relation("SupplierApplicationApprovedCompany", fields: [approvedCompanyId], references: [id], onDelete: SetNull)
+  assignedAdminUserId  String?
+  assignedAdmin        UserProfile?                       @relation("SupplierApplicationAssignedAdmin", fields: [assignedAdminUserId], references: [id], onDelete: SetNull)
+  status               SupplierApplicationStatus          @default(DRAFT)
+  statusReason         String?
+  legalCompanyName     String
+  tradeName            String?
+  companyWebsite       String
+  websiteDomain        String?
+  registrationCountry  String
+  brandsHandled        String[]                           @default([])
+  annualRevenueRange   String                             @default("")
+  warehouseType        String                             @default("")
+  skuCountRange        String                             @default("")
+  riskLevel            String                             @default("STANDARD")
+  riskOverrideReason   String?
+  riskOverrideByUserId String?
+  riskOverrideBy       UserProfile?                       @relation("SupplierApplicationRiskOverrideAdmin", fields: [riskOverrideByUserId], references: [id], onDelete: SetNull)
+  submittedAt          DateTime?
+  withdrawnAt          DateTime?
+  approvedAt           DateTime?
+  legacyClassification SupplierLegacyClassification?
+  legacyBackfilledAt   DateTime?
+  contacts             SupplierApplicationContact[]
+  businessVerification SupplierBusinessVerification?
+  stakeholders         SupplierStakeholder[]
+  warehouses           SupplierWarehouse[]
+  supplyChains         SupplierSupplyChain[]
+  brandVerifications   SupplierBrandVerification[]
+  operationsProfile    SupplierOperationsProfile?
+  settlementProfile    SupplierSettlementProfile?
+  documents            SupplierApplicationDocument[]
+  inventorySamples     SupplierInventorySample[]
+  reviews              SupplierApplicationReview[]
+  statusHistory        SupplierApplicationStatusHistory[]
+  informationRequests  SupplierInformationRequest[]
+  duplicateFlags       SupplierDuplicateFlag[]
+  auditEvents          SupplierApplicationAuditEvent[]
+  createdAt            DateTime                           @default(now())
+  updatedAt            DateTime                           @updatedAt
+
+  @@index([applicantUserId, status])
+  @@index([status, submittedAt])
+  @@index([assignedAdminUserId, status])
+  @@index([riskOverrideByUserId])
+  @@index([registrationCountry, status])
+}
+
+model SupplierApplicationContact {
+  id            String              @id @default(cuid())
+  applicationId String
+  application   SupplierApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  contactType   String              @default("PRIMARY")
+  firstName     String
+  lastName      String
+  jobTitle      String
+  workEmail     String
+  phoneNumber   String
+  isPrimary     Boolean             @default(false)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@unique([applicationId, workEmail])
+  @@index([applicationId, isPrimary])
+}
+
+model SupplierBusinessVerification {
+  id                        String               @id @default(cuid())
+  applicationId             String               @unique
+  application               SupplierApplication  @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  registrationNumber        String               @default("")
+  representativeInformation String               @default("")
+  registeredAddress         String               @default("")
+  operatingAddress          String               @default("")
+  authorityDescription      String               @default("")
+  taxCountry                String               @default("")
+  taxNumberCiphertext       Bytes?
+  taxNumberIv               Bytes?
+  taxNumberAuthTag          Bytes?
+  taxNumberKeyVersion       String?
+  taxNumberLast4            String?
+  websiteEmailDomainMatch   Boolean?
+  reviewStatus              SupplierReviewStatus @default(PENDING)
+  reviewedAt                DateTime?
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+}
+
+model SupplierStakeholder {
+  id               String              @id @default(cuid())
+  applicationId    String
+  application      SupplierApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  fullName         String
+  title            String              @default("")
+  relationship     String              @default("")
+  ownershipPercent String              @default("")
+  country          String              @default("")
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([applicationId])
+}
+
+model SupplierWarehouse {
+  id                 String                        @id @default(cuid())
+  applicationId      String
+  application        SupplierApplication           @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  name               String
+  address            String
+  operator           String                        @default("")
+  contactName        String                        @default("")
+  contactPhone       String                        @default("")
+  openingHours       String                        @default("")
+  dailyOrderCapacity Int?
+  warehouseType      String                        @default("")
+  reviewStatus       SupplierReviewStatus          @default(PENDING)
+  documents          SupplierApplicationDocument[] @relation("SupplierWarehouseDocuments")
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+
+  @@index([applicationId, reviewStatus])
+}
+
+model SupplierSupplyChain {
+  id               String                  @id @default(cuid())
+  applicationId    String
+  application      SupplierApplication     @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  relationshipType SupplierSupplyChainType
+  supplierCompany  String                  @default("")
+  countries        String[]                @default([])
+  description      String                  @default("")
+  reviewStatus     SupplierReviewStatus    @default(PENDING)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  @@index([applicationId, relationshipType])
+}
+
+model SupplierBrandVerification {
+  id                   String                          @id @default(cuid())
+  applicationId        String
+  application          SupplierApplication             @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  brand                String
+  normalizedBrand      String
+  isActive             Boolean                         @default(true)
+  removedAt            DateTime?
+  relationshipType     SupplierSupplyChainType
+  supplierCompany      String                          @default("")
+  transactionStartedAt DateTime?
+  evidenceStatus       SupplierReviewStatus            @default(PENDING)
+  reviewNotes          String                          @default("")
+  countryRestrictions  String[]                        @default([])
+  status               SupplierBrandVerificationStatus @default(PENDING)
+  verifiedAt           DateTime?
+  expiresAt            DateTime?
+  documents            SupplierApplicationDocument[]   @relation("SupplierBrandVerificationDocuments")
+  createdAt            DateTime                        @default(now())
+  updatedAt            DateTime                        @updatedAt
+
+  @@unique([applicationId, normalizedBrand])
+  @@index([applicationId, isActive, status])
+  @@index([brand, status])
+}
+
+model SupplierOperationsProfile {
+  id                            String               @id @default(cuid())
+  applicationId                 String               @unique
+  application                   SupplierApplication  @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  companyMov                    String               @default("")
+  brandLevelMov                 Json                 @default("{}")
+  defaultLeadTimeDays           Int?
+  onHandStockLeadTimeDays       Int?
+  sourcedAfterOrderLeadTimeDays Int?
+  allowedCountries              String[]             @default([])
+  restrictedCountries           String[]             @default([])
+  dailyOrderCapacity            Int?
+  dailyUnitCapacity             Int?
+  boxPacking                    Boolean              @default(false)
+  palletPacking                 Boolean              @default(false)
+  hazardousGoodsPacking         Boolean              @default(false)
+  temperatureControlledPacking  Boolean              @default(false)
+  weekendShipping               Boolean              @default(false)
+  inventoryUpdateMethod         String               @default("MANUAL_PORTAL")
+  inventoryUpdateFrequency      String               @default("")
+  reviewStatus                  SupplierReviewStatus @default(PENDING)
+  reviewedAt                    DateTime?
+  createdAt                     DateTime             @default(now())
+  updatedAt                     DateTime             @updatedAt
+}
+
+model SupplierSettlementProfile {
+  id                      String               @id @default(cuid())
+  applicationId           String               @unique
+  application             SupplierApplication  @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  legalAccountHolder      String               @default("")
+  bankName                String               @default("")
+  bankCountry             String               @default("")
+  accountNumberCiphertext Bytes?
+  accountNumberIv         Bytes?
+  accountNumberAuthTag    Bytes?
+  accountNumberKeyVersion String?
+  accountNumberLast4      String?
+  accountNumberMasked     String?
+  bankCode                String               @default("")
+  swiftBic                String               @default("")
+  payoutCurrency          String               @default("")
+  taxCountry              String               @default("")
+  taxNumberCiphertext     Bytes?
+  taxNumberIv             Bytes?
+  taxNumberAuthTag        Bytes?
+  taxNumberKeyVersion     String?
+  taxNumberLast4          String?
+  vatInformation          String               @default("")
+  invoiceMethod           String               @default("")
+  payoutPolicyAcceptedAt  DateTime?
+  reviewStatus            SupplierReviewStatus @default(PENDING)
+  reviewedAt              DateTime?
+  createdAt               DateTime             @default(now())
+  updatedAt               DateTime             @updatedAt
+}
+
+model SupplierApplicationDocument {
+  id                  String                          @id @default(cuid())
+  applicationId       String
+  application         SupplierApplication             @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  uploadedByUserId    String
+  uploadedByUser      UserProfile                     @relation("SupplierApplicationDocumentUploader", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  documentType        SupplierApplicationDocumentType
+  warehouseId         String?
+  warehouse           SupplierWarehouse?              @relation("SupplierWarehouseDocuments", fields: [warehouseId], references: [id], onDelete: SetNull)
+  brandVerificationId String?
+  brandVerification   SupplierBrandVerification?      @relation("SupplierBrandVerificationDocuments", fields: [brandVerificationId], references: [id], onDelete: SetNull)
+  originalFilename    String
+  storedFilename      String
+  storageBucket       String
+  storagePath         String                          @unique
+  mimeType            String
+  sizeBytes           Int
+  sha256Hash          String
+  reviewStatus        SupplierReviewStatus            @default(PENDING)
+  reviewedAt          DateTime?
+  createdAt           DateTime                        @default(now())
+  updatedAt           DateTime                        @updatedAt
+
+  @@index([applicationId, documentType, createdAt])
+  @@index([warehouseId])
+  @@index([brandVerificationId])
+}
+
+model SupplierInventorySample {
+  id                String                        @id @default(cuid())
+  applicationId     String
+  application       SupplierApplication           @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  format            SupplierInventorySampleFormat
+  originalFilename  String
+  storageBucket     String
+  storagePath       String                        @unique
+  mimeType          String
+  sizeBytes         Int
+  sha256Hash        String
+  totalRows         Int                           @default(0)
+  validRows         Int                           @default(0)
+  invalidRows       Int                           @default(0)
+  duplicateGtins    Int                           @default(0)
+  validationSummary Json                          @default("{}")
+  reviewStatus      SupplierReviewStatus          @default(PENDING)
+  reviewedAt        DateTime?
+  createdAt         DateTime                      @default(now())
+  updatedAt         DateTime                      @updatedAt
+
+  @@index([applicationId, createdAt])
+  @@index([applicationId, reviewStatus])
+}
+
+model SupplierApplicationReview {
+  id               String                     @id @default(cuid())
+  applicationId    String
+  application      SupplierApplication        @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  section          SupplierApplicationSection
+  status           SupplierReviewStatus
+  notes            String                     @default("")
+  reviewedByUserId String
+  reviewedByUser   UserProfile                @relation("SupplierApplicationReviewAdmin", fields: [reviewedByUserId], references: [id], onDelete: Restrict)
+  createdAt        DateTime                   @default(now())
+
+  @@index([applicationId, section, createdAt])
+  @@index([reviewedByUserId, createdAt])
+}
+
+model SupplierApplicationStatusHistory {
+  id            String                     @id @default(cuid())
+  applicationId String
+  application   SupplierApplication        @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  fromStatus    SupplierApplicationStatus?
+  toStatus      SupplierApplicationStatus
+  reason        String?
+  actorUserId   String?
+  actorUser     UserProfile?               @relation("SupplierApplicationStatusActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  actorType     String                     @default("SYSTEM")
+  createdAt     DateTime                   @default(now())
+
+  @@index([applicationId, createdAt])
+  @@index([toStatus, createdAt])
+}
+
+model SupplierInformationRequest {
+  id                String                     @id @default(cuid())
+  applicationId     String
+  application       SupplierApplication        @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  section           SupplierApplicationSection
+  message           String
+  requestedByUserId String
+  requestedByUser   UserProfile                @relation("SupplierInformationRequestAdmin", fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  applicantResponse String?
+  respondedAt       DateTime?
+  resolvedByUserId  String?
+  resolvedByUser    UserProfile?               @relation("SupplierInformationRequestResolver", fields: [resolvedByUserId], references: [id], onDelete: SetNull)
+  resolutionNote    String?
+  resolvedAt        DateTime?
+  createdAt         DateTime                   @default(now())
+
+  @@index([applicationId, resolvedAt, createdAt])
+  @@index([resolvedByUserId])
+}
+
+model SupplierDuplicateFlag {
+  id                String              @id @default(cuid())
+  applicationId     String
+  application       SupplierApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  signal            String
+  matchedEntityType String
+  matchedEntityId   String?
+  matchedValueHash  String
+  severity          String              @default("REVIEW")
+  createdAt         DateTime            @default(now())
+  resolvedAt        DateTime?
+  resolutionNote    String?
+
+  @@unique([applicationId, signal, matchedValueHash])
+  @@index([applicationId, resolvedAt])
+}
+
+model SupplierApplicationAuditEvent {
+  id            String              @id @default(cuid())
+  applicationId String
+  application   SupplierApplication @relation(fields: [applicationId], references: [id], onDelete: Restrict)
+  actorUserId   String?
+  actorUser     UserProfile?        @relation("SupplierApplicationAuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  action        String
+  before        Json                @default("{}")
+  after         Json                @default("{}")
+  createdAt     DateTime            @default(now())
+
+  @@index([applicationId, createdAt])
+  @@index([actorUserId, createdAt])
 }
 
 model Inquiry {

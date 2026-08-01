@@ -5,7 +5,7 @@ import {
   rateLimitOrResponse,
   readJsonObject,
 } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getAppUrl, getStripe } from "@/lib/stripe";
 import {
   findSellerOwnedListedProduct,
@@ -21,7 +21,7 @@ import { safeInternalPath } from "@/lib/url-security";
 
 export async function POST(request: Request) {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json(
         { error: "Seller company profile is required before Marketing." },

@@ -27,6 +27,11 @@ import {
 } from "@/lib/payment-request-checkout";
 import { checkoutIdempotencyKey } from "@/lib/payment-request-rules";
 import { getAppUrl, getStripe } from "@/lib/stripe";
+import {
+  requireSupplierCanAcceptNewOrdersForCompany,
+  SUPPLIER_CHECKOUT_HOLD_NOTE,
+  SUPPLIER_NEW_ORDER_INELIGIBLE_MESSAGE,
+} from "@/lib/supplier-application";
 
 const checkoutFields = new Set(["returnPath"]);
 const CHECKOUT_LOCK_MS = 2 * 60_000;
@@ -51,6 +56,54 @@ function messageReturnPath(value: string | null | undefined) {
 function stripeObjectId(value: string | { id?: string } | null | undefined) {
   if (typeof value === "string") return value;
   return typeof value?.id === "string" ? value.id : null;
+}
+
+async function holdCheckoutForSupplierIneligibility({
+  paymentRequestId,
+  stripeCheckoutSessionId,
+  message = SUPPLIER_CHECKOUT_HOLD_NOTE,
+}: {
+  paymentRequestId: string;
+  stripeCheckoutSessionId: string | null;
+  message?: string;
+}) {
+  const db = getDb();
+  await db.$transaction(async (tx) => {
+    const held = await tx.paymentRequest.updateMany({
+      where: {
+        id: paymentRequestId,
+        status: PaymentRequestStatus.PENDING,
+        requiresManualReconciliation: false,
+      },
+      data: {
+        requiresManualReconciliation: true,
+        reconciliationNote: message,
+        checkoutLockToken: null,
+        checkoutLockExpiresAt: null,
+      },
+    });
+    if (held.count === 1) {
+      await tx.paymentRequestEvent.create({
+        data: {
+          paymentRequestId,
+          eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+          message,
+          metadata: { source: "checkout_supplier_capability" },
+        },
+      });
+    }
+  });
+
+  if (stripeCheckoutSessionId) {
+    try {
+      await getStripe().checkout.sessions.expire(stripeCheckoutSessionId);
+    } catch (error) {
+      console.warn("Unable to expire ineligible supplier Checkout session.", {
+        paymentRequestId,
+        ...safeStripeErrorSummary(error),
+      });
+    }
+  }
 }
 
 export async function POST(
@@ -93,9 +146,45 @@ export async function POST(
           deletedAt: null,
         },
       },
+      include: {
+        sellerCompany: {
+          select: {
+            ownerUserId: true,
+            deletedAt: true,
+            verificationStatus: true,
+          },
+        },
+        tradeOrderByPaymentRequest: { select: { id: true } },
+      },
     });
     if (!paymentRequest) {
       return Response.json({ error: "Payment request not found." }, { status: 404 });
+    }
+    try {
+      await requireSupplierCanAcceptNewOrdersForCompany(
+        paymentRequest.sellerCompany.ownerUserId,
+        paymentRequest.sellerCompanyId,
+      );
+    } catch (error) {
+      if (!(error instanceof Response) || error.status !== 403) throw error;
+      await holdCheckoutForSupplierIneligibility({
+        paymentRequestId: paymentRequest.id,
+        stripeCheckoutSessionId: paymentRequest.stripeCheckoutSessionId,
+      });
+      return Response.json(
+        { error: SUPPLIER_NEW_ORDER_INELIGIBLE_MESSAGE },
+        { status: 409 },
+      );
+    }
+    if (!paymentRequest.tradeOrderByPaymentRequest) {
+      const message =
+        "This payment request is not linked to an order and requires manual reconciliation.";
+      await holdCheckoutForSupplierIneligibility({
+        paymentRequestId: paymentRequest.id,
+        stripeCheckoutSessionId: paymentRequest.stripeCheckoutSessionId,
+        message,
+      });
+      return Response.json({ error: message }, { status: 409 });
     }
     if (paymentRequest.status !== PaymentRequestStatus.PENDING) {
       return Response.json(

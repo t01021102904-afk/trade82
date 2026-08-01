@@ -1,6 +1,7 @@
 import { apiError } from "@/lib/api-response";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
+import { getSupplierApplicationCapabilities } from "@/lib/supplier-application";
 import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 
 export async function GET(request: Request) {
@@ -12,12 +13,17 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const page = Math.max(1, Number(url.searchParams.get("page") ?? "1") || 1);
     const pageSize = Math.min(50, Math.max(1, Number(url.searchParams.get("pageSize") ?? "24") || 24));
-    const companies = await getDb().company.findMany({
+    const [companies, supplierAccess] = await Promise.all([
+      getDb().company.findMany({
       where: { ownerUserId: user.id, deletedAt: null },
       select: { id: true, companyRole: true },
-    });
+      }),
+      getSupplierApplicationCapabilities(user.id),
+    ]);
     const buyerCompanyIds = companies.filter((company) => company.companyRole === "buyer").map((company) => company.id);
-    const sellerCompanyIds = companies.filter((company) => company.companyRole === "seller").map((company) => company.id);
+    const sellerCompanyIds = supplierAccess.canAccessAssignedOrders
+      ? companies.filter((company) => company.companyRole === "seller").map((company) => company.id)
+      : [];
     const where = { OR: [{ buyerCompanyId: { in: buyerCompanyIds } }, { sellerCompanyId: { in: sellerCompanyIds } }] };
     const [total, orders] = await Promise.all([
       getDb().tradeOrder.count({ where }),

@@ -11,6 +11,11 @@ import {
 } from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
+import { lockSupplierCommerceBoundary } from "@/lib/supplier-commerce-boundary";
+import {
+  requireSupplierCanAcceptNewOrdersForCompany,
+  requireSupplierCanAcceptNewOrdersForCompanyWithDb,
+} from "@/lib/supplier-application";
 import { isMessagePaymentFeatureEnabledForUser } from "@/lib/message-payment-feature";
 import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
@@ -74,8 +79,6 @@ export async function POST(
       productAmount,
       shippingAmount,
     );
-    const shouldCreateTradeOrder = isTradeOrderSystemEnabledForClerkUser(user.clerkUserId);
-
     const inquiry = await getDb().inquiry.findFirst({
       where: {
         id: inquiryId,
@@ -94,14 +97,57 @@ export async function POST(
     if (!inquiry) {
       return Response.json({ error: "Conversation not found." }, { status: 404 });
     }
+    const shouldCreateTradeOrder = isTradeOrderSystemEnabledForClerkUser(
+      user.clerkUserId,
+    );
+    if (!shouldCreateTradeOrder) {
+      return Response.json(
+        { error: "Trade orders are not enabled for this account." },
+        { status: 409 },
+      );
+    }
+    // Fast-fail before opening a write transaction. The same capability is
+    // rechecked after the seller commerce lock below and is the authoritative
+    // decision for the insert.
+    await requireSupplierCanAcceptNewOrdersForCompany(
+      user.id,
+      inquiry.sellerCompanyId,
+    );
 
     let tradeOrderId: string | null = null;
     const paymentRequest = await getDb().$transaction(async (tx) => {
+      // Lock first, then re-read ownership and supplier eligibility. This
+      // prevents a status or brand review from interleaving a lone request.
+      await lockSupplierCommerceBoundary(tx, inquiry.sellerCompanyId);
+      const lockedInquiry = await tx.inquiry.findFirst({
+        where: {
+          id: inquiry.id,
+          sellerCompanyId: inquiry.sellerCompanyId,
+          sellerCompany: {
+            ownerUserId: user.id,
+            companyRole: "seller",
+            deletedAt: null,
+          },
+        },
+        select: {
+          id: true,
+          buyerCompanyId: true,
+          sellerCompanyId: true,
+        },
+      });
+      if (!lockedInquiry) {
+        throw new Response("Conversation not found.", { status: 404 });
+      }
+      await requireSupplierCanAcceptNewOrdersForCompanyWithDb(
+        user.id,
+        lockedInquiry.sellerCompanyId,
+        tx,
+      );
       const created = await tx.paymentRequest.create({
         data: {
-          inquiryId: inquiry.id,
-          buyerCompanyId: inquiry.buyerCompanyId,
-          sellerCompanyId: inquiry.sellerCompanyId,
+          inquiryId: lockedInquiry.id,
+          buyerCompanyId: lockedInquiry.buyerCompanyId,
+          sellerCompanyId: lockedInquiry.sellerCompanyId,
           createdByUserId: user.id,
           productName,
           quantity,
@@ -127,16 +173,12 @@ export async function POST(
         },
       });
 
-      // Order rollout is independent from message payments. When it is off, the
-      // existing request flow is unchanged; when enabled, both records commit or
-      // roll back together.
-      if (shouldCreateTradeOrder) {
-        const order = await createTradeOrderForPaymentRequest(tx, created.id);
-        tradeOrderId = order.id;
-      }
+      // A payable payment request is always backed by exactly one trade order.
+      const order = await createTradeOrderForPaymentRequest(tx, created.id);
+      tradeOrderId = order.id;
 
       await tx.inquiry.update({
-        where: { id: inquiry.id },
+        where: { id: lockedInquiry.id },
         data: { updatedAt: new Date() },
       });
 

@@ -1,5 +1,5 @@
-import { ListingPage } from "@/components/listing-page";
+import { SupplierProgramPage } from "@/components/supplier-program-page";
 
 export default function KoSellPage() {
-  return <ListingPage locale="ko" pathname="/ko/sell" />;
+  return <SupplierProgramPage locale="ko" />;
 }

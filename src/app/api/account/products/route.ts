@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { rateLimitOrResponse } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import {
   getComplianceClaimOptions,
   getCountryOptions,
@@ -93,7 +93,7 @@ function slugify(value: string) {
 
 export async function GET() {
   try {
-    const { user } = await requireSeller();
+    const { user } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     const products = await getDb().product.findMany({
       where: {
         deletedAt: null,
@@ -122,7 +122,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { company } = await requireSeller();
+    const { company, access } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-products-write",
@@ -181,6 +181,13 @@ export async function POST(request: Request) {
       body.status === "inactive" || body.status === "draft"
         ? body.status
         : "active";
+
+    if (status === "active" && !access.canPublishOffer) {
+      return Response.json(
+        { error: "Supplier approval and verified brand authorization are required to publish products." },
+        { status: 403 },
+      );
+    }
 
     if (!name) {
       return Response.json({ error: "상품명을 입력해 주시기 바랍니다." }, { status: 400 });

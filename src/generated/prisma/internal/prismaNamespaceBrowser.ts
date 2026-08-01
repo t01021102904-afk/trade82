@@ -59,6 +59,22 @@ export const ModelName = {
   ProductImage: 'ProductImage',
   Category: 'Category',
   VerificationRequest: 'VerificationRequest',
+  SupplierApplication: 'SupplierApplication',
+  SupplierApplicationContact: 'SupplierApplicationContact',
+  SupplierBusinessVerification: 'SupplierBusinessVerification',
+  SupplierStakeholder: 'SupplierStakeholder',
+  SupplierWarehouse: 'SupplierWarehouse',
+  SupplierSupplyChain: 'SupplierSupplyChain',
+  SupplierBrandVerification: 'SupplierBrandVerification',
+  SupplierOperationsProfile: 'SupplierOperationsProfile',
+  SupplierSettlementProfile: 'SupplierSettlementProfile',
+  SupplierApplicationDocument: 'SupplierApplicationDocument',
+  SupplierInventorySample: 'SupplierInventorySample',
+  SupplierApplicationReview: 'SupplierApplicationReview',
+  SupplierApplicationStatusHistory: 'SupplierApplicationStatusHistory',
+  SupplierInformationRequest: 'SupplierInformationRequest',
+  SupplierDuplicateFlag: 'SupplierDuplicateFlag',
+  SupplierApplicationAuditEvent: 'SupplierApplicationAuditEvent',
   Inquiry: 'Inquiry',
   RfqRequest: 'RfqRequest',
   RfqMatchedProduct: 'RfqMatchedProduct',
@@ -338,6 +354,333 @@ export const VerificationRequestScalarFieldEnum = {
 } as const
 
 export type VerificationRequestScalarFieldEnum = (typeof VerificationRequestScalarFieldEnum)[keyof typeof VerificationRequestScalarFieldEnum]
+
+
+export const SupplierApplicationScalarFieldEnum = {
+  id: 'id',
+  applicationNumber: 'applicationNumber',
+  applicantUserId: 'applicantUserId',
+  legacyCompanyId: 'legacyCompanyId',
+  approvedCompanyId: 'approvedCompanyId',
+  assignedAdminUserId: 'assignedAdminUserId',
+  status: 'status',
+  statusReason: 'statusReason',
+  legalCompanyName: 'legalCompanyName',
+  tradeName: 'tradeName',
+  companyWebsite: 'companyWebsite',
+  websiteDomain: 'websiteDomain',
+  registrationCountry: 'registrationCountry',
+  brandsHandled: 'brandsHandled',
+  annualRevenueRange: 'annualRevenueRange',
+  warehouseType: 'warehouseType',
+  skuCountRange: 'skuCountRange',
+  riskLevel: 'riskLevel',
+  riskOverrideReason: 'riskOverrideReason',
+  riskOverrideByUserId: 'riskOverrideByUserId',
+  submittedAt: 'submittedAt',
+  withdrawnAt: 'withdrawnAt',
+  approvedAt: 'approvedAt',
+  legacyClassification: 'legacyClassification',
+  legacyBackfilledAt: 'legacyBackfilledAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierApplicationScalarFieldEnum = (typeof SupplierApplicationScalarFieldEnum)[keyof typeof SupplierApplicationScalarFieldEnum]
+
+
+export const SupplierApplicationContactScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  contactType: 'contactType',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  jobTitle: 'jobTitle',
+  workEmail: 'workEmail',
+  phoneNumber: 'phoneNumber',
+  isPrimary: 'isPrimary',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierApplicationContactScalarFieldEnum = (typeof SupplierApplicationContactScalarFieldEnum)[keyof typeof SupplierApplicationContactScalarFieldEnum]
+
+
+export const SupplierBusinessVerificationScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  registrationNumber: 'registrationNumber',
+  representativeInformation: 'representativeInformation',
+  registeredAddress: 'registeredAddress',
+  operatingAddress: 'operatingAddress',
+  authorityDescription: 'authorityDescription',
+  taxCountry: 'taxCountry',
+  taxNumberCiphertext: 'taxNumberCiphertext',
+  taxNumberIv: 'taxNumberIv',
+  taxNumberAuthTag: 'taxNumberAuthTag',
+  taxNumberKeyVersion: 'taxNumberKeyVersion',
+  taxNumberLast4: 'taxNumberLast4',
+  websiteEmailDomainMatch: 'websiteEmailDomainMatch',
+  reviewStatus: 'reviewStatus',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierBusinessVerificationScalarFieldEnum = (typeof SupplierBusinessVerificationScalarFieldEnum)[keyof typeof SupplierBusinessVerificationScalarFieldEnum]
+
+
+export const SupplierStakeholderScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  fullName: 'fullName',
+  title: 'title',
+  relationship: 'relationship',
+  ownershipPercent: 'ownershipPercent',
+  country: 'country',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierStakeholderScalarFieldEnum = (typeof SupplierStakeholderScalarFieldEnum)[keyof typeof SupplierStakeholderScalarFieldEnum]
+
+
+export const SupplierWarehouseScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  name: 'name',
+  address: 'address',
+  operator: 'operator',
+  contactName: 'contactName',
+  contactPhone: 'contactPhone',
+  openingHours: 'openingHours',
+  dailyOrderCapacity: 'dailyOrderCapacity',
+  warehouseType: 'warehouseType',
+  reviewStatus: 'reviewStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierWarehouseScalarFieldEnum = (typeof SupplierWarehouseScalarFieldEnum)[keyof typeof SupplierWarehouseScalarFieldEnum]
+
+
+export const SupplierSupplyChainScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  relationshipType: 'relationshipType',
+  supplierCompany: 'supplierCompany',
+  countries: 'countries',
+  description: 'description',
+  reviewStatus: 'reviewStatus',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierSupplyChainScalarFieldEnum = (typeof SupplierSupplyChainScalarFieldEnum)[keyof typeof SupplierSupplyChainScalarFieldEnum]
+
+
+export const SupplierBrandVerificationScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  brand: 'brand',
+  normalizedBrand: 'normalizedBrand',
+  isActive: 'isActive',
+  removedAt: 'removedAt',
+  relationshipType: 'relationshipType',
+  supplierCompany: 'supplierCompany',
+  transactionStartedAt: 'transactionStartedAt',
+  evidenceStatus: 'evidenceStatus',
+  reviewNotes: 'reviewNotes',
+  countryRestrictions: 'countryRestrictions',
+  status: 'status',
+  verifiedAt: 'verifiedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierBrandVerificationScalarFieldEnum = (typeof SupplierBrandVerificationScalarFieldEnum)[keyof typeof SupplierBrandVerificationScalarFieldEnum]
+
+
+export const SupplierOperationsProfileScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  companyMov: 'companyMov',
+  brandLevelMov: 'brandLevelMov',
+  defaultLeadTimeDays: 'defaultLeadTimeDays',
+  onHandStockLeadTimeDays: 'onHandStockLeadTimeDays',
+  sourcedAfterOrderLeadTimeDays: 'sourcedAfterOrderLeadTimeDays',
+  allowedCountries: 'allowedCountries',
+  restrictedCountries: 'restrictedCountries',
+  dailyOrderCapacity: 'dailyOrderCapacity',
+  dailyUnitCapacity: 'dailyUnitCapacity',
+  boxPacking: 'boxPacking',
+  palletPacking: 'palletPacking',
+  hazardousGoodsPacking: 'hazardousGoodsPacking',
+  temperatureControlledPacking: 'temperatureControlledPacking',
+  weekendShipping: 'weekendShipping',
+  inventoryUpdateMethod: 'inventoryUpdateMethod',
+  inventoryUpdateFrequency: 'inventoryUpdateFrequency',
+  reviewStatus: 'reviewStatus',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierOperationsProfileScalarFieldEnum = (typeof SupplierOperationsProfileScalarFieldEnum)[keyof typeof SupplierOperationsProfileScalarFieldEnum]
+
+
+export const SupplierSettlementProfileScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  legalAccountHolder: 'legalAccountHolder',
+  bankName: 'bankName',
+  bankCountry: 'bankCountry',
+  accountNumberCiphertext: 'accountNumberCiphertext',
+  accountNumberIv: 'accountNumberIv',
+  accountNumberAuthTag: 'accountNumberAuthTag',
+  accountNumberKeyVersion: 'accountNumberKeyVersion',
+  accountNumberLast4: 'accountNumberLast4',
+  accountNumberMasked: 'accountNumberMasked',
+  bankCode: 'bankCode',
+  swiftBic: 'swiftBic',
+  payoutCurrency: 'payoutCurrency',
+  taxCountry: 'taxCountry',
+  taxNumberCiphertext: 'taxNumberCiphertext',
+  taxNumberIv: 'taxNumberIv',
+  taxNumberAuthTag: 'taxNumberAuthTag',
+  taxNumberKeyVersion: 'taxNumberKeyVersion',
+  taxNumberLast4: 'taxNumberLast4',
+  vatInformation: 'vatInformation',
+  invoiceMethod: 'invoiceMethod',
+  payoutPolicyAcceptedAt: 'payoutPolicyAcceptedAt',
+  reviewStatus: 'reviewStatus',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierSettlementProfileScalarFieldEnum = (typeof SupplierSettlementProfileScalarFieldEnum)[keyof typeof SupplierSettlementProfileScalarFieldEnum]
+
+
+export const SupplierApplicationDocumentScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  uploadedByUserId: 'uploadedByUserId',
+  documentType: 'documentType',
+  warehouseId: 'warehouseId',
+  brandVerificationId: 'brandVerificationId',
+  originalFilename: 'originalFilename',
+  storedFilename: 'storedFilename',
+  storageBucket: 'storageBucket',
+  storagePath: 'storagePath',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  sha256Hash: 'sha256Hash',
+  reviewStatus: 'reviewStatus',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierApplicationDocumentScalarFieldEnum = (typeof SupplierApplicationDocumentScalarFieldEnum)[keyof typeof SupplierApplicationDocumentScalarFieldEnum]
+
+
+export const SupplierInventorySampleScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  format: 'format',
+  originalFilename: 'originalFilename',
+  storageBucket: 'storageBucket',
+  storagePath: 'storagePath',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  sha256Hash: 'sha256Hash',
+  totalRows: 'totalRows',
+  validRows: 'validRows',
+  invalidRows: 'invalidRows',
+  duplicateGtins: 'duplicateGtins',
+  validationSummary: 'validationSummary',
+  reviewStatus: 'reviewStatus',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SupplierInventorySampleScalarFieldEnum = (typeof SupplierInventorySampleScalarFieldEnum)[keyof typeof SupplierInventorySampleScalarFieldEnum]
+
+
+export const SupplierApplicationReviewScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  section: 'section',
+  status: 'status',
+  notes: 'notes',
+  reviewedByUserId: 'reviewedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type SupplierApplicationReviewScalarFieldEnum = (typeof SupplierApplicationReviewScalarFieldEnum)[keyof typeof SupplierApplicationReviewScalarFieldEnum]
+
+
+export const SupplierApplicationStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  reason: 'reason',
+  actorUserId: 'actorUserId',
+  actorType: 'actorType',
+  createdAt: 'createdAt'
+} as const
+
+export type SupplierApplicationStatusHistoryScalarFieldEnum = (typeof SupplierApplicationStatusHistoryScalarFieldEnum)[keyof typeof SupplierApplicationStatusHistoryScalarFieldEnum]
+
+
+export const SupplierInformationRequestScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  section: 'section',
+  message: 'message',
+  requestedByUserId: 'requestedByUserId',
+  applicantResponse: 'applicantResponse',
+  respondedAt: 'respondedAt',
+  resolvedByUserId: 'resolvedByUserId',
+  resolutionNote: 'resolutionNote',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SupplierInformationRequestScalarFieldEnum = (typeof SupplierInformationRequestScalarFieldEnum)[keyof typeof SupplierInformationRequestScalarFieldEnum]
+
+
+export const SupplierDuplicateFlagScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  signal: 'signal',
+  matchedEntityType: 'matchedEntityType',
+  matchedEntityId: 'matchedEntityId',
+  matchedValueHash: 'matchedValueHash',
+  severity: 'severity',
+  createdAt: 'createdAt',
+  resolvedAt: 'resolvedAt',
+  resolutionNote: 'resolutionNote'
+} as const
+
+export type SupplierDuplicateFlagScalarFieldEnum = (typeof SupplierDuplicateFlagScalarFieldEnum)[keyof typeof SupplierDuplicateFlagScalarFieldEnum]
+
+
+export const SupplierApplicationAuditEventScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  actorUserId: 'actorUserId',
+  action: 'action',
+  before: 'before',
+  after: 'after',
+  createdAt: 'createdAt'
+} as const
+
+export type SupplierApplicationAuditEventScalarFieldEnum = (typeof SupplierApplicationAuditEventScalarFieldEnum)[keyof typeof SupplierApplicationAuditEventScalarFieldEnum]
 
 
 export const InquiryScalarFieldEnum = {

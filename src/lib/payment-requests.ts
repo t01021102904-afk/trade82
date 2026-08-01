@@ -11,6 +11,7 @@ import {
 } from "@/generated/prisma/client";
 import { validationError } from "@/lib/api-security";
 import { getDb } from "@/lib/db";
+import { lockSupplierCommerceBoundary } from "@/lib/supplier-commerce-boundary";
 import {
   calculatePaymentAmounts as calculateStrictPaymentAmounts,
   cappedCumulativeRefundAmount,
@@ -35,6 +36,10 @@ import {
 } from "@/lib/stripe-connect-settlement-reconciliation";
 import { syncTradeOrderFromPaymentRequest } from "@/lib/trade-orders";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
+import {
+  getSupplierApplicationCapabilitiesWithDb,
+  SUPPLIER_PAYMENT_RECONCILIATION_NOTE,
+} from "@/lib/supplier-application";
 
 export {
   MAX_PAYMENT_AMOUNT_MINOR,
@@ -166,6 +171,31 @@ type StripeEventContext = {
   stripeEventCreatedAt: Date;
 };
 
+const STRIPE_EVENT_MAX_FUTURE_SKEW_MS = 5 * 60_000;
+const STRIPE_EVENT_CREATION_SKEW_MS = 5 * 60_000;
+const INVALID_STRIPE_EVENT_TIME_RECONCILIATION_NOTE =
+  "Stripe event timestamp is outside the allowed payment window; manual reconciliation is required.";
+
+export function isTrustedStripeEventTimestamp(
+  stripeEventCreatedAt: Date,
+  paymentRequestCreatedAt: Date,
+  now = new Date(),
+) {
+  const eventTime = stripeEventCreatedAt.getTime();
+  return (
+    Number.isFinite(eventTime) &&
+    eventTime >= paymentRequestCreatedAt.getTime() - STRIPE_EVENT_CREATION_SKEW_MS &&
+    eventTime <= now.getTime() + STRIPE_EVENT_MAX_FUTURE_SKEW_MS
+  );
+}
+
+type VerifiedPaymentRequest = Prisma.PaymentRequestGetPayload<{
+  include: {
+    inquiry: { select: { buyerCompanyId: true; sellerCompanyId: true } };
+    sellerCompany: { select: { ownerUserId: true } };
+  };
+}>;
+
 async function appendEvent(
   tx: Prisma.TransactionClient,
   {
@@ -194,6 +224,119 @@ async function appendEvent(
       ...(metadata ? { metadata } : {}),
     },
   });
+}
+
+export async function finalizeVerifiedPaymentRequestInTransaction({
+  tx,
+  current,
+  updateData,
+  stripeEvent,
+  stripeProcessingFeeAmount,
+  commerceLockAlreadyHeld = false,
+}: {
+  tx: Prisma.TransactionClient;
+  current: VerifiedPaymentRequest;
+  updateData: Prisma.PaymentRequestUpdateManyMutationInput;
+  stripeEvent: StripeEventContext;
+  stripeProcessingFeeAmount: number | null;
+  commerceLockAlreadyHeld?: boolean;
+}) {
+  if (!commerceLockAlreadyHeld) {
+    await lockSupplierCommerceBoundary(tx, current.sellerCompanyId);
+  }
+  const paymentTimeValid = isTrustedStripeEventTimestamp(
+    stripeEvent.stripeEventCreatedAt,
+    current.createdAt,
+  );
+  // The event timestamp is the immutable payment decision time. An anomalous
+  // timestamp never receives automatic order or settlement processing.
+  const capabilityTime = paymentTimeValid
+    ? stripeEvent.stripeEventCreatedAt
+    : new Date();
+  const sellerAccess = await getSupplierApplicationCapabilitiesWithDb(
+    current.sellerCompany.ownerUserId,
+    tx,
+    { now: capabilityTime },
+  );
+  const supplierEligible = Boolean(
+    sellerAccess.canAcceptNewOrders &&
+      sellerAccess.companyId === current.sellerCompanyId,
+  );
+  const requiresManualReconciliation = Boolean(
+    current.requiresManualReconciliation || !supplierEligible || !paymentTimeValid,
+  );
+  const reconciliationNote = !paymentTimeValid
+    ? INVALID_STRIPE_EVENT_TIME_RECONCILIATION_NOTE
+    : !supplierEligible
+      ? SUPPLIER_PAYMENT_RECONCILIATION_NOTE
+      : current.reconciliationNote;
+  // Invalid event clocks are explicitly manual-only. Do not persist an
+  // untrusted Stripe timestamp as an automatic settlement anchor.
+  const paidAt = current.paidAt ?? (
+    paymentTimeValid ? stripeEvent.stripeEventCreatedAt : new Date()
+  );
+  const paid = await claimPendingPaymentRequestPaid({
+    locker: tx,
+    paymentRequestId: current.id,
+    data: {
+      ...updateData,
+      status: PaymentRequestStatus.PAID,
+      paidAt,
+      ...((!supplierEligible || !paymentTimeValid)
+        ? {
+            requiresManualReconciliation: true,
+            reconciliationNote,
+          }
+        : {}),
+    },
+  });
+  if (!paid) {
+    return { paid: false, paymentConfirmedOrderId: null, supplierEligible };
+  }
+
+  await appendEvent(tx, {
+    paymentRequestId: current.id,
+    eventType: PaymentRequestEventType.PAID,
+    stripeEventId: stripeEvent.stripeEventId,
+    message: "Payment confirmed by Stripe.",
+    metadata: {
+      source: stripeEvent.stripeEventType,
+      supplierEligible,
+      paymentTimeValid,
+    },
+  });
+  if (requiresManualReconciliation) {
+    await appendEvent(tx, {
+      paymentRequestId: current.id,
+      eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+      message:
+        reconciliationNote ??
+        "Payment requires manual reconciliation before settlement.",
+      metadata: {
+        source: stripeEvent.stripeEventType,
+        reason: !paymentTimeValid
+          ? "invalid_stripe_event_time"
+          : supplierEligible
+            ? "existing_manual_reconciliation"
+            : "supplier_new_order_ineligible",
+      },
+    });
+    return { paid: true, paymentConfirmedOrderId: null, supplierEligible };
+  }
+
+  const paymentConfirmedOrderId = await syncTradeOrderFromPaymentRequest(
+    tx,
+    {
+      id: current.id,
+      status: PaymentRequestStatus.PAID,
+      grossAmount: current.grossAmount,
+      refundAmount: current.refundAmount,
+      paidAt,
+      stripeProcessingFeeAmount,
+    },
+    "paid",
+  );
+  return { paid: true, paymentConfirmedOrderId, supplierEligible };
 }
 
 async function findPaymentRequestForStripeObject({
@@ -569,6 +712,7 @@ export async function markPaymentRequestPaid({
       : null;
   if (initialPaymentIntentCheckoutDecision?.action === "WAIT_FOR_CHECKOUT_SESSION") {
     await getDb().$transaction(async (tx) => {
+      await lockSupplierCommerceBoundary(tx, existing.sellerCompanyId);
       await claimPaymentRequestWebhookEvent({
         locker: tx,
         paymentRequestId,
@@ -631,6 +775,14 @@ export async function markPaymentRequestPaid({
 
   let paymentConfirmedOrderId: string | null = null;
   await getDb().$transaction(async (tx) => {
+    // This initial read identifies the seller-company lock only. Every
+    // authorization-sensitive field is re-read after the lock is acquired.
+    const lockCandidate = await tx.paymentRequest.findUnique({
+      where: { id: paymentRequestId },
+      select: { sellerCompanyId: true },
+    });
+    if (!lockCandidate) return;
+    await lockSupplierCommerceBoundary(tx, lockCandidate.sellerCompanyId);
     if (!(await claimPaymentRequestWebhookEvent({
       locker: tx,
       paymentRequestId,
@@ -639,15 +791,12 @@ export async function markPaymentRequestPaid({
 
     const current = await tx.paymentRequest.findUnique({
       where: { id: paymentRequestId },
-      include: { inquiry: { select: { buyerCompanyId: true, sellerCompanyId: true } } },
+      include: {
+        inquiry: { select: { buyerCompanyId: true, sellerCompanyId: true } },
+        sellerCompany: { select: { ownerUserId: true } },
+      },
     });
     if (!current) return;
-    if (
-      current.status === PaymentRequestStatus.PENDING &&
-      current.requiresManualReconciliation
-    ) {
-      return;
-    }
 
     const checkoutSessionIdForValidation =
       confirmationSource === "payment_intent"
@@ -754,36 +903,19 @@ export async function markPaymentRequestPaid({
               stripeFeeSyncedAt: new Date(),
             }
           : {}),
-      status: PaymentRequestStatus.PAID,
-      paidAt: current.paidAt ?? new Date(),
     };
-    const paid = await claimPendingPaymentRequestPaid({
-      locker: tx,
-      paymentRequestId: current.id,
-      data: updateData,
+    const finalized = await finalizeVerifiedPaymentRequestInTransaction({
+      tx,
+      current,
+      updateData,
+      stripeEvent,
+      stripeProcessingFeeAmount: feeResult?.ok
+        ? feeResult.details.stripeProcessingFeeAmount
+        : current.stripeProcessingFeeAmount,
+      commerceLockAlreadyHeld: true,
     });
-    if (paid) {
-      await appendEvent(tx, {
-        paymentRequestId: current.id,
-        eventType: PaymentRequestEventType.PAID,
-        stripeEventId: stripeEvent.stripeEventId,
-        message: "Payment confirmed by Stripe.",
-        metadata: { source: stripeEvent.stripeEventType },
-      });
-      paymentConfirmedOrderId = await syncTradeOrderFromPaymentRequest(
-        tx,
-        {
-          id: current.id,
-          status: PaymentRequestStatus.PAID,
-          grossAmount: current.grossAmount,
-          refundAmount: current.refundAmount,
-          paidAt: current.paidAt ?? new Date(),
-          stripeProcessingFeeAmount: feeResult?.ok
-            ? feeResult.details.stripeProcessingFeeAmount
-            : current.stripeProcessingFeeAmount,
-        },
-        "paid",
-      );
+    if (finalized.paid) {
+      paymentConfirmedOrderId = finalized.paymentConfirmedOrderId;
       await tx.inquiry.update({ where: { id: current.inquiryId }, data: { updatedAt: new Date() } });
       return;
     }

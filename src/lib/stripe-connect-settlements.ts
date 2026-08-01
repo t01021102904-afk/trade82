@@ -338,7 +338,6 @@ export async function createPendingSettlementForVerifiedWebhookPayment(
       ) {
         return null;
       }
-
       const attribution = await selectLockedReferralAttributionForPaymentRequest(
         tx,
         paymentRequestId,

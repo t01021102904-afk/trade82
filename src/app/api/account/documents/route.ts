@@ -4,7 +4,7 @@ import type {
 } from "@/generated/prisma/client";
 import { apiError } from "@/lib/api-response";
 import { rateLimitOrResponse } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import {
   buildTradeDocumentFilename,
@@ -101,7 +101,7 @@ async function documentPayload(companyId: string) {
 
 export async function GET() {
   try {
-    const { company } = await requireSeller();
+    const { company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json({ folders: [], documents: [], companyRequired: true });
     }
@@ -116,7 +116,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return jsonError("Create a company profile before uploading documents.", 403);
     }

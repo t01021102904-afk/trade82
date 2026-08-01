@@ -112,6 +112,11 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
         run: npm run test:admin-partners:integration
 
+      - name: Run supplier application integration suite
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/trade82_order_payout_test_ci?schema=public
+        run: npm run test:supplier-applications:integration
+
       - name: Run application tests
         run: npm test
 

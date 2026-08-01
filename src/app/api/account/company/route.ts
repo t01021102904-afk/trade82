@@ -6,7 +6,7 @@ import {
   validationError,
   validationErrorResponse,
 } from "@/lib/api-security";
-import { requireBuyer, requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability, requireBuyer } from "@/lib/authz";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
 import { recordReferralConversionForCompany } from "@/lib/partner-referral-conversions";
@@ -285,7 +285,9 @@ export async function PUT(request: Request) {
     }
     const companyRole: CompanyRole = body.companyRole;
     const { user } =
-      companyRole === "seller" ? await requireSeller() : await requireBuyer();
+      companyRole === "seller"
+        ? await requireApprovedSupplierCapability("canCreateProductCandidate")
+        : await requireBuyer();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-company-write",

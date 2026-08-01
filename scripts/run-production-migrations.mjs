@@ -24,6 +24,8 @@ export const DEFERRED_APPLICATION_MIGRATIONS = Object.freeze([
   "20260726120000_add_homepage_promotions",
   "20260727210000_make_review_ratings_nullable",
   "20260728180000_require_product_pricing_and_moq",
+  "20260801090000_add_supplier_applications",
+  "20260801120000_harden_supplier_application_review",
 ]);
 export const DEFERRED_APPLICATION_MIGRATION = DEFERRED_APPLICATION_MIGRATIONS.at(-1);
 export const ALLOWLISTED_PRODUCTION_MIGRATIONS = Object.freeze([

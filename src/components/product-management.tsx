@@ -129,7 +129,7 @@ export function ProductManagement() {
           <p className="mt-1 text-sm text-zinc-500">{t("settings.productVisibilityRule")}</p>
         </div>
         <Link
-          href={withLocale("/sell", locale)}
+          href={withLocale("/dashboard/seller/products/new", locale)}
           className="inline-flex h-8 items-center justify-center rounded-md bg-zinc-950 px-2.5 text-xs font-medium text-white"
         >
           {t("settings.addProduct")}

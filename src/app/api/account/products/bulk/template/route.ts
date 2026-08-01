@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { rateLimitOrResponse } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { buildBulkProductTemplate } from "@/lib/bulk-product-registration";
 import type { Locale } from "@/lib/i18n";
 
@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canUploadLiveInventory");
     if (!company) {
       return Response.json({ error: "Seller company required." }, { status: 403 });
     }

@@ -421,12 +421,12 @@ test("bulk APIs reauthorize, revalidate, transact, and never trust a company id"
   const importRoute = source(
     "src/app/api/account/products/bulk/import/route.ts",
   );
-  assert.match(templateRoute, /requireSeller\(\)/);
+  assert.match(templateRoute, /requireApprovedSupplierCapability\("canUploadLiveInventory"\)/);
   assert.match(templateRoute, /spreadsheetml\.sheet/);
   assert.match(validateRoute, /assertSameOrigin\(request\)/);
-  assert.match(validateRoute, /requireSeller\(\)/);
+  assert.match(validateRoute, /requireApprovedSupplierCapability\("canUploadLiveInventory"\)/);
   assert.match(importRoute, /assertSameOrigin\(request\)/);
-  assert.match(importRoute, /requireSeller\(\)/);
+  assert.match(importRoute, /requireApprovedSupplierCapability\("canUploadLiveInventory"\)/);
   assert.match(importRoute, /validateBulkProductRows/);
   assert.match(importRoute, /pg_advisory_xact_lock/);
   assert.match(importRoute, /status: "inactive"/);

@@ -2,7 +2,7 @@ import { BackButton } from "@/components/back-button";
 import { ListingCreateForm } from "@/components/listing-create-form";
 import { ProductRegistrationModeSwitch } from "@/components/product-registration-mode-switch";
 import type { Locale } from "@/lib/i18n";
-import { requireDashboardRole } from "@/lib/require-auth";
+import { requireApprovedSupplierDashboard } from "@/lib/require-auth";
 
 export async function ListingPage({
   pathname,
@@ -10,7 +10,7 @@ export async function ListingPage({
   locale: Locale;
   pathname: string;
 }) {
-  await requireDashboardRole(pathname, "seller");
+  await requireApprovedSupplierDashboard(pathname);
 
   return (
     <div className="theme-bg">

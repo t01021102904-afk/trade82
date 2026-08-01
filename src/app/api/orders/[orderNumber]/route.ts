@@ -3,6 +3,7 @@ import { idParam, readJsonObject } from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { isAdminUser } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { getSupplierApplicationCapabilities } from "@/lib/supplier-application";
 import { appendTradeOrderEvent } from "@/lib/trade-orders";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
 import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
@@ -80,19 +81,33 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
     const admin = await isAdminUser();
     const order = await accessibleOrder(orderNumber, user.id, admin);
     if (!order) return Response.json({ error: "Order not found." }, { status: 404, headers: noStore });
-    const sellerCanEdit = await getDb().company.count({
-      where: {
-        id: order.sellerCompanyId,
-        ownerUserId: user.id,
-        companyRole: "seller",
-        deletedAt: null,
-      },
-    });
-    const canViewSellerFinancials = admin || sellerCanEdit > 0;
+    const [sellerCanEdit, buyerCanView, supplierAccess] = await Promise.all([
+      getDb().company.count({
+        where: {
+          id: order.sellerCompanyId,
+          ownerUserId: user.id,
+          companyRole: "seller",
+          deletedAt: null,
+        },
+      }),
+      getDb().company.count({
+        where: {
+          id: order.buyerCompanyId,
+          ownerUserId: user.id,
+          companyRole: "buyer",
+          deletedAt: null,
+        },
+      }),
+      getSupplierApplicationCapabilities(user.id),
+    ]);
+    if (!admin && sellerCanEdit > 0 && buyerCanView === 0 && !supplierAccess.canAccessAssignedOrders) {
+      return Response.json({ error: "Supplier approval is required to access seller orders." }, { status: 403, headers: noStore });
+    }
+    const canViewSellerFinancials = admin || (sellerCanEdit > 0 && supplierAccess.canAccessAssignedOrders);
     return Response.json(
       {
         order: canViewSellerFinancials ? order : buyerSafeOrder(order),
-        sellerCanEdit: sellerCanEdit > 0,
+        sellerCanEdit: sellerCanEdit > 0 && supplierAccess.canShipExistingOrders,
       },
       { headers: noStore },
     );
@@ -105,6 +120,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
   try {
     const user = await requireCurrentAppUser();
     if (!isTradeOrderSystemEnabledForClerkUser(user.clerkUserId)) return Response.json({ error: "Orders are not enabled for this account." }, { status: 403, headers: noStore });
+    const supplierAccess = await getSupplierApplicationCapabilities(user.id);
+    if (!supplierAccess.canShipExistingOrders) return Response.json({ error: "Supplier approval is required to update shipment information." }, { status: 403, headers: noStore });
     const orderNumber = idParam((await params).orderNumber, "orderNumber");
     const order = await getDb().tradeOrder.findFirst({
       where: {

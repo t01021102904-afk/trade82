@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { assertSameOrigin, rateLimitOrResponse } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import {
   bulkProductCreateData,
   bulkProductImportIdentity,
@@ -18,7 +18,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
     assertSameOrigin(request);
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canUploadLiveInventory");
     if (!company) {
       return Response.json({ error: "Seller company required." }, { status: 403 });
     }
