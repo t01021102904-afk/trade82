@@ -16,6 +16,7 @@ import {
 } from "@/generated/prisma/client";
 import { validationError } from "@/lib/api-security";
 import { getDb } from "@/lib/db";
+import { lockSupplierCommerceBoundary } from "@/lib/supplier-commerce-boundary";
 import {
   encryptPayoutData,
   lastFour,
@@ -1739,6 +1740,19 @@ export async function transitionSupplierApplication({
   }
   const db = getDb();
   return db.$transaction(async (tx) => {
+    // The first read is only used to derive the shared company lock. Reload the
+    // application after locking before making any authorization decision.
+    const commerceBoundary = await tx.supplierApplication.findUnique({
+      where: { id: applicationId },
+      select: { approvedCompanyId: true, legacyCompanyId: true },
+    });
+    if (!commerceBoundary)
+      throw new Response("Supplier application not found.", { status: 404 });
+    const existingSellerCompanyId =
+      commerceBoundary.approvedCompanyId ?? commerceBoundary.legacyCompanyId;
+    if (existingSellerCompanyId) {
+      await lockSupplierCommerceBoundary(tx, existingSellerCompanyId);
+    }
     const application = await tx.supplierApplication.findUnique({
       where: { id: applicationId },
       include: {
@@ -1802,6 +1816,11 @@ export async function transitionSupplierApplication({
             trimmedReason,
           )
         : null;
+    // A newly approved application has no pre-existing commerce boundary. Lock
+    // its newly materialized company before making the status visible.
+    if (!existingSellerCompanyId && company) {
+      await lockSupplierCommerceBoundary(tx, company.id);
+    }
     const now = new Date();
     const updated = await tx.supplierApplication.update({
       where: { id: application.id },
@@ -2044,6 +2063,19 @@ export async function reviewSupplierBrandVerification({
     throw validationError("Verified brands require verified evidence.");
   }
   return getDb().$transaction(async (tx) => {
+    // Resolve the company solely to acquire the lock, then re-read both the
+    // application and brand before evaluating review semantics.
+    const commerceBoundary = await tx.supplierApplication.findUnique({
+      where: { id: applicationId },
+      select: { approvedCompanyId: true, legacyCompanyId: true },
+    });
+    if (!commerceBoundary)
+      throw new Response("Supplier application not found.", { status: 404 });
+    const sellerCompanyId =
+      commerceBoundary.approvedCompanyId ?? commerceBoundary.legacyCompanyId;
+    if (sellerCompanyId) {
+      await lockSupplierCommerceBoundary(tx, sellerCompanyId);
+    }
     const admin = await tx.userProfile.findUnique({
       where: { id: adminUserId },
       select: { role: true },

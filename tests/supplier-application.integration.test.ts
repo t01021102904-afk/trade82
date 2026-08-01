@@ -6,6 +6,7 @@ import { Pool } from "pg";
 
 import {
   PaymentRequestEventType,
+  Prisma,
   SupplierApplicationStatus,
   SupplierBrandVerificationStatus,
   SupplierReviewStatus,
@@ -19,6 +20,7 @@ assert.ok(["localhost", "127.0.0.1"].includes(databaseUrl.hostname));
 assert.match(databaseUrl.pathname.slice(1), /^trade82_order_payout_test_/);
 
 process.env.SUPPLIER_APPLICATIONS_ENABLED = "true";
+process.env.DATABASE_POOL_MAX = "2";
 const supplierApplications = await import(
   new URL("../src/lib/supplier-application.ts", import.meta.url).href
 );
@@ -30,6 +32,9 @@ const tradeOrders = await import(
 );
 const settlements = await import(
   new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href
+);
+const commerceBoundary = await import(
+  new URL("../src/lib/supplier-commerce-boundary.ts", import.meta.url).href
 );
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const db = getDb() as PrismaClient;
@@ -269,9 +274,26 @@ async function createCommerceFixture({
 
 async function createAuthorizedPaymentRequest(
   fixture: CommerceFixture,
-  { enabled = true }: { enabled?: boolean } = {},
+  {
+    enabled = true,
+    afterCommerceLock,
+  }: {
+    enabled?: boolean;
+    afterCommerceLock?: (tx: Prisma.TransactionClient) => Promise<void>;
+  } = {},
 ) {
   return db.$transaction(async (tx) => {
+    await commerceBoundary.lockSupplierCommerceBoundary(tx, fixture.sellerCompany.id);
+    await afterCommerceLock?.(tx);
+    const lockedInquiry = await tx.inquiry.findFirst({
+      where: {
+        id: fixture.inquiry.id,
+        sellerCompanyId: fixture.sellerCompany.id,
+        sellerCompany: { ownerUserId: fixture.seller.id, deletedAt: null },
+      },
+      select: { id: true },
+    });
+    if (!lockedInquiry) throw new Error("Locked inquiry is unavailable.");
     await supplierApplications.requireSupplierCanAcceptNewOrdersForCompanyWithDb(
       fixture.seller.id,
       fixture.sellerCompany.id,
@@ -825,6 +847,7 @@ test("brand review capability loss places pending payments on manual hold", asyn
 async function finalizeVerifiedSupplierPayment(
   fixture: CommerceFixture,
   paymentRequestId: string,
+  { stripeEventCreatedAt = new Date() }: { stripeEventCreatedAt?: Date } = {},
 ) {
   const checkoutSessionId = `cs_${unique("supplier-payment")}`;
   const paymentIntentId = `pi_${unique("supplier-payment")}`;
@@ -855,7 +878,7 @@ async function finalizeVerifiedSupplierPayment(
       stripeEvent: {
         stripeEventId,
         stripeEventType: "checkout.session.completed",
-        stripeEventCreatedAt: new Date(),
+        stripeEventCreatedAt,
       },
       stripeProcessingFeeAmount: 330,
     });
@@ -974,4 +997,327 @@ test("eligible paid webhook preserves normal order and settlement creation", asy
     await db.settlement.count({ where: { paymentRequestId: paymentRequest.id } }),
     1,
   );
+});
+
+test("payment event time, not delayed webhook time, determines brand eligibility and paidAt", async () => {
+  const eventTime = new Date();
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+    brandExpiresAt: new Date(eventTime.getTime() + 60_000),
+  });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  // The stored expiry is after the event but can be before delayed webhook
+  // processing; eligibility must use the Stripe event time, not processing now.
+  await db.supplierBrandVerification.updateMany({
+    where: { applicationId: fixture.application!.id },
+    data: { expiresAt: new Date(eventTime.getTime() + 30_000) },
+  });
+  const finalized = await finalizeVerifiedSupplierPayment(fixture, paymentRequest.id, {
+    stripeEventCreatedAt: eventTime,
+  });
+  assert.equal(finalized.supplierEligible, true);
+  const stored = await db.paymentRequest.findUniqueOrThrow({
+    where: { id: paymentRequest.id },
+  });
+  assert.equal(stored.paidAt?.toISOString(), eventTime.toISOString());
+  assert.equal(
+    (await db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } })).paymentStatus,
+    "PAID",
+  );
+  assert.ok(await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment(finalized.evidence),
+  ));
+});
+
+test("brand expiry before the Stripe event requires manual reconciliation", async () => {
+  const eventTime = new Date();
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+    brandExpiresAt: new Date(eventTime.getTime() + 60_000),
+  });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  await db.supplierBrandVerification.updateMany({
+    where: { applicationId: fixture.application!.id },
+    data: { expiresAt: new Date(eventTime.getTime() - 30_000) },
+  });
+  const finalized = await finalizeVerifiedSupplierPayment(fixture, paymentRequest.id, {
+    stripeEventCreatedAt: eventTime,
+  });
+  assert.equal(finalized.supplierEligible, false);
+  const [stored, storedOrder] = await Promise.all([
+    db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+    db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+  ]);
+  assert.equal(stored.requiresManualReconciliation, true);
+  assert.equal(storedOrder.paymentStatus, "PENDING");
+  assert.equal(await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment(finalized.evidence),
+  ), null);
+});
+
+test("anomalous future Stripe event timestamps are manual-only", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  const finalized = await finalizeVerifiedSupplierPayment(fixture, paymentRequest.id, {
+    stripeEventCreatedAt: new Date(Date.now() + 10 * 60_000),
+  });
+  assert.equal(finalized.supplierEligible, true);
+  const [stored, storedOrder] = await Promise.all([
+    db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+    db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+  ]);
+  assert.equal(stored.requiresManualReconciliation, true);
+  assert.match(stored.reconciliationNote ?? "", /timestamp/i);
+  assert.equal(storedOrder.paymentStatus, "PENDING");
+  assert.equal(await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment(finalized.evidence),
+  ), null);
+});
+
+test("settlement remains creatable after an eligible payment is later put on hold", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const { paymentRequest } = await createAuthorizedPaymentRequest(fixture);
+  const finalized = await finalizeVerifiedSupplierPayment(fixture, paymentRequest.id);
+  const admin = await createApplicant("admin");
+  await supplierApplications.transitionSupplierApplication({
+    applicationId: fixture.application!.id,
+    actorUserId: admin.id,
+    actor: "ADMIN",
+    targetStatus: SupplierApplicationStatus.ON_HOLD,
+    reason: "Post-payment operational review.",
+  });
+  assert.ok(await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment(finalized.evidence),
+  ));
+});
+
+function deferred<T = void>() {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  const promise = new Promise<T>((next) => { resolve = next; });
+  return { promise, resolve };
+}
+
+function commerceLockKey(companyId: string) {
+  return `supplier-commerce:${companyId}`;
+}
+
+test("independent connections serialize ON_HOLD before payment-request creation", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const connection = await pool.connect();
+  try {
+    await connection.query("BEGIN");
+    const [{ pid: holdPid }] = (await connection.query<{ pid: number }>(
+      "SELECT pg_backend_pid() AS pid",
+    )).rows;
+    await connection.query(
+      "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+      [commerceLockKey(fixture.sellerCompany.id)],
+    );
+
+    let creationPid: number | null = null;
+    const blockedCreation = createAuthorizedPaymentRequest(fixture, {
+      afterCommerceLock: async (tx) => {
+        const [{ pid }] = await tx.$queryRaw<Array<{ pid: number }>>(
+          Prisma.sql`SELECT pg_backend_pid() AS pid`,
+        );
+        creationPid = pid;
+      },
+    });
+    let creationSettled = false;
+    void blockedCreation.then(
+      () => { creationSettled = true; },
+      () => { creationSettled = true; },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(creationSettled, false, "creation must wait for another connection's commerce lock");
+
+    await connection.query(
+      'UPDATE "SupplierApplication" SET "status" = $1::"SupplierApplicationStatus" WHERE "id" = $2',
+      [SupplierApplicationStatus.ON_HOLD, fixture.application!.id],
+    );
+    await connection.query("COMMIT");
+    await assert.rejects(
+      blockedCreation,
+      (error: unknown) => error instanceof Response && error.status === 403,
+    );
+    assert.notEqual(creationPid, holdPid);
+    await assertNoCommerceSideEffects(fixture);
+  } finally {
+    await connection.query("ROLLBACK").catch(() => undefined);
+    connection.release();
+  }
+});
+
+test("payment request wins the commerce lock atomically before a later ON_HOLD transition", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const locked = deferred();
+  const releaseCreation = deferred();
+  const creation = createAuthorizedPaymentRequest(fixture, {
+    afterCommerceLock: async () => {
+      locked.resolve();
+      await releaseCreation.promise;
+    },
+  });
+  await locked.promise;
+  const admin = await createApplicant("admin");
+  const hold = supplierApplications.transitionSupplierApplication({
+    applicationId: fixture.application!.id,
+    actorUserId: admin.id,
+    actor: "ADMIN",
+    targetStatus: SupplierApplicationStatus.ON_HOLD,
+    reason: "Concurrent compliance hold.",
+  });
+  let holdSettled = false;
+  void hold.then(
+    () => { holdSettled = true; },
+    () => { holdSettled = true; },
+  );
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  assert.equal(holdSettled, false, "status transition must wait for the payment-request lock");
+  releaseCreation.resolve();
+  const { paymentRequest, order } = await creation;
+  await hold;
+  const [storedRequest, storedOrder] = await Promise.all([
+    db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+    db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+  ]);
+  assert.equal(storedRequest.requiresManualReconciliation, true);
+  assert.equal(storedOrder.paymentStatus, "PENDING");
+});
+
+test("webhook finalization and ON_HOLD resolve to a complete eligible-or-manual outcome", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  const locked = deferred();
+  const releaseFinalization = deferred();
+  const checkoutSessionId = `cs_${unique("race-webhook")}`;
+  const paymentIntentId = `pi_${unique("race-webhook")}`;
+  const finalization = db.$transaction(async (tx) => {
+    await commerceBoundary.lockSupplierCommerceBoundary(tx, fixture.sellerCompany.id);
+    locked.resolve();
+    await releaseFinalization.promise;
+    const current = await tx.paymentRequest.findUniqueOrThrow({
+      where: { id: paymentRequest.id },
+      include: {
+        inquiry: { select: { buyerCompanyId: true, sellerCompanyId: true } },
+        sellerCompany: { select: { ownerUserId: true } },
+      },
+    });
+    return paymentRequests.finalizeVerifiedPaymentRequestInTransaction({
+      tx,
+      current,
+      commerceLockAlreadyHeld: true,
+      updateData: {
+        stripeCheckoutSessionId: checkoutSessionId,
+        stripePaymentIntentId: paymentIntentId,
+      },
+      stripeEvent: {
+        stripeEventId: unique("race-webhook"),
+        stripeEventType: "checkout.session.completed",
+        stripeEventCreatedAt: new Date(),
+      },
+      stripeProcessingFeeAmount: null,
+    });
+  });
+  await locked.promise;
+  const admin = await createApplicant("admin");
+  const hold = supplierApplications.transitionSupplierApplication({
+    applicationId: fixture.application!.id,
+    actorUserId: admin.id,
+    actor: "ADMIN",
+    targetStatus: SupplierApplicationStatus.ON_HOLD,
+    reason: "Concurrent payment review.",
+  });
+  releaseFinalization.resolve();
+  const finalized = await finalization;
+  await hold;
+  assert.equal(finalized.supplierEligible, true);
+  const [storedRequest, storedOrder] = await Promise.all([
+    db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+    db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+  ]);
+  assert.equal(storedRequest.status, "PAID");
+  assert.equal(storedRequest.requiresManualReconciliation, false);
+  assert.equal(storedOrder.paymentStatus, "PAID");
+  assert.ok(await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment({
+      paymentRequestId: paymentRequest.id,
+      paymentIntentId,
+      checkoutSessionId,
+      grossAmount: 11_000,
+      currency: "usd",
+      confirmationSource: "checkout_session",
+    }),
+  ));
+});
+
+test("ON_HOLD winning the commerce lock makes a concurrent webhook manual-only", async () => {
+  const fixture = await createCommerceFixture({ status: SupplierApplicationStatus.APPROVED });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  const connection = await pool.connect();
+  try {
+    await connection.query("BEGIN");
+    await connection.query(
+      "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+      [commerceLockKey(fixture.sellerCompany.id)],
+    );
+    await connection.query(
+      'UPDATE "SupplierApplication" SET "status" = $1::"SupplierApplicationStatus" WHERE "id" = $2',
+      [SupplierApplicationStatus.ON_HOLD, fixture.application!.id],
+    );
+    await connection.query(
+      'UPDATE "PaymentRequest" SET "requiresManualReconciliation" = true WHERE "id" = $1',
+      [paymentRequest.id],
+    );
+    const finalization = db.$transaction(async (tx) => {
+      const current = await tx.paymentRequest.findUniqueOrThrow({
+        where: { id: paymentRequest.id },
+        include: {
+          inquiry: { select: { buyerCompanyId: true, sellerCompanyId: true } },
+          sellerCompany: { select: { ownerUserId: true } },
+        },
+      });
+      return paymentRequests.finalizeVerifiedPaymentRequestInTransaction({
+        tx,
+        current,
+        updateData: {},
+        stripeEvent: {
+          stripeEventId: unique("race-hold-webhook"),
+          stripeEventType: "checkout.session.completed",
+          stripeEventCreatedAt: new Date(),
+        },
+        stripeProcessingFeeAmount: null,
+      });
+    });
+    let finalizationSettled = false;
+    void finalization.then(
+      () => { finalizationSettled = true; },
+      () => { finalizationSettled = true; },
+    );
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(finalizationSettled, false, "webhook finalization must wait for the hold lock");
+    await connection.query("COMMIT");
+    const finalized = await finalization;
+    assert.equal(finalized.supplierEligible, false);
+    const [storedRequest, storedOrder] = await Promise.all([
+      db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+      db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+    ]);
+    assert.equal(storedRequest.status, "PAID");
+    assert.equal(storedRequest.requiresManualReconciliation, true);
+    assert.equal(storedOrder.paymentStatus, "PENDING");
+    assert.equal(await withSettlementLedgerEnabled(() =>
+      settlements.createPendingSettlementForVerifiedWebhookPayment({
+        paymentRequestId: paymentRequest.id,
+        paymentIntentId: "pi_not_created",
+        checkoutSessionId: null,
+        grossAmount: 11_000,
+        currency: "usd",
+        confirmationSource: "payment_intent",
+      }),
+    ), null);
+  } finally {
+    await connection.query("ROLLBACK").catch(() => undefined);
+    connection.release();
+  }
 });

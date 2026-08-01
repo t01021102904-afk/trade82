@@ -523,16 +523,22 @@ test("payment authorization guards run before every money-moving boundary", asyn
     source("src/lib/stripe-connect-settlements.ts"),
   ]);
   const ownershipLookup = creation.indexOf("const inquiry = await");
-  const creationGuard = creation.indexOf(
+  const tradeOrderGuard = creation.indexOf("Trade orders are not enabled for this account.");
+  const preflightGuard = creation.indexOf(
     "requireSupplierCanAcceptNewOrdersForCompany(",
   );
+  const commerceLock = creation.indexOf("await lockSupplierCommerceBoundary");
   const transactionalGuard = creation.indexOf(
     "requireSupplierCanAcceptNewOrdersForCompanyWithDb(",
   );
   const paymentInsert = creation.indexOf("tx.paymentRequest.create(");
-  assert.ok(ownershipLookup >= 0 && ownershipLookup < creationGuard);
-  assert.ok(creationGuard < transactionalGuard);
+  assert.ok(ownershipLookup >= 0 && ownershipLookup < tradeOrderGuard);
+  assert.ok(tradeOrderGuard < preflightGuard);
+  assert.ok(preflightGuard < commerceLock);
+  assert.ok(commerceLock < transactionalGuard);
   assert.ok(transactionalGuard < paymentInsert);
+  assert.match(creation, /const order = await createTradeOrderForPaymentRequest/);
+  assert.doesNotMatch(creation, /if \(shouldCreateTradeOrder\)/);
 
   const checkoutGuard = checkout.indexOf(
     "requireSupplierCanAcceptNewOrdersForCompany(",
@@ -545,6 +551,8 @@ test("payment authorization guards run before every money-moving boundary", asyn
 
   assert.match(webhook, /finalizeVerifiedPaymentRequestInTransaction/);
   assert.match(webhook, /supplier_new_order_ineligible/);
-  assert.match(settlement, /getSupplierApplicationCapabilitiesWithDb/);
-  assert.match(settlement, /!sellerAccess\.canAcceptNewOrders/);
+  assert.match(webhook, /lockSupplierCommerceBoundary/);
+  assert.match(webhook, /isTrustedStripeEventTimestamp/);
+  assert.doesNotMatch(settlement, /getSupplierApplicationCapabilitiesWithDb/);
+  assert.match(settlement, /requiresManualReconciliation/);
 });
