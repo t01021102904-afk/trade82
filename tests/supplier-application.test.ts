@@ -500,7 +500,10 @@ test("seller operational APIs are guarded by approval capabilities and legacy on
   assert.match(orders, /canShipExistingOrders/);
   assert.match(orders, /canAccessAssignedOrders/);
   assert.match(orderList, /canAccessAssignedOrders/);
-  assert.match(paymentRequests, /canAcceptNewOrders/);
+  assert.match(
+    paymentRequests,
+    /requireSupplierCanAcceptNewOrdersForCompanyWithDb/,
+  );
   assert.match(payout, /requireApprovedSupplierCapability\("canCreateProductCandidate"\)/);
   assert.match(dashboard, /getSupplierApplicationCapabilities/);
   assert.match(onboarding, /redirect\("\/seller\/apply"\)/);
@@ -510,4 +513,38 @@ test("seller operational APIs are guarded by approval capabilities and legacy on
   assert.match(backfill, /--dry-run\|--apply/);
   assert.match(backfill, /SUPPLIER_APPLICATION_BACKFILL_CONFIRM/);
   assert.match(backfill, /Refusing to apply the supplier backfill to Production/);
+});
+
+test("payment authorization guards run before every money-moving boundary", async () => {
+  const [creation, checkout, webhook, settlement] = await Promise.all([
+    source("src/app/api/inquiries/[id]/payment-requests/route.ts"),
+    source("src/app/api/payment-requests/[id]/checkout/route.ts"),
+    source("src/lib/payment-requests.ts"),
+    source("src/lib/stripe-connect-settlements.ts"),
+  ]);
+  const ownershipLookup = creation.indexOf("const inquiry = await");
+  const creationGuard = creation.indexOf(
+    "requireSupplierCanAcceptNewOrdersForCompany(",
+  );
+  const transactionalGuard = creation.indexOf(
+    "requireSupplierCanAcceptNewOrdersForCompanyWithDb(",
+  );
+  const paymentInsert = creation.indexOf("tx.paymentRequest.create(");
+  assert.ok(ownershipLookup >= 0 && ownershipLookup < creationGuard);
+  assert.ok(creationGuard < transactionalGuard);
+  assert.ok(transactionalGuard < paymentInsert);
+
+  const checkoutGuard = checkout.indexOf(
+    "requireSupplierCanAcceptNewOrdersForCompany(",
+  );
+  assert.ok(checkoutGuard >= 0);
+  assert.ok(checkoutGuard < checkout.indexOf("const stripe = getStripe()"));
+  assert.ok(checkoutGuard < checkout.indexOf("stripe.checkout.sessions.retrieve("));
+  assert.match(checkout, /tradeOrderByPaymentRequest/);
+  assert.match(checkout, /checkout\.sessions\.expire/);
+
+  assert.match(webhook, /finalizeVerifiedPaymentRequestInTransaction/);
+  assert.match(webhook, /supplier_new_order_ineligible/);
+  assert.match(settlement, /getSupplierApplicationCapabilitiesWithDb/);
+  assert.match(settlement, /!sellerAccess\.canAcceptNewOrders/);
 });

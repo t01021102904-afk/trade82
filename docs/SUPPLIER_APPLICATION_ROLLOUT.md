@@ -38,3 +38,20 @@ Master or that product-to-brand relationship.
 
 This PR does not apply a Production migration, enable the Production flag, run
 the backfill, or deploy to Production.
+
+## Payment authorization boundary
+
+`MESSAGE_PAYMENT_REQUEST_MODE` is only a rollout switch and never substitutes
+for Supplier eligibility. `canAcceptNewOrders` is checked after seller inquiry
+ownership, again at the PaymentRequest transaction write boundary, before a
+buyer can retrieve/reuse/create Stripe Checkout, and after verified payment
+confirmation before TradeOrder synchronization or settlement creation.
+
+Changing an application to `ON_HOLD`, `REJECTED`, `WITHDRAWN`, or `SUSPENDED`,
+or reviewing brand evidence so that no active unexpired verified brand remains,
+places pending PaymentRequests into manual reconciliation. Existing Stripe
+sessions are not synchronously expired inside Supplier Application database
+transactions. Checkout attempts fail closed and best-effort expiration occurs
+outside the transaction. If an already-issued Stripe URL is nevertheless paid,
+the webhook records the payment and audit event without automatic settlement,
+payout eligibility, refund, or transfer; an administrator must reconcile it.

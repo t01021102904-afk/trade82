@@ -61,10 +61,23 @@ ship-order capabilities. The corrected design exposes only
 brand. An approved supplier whose brand evidence later expires may still access
 and ship already assigned orders. `ON_HOLD` blocks new activity and payout but
 allows a previously verified company to finish assigned orders; `REJECTED`,
-`WITHDRAWN`, and `SUSPENDED` block all three order capabilities. The actual order
-creation path in the seller payment-request route checks `canAcceptNewOrders`.
-A new conditional Company stays `pending_review` and is not a public verified
-seller.
+`WITHDRAWN`, and `SUSPENDED` block all three order capabilities. Supplier
+eligibility is enforced at PaymentRequest creation, buyer Checkout
+creation/reuse, and post-payment settlement reconciliation. Creation rechecks
+the seller-company-specific capability at the transaction write boundary;
+Checkout checks it before any Stripe session lookup, reuse, or creation. A new
+conditional Company stays `pending_review` and is not a public verified seller.
+
+When a supplier loses new-order capability, pending PaymentRequests are marked
+for manual reconciliation and checkout locks are cleared in the same database
+transaction as the application or brand review. No Stripe call runs inside that
+transaction. A previously issued Checkout URL can still complete outside the
+application, so the verified webhook records the paid Stripe evidence but does
+not synchronize the TradeOrder or create settlement/payout eligibility. It adds
+an auditable reconciliation event and returns successfully to avoid a webhook
+retry loop. The buyer Checkout endpoint also attempts to expire a stored open
+session after the database hold is committed and remains fail-closed if Stripe
+expiration fails.
 
 ## Brand review behavior found
 

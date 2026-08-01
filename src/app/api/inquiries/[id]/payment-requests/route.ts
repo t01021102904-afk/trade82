@@ -11,7 +11,10 @@ import {
 } from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
-import { getSupplierApplicationCapabilities } from "@/lib/supplier-application";
+import {
+  requireSupplierCanAcceptNewOrdersForCompany,
+  requireSupplierCanAcceptNewOrdersForCompanyWithDb,
+} from "@/lib/supplier-application";
 import { isMessagePaymentFeatureEnabledForUser } from "@/lib/message-payment-feature";
 import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
@@ -75,13 +78,6 @@ export async function POST(
       productAmount,
       shippingAmount,
     );
-    const tradeOrderSystemEnabled = isTradeOrderSystemEnabledForClerkUser(
-      user.clerkUserId,
-    );
-    const shouldCreateTradeOrder = tradeOrderSystemEnabled
-      ? (await getSupplierApplicationCapabilities(user.id)).canAcceptNewOrders
-      : false;
-
     const inquiry = await getDb().inquiry.findFirst({
       where: {
         id: inquiryId,
@@ -100,9 +96,23 @@ export async function POST(
     if (!inquiry) {
       return Response.json({ error: "Conversation not found." }, { status: 404 });
     }
+    await requireSupplierCanAcceptNewOrdersForCompany(
+      user.id,
+      inquiry.sellerCompanyId,
+    );
+    const shouldCreateTradeOrder = isTradeOrderSystemEnabledForClerkUser(
+      user.clerkUserId,
+    );
 
     let tradeOrderId: string | null = null;
     const paymentRequest = await getDb().$transaction(async (tx) => {
+      // Recheck at the write boundary so a status change cannot leave an
+      // unauthorized request behind between the ownership check and insert.
+      await requireSupplierCanAcceptNewOrdersForCompanyWithDb(
+        user.id,
+        inquiry.sellerCompanyId,
+        tx,
+      );
       const created = await tx.paymentRequest.create({
         data: {
           inquiryId: inquiry.id,

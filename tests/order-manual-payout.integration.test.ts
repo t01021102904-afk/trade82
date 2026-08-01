@@ -114,6 +114,10 @@ async function createFixture(prefix = "fixture") {
         country: "KR",
         city: "Seoul",
         businessAddress: "Seller address",
+        // The order suite represents the verified sellers that predate the
+        // supplier-application rollout. Feature-off capability fallback must
+        // keep these existing sellers operational.
+        verificationStatus: "verified",
       },
     }),
   ]);

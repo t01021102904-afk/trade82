@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 
 import {
   AccountRole,
+  PaymentRequestEventType,
+  PaymentRequestStatus,
   SupplierApplicationSection,
   SupplierApplicationStatus,
   SupplierBrandVerificationStatus,
@@ -152,6 +154,13 @@ const statusReasonRequired = new Set<SupplierApplicationStatus>([
   SupplierApplicationStatus.SUSPENDED,
   SupplierApplicationStatus.CONDITIONALLY_APPROVED,
   SupplierApplicationStatus.APPROVED,
+]);
+
+const supplierNewOrderBlockedStatuses = new Set<SupplierApplicationStatus>([
+  SupplierApplicationStatus.ON_HOLD,
+  SupplierApplicationStatus.REJECTED,
+  SupplierApplicationStatus.WITHDRAWN,
+  SupplierApplicationStatus.SUSPENDED,
 ]);
 
 type ApplicationActor = "APPLICANT" | "ADMIN" | "SYSTEM";
@@ -1856,6 +1865,14 @@ export async function transitionSupplierApplication({
         },
       });
     }
+    if (supplierNewOrderBlockedStatuses.has(targetStatus)) {
+      await holdPendingSupplierPaymentRequests({
+        tx,
+        sellerCompanyId:
+          application.approvedCompanyId ?? application.legacyCompanyId,
+        source: `supplier_application_status:${targetStatus}`,
+      });
+    }
     return updated;
   });
 }
@@ -2110,6 +2127,22 @@ export async function reviewSupplierBrandVerification({
         },
       },
     });
+    const application = await tx.supplierApplication.findUniqueOrThrow({
+      where: { id: applicationId },
+      select: { applicantUserId: true },
+    });
+    const supplierAccess = await getSupplierApplicationCapabilitiesWithDb(
+      application.applicantUserId,
+      tx,
+      { enabled: true, now },
+    );
+    if (!supplierAccess.canAcceptNewOrders) {
+      await holdPendingSupplierPaymentRequests({
+        tx,
+        sellerCompanyId: supplierAccess.companyId,
+        source: `supplier_brand_review:${input.status}`,
+      });
+    }
     return updated;
   });
 }
@@ -2268,6 +2301,125 @@ export async function getSupplierApplicationCapabilities(
   });
 }
 
+export function getSupplierApplicationCapabilitiesWithDb(
+  userId: string,
+  db: SupplierCapabilityDb,
+  options?: Pick<SupplierCapabilityLoadOptions, "enabled" | "now">,
+) {
+  return getSupplierApplicationCapabilities(userId, {
+    ...options,
+    loadCompany: () =>
+      db.company.findUnique({
+        where: {
+          ownerUserId_companyRole: {
+            ownerUserId: userId,
+            companyRole: "seller",
+          },
+        },
+        include: { sellerPayoutProfile: { select: { status: true } } },
+      }),
+    loadApplication: () =>
+      db.supplierApplication.findFirst({
+        where: { applicantUserId: userId },
+        orderBy: { updatedAt: "desc" },
+        include: {
+          approvedCompany: {
+            select: {
+              id: true,
+              deletedAt: true,
+              verificationStatus: true,
+              sellerPayoutProfile: { select: { status: true } },
+            },
+          },
+          legacyCompany: {
+            select: {
+              id: true,
+              deletedAt: true,
+              verificationStatus: true,
+              sellerPayoutProfile: { select: { status: true } },
+            },
+          },
+          brandVerifications: {
+            select: { status: true, isActive: true, expiresAt: true },
+          },
+        },
+      }),
+  });
+}
+
+function assertSupplierCanAcceptNewOrdersForCompany(
+  access: SupplierApplicationCapabilities,
+  sellerCompanyId: string,
+) {
+  if (
+    !access.canAcceptNewOrders ||
+    access.companyId !== sellerCompanyId
+  ) {
+    throw new Response(SUPPLIER_NEW_ORDER_INELIGIBLE_MESSAGE, { status: 403 });
+  }
+  return access;
+}
+
+export async function requireSupplierCanAcceptNewOrdersForCompany(
+  userId: string,
+  sellerCompanyId: string,
+  options?: SupplierCapabilityLoadOptions,
+) {
+  return assertSupplierCanAcceptNewOrdersForCompany(
+    await getSupplierApplicationCapabilities(userId, options),
+    sellerCompanyId,
+  );
+}
+
+export async function requireSupplierCanAcceptNewOrdersForCompanyWithDb(
+  userId: string,
+  sellerCompanyId: string,
+  db: SupplierCapabilityDb,
+  options?: Pick<SupplierCapabilityLoadOptions, "enabled" | "now">,
+) {
+  return assertSupplierCanAcceptNewOrdersForCompany(
+    await getSupplierApplicationCapabilitiesWithDb(userId, db, options),
+    sellerCompanyId,
+  );
+}
+
+async function holdPendingSupplierPaymentRequests({
+  tx,
+  sellerCompanyId,
+  source,
+}: {
+  tx: Prisma.TransactionClient;
+  sellerCompanyId: string | null | undefined;
+  source: string;
+}) {
+  if (!sellerCompanyId) return [];
+  const held = await tx.paymentRequest.updateManyAndReturn({
+    where: {
+      sellerCompanyId,
+      status: PaymentRequestStatus.PENDING,
+      requiresManualReconciliation: false,
+    },
+    data: {
+      requiresManualReconciliation: true,
+      reconciliationNote: SUPPLIER_CHECKOUT_HOLD_NOTE,
+      checkoutLockToken: null,
+      checkoutLockExpiresAt: null,
+    },
+    select: { id: true },
+  });
+  if (held.length > 0) {
+    await tx.paymentRequestEvent.createMany({
+      data: held.map(({ id }) => ({
+        paymentRequestId: id,
+        eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+        message: SUPPLIER_CHECKOUT_HOLD_NOTE,
+        metadata: { source },
+      })),
+    });
+  }
+  return held;
+}
+
 type CapabilityCompany = {
   id: string;
   deletedAt: Date | null;
@@ -2295,6 +2447,20 @@ export type SupplierCapabilityLoadOptions = {
   loadCompany?: () => Promise<CapabilityCompany | null>;
   loadApplication?: () => Promise<CapabilityApplication | null>;
 };
+
+type SupplierCapabilityDb = Pick<
+  Prisma.TransactionClient,
+  "company" | "supplierApplication"
+>;
+
+export const SUPPLIER_NEW_ORDER_INELIGIBLE_MESSAGE =
+  "This supplier is not currently eligible to accept new orders.";
+
+export const SUPPLIER_CHECKOUT_HOLD_NOTE =
+  "Supplier is not currently eligible to accept new orders; checkout is unavailable pending manual review.";
+
+export const SUPPLIER_PAYMENT_RECONCILIATION_NOTE =
+  "Supplier capability was not valid at payment completion; manual reconciliation is required.";
 
 export function resolveSupplierApplicationCapabilities({
   application,

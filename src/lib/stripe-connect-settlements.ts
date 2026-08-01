@@ -12,6 +12,7 @@ import {
   SettlementStatus,
 } from "@/generated/prisma/client";
 import { getDb } from "@/lib/db";
+import { getSupplierApplicationCapabilitiesWithDb } from "@/lib/supplier-application";
 import { isStripeConnectSettlementLedgerEnabled } from "@/lib/stripe-connect-settlement-feature";
 import { calculateStripeConnectSettlementFinancials } from "@/lib/stripe-connect-settlement-financials";
 import { selectLockedReferralAttribution } from "@/lib/stripe-connect-settlement-referral";
@@ -312,6 +313,7 @@ export async function createPendingSettlementForVerifiedWebhookPayment(
         where: { id: paymentRequestId },
         select: {
           id: true,
+          sellerCompanyId: true,
           status: true,
           paidAt: true,
           grossAmount: true,
@@ -320,6 +322,7 @@ export async function createPendingSettlementForVerifiedWebhookPayment(
           stripeCheckoutSessionId: true,
           requiresManualReconciliation: true,
           tradeOrderByPaymentRequest: { select: { id: true } },
+          sellerCompany: { select: { ownerUserId: true } },
         },
       });
       if (
@@ -335,6 +338,17 @@ export async function createPendingSettlementForVerifiedWebhookPayment(
         || paymentRequest.currency !== "usd"
         || (evidence.confirmationSource === "checkout_session"
           && paymentRequest.stripeCheckoutSessionId !== evidence.checkoutSessionId)
+      ) {
+        return null;
+      }
+      const sellerAccess = await getSupplierApplicationCapabilitiesWithDb(
+        paymentRequest.sellerCompany.ownerUserId,
+        tx,
+        { now: paymentRequest.paidAt },
+      );
+      if (
+        !sellerAccess.canAcceptNewOrders ||
+        sellerAccess.companyId !== paymentRequest.sellerCompanyId
       ) {
         return null;
       }

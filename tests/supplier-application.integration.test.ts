@@ -5,6 +5,7 @@ import { after, test } from "node:test";
 import { Pool } from "pg";
 
 import {
+  PaymentRequestEventType,
   SupplierApplicationStatus,
   SupplierBrandVerificationStatus,
   SupplierReviewStatus,
@@ -20,6 +21,15 @@ assert.match(databaseUrl.pathname.slice(1), /^trade82_order_payout_test_/);
 process.env.SUPPLIER_APPLICATIONS_ENABLED = "true";
 const supplierApplications = await import(
   new URL("../src/lib/supplier-application.ts", import.meta.url).href
+);
+const paymentRequests = await import(
+  new URL("../src/lib/payment-requests.ts", import.meta.url).href
+);
+const tradeOrders = await import(
+  new URL("../src/lib/trade-orders.ts", import.meta.url).href
+);
+const settlements = await import(
+  new URL("../src/lib/stripe-connect-settlements.ts", import.meta.url).href
 );
 const { getDb } = await import(new URL("../src/lib/db.ts", import.meta.url).href);
 const db = getDb() as PrismaClient;
@@ -151,6 +161,170 @@ async function prepareApprovalEvidence({
     ]);
   }
   return brand;
+}
+
+type CommerceFixture = Awaited<ReturnType<typeof createCommerceFixture>>;
+
+async function createCommerceFixture({
+  status,
+  withApplication = true,
+  brandExpiresAt = null,
+}: {
+  status?: SupplierApplicationStatus;
+  withApplication?: boolean;
+  brandExpiresAt?: Date | null;
+} = {}) {
+  const [seller, buyer] = await Promise.all([createApplicant(), createApplicant()]);
+  const suffix = unique("commerce");
+  const [sellerCompany, buyerCompany] = await Promise.all([
+    db.company.create({
+      data: {
+        ownerUserId: seller.id,
+        companyRole: "seller",
+        legalName: `Seller ${suffix}`,
+        tradeName: `Seller ${suffix}`,
+        country: "KR",
+        city: "Seoul",
+        businessAddress: "Seller address",
+        verificationStatus: "verified",
+      },
+    }),
+    db.company.create({
+      data: {
+        ownerUserId: buyer.id,
+        companyRole: "buyer",
+        legalName: `Buyer ${suffix}`,
+        tradeName: `Buyer ${suffix}`,
+        country: "US",
+        city: "New York",
+        businessAddress: "Buyer address",
+      },
+    }),
+  ]);
+  const product = await db.product.create({
+    data: {
+      sellerCompanyId: sellerCompany.id,
+      name: `Product ${suffix}`,
+      slug: `product-${suffix}`,
+      category: "Beauty",
+      shortDescription: "Supplier capability integration product.",
+      detailedDescription: "Supplier capability integration product.",
+      priceMin: "10.00",
+      priceMax: "12.00",
+      currency: "USD",
+      moq: "10",
+      moqQuantity: "10",
+      moqUnit: "Units",
+      leadTime: "14 days",
+      ingredientsOrMaterials: "Test material",
+      packaging: "Test packaging",
+      status: "active",
+    },
+  });
+  const inquiry = await db.inquiry.create({
+    data: {
+      buyerCompanyId: buyerCompany.id,
+      sellerCompanyId: sellerCompany.id,
+      productId: product.id,
+      senderUserId: buyer.id,
+      recipientCompanyId: sellerCompany.id,
+      message: "Please send a payment request.",
+    },
+  });
+  const application = withApplication
+    ? await createApplication(
+        seller.id,
+        status ?? SupplierApplicationStatus.DRAFT,
+      )
+    : null;
+  if (application) {
+    await db.supplierApplication.update({
+      where: { id: application.id },
+      data: { approvedCompanyId: sellerCompany.id },
+    });
+    await db.supplierBrandVerification.create({
+      data: {
+        applicationId: application.id,
+        brand: "COSRX",
+        normalizedBrand: "cosrx",
+        relationshipType: "BRAND_DIRECT",
+        status: "VERIFIED",
+        evidenceStatus: "VERIFIED",
+        isActive: true,
+        expiresAt: brandExpiresAt,
+        verifiedAt: new Date(),
+      },
+    });
+  }
+  return {
+    seller,
+    buyer,
+    sellerCompany,
+    buyerCompany,
+    product,
+    inquiry,
+    application,
+  };
+}
+
+async function createAuthorizedPaymentRequest(
+  fixture: CommerceFixture,
+  { enabled = true }: { enabled?: boolean } = {},
+) {
+  return db.$transaction(async (tx) => {
+    await supplierApplications.requireSupplierCanAcceptNewOrdersForCompanyWithDb(
+      fixture.seller.id,
+      fixture.sellerCompany.id,
+      tx,
+      { enabled },
+    );
+    const paymentRequest = await tx.paymentRequest.create({
+      data: {
+        inquiryId: fixture.inquiry.id,
+        buyerCompanyId: fixture.buyerCompany.id,
+        sellerCompanyId: fixture.sellerCompany.id,
+        createdByUserId: fixture.seller.id,
+        productName: fixture.product.name,
+        quantity: "10",
+        unit: "units",
+        productAmount: 10_000,
+        shippingAmount: 1_000,
+        grossAmount: 11_000,
+        platformFeeAmount: 550,
+        sellerPayableAmount: 10_450,
+        currency: "usd",
+        paymentDueDate: new Date(Date.now() + 86_400_000),
+        orderTerms: "Supplier capability integration terms.",
+      },
+    });
+    await tx.paymentRequestEvent.create({
+      data: {
+        paymentRequestId: paymentRequest.id,
+        eventType: PaymentRequestEventType.CREATED,
+        actorUserId: fixture.seller.id,
+        message: "Seller created a payment request.",
+      },
+    });
+    const order = await tradeOrders.createTradeOrderForPaymentRequest(
+      tx,
+      paymentRequest.id,
+    );
+    return { paymentRequest, order };
+  });
+}
+
+async function assertNoCommerceSideEffects(fixture: CommerceFixture) {
+  const [paymentRequestCount, eventCount, orderCount] = await Promise.all([
+    db.paymentRequest.count({ where: { inquiryId: fixture.inquiry.id } }),
+    db.paymentRequestEvent.count({
+      where: { paymentRequest: { inquiryId: fixture.inquiry.id } },
+    }),
+    db.tradeOrder.count({ where: { inquiryId: fixture.inquiry.id } }),
+  ]);
+  assert.deepEqual(
+    { paymentRequestCount, eventCount, orderCount },
+    { paymentRequestCount: 0, eventCount: 0, orderCount: 0 },
+  );
 }
 
 test("supplier migration is additive and protected by RLS", async () => {
@@ -505,6 +679,299 @@ test("conditional approval keeps the company private and full approval blocks un
         section: "FINAL_REVIEW",
       },
     }),
+    1,
+  );
+});
+
+test("payment-request creation is atomically blocked for ineligible supplier states", async () => {
+  const blockedStatuses = [
+    SupplierApplicationStatus.DRAFT,
+    SupplierApplicationStatus.CONDITIONALLY_APPROVED,
+    SupplierApplicationStatus.ON_HOLD,
+    SupplierApplicationStatus.REJECTED,
+    SupplierApplicationStatus.WITHDRAWN,
+    SupplierApplicationStatus.SUSPENDED,
+  ];
+  for (const status of blockedStatuses) {
+    const fixture = await createCommerceFixture({ status });
+    await assert.rejects(
+      createAuthorizedPaymentRequest(fixture),
+      (error: unknown) => error instanceof Response && error.status === 403,
+      `${status} must not create a payment request`,
+    );
+    await assertNoCommerceSideEffects(fixture);
+  }
+
+  const expiredBrand = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+    brandExpiresAt: new Date("2020-01-01T00:00:00.000Z"),
+  });
+  await assert.rejects(
+    createAuthorizedPaymentRequest(expiredBrand),
+    (error: unknown) => error instanceof Response && error.status === 403,
+  );
+  await assertNoCommerceSideEffects(expiredBrand);
+});
+
+test("approved suppliers and feature-off verified legacy sellers create payment requests with orders", async () => {
+  const approved = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+  });
+  const approvedResult = await createAuthorizedPaymentRequest(approved);
+  assert.equal(approvedResult.order.paymentRequestId, approvedResult.paymentRequest.id);
+  assert.equal(
+    await db.paymentRequestEvent.count({
+      where: {
+        paymentRequestId: approvedResult.paymentRequest.id,
+        eventType: PaymentRequestEventType.CREATED,
+      },
+    }),
+    1,
+  );
+
+  const legacy = await createCommerceFixture({ withApplication: false });
+  const legacyResult = await createAuthorizedPaymentRequest(legacy, {
+    enabled: false,
+  });
+  assert.equal(legacyResult.order.paymentRequestId, legacyResult.paymentRequest.id);
+  const legacyAccess = await supplierApplications.getSupplierApplicationCapabilities(
+    legacy.seller.id,
+    { enabled: false },
+  );
+  assert.equal(legacyAccess.canAcceptNewOrders, true);
+  assert.equal(legacyAccess.isLegacyFallback, true);
+});
+
+test("capability loss holds pending checkout before Stripe reuse or creation", async () => {
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+  });
+  const { paymentRequest } = await createAuthorizedPaymentRequest(fixture);
+  const checkoutSessionId = `cs_${unique("supplier-hold")}`;
+  await db.paymentRequest.update({
+    where: { id: paymentRequest.id },
+    data: { stripeCheckoutSessionId: checkoutSessionId },
+  });
+  const admin = await createApplicant("admin");
+  await supplierApplications.transitionSupplierApplication({
+    applicationId: fixture.application!.id,
+    actorUserId: admin.id,
+    actor: "ADMIN",
+    targetStatus: SupplierApplicationStatus.ON_HOLD,
+    reason: "Pause new commercial activity during review.",
+  });
+
+  await assert.rejects(
+    supplierApplications.requireSupplierCanAcceptNewOrdersForCompany(
+      fixture.seller.id,
+      fixture.sellerCompany.id,
+    ),
+    (error: unknown) => error instanceof Response && error.status === 403,
+  );
+  const held = await db.paymentRequest.findUniqueOrThrow({
+    where: { id: paymentRequest.id },
+  });
+  assert.equal(held.status, "PENDING");
+  assert.equal(held.requiresManualReconciliation, true);
+  assert.equal(held.stripeCheckoutSessionId, checkoutSessionId);
+  assert.equal(held.checkoutLockToken, null);
+  assert.match(held.reconciliationNote ?? "", /checkout is unavailable/i);
+  assert.equal(
+    await db.paymentRequestEvent.count({
+      where: {
+        paymentRequestId: paymentRequest.id,
+        eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+      },
+    }),
+    1,
+  );
+});
+
+test("brand review capability loss places pending payments on manual hold", async () => {
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+  });
+  const { paymentRequest } = await createAuthorizedPaymentRequest(fixture);
+  const brand = await db.supplierBrandVerification.findFirstOrThrow({
+    where: { applicationId: fixture.application!.id },
+  });
+  const admin = await createApplicant("admin");
+  await supplierApplications.reviewSupplierBrandVerification({
+    applicationId: fixture.application!.id,
+    brandVerificationId: brand.id,
+    adminUserId: admin.id,
+    input: {
+      status: SupplierBrandVerificationStatus.EXPIRED,
+      evidenceStatus: SupplierReviewStatus.EXPIRED_DOCUMENT,
+      expiresAt: new Date("2020-01-01T00:00:00.000Z"),
+      reason: "The only verified brand authorization expired.",
+    },
+  });
+  const held = await db.paymentRequest.findUniqueOrThrow({
+    where: { id: paymentRequest.id },
+  });
+  assert.equal(held.requiresManualReconciliation, true);
+  assert.equal(
+    await db.paymentRequestEvent.count({
+      where: {
+        paymentRequestId: paymentRequest.id,
+        eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+      },
+    }),
+    1,
+  );
+});
+
+async function finalizeVerifiedSupplierPayment(
+  fixture: CommerceFixture,
+  paymentRequestId: string,
+) {
+  const checkoutSessionId = `cs_${unique("supplier-payment")}`;
+  const paymentIntentId = `pi_${unique("supplier-payment")}`;
+  const chargeId = `ch_${unique("supplier-payment")}`;
+  const stripeEventId = `evt_${unique("supplier-payment")}`;
+  const result = await db.$transaction(async (tx) => {
+    const current = await tx.paymentRequest.findUniqueOrThrow({
+      where: { id: paymentRequestId },
+      include: {
+        inquiry: { select: { buyerCompanyId: true, sellerCompanyId: true } },
+        sellerCompany: { select: { ownerUserId: true } },
+      },
+    });
+    return paymentRequests.finalizeVerifiedPaymentRequestInTransaction({
+      tx,
+      current,
+      updateData: {
+        stripeCheckoutSessionId: checkoutSessionId,
+        stripePaymentIntentId: paymentIntentId,
+        stripeChargeId: chargeId,
+        stripeProcessingFeeAmount: 330,
+        stripeFeeSyncStatus: "SYNCED",
+        stripeFeeSyncError: null,
+        stripeFeeSyncedAt: new Date(),
+        checkoutLockToken: null,
+        checkoutLockExpiresAt: null,
+      },
+      stripeEvent: {
+        stripeEventId,
+        stripeEventType: "checkout.session.completed",
+        stripeEventCreatedAt: new Date(),
+      },
+      stripeProcessingFeeAmount: 330,
+    });
+  });
+  return {
+    ...result,
+    evidence: {
+      paymentRequestId,
+      paymentIntentId,
+      checkoutSessionId,
+      grossAmount: 11_000,
+      currency: "usd",
+      confirmationSource: "checkout_session" as const,
+    },
+    fixture,
+  };
+}
+
+async function withSettlementLedgerEnabled<T>(run: () => Promise<T>) {
+  const previous = process.env.STRIPE_CONNECT_SETTLEMENT_MODE;
+  process.env.STRIPE_CONNECT_SETTLEMENT_MODE = "on";
+  try {
+    return await run();
+  } finally {
+    if (previous === undefined) delete process.env.STRIPE_CONNECT_SETTLEMENT_MODE;
+    else process.env.STRIPE_CONNECT_SETTLEMENT_MODE = previous;
+  }
+}
+
+test("ineligible paid webhook is recorded for manual reconciliation without order or settlement sync", async () => {
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+  });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  const admin = await createApplicant("admin");
+  await supplierApplications.transitionSupplierApplication({
+    applicationId: fixture.application!.id,
+    actorUserId: admin.id,
+    actor: "ADMIN",
+    targetStatus: SupplierApplicationStatus.ON_HOLD,
+    reason: "Capability changed after Checkout was opened.",
+  });
+
+  const finalized = await finalizeVerifiedSupplierPayment(
+    fixture,
+    paymentRequest.id,
+  );
+  assert.equal(finalized.paid, true);
+  assert.equal(finalized.supplierEligible, false);
+  assert.equal(finalized.paymentConfirmedOrderId, null);
+  const [storedPayment, storedOrder, paidEvents, reconciliationEvents] =
+    await Promise.all([
+      db.paymentRequest.findUniqueOrThrow({ where: { id: paymentRequest.id } }),
+      db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }),
+      db.paymentRequestEvent.count({
+        where: {
+          paymentRequestId: paymentRequest.id,
+          eventType: PaymentRequestEventType.PAID,
+        },
+      }),
+      db.paymentRequestEvent.count({
+        where: {
+          paymentRequestId: paymentRequest.id,
+          eventType: PaymentRequestEventType.RECONCILIATION_REQUIRED,
+        },
+      }),
+    ]);
+  assert.equal(storedPayment.status, "PAID");
+  assert.equal(storedPayment.requiresManualReconciliation, true);
+  assert.match(storedPayment.reconciliationNote ?? "", /payment completion/i);
+  assert.equal(storedOrder.paymentStatus, "PENDING");
+  assert.equal(paidEvents, 1);
+  assert.equal(reconciliationEvents, 2);
+  assert.equal(
+    await withSettlementLedgerEnabled(() =>
+      settlements.createPendingSettlementForVerifiedWebhookPayment(
+        finalized.evidence,
+      ),
+    ),
+    null,
+  );
+  assert.equal(
+    await db.settlement.count({ where: { paymentRequestId: paymentRequest.id } }),
+    0,
+  );
+  assert.equal(
+    await db.sellerPayout.count({ where: { orderId: order.id } }),
+    0,
+  );
+});
+
+test("eligible paid webhook preserves normal order and settlement creation", async () => {
+  const fixture = await createCommerceFixture({
+    status: SupplierApplicationStatus.APPROVED,
+  });
+  const { paymentRequest, order } = await createAuthorizedPaymentRequest(fixture);
+  const finalized = await finalizeVerifiedSupplierPayment(
+    fixture,
+    paymentRequest.id,
+  );
+  assert.equal(finalized.paid, true);
+  assert.equal(finalized.supplierEligible, true);
+  assert.equal(finalized.paymentConfirmedOrderId, order.id);
+  assert.equal(
+    (await db.tradeOrder.findUniqueOrThrow({ where: { id: order.id } }))
+      .paymentStatus,
+    "PAID",
+  );
+  const settlement = await withSettlementLedgerEnabled(() =>
+    settlements.createPendingSettlementForVerifiedWebhookPayment(
+      finalized.evidence,
+    ),
+  );
+  assert.ok(settlement);
+  assert.equal(
+    await db.settlement.count({ where: { paymentRequestId: paymentRequest.id } }),
     1,
   );
 });
