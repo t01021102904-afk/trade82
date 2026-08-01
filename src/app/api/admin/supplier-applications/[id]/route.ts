@@ -9,6 +9,7 @@ import {
 } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { requireSupplierApplicationsEnabled } from "@/lib/supplier-application-feature";
 import {
   getSupplierApplicationForAdmin,
   supplierApplicationAdminResponse,
@@ -19,6 +20,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 export async function GET(_: Request, context: RouteContext) {
   try {
     await requireAdmin();
+    requireSupplierApplicationsEnabled();
     const { id } = await context.params;
     const [application, reviewers] = await Promise.all([
       getSupplierApplicationForAdmin(idParam(id)),
@@ -41,6 +43,7 @@ export async function PATCH(request: Request, context: RouteContext) {
   try {
     assertSameOrigin(request);
     const admin = await requireAdmin();
+    requireSupplierApplicationsEnabled();
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "admin-supplier-application-assignment",

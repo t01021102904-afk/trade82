@@ -4,10 +4,24 @@ import { test } from "node:test";
 
 import {
   canTransitionSupplierApplication,
+  getSupplierApplicationCapabilities,
+  normalizeSupplierBrand,
   parseSupplierApplicationCreateInput,
   parseSupplierApplicationUpdateInput,
+  resolveSupplierApplicationCapabilities,
+  validateReadyForFullApproval,
+  validateReadyForInitialSubmission,
 } from "../src/lib/supplier-application.ts";
-import { SupplierApplicationStatus } from "../src/generated/prisma/client.ts";
+import {
+  SupplierApplicationStatus,
+  SupplierBrandVerificationStatus,
+  SupplierLegacyClassification,
+  SupplierReviewStatus,
+} from "../src/generated/prisma/client.ts";
+import {
+  supplierInventorySampleHeaders,
+  validateInventorySample,
+} from "../src/lib/supplier-application-files.ts";
 
 const root = new URL("..", import.meta.url);
 
@@ -116,6 +130,231 @@ test("supplier status transitions are actor-specific and do not allow direct app
     ),
     false,
   );
+});
+
+const verifiedCompany = {
+  id: "legacy-company",
+  deletedAt: null,
+  verificationStatus: "verified",
+  sellerPayoutProfile: { status: "VERIFIED" },
+};
+
+test("disabled feature flag never loads the SupplierApplication table", async () => {
+  let applicationQueries = 0;
+  const capabilities = await getSupplierApplicationCapabilities("user", {
+    enabled: false,
+    loadCompany: async () => verifiedCompany,
+    loadApplication: async () => {
+      applicationQueries += 1;
+      throw new Error("SupplierApplication must not be queried");
+    },
+  });
+  assert.equal(applicationQueries, 0);
+  assert.equal(capabilities.canCreateProductCandidate, true);
+  assert.equal(capabilities.canReceiveOrder, true);
+  assert.equal(capabilities.canReceivePayout, true);
+});
+
+test("legacy backfill preserves capabilities until explicit suspension", () => {
+  const before = resolveSupplierApplicationCapabilities({
+    application: null,
+    company: verifiedCompany,
+  });
+  const backfilled = {
+    id: "application",
+    status: SupplierApplicationStatus.CONDITIONALLY_APPROVED,
+    legacyClassification:
+      SupplierLegacyClassification.LEGACY_CONDITIONALLY_APPROVED,
+    legacyCompanyId: verifiedCompany.id,
+    approvedCompany: null,
+    legacyCompany: verifiedCompany,
+    brandVerifications: [],
+  };
+  const after = resolveSupplierApplicationCapabilities({
+    application: backfilled,
+    company: verifiedCompany,
+  });
+  for (const capability of [
+    "canUploadLiveInventory",
+    "canCreateProductCandidate",
+    "canPublishOffer",
+    "canReceiveOrder",
+    "canShipOrder",
+    "canReceivePayout",
+  ] as const) {
+    assert.equal(after[capability], before[capability]);
+  }
+  assert.equal(after.isLegacyFallback, true);
+  assert.equal(
+    resolveSupplierApplicationCapabilities({
+      application: {
+        ...backfilled,
+        legacyClassification: SupplierLegacyClassification.REVERIFICATION_REQUIRED,
+      },
+      company: verifiedCompany,
+    }).canPublishOffer,
+    false,
+  );
+  assert.equal(
+    resolveSupplierApplicationCapabilities({
+      application: {
+        ...backfilled,
+        status: SupplierApplicationStatus.SUSPENDED,
+      },
+      company: verifiedCompany,
+    }).canReceiveOrder,
+    false,
+  );
+});
+
+test("conditional approval exposes test-order state but no live order access", () => {
+  const capabilities = resolveSupplierApplicationCapabilities({
+    application: {
+      id: "application",
+      status: SupplierApplicationStatus.CONDITIONALLY_APPROVED,
+      legacyClassification: null,
+      legacyCompanyId: null,
+      approvedCompany: {
+        ...verifiedCompany,
+        id: "pending-company",
+        verificationStatus: "pending_review",
+      },
+      legacyCompany: null,
+      brandVerifications: [],
+    },
+    company: null,
+  });
+  assert.equal(capabilities.canReceiveTestOrder, true);
+  assert.equal(capabilities.canReceiveOrder, false);
+  assert.equal(capabilities.canShipOrder, false);
+  assert.equal(capabilities.canCreateProductCandidate, false);
+});
+
+test("brand normalization and readiness validation use active, unexpired evidence", () => {
+  assert.equal(normalizeSupplierBrand("  COSRX  "), "cosrx");
+  assert.equal(normalizeSupplierBrand("Beauty   of Joseon"), "beauty of joseon");
+  const application = {
+    status: SupplierApplicationStatus.SETTLEMENT_VERIFICATION,
+    legalCompanyName: "Supplier",
+    companyWebsite: "https://supplier.example.com",
+    registrationCountry: "KR",
+    brandsHandled: ["COSRX"],
+    annualRevenueRange: "USD 1M-5M",
+    warehouseType: "OWN",
+    skuCountRange: "100-499",
+    contacts: [{
+      firstName: "Jin",
+      lastName: "Park",
+      jobTitle: "Manager",
+      workEmail: "jin@example.com",
+      phoneNumber: "+821012345678",
+    }],
+    businessVerification: { reviewStatus: SupplierReviewStatus.VERIFIED },
+    brandVerifications: [{
+      id: "brand",
+      isActive: true,
+      status: SupplierBrandVerificationStatus.VERIFIED,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+      documents: [{
+        documentType: "BRAND_AUTHORIZATION",
+        reviewStatus: SupplierReviewStatus.VERIFIED,
+      }],
+    }],
+    operationsProfile: { reviewStatus: SupplierReviewStatus.VERIFIED },
+    settlementProfile: { reviewStatus: SupplierReviewStatus.VERIFIED },
+    documents: [
+      { documentType: "BUSINESS_REGISTRATION", reviewStatus: SupplierReviewStatus.VERIFIED },
+      { documentType: "COMPANY_AUTHORITY", reviewStatus: SupplierReviewStatus.VERIFIED },
+    ],
+    informationRequests: [],
+    duplicateFlags: [],
+  };
+  validateReadyForInitialSubmission(application);
+  validateReadyForFullApproval(application);
+  assert.throws(() =>
+    validateReadyForFullApproval({
+      ...application,
+      informationRequests: [{ resolvedAt: null }],
+    }),
+  );
+  assert.throws(() =>
+    validateReadyForFullApproval({
+      ...application,
+      brandVerifications: application.brandVerifications.map((brand) => ({
+        ...brand,
+        isActive: false,
+      })),
+    }),
+  );
+  assert.throws(() =>
+    validateReadyForFullApproval({
+      ...application,
+      duplicateFlags: [{ severity: "CRITICAL", resolvedAt: null }],
+    }),
+  );
+  validateReadyForFullApproval(
+    {
+      ...application,
+      duplicateFlags: [{ severity: "CRITICAL", resolvedAt: null }],
+    },
+    { duplicateOverrideReason: "Reviewed duplicate corporate group." },
+  );
+});
+
+test("inventory samples enforce the dedicated supplier template and row counters", async () => {
+  process.env.SUPPLIER_APPLICATIONS_ENABLED = "true";
+  const validRow = [
+    "4006381333931",
+    "COSRX",
+    "Cleanser",
+    "100 ml",
+    "12.50",
+    "USD",
+    "50",
+    "10",
+    "100",
+    "3",
+    "2030-01-01",
+    "Seoul warehouse",
+    "US|KR",
+    "2026-08-01T12:00:00Z",
+  ];
+  const invalidRow = [
+    "4006381333931",
+    "COSRX",
+    "Cleanser duplicate",
+    "",
+    "0",
+    "ZZZ",
+    "-1",
+    "0",
+    "-1",
+    "1.5",
+    "not-a-date",
+    "",
+    "",
+    "not-a-date",
+  ];
+  const csv = [
+    supplierInventorySampleHeaders.join(","),
+    validRow.join(","),
+    invalidRow.join(","),
+  ].join("\n");
+  const result = await validateInventorySample(
+    new File([csv], "inventory.csv", { type: "text/csv" }),
+  );
+  assert.equal(result.summary.totalRows, 2);
+  assert.equal(result.summary.validRows, 1);
+  assert.equal(result.summary.invalidRows, 1);
+  assert.equal(result.summary.duplicateGtinRows, 1);
+  assert.equal(result.summary.invalidPriceRows, 1);
+  assert.equal(result.summary.invalidQuantityRows, 1);
+  assert.equal(result.summary.invalidMoqRows, 1);
+  assert.equal(result.summary.invalidMovRows, 1);
+  assert.equal(result.summary.invalidLeadTimeRows, 1);
+  assert.equal(result.summary.invalidExpirationDateRows, 1);
+  assert.equal(result.summary.invalidStockUpdatedAtRows, 1);
+  assert.equal(result.summary.invalidCurrencyRows, 1);
 });
 
 test("supplier schema and migration keep the approval domain additive, private, and auditable", async () => {

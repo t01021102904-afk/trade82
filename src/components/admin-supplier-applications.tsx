@@ -85,7 +85,20 @@ type AdminApplication = ApplicationListItem & {
     id: string;
     section: string;
     message: string;
+    applicantResponse: string | null;
+    respondedAt: string | null;
+    resolutionNote: string | null;
     resolvedAt: string | null;
+  }>;
+  brandVerifications: Array<{
+    id: string;
+    brand: string;
+    isActive: boolean;
+    status: string;
+    evidenceStatus: string;
+    reviewNotes: string;
+    countryRestrictions: string[];
+    expiresAt: string | null;
   }>;
   statusHistory: Array<{
     id: string;
@@ -576,6 +589,56 @@ export function AdminSupplierApplicationDetail({
           </Button>
         </CardContent>
       </Card>
+      {application.informationRequests.length ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Information request responses</CardTitle>
+            <CardDescription>
+              Applicant responses remain unresolved until an administrator
+              explicitly closes the request.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {application.informationRequests.map((request) => (
+              <AdminInformationRequestRow
+                key={request.id}
+                applicationId={applicationId}
+                request={request}
+                disabled={saving}
+                onSaving={setSaving}
+                onError={setError}
+                onSaved={load}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+      <Card>
+        <CardHeader>
+          <CardTitle>Brand verifications</CardTitle>
+          <CardDescription>
+            Review each active brand independently. Section reviews are audit
+            records and do not mutate brand status.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {application.brandVerifications.length ? (
+            application.brandVerifications.map((brand) => (
+              <BrandReviewRow
+                key={brand.id}
+                applicationId={applicationId}
+                brand={brand}
+                disabled={saving}
+                onSaving={setSaving}
+                onError={setError}
+                onSaved={load}
+              />
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">—</p>
+          )}
+        </CardContent>
+      </Card>
       <div className="grid gap-6 lg:grid-cols-2">
         <ReviewList
           title={copy.documents}
@@ -606,6 +669,199 @@ export function AdminSupplierApplicationDetail({
           )}
         />
       </div>
+    </div>
+  );
+}
+
+function AdminInformationRequestRow({
+  applicationId,
+  request,
+  disabled,
+  onSaving,
+  onError,
+  onSaved,
+}: {
+  applicationId: string;
+  request: AdminApplication["informationRequests"][number];
+  disabled: boolean;
+  onSaving: (saving: boolean) => void;
+  onError: (error: string | null) => void;
+  onSaved: () => Promise<void>;
+}) {
+  const [resolutionNote, setResolutionNote] = useState(
+    request.resolutionNote ?? "",
+  );
+  const resolve = async () => {
+    onSaving(true);
+    onError(null);
+    const response = await fetch(
+      `/api/admin/supplier-applications/${applicationId}/information-requests/${request.id}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resolutionNote }),
+      },
+    );
+    const result = (await response.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    if (!response.ok)
+      onError(result?.error ?? "Unable to resolve the information request.");
+    else await onSaved();
+    onSaving(false);
+  };
+  return (
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">{pretty(request.section)}</p>
+        <Badge variant={request.resolvedAt ? "secondary" : "outline"}>
+          {request.resolvedAt ? "Resolved" : "Open"}
+        </Badge>
+      </div>
+      <p className="text-sm text-muted-foreground">{request.message}</p>
+      <div className="rounded-md bg-muted p-3 text-sm">
+        {request.applicantResponse ?? "No applicant response yet."}
+      </div>
+      {!request.resolvedAt ? (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+          <Field className="flex-1">
+            <FieldLabel>Resolution note</FieldLabel>
+            <Input
+              value={resolutionNote}
+              onChange={(event) => setResolutionNote(event.target.value)}
+            />
+          </Field>
+          <Button
+            variant="outline"
+            disabled={disabled || !resolutionNote.trim()}
+            onClick={() => void resolve()}
+          >
+            Resolve request
+          </Button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+const brandStatusOptions = [
+  "PENDING",
+  "VERIFIED",
+  "ADDITIONAL_EVIDENCE_REQUIRED",
+  "RESTRICTED",
+  "REJECTED",
+  "EXPIRED",
+];
+
+function BrandReviewRow({
+  applicationId,
+  brand,
+  disabled,
+  onSaving,
+  onError,
+  onSaved,
+}: {
+  applicationId: string;
+  brand: AdminApplication["brandVerifications"][number];
+  disabled: boolean;
+  onSaving: (saving: boolean) => void;
+  onError: (error: string | null) => void;
+  onSaved: () => Promise<void>;
+}) {
+  const [status, setStatus] = useState(brand.status);
+  const [evidenceStatus, setEvidenceStatus] = useState(brand.evidenceStatus);
+  const [reviewNotes, setReviewNotes] = useState(brand.reviewNotes);
+  const [expiresAt, setExpiresAt] = useState(
+    brand.expiresAt?.slice(0, 10) ?? "",
+  );
+  const [countryRestrictions, setCountryRestrictions] = useState(
+    brand.countryRestrictions.join(", "),
+  );
+  const [reason, setReason] = useState("");
+  const save = async () => {
+    onSaving(true);
+    onError(null);
+    const response = await fetch(
+      `/api/admin/supplier-applications/${applicationId}/brands/${brand.id}/review`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status,
+          evidenceStatus,
+          reviewNotes,
+          expiresAt: expiresAt ? `${expiresAt}T23:59:59.999Z` : null,
+          countryRestrictions: countryRestrictions
+            .split(",")
+            .map((country) => country.trim())
+            .filter(Boolean),
+          reason,
+        }),
+      },
+    );
+    const result = (await response.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    if (!response.ok) onError(result?.error ?? "Unable to review this brand.");
+    else {
+      setReason("");
+      await onSaved();
+    }
+    onSaving(false);
+  };
+  return (
+    <div className="grid gap-3 rounded-lg border p-4 lg:grid-cols-2">
+      <div className="flex items-center gap-2 lg:col-span-2">
+        <p className="font-medium">{brand.brand}</p>
+        <Badge variant={brand.isActive ? "secondary" : "outline"}>
+          {brand.isActive ? "Active" : "Removed"}
+        </Badge>
+      </div>
+      <Field>
+        <FieldLabel>Status</FieldLabel>
+        <Select value={status} onValueChange={(value) => setStatus(value ?? "")}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {brandStatusOptions.map((option) => (
+              <SelectItem key={option} value={option}>{pretty(option)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Evidence status</FieldLabel>
+        <Select value={evidenceStatus} onValueChange={(value) => setEvidenceStatus(value ?? "")}>
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {reviewOptions.map((option) => (
+              <SelectItem key={option} value={option}>{pretty(option)}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
+      <Field>
+        <FieldLabel>Expires at</FieldLabel>
+        <Input type="date" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} />
+      </Field>
+      <Field>
+        <FieldLabel>Country restrictions</FieldLabel>
+        <Input value={countryRestrictions} onChange={(event) => setCountryRestrictions(event.target.value)} />
+      </Field>
+      <Field>
+        <FieldLabel>Review notes</FieldLabel>
+        <Textarea value={reviewNotes} onChange={(event) => setReviewNotes(event.target.value)} />
+      </Field>
+      <Field>
+        <FieldLabel>Reason</FieldLabel>
+        <Textarea required value={reason} onChange={(event) => setReason(event.target.value)} />
+      </Field>
+      <Button
+        className="w-fit lg:col-span-2"
+        disabled={disabled || !brand.isActive || !reason.trim()}
+        onClick={() => void save()}
+      >
+        Review brand
+      </Button>
     </div>
   );
 }

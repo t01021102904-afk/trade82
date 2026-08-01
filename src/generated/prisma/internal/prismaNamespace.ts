@@ -5928,6 +5928,8 @@ export const SupplierApplicationScalarFieldEnum = {
   warehouseType: 'warehouseType',
   skuCountRange: 'skuCountRange',
   riskLevel: 'riskLevel',
+  riskOverrideReason: 'riskOverrideReason',
+  riskOverrideByUserId: 'riskOverrideByUserId',
   submittedAt: 'submittedAt',
   withdrawnAt: 'withdrawnAt',
   approvedAt: 'approvedAt',
@@ -6034,6 +6036,9 @@ export const SupplierBrandVerificationScalarFieldEnum = {
   id: 'id',
   applicationId: 'applicationId',
   brand: 'brand',
+  normalizedBrand: 'normalizedBrand',
+  isActive: 'isActive',
+  removedAt: 'removedAt',
   relationshipType: 'relationshipType',
   supplierCompany: 'supplierCompany',
   transactionStartedAt: 'transactionStartedAt',
@@ -6191,6 +6196,10 @@ export const SupplierInformationRequestScalarFieldEnum = {
   section: 'section',
   message: 'message',
   requestedByUserId: 'requestedByUserId',
+  applicantResponse: 'applicantResponse',
+  respondedAt: 'respondedAt',
+  resolvedByUserId: 'resolvedByUserId',
+  resolutionNote: 'resolutionNote',
   resolvedAt: 'resolvedAt',
   createdAt: 'createdAt'
 } as const
@@ -6205,6 +6214,7 @@ export const SupplierDuplicateFlagScalarFieldEnum = {
   matchedEntityType: 'matchedEntityType',
   matchedEntityId: 'matchedEntityId',
   matchedValueHash: 'matchedValueHash',
+  severity: 'severity',
   createdAt: 'createdAt',
   resolvedAt: 'resolvedAt',
   resolutionNote: 'resolutionNote'

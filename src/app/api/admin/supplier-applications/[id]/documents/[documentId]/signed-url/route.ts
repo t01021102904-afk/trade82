@@ -3,12 +3,14 @@ import { idParam } from "@/lib/api-security";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { createSignedPrivateFileUrl } from "@/lib/supabase-storage";
+import { requireSupplierApplicationsEnabled } from "@/lib/supplier-application-feature";
 
 type RouteContext = { params: Promise<{ id: string; documentId: string }> };
 
 export async function GET(_: Request, context: RouteContext) {
   try {
     const admin = await requireAdmin();
+    requireSupplierApplicationsEnabled();
     const { id, documentId } = await context.params;
     const applicationId = idParam(id);
     const document = await getDb().supplierApplicationDocument.findFirst({

@@ -55,6 +55,13 @@ function websiteDomain(website: string) {
 
 async function main() {
   const { apply } = parseArgs(process.argv.slice(2));
+  if (
+    process.env.SUPPLIER_APPLICATIONS_ENABLED?.trim().toLowerCase() !== "true"
+  ) {
+    throw new Error(
+      "SUPPLIER_APPLICATIONS_ENABLED=true is required before querying the backfill tables.",
+    );
+  }
   const databaseUrl = process.env.DATABASE_URL?.trim();
   if (!databaseUrl) throw new Error("DATABASE_URL is not configured.");
   if (apply && (process.env.VERCEL_ENV === "production" || databaseUrl.includes("cjryteuoyiiwsxarblfd"))) {

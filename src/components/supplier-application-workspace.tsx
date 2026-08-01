@@ -74,7 +74,13 @@ type Application = {
   stakeholders: Array<Record<string, unknown>>;
   warehouses: Array<Record<string, unknown>>;
   supplyChains: Array<Record<string, unknown>>;
-  brandVerifications: Array<Record<string, unknown>>;
+  brandVerifications: Array<
+    Record<string, unknown> & {
+      id: string;
+      brand: string;
+      isActive: boolean;
+    }
+  >;
   statusHistory: Array<{
     id: string;
     toStatus: string;
@@ -85,6 +91,8 @@ type Application = {
     id: string;
     section: string;
     message: string;
+    applicantResponse: string | null;
+    respondedAt: string | null;
     resolvedAt: string | null;
   }>;
   progress: { complete: number; total: number; percent: number };
@@ -429,6 +437,8 @@ export function SupplierApplicationWorkspace({
   });
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [documentType, setDocumentType] = useState("BUSINESS_REGISTRATION");
+  const [documentBrandId, setDocumentBrandId] = useState("NONE");
   const documentFile = useRef<HTMLInputElement>(null);
   const inventoryFile = useRef<HTMLInputElement>(null);
 
@@ -616,7 +626,11 @@ export function SupplierApplicationWorkspace({
     if (!file) return;
     const form = new FormData();
     form.set("file", file);
-    if (kind === "documents") form.set("documentType", "OTHER");
+    if (kind === "documents") {
+      form.set("documentType", documentType);
+      if (documentBrandId !== "NONE")
+        form.set("brandVerificationId", documentBrandId);
+    }
     const response = await fetch(
       `/api/supplier-applications/${applicationId}/${kind === "documents" ? "documents" : "inventory-samples"}`,
       { method: "POST", body: form },
@@ -637,6 +651,24 @@ export function SupplierApplicationWorkspace({
     } | null;
     if (!response.ok) setMessage(result?.error ?? copy.submitError);
     else await load();
+  };
+  const respondToRequest = async (requestId: string, responseText: string) => {
+    setSaving(true);
+    setMessage(null);
+    const response = await fetch(
+      `/api/supplier-applications/${applicationId}/information-requests/${requestId}/respond`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response: responseText }),
+      },
+    );
+    const result = (await response.json().catch(() => null)) as {
+      error?: string;
+    } | null;
+    if (!response.ok) setMessage(result?.error ?? copy.saveError);
+    else await load();
+    setSaving(false);
   };
 
   if (!application)
@@ -963,13 +995,63 @@ export function SupplierApplicationWorkspace({
             inputRef={documentFile}
             accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
             buttonLabel={copy.uploadDocument}
-            disabled={!editable}
+            disabled={
+              !editable ||
+              (["SUPPLIER_INVOICE", "BRAND_AUTHORIZATION"].includes(
+                documentType,
+              ) && documentBrandId === "NONE")
+            }
             onUpload={() => void upload("documents")}
             rows={application.documents.map(
               (document) =>
                 `${document.originalFilename} · ${document.reviewStatus}`,
             )}
-          />
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field>
+                <FieldLabel>Document type</FieldLabel>
+                <Select
+                  value={documentType}
+                  onValueChange={(value) => {
+                    const next = value ?? "BUSINESS_REGISTRATION";
+                    setDocumentType(next);
+                    if (!["SUPPLIER_INVOICE", "BRAND_AUTHORIZATION"].includes(next))
+                      setDocumentBrandId("NONE");
+                  }}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[
+                      "BUSINESS_REGISTRATION",
+                      "COMPANY_AUTHORITY",
+                      "SUPPLIER_INVOICE",
+                      "BRAND_AUTHORIZATION",
+                      "BANK_DOCUMENT",
+                      "OTHER",
+                    ].map((type) => (
+                      <SelectItem key={type} value={type}>{type.replaceAll("_", " ")}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              {["SUPPLIER_INVOICE", "BRAND_AUTHORIZATION"].includes(documentType) ? (
+                <Field>
+                  <FieldLabel>Brand</FieldLabel>
+                  <Select value={documentBrandId} onValueChange={(value) => setDocumentBrandId(value ?? "NONE")}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="NONE">Select a brand</SelectItem>
+                      {application.brandVerifications
+                        .filter((brand) => brand.isActive)
+                        .map((brand) => (
+                          <SelectItem key={brand.id} value={brand.id}>{brand.brand}</SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              ) : null}
+            </div>
+          </UploadCard>
         </section>
         <section id="review">
           <StructuredCard title={copy.finalReview}>
@@ -989,9 +1071,69 @@ export function SupplierApplicationWorkspace({
                 </li>
               ))}
             </ul>
+            {application.informationRequests.length ? (
+              <div className="space-y-3 border-t pt-4">
+                <h3 className="text-sm font-medium">
+                  {locale === "ko" ? "추가 정보 요청" : "Information requests"}
+                </h3>
+                {application.informationRequests.map((request) => (
+                  <InformationRequestResponse
+                    key={request.id}
+                    request={request}
+                    disabled={saving || Boolean(request.resolvedAt)}
+                    locale={locale}
+                    onSubmit={respondToRequest}
+                  />
+                ))}
+              </div>
+            ) : null}
           </StructuredCard>
         </section>
       </main>
+    </div>
+  );
+}
+
+function InformationRequestResponse({
+  request,
+  disabled,
+  locale,
+  onSubmit,
+}: {
+  request: Application["informationRequests"][number];
+  disabled: boolean;
+  locale: Locale;
+  onSubmit: (requestId: string, response: string) => Promise<void>;
+}) {
+  const [response, setResponse] = useState(request.applicantResponse ?? "");
+  return (
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">{request.section.replaceAll("_", " ")}</p>
+        <Badge variant={request.resolvedAt ? "secondary" : "outline"}>
+          {request.resolvedAt
+            ? locale === "ko" ? "해결됨" : "Resolved"
+            : locale === "ko" ? "응답 필요" : "Response required"}
+        </Badge>
+      </div>
+      <p className="text-sm text-muted-foreground">{request.message}</p>
+      <Field>
+        <FieldLabel>{locale === "ko" ? "답변" : "Response"}</FieldLabel>
+        <Textarea
+          value={response}
+          onChange={(event) => setResponse(event.target.value)}
+          disabled={disabled}
+        />
+      </Field>
+      {!request.resolvedAt ? (
+        <Button
+          variant="outline"
+          disabled={disabled || !response.trim()}
+          onClick={() => void onSubmit(request.id, response)}
+        >
+          {locale === "ko" ? "답변 저장" : "Save response"}
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -1060,6 +1202,7 @@ function UploadCard({
   disabled,
   onUpload,
   rows,
+  children,
 }: {
   title: string;
   description: string;
@@ -1069,9 +1212,11 @@ function UploadCard({
   disabled: boolean;
   onUpload: () => void;
   rows: string[];
+  children?: ReactNode;
 }) {
   return (
     <StructuredCard title={title} description={description} disabled={disabled}>
+      {children}
       <input
         ref={inputRef}
         type="file"

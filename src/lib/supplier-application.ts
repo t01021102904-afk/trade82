@@ -7,6 +7,7 @@ import {
   SupplierApplicationSection,
   SupplierApplicationStatus,
   SupplierBrandVerificationStatus,
+  SupplierLegacyClassification,
   SupplierReviewStatus,
   SupplierSupplyChainType,
   type Prisma,
@@ -18,6 +19,10 @@ import {
   lastFour,
   maskAccountNumber,
 } from "@/lib/payout-crypto";
+import {
+  requireSupplierApplicationsEnabled,
+  supplierApplicationsEnabled,
+} from "@/lib/supplier-application-feature";
 
 const APPLICATION_NUMBER_PREFIX = "T82-SA";
 
@@ -145,6 +150,8 @@ const statusReasonRequired = new Set<SupplierApplicationStatus>([
   SupplierApplicationStatus.ON_HOLD,
   SupplierApplicationStatus.REJECTED,
   SupplierApplicationStatus.SUSPENDED,
+  SupplierApplicationStatus.CONDITIONALLY_APPROVED,
+  SupplierApplicationStatus.APPROVED,
 ]);
 
 type ApplicationActor = "APPLICANT" | "ADMIN" | "SYSTEM";
@@ -158,6 +165,7 @@ export type SupplierApplicationCapabilities = {
   canUploadLiveInventory: boolean;
   canCreateProductCandidate: boolean;
   canPublishOffer: boolean;
+  canReceiveTestOrder: boolean;
   canReceiveOrder: boolean;
   canShipOrder: boolean;
   canReceivePayout: boolean;
@@ -655,7 +663,7 @@ export function parseSupplierApplicationUpdateInput(
     const seenBrands = new Set<string>();
     next.brands = requiredArray(source.brands, "brands", 100).map((record) => {
       const brand = text(record.brand, "brand.brand", 160, true);
-      const key = brand.toLocaleLowerCase();
+      const key = normalizeSupplierBrand(brand);
       if (seenBrands.has(key))
         throw validationError("brands contains duplicate brands.");
       seenBrands.add(key);
@@ -745,6 +753,10 @@ export function parseSupplierApplicationUpdateInput(
   if (!Object.keys(next).length)
     throw validationError("No supported application fields were provided.");
   return next;
+}
+
+export function normalizeSupplierBrand(value: string) {
+  return value.trim().replaceAll(/\s+/g, " ").toLocaleLowerCase("en-US");
 }
 
 async function writeDuplicateFlags(
@@ -901,6 +913,7 @@ export async function createOrResumeSupplierApplication({
   userId: string;
   input: SupplierApplicationCreateInput;
 }) {
+  requireSupplierApplicationsEnabled();
   const db = getDb();
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`supplier-application:${userId}`}, 0))`;
@@ -977,6 +990,7 @@ export async function createOrResumeSupplierApplication({
 }
 
 export async function getCurrentSupplierApplication(userId: string) {
+  if (!supplierApplicationsEnabled()) return null;
   return getDb().supplierApplication.findFirst({
     where: { applicantUserId: userId },
     orderBy: { updatedAt: "desc" },
@@ -1012,6 +1026,7 @@ export async function getSupplierApplicationForApplicant(
   applicationId: string,
   userId: string,
 ) {
+  requireSupplierApplicationsEnabled();
   const application = await getDb().supplierApplication.findFirst({
     where: { id: applicationId, applicantUserId: userId },
     include: applicationDetailInclude,
@@ -1022,6 +1037,7 @@ export async function getSupplierApplicationForApplicant(
 }
 
 export async function getSupplierApplicationForAdmin(applicationId: string) {
+  requireSupplierApplicationsEnabled();
   const application = await getDb().supplierApplication.findUnique({
     where: { id: applicationId },
     include: {
@@ -1055,11 +1071,15 @@ export async function updateSupplierApplication({
   userId: string;
   input: SupplierApplicationUpdateInput;
 }) {
+  requireSupplierApplicationsEnabled();
   const db = getDb();
   return db.$transaction(async (tx) => {
     const application = await tx.supplierApplication.findFirst({
       where: { id: applicationId, applicantUserId: userId },
-      include: { contacts: { where: { isPrimary: true }, take: 1 } },
+      include: {
+        contacts: { where: { isPrimary: true }, take: 1 },
+        brandVerifications: true,
+      },
     });
     if (!application)
       throw new Response("Supplier application not found.", { status: 404 });
@@ -1177,27 +1197,104 @@ export async function updateSupplierApplication({
       }
     }
     if (input.brands) {
-      // Preserve prior verification evidence and its audit trail. A changed
-      // brand record is reset to PENDING by the reviewer workflow rather than
-      // deleting an already reviewed authorization silently.
+      const activeNormalizedBrands = new Set<string>();
       for (const brand of input.brands) {
-        await tx.supplierBrandVerification.upsert({
-          where: {
-            applicationId_brand: {
+        const normalizedBrand = normalizeSupplierBrand(brand.brand);
+        activeNormalizedBrands.add(normalizedBrand);
+        const existingBrand = application.brandVerifications.find(
+          (candidate) => candidate.normalizedBrand === normalizedBrand,
+        );
+        if (!existingBrand) {
+          await tx.supplierBrandVerification.create({
+            data: {
               applicationId: application.id,
-              brand: brand.brand,
+              normalizedBrand,
+              isActive: true,
+              removedAt: null,
+              ...brand,
             },
+          });
+          await tx.supplierApplicationAuditEvent.create({
+            data: {
+              applicationId: application.id,
+              actorUserId: userId,
+              action: "BRAND_ADDED",
+              before: {},
+              after: { normalizedBrand },
+            },
+          });
+          continue;
+        }
+        const changed =
+          existingBrand.brand !== brand.brand ||
+          existingBrand.relationshipType !== brand.relationshipType ||
+          existingBrand.supplierCompany !== brand.supplierCompany ||
+          existingBrand.transactionStartedAt?.getTime() !==
+            brand.transactionStartedAt?.getTime() ||
+          JSON.stringify([...existingBrand.countryRestrictions].sort()) !==
+            JSON.stringify([...brand.countryRestrictions].sort());
+        const reactivated = !existingBrand.isActive;
+        await tx.supplierBrandVerification.update({
+          where: { id: existingBrand.id },
+          data: {
+            ...brand,
+            normalizedBrand,
+            isActive: true,
+            removedAt: null,
+            ...(changed || reactivated
+              ? {
+                  status: SupplierBrandVerificationStatus.PENDING,
+                  evidenceStatus: SupplierReviewStatus.PENDING,
+                  verifiedAt: null,
+                  expiresAt: null,
+                  reviewNotes: "",
+                }
+              : {}),
           },
-          create: { applicationId: application.id, ...brand },
-          update: {
-            relationshipType: brand.relationshipType,
-            supplierCompany: brand.supplierCompany,
-            transactionStartedAt: brand.transactionStartedAt,
-            countryRestrictions: brand.countryRestrictions,
-            status: SupplierBrandVerificationStatus.PENDING,
-            evidenceStatus: SupplierReviewStatus.PENDING,
-            verifiedAt: null,
-            expiresAt: null,
+        });
+        if (changed || reactivated) {
+          await tx.supplierApplicationAuditEvent.create({
+            data: {
+              applicationId: application.id,
+              actorUserId: userId,
+              action: reactivated ? "BRAND_REACTIVATED" : "BRAND_UPDATED",
+              before: {
+                normalizedBrand,
+                status: existingBrand.status,
+                isActive: existingBrand.isActive,
+              },
+              after: {
+                normalizedBrand,
+                status: SupplierBrandVerificationStatus.PENDING,
+                isActive: true,
+              },
+            },
+          });
+        }
+      }
+      const removedBrands = application.brandVerifications.filter(
+        (brand) =>
+          brand.isActive && !activeNormalizedBrands.has(brand.normalizedBrand),
+      );
+      for (const removedBrand of removedBrands) {
+        await tx.supplierBrandVerification.update({
+          where: { id: removedBrand.id },
+          data: { isActive: false, removedAt: new Date() },
+        });
+        await tx.supplierApplicationAuditEvent.create({
+          data: {
+            applicationId: application.id,
+            actorUserId: userId,
+            action: "BRAND_REMOVED",
+            before: {
+              normalizedBrand: removedBrand.normalizedBrand,
+              status: removedBrand.status,
+              isActive: true,
+            },
+            after: {
+              normalizedBrand: removedBrand.normalizedBrand,
+              isActive: false,
+            },
           },
         });
       }
@@ -1293,65 +1390,226 @@ export function canTransitionSupplierApplication(
   return transitions[current]?.includes(target) ?? false;
 }
 
+type SupplierApplicationReadiness = {
+  status: SupplierApplicationStatus;
+  legalCompanyName: string;
+  companyWebsite: string;
+  registrationCountry: string;
+  brandsHandled: string[];
+  annualRevenueRange: string;
+  warehouseType: string;
+  skuCountRange: string;
+  contacts: Array<{
+    firstName: string;
+    lastName: string;
+    jobTitle: string;
+    workEmail: string;
+    phoneNumber: string;
+  }>;
+  businessVerification: { reviewStatus: SupplierReviewStatus } | null;
+  brandVerifications: Array<{
+    id: string;
+    isActive: boolean;
+    status: SupplierBrandVerificationStatus;
+    expiresAt: Date | null;
+    documents: Array<{
+      documentType: string;
+      reviewStatus: SupplierReviewStatus;
+    }>;
+  }>;
+  operationsProfile: { reviewStatus: SupplierReviewStatus } | null;
+  settlementProfile: { reviewStatus: SupplierReviewStatus } | null;
+  documents: Array<{
+    documentType: string;
+    reviewStatus: SupplierReviewStatus;
+  }>;
+  informationRequests: Array<{ resolvedAt: Date | null }>;
+  duplicateFlags: Array<{
+    severity: string;
+    resolvedAt: Date | null;
+  }>;
+};
+
+function assertReadiness(condition: unknown, message: string): asserts condition {
+  if (!condition) throw validationError(message);
+}
+
+export function validateReadyForInitialSubmission(
+  application: SupplierApplicationReadiness,
+) {
+  const contact = application.contacts[0];
+  assertReadiness(
+    contact &&
+      contact.firstName.trim() &&
+      contact.lastName.trim() &&
+      contact.jobTitle.trim() &&
+      contact.workEmail.trim() &&
+      contact.phoneNumber.trim(),
+    "A complete primary contact is required before submission.",
+  );
+  assertReadiness(
+    application.legalCompanyName.trim() &&
+      application.companyWebsite.trim() &&
+      application.registrationCountry.trim() &&
+      application.brandsHandled.some((brand) => brand.trim()) &&
+      application.annualRevenueRange.trim() &&
+      application.warehouseType.trim() &&
+      application.skuCountRange.trim(),
+    "Complete all initial supplier application fields before submission.",
+  );
+}
+
+export function validateReadyForBusinessReview(
+  application: SupplierApplicationReadiness,
+) {
+  validateReadyForInitialSubmission(application);
+  assertReadiness(
+    application.businessVerification,
+    "Business verification information is required.",
+  );
+}
+
+export function validateReadyForAuthenticityReview(
+  application: SupplierApplicationReadiness,
+) {
+  validateReadyForBusinessReview(application);
+  assertReadiness(
+    application.businessVerification?.reviewStatus ===
+      SupplierReviewStatus.VERIFIED,
+    "Business verification must be verified first.",
+  );
+}
+
+export function validateReadyForOperationsReview(
+  application: SupplierApplicationReadiness,
+  now = new Date(),
+) {
+  validateReadyForAuthenticityReview(application);
+  assertReadiness(
+    hasActiveVerifiedBrandEvidence(application, now),
+    "At least one active brand and its evidence must be verified first.",
+  );
+  assertReadiness(
+    application.operationsProfile,
+    "Operations information is required.",
+  );
+}
+
+export function validateReadyForSettlementReview(
+  application: SupplierApplicationReadiness,
+  now = new Date(),
+) {
+  validateReadyForOperationsReview(application, now);
+  assertReadiness(
+    application.operationsProfile?.reviewStatus ===
+      SupplierReviewStatus.VERIFIED,
+    "Operations verification must be verified first.",
+  );
+  assertReadiness(
+    application.settlementProfile,
+    "Settlement information is required.",
+  );
+}
+
+function hasActiveVerifiedBrandEvidence(
+  application: SupplierApplicationReadiness,
+  now: Date,
+) {
+  return application.brandVerifications.some(
+    (brand) =>
+      brand.isActive &&
+      brand.status === SupplierBrandVerificationStatus.VERIFIED &&
+      (!brand.expiresAt || brand.expiresAt > now) &&
+      brand.documents.some(
+        (document) =>
+          (document.documentType === "SUPPLIER_INVOICE" ||
+            document.documentType === "BRAND_AUTHORIZATION") &&
+          document.reviewStatus === SupplierReviewStatus.VERIFIED,
+      ),
+  );
+}
+
+function hasVerifiedBusinessDocuments(application: SupplierApplicationReadiness) {
+  const verifiedTypes = new Set(
+    application.documents
+      .filter((document) => document.reviewStatus === SupplierReviewStatus.VERIFIED)
+      .map((document) => document.documentType),
+  );
+  return (
+    verifiedTypes.has("BUSINESS_REGISTRATION") &&
+    verifiedTypes.has("COMPANY_AUTHORITY")
+  );
+}
+
+export function validateReadyForConditionalApproval(
+  application: SupplierApplicationReadiness,
+  now = new Date(),
+) {
+  validateReadyForAuthenticityReview(application);
+  assertReadiness(
+    hasActiveVerifiedBrandEvidence(application, now),
+    "At least one active brand and its evidence must be verified before conditional approval.",
+  );
+}
+
+export function validateReadyForFullApproval(
+  application: SupplierApplicationReadiness,
+  options: { now?: Date; duplicateOverrideReason?: string | null } = {},
+) {
+  const now = options.now ?? new Date();
+  validateReadyForSettlementReview(application, now);
+  assertReadiness(
+    application.settlementProfile?.reviewStatus === SupplierReviewStatus.VERIFIED,
+    "Settlement verification must be verified before full approval.",
+  );
+  assertReadiness(
+    hasVerifiedBusinessDocuments(application),
+    "Verified business registration and company authority documents are required.",
+  );
+  assertReadiness(
+    application.informationRequests.every((request) => request.resolvedAt),
+    "Resolve all information requests before full approval.",
+  );
+  const criticalDuplicates = application.duplicateFlags.some(
+    (flag) => flag.severity === "CRITICAL" && !flag.resolvedAt,
+  );
+  assertReadiness(
+    !criticalDuplicates || Boolean(options.duplicateOverrideReason?.trim()),
+    "Resolve critical duplicate flags or provide an administrator override reason.",
+  );
+  assertReadiness(
+    !(
+      [
+      SupplierApplicationStatus.ON_HOLD,
+      SupplierApplicationStatus.REJECTED,
+      SupplierApplicationStatus.WITHDRAWN,
+      ] as readonly SupplierApplicationStatus[]
+    ).includes(application.status),
+    "This application status cannot be fully approved.",
+  );
+}
+
 async function approvalRequirementsMet(
   tx: Prisma.TransactionClient,
   applicationId: string,
   conditional: boolean,
+  duplicateOverrideReason?: string | null,
 ) {
   const application = await tx.supplierApplication.findUniqueOrThrow({
     where: { id: applicationId },
     include: {
       contacts: { where: { isPrimary: true }, take: 1 },
       businessVerification: true,
-      brandVerifications: true,
+      brandVerifications: { include: { documents: true } },
       operationsProfile: true,
       settlementProfile: true,
+      documents: true,
+      informationRequests: true,
+      duplicateFlags: true,
     },
   });
-  if (
-    !application.contacts[0] ||
-    !application.legalCompanyName ||
-    !application.registrationCountry
-  ) {
-    throw validationError(
-      "Basic supplier application information is incomplete.",
-    );
-  }
-  if (
-    application.businessVerification?.reviewStatus !==
-    SupplierReviewStatus.VERIFIED
-  ) {
-    throw validationError(
-      "Business verification must be verified before approval.",
-    );
-  }
-  if (
-    !application.brandVerifications.some(
-      (brand) => brand.status === SupplierBrandVerificationStatus.VERIFIED,
-    )
-  ) {
-    throw validationError(
-      "At least one brand must be verified before approval.",
-    );
-  }
-  if (
-    !conditional &&
-    application.operationsProfile?.reviewStatus !==
-      SupplierReviewStatus.VERIFIED
-  ) {
-    throw validationError(
-      "Operations verification must be verified before full approval.",
-    );
-  }
-  if (
-    !conditional &&
-    application.settlementProfile?.reviewStatus !==
-      SupplierReviewStatus.VERIFIED
-  ) {
-    throw validationError(
-      "Settlement verification must be verified before full approval.",
-    );
-  }
+  if (conditional) validateReadyForConditionalApproval(application);
+  else validateReadyForFullApproval(application, { duplicateOverrideReason });
   return application;
 }
 
@@ -1366,11 +1624,13 @@ async function ensureApprovedCompany(
   tx: Prisma.TransactionClient,
   applicationId: string,
   conditional: boolean,
+  duplicateOverrideReason?: string | null,
 ) {
   const application = await approvalRequirementsMet(
     tx,
     applicationId,
     conditional,
+    duplicateOverrideReason,
   );
   const business = application.businessVerification!;
   const existing =
@@ -1395,8 +1655,10 @@ async function ensureApprovedCompany(
     ? await tx.company.update({
         where: { id: existing.id },
         data: {
-          verificationStatus: "verified",
-          verifiedSellerSince: existing.verifiedSellerSince ?? new Date(),
+          verificationStatus: conditional ? "pending_review" : "verified",
+          verifiedSellerSince: conditional
+            ? existing.verifiedSellerSince
+            : existing.verifiedSellerSince ?? new Date(),
         },
       })
     : await tx.company.create({
@@ -1409,8 +1671,8 @@ async function ensureApprovedCompany(
           country: application.registrationCountry,
           city: "",
           businessAddress: business.registeredAddress,
-          verificationStatus: "verified",
-          verifiedSellerSince: new Date(),
+          verificationStatus: conditional ? "pending_review" : "verified",
+          verifiedSellerSince: conditional ? null : new Date(),
         },
       });
   await tx.sellerProfile.upsert({
@@ -1460,6 +1722,7 @@ export async function transitionSupplierApplication({
   targetStatus: SupplierApplicationStatus;
   reason?: string | null;
 }) {
+  requireSupplierApplicationsEnabled();
   const trimmedReason = reason?.trim() || null;
   if (statusReasonRequired.has(targetStatus) && !trimmedReason) {
     throw validationError("A reason is required for this status change.");
@@ -1468,9 +1731,35 @@ export async function transitionSupplierApplication({
   return db.$transaction(async (tx) => {
     const application = await tx.supplierApplication.findUnique({
       where: { id: applicationId },
+      include: {
+        contacts: { where: { isPrimary: true }, take: 1 },
+        businessVerification: true,
+        brandVerifications: { include: { documents: true } },
+        operationsProfile: true,
+        settlementProfile: true,
+        documents: true,
+        informationRequests: true,
+        duplicateFlags: true,
+      },
     });
     if (!application)
       throw new Response("Supplier application not found.", { status: 404 });
+    if (actor === "ADMIN") {
+      const admin = await tx.userProfile.findUnique({
+        where: { id: actorUserId },
+        select: { role: true },
+      });
+      if (admin?.role !== AccountRole.admin) {
+        throw new Response("Forbidden", { status: 403 });
+      }
+    }
+    if (
+      application.status === targetStatus &&
+      (targetStatus === SupplierApplicationStatus.APPROVED ||
+        targetStatus === SupplierApplicationStatus.CONDITIONALLY_APPROVED)
+    ) {
+      return application;
+    }
     if (!canTransitionSupplierApplication(actor, application.status, targetStatus)) {
       throw validationError(
         "This supplier application transition is not allowed.",
@@ -1479,19 +1768,29 @@ export async function transitionSupplierApplication({
     if (actor === "APPLICANT" && application.applicantUserId !== actorUserId) {
       throw new Response("Forbidden", { status: 403 });
     }
+    if (targetStatus === SupplierApplicationStatus.SUBMITTED)
+      validateReadyForInitialSubmission(application);
+    if (targetStatus === SupplierApplicationStatus.BUSINESS_VERIFICATION)
+      validateReadyForBusinessReview(application);
     if (
-      targetStatus === SupplierApplicationStatus.SUBMITTED &&
-      !application.legalCompanyName
-    ) {
-      throw validationError(
-        "Complete the initial supplier application before submitting.",
-      );
-    }
+      targetStatus ===
+      SupplierApplicationStatus.PRODUCT_AUTHENTICITY_VERIFICATION
+    )
+      validateReadyForAuthenticityReview(application);
+    if (targetStatus === SupplierApplicationStatus.OPERATIONS_VERIFICATION)
+      validateReadyForOperationsReview(application);
+    if (targetStatus === SupplierApplicationStatus.SETTLEMENT_VERIFICATION)
+      validateReadyForSettlementReview(application);
     const conditional =
       targetStatus === SupplierApplicationStatus.CONDITIONALLY_APPROVED;
     const company =
       targetStatus === SupplierApplicationStatus.APPROVED || conditional
-        ? await ensureApprovedCompany(tx, application.id, conditional)
+        ? await ensureApprovedCompany(
+            tx,
+            application.id,
+            conditional,
+            trimmedReason,
+          )
         : null;
     const now = new Date();
     const updated = await tx.supplierApplication.update({
@@ -1512,6 +1811,15 @@ export async function transitionSupplierApplication({
             ? now
             : application.approvedAt,
         approvedCompanyId: company?.id ?? application.approvedCompanyId,
+        ...(targetStatus === SupplierApplicationStatus.APPROVED &&
+        application.duplicateFlags.some(
+          (flag) => flag.severity === "CRITICAL" && !flag.resolvedAt,
+        )
+          ? {
+              riskOverrideReason: trimmedReason,
+              riskOverrideByUserId: actorUserId,
+            }
+          : {}),
       },
     });
     await tx.supplierApplicationStatusHistory.create({
@@ -1533,6 +1841,20 @@ export async function transitionSupplierApplication({
         after: { status: targetStatus, reasonProvided: Boolean(trimmedReason) },
       },
     });
+    if (
+      targetStatus === SupplierApplicationStatus.APPROVED ||
+      targetStatus === SupplierApplicationStatus.CONDITIONALLY_APPROVED
+    ) {
+      await tx.supplierApplicationReview.create({
+        data: {
+          applicationId: application.id,
+          section: SupplierApplicationSection.FINAL_REVIEW,
+          status: SupplierReviewStatus.VERIFIED,
+          notes: trimmedReason ?? "",
+          reviewedByUserId: actorUserId,
+        },
+      });
+    }
     return updated;
   });
 }
@@ -1553,6 +1875,7 @@ export async function createSupplierInformationRequest({
     | typeof SupplierApplicationStatus.ADDITIONAL_DOCUMENTS_REQUIRED
     | typeof SupplierApplicationStatus.INVENTORY_VERIFICATION_REQUIRED;
 }) {
+  requireSupplierApplicationsEnabled();
   const requestMessage = text(message, "message", 4_000, true);
   return getDb().$transaction(async (tx) => {
     const application = await tx.supplierApplication.findUnique({
@@ -1613,6 +1936,7 @@ export async function recordSupplierApplicationReview({
   status: SupplierReviewStatus;
   notes?: string;
 }) {
+  requireSupplierApplicationsEnabled();
   const db = getDb();
   const note = text(notes ?? "", "notes", 4_000);
   return db.$transaction(async (tx) => {
@@ -1648,31 +1972,8 @@ export async function recordSupplierApplicationReview({
         data: { reviewStatus: status, reviewedAt: new Date() },
       });
     }
-    if (section === SupplierApplicationSection.BRANDS) {
-      const brandStatus =
-        status === SupplierReviewStatus.VERIFIED
-          ? SupplierBrandVerificationStatus.VERIFIED
-          : status === SupplierReviewStatus.ADDITIONAL_INFORMATION_REQUIRED
-            ? SupplierBrandVerificationStatus.ADDITIONAL_EVIDENCE_REQUIRED
-            : status === SupplierReviewStatus.REJECTED ||
-                status === SupplierReviewStatus.INVALID_DOCUMENT
-              ? SupplierBrandVerificationStatus.REJECTED
-              : SupplierBrandVerificationStatus.PENDING;
-      await tx.supplierBrandVerification.updateMany({
-        where: {
-          applicationId,
-          status: SupplierBrandVerificationStatus.PENDING,
-        },
-        data: {
-          evidenceStatus: status,
-          status: brandStatus,
-          verifiedAt:
-            brandStatus === SupplierBrandVerificationStatus.VERIFIED
-              ? new Date()
-              : null,
-        },
-      });
-    }
+    // BRANDS reviews are aggregate audit records only. Individual brand state
+    // changes go through reviewSupplierBrandVerification().
     if (section === SupplierApplicationSection.DOCUMENTS) {
       await tx.supplierApplicationDocument.updateMany({
         where: { applicationId, reviewStatus: SupplierReviewStatus.PENDING },
@@ -1698,32 +1999,278 @@ export async function recordSupplierApplicationReview({
   });
 }
 
+export async function reviewSupplierBrandVerification({
+  applicationId,
+  brandVerificationId,
+  adminUserId,
+  input,
+}: {
+  applicationId: string;
+  brandVerificationId: string;
+  adminUserId: string;
+  input: {
+    status: SupplierBrandVerificationStatus;
+    evidenceStatus: SupplierReviewStatus;
+    reviewNotes?: string;
+    expiresAt?: Date | null;
+    countryRestrictions?: string[];
+    reason: string;
+  };
+}) {
+  requireSupplierApplicationsEnabled();
+  const reason = text(input.reason, "reason", 4_000, true);
+  const reviewNotes = text(input.reviewNotes ?? "", "reviewNotes", 4_000);
+  if (
+    input.status === SupplierBrandVerificationStatus.VERIFIED &&
+    input.evidenceStatus !== SupplierReviewStatus.VERIFIED
+  ) {
+    throw validationError("Verified brands require verified evidence.");
+  }
+  if (input.expiresAt && input.expiresAt <= new Date()) {
+    throw validationError("expiresAt must be in the future.");
+  }
+  return getDb().$transaction(async (tx) => {
+    const admin = await tx.userProfile.findUnique({
+      where: { id: adminUserId },
+      select: { role: true },
+    });
+    if (admin?.role !== AccountRole.admin)
+      throw new Response("Forbidden", { status: 403 });
+    const brand = await tx.supplierBrandVerification.findFirst({
+      where: { id: brandVerificationId, applicationId },
+    });
+    if (!brand)
+      throw new Response("Brand verification not found.", { status: 404 });
+    if (!brand.isActive)
+      throw validationError("Removed brands cannot be reviewed.");
+    const now = new Date();
+    const updated = await tx.supplierBrandVerification.update({
+      where: { id: brand.id },
+      data: {
+        status: input.status,
+        evidenceStatus: input.evidenceStatus,
+        reviewNotes,
+        expiresAt: input.expiresAt,
+        countryRestrictions: input.countryRestrictions,
+        verifiedAt:
+          input.status === SupplierBrandVerificationStatus.VERIFIED
+            ? now
+            : null,
+      },
+    });
+    await tx.supplierApplicationAuditEvent.create({
+      data: {
+        applicationId,
+        actorUserId: adminUserId,
+        action: "BRAND_REVIEWED",
+        before: {
+          brandVerificationId: brand.id,
+          status: brand.status,
+          evidenceStatus: brand.evidenceStatus,
+        },
+        after: {
+          brandVerificationId: brand.id,
+          status: input.status,
+          evidenceStatus: input.evidenceStatus,
+          reason,
+        },
+      },
+    });
+    return updated;
+  });
+}
+
+export async function respondToSupplierInformationRequest({
+  applicationId,
+  requestId,
+  applicantUserId,
+  response,
+}: {
+  applicationId: string;
+  requestId: string;
+  applicantUserId: string;
+  response: string;
+}) {
+  requireSupplierApplicationsEnabled();
+  const applicantResponse = text(response, "response", 4_000, true);
+  return getDb().$transaction(async (tx) => {
+    const request = await tx.supplierInformationRequest.findFirst({
+      where: {
+        id: requestId,
+        applicationId,
+        application: { applicantUserId },
+      },
+      include: { application: { select: { status: true } } },
+    });
+    if (!request)
+      throw new Response("Information request not found.", { status: 404 });
+    if (!canEditSupplierApplication(request.application.status))
+      throw new Response("This supplier application is read-only.", {
+        status: 409,
+      });
+    if (request.resolvedAt)
+      throw validationError("This information request is already resolved.");
+    const updated = await tx.supplierInformationRequest.update({
+      where: { id: request.id },
+      data: { applicantResponse, respondedAt: new Date() },
+    });
+    await tx.supplierApplicationAuditEvent.create({
+      data: {
+        applicationId,
+        actorUserId: applicantUserId,
+        action: "INFORMATION_REQUEST_RESPONDED",
+        before: { requestId, responded: Boolean(request.respondedAt) },
+        after: { requestId, responded: true, resolved: false },
+      },
+    });
+    return updated;
+  });
+}
+
+export async function resolveSupplierInformationRequest({
+  applicationId,
+  requestId,
+  adminUserId,
+  resolutionNote,
+}: {
+  applicationId: string;
+  requestId: string;
+  adminUserId: string;
+  resolutionNote: string;
+}) {
+  requireSupplierApplicationsEnabled();
+  const note = text(resolutionNote, "resolutionNote", 4_000, true);
+  return getDb().$transaction(async (tx) => {
+    const admin = await tx.userProfile.findUnique({
+      where: { id: adminUserId },
+      select: { role: true },
+    });
+    if (admin?.role !== AccountRole.admin)
+      throw new Response("Forbidden", { status: 403 });
+    const request = await tx.supplierInformationRequest.findFirst({
+      where: { id: requestId, applicationId },
+    });
+    if (!request)
+      throw new Response("Information request not found.", { status: 404 });
+    const updated = await tx.supplierInformationRequest.update({
+      where: { id: request.id },
+      data: {
+        resolvedAt: request.resolvedAt ?? new Date(),
+        resolvedByUserId: request.resolvedByUserId ?? adminUserId,
+        resolutionNote: note,
+      },
+    });
+    await tx.supplierApplicationAuditEvent.create({
+      data: {
+        applicationId,
+        actorUserId: adminUserId,
+        action: "INFORMATION_REQUEST_RESOLVED",
+        before: { requestId, resolved: Boolean(request.resolvedAt) },
+        after: { requestId, resolved: true },
+      },
+    });
+    return updated;
+  });
+}
+
 export async function getSupplierApplicationCapabilities(
   userId: string,
+  options?: SupplierCapabilityLoadOptions,
 ): Promise<SupplierApplicationCapabilities> {
-  const db = getDb();
-  const [application, company] = await Promise.all([
-    db.supplierApplication.findFirst({
+  const loadCompany =
+    options?.loadCompany ??
+    (() =>
+      getDb().company.findUnique({
+        where: {
+          ownerUserId_companyRole: {
+            ownerUserId: userId,
+            companyRole: "seller",
+          },
+        },
+        include: { sellerPayoutProfile: { select: { status: true } } },
+      }));
+  const company = await loadCompany();
+  const enabled = options?.enabled ?? supplierApplicationsEnabled();
+  if (!enabled) {
+    return resolveSupplierApplicationCapabilities({
+      application: null,
+      company,
+      now: options?.now,
+    });
+  }
+  const loadApplication =
+    options?.loadApplication ??
+    (() =>
+      getDb().supplierApplication.findFirst({
       where: { applicantUserId: userId },
       orderBy: { updatedAt: "desc" },
       include: {
         approvedCompany: {
           select: {
             id: true,
+            deletedAt: true,
             verificationStatus: true,
             sellerPayoutProfile: { select: { status: true } },
           },
         },
-        brandVerifications: { select: { status: true } },
+        legacyCompany: {
+          select: {
+            id: true,
+            deletedAt: true,
+            verificationStatus: true,
+            sellerPayoutProfile: { select: { status: true } },
+          },
+        },
+        brandVerifications: {
+          select: { status: true, isActive: true, expiresAt: true },
+        },
       },
-    }),
-    db.company.findUnique({
-      where: {
-        ownerUserId_companyRole: { ownerUserId: userId, companyRole: "seller" },
-      },
-      include: { sellerPayoutProfile: { select: { status: true } } },
-    }),
-  ]);
+    }));
+  const application = await loadApplication();
+  return resolveSupplierApplicationCapabilities({
+    application,
+    company,
+    now: options?.now,
+  });
+}
+
+type CapabilityCompany = {
+  id: string;
+  deletedAt: Date | null;
+  verificationStatus: string;
+  sellerPayoutProfile: { status: string } | null;
+};
+
+type CapabilityApplication = {
+  id: string;
+  status: SupplierApplicationStatus;
+  legacyClassification: SupplierLegacyClassification | null;
+  legacyCompanyId: string | null;
+  approvedCompany: CapabilityCompany | null;
+  legacyCompany: CapabilityCompany | null;
+  brandVerifications: Array<{
+    status: SupplierBrandVerificationStatus;
+    isActive: boolean;
+    expiresAt: Date | null;
+  }>;
+};
+
+export type SupplierCapabilityLoadOptions = {
+  enabled?: boolean;
+  now?: Date;
+  loadCompany?: () => Promise<CapabilityCompany | null>;
+  loadApplication?: () => Promise<CapabilityApplication | null>;
+};
+
+export function resolveSupplierApplicationCapabilities({
+  application,
+  company,
+  now = new Date(),
+}: {
+  application: CapabilityApplication | null;
+  company: CapabilityCompany | null;
+  now?: Date;
+}): SupplierApplicationCapabilities {
   if (!application) {
     const legacyVerified = Boolean(
       company &&
@@ -1741,6 +2288,7 @@ export async function getSupplierApplicationCapabilities(
       canUploadLiveInventory: legacyVerified,
       canCreateProductCandidate: legacyVerified,
       canPublishOffer: legacyVerified,
+      canReceiveTestOrder: false,
       canReceiveOrder: legacyVerified,
       canShipOrder: legacyVerified,
       canReceivePayout:
@@ -1749,11 +2297,23 @@ export async function getSupplierApplicationCapabilities(
     };
   }
   const approvedCompany = application.approvedCompany ?? company;
+  const grandfatheredLegacy = Boolean(
+    application.status !== SupplierApplicationStatus.SUSPENDED &&
+      application.legacyClassification ===
+        SupplierLegacyClassification.LEGACY_CONDITIONALLY_APPROVED &&
+      application.legacyCompanyId &&
+      application.legacyCompany?.id === application.legacyCompanyId &&
+      !application.legacyCompany.deletedAt &&
+      application.legacyCompany.verificationStatus === "verified",
+  );
   const activeApproved =
     application.status === SupplierApplicationStatus.APPROVED &&
     approvedCompany?.verificationStatus === "verified";
   const verifiedBrand = application.brandVerifications.some(
-    (brand) => brand.status === SupplierBrandVerificationStatus.VERIFIED,
+    (brand) =>
+      brand.isActive &&
+      brand.status === SupplierBrandVerificationStatus.VERIFIED &&
+      (!brand.expiresAt || brand.expiresAt > now),
   );
   const conditional =
     application.status === SupplierApplicationStatus.CONDITIONALLY_APPROVED;
@@ -1767,22 +2327,25 @@ export async function getSupplierApplicationCapabilities(
       SupplierApplicationStatus.INVENTORY_VERIFICATION_REQUIRED,
       SupplierApplicationStatus.ADDITIONAL_DOCUMENTS_REQUIRED,
     ] as readonly SupplierApplicationStatus[]).includes(application.status),
-    canUploadLiveInventory: Boolean(activeApproved && verifiedBrand),
-    canCreateProductCandidate: Boolean(activeApproved && verifiedBrand),
-    canPublishOffer: Boolean(activeApproved && verifiedBrand),
-    canReceiveOrder: Boolean(
-      (activeApproved || conditional) &&
-      approvedCompany?.verificationStatus === "verified",
+    canUploadLiveInventory: Boolean(
+      grandfatheredLegacy || (activeApproved && verifiedBrand),
     ),
-    canShipOrder: Boolean(
-      (activeApproved || conditional) &&
-      approvedCompany?.verificationStatus === "verified",
+    canCreateProductCandidate: Boolean(
+      grandfatheredLegacy || (activeApproved && verifiedBrand),
     ),
+    canPublishOffer: Boolean(
+      grandfatheredLegacy || (activeApproved && verifiedBrand),
+    ),
+    canReceiveTestOrder: conditional && !grandfatheredLegacy,
+    canReceiveOrder: Boolean(grandfatheredLegacy || activeApproved),
+    canShipOrder: Boolean(grandfatheredLegacy || activeApproved),
     canReceivePayout: Boolean(
-      activeApproved &&
-      approvedCompany?.sellerPayoutProfile?.status === "VERIFIED",
+      (grandfatheredLegacy || activeApproved) &&
+        (grandfatheredLegacy
+          ? application.legacyCompany?.sellerPayoutProfile?.status
+          : approvedCompany?.sellerPayoutProfile?.status) === "VERIFIED",
     ),
-    isLegacyFallback: false,
+    isLegacyFallback: grandfatheredLegacy,
   };
 }
 

@@ -28,6 +28,9 @@ export type SupplierBrandVerificationMinAggregateOutputType = {
   id: string | null
   applicationId: string | null
   brand: string | null
+  normalizedBrand: string | null
+  isActive: boolean | null
+  removedAt: Date | null
   relationshipType: $Enums.SupplierSupplyChainType | null
   supplierCompany: string | null
   transactionStartedAt: Date | null
@@ -44,6 +47,9 @@ export type SupplierBrandVerificationMaxAggregateOutputType = {
   id: string | null
   applicationId: string | null
   brand: string | null
+  normalizedBrand: string | null
+  isActive: boolean | null
+  removedAt: Date | null
   relationshipType: $Enums.SupplierSupplyChainType | null
   supplierCompany: string | null
   transactionStartedAt: Date | null
@@ -60,6 +66,9 @@ export type SupplierBrandVerificationCountAggregateOutputType = {
   id: number
   applicationId: number
   brand: number
+  normalizedBrand: number
+  isActive: number
+  removedAt: number
   relationshipType: number
   supplierCompany: number
   transactionStartedAt: number
@@ -79,6 +88,9 @@ export type SupplierBrandVerificationMinAggregateInputType = {
   id?: true
   applicationId?: true
   brand?: true
+  normalizedBrand?: true
+  isActive?: true
+  removedAt?: true
   relationshipType?: true
   supplierCompany?: true
   transactionStartedAt?: true
@@ -95,6 +107,9 @@ export type SupplierBrandVerificationMaxAggregateInputType = {
   id?: true
   applicationId?: true
   brand?: true
+  normalizedBrand?: true
+  isActive?: true
+  removedAt?: true
   relationshipType?: true
   supplierCompany?: true
   transactionStartedAt?: true
@@ -111,6 +126,9 @@ export type SupplierBrandVerificationCountAggregateInputType = {
   id?: true
   applicationId?: true
   brand?: true
+  normalizedBrand?: true
+  isActive?: true
+  removedAt?: true
   relationshipType?: true
   supplierCompany?: true
   transactionStartedAt?: true
@@ -201,6 +219,9 @@ export type SupplierBrandVerificationGroupByOutputType = {
   id: string
   applicationId: string
   brand: string
+  normalizedBrand: string
+  isActive: boolean
+  removedAt: Date | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany: string
   transactionStartedAt: Date | null
@@ -239,6 +260,9 @@ export type SupplierBrandVerificationWhereInput = {
   id?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   applicationId?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   brand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  normalizedBrand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  isActive?: Prisma.BoolFilter<"SupplierBrandVerification"> | boolean
+  removedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFilter<"SupplierBrandVerification"> | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   transactionStartedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
@@ -258,6 +282,9 @@ export type SupplierBrandVerificationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
   brand?: Prisma.SortOrder
+  normalizedBrand?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  removedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   relationshipType?: Prisma.SortOrder
   supplierCompany?: Prisma.SortOrder
   transactionStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -275,12 +302,15 @@ export type SupplierBrandVerificationOrderByWithRelationInput = {
 
 export type SupplierBrandVerificationWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  applicationId_brand?: Prisma.SupplierBrandVerificationApplicationIdBrandCompoundUniqueInput
+  applicationId_normalizedBrand?: Prisma.SupplierBrandVerificationApplicationIdNormalizedBrandCompoundUniqueInput
   AND?: Prisma.SupplierBrandVerificationWhereInput | Prisma.SupplierBrandVerificationWhereInput[]
   OR?: Prisma.SupplierBrandVerificationWhereInput[]
   NOT?: Prisma.SupplierBrandVerificationWhereInput | Prisma.SupplierBrandVerificationWhereInput[]
   applicationId?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   brand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  normalizedBrand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  isActive?: Prisma.BoolFilter<"SupplierBrandVerification"> | boolean
+  removedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFilter<"SupplierBrandVerification"> | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   transactionStartedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
@@ -294,12 +324,15 @@ export type SupplierBrandVerificationWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"SupplierBrandVerification"> | Date | string
   application?: Prisma.XOR<Prisma.SupplierApplicationScalarRelationFilter, Prisma.SupplierApplicationWhereInput>
   documents?: Prisma.SupplierApplicationDocumentListRelationFilter
-}, "id" | "applicationId_brand">
+}, "id" | "applicationId_normalizedBrand">
 
 export type SupplierBrandVerificationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
   brand?: Prisma.SortOrder
+  normalizedBrand?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  removedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   relationshipType?: Prisma.SortOrder
   supplierCompany?: Prisma.SortOrder
   transactionStartedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -323,6 +356,9 @@ export type SupplierBrandVerificationScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"SupplierBrandVerification"> | string
   applicationId?: Prisma.StringWithAggregatesFilter<"SupplierBrandVerification"> | string
   brand?: Prisma.StringWithAggregatesFilter<"SupplierBrandVerification"> | string
+  normalizedBrand?: Prisma.StringWithAggregatesFilter<"SupplierBrandVerification"> | string
+  isActive?: Prisma.BoolWithAggregatesFilter<"SupplierBrandVerification"> | boolean
+  removedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierBrandVerification"> | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeWithAggregatesFilter<"SupplierBrandVerification"> | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringWithAggregatesFilter<"SupplierBrandVerification"> | string
   transactionStartedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierBrandVerification"> | Date | string | null
@@ -339,6 +375,9 @@ export type SupplierBrandVerificationScalarWhereWithAggregatesInput = {
 export type SupplierBrandVerificationCreateInput = {
   id?: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -358,6 +397,9 @@ export type SupplierBrandVerificationUncheckedCreateInput = {
   id?: string
   applicationId: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -375,6 +417,9 @@ export type SupplierBrandVerificationUncheckedCreateInput = {
 export type SupplierBrandVerificationUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -394,6 +439,9 @@ export type SupplierBrandVerificationUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -412,6 +460,9 @@ export type SupplierBrandVerificationCreateManyInput = {
   id?: string
   applicationId: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -428,6 +479,9 @@ export type SupplierBrandVerificationCreateManyInput = {
 export type SupplierBrandVerificationUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -445,6 +499,9 @@ export type SupplierBrandVerificationUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -468,15 +525,18 @@ export type SupplierBrandVerificationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type SupplierBrandVerificationApplicationIdBrandCompoundUniqueInput = {
+export type SupplierBrandVerificationApplicationIdNormalizedBrandCompoundUniqueInput = {
   applicationId: string
-  brand: string
+  normalizedBrand: string
 }
 
 export type SupplierBrandVerificationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
   brand?: Prisma.SortOrder
+  normalizedBrand?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  removedAt?: Prisma.SortOrder
   relationshipType?: Prisma.SortOrder
   supplierCompany?: Prisma.SortOrder
   transactionStartedAt?: Prisma.SortOrder
@@ -494,6 +554,9 @@ export type SupplierBrandVerificationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
   brand?: Prisma.SortOrder
+  normalizedBrand?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  removedAt?: Prisma.SortOrder
   relationshipType?: Prisma.SortOrder
   supplierCompany?: Prisma.SortOrder
   transactionStartedAt?: Prisma.SortOrder
@@ -510,6 +573,9 @@ export type SupplierBrandVerificationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   applicationId?: Prisma.SortOrder
   brand?: Prisma.SortOrder
+  normalizedBrand?: Prisma.SortOrder
+  isActive?: Prisma.SortOrder
+  removedAt?: Prisma.SortOrder
   relationshipType?: Prisma.SortOrder
   supplierCompany?: Prisma.SortOrder
   transactionStartedAt?: Prisma.SortOrder
@@ -601,6 +667,9 @@ export type SupplierBrandVerificationUpdateOneWithoutDocumentsNestedInput = {
 export type SupplierBrandVerificationCreateWithoutApplicationInput = {
   id?: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -618,6 +687,9 @@ export type SupplierBrandVerificationCreateWithoutApplicationInput = {
 export type SupplierBrandVerificationUncheckedCreateWithoutApplicationInput = {
   id?: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -665,6 +737,9 @@ export type SupplierBrandVerificationScalarWhereInput = {
   id?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   applicationId?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   brand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  normalizedBrand?: Prisma.StringFilter<"SupplierBrandVerification"> | string
+  isActive?: Prisma.BoolFilter<"SupplierBrandVerification"> | boolean
+  removedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFilter<"SupplierBrandVerification"> | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFilter<"SupplierBrandVerification"> | string
   transactionStartedAt?: Prisma.DateTimeNullableFilter<"SupplierBrandVerification"> | Date | string | null
@@ -681,6 +756,9 @@ export type SupplierBrandVerificationScalarWhereInput = {
 export type SupplierBrandVerificationCreateWithoutDocumentsInput = {
   id?: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -699,6 +777,9 @@ export type SupplierBrandVerificationUncheckedCreateWithoutDocumentsInput = {
   id?: string
   applicationId: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -731,6 +812,9 @@ export type SupplierBrandVerificationUpdateToOneWithWhereWithoutDocumentsInput =
 export type SupplierBrandVerificationUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -749,6 +833,9 @@ export type SupplierBrandVerificationUncheckedUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -765,6 +852,9 @@ export type SupplierBrandVerificationUncheckedUpdateWithoutDocumentsInput = {
 export type SupplierBrandVerificationCreateManyApplicationInput = {
   id?: string
   brand: string
+  normalizedBrand: string
+  isActive?: boolean
+  removedAt?: Date | string | null
   relationshipType: $Enums.SupplierSupplyChainType
   supplierCompany?: string
   transactionStartedAt?: Date | string | null
@@ -781,6 +871,9 @@ export type SupplierBrandVerificationCreateManyApplicationInput = {
 export type SupplierBrandVerificationUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -798,6 +891,9 @@ export type SupplierBrandVerificationUpdateWithoutApplicationInput = {
 export type SupplierBrandVerificationUncheckedUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -815,6 +911,9 @@ export type SupplierBrandVerificationUncheckedUpdateWithoutApplicationInput = {
 export type SupplierBrandVerificationUncheckedUpdateManyWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   brand?: Prisma.StringFieldUpdateOperationsInput | string
+  normalizedBrand?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  removedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   relationshipType?: Prisma.EnumSupplierSupplyChainTypeFieldUpdateOperationsInput | $Enums.SupplierSupplyChainType
   supplierCompany?: Prisma.StringFieldUpdateOperationsInput | string
   transactionStartedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -863,6 +962,9 @@ export type SupplierBrandVerificationSelect<ExtArgs extends runtime.Types.Extens
   id?: boolean
   applicationId?: boolean
   brand?: boolean
+  normalizedBrand?: boolean
+  isActive?: boolean
+  removedAt?: boolean
   relationshipType?: boolean
   supplierCompany?: boolean
   transactionStartedAt?: boolean
@@ -883,6 +985,9 @@ export type SupplierBrandVerificationSelectCreateManyAndReturn<ExtArgs extends r
   id?: boolean
   applicationId?: boolean
   brand?: boolean
+  normalizedBrand?: boolean
+  isActive?: boolean
+  removedAt?: boolean
   relationshipType?: boolean
   supplierCompany?: boolean
   transactionStartedAt?: boolean
@@ -901,6 +1006,9 @@ export type SupplierBrandVerificationSelectUpdateManyAndReturn<ExtArgs extends r
   id?: boolean
   applicationId?: boolean
   brand?: boolean
+  normalizedBrand?: boolean
+  isActive?: boolean
+  removedAt?: boolean
   relationshipType?: boolean
   supplierCompany?: boolean
   transactionStartedAt?: boolean
@@ -919,6 +1027,9 @@ export type SupplierBrandVerificationSelectScalar = {
   id?: boolean
   applicationId?: boolean
   brand?: boolean
+  normalizedBrand?: boolean
+  isActive?: boolean
+  removedAt?: boolean
   relationshipType?: boolean
   supplierCompany?: boolean
   transactionStartedAt?: boolean
@@ -932,7 +1043,7 @@ export type SupplierBrandVerificationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SupplierBrandVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "brand" | "relationshipType" | "supplierCompany" | "transactionStartedAt" | "evidenceStatus" | "reviewNotes" | "countryRestrictions" | "status" | "verifiedAt" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["supplierBrandVerification"]>
+export type SupplierBrandVerificationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "brand" | "normalizedBrand" | "isActive" | "removedAt" | "relationshipType" | "supplierCompany" | "transactionStartedAt" | "evidenceStatus" | "reviewNotes" | "countryRestrictions" | "status" | "verifiedAt" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["supplierBrandVerification"]>
 export type SupplierBrandVerificationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   documents?: boolean | Prisma.SupplierBrandVerification$documentsArgs<ExtArgs>
@@ -955,6 +1066,9 @@ export type $SupplierBrandVerificationPayload<ExtArgs extends runtime.Types.Exte
     id: string
     applicationId: string
     brand: string
+    normalizedBrand: string
+    isActive: boolean
+    removedAt: Date | null
     relationshipType: $Enums.SupplierSupplyChainType
     supplierCompany: string
     transactionStartedAt: Date | null
@@ -1394,6 +1508,9 @@ export interface SupplierBrandVerificationFieldRefs {
   readonly id: Prisma.FieldRef<"SupplierBrandVerification", 'String'>
   readonly applicationId: Prisma.FieldRef<"SupplierBrandVerification", 'String'>
   readonly brand: Prisma.FieldRef<"SupplierBrandVerification", 'String'>
+  readonly normalizedBrand: Prisma.FieldRef<"SupplierBrandVerification", 'String'>
+  readonly isActive: Prisma.FieldRef<"SupplierBrandVerification", 'Boolean'>
+  readonly removedAt: Prisma.FieldRef<"SupplierBrandVerification", 'DateTime'>
   readonly relationshipType: Prisma.FieldRef<"SupplierBrandVerification", 'SupplierSupplyChainType'>
   readonly supplierCompany: Prisma.FieldRef<"SupplierBrandVerification", 'String'>
   readonly transactionStartedAt: Prisma.FieldRef<"SupplierBrandVerification", 'DateTime'>

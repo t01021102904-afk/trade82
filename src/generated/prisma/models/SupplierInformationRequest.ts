@@ -30,6 +30,10 @@ export type SupplierInformationRequestMinAggregateOutputType = {
   section: $Enums.SupplierApplicationSection | null
   message: string | null
   requestedByUserId: string | null
+  applicantResponse: string | null
+  respondedAt: Date | null
+  resolvedByUserId: string | null
+  resolutionNote: string | null
   resolvedAt: Date | null
   createdAt: Date | null
 }
@@ -40,6 +44,10 @@ export type SupplierInformationRequestMaxAggregateOutputType = {
   section: $Enums.SupplierApplicationSection | null
   message: string | null
   requestedByUserId: string | null
+  applicantResponse: string | null
+  respondedAt: Date | null
+  resolvedByUserId: string | null
+  resolutionNote: string | null
   resolvedAt: Date | null
   createdAt: Date | null
 }
@@ -50,6 +58,10 @@ export type SupplierInformationRequestCountAggregateOutputType = {
   section: number
   message: number
   requestedByUserId: number
+  applicantResponse: number
+  respondedAt: number
+  resolvedByUserId: number
+  resolutionNote: number
   resolvedAt: number
   createdAt: number
   _all: number
@@ -62,6 +74,10 @@ export type SupplierInformationRequestMinAggregateInputType = {
   section?: true
   message?: true
   requestedByUserId?: true
+  applicantResponse?: true
+  respondedAt?: true
+  resolvedByUserId?: true
+  resolutionNote?: true
   resolvedAt?: true
   createdAt?: true
 }
@@ -72,6 +88,10 @@ export type SupplierInformationRequestMaxAggregateInputType = {
   section?: true
   message?: true
   requestedByUserId?: true
+  applicantResponse?: true
+  respondedAt?: true
+  resolvedByUserId?: true
+  resolutionNote?: true
   resolvedAt?: true
   createdAt?: true
 }
@@ -82,6 +102,10 @@ export type SupplierInformationRequestCountAggregateInputType = {
   section?: true
   message?: true
   requestedByUserId?: true
+  applicantResponse?: true
+  respondedAt?: true
+  resolvedByUserId?: true
+  resolutionNote?: true
   resolvedAt?: true
   createdAt?: true
   _all?: true
@@ -165,6 +189,10 @@ export type SupplierInformationRequestGroupByOutputType = {
   section: $Enums.SupplierApplicationSection
   message: string
   requestedByUserId: string
+  applicantResponse: string | null
+  respondedAt: Date | null
+  resolvedByUserId: string | null
+  resolutionNote: string | null
   resolvedAt: Date | null
   createdAt: Date
   _count: SupplierInformationRequestCountAggregateOutputType | null
@@ -196,10 +224,15 @@ export type SupplierInformationRequestWhereInput = {
   section?: Prisma.EnumSupplierApplicationSectionFilter<"SupplierInformationRequest"> | $Enums.SupplierApplicationSection
   message?: Prisma.StringFilter<"SupplierInformationRequest"> | string
   requestedByUserId?: Prisma.StringFilter<"SupplierInformationRequest"> | string
+  applicantResponse?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  respondedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
+  resolvedByUserId?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  resolutionNote?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SupplierInformationRequest"> | Date | string
   application?: Prisma.XOR<Prisma.SupplierApplicationScalarRelationFilter, Prisma.SupplierApplicationWhereInput>
   requestedByUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
+  resolvedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
 }
 
 export type SupplierInformationRequestOrderByWithRelationInput = {
@@ -208,10 +241,15 @@ export type SupplierInformationRequestOrderByWithRelationInput = {
   section?: Prisma.SortOrder
   message?: Prisma.SortOrder
   requestedByUserId?: Prisma.SortOrder
+  applicantResponse?: Prisma.SortOrderInput | Prisma.SortOrder
+  respondedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolutionNote?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   application?: Prisma.SupplierApplicationOrderByWithRelationInput
   requestedByUser?: Prisma.UserProfileOrderByWithRelationInput
+  resolvedByUser?: Prisma.UserProfileOrderByWithRelationInput
 }
 
 export type SupplierInformationRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -223,10 +261,15 @@ export type SupplierInformationRequestWhereUniqueInput = Prisma.AtLeast<{
   section?: Prisma.EnumSupplierApplicationSectionFilter<"SupplierInformationRequest"> | $Enums.SupplierApplicationSection
   message?: Prisma.StringFilter<"SupplierInformationRequest"> | string
   requestedByUserId?: Prisma.StringFilter<"SupplierInformationRequest"> | string
+  applicantResponse?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  respondedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
+  resolvedByUserId?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  resolutionNote?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SupplierInformationRequest"> | Date | string
   application?: Prisma.XOR<Prisma.SupplierApplicationScalarRelationFilter, Prisma.SupplierApplicationWhereInput>
   requestedByUser?: Prisma.XOR<Prisma.UserProfileScalarRelationFilter, Prisma.UserProfileWhereInput>
+  resolvedByUser?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
 }, "id">
 
 export type SupplierInformationRequestOrderByWithAggregationInput = {
@@ -235,6 +278,10 @@ export type SupplierInformationRequestOrderByWithAggregationInput = {
   section?: Prisma.SortOrder
   message?: Prisma.SortOrder
   requestedByUserId?: Prisma.SortOrder
+  applicantResponse?: Prisma.SortOrderInput | Prisma.SortOrder
+  respondedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolvedByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
+  resolutionNote?: Prisma.SortOrderInput | Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.SupplierInformationRequestCountOrderByAggregateInput
@@ -251,6 +298,10 @@ export type SupplierInformationRequestScalarWhereWithAggregatesInput = {
   section?: Prisma.EnumSupplierApplicationSectionWithAggregatesFilter<"SupplierInformationRequest"> | $Enums.SupplierApplicationSection
   message?: Prisma.StringWithAggregatesFilter<"SupplierInformationRequest"> | string
   requestedByUserId?: Prisma.StringWithAggregatesFilter<"SupplierInformationRequest"> | string
+  applicantResponse?: Prisma.StringNullableWithAggregatesFilter<"SupplierInformationRequest"> | string | null
+  respondedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierInformationRequest"> | Date | string | null
+  resolvedByUserId?: Prisma.StringNullableWithAggregatesFilter<"SupplierInformationRequest"> | string | null
+  resolutionNote?: Prisma.StringNullableWithAggregatesFilter<"SupplierInformationRequest"> | string | null
   resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierInformationRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SupplierInformationRequest"> | Date | string
 }
@@ -259,10 +310,14 @@ export type SupplierInformationRequestCreateInput = {
   id?: string
   section: $Enums.SupplierApplicationSection
   message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
   application: Prisma.SupplierApplicationCreateNestedOneWithoutInformationRequestsInput
   requestedByUser: Prisma.UserProfileCreateNestedOneWithoutSupplierInformationRequestsInput
+  resolvedByUser?: Prisma.UserProfileCreateNestedOneWithoutResolvedSupplierInformationRequestsInput
 }
 
 export type SupplierInformationRequestUncheckedCreateInput = {
@@ -271,6 +326,10 @@ export type SupplierInformationRequestUncheckedCreateInput = {
   section: $Enums.SupplierApplicationSection
   message: string
   requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -279,10 +338,14 @@ export type SupplierInformationRequestUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.SupplierApplicationUpdateOneRequiredWithoutInformationRequestsNestedInput
   requestedByUser?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierInformationRequestsNestedInput
+  resolvedByUser?: Prisma.UserProfileUpdateOneWithoutResolvedSupplierInformationRequestsNestedInput
 }
 
 export type SupplierInformationRequestUncheckedUpdateInput = {
@@ -291,6 +354,10 @@ export type SupplierInformationRequestUncheckedUpdateInput = {
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
   requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -301,6 +368,10 @@ export type SupplierInformationRequestCreateManyInput = {
   section: $Enums.SupplierApplicationSection
   message: string
   requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -309,6 +380,9 @@ export type SupplierInformationRequestUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -319,6 +393,10 @@ export type SupplierInformationRequestUncheckedUpdateManyInput = {
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
   requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -339,6 +417,10 @@ export type SupplierInformationRequestCountOrderByAggregateInput = {
   section?: Prisma.SortOrder
   message?: Prisma.SortOrder
   requestedByUserId?: Prisma.SortOrder
+  applicantResponse?: Prisma.SortOrder
+  respondedAt?: Prisma.SortOrder
+  resolvedByUserId?: Prisma.SortOrder
+  resolutionNote?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -349,6 +431,10 @@ export type SupplierInformationRequestMaxOrderByAggregateInput = {
   section?: Prisma.SortOrder
   message?: Prisma.SortOrder
   requestedByUserId?: Prisma.SortOrder
+  applicantResponse?: Prisma.SortOrder
+  respondedAt?: Prisma.SortOrder
+  resolvedByUserId?: Prisma.SortOrder
+  resolutionNote?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -359,6 +445,10 @@ export type SupplierInformationRequestMinOrderByAggregateInput = {
   section?: Prisma.SortOrder
   message?: Prisma.SortOrder
   requestedByUserId?: Prisma.SortOrder
+  applicantResponse?: Prisma.SortOrder
+  respondedAt?: Prisma.SortOrder
+  resolvedByUserId?: Prisma.SortOrder
+  resolutionNote?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -370,10 +460,24 @@ export type SupplierInformationRequestCreateNestedManyWithoutRequestedByUserInpu
   connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
 }
 
+export type SupplierInformationRequestCreateNestedManyWithoutResolvedByUserInput = {
+  create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput[]
+  createMany?: Prisma.SupplierInformationRequestCreateManyResolvedByUserInputEnvelope
+  connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+}
+
 export type SupplierInformationRequestUncheckedCreateNestedManyWithoutRequestedByUserInput = {
   create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutRequestedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutRequestedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput[]
   connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutRequestedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutRequestedByUserInput[]
   createMany?: Prisma.SupplierInformationRequestCreateManyRequestedByUserInputEnvelope
+  connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+}
+
+export type SupplierInformationRequestUncheckedCreateNestedManyWithoutResolvedByUserInput = {
+  create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput[]
+  createMany?: Prisma.SupplierInformationRequestCreateManyResolvedByUserInputEnvelope
   connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
 }
 
@@ -391,6 +495,20 @@ export type SupplierInformationRequestUpdateManyWithoutRequestedByUserNestedInpu
   deleteMany?: Prisma.SupplierInformationRequestScalarWhereInput | Prisma.SupplierInformationRequestScalarWhereInput[]
 }
 
+export type SupplierInformationRequestUpdateManyWithoutResolvedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput[]
+  upsert?: Prisma.SupplierInformationRequestUpsertWithWhereUniqueWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpsertWithWhereUniqueWithoutResolvedByUserInput[]
+  createMany?: Prisma.SupplierInformationRequestCreateManyResolvedByUserInputEnvelope
+  set?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  disconnect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  delete?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  update?: Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutResolvedByUserInput[]
+  updateMany?: Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutResolvedByUserInput[]
+  deleteMany?: Prisma.SupplierInformationRequestScalarWhereInput | Prisma.SupplierInformationRequestScalarWhereInput[]
+}
+
 export type SupplierInformationRequestUncheckedUpdateManyWithoutRequestedByUserNestedInput = {
   create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutRequestedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutRequestedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput[]
   connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutRequestedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutRequestedByUserInput[]
@@ -402,6 +520,20 @@ export type SupplierInformationRequestUncheckedUpdateManyWithoutRequestedByUserN
   connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
   update?: Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutRequestedByUserInput | Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutRequestedByUserInput[]
   updateMany?: Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutRequestedByUserInput | Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutRequestedByUserInput[]
+  deleteMany?: Prisma.SupplierInformationRequestScalarWhereInput | Prisma.SupplierInformationRequestScalarWhereInput[]
+}
+
+export type SupplierInformationRequestUncheckedUpdateManyWithoutResolvedByUserNestedInput = {
+  create?: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput> | Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput[] | Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput[]
+  connectOrCreate?: Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput | Prisma.SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput[]
+  upsert?: Prisma.SupplierInformationRequestUpsertWithWhereUniqueWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpsertWithWhereUniqueWithoutResolvedByUserInput[]
+  createMany?: Prisma.SupplierInformationRequestCreateManyResolvedByUserInputEnvelope
+  set?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  disconnect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  delete?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  connect?: Prisma.SupplierInformationRequestWhereUniqueInput | Prisma.SupplierInformationRequestWhereUniqueInput[]
+  update?: Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpdateWithWhereUniqueWithoutResolvedByUserInput[]
+  updateMany?: Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutResolvedByUserInput | Prisma.SupplierInformationRequestUpdateManyWithWhereWithoutResolvedByUserInput[]
   deleteMany?: Prisma.SupplierInformationRequestScalarWhereInput | Prisma.SupplierInformationRequestScalarWhereInput[]
 }
 
@@ -451,9 +583,13 @@ export type SupplierInformationRequestCreateWithoutRequestedByUserInput = {
   id?: string
   section: $Enums.SupplierApplicationSection
   message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
   application: Prisma.SupplierApplicationCreateNestedOneWithoutInformationRequestsInput
+  resolvedByUser?: Prisma.UserProfileCreateNestedOneWithoutResolvedSupplierInformationRequestsInput
 }
 
 export type SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput = {
@@ -461,6 +597,10 @@ export type SupplierInformationRequestUncheckedCreateWithoutRequestedByUserInput
   applicationId: string
   section: $Enums.SupplierApplicationSection
   message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -472,6 +612,42 @@ export type SupplierInformationRequestCreateOrConnectWithoutRequestedByUserInput
 
 export type SupplierInformationRequestCreateManyRequestedByUserInputEnvelope = {
   data: Prisma.SupplierInformationRequestCreateManyRequestedByUserInput | Prisma.SupplierInformationRequestCreateManyRequestedByUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type SupplierInformationRequestCreateWithoutResolvedByUserInput = {
+  id?: string
+  section: $Enums.SupplierApplicationSection
+  message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+  application: Prisma.SupplierApplicationCreateNestedOneWithoutInformationRequestsInput
+  requestedByUser: Prisma.UserProfileCreateNestedOneWithoutSupplierInformationRequestsInput
+}
+
+export type SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput = {
+  id?: string
+  applicationId: string
+  section: $Enums.SupplierApplicationSection
+  message: string
+  requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type SupplierInformationRequestCreateOrConnectWithoutResolvedByUserInput = {
+  where: Prisma.SupplierInformationRequestWhereUniqueInput
+  create: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput>
+}
+
+export type SupplierInformationRequestCreateManyResolvedByUserInputEnvelope = {
+  data: Prisma.SupplierInformationRequestCreateManyResolvedByUserInput | Prisma.SupplierInformationRequestCreateManyResolvedByUserInput[]
   skipDuplicates?: boolean
 }
 
@@ -500,17 +676,41 @@ export type SupplierInformationRequestScalarWhereInput = {
   section?: Prisma.EnumSupplierApplicationSectionFilter<"SupplierInformationRequest"> | $Enums.SupplierApplicationSection
   message?: Prisma.StringFilter<"SupplierInformationRequest"> | string
   requestedByUserId?: Prisma.StringFilter<"SupplierInformationRequest"> | string
+  applicantResponse?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  respondedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
+  resolvedByUserId?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
+  resolutionNote?: Prisma.StringNullableFilter<"SupplierInformationRequest"> | string | null
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierInformationRequest"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"SupplierInformationRequest"> | Date | string
+}
+
+export type SupplierInformationRequestUpsertWithWhereUniqueWithoutResolvedByUserInput = {
+  where: Prisma.SupplierInformationRequestWhereUniqueInput
+  update: Prisma.XOR<Prisma.SupplierInformationRequestUpdateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedUpdateWithoutResolvedByUserInput>
+  create: Prisma.XOR<Prisma.SupplierInformationRequestCreateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedCreateWithoutResolvedByUserInput>
+}
+
+export type SupplierInformationRequestUpdateWithWhereUniqueWithoutResolvedByUserInput = {
+  where: Prisma.SupplierInformationRequestWhereUniqueInput
+  data: Prisma.XOR<Prisma.SupplierInformationRequestUpdateWithoutResolvedByUserInput, Prisma.SupplierInformationRequestUncheckedUpdateWithoutResolvedByUserInput>
+}
+
+export type SupplierInformationRequestUpdateManyWithWhereWithoutResolvedByUserInput = {
+  where: Prisma.SupplierInformationRequestScalarWhereInput
+  data: Prisma.XOR<Prisma.SupplierInformationRequestUpdateManyMutationInput, Prisma.SupplierInformationRequestUncheckedUpdateManyWithoutResolvedByUserInput>
 }
 
 export type SupplierInformationRequestCreateWithoutApplicationInput = {
   id?: string
   section: $Enums.SupplierApplicationSection
   message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
   requestedByUser: Prisma.UserProfileCreateNestedOneWithoutSupplierInformationRequestsInput
+  resolvedByUser?: Prisma.UserProfileCreateNestedOneWithoutResolvedSupplierInformationRequestsInput
 }
 
 export type SupplierInformationRequestUncheckedCreateWithoutApplicationInput = {
@@ -518,6 +718,10 @@ export type SupplierInformationRequestUncheckedCreateWithoutApplicationInput = {
   section: $Enums.SupplierApplicationSection
   message: string
   requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -553,6 +757,23 @@ export type SupplierInformationRequestCreateManyRequestedByUserInput = {
   applicationId: string
   section: $Enums.SupplierApplicationSection
   message: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
+  resolvedAt?: Date | string | null
+  createdAt?: Date | string
+}
+
+export type SupplierInformationRequestCreateManyResolvedByUserInput = {
+  id?: string
+  applicationId: string
+  section: $Enums.SupplierApplicationSection
+  message: string
+  requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -561,9 +782,13 @@ export type SupplierInformationRequestUpdateWithoutRequestedByUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   application?: Prisma.SupplierApplicationUpdateOneRequiredWithoutInformationRequestsNestedInput
+  resolvedByUser?: Prisma.UserProfileUpdateOneWithoutResolvedSupplierInformationRequestsNestedInput
 }
 
 export type SupplierInformationRequestUncheckedUpdateWithoutRequestedByUserInput = {
@@ -571,6 +796,10 @@ export type SupplierInformationRequestUncheckedUpdateWithoutRequestedByUserInput
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -580,6 +809,49 @@ export type SupplierInformationRequestUncheckedUpdateManyWithoutRequestedByUserI
   applicationId?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SupplierInformationRequestUpdateWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  application?: Prisma.SupplierApplicationUpdateOneRequiredWithoutInformationRequestsNestedInput
+  requestedByUser?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierInformationRequestsNestedInput
+}
+
+export type SupplierInformationRequestUncheckedUpdateWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  applicationId?: Prisma.StringFieldUpdateOperationsInput | string
+  section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SupplierInformationRequestUncheckedUpdateManyWithoutResolvedByUserInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  applicationId?: Prisma.StringFieldUpdateOperationsInput | string
+  section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
+  message?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -589,6 +861,10 @@ export type SupplierInformationRequestCreateManyApplicationInput = {
   section: $Enums.SupplierApplicationSection
   message: string
   requestedByUserId: string
+  applicantResponse?: string | null
+  respondedAt?: Date | string | null
+  resolvedByUserId?: string | null
+  resolutionNote?: string | null
   resolvedAt?: Date | string | null
   createdAt?: Date | string
 }
@@ -597,9 +873,13 @@ export type SupplierInformationRequestUpdateWithoutApplicationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requestedByUser?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierInformationRequestsNestedInput
+  resolvedByUser?: Prisma.UserProfileUpdateOneWithoutResolvedSupplierInformationRequestsNestedInput
 }
 
 export type SupplierInformationRequestUncheckedUpdateWithoutApplicationInput = {
@@ -607,6 +887,10 @@ export type SupplierInformationRequestUncheckedUpdateWithoutApplicationInput = {
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
   requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -616,6 +900,10 @@ export type SupplierInformationRequestUncheckedUpdateManyWithoutApplicationInput
   section?: Prisma.EnumSupplierApplicationSectionFieldUpdateOperationsInput | $Enums.SupplierApplicationSection
   message?: Prisma.StringFieldUpdateOperationsInput | string
   requestedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantResponse?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  respondedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  resolvedByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -628,10 +916,15 @@ export type SupplierInformationRequestSelect<ExtArgs extends runtime.Types.Exten
   section?: boolean
   message?: boolean
   requestedByUserId?: boolean
+  applicantResponse?: boolean
+  respondedAt?: boolean
+  resolvedByUserId?: boolean
+  resolutionNote?: boolean
   resolvedAt?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["supplierInformationRequest"]>
 
 export type SupplierInformationRequestSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -640,10 +933,15 @@ export type SupplierInformationRequestSelectCreateManyAndReturn<ExtArgs extends 
   section?: boolean
   message?: boolean
   requestedByUserId?: boolean
+  applicantResponse?: boolean
+  respondedAt?: boolean
+  resolvedByUserId?: boolean
+  resolutionNote?: boolean
   resolvedAt?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["supplierInformationRequest"]>
 
 export type SupplierInformationRequestSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -652,10 +950,15 @@ export type SupplierInformationRequestSelectUpdateManyAndReturn<ExtArgs extends 
   section?: boolean
   message?: boolean
   requestedByUserId?: boolean
+  applicantResponse?: boolean
+  respondedAt?: boolean
+  resolvedByUserId?: boolean
+  resolutionNote?: boolean
   resolvedAt?: boolean
   createdAt?: boolean
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }, ExtArgs["result"]["supplierInformationRequest"]>
 
 export type SupplierInformationRequestSelectScalar = {
@@ -664,22 +967,29 @@ export type SupplierInformationRequestSelectScalar = {
   section?: boolean
   message?: boolean
   requestedByUserId?: boolean
+  applicantResponse?: boolean
+  respondedAt?: boolean
+  resolvedByUserId?: boolean
+  resolutionNote?: boolean
   resolvedAt?: boolean
   createdAt?: boolean
 }
 
-export type SupplierInformationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "section" | "message" | "requestedByUserId" | "resolvedAt" | "createdAt", ExtArgs["result"]["supplierInformationRequest"]>
+export type SupplierInformationRequestOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "section" | "message" | "requestedByUserId" | "applicantResponse" | "respondedAt" | "resolvedByUserId" | "resolutionNote" | "resolvedAt" | "createdAt", ExtArgs["result"]["supplierInformationRequest"]>
 export type SupplierInformationRequestInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }
 export type SupplierInformationRequestIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }
 export type SupplierInformationRequestIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
   requestedByUser?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
+  resolvedByUser?: boolean | Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>
 }
 
 export type $SupplierInformationRequestPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -687,6 +997,7 @@ export type $SupplierInformationRequestPayload<ExtArgs extends runtime.Types.Ext
   objects: {
     application: Prisma.$SupplierApplicationPayload<ExtArgs>
     requestedByUser: Prisma.$UserProfilePayload<ExtArgs>
+    resolvedByUser: Prisma.$UserProfilePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -694,6 +1005,10 @@ export type $SupplierInformationRequestPayload<ExtArgs extends runtime.Types.Ext
     section: $Enums.SupplierApplicationSection
     message: string
     requestedByUserId: string
+    applicantResponse: string | null
+    respondedAt: Date | null
+    resolvedByUserId: string | null
+    resolutionNote: string | null
     resolvedAt: Date | null
     createdAt: Date
   }, ExtArgs["result"]["supplierInformationRequest"]>
@@ -1092,6 +1407,7 @@ export interface Prisma__SupplierInformationRequestClient<T, Null = never, ExtAr
   readonly [Symbol.toStringTag]: "PrismaPromise"
   application<T extends Prisma.SupplierApplicationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplicationDefaultArgs<ExtArgs>>): Prisma.Prisma__SupplierApplicationClient<runtime.Types.Result.GetResult<Prisma.$SupplierApplicationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   requestedByUser<T extends Prisma.UserProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  resolvedByUser<T extends Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierInformationRequest$resolvedByUserArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1126,6 +1442,10 @@ export interface SupplierInformationRequestFieldRefs {
   readonly section: Prisma.FieldRef<"SupplierInformationRequest", 'SupplierApplicationSection'>
   readonly message: Prisma.FieldRef<"SupplierInformationRequest", 'String'>
   readonly requestedByUserId: Prisma.FieldRef<"SupplierInformationRequest", 'String'>
+  readonly applicantResponse: Prisma.FieldRef<"SupplierInformationRequest", 'String'>
+  readonly respondedAt: Prisma.FieldRef<"SupplierInformationRequest", 'DateTime'>
+  readonly resolvedByUserId: Prisma.FieldRef<"SupplierInformationRequest", 'String'>
+  readonly resolutionNote: Prisma.FieldRef<"SupplierInformationRequest", 'String'>
   readonly resolvedAt: Prisma.FieldRef<"SupplierInformationRequest", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"SupplierInformationRequest", 'DateTime'>
 }
@@ -1526,6 +1846,25 @@ export type SupplierInformationRequestDeleteManyArgs<ExtArgs extends runtime.Typ
    * Limit how many SupplierInformationRequests to delete.
    */
   limit?: number
+}
+
+/**
+ * SupplierInformationRequest.resolvedByUser
+ */
+export type SupplierInformationRequest$resolvedByUserArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserProfile
+   */
+  select?: Prisma.UserProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserProfile
+   */
+  omit?: Prisma.UserProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserProfileInclude<ExtArgs> | null
+  where?: Prisma.UserProfileWhereInput
 }
 
 /**

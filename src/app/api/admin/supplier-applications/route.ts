@@ -2,10 +2,12 @@ import { SupplierApplicationStatus } from "@/generated/prisma/client";
 import { apiError } from "@/lib/api-response";
 import { requireAdmin } from "@/lib/authz";
 import { getDb } from "@/lib/db";
+import { requireSupplierApplicationsEnabled } from "@/lib/supplier-application-feature";
 
 export async function GET(request: Request) {
   try {
     await requireAdmin();
+    requireSupplierApplicationsEnabled();
     const statusValue = new URL(request.url).searchParams.get("status");
     if (
       statusValue &&

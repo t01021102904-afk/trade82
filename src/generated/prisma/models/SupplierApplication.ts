@@ -42,6 +42,8 @@ export type SupplierApplicationMinAggregateOutputType = {
   warehouseType: string | null
   skuCountRange: string | null
   riskLevel: string | null
+  riskOverrideReason: string | null
+  riskOverrideByUserId: string | null
   submittedAt: Date | null
   withdrawnAt: Date | null
   approvedAt: Date | null
@@ -69,6 +71,8 @@ export type SupplierApplicationMaxAggregateOutputType = {
   warehouseType: string | null
   skuCountRange: string | null
   riskLevel: string | null
+  riskOverrideReason: string | null
+  riskOverrideByUserId: string | null
   submittedAt: Date | null
   withdrawnAt: Date | null
   approvedAt: Date | null
@@ -97,6 +101,8 @@ export type SupplierApplicationCountAggregateOutputType = {
   warehouseType: number
   skuCountRange: number
   riskLevel: number
+  riskOverrideReason: number
+  riskOverrideByUserId: number
   submittedAt: number
   withdrawnAt: number
   approvedAt: number
@@ -126,6 +132,8 @@ export type SupplierApplicationMinAggregateInputType = {
   warehouseType?: true
   skuCountRange?: true
   riskLevel?: true
+  riskOverrideReason?: true
+  riskOverrideByUserId?: true
   submittedAt?: true
   withdrawnAt?: true
   approvedAt?: true
@@ -153,6 +161,8 @@ export type SupplierApplicationMaxAggregateInputType = {
   warehouseType?: true
   skuCountRange?: true
   riskLevel?: true
+  riskOverrideReason?: true
+  riskOverrideByUserId?: true
   submittedAt?: true
   withdrawnAt?: true
   approvedAt?: true
@@ -181,6 +191,8 @@ export type SupplierApplicationCountAggregateInputType = {
   warehouseType?: true
   skuCountRange?: true
   riskLevel?: true
+  riskOverrideReason?: true
+  riskOverrideByUserId?: true
   submittedAt?: true
   withdrawnAt?: true
   approvedAt?: true
@@ -282,6 +294,8 @@ export type SupplierApplicationGroupByOutputType = {
   warehouseType: string
   skuCountRange: string
   riskLevel: string
+  riskOverrideReason: string | null
+  riskOverrideByUserId: string | null
   submittedAt: Date | null
   withdrawnAt: Date | null
   approvedAt: Date | null
@@ -331,6 +345,8 @@ export type SupplierApplicationWhereInput = {
   warehouseType?: Prisma.StringFilter<"SupplierApplication"> | string
   skuCountRange?: Prisma.StringFilter<"SupplierApplication"> | string
   riskLevel?: Prisma.StringFilter<"SupplierApplication"> | string
+  riskOverrideReason?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
+  riskOverrideByUserId?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
   submittedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   withdrawnAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
@@ -342,6 +358,7 @@ export type SupplierApplicationWhereInput = {
   legacyCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   approvedCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   assignedAdmin?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  riskOverrideBy?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   contacts?: Prisma.SupplierApplicationContactListRelationFilter
   businessVerification?: Prisma.XOR<Prisma.SupplierBusinessVerificationNullableScalarRelationFilter, Prisma.SupplierBusinessVerificationWhereInput> | null
   stakeholders?: Prisma.SupplierStakeholderListRelationFilter
@@ -378,6 +395,8 @@ export type SupplierApplicationOrderByWithRelationInput = {
   warehouseType?: Prisma.SortOrder
   skuCountRange?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  riskOverrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskOverrideByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   withdrawnAt?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -389,6 +408,7 @@ export type SupplierApplicationOrderByWithRelationInput = {
   legacyCompany?: Prisma.CompanyOrderByWithRelationInput
   approvedCompany?: Prisma.CompanyOrderByWithRelationInput
   assignedAdmin?: Prisma.UserProfileOrderByWithRelationInput
+  riskOverrideBy?: Prisma.UserProfileOrderByWithRelationInput
   contacts?: Prisma.SupplierApplicationContactOrderByRelationAggregateInput
   businessVerification?: Prisma.SupplierBusinessVerificationOrderByWithRelationInput
   stakeholders?: Prisma.SupplierStakeholderOrderByRelationAggregateInput
@@ -428,6 +448,8 @@ export type SupplierApplicationWhereUniqueInput = Prisma.AtLeast<{
   warehouseType?: Prisma.StringFilter<"SupplierApplication"> | string
   skuCountRange?: Prisma.StringFilter<"SupplierApplication"> | string
   riskLevel?: Prisma.StringFilter<"SupplierApplication"> | string
+  riskOverrideReason?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
+  riskOverrideByUserId?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
   submittedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   withdrawnAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
@@ -439,6 +461,7 @@ export type SupplierApplicationWhereUniqueInput = Prisma.AtLeast<{
   legacyCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   approvedCompany?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   assignedAdmin?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
+  riskOverrideBy?: Prisma.XOR<Prisma.UserProfileNullableScalarRelationFilter, Prisma.UserProfileWhereInput> | null
   contacts?: Prisma.SupplierApplicationContactListRelationFilter
   businessVerification?: Prisma.XOR<Prisma.SupplierBusinessVerificationNullableScalarRelationFilter, Prisma.SupplierBusinessVerificationWhereInput> | null
   stakeholders?: Prisma.SupplierStakeholderListRelationFilter
@@ -475,6 +498,8 @@ export type SupplierApplicationOrderByWithAggregationInput = {
   warehouseType?: Prisma.SortOrder
   skuCountRange?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  riskOverrideReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  riskOverrideByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   withdrawnAt?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -509,6 +534,8 @@ export type SupplierApplicationScalarWhereWithAggregatesInput = {
   warehouseType?: Prisma.StringWithAggregatesFilter<"SupplierApplication"> | string
   skuCountRange?: Prisma.StringWithAggregatesFilter<"SupplierApplication"> | string
   riskLevel?: Prisma.StringWithAggregatesFilter<"SupplierApplication"> | string
+  riskOverrideReason?: Prisma.StringNullableWithAggregatesFilter<"SupplierApplication"> | string | null
+  riskOverrideByUserId?: Prisma.StringNullableWithAggregatesFilter<"SupplierApplication"> | string | null
   submittedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierApplication"> | Date | string | null
   withdrawnAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierApplication"> | Date | string | null
   approvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierApplication"> | Date | string | null
@@ -533,6 +560,7 @@ export type SupplierApplicationCreateInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -544,6 +572,7 @@ export type SupplierApplicationCreateInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -580,6 +609,8 @@ export type SupplierApplicationUncheckedCreateInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -619,6 +650,7 @@ export type SupplierApplicationUpdateInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -630,6 +662,7 @@ export type SupplierApplicationUpdateInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -666,6 +699,8 @@ export type SupplierApplicationUncheckedUpdateInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -709,6 +744,8 @@ export type SupplierApplicationCreateManyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -733,6 +770,7 @@ export type SupplierApplicationUpdateManyMutationInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -761,6 +799,8 @@ export type SupplierApplicationUncheckedUpdateManyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -799,6 +839,8 @@ export type SupplierApplicationCountOrderByAggregateInput = {
   warehouseType?: Prisma.SortOrder
   skuCountRange?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  riskOverrideReason?: Prisma.SortOrder
+  riskOverrideByUserId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   withdrawnAt?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -826,6 +868,8 @@ export type SupplierApplicationMaxOrderByAggregateInput = {
   warehouseType?: Prisma.SortOrder
   skuCountRange?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  riskOverrideReason?: Prisma.SortOrder
+  riskOverrideByUserId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   withdrawnAt?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -853,6 +897,8 @@ export type SupplierApplicationMinOrderByAggregateInput = {
   warehouseType?: Prisma.SortOrder
   skuCountRange?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
+  riskOverrideReason?: Prisma.SortOrder
+  riskOverrideByUserId?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
   withdrawnAt?: Prisma.SortOrder
   approvedAt?: Prisma.SortOrder
@@ -881,6 +927,13 @@ export type SupplierApplicationCreateNestedManyWithoutAssignedAdminInput = {
   connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
 }
 
+export type SupplierApplicationCreateNestedManyWithoutRiskOverrideByInput = {
+  create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput> | Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput[]
+  connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput | Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput[]
+  createMany?: Prisma.SupplierApplicationCreateManyRiskOverrideByInputEnvelope
+  connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+}
+
 export type SupplierApplicationUncheckedCreateNestedManyWithoutApplicantInput = {
   create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutApplicantInput, Prisma.SupplierApplicationUncheckedCreateWithoutApplicantInput> | Prisma.SupplierApplicationCreateWithoutApplicantInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutApplicantInput[]
   connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutApplicantInput | Prisma.SupplierApplicationCreateOrConnectWithoutApplicantInput[]
@@ -892,6 +945,13 @@ export type SupplierApplicationUncheckedCreateNestedManyWithoutAssignedAdminInpu
   create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutAssignedAdminInput, Prisma.SupplierApplicationUncheckedCreateWithoutAssignedAdminInput> | Prisma.SupplierApplicationCreateWithoutAssignedAdminInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutAssignedAdminInput[]
   connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutAssignedAdminInput | Prisma.SupplierApplicationCreateOrConnectWithoutAssignedAdminInput[]
   createMany?: Prisma.SupplierApplicationCreateManyAssignedAdminInputEnvelope
+  connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+}
+
+export type SupplierApplicationUncheckedCreateNestedManyWithoutRiskOverrideByInput = {
+  create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput> | Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput[]
+  connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput | Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput[]
+  createMany?: Prisma.SupplierApplicationCreateManyRiskOverrideByInputEnvelope
   connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
 }
 
@@ -923,6 +983,20 @@ export type SupplierApplicationUpdateManyWithoutAssignedAdminNestedInput = {
   deleteMany?: Prisma.SupplierApplicationScalarWhereInput | Prisma.SupplierApplicationScalarWhereInput[]
 }
 
+export type SupplierApplicationUpdateManyWithoutRiskOverrideByNestedInput = {
+  create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput> | Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput[]
+  connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput | Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput[]
+  upsert?: Prisma.SupplierApplicationUpsertWithWhereUniqueWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpsertWithWhereUniqueWithoutRiskOverrideByInput[]
+  createMany?: Prisma.SupplierApplicationCreateManyRiskOverrideByInputEnvelope
+  set?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  disconnect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  delete?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  update?: Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutRiskOverrideByInput[]
+  updateMany?: Prisma.SupplierApplicationUpdateManyWithWhereWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpdateManyWithWhereWithoutRiskOverrideByInput[]
+  deleteMany?: Prisma.SupplierApplicationScalarWhereInput | Prisma.SupplierApplicationScalarWhereInput[]
+}
+
 export type SupplierApplicationUncheckedUpdateManyWithoutApplicantNestedInput = {
   create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutApplicantInput, Prisma.SupplierApplicationUncheckedCreateWithoutApplicantInput> | Prisma.SupplierApplicationCreateWithoutApplicantInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutApplicantInput[]
   connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutApplicantInput | Prisma.SupplierApplicationCreateOrConnectWithoutApplicantInput[]
@@ -948,6 +1022,20 @@ export type SupplierApplicationUncheckedUpdateManyWithoutAssignedAdminNestedInpu
   connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
   update?: Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutAssignedAdminInput | Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutAssignedAdminInput[]
   updateMany?: Prisma.SupplierApplicationUpdateManyWithWhereWithoutAssignedAdminInput | Prisma.SupplierApplicationUpdateManyWithWhereWithoutAssignedAdminInput[]
+  deleteMany?: Prisma.SupplierApplicationScalarWhereInput | Prisma.SupplierApplicationScalarWhereInput[]
+}
+
+export type SupplierApplicationUncheckedUpdateManyWithoutRiskOverrideByNestedInput = {
+  create?: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput> | Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput[] | Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput[]
+  connectOrCreate?: Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput | Prisma.SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput[]
+  upsert?: Prisma.SupplierApplicationUpsertWithWhereUniqueWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpsertWithWhereUniqueWithoutRiskOverrideByInput[]
+  createMany?: Prisma.SupplierApplicationCreateManyRiskOverrideByInputEnvelope
+  set?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  disconnect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  delete?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  connect?: Prisma.SupplierApplicationWhereUniqueInput | Prisma.SupplierApplicationWhereUniqueInput[]
+  update?: Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpdateWithWhereUniqueWithoutRiskOverrideByInput[]
+  updateMany?: Prisma.SupplierApplicationUpdateManyWithWhereWithoutRiskOverrideByInput | Prisma.SupplierApplicationUpdateManyWithWhereWithoutRiskOverrideByInput[]
   deleteMany?: Prisma.SupplierApplicationScalarWhereInput | Prisma.SupplierApplicationScalarWhereInput[]
 }
 
@@ -1277,6 +1365,7 @@ export type SupplierApplicationCreateWithoutApplicantInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1287,6 +1376,7 @@ export type SupplierApplicationCreateWithoutApplicantInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -1322,6 +1412,8 @@ export type SupplierApplicationUncheckedCreateWithoutApplicantInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1371,6 +1463,7 @@ export type SupplierApplicationCreateWithoutAssignedAdminInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1381,6 +1474,7 @@ export type SupplierApplicationCreateWithoutAssignedAdminInput = {
   applicant: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationsInput
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -1416,6 +1510,8 @@ export type SupplierApplicationUncheckedCreateWithoutAssignedAdminInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1447,6 +1543,104 @@ export type SupplierApplicationCreateOrConnectWithoutAssignedAdminInput = {
 
 export type SupplierApplicationCreateManyAssignedAdminInputEnvelope = {
   data: Prisma.SupplierApplicationCreateManyAssignedAdminInput | Prisma.SupplierApplicationCreateManyAssignedAdminInput[]
+  skipDuplicates?: boolean
+}
+
+export type SupplierApplicationCreateWithoutRiskOverrideByInput = {
+  id?: string
+  applicationNumber: string
+  status?: $Enums.SupplierApplicationStatus
+  statusReason?: string | null
+  legalCompanyName: string
+  tradeName?: string | null
+  companyWebsite: string
+  websiteDomain?: string | null
+  registrationCountry: string
+  brandsHandled?: Prisma.SupplierApplicationCreatebrandsHandledInput | string[]
+  annualRevenueRange?: string
+  warehouseType?: string
+  skuCountRange?: string
+  riskLevel?: string
+  riskOverrideReason?: string | null
+  submittedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  approvedAt?: Date | string | null
+  legacyClassification?: $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  applicant: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationsInput
+  legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
+  approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
+  assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
+  businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
+  stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
+  warehouses?: Prisma.SupplierWarehouseCreateNestedManyWithoutApplicationInput
+  supplyChains?: Prisma.SupplierSupplyChainCreateNestedManyWithoutApplicationInput
+  brandVerifications?: Prisma.SupplierBrandVerificationCreateNestedManyWithoutApplicationInput
+  operationsProfile?: Prisma.SupplierOperationsProfileCreateNestedOneWithoutApplicationInput
+  settlementProfile?: Prisma.SupplierSettlementProfileCreateNestedOneWithoutApplicationInput
+  documents?: Prisma.SupplierApplicationDocumentCreateNestedManyWithoutApplicationInput
+  inventorySamples?: Prisma.SupplierInventorySampleCreateNestedManyWithoutApplicationInput
+  reviews?: Prisma.SupplierApplicationReviewCreateNestedManyWithoutApplicationInput
+  statusHistory?: Prisma.SupplierApplicationStatusHistoryCreateNestedManyWithoutApplicationInput
+  informationRequests?: Prisma.SupplierInformationRequestCreateNestedManyWithoutApplicationInput
+  duplicateFlags?: Prisma.SupplierDuplicateFlagCreateNestedManyWithoutApplicationInput
+  auditEvents?: Prisma.SupplierApplicationAuditEventCreateNestedManyWithoutApplicationInput
+}
+
+export type SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput = {
+  id?: string
+  applicationNumber: string
+  applicantUserId: string
+  legacyCompanyId?: string | null
+  approvedCompanyId?: string | null
+  assignedAdminUserId?: string | null
+  status?: $Enums.SupplierApplicationStatus
+  statusReason?: string | null
+  legalCompanyName: string
+  tradeName?: string | null
+  companyWebsite: string
+  websiteDomain?: string | null
+  registrationCountry: string
+  brandsHandled?: Prisma.SupplierApplicationCreatebrandsHandledInput | string[]
+  annualRevenueRange?: string
+  warehouseType?: string
+  skuCountRange?: string
+  riskLevel?: string
+  riskOverrideReason?: string | null
+  submittedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  approvedAt?: Date | string | null
+  legacyClassification?: $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  contacts?: Prisma.SupplierApplicationContactUncheckedCreateNestedManyWithoutApplicationInput
+  businessVerification?: Prisma.SupplierBusinessVerificationUncheckedCreateNestedOneWithoutApplicationInput
+  stakeholders?: Prisma.SupplierStakeholderUncheckedCreateNestedManyWithoutApplicationInput
+  warehouses?: Prisma.SupplierWarehouseUncheckedCreateNestedManyWithoutApplicationInput
+  supplyChains?: Prisma.SupplierSupplyChainUncheckedCreateNestedManyWithoutApplicationInput
+  brandVerifications?: Prisma.SupplierBrandVerificationUncheckedCreateNestedManyWithoutApplicationInput
+  operationsProfile?: Prisma.SupplierOperationsProfileUncheckedCreateNestedOneWithoutApplicationInput
+  settlementProfile?: Prisma.SupplierSettlementProfileUncheckedCreateNestedOneWithoutApplicationInput
+  documents?: Prisma.SupplierApplicationDocumentUncheckedCreateNestedManyWithoutApplicationInput
+  inventorySamples?: Prisma.SupplierInventorySampleUncheckedCreateNestedManyWithoutApplicationInput
+  reviews?: Prisma.SupplierApplicationReviewUncheckedCreateNestedManyWithoutApplicationInput
+  statusHistory?: Prisma.SupplierApplicationStatusHistoryUncheckedCreateNestedManyWithoutApplicationInput
+  informationRequests?: Prisma.SupplierInformationRequestUncheckedCreateNestedManyWithoutApplicationInput
+  duplicateFlags?: Prisma.SupplierDuplicateFlagUncheckedCreateNestedManyWithoutApplicationInput
+  auditEvents?: Prisma.SupplierApplicationAuditEventUncheckedCreateNestedManyWithoutApplicationInput
+}
+
+export type SupplierApplicationCreateOrConnectWithoutRiskOverrideByInput = {
+  where: Prisma.SupplierApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput>
+}
+
+export type SupplierApplicationCreateManyRiskOverrideByInputEnvelope = {
+  data: Prisma.SupplierApplicationCreateManyRiskOverrideByInput | Prisma.SupplierApplicationCreateManyRiskOverrideByInput[]
   skipDuplicates?: boolean
 }
 
@@ -1488,6 +1682,8 @@ export type SupplierApplicationScalarWhereInput = {
   warehouseType?: Prisma.StringFilter<"SupplierApplication"> | string
   skuCountRange?: Prisma.StringFilter<"SupplierApplication"> | string
   riskLevel?: Prisma.StringFilter<"SupplierApplication"> | string
+  riskOverrideReason?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
+  riskOverrideByUserId?: Prisma.StringNullableFilter<"SupplierApplication"> | string | null
   submittedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   withdrawnAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
   approvedAt?: Prisma.DateTimeNullableFilter<"SupplierApplication"> | Date | string | null
@@ -1513,6 +1709,22 @@ export type SupplierApplicationUpdateManyWithWhereWithoutAssignedAdminInput = {
   data: Prisma.XOR<Prisma.SupplierApplicationUpdateManyMutationInput, Prisma.SupplierApplicationUncheckedUpdateManyWithoutAssignedAdminInput>
 }
 
+export type SupplierApplicationUpsertWithWhereUniqueWithoutRiskOverrideByInput = {
+  where: Prisma.SupplierApplicationWhereUniqueInput
+  update: Prisma.XOR<Prisma.SupplierApplicationUpdateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedUpdateWithoutRiskOverrideByInput>
+  create: Prisma.XOR<Prisma.SupplierApplicationCreateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedCreateWithoutRiskOverrideByInput>
+}
+
+export type SupplierApplicationUpdateWithWhereUniqueWithoutRiskOverrideByInput = {
+  where: Prisma.SupplierApplicationWhereUniqueInput
+  data: Prisma.XOR<Prisma.SupplierApplicationUpdateWithoutRiskOverrideByInput, Prisma.SupplierApplicationUncheckedUpdateWithoutRiskOverrideByInput>
+}
+
+export type SupplierApplicationUpdateManyWithWhereWithoutRiskOverrideByInput = {
+  where: Prisma.SupplierApplicationScalarWhereInput
+  data: Prisma.XOR<Prisma.SupplierApplicationUpdateManyMutationInput, Prisma.SupplierApplicationUncheckedUpdateManyWithoutRiskOverrideByInput>
+}
+
 export type SupplierApplicationCreateWithoutLegacyCompanyInput = {
   id?: string
   applicationNumber: string
@@ -1528,6 +1740,7 @@ export type SupplierApplicationCreateWithoutLegacyCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1538,6 +1751,7 @@ export type SupplierApplicationCreateWithoutLegacyCompanyInput = {
   applicant: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -1573,6 +1787,8 @@ export type SupplierApplicationUncheckedCreateWithoutLegacyCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1622,6 +1838,7 @@ export type SupplierApplicationCreateWithoutApprovedCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1632,6 +1849,7 @@ export type SupplierApplicationCreateWithoutApprovedCompanyInput = {
   applicant: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationsInput
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -1667,6 +1885,8 @@ export type SupplierApplicationUncheckedCreateWithoutApprovedCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1748,6 +1968,7 @@ export type SupplierApplicationCreateWithoutContactsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1759,6 +1980,7 @@ export type SupplierApplicationCreateWithoutContactsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
   warehouses?: Prisma.SupplierWarehouseCreateNestedManyWithoutApplicationInput
@@ -1794,6 +2016,8 @@ export type SupplierApplicationUncheckedCreateWithoutContactsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1848,6 +2072,7 @@ export type SupplierApplicationUpdateWithoutContactsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1859,6 +2084,7 @@ export type SupplierApplicationUpdateWithoutContactsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
   warehouses?: Prisma.SupplierWarehouseUpdateManyWithoutApplicationNestedInput
@@ -1894,6 +2120,8 @@ export type SupplierApplicationUncheckedUpdateWithoutContactsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1932,6 +2160,7 @@ export type SupplierApplicationCreateWithoutBusinessVerificationInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -1943,6 +2172,7 @@ export type SupplierApplicationCreateWithoutBusinessVerificationInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
   warehouses?: Prisma.SupplierWarehouseCreateNestedManyWithoutApplicationInput
@@ -1978,6 +2208,8 @@ export type SupplierApplicationUncheckedCreateWithoutBusinessVerificationInput =
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2032,6 +2264,7 @@ export type SupplierApplicationUpdateWithoutBusinessVerificationInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2043,6 +2276,7 @@ export type SupplierApplicationUpdateWithoutBusinessVerificationInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
   warehouses?: Prisma.SupplierWarehouseUpdateManyWithoutApplicationNestedInput
@@ -2078,6 +2312,8 @@ export type SupplierApplicationUncheckedUpdateWithoutBusinessVerificationInput =
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2116,6 +2352,7 @@ export type SupplierApplicationCreateWithoutStakeholdersInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2127,6 +2364,7 @@ export type SupplierApplicationCreateWithoutStakeholdersInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   warehouses?: Prisma.SupplierWarehouseCreateNestedManyWithoutApplicationInput
@@ -2162,6 +2400,8 @@ export type SupplierApplicationUncheckedCreateWithoutStakeholdersInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2216,6 +2456,7 @@ export type SupplierApplicationUpdateWithoutStakeholdersInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2227,6 +2468,7 @@ export type SupplierApplicationUpdateWithoutStakeholdersInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   warehouses?: Prisma.SupplierWarehouseUpdateManyWithoutApplicationNestedInput
@@ -2262,6 +2504,8 @@ export type SupplierApplicationUncheckedUpdateWithoutStakeholdersInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2300,6 +2544,7 @@ export type SupplierApplicationCreateWithoutWarehousesInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2311,6 +2556,7 @@ export type SupplierApplicationCreateWithoutWarehousesInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -2346,6 +2592,8 @@ export type SupplierApplicationUncheckedCreateWithoutWarehousesInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2400,6 +2648,7 @@ export type SupplierApplicationUpdateWithoutWarehousesInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2411,6 +2660,7 @@ export type SupplierApplicationUpdateWithoutWarehousesInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -2446,6 +2696,8 @@ export type SupplierApplicationUncheckedUpdateWithoutWarehousesInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2484,6 +2736,7 @@ export type SupplierApplicationCreateWithoutSupplyChainsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2495,6 +2748,7 @@ export type SupplierApplicationCreateWithoutSupplyChainsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -2530,6 +2784,8 @@ export type SupplierApplicationUncheckedCreateWithoutSupplyChainsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2584,6 +2840,7 @@ export type SupplierApplicationUpdateWithoutSupplyChainsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2595,6 +2852,7 @@ export type SupplierApplicationUpdateWithoutSupplyChainsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -2630,6 +2888,8 @@ export type SupplierApplicationUncheckedUpdateWithoutSupplyChainsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2668,6 +2928,7 @@ export type SupplierApplicationCreateWithoutBrandVerificationsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2679,6 +2940,7 @@ export type SupplierApplicationCreateWithoutBrandVerificationsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -2714,6 +2976,8 @@ export type SupplierApplicationUncheckedCreateWithoutBrandVerificationsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2768,6 +3032,7 @@ export type SupplierApplicationUpdateWithoutBrandVerificationsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2779,6 +3044,7 @@ export type SupplierApplicationUpdateWithoutBrandVerificationsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -2814,6 +3080,8 @@ export type SupplierApplicationUncheckedUpdateWithoutBrandVerificationsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2852,6 +3120,7 @@ export type SupplierApplicationCreateWithoutOperationsProfileInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2863,6 +3132,7 @@ export type SupplierApplicationCreateWithoutOperationsProfileInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -2898,6 +3168,8 @@ export type SupplierApplicationUncheckedCreateWithoutOperationsProfileInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -2952,6 +3224,7 @@ export type SupplierApplicationUpdateWithoutOperationsProfileInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2963,6 +3236,7 @@ export type SupplierApplicationUpdateWithoutOperationsProfileInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -2998,6 +3272,8 @@ export type SupplierApplicationUncheckedUpdateWithoutOperationsProfileInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3036,6 +3312,7 @@ export type SupplierApplicationCreateWithoutSettlementProfileInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3047,6 +3324,7 @@ export type SupplierApplicationCreateWithoutSettlementProfileInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -3082,6 +3360,8 @@ export type SupplierApplicationUncheckedCreateWithoutSettlementProfileInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3136,6 +3416,7 @@ export type SupplierApplicationUpdateWithoutSettlementProfileInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3147,6 +3428,7 @@ export type SupplierApplicationUpdateWithoutSettlementProfileInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -3182,6 +3464,8 @@ export type SupplierApplicationUncheckedUpdateWithoutSettlementProfileInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3220,6 +3504,7 @@ export type SupplierApplicationCreateWithoutDocumentsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3231,6 +3516,7 @@ export type SupplierApplicationCreateWithoutDocumentsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -3266,6 +3552,8 @@ export type SupplierApplicationUncheckedCreateWithoutDocumentsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3320,6 +3608,7 @@ export type SupplierApplicationUpdateWithoutDocumentsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3331,6 +3620,7 @@ export type SupplierApplicationUpdateWithoutDocumentsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -3366,6 +3656,8 @@ export type SupplierApplicationUncheckedUpdateWithoutDocumentsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3404,6 +3696,7 @@ export type SupplierApplicationCreateWithoutInventorySamplesInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3415,6 +3708,7 @@ export type SupplierApplicationCreateWithoutInventorySamplesInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -3450,6 +3744,8 @@ export type SupplierApplicationUncheckedCreateWithoutInventorySamplesInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3504,6 +3800,7 @@ export type SupplierApplicationUpdateWithoutInventorySamplesInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3515,6 +3812,7 @@ export type SupplierApplicationUpdateWithoutInventorySamplesInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -3550,6 +3848,8 @@ export type SupplierApplicationUncheckedUpdateWithoutInventorySamplesInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3588,6 +3888,7 @@ export type SupplierApplicationCreateWithoutReviewsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3599,6 +3900,7 @@ export type SupplierApplicationCreateWithoutReviewsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -3634,6 +3936,8 @@ export type SupplierApplicationUncheckedCreateWithoutReviewsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3688,6 +3992,7 @@ export type SupplierApplicationUpdateWithoutReviewsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3699,6 +4004,7 @@ export type SupplierApplicationUpdateWithoutReviewsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -3734,6 +4040,8 @@ export type SupplierApplicationUncheckedUpdateWithoutReviewsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3772,6 +4080,7 @@ export type SupplierApplicationCreateWithoutStatusHistoryInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3783,6 +4092,7 @@ export type SupplierApplicationCreateWithoutStatusHistoryInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -3818,6 +4128,8 @@ export type SupplierApplicationUncheckedCreateWithoutStatusHistoryInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3872,6 +4184,7 @@ export type SupplierApplicationUpdateWithoutStatusHistoryInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3883,6 +4196,7 @@ export type SupplierApplicationUpdateWithoutStatusHistoryInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -3918,6 +4232,8 @@ export type SupplierApplicationUncheckedUpdateWithoutStatusHistoryInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3956,6 +4272,7 @@ export type SupplierApplicationCreateWithoutInformationRequestsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -3967,6 +4284,7 @@ export type SupplierApplicationCreateWithoutInformationRequestsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -4002,6 +4320,8 @@ export type SupplierApplicationUncheckedCreateWithoutInformationRequestsInput = 
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4056,6 +4376,7 @@ export type SupplierApplicationUpdateWithoutInformationRequestsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4067,6 +4388,7 @@ export type SupplierApplicationUpdateWithoutInformationRequestsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4102,6 +4424,8 @@ export type SupplierApplicationUncheckedUpdateWithoutInformationRequestsInput = 
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4140,6 +4464,7 @@ export type SupplierApplicationCreateWithoutDuplicateFlagsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4151,6 +4476,7 @@ export type SupplierApplicationCreateWithoutDuplicateFlagsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -4186,6 +4512,8 @@ export type SupplierApplicationUncheckedCreateWithoutDuplicateFlagsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4240,6 +4568,7 @@ export type SupplierApplicationUpdateWithoutDuplicateFlagsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4251,6 +4580,7 @@ export type SupplierApplicationUpdateWithoutDuplicateFlagsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4286,6 +4616,8 @@ export type SupplierApplicationUncheckedUpdateWithoutDuplicateFlagsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4324,6 +4656,7 @@ export type SupplierApplicationCreateWithoutAuditEventsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4335,6 +4668,7 @@ export type SupplierApplicationCreateWithoutAuditEventsInput = {
   legacyCompany?: Prisma.CompanyCreateNestedOneWithoutLegacySupplierApplicationsInput
   approvedCompany?: Prisma.CompanyCreateNestedOneWithoutApprovedSupplierApplicationsInput
   assignedAdmin?: Prisma.UserProfileCreateNestedOneWithoutAssignedSupplierApplicationsInput
+  riskOverrideBy?: Prisma.UserProfileCreateNestedOneWithoutSupplierApplicationRiskOverridesInput
   contacts?: Prisma.SupplierApplicationContactCreateNestedManyWithoutApplicationInput
   businessVerification?: Prisma.SupplierBusinessVerificationCreateNestedOneWithoutApplicationInput
   stakeholders?: Prisma.SupplierStakeholderCreateNestedManyWithoutApplicationInput
@@ -4370,6 +4704,8 @@ export type SupplierApplicationUncheckedCreateWithoutAuditEventsInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4424,6 +4760,7 @@ export type SupplierApplicationUpdateWithoutAuditEventsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4435,6 +4772,7 @@ export type SupplierApplicationUpdateWithoutAuditEventsInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4470,6 +4808,8 @@ export type SupplierApplicationUncheckedUpdateWithoutAuditEventsInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4511,6 +4851,8 @@ export type SupplierApplicationCreateManyApplicantInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4538,6 +4880,37 @@ export type SupplierApplicationCreateManyAssignedAdminInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
+  submittedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  approvedAt?: Date | string | null
+  legacyClassification?: $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SupplierApplicationCreateManyRiskOverrideByInput = {
+  id?: string
+  applicationNumber: string
+  applicantUserId: string
+  legacyCompanyId?: string | null
+  approvedCompanyId?: string | null
+  assignedAdminUserId?: string | null
+  status?: $Enums.SupplierApplicationStatus
+  statusReason?: string | null
+  legalCompanyName: string
+  tradeName?: string | null
+  companyWebsite: string
+  websiteDomain?: string | null
+  registrationCountry: string
+  brandsHandled?: Prisma.SupplierApplicationCreatebrandsHandledInput | string[]
+  annualRevenueRange?: string
+  warehouseType?: string
+  skuCountRange?: string
+  riskLevel?: string
+  riskOverrideReason?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4562,6 +4935,7 @@ export type SupplierApplicationUpdateWithoutApplicantInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4572,6 +4946,7 @@ export type SupplierApplicationUpdateWithoutApplicantInput = {
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4607,6 +4982,8 @@ export type SupplierApplicationUncheckedUpdateWithoutApplicantInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4649,6 +5026,8 @@ export type SupplierApplicationUncheckedUpdateManyWithoutApplicantInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4673,6 +5052,7 @@ export type SupplierApplicationUpdateWithoutAssignedAdminInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4683,6 +5063,7 @@ export type SupplierApplicationUpdateWithoutAssignedAdminInput = {
   applicant?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierApplicationsNestedInput
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4718,6 +5099,8 @@ export type SupplierApplicationUncheckedUpdateWithoutAssignedAdminInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4760,6 +5143,125 @@ export type SupplierApplicationUncheckedUpdateManyWithoutAssignedAdminInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyClassification?: Prisma.NullableEnumSupplierLegacyClassificationFieldUpdateOperationsInput | $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SupplierApplicationUpdateWithoutRiskOverrideByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  applicationNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSupplierApplicationStatusFieldUpdateOperationsInput | $Enums.SupplierApplicationStatus
+  statusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.StringFieldUpdateOperationsInput | string
+  websiteDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  brandsHandled?: Prisma.SupplierApplicationUpdatebrandsHandledInput | string[]
+  annualRevenueRange?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
+  skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyClassification?: Prisma.NullableEnumSupplierLegacyClassificationFieldUpdateOperationsInput | $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applicant?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierApplicationsNestedInput
+  legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
+  approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
+  assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
+  businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
+  stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
+  warehouses?: Prisma.SupplierWarehouseUpdateManyWithoutApplicationNestedInput
+  supplyChains?: Prisma.SupplierSupplyChainUpdateManyWithoutApplicationNestedInput
+  brandVerifications?: Prisma.SupplierBrandVerificationUpdateManyWithoutApplicationNestedInput
+  operationsProfile?: Prisma.SupplierOperationsProfileUpdateOneWithoutApplicationNestedInput
+  settlementProfile?: Prisma.SupplierSettlementProfileUpdateOneWithoutApplicationNestedInput
+  documents?: Prisma.SupplierApplicationDocumentUpdateManyWithoutApplicationNestedInput
+  inventorySamples?: Prisma.SupplierInventorySampleUpdateManyWithoutApplicationNestedInput
+  reviews?: Prisma.SupplierApplicationReviewUpdateManyWithoutApplicationNestedInput
+  statusHistory?: Prisma.SupplierApplicationStatusHistoryUpdateManyWithoutApplicationNestedInput
+  informationRequests?: Prisma.SupplierInformationRequestUpdateManyWithoutApplicationNestedInput
+  duplicateFlags?: Prisma.SupplierDuplicateFlagUpdateManyWithoutApplicationNestedInput
+  auditEvents?: Prisma.SupplierApplicationAuditEventUpdateManyWithoutApplicationNestedInput
+}
+
+export type SupplierApplicationUncheckedUpdateWithoutRiskOverrideByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  applicationNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  legacyCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSupplierApplicationStatusFieldUpdateOperationsInput | $Enums.SupplierApplicationStatus
+  statusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.StringFieldUpdateOperationsInput | string
+  websiteDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  brandsHandled?: Prisma.SupplierApplicationUpdatebrandsHandledInput | string[]
+  annualRevenueRange?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
+  skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  legacyClassification?: Prisma.NullableEnumSupplierLegacyClassificationFieldUpdateOperationsInput | $Enums.SupplierLegacyClassification | null
+  legacyBackfilledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  contacts?: Prisma.SupplierApplicationContactUncheckedUpdateManyWithoutApplicationNestedInput
+  businessVerification?: Prisma.SupplierBusinessVerificationUncheckedUpdateOneWithoutApplicationNestedInput
+  stakeholders?: Prisma.SupplierStakeholderUncheckedUpdateManyWithoutApplicationNestedInput
+  warehouses?: Prisma.SupplierWarehouseUncheckedUpdateManyWithoutApplicationNestedInput
+  supplyChains?: Prisma.SupplierSupplyChainUncheckedUpdateManyWithoutApplicationNestedInput
+  brandVerifications?: Prisma.SupplierBrandVerificationUncheckedUpdateManyWithoutApplicationNestedInput
+  operationsProfile?: Prisma.SupplierOperationsProfileUncheckedUpdateOneWithoutApplicationNestedInput
+  settlementProfile?: Prisma.SupplierSettlementProfileUncheckedUpdateOneWithoutApplicationNestedInput
+  documents?: Prisma.SupplierApplicationDocumentUncheckedUpdateManyWithoutApplicationNestedInput
+  inventorySamples?: Prisma.SupplierInventorySampleUncheckedUpdateManyWithoutApplicationNestedInput
+  reviews?: Prisma.SupplierApplicationReviewUncheckedUpdateManyWithoutApplicationNestedInput
+  statusHistory?: Prisma.SupplierApplicationStatusHistoryUncheckedUpdateManyWithoutApplicationNestedInput
+  informationRequests?: Prisma.SupplierInformationRequestUncheckedUpdateManyWithoutApplicationNestedInput
+  duplicateFlags?: Prisma.SupplierDuplicateFlagUncheckedUpdateManyWithoutApplicationNestedInput
+  auditEvents?: Prisma.SupplierApplicationAuditEventUncheckedUpdateManyWithoutApplicationNestedInput
+}
+
+export type SupplierApplicationUncheckedUpdateManyWithoutRiskOverrideByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  applicationNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  applicantUserId?: Prisma.StringFieldUpdateOperationsInput | string
+  legacyCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  approvedCompanyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedAdminUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSupplierApplicationStatusFieldUpdateOperationsInput | $Enums.SupplierApplicationStatus
+  statusReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  legalCompanyName?: Prisma.StringFieldUpdateOperationsInput | string
+  tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyWebsite?: Prisma.StringFieldUpdateOperationsInput | string
+  websiteDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  registrationCountry?: Prisma.StringFieldUpdateOperationsInput | string
+  brandsHandled?: Prisma.SupplierApplicationUpdatebrandsHandledInput | string[]
+  annualRevenueRange?: Prisma.StringFieldUpdateOperationsInput | string
+  warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
+  skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
+  riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4787,6 +5289,8 @@ export type SupplierApplicationCreateManyLegacyCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4814,6 +5318,8 @@ export type SupplierApplicationCreateManyApprovedCompanyInput = {
   warehouseType?: string
   skuCountRange?: string
   riskLevel?: string
+  riskOverrideReason?: string | null
+  riskOverrideByUserId?: string | null
   submittedAt?: Date | string | null
   withdrawnAt?: Date | string | null
   approvedAt?: Date | string | null
@@ -4838,6 +5344,7 @@ export type SupplierApplicationUpdateWithoutLegacyCompanyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4848,6 +5355,7 @@ export type SupplierApplicationUpdateWithoutLegacyCompanyInput = {
   applicant?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierApplicationsNestedInput
   approvedCompany?: Prisma.CompanyUpdateOneWithoutApprovedSupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4883,6 +5391,8 @@ export type SupplierApplicationUncheckedUpdateWithoutLegacyCompanyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4925,6 +5435,8 @@ export type SupplierApplicationUncheckedUpdateManyWithoutLegacyCompanyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4949,6 +5461,7 @@ export type SupplierApplicationUpdateWithoutApprovedCompanyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4959,6 +5472,7 @@ export type SupplierApplicationUpdateWithoutApprovedCompanyInput = {
   applicant?: Prisma.UserProfileUpdateOneRequiredWithoutSupplierApplicationsNestedInput
   legacyCompany?: Prisma.CompanyUpdateOneWithoutLegacySupplierApplicationsNestedInput
   assignedAdmin?: Prisma.UserProfileUpdateOneWithoutAssignedSupplierApplicationsNestedInput
+  riskOverrideBy?: Prisma.UserProfileUpdateOneWithoutSupplierApplicationRiskOverridesNestedInput
   contacts?: Prisma.SupplierApplicationContactUpdateManyWithoutApplicationNestedInput
   businessVerification?: Prisma.SupplierBusinessVerificationUpdateOneWithoutApplicationNestedInput
   stakeholders?: Prisma.SupplierStakeholderUpdateManyWithoutApplicationNestedInput
@@ -4994,6 +5508,8 @@ export type SupplierApplicationUncheckedUpdateWithoutApprovedCompanyInput = {
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5036,6 +5552,8 @@ export type SupplierApplicationUncheckedUpdateManyWithoutApprovedCompanyInput = 
   warehouseType?: Prisma.StringFieldUpdateOperationsInput | string
   skuCountRange?: Prisma.StringFieldUpdateOperationsInput | string
   riskLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  riskOverrideReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riskOverrideByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   approvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5194,6 +5712,8 @@ export type SupplierApplicationSelect<ExtArgs extends runtime.Types.Extensions.I
   warehouseType?: boolean
   skuCountRange?: boolean
   riskLevel?: boolean
+  riskOverrideReason?: boolean
+  riskOverrideByUserId?: boolean
   submittedAt?: boolean
   withdrawnAt?: boolean
   approvedAt?: boolean
@@ -5205,6 +5725,7 @@ export type SupplierApplicationSelect<ExtArgs extends runtime.Types.Extensions.I
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
   contacts?: boolean | Prisma.SupplierApplication$contactsArgs<ExtArgs>
   businessVerification?: boolean | Prisma.SupplierApplication$businessVerificationArgs<ExtArgs>
   stakeholders?: boolean | Prisma.SupplierApplication$stakeholdersArgs<ExtArgs>
@@ -5242,6 +5763,8 @@ export type SupplierApplicationSelectCreateManyAndReturn<ExtArgs extends runtime
   warehouseType?: boolean
   skuCountRange?: boolean
   riskLevel?: boolean
+  riskOverrideReason?: boolean
+  riskOverrideByUserId?: boolean
   submittedAt?: boolean
   withdrawnAt?: boolean
   approvedAt?: boolean
@@ -5253,6 +5776,7 @@ export type SupplierApplicationSelectCreateManyAndReturn<ExtArgs extends runtime
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
 }, ExtArgs["result"]["supplierApplication"]>
 
 export type SupplierApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -5274,6 +5798,8 @@ export type SupplierApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime
   warehouseType?: boolean
   skuCountRange?: boolean
   riskLevel?: boolean
+  riskOverrideReason?: boolean
+  riskOverrideByUserId?: boolean
   submittedAt?: boolean
   withdrawnAt?: boolean
   approvedAt?: boolean
@@ -5285,6 +5811,7 @@ export type SupplierApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
 }, ExtArgs["result"]["supplierApplication"]>
 
 export type SupplierApplicationSelectScalar = {
@@ -5306,6 +5833,8 @@ export type SupplierApplicationSelectScalar = {
   warehouseType?: boolean
   skuCountRange?: boolean
   riskLevel?: boolean
+  riskOverrideReason?: boolean
+  riskOverrideByUserId?: boolean
   submittedAt?: boolean
   withdrawnAt?: boolean
   approvedAt?: boolean
@@ -5315,12 +5844,13 @@ export type SupplierApplicationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SupplierApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationNumber" | "applicantUserId" | "legacyCompanyId" | "approvedCompanyId" | "assignedAdminUserId" | "status" | "statusReason" | "legalCompanyName" | "tradeName" | "companyWebsite" | "websiteDomain" | "registrationCountry" | "brandsHandled" | "annualRevenueRange" | "warehouseType" | "skuCountRange" | "riskLevel" | "submittedAt" | "withdrawnAt" | "approvedAt" | "legacyClassification" | "legacyBackfilledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["supplierApplication"]>
+export type SupplierApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationNumber" | "applicantUserId" | "legacyCompanyId" | "approvedCompanyId" | "assignedAdminUserId" | "status" | "statusReason" | "legalCompanyName" | "tradeName" | "companyWebsite" | "websiteDomain" | "registrationCountry" | "brandsHandled" | "annualRevenueRange" | "warehouseType" | "skuCountRange" | "riskLevel" | "riskOverrideReason" | "riskOverrideByUserId" | "submittedAt" | "withdrawnAt" | "approvedAt" | "legacyClassification" | "legacyBackfilledAt" | "createdAt" | "updatedAt", ExtArgs["result"]["supplierApplication"]>
 export type SupplierApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applicant?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
   contacts?: boolean | Prisma.SupplierApplication$contactsArgs<ExtArgs>
   businessVerification?: boolean | Prisma.SupplierApplication$businessVerificationArgs<ExtArgs>
   stakeholders?: boolean | Prisma.SupplierApplication$stakeholdersArgs<ExtArgs>
@@ -5343,12 +5873,14 @@ export type SupplierApplicationIncludeCreateManyAndReturn<ExtArgs extends runtim
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
 }
 export type SupplierApplicationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   applicant?: boolean | Prisma.UserProfileDefaultArgs<ExtArgs>
   legacyCompany?: boolean | Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>
   approvedCompany?: boolean | Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>
   assignedAdmin?: boolean | Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>
+  riskOverrideBy?: boolean | Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>
 }
 
 export type $SupplierApplicationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5358,6 +5890,7 @@ export type $SupplierApplicationPayload<ExtArgs extends runtime.Types.Extensions
     legacyCompany: Prisma.$CompanyPayload<ExtArgs> | null
     approvedCompany: Prisma.$CompanyPayload<ExtArgs> | null
     assignedAdmin: Prisma.$UserProfilePayload<ExtArgs> | null
+    riskOverrideBy: Prisma.$UserProfilePayload<ExtArgs> | null
     contacts: Prisma.$SupplierApplicationContactPayload<ExtArgs>[]
     businessVerification: Prisma.$SupplierBusinessVerificationPayload<ExtArgs> | null
     stakeholders: Prisma.$SupplierStakeholderPayload<ExtArgs>[]
@@ -5393,6 +5926,8 @@ export type $SupplierApplicationPayload<ExtArgs extends runtime.Types.Extensions
     warehouseType: string
     skuCountRange: string
     riskLevel: string
+    riskOverrideReason: string | null
+    riskOverrideByUserId: string | null
     submittedAt: Date | null
     withdrawnAt: Date | null
     approvedAt: Date | null
@@ -5798,6 +6333,7 @@ export interface Prisma__SupplierApplicationClient<T, Null = never, ExtArgs exte
   legacyCompany<T extends Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$legacyCompanyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   approvedCompany<T extends Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$approvedCompanyArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   assignedAdmin<T extends Prisma.SupplierApplication$assignedAdminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$assignedAdminArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  riskOverrideBy<T extends Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$riskOverrideByArgs<ExtArgs>>): Prisma.Prisma__UserProfileClient<runtime.Types.Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   contacts<T extends Prisma.SupplierApplication$contactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupplierApplicationContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   businessVerification<T extends Prisma.SupplierApplication$businessVerificationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$businessVerificationArgs<ExtArgs>>): Prisma.Prisma__SupplierBusinessVerificationClient<runtime.Types.Result.GetResult<Prisma.$SupplierBusinessVerificationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   stakeholders<T extends Prisma.SupplierApplication$stakeholdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SupplierApplication$stakeholdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupplierStakeholderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5860,6 +6396,8 @@ export interface SupplierApplicationFieldRefs {
   readonly warehouseType: Prisma.FieldRef<"SupplierApplication", 'String'>
   readonly skuCountRange: Prisma.FieldRef<"SupplierApplication", 'String'>
   readonly riskLevel: Prisma.FieldRef<"SupplierApplication", 'String'>
+  readonly riskOverrideReason: Prisma.FieldRef<"SupplierApplication", 'String'>
+  readonly riskOverrideByUserId: Prisma.FieldRef<"SupplierApplication", 'String'>
   readonly submittedAt: Prisma.FieldRef<"SupplierApplication", 'DateTime'>
   readonly withdrawnAt: Prisma.FieldRef<"SupplierApplication", 'DateTime'>
   readonly approvedAt: Prisma.FieldRef<"SupplierApplication", 'DateTime'>
@@ -6309,6 +6847,25 @@ export type SupplierApplication$approvedCompanyArgs<ExtArgs extends runtime.Type
  * SupplierApplication.assignedAdmin
  */
 export type SupplierApplication$assignedAdminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserProfile
+   */
+  select?: Prisma.UserProfileSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserProfile
+   */
+  omit?: Prisma.UserProfileOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserProfileInclude<ExtArgs> | null
+  where?: Prisma.UserProfileWhereInput
+}
+
+/**
+ * SupplierApplication.riskOverrideBy
+ */
+export type SupplierApplication$riskOverrideByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the UserProfile
    */

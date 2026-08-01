@@ -11,6 +11,7 @@ import {
 import { validationError } from "@/lib/api-security";
 import { assertSafeXlsxArchive } from "@/lib/bulk-product-registration";
 import type { Locale } from "@/lib/i18n";
+import { requireSupplierApplicationsEnabled } from "@/lib/supplier-application-feature";
 import {
   getPrivateStorageBucket,
   sanitizeStoredFilename,
@@ -19,15 +20,21 @@ import {
   validateFileType,
 } from "@/lib/supabase-storage";
 
-const inventoryHeaders = [
-  "brand",
+export const supplierInventorySampleHeaders = [
   "gtin",
-  "sku",
-  "name",
-  "quantity",
-  "stock date",
+  "brand",
+  "product_name",
+  "size_or_variant",
+  "supply_price",
   "currency",
-  "price",
+  "available_quantity",
+  "moq",
+  "mov",
+  "lead_time_days",
+  "expiration_date",
+  "warehouse",
+  "allowed_countries",
+  "stock_updated_at",
 ] as const;
 
 export type InventorySampleSummary = {
@@ -36,10 +43,30 @@ export type InventorySampleSummary = {
   invalidRows: number;
   duplicateGtins: number;
   missingRequiredFieldRows: number;
+  invalidGtinRows: number;
   invalidPriceRows: number;
-  invalidStockDateRows: number;
+  invalidQuantityRows: number;
+  invalidMoqRows: number;
+  invalidMovRows: number;
+  invalidLeadTimeRows: number;
+  invalidExpirationDateRows: number;
+  invalidStockUpdatedAtRows: number;
   invalidCurrencyRows: number;
+  duplicateGtinRows: number;
 };
+
+const supportedCurrencies = new Set([
+  "AUD",
+  "CAD",
+  "CNY",
+  "EUR",
+  "GBP",
+  "HKD",
+  "JPY",
+  "KRW",
+  "SGD",
+  "USD",
+]);
 
 function extension(filename: string) {
   return filename.trim().toLowerCase().split(".").at(-1) ?? "";
@@ -49,8 +76,51 @@ function normalizedHeader(value: unknown) {
   return String(value ?? "")
     .trim()
     .toLocaleLowerCase()
-    .replaceAll(/[_-]+/g, " ")
-    .replaceAll(/\s+/g, " ");
+    .replaceAll(/[\s-]+/g, "_");
+}
+
+function validGtin(value: string) {
+  if (!/^\d{8}$|^\d{12}$|^\d{13}$|^\d{14}$/.test(value)) return false;
+  const digits = [...value].map(Number);
+  const checkDigit = digits.pop();
+  const sum = digits
+    .reverse()
+    .reduce((total, digit, index) => total + digit * (index % 2 === 0 ? 3 : 1), 0);
+  return (10 - (sum % 10)) % 10 === checkDigit;
+}
+
+function finiteNumber(value: string, minimum: number) {
+  if (!/^\d+(?:\.\d+)?$/.test(value)) return false;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= minimum;
+}
+
+function integer(value: string, minimum: number) {
+  if (!/^\d+$/.test(value)) return false;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= minimum;
+}
+
+function validDate(value: string, dateTime: boolean) {
+  if (!value) return false;
+  if (dateTime && !/^\d{4}-\d{2}-\d{2}T/.test(value)) return false;
+  if (!dateTime) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    const parsed = new Date(`${value}T00:00:00.000Z`);
+    return (
+      !Number.isNaN(parsed.getTime()) &&
+      parsed.toISOString().slice(0, 10) === value
+    );
+  }
+  return !Number.isNaN(new Date(value).getTime());
+}
+
+function validCountries(value: string) {
+  if (!value) return false;
+  return value.split(/[|;]/).every((item) => {
+    const country = item.trim();
+    return /^[A-Za-z][A-Za-z .'-]{1,79}$/.test(country);
+  });
 }
 
 function stringCell(value: unknown) {
@@ -109,6 +179,7 @@ export async function validateInventorySample(file: File): Promise<{
   format: SupplierInventorySampleFormat;
   summary: InventorySampleSummary;
 }> {
+  requireSupplierApplicationsEnabled();
   validateFileType(file, "supplier_inventory_sample");
   validateFileSize(file, "supplier_inventory_sample");
   const fileExtension = extension(file.name);
@@ -118,7 +189,9 @@ export async function validateInventorySample(file: File): Promise<{
   if (rows.length > 5_001) throw validationError("The inventory sample can contain at most 5,000 rows.");
 
   const headers = rows[0].map(normalizedHeader);
-  const missingHeaders = inventoryHeaders.filter((header) => !headers.includes(header));
+  const missingHeaders = supplierInventorySampleHeaders.filter(
+    (header) => !headers.includes(header),
+  );
   if (missingHeaders.length) {
     throw validationError(`The inventory sample is missing required columns: ${missingHeaders.join(", ")}.`);
   }
@@ -126,39 +199,88 @@ export async function validateInventorySample(file: File): Promise<{
   const gtins = new Map<string, number>();
   let validRows = 0;
   let invalidRows = 0;
-  let duplicateGtins = 0;
+  let duplicateGtinRows = 0;
   let missingRequiredFieldRows = 0;
+  let invalidGtinRows = 0;
   let invalidPriceRows = 0;
-  let invalidStockDateRows = 0;
+  let invalidQuantityRows = 0;
+  let invalidMoqRows = 0;
+  let invalidMovRows = 0;
+  let invalidLeadTimeRows = 0;
+  let invalidExpirationDateRows = 0;
+  let invalidStockUpdatedAtRows = 0;
   let invalidCurrencyRows = 0;
 
   for (const row of rows.slice(1)) {
-    const field = (header: (typeof inventoryHeaders)[number]) => stringCell(row[positions.get(header) ?? -1]);
-    const required = [field("brand"), field("gtin"), field("sku"), field("name"), field("quantity"), field("stock date"), field("currency"), field("price")];
-    let valid = required.every(Boolean);
-    if (!valid) missingRequiredFieldRows += 1;
+    const field = (header: (typeof supplierInventorySampleHeaders)[number]) =>
+      stringCell(row[positions.get(header) ?? -1]);
+    const required = [
+      field("gtin"),
+      field("brand"),
+      field("product_name"),
+      field("supply_price"),
+      field("currency"),
+      field("available_quantity"),
+      field("moq"),
+      field("mov"),
+      field("lead_time_days"),
+      field("expiration_date"),
+      field("warehouse"),
+      field("allowed_countries"),
+      field("stock_updated_at"),
+    ];
+    const missingRequiredField = !required.every(Boolean);
+    let valid = !missingRequiredField;
+    if (missingRequiredField) missingRequiredFieldRows += 1;
     const gtin = field("gtin");
-    if (gtin) {
+    if (!validGtin(gtin)) {
+      invalidGtinRows += 1;
+      valid = false;
+    } else {
       const current = gtins.get(gtin) ?? 0;
       gtins.set(gtin, current + 1);
       if (current > 0) {
-        duplicateGtins += 1;
+        duplicateGtinRows += 1;
         valid = false;
       }
     }
-    const quantity = Number(field("quantity"));
-    const price = Number(field("price"));
-    if (!Number.isFinite(quantity) || quantity < 0 || !Number.isInteger(quantity) || !Number.isFinite(price) || price < 0) {
+    if (!finiteNumber(field("supply_price"), Number.MIN_VALUE)) {
       invalidPriceRows += 1;
       valid = false;
     }
-    const stockDate = new Date(field("stock date"));
-    if (Number.isNaN(stockDate.getTime())) {
-      invalidStockDateRows += 1;
+    if (!integer(field("available_quantity"), 0)) {
+      invalidQuantityRows += 1;
       valid = false;
     }
-    if (!/^[A-Z]{3}$/.test(field("currency").toUpperCase())) {
+    if (!integer(field("moq"), 1)) {
+      invalidMoqRows += 1;
+      valid = false;
+    }
+    if (!finiteNumber(field("mov"), 0)) {
+      invalidMovRows += 1;
+      valid = false;
+    }
+    if (!integer(field("lead_time_days"), 0)) {
+      invalidLeadTimeRows += 1;
+      valid = false;
+    }
+    const expirationDate = field("expiration_date");
+    if (!validDate(expirationDate, false)) {
+      invalidExpirationDateRows += 1;
+      valid = false;
+    }
+    if (!validDate(field("stock_updated_at"), true)) {
+      invalidStockUpdatedAtRows += 1;
+      valid = false;
+    }
+    if (!supportedCurrencies.has(field("currency").toUpperCase())) {
       invalidCurrencyRows += 1;
+      valid = false;
+    }
+    if (
+      field("allowed_countries") &&
+      !validCountries(field("allowed_countries"))
+    ) {
       valid = false;
     }
     if (valid) validRows += 1;
@@ -166,7 +288,23 @@ export async function validateInventorySample(file: File): Promise<{
   }
   return {
     format: fileExtension === "csv" ? SupplierInventorySampleFormat.CSV : SupplierInventorySampleFormat.XLSX,
-    summary: { totalRows: rows.length - 1, validRows, invalidRows, duplicateGtins, missingRequiredFieldRows, invalidPriceRows, invalidStockDateRows, invalidCurrencyRows },
+    summary: {
+      totalRows: rows.length - 1,
+      validRows,
+      invalidRows,
+      duplicateGtins: duplicateGtinRows,
+      missingRequiredFieldRows,
+      invalidGtinRows,
+      invalidPriceRows,
+      invalidQuantityRows,
+      invalidMoqRows,
+      invalidMovRows,
+      invalidLeadTimeRows,
+      invalidExpirationDateRows,
+      invalidStockUpdatedAtRows,
+      invalidCurrencyRows,
+      duplicateGtinRows,
+    },
   };
 }
 
@@ -186,6 +324,7 @@ export async function uploadSupplierApplicationPrivateFile({
   kind: "documents" | "inventory";
   file: File;
 }) {
+  requireSupplierApplicationsEnabled();
   const filename = sanitizeStoredFilename(file.name);
   const uniqueName = `${randomUUID()}-${filename}`;
   const path = `supplier-applications/${applicationId}/${kind}/${uniqueName}`;

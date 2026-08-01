@@ -80,6 +80,40 @@ export async function POST(request: Request, context: RouteContext) {
       throw new Response("A document file is required.", { status: 400 });
     validateFileType(file, "supplier_application_document");
     validateFileSize(file, "supplier_application_document");
+    const documentType = parseSupplierApplicationDocumentType(
+      form.get("documentType"),
+    );
+    const brandVerificationValue = form.get("brandVerificationId");
+    const brandVerificationId =
+      typeof brandVerificationValue === "string" && brandVerificationValue
+        ? idParam(brandVerificationValue, "brandVerificationId")
+        : null;
+    if (
+      (documentType === "SUPPLIER_INVOICE" ||
+        documentType === "BRAND_AUTHORIZATION") &&
+      !brandVerificationId
+    ) {
+      throw new Response("Brand evidence must identify an active brand.", {
+        status: 400,
+      });
+    }
+    if (brandVerificationId) {
+      const brand = application.brandVerifications.find(
+        (candidate) => candidate.id === brandVerificationId,
+      );
+      if (!brand || !brand.isActive)
+        throw new Response("Active brand verification not found.", {
+          status: 404,
+        });
+      if (
+        documentType !== "SUPPLIER_INVOICE" &&
+        documentType !== "BRAND_AUTHORIZATION"
+      )
+        throw new Response(
+          "Brand evidence must be an invoice or authorization document.",
+          { status: 400 },
+        );
+    }
     const upload = await uploadSupplierApplicationPrivateFile({
       applicationId: application.id,
       kind: "documents",
@@ -90,9 +124,8 @@ export async function POST(request: Request, context: RouteContext) {
       data: {
         applicationId: application.id,
         uploadedByUserId: user.id,
-        documentType: parseSupplierApplicationDocumentType(
-          form.get("documentType"),
-        ),
+        documentType,
+        brandVerificationId,
         originalFilename: file.name,
         storedFilename: upload.storedFilename,
         storageBucket: upload.bucket,

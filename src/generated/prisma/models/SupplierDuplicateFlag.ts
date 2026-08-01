@@ -31,6 +31,7 @@ export type SupplierDuplicateFlagMinAggregateOutputType = {
   matchedEntityType: string | null
   matchedEntityId: string | null
   matchedValueHash: string | null
+  severity: string | null
   createdAt: Date | null
   resolvedAt: Date | null
   resolutionNote: string | null
@@ -43,6 +44,7 @@ export type SupplierDuplicateFlagMaxAggregateOutputType = {
   matchedEntityType: string | null
   matchedEntityId: string | null
   matchedValueHash: string | null
+  severity: string | null
   createdAt: Date | null
   resolvedAt: Date | null
   resolutionNote: string | null
@@ -55,6 +57,7 @@ export type SupplierDuplicateFlagCountAggregateOutputType = {
   matchedEntityType: number
   matchedEntityId: number
   matchedValueHash: number
+  severity: number
   createdAt: number
   resolvedAt: number
   resolutionNote: number
@@ -69,6 +72,7 @@ export type SupplierDuplicateFlagMinAggregateInputType = {
   matchedEntityType?: true
   matchedEntityId?: true
   matchedValueHash?: true
+  severity?: true
   createdAt?: true
   resolvedAt?: true
   resolutionNote?: true
@@ -81,6 +85,7 @@ export type SupplierDuplicateFlagMaxAggregateInputType = {
   matchedEntityType?: true
   matchedEntityId?: true
   matchedValueHash?: true
+  severity?: true
   createdAt?: true
   resolvedAt?: true
   resolutionNote?: true
@@ -93,6 +98,7 @@ export type SupplierDuplicateFlagCountAggregateInputType = {
   matchedEntityType?: true
   matchedEntityId?: true
   matchedValueHash?: true
+  severity?: true
   createdAt?: true
   resolvedAt?: true
   resolutionNote?: true
@@ -178,6 +184,7 @@ export type SupplierDuplicateFlagGroupByOutputType = {
   matchedEntityType: string
   matchedEntityId: string | null
   matchedValueHash: string
+  severity: string
   createdAt: Date
   resolvedAt: Date | null
   resolutionNote: string | null
@@ -211,6 +218,7 @@ export type SupplierDuplicateFlagWhereInput = {
   matchedEntityType?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   matchedEntityId?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
   matchedValueHash?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
+  severity?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   createdAt?: Prisma.DateTimeFilter<"SupplierDuplicateFlag"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierDuplicateFlag"> | Date | string | null
   resolutionNote?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
@@ -224,6 +232,7 @@ export type SupplierDuplicateFlagOrderByWithRelationInput = {
   matchedEntityType?: Prisma.SortOrder
   matchedEntityId?: Prisma.SortOrderInput | Prisma.SortOrder
   matchedValueHash?: Prisma.SortOrder
+  severity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resolutionNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -241,6 +250,7 @@ export type SupplierDuplicateFlagWhereUniqueInput = Prisma.AtLeast<{
   matchedEntityType?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   matchedEntityId?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
   matchedValueHash?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
+  severity?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   createdAt?: Prisma.DateTimeFilter<"SupplierDuplicateFlag"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierDuplicateFlag"> | Date | string | null
   resolutionNote?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
@@ -254,6 +264,7 @@ export type SupplierDuplicateFlagOrderByWithAggregationInput = {
   matchedEntityType?: Prisma.SortOrder
   matchedEntityId?: Prisma.SortOrderInput | Prisma.SortOrder
   matchedValueHash?: Prisma.SortOrder
+  severity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   resolutionNote?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -272,6 +283,7 @@ export type SupplierDuplicateFlagScalarWhereWithAggregatesInput = {
   matchedEntityType?: Prisma.StringWithAggregatesFilter<"SupplierDuplicateFlag"> | string
   matchedEntityId?: Prisma.StringNullableWithAggregatesFilter<"SupplierDuplicateFlag"> | string | null
   matchedValueHash?: Prisma.StringWithAggregatesFilter<"SupplierDuplicateFlag"> | string
+  severity?: Prisma.StringWithAggregatesFilter<"SupplierDuplicateFlag"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SupplierDuplicateFlag"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SupplierDuplicateFlag"> | Date | string | null
   resolutionNote?: Prisma.StringNullableWithAggregatesFilter<"SupplierDuplicateFlag"> | string | null
@@ -283,6 +295,7 @@ export type SupplierDuplicateFlagCreateInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -296,6 +309,7 @@ export type SupplierDuplicateFlagUncheckedCreateInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -307,6 +321,7 @@ export type SupplierDuplicateFlagUpdateInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -320,6 +335,7 @@ export type SupplierDuplicateFlagUncheckedUpdateInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -332,6 +348,7 @@ export type SupplierDuplicateFlagCreateManyInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -343,6 +360,7 @@ export type SupplierDuplicateFlagUpdateManyMutationInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -355,6 +373,7 @@ export type SupplierDuplicateFlagUncheckedUpdateManyInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -383,6 +402,7 @@ export type SupplierDuplicateFlagCountOrderByAggregateInput = {
   matchedEntityType?: Prisma.SortOrder
   matchedEntityId?: Prisma.SortOrder
   matchedValueHash?: Prisma.SortOrder
+  severity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   resolutionNote?: Prisma.SortOrder
@@ -395,6 +415,7 @@ export type SupplierDuplicateFlagMaxOrderByAggregateInput = {
   matchedEntityType?: Prisma.SortOrder
   matchedEntityId?: Prisma.SortOrder
   matchedValueHash?: Prisma.SortOrder
+  severity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   resolutionNote?: Prisma.SortOrder
@@ -407,6 +428,7 @@ export type SupplierDuplicateFlagMinOrderByAggregateInput = {
   matchedEntityType?: Prisma.SortOrder
   matchedEntityId?: Prisma.SortOrder
   matchedValueHash?: Prisma.SortOrder
+  severity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   resolvedAt?: Prisma.SortOrder
   resolutionNote?: Prisma.SortOrder
@@ -460,6 +482,7 @@ export type SupplierDuplicateFlagCreateWithoutApplicationInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -471,6 +494,7 @@ export type SupplierDuplicateFlagUncheckedCreateWithoutApplicationInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -512,6 +536,7 @@ export type SupplierDuplicateFlagScalarWhereInput = {
   matchedEntityType?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   matchedEntityId?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
   matchedValueHash?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
+  severity?: Prisma.StringFilter<"SupplierDuplicateFlag"> | string
   createdAt?: Prisma.DateTimeFilter<"SupplierDuplicateFlag"> | Date | string
   resolvedAt?: Prisma.DateTimeNullableFilter<"SupplierDuplicateFlag"> | Date | string | null
   resolutionNote?: Prisma.StringNullableFilter<"SupplierDuplicateFlag"> | string | null
@@ -523,6 +548,7 @@ export type SupplierDuplicateFlagCreateManyApplicationInput = {
   matchedEntityType: string
   matchedEntityId?: string | null
   matchedValueHash: string
+  severity?: string
   createdAt?: Date | string
   resolvedAt?: Date | string | null
   resolutionNote?: string | null
@@ -534,6 +560,7 @@ export type SupplierDuplicateFlagUpdateWithoutApplicationInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -545,6 +572,7 @@ export type SupplierDuplicateFlagUncheckedUpdateWithoutApplicationInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -556,6 +584,7 @@ export type SupplierDuplicateFlagUncheckedUpdateManyWithoutApplicationInput = {
   matchedEntityType?: Prisma.StringFieldUpdateOperationsInput | string
   matchedEntityId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   matchedValueHash?: Prisma.StringFieldUpdateOperationsInput | string
+  severity?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   resolvedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   resolutionNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -570,6 +599,7 @@ export type SupplierDuplicateFlagSelect<ExtArgs extends runtime.Types.Extensions
   matchedEntityType?: boolean
   matchedEntityId?: boolean
   matchedValueHash?: boolean
+  severity?: boolean
   createdAt?: boolean
   resolvedAt?: boolean
   resolutionNote?: boolean
@@ -583,6 +613,7 @@ export type SupplierDuplicateFlagSelectCreateManyAndReturn<ExtArgs extends runti
   matchedEntityType?: boolean
   matchedEntityId?: boolean
   matchedValueHash?: boolean
+  severity?: boolean
   createdAt?: boolean
   resolvedAt?: boolean
   resolutionNote?: boolean
@@ -596,6 +627,7 @@ export type SupplierDuplicateFlagSelectUpdateManyAndReturn<ExtArgs extends runti
   matchedEntityType?: boolean
   matchedEntityId?: boolean
   matchedValueHash?: boolean
+  severity?: boolean
   createdAt?: boolean
   resolvedAt?: boolean
   resolutionNote?: boolean
@@ -609,12 +641,13 @@ export type SupplierDuplicateFlagSelectScalar = {
   matchedEntityType?: boolean
   matchedEntityId?: boolean
   matchedValueHash?: boolean
+  severity?: boolean
   createdAt?: boolean
   resolvedAt?: boolean
   resolutionNote?: boolean
 }
 
-export type SupplierDuplicateFlagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "signal" | "matchedEntityType" | "matchedEntityId" | "matchedValueHash" | "createdAt" | "resolvedAt" | "resolutionNote", ExtArgs["result"]["supplierDuplicateFlag"]>
+export type SupplierDuplicateFlagOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "applicationId" | "signal" | "matchedEntityType" | "matchedEntityId" | "matchedValueHash" | "severity" | "createdAt" | "resolvedAt" | "resolutionNote", ExtArgs["result"]["supplierDuplicateFlag"]>
 export type SupplierDuplicateFlagInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   application?: boolean | Prisma.SupplierApplicationDefaultArgs<ExtArgs>
 }
@@ -637,6 +670,7 @@ export type $SupplierDuplicateFlagPayload<ExtArgs extends runtime.Types.Extensio
     matchedEntityType: string
     matchedEntityId: string | null
     matchedValueHash: string
+    severity: string
     createdAt: Date
     resolvedAt: Date | null
     resolutionNote: string | null
@@ -1070,6 +1104,7 @@ export interface SupplierDuplicateFlagFieldRefs {
   readonly matchedEntityType: Prisma.FieldRef<"SupplierDuplicateFlag", 'String'>
   readonly matchedEntityId: Prisma.FieldRef<"SupplierDuplicateFlag", 'String'>
   readonly matchedValueHash: Prisma.FieldRef<"SupplierDuplicateFlag", 'String'>
+  readonly severity: Prisma.FieldRef<"SupplierDuplicateFlag", 'String'>
   readonly createdAt: Prisma.FieldRef<"SupplierDuplicateFlag", 'DateTime'>
   readonly resolvedAt: Prisma.FieldRef<"SupplierDuplicateFlag", 'DateTime'>
   readonly resolutionNote: Prisma.FieldRef<"SupplierDuplicateFlag", 'String'>
