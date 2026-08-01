@@ -7,6 +7,7 @@ import {
   buildSellerDashboardCurrencySeries,
   SELLER_DASHBOARD_HISTORY_DAYS,
 } from "@/lib/seller-dashboard-net-sales";
+import { getSupplierApplicationCapabilities } from "@/lib/supplier-application";
 
 const noStoreHeaders = { "Cache-Control": "no-store" };
 
@@ -39,6 +40,15 @@ export async function GET(request: Request) {
     const user = await requireAuth();
     const url = new URL(request.url);
     const role = url.searchParams.get("role") === "seller" ? "seller" : "buyer";
+    if (role === "seller") {
+      const access = await getSupplierApplicationCapabilities(user.id);
+      if (!access.canCreateProductCandidate) {
+        return Response.json(
+          { error: "Supplier approval is required to access the seller dashboard." },
+          { status: 403, headers: noStoreHeaders },
+        );
+      }
+    }
     const company = await getUserCompany(user.id, role);
     if (!company) {
       return Response.json(

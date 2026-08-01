@@ -1,8 +1,8 @@
 import { BulkProductRegistration } from "@/components/bulk-product-registration";
 import { SellerDashboardShell } from "@/components/seller-dashboard-shell";
-import { requireDashboardRole } from "@/lib/require-auth";
+import { requireApprovedSupplierDashboard } from "@/lib/require-auth";
 
 export default async function BulkProductRegistrationPage() {
-  await requireDashboardRole("/dashboard/seller/products/bulk", "seller");
+  await requireApprovedSupplierDashboard("/dashboard/seller/products/bulk");
   return <SellerDashboardShell content={<BulkProductRegistration />} />;
 }

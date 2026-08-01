@@ -579,7 +579,9 @@ export function parseSupplierApplicationUpdateInput(
         record.temperatureControlledPacking === true,
       weekendShipping: record.weekendShipping === true,
       inventoryUpdateMethod:
-        method as SupplierApplicationUpdateInput["operations"]["inventoryUpdateMethod"],
+        method as NonNullable<
+          SupplierApplicationUpdateInput["operations"]
+        >["inventoryUpdateMethod"],
       inventoryUpdateFrequency: text(
         record.inventoryUpdateFrequency,
         "inventoryUpdateFrequency",
@@ -1547,9 +1549,9 @@ export async function createSupplierInformationRequest({
   section: SupplierApplicationSection;
   message: string;
   targetStatus:
-    | SupplierApplicationStatus.ADDITIONAL_INFORMATION_REQUIRED
-    | SupplierApplicationStatus.ADDITIONAL_DOCUMENTS_REQUIRED
-    | SupplierApplicationStatus.INVENTORY_VERIFICATION_REQUIRED;
+    | typeof SupplierApplicationStatus.ADDITIONAL_INFORMATION_REQUIRED
+    | typeof SupplierApplicationStatus.ADDITIONAL_DOCUMENTS_REQUIRED
+    | typeof SupplierApplicationStatus.INVENTORY_VERIFICATION_REQUIRED;
 }) {
   const requestMessage = text(message, "message", 4_000, true);
   return getDb().$transaction(async (tx) => {
@@ -1760,11 +1762,11 @@ export async function getSupplierApplicationCapabilities(
     status: application.status,
     companyId: approvedCompany?.id ?? null,
     canEditApplication: canEditSupplierApplication(application.status),
-    canUploadInventorySample: [
+    canUploadInventorySample: ([
       SupplierApplicationStatus.PRODUCT_AUTHENTICITY_VERIFICATION,
       SupplierApplicationStatus.INVENTORY_VERIFICATION_REQUIRED,
       SupplierApplicationStatus.ADDITIONAL_DOCUMENTS_REQUIRED,
-    ].includes(application.status),
+    ] as readonly SupplierApplicationStatus[]).includes(application.status),
     canUploadLiveInventory: Boolean(activeApproved && verifiedBrand),
     canCreateProductCandidate: Boolean(activeApproved && verifiedBrand),
     canPublishOffer: Boolean(activeApproved && verifiedBrand),
@@ -1838,10 +1840,16 @@ export function supplierApplicationSafeResponse(
     businessVerification,
     documents,
     inventorySamples,
-    reviews: _reviews,
-    duplicateFlags: _duplicateFlags,
-    ...safeApplication
+    ...applicationWithPrivateRelations
   } = application;
+  const safeApplication = Object.fromEntries(
+    Object.entries(applicationWithPrivateRelations).filter(
+      ([key]) => key !== "reviews" && key !== "duplicateFlags",
+    ),
+  ) as Omit<
+    typeof applicationWithPrivateRelations,
+    "reviews" | "duplicateFlags"
+  >;
   return {
     ...safeApplication,
     businessVerification: businessVerification

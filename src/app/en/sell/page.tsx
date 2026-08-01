@@ -1,5 +1,5 @@
-import { ListingPage } from "@/components/listing-page";
+import { SupplierProgramPage } from "@/components/supplier-program-page";
 
 export default function EnSellPage() {
-  return <ListingPage locale="en" pathname="/en/sell" />;
+  return <SupplierProgramPage locale="en" />;
 }

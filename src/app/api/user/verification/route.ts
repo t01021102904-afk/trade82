@@ -1,11 +1,11 @@
 import { apiError } from "@/lib/api-response";
 import { rateLimitOrResponse } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { user, company } = await requireSeller();
+    const { user, company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "user-review-request",

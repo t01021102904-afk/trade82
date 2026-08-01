@@ -317,7 +317,7 @@ test("rollout flags fail closed and only a Clerk user ID in the allowlist is ena
 });
 
 test("seller profile APIs use safe selects and prohibit cross-role access without encrypted fields", () => {
-  assert.match(source.sellerProfileRoute, /requireSeller\(\)/);
+  assert.match(source.sellerProfileRoute, /requireApprovedSupplierCapability\("canCreateProductCandidate"\)/);
   assert.match(source.sellerProfileRoute, /user\.clerkUserId/);
   assert.match(source.sellerProfileRoute, /assertSameOrigin\(request\)/);
   assert.match(source.sellerProfileRoute, /companyId: company\.id/);
@@ -326,23 +326,16 @@ test("seller profile APIs use safe selects and prohibit cross-role access withou
   assert.match(source.payoutProfileAdminRoute, /cannot verify their own seller payout profile/);
 });
 
-test("seller onboarding requires an encrypted payout profile while buyer onboarding remains unchanged", () => {
-  assert.match(
-    source.onboardingStatus,
-    /role === "seller"[\s\S]*hasSellerCompany && companyState\.hasSellerPayoutProfile/,
-  );
+test("buyer onboarding remains unchanged while seller onboarding is replaced by the approval application", async () => {
   assert.match(
     source.onboardingStatus,
     /role === "buyer"\) return companyState\.hasBuyerCompany/,
   );
-  assert.match(source.onboardingRoute, /Complete payout information before finishing seller onboarding/);
-  assert.match(source.requireAuth, /onboardingComplete: isOnboardingCompleteForRole/);
-  assert.match(source.requireAuth, /hasSellerCompany: companyState\.hasSellerCompany/);
-  assert.match(source.onboardingForm, /kind === "seller" \? "payout" : "personal"/);
-  assert.match(source.onboardingForm, /SellerPayoutOnboardingStep/);
-  assert.match(source.onboardingForm, /completeOnboardingAfterSave/);
+  assert.match(await readFile(new URL("../src/app/onboarding/seller/page.tsx", import.meta.url), "utf8"), /redirect\("\/seller\/apply"\)/);
+  assert.match(source.requireAuth, /requireApprovedSupplierDashboard/);
+  assert.match(await readFile(new URL("../src/components/supplier-application-workspace.tsx", import.meta.url), "utf8"), /SupplierApplicationStart/);
+  assert.doesNotMatch(await readFile(new URL("../src/components/supplier-program-page.tsx", import.meta.url), "utf8"), /SellerPayoutOnboardingStep|RichProductFormFields/);
   assert.match(source.onboardingForm, /if \(kind === "buyer"\)/);
-  assert.match(source.onboardingStepper, /id: "payout"/);
 });
 
 test("payout onboarding accepts only required safe fields and never renders full account data", () => {

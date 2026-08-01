@@ -25,6 +25,10 @@ import {
   resolveCurrentClerkUser,
   type ResolvedClerkUser,
 } from "@/lib/clerk-identity";
+import {
+  getSupplierApplicationCapabilities,
+  type SupplierApplicationCapabilities,
+} from "@/lib/supplier-application";
 
 type CompanyWithOwner = Company & {
   owner?: Pick<UserProfile, "id">;
@@ -232,10 +236,32 @@ export async function requireCompanyOwner(companyId: string) {
 
 export async function requireVerifiedSeller() {
   const { user, company } = await requireSeller();
-  if (!company || company.verificationStatus !== "verified") {
+  const supplierAccess = await getSupplierApplicationCapabilities(user.id);
+  if (!company || company.verificationStatus !== "verified" || !supplierAccess.canPublishOffer) {
     throw new Response("Listed seller required", { status: 403 });
   }
   return { user, company };
+}
+
+type SupplierCapabilityName = Exclude<
+  keyof SupplierApplicationCapabilities,
+  "applicationId" | "status" | "companyId" | "isLegacyFallback"
+>;
+
+/**
+ * Central server-side gate for the post-approval seller surface. UI state is
+ * deliberately not trusted: every product, inventory, order, and payout API
+ * must ask the application service for the current capability.
+ */
+export async function requireApprovedSupplierCapability(
+  capability: SupplierCapabilityName,
+) {
+  const { user, company } = await requireSeller();
+  const access = await getSupplierApplicationCapabilities(user.id);
+  if (!access[capability] || !company || (access.companyId && access.companyId !== company.id)) {
+    throw new Response("Supplier approval is required for this action.", { status: 403 });
+  }
+  return { user, company, access };
 }
 
 export function canViewPublicCompany(

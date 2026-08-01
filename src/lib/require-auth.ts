@@ -25,6 +25,7 @@ import {
 import { isExistingEmailDifferentClerkIdentityError } from "@/lib/fresh-user-profile";
 import { getOwnedPartnerProfile } from "@/lib/owned-partner-profile";
 import { isPartnerOnlyAccount } from "@/lib/partner-account-routing";
+import { getCurrentSupplierApplication, getSupplierApplicationCapabilities } from "@/lib/supplier-application";
 
 type PublicMetadata = {
   role?: unknown;
@@ -202,7 +203,13 @@ export async function redirectSignedInUserFromSignup(
     redirect(`${basePath}/partner/dashboard`);
   }
 
+  if (!profile) {
+    redirect(`${basePath}/onboarding/role`);
+  }
+
   if (role === "user") {
+    const supplierApplication = await getCurrentSupplierApplication(profile.id);
+    if (supplierApplication) redirect(`${basePath}/seller/application/status`);
     if (redirectUrl) redirect(safeInternalPath(redirectUrl, `${basePath}/onboarding/role`));
     redirect(`${basePath}/onboarding/role`);
   }
@@ -213,6 +220,10 @@ export async function redirectSignedInUserFromSignup(
     (role === "seller" || role === "buyer" || role === "both") &&
     !onboardingComplete
   ) {
+    if (role === "seller" || role === "both") {
+      const supplierAccess = await getSupplierApplicationCapabilities(profile.id);
+      if (supplierAccess.canCreateProductCandidate) redirect(`${basePath}/dashboard/seller`);
+    }
     redirect(`${basePath}/onboarding/${onboardingRoleSegment(role)}`);
   }
 
@@ -258,6 +269,8 @@ export async function requireAppProfile(redirectUrl: string) {
   }
 
   if (role === "user") {
+    const supplierApplication = await getCurrentSupplierApplication(profile.id);
+    if (supplierApplication) redirect(`${prefix}/seller/application/status`);
     redirect(`${prefix}/onboarding/role`);
   }
 
@@ -265,6 +278,12 @@ export async function requireAppProfile(redirectUrl: string) {
     (role === "seller" || role === "buyer" || role === "both") &&
     !onboardingComplete
   ) {
+    if (role === "seller" || role === "both") {
+      const supplierAccess = await getSupplierApplicationCapabilities(profile.id);
+      if (supplierAccess.canCreateProductCandidate) {
+        return { role };
+      }
+    }
     const onboardingRole = onboardingRoleSegment(role);
     redirect(`${prefix}/onboarding/${onboardingRole}`);
   }
@@ -407,6 +426,40 @@ export async function requireDashboardRole(
   }
 
   return { role: expectedRole };
+}
+
+/** The applicant portal accepts a signed-in account before it has a seller
+ * role or Company row. That distinction is what prevents pre-approval seller
+ * profiles from becoming publicly usable. */
+export async function requireSupplierApplicant(redirectUrl: string) {
+  const clerkUser = await requireAuth(redirectUrl);
+  const profile = await getCurrentUserProfile(clerkUser);
+  const prefix = localePrefix(redirectUrl);
+  if (!profile) redirect(`${prefix}/login`);
+  const companyState = await getOnboardingCompanyState(profile.id);
+  const partnerProfile = await getOwnedPartnerProfile(profile.id);
+  if (profile.role === "admin") redirect(`${prefix}/admin`);
+  if (isPartnerOnlyAccount({ partnerProfile, companyState })) {
+    redirect(`${prefix}/partner/dashboard`);
+  }
+  return profile;
+}
+
+/** Seller operational screens are available only after approval. Pending,
+ * suspended, or information-requested applicants are deliberately routed to
+ * their status workspace rather than merely hiding dashboard links. */
+export async function requireApprovedSupplierDashboard(redirectUrl: string) {
+  const profile = await requireSupplierApplicant(redirectUrl);
+  const access = await getSupplierApplicationCapabilities(profile.id);
+  const prefix = localePrefix(redirectUrl);
+  if (!access.canCreateProductCandidate) {
+    redirect(
+      access.applicationId
+        ? `${prefix}/seller/application/status`
+        : `${prefix}/seller/apply`,
+    );
+  }
+  return { profile, access };
 }
 
 export async function requireAdmin(redirectUrl: string) {

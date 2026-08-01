@@ -26,7 +26,7 @@ test("public header navigation keeps guest discovery links and role-backed actio
   assert.doesNotMatch(headerSource, /primaryCta/);
   assert.match(headerSource, /getSignedInHeaderAction/);
   assert.doesNotMatch(headerSource, /nav\.browseProducts/);
-  assert.match(navigationSource, /href: "\/sell"/);
+  assert.match(navigationSource, /href: "\/dashboard\/seller\/products\/new"/);
   assert.match(navigationSource, /href: "\/dashboard\/rfqs\/new"/);
   assert.match(navigationSource, /role === "seller" \|\| role === "both"/);
   assert.match(navigationSource, /isAdmin \|\| isPartnerOnly/);

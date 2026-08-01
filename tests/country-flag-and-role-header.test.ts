@@ -41,7 +41,7 @@ test("signed-in header actions follow seller-first both-role priority", () => {
       isAdmin: false,
       isPartnerOnly: false,
     }),
-    { href: "/sell", labelKey: "nav.listProduct" },
+    { href: "/dashboard/seller/products/new", labelKey: "nav.listProduct" },
   );
   assert.deepEqual(
     getSignedInHeaderAction({
@@ -49,7 +49,7 @@ test("signed-in header actions follow seller-first both-role priority", () => {
       isAdmin: false,
       isPartnerOnly: false,
     }),
-    { href: "/sell", labelKey: "nav.listProduct" },
+    { href: "/dashboard/seller/products/new", labelKey: "nav.listProduct" },
   );
   assert.deepEqual(
     getSignedInHeaderAction({

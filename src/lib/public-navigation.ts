@@ -23,7 +23,7 @@ export function getSignedInHeaderAction({
 }) {
   if (isAdmin || isPartnerOnly) return null;
   if (role === "seller" || role === "both") {
-    return { href: "/sell", labelKey: "nav.listProduct" } as const;
+    return { href: "/dashboard/seller/products/new", labelKey: "nav.listProduct" } as const;
   }
   if (role === "buyer") {
     return { href: "/dashboard/rfqs/new", labelKey: "nav.createRfq" } as const;

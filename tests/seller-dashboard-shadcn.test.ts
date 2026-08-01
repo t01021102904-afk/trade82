@@ -17,7 +17,7 @@ test("seller routes use the shadcn shell while buyer routes keep RoleDashboard",
   ]) {
     const value = source(path);
     assert.match(value, /SellerDashboardShell/);
-    assert.match(value, /requireDashboardRole/);
+    assert.match(value, /requireApprovedSupplierDashboard/);
   }
 
   for (const path of [

@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { idParam } from "@/lib/api-security";
-import { requireSeller } from "@/lib/authz";
+import { requireApprovedSupplierCapability } from "@/lib/authz";
 import { getDb } from "@/lib/db";
 import { createSignedTradeDocumentUrl } from "@/lib/document-storage";
 import { StorageConfigurationError } from "@/lib/supabase-storage";
@@ -12,7 +12,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { company } = await requireSeller();
+    const { company } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     if (!company) {
       return Response.json(
         { error: "Create a company profile before opening documents." },

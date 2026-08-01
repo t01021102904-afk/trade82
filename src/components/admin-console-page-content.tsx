@@ -36,6 +36,7 @@ export function AdminConsolePageContent({ locale }: { locale: Locale }) {
         <section>
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide theme-muted">{admin.companyManagement}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AdminCard title={admin.supplierApplications.title} description={admin.supplierApplications.description} href={withLocale("/admin/supplier-applications", locale)} />
             <AdminCard title={admin.companyQueueTitle} description={admin.companyQueueDescription} href={withLocale("/admin/verifications", locale)} />
             <AdminCard title={admin.allCompanies} description={admin.allCompaniesDescription} href={`${withLocale("/admin/companies", locale)}?status=all`} />
             <AdminCard title={admin.sellerCompanies} description={admin.sellerCompaniesDescription} href={`${withLocale("/admin/companies", locale)}?role=seller&status=all`} />

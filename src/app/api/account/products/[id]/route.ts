@@ -1,6 +1,6 @@
 import { apiError } from "@/lib/api-response";
 import { ApiValidationError, idParam, rateLimitOrResponse, validationErrorResponse } from "@/lib/api-security";
-import { canManageProduct, requireSeller } from "@/lib/authz";
+import { canManageProduct, requireApprovedSupplierCapability } from "@/lib/authz";
 import {
   getComplianceClaimOptions,
   getIncotermOptions,
@@ -89,7 +89,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { user } = await requireSeller();
+    const { user, access } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-products-write",
@@ -107,6 +107,12 @@ export async function PATCH(
     }
 
     const body = (await request.json()) as Record<string, unknown>;
+    if (body.status === "active" && !access.canPublishOffer) {
+      return Response.json(
+        { error: "Supplier approval and verified brand authorization are required to publish products." },
+        { status: 403 },
+      );
+    }
     const submittedFieldVisibility =
       body.fieldVisibility === undefined
         ? undefined
@@ -537,7 +543,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { user } = await requireSeller();
+    const { user } = await requireApprovedSupplierCapability("canCreateProductCandidate");
     const rateLimited = rateLimitOrResponse({
       request,
       scope: "account-products-delete",

@@ -1,5 +1,5 @@
-import { ListingPage } from "@/components/listing-page";
+import { SupplierProgramPage } from "@/components/supplier-program-page";
 
-export default async function SellPage() {
-  return <ListingPage locale="en" pathname="/sell" />;
+export default function SellPage() {
+  return <SupplierProgramPage locale="en" />;
 }

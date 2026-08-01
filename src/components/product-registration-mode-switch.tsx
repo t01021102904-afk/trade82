@@ -17,7 +17,7 @@ export function ProductRegistrationModeSwitch() {
         <Button
           size="lg"
           className="h-auto justify-start gap-3 px-4 py-3 text-left"
-          render={<Link href={withLocale("/sell", locale)} />}
+          render={<Link href={withLocale("/dashboard/seller/products/new", locale)} />}
           aria-current="page"
         >
           <PackagePlus className="size-5" aria-hidden="true" />

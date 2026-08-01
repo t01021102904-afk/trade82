@@ -256,7 +256,7 @@ export function BulkProductRegistration() {
           </Button>
           <Button
             variant="secondary"
-            render={<Link href={withLocale("/sell", locale)} />}
+            render={<Link href={withLocale("/dashboard/seller/products/new", locale)} />}
           >
             {t("bulkProducts.backToSingle")}
           </Button>
