@@ -7,7 +7,9 @@ export type UploadType =
   | "product_image"
   | "profile_avatar"
   | "verification_document"
-  | "contract_file";
+  | "contract_file"
+  | "supplier_application_document"
+  | "supplier_inventory_sample";
 
 type FileRule = {
   folder: string;
@@ -45,6 +47,11 @@ const DOCUMENT_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
+]);
+const INVENTORY_EXTENSIONS = new Set(["csv", "xlsx"]);
+const INVENTORY_MIME_TYPES = new Set([
+  "text/csv",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ]);
 const SUSPICIOUS_EXTENSIONS = new Set([
   "bat",
@@ -94,6 +101,20 @@ export const FILE_RULES: Record<UploadType, FileRule> = {
     maxBytes: 20 * MB,
     extensions: DOCUMENT_EXTENSIONS,
     mimeTypes: DOCUMENT_MIME_TYPES,
+    visibility: "private",
+  },
+  supplier_application_document: {
+    folder: "supplier-applications",
+    maxBytes: 10 * MB,
+    extensions: DOCUMENT_EXTENSIONS,
+    mimeTypes: DOCUMENT_MIME_TYPES,
+    visibility: "private",
+  },
+  supplier_inventory_sample: {
+    folder: "supplier-applications",
+    maxBytes: 10 * MB,
+    extensions: INVENTORY_EXTENSIONS,
+    mimeTypes: INVENTORY_MIME_TYPES,
     visibility: "private",
   },
 };
@@ -366,14 +387,14 @@ export async function ensureStorageBuckets() {
     const result = await client.storage.createBucket(privateBucket, {
       public: false,
       fileSizeLimit: 100 * MB,
-      allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
+      allowedMimeTypes: [...DOCUMENT_MIME_TYPES, ...INVENTORY_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
   } else {
     const result = await client.storage.updateBucket(privateBucket, {
       public: false,
       fileSizeLimit: 100 * MB,
-      allowedMimeTypes: [...DOCUMENT_MIME_TYPES],
+      allowedMimeTypes: [...DOCUMENT_MIME_TYPES, ...INVENTORY_MIME_TYPES],
     });
     if (result.error) throw new Error(result.error.message);
   }

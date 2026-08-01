@@ -427,7 +427,7 @@ const MAX_XLSX_ENTRIES = 512;
 const MAX_XLSX_UNCOMPRESSED_BYTES = 25 * 1024 * 1024;
 const MAX_XLSX_ENTRY_BYTES = 10 * 1024 * 1024;
 
-function assertSafeXlsxArchive(buffer: Buffer, locale: Locale) {
+export function assertSafeXlsxArchive(buffer: Buffer, locale: Locale) {
   const endOfCentralDirectory = findEndOfCentralDirectory(buffer);
   if (endOfCentralDirectory < 0) {
     throw invalidWorkbookError(locale);

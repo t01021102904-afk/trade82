@@ -1053,10 +1053,6 @@ export type SellerPayoutProfileCreatesupportedCurrenciesInput = {
   set: string[]
 }
 
-export type NullableBytesFieldUpdateOperationsInput = {
-  set?: runtime.Bytes | null
-}
-
 export type EnumPayoutAccountTypeFieldUpdateOperationsInput = {
   set?: $Enums.PayoutAccountType
 }

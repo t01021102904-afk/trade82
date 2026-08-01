@@ -809,10 +809,6 @@ export type EnumRfqSellerQuoteStatusFieldUpdateOperationsInput = {
   set?: $Enums.RfqSellerQuoteStatus
 }
 
-export type NullableBoolFieldUpdateOperationsInput = {
-  set?: boolean | null
-}
-
 export type RfqSellerQuoteCreateWithoutSellerCompanyInput = {
   id?: string
   status?: $Enums.RfqSellerQuoteStatus

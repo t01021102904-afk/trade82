@@ -7,7 +7,7 @@
     "build": "node scripts/run-production-migrations.mjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npm run test:payments && npm run test:orders && npm run test:production-migrations && npm run test:partner-referral-analytics && npm run test:admin-partners && npm run test:localization && npm run test:homepage-promotions && NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/stripe-connect-settlement.test.ts tests/stripe-connect-transfer-reversal.test.ts tests/settlement-operations-control-plane.test.ts && npm run test:seller-dashboard-orders-payouts",
+    "test": "npm run test:payments && npm run test:orders && npm run test:production-migrations && npm run test:partner-referral-analytics && npm run test:admin-partners && npm run test:localization && npm run test:homepage-promotions && npm run test:supplier-applications && NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/stripe-connect-settlement.test.ts tests/stripe-connect-transfer-reversal.test.ts tests/settlement-operations-control-plane.test.ts && npm run test:seller-dashboard-orders-payouts",
     "test:payments": "node --experimental-strip-types --test tests/payment-request-rules.test.ts tests/payment-request-safety.test.ts",
     "test:orders": "NODE_OPTIONS=--conditions=react-server node --experimental-strip-types --test tests/order-manual-payout.test.ts",
     "test:orders:integration": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test --test-concurrency=1 tests/order-manual-payout.integration.test.ts",
@@ -15,6 +15,7 @@
     "test:admin-partners": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/admin-partners.test.ts",
     "test:localization": "node --experimental-strip-types --test tests/sitewide-localization-and-buttons.test.ts",
     "test:homepage-promotions": "NODE_OPTIONS='--import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/b2b-feedback.test.ts tests/bulk-product-registration.test.ts tests/country-flag-and-role-header.test.ts tests/homepage-promotions.test.ts tests/header-auth-shell.test.ts tests/home-category-visual-scroller.test.ts tests/marketplace-server-rendered-products.test.ts tests/product-pricing-requirements.test.ts tests/seller-dashboard-shadcn.test.ts tests/seller-dashboard-net-sales.test.ts tests/comet-spinner.test.ts tests/seller-dashboard-top-navigation.test.ts tests/seller-card-main-countries.test.ts tests/sidebar-account-company-profile-route.test.ts tests/sidebar-user-dropdown.test.ts tests/clerk-user-button-default-pages.test.ts",
+    "test:supplier-applications": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/supplier-application.test.ts",
     "test:marketplace-search:e2e": "node --test tests/marketplace-search.e2e.test.mjs",
     "test:admin-partners:integration": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test --test-concurrency=1 tests/admin-partners.integration.test.ts",
     "test:partner-referral-analytics": "NODE_OPTIONS='--conditions=react-server --import=./tests/register-test-alias.mjs' node --experimental-strip-types --test tests/partner-referral-analytics.test.ts",
@@ -30,6 +31,7 @@
     "db:studio": "prisma studio",
     "db:seed:south-korean-banks": "node --experimental-strip-types scripts/seed-south-korea-bank-directory.ts",
     "backfill:english": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/backfill-english-content.ts",
+    "backfill:supplier-applications": "node --env-file-if-exists=.env.local --experimental-strip-types scripts/backfill-supplier-applications.ts",
     "test:seller-dashboard-orders-payouts": "npx --yes tsx --test tests/seller-dashboard-orders-payouts.test.ts"
   },
   "dependencies": {

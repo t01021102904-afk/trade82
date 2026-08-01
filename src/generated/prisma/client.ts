@@ -82,6 +82,86 @@ export type Category = Prisma.CategoryModel
  */
 export type VerificationRequest = Prisma.VerificationRequestModel
 /**
+ * Model SupplierApplication
+ * 
+ */
+export type SupplierApplication = Prisma.SupplierApplicationModel
+/**
+ * Model SupplierApplicationContact
+ * 
+ */
+export type SupplierApplicationContact = Prisma.SupplierApplicationContactModel
+/**
+ * Model SupplierBusinessVerification
+ * 
+ */
+export type SupplierBusinessVerification = Prisma.SupplierBusinessVerificationModel
+/**
+ * Model SupplierStakeholder
+ * 
+ */
+export type SupplierStakeholder = Prisma.SupplierStakeholderModel
+/**
+ * Model SupplierWarehouse
+ * 
+ */
+export type SupplierWarehouse = Prisma.SupplierWarehouseModel
+/**
+ * Model SupplierSupplyChain
+ * 
+ */
+export type SupplierSupplyChain = Prisma.SupplierSupplyChainModel
+/**
+ * Model SupplierBrandVerification
+ * 
+ */
+export type SupplierBrandVerification = Prisma.SupplierBrandVerificationModel
+/**
+ * Model SupplierOperationsProfile
+ * 
+ */
+export type SupplierOperationsProfile = Prisma.SupplierOperationsProfileModel
+/**
+ * Model SupplierSettlementProfile
+ * 
+ */
+export type SupplierSettlementProfile = Prisma.SupplierSettlementProfileModel
+/**
+ * Model SupplierApplicationDocument
+ * 
+ */
+export type SupplierApplicationDocument = Prisma.SupplierApplicationDocumentModel
+/**
+ * Model SupplierInventorySample
+ * 
+ */
+export type SupplierInventorySample = Prisma.SupplierInventorySampleModel
+/**
+ * Model SupplierApplicationReview
+ * 
+ */
+export type SupplierApplicationReview = Prisma.SupplierApplicationReviewModel
+/**
+ * Model SupplierApplicationStatusHistory
+ * 
+ */
+export type SupplierApplicationStatusHistory = Prisma.SupplierApplicationStatusHistoryModel
+/**
+ * Model SupplierInformationRequest
+ * 
+ */
+export type SupplierInformationRequest = Prisma.SupplierInformationRequestModel
+/**
+ * Model SupplierDuplicateFlag
+ * 
+ */
+export type SupplierDuplicateFlag = Prisma.SupplierDuplicateFlagModel
+/**
+ * Model SupplierApplicationAuditEvent
+ * 
+ */
+export type SupplierApplicationAuditEvent = Prisma.SupplierApplicationAuditEventModel
+/**
  * Model Inquiry
  * 
  */
