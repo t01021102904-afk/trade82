@@ -2637,7 +2637,7 @@
     "phone": "전화번호",
     "uploadDocument": "문서 업로드",
     "uploadInventory": "재고 샘플 업로드",
-    "inventoryHint": "GTIN, 브랜드, 상품명, 규격, 공급가, 통화, 가용 수량, MOQ, MOV, 리드타임, 유효기간, 창고, 허용 국가, 재고 갱신 시각이 포함된 공급사 전용 CSV 또는 XLSX를 업로드하세요.",
+    "inventoryHint": "공급사 전용 CSV 또는 XLSX의 모든 행에 GTIN, 브랜드, 상품명, 규격 또는 옵션, 공급가, 통화, 가용 수량, MOQ, MOV, 리드타임, 유효기간, 창고, 허용 국가, 재고 갱신 시각을 필수로 입력하세요.",
     "documentType": "문서 유형",
     "noApplication": "아직 공급사 신청이 없습니다.",
     "statusReason": "검토 메모",

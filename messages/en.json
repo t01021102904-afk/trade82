@@ -2637,7 +2637,7 @@
     "phone": "Phone number",
     "uploadDocument": "Upload document",
     "uploadInventory": "Upload inventory sample",
-    "inventoryHint": "Upload the dedicated supplier inventory CSV or XLSX with GTIN, brand, product name, size or variant, supply price, currency, available quantity, MOQ, MOV, lead time, expiration date, warehouse, allowed countries, and stock updated time.",
+    "inventoryHint": "Upload the dedicated supplier inventory CSV or XLSX. Every row requires GTIN, brand, product name, size or variant, supply price, currency, available quantity, MOQ, MOV, lead time, expiration date, warehouse, allowed countries, and stock updated time.",
     "documentType": "Document type",
     "noApplication": "You do not have a supplier application yet.",
     "statusReason": "Review note",

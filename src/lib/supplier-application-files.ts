@@ -218,6 +218,7 @@ export async function validateInventorySample(file: File): Promise<{
       field("gtin"),
       field("brand"),
       field("product_name"),
+      field("size_or_variant"),
       field("supply_price"),
       field("currency"),
       field("available_quantity"),

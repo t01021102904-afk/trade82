@@ -22,7 +22,7 @@ type RouteContext = {
   params: Promise<{ id: string; brandVerificationId: string }>;
 };
 
-export async function POST(request: Request, context: RouteContext) {
+export async function PATCH(request: Request, context: RouteContext) {
   try {
     assertSameOrigin(request);
     const admin = await requireAdmin();
@@ -46,10 +46,24 @@ export async function POST(request: Request, context: RouteContext) {
         "reason",
       ]),
     );
-    const expiresAtValue = nullableStringField(body, "expiresAt", 64);
-    const expiresAt = expiresAtValue ? new Date(expiresAtValue) : null;
+    const hasExpiresAt = Object.hasOwn(body, "expiresAt");
+    const expiresAtValue = hasExpiresAt
+      ? nullableStringField(body, "expiresAt", 64)
+      : undefined;
+    let expiresAt: Date | null | undefined;
+    if (expiresAtValue === undefined) expiresAt = undefined;
+    else if (expiresAtValue === null) expiresAt = null;
+    else expiresAt = new Date(expiresAtValue);
     if (expiresAt && Number.isNaN(expiresAt.getTime()))
       throw validationError("expiresAt is invalid.");
+    const hasCountryRestrictions = Object.hasOwn(body, "countryRestrictions");
+    if (
+      hasCountryRestrictions &&
+      body.countryRestrictions !== null &&
+      !Array.isArray(body.countryRestrictions)
+    ) {
+      throw validationError("countryRestrictions must be a list or null.");
+    }
     const { id, brandVerificationId } = await context.params;
     const brand = await reviewSupplierBrandVerification({
       applicationId: idParam(id),
@@ -66,12 +80,18 @@ export async function POST(request: Request, context: RouteContext) {
           "evidenceStatus",
           Object.values(SupplierReviewStatus),
         ),
-        reviewNotes: nullableStringField(body, "reviewNotes", 4_000) ?? "",
+        reviewNotes: Object.hasOwn(body, "reviewNotes")
+          ? nullableStringField(body, "reviewNotes", 4_000)
+          : undefined,
         expiresAt,
-        countryRestrictions: stringArrayField(body, "countryRestrictions", {
-          maxItems: 100,
-          maxLength: 100,
-        }),
+        countryRestrictions: hasCountryRestrictions
+          ? body.countryRestrictions === null
+            ? null
+            : stringArrayField(body, "countryRestrictions", {
+                maxItems: 100,
+                maxLength: 100,
+              })
+          : undefined,
         reason: requiredStringField(body, "reason", 4_000),
       },
     });

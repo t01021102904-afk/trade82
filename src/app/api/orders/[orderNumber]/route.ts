@@ -100,14 +100,14 @@ export async function GET(_request: Request, { params }: { params: Promise<{ ord
       }),
       getSupplierApplicationCapabilities(user.id),
     ]);
-    if (!admin && sellerCanEdit > 0 && buyerCanView === 0 && !supplierAccess.canReceiveOrder) {
+    if (!admin && sellerCanEdit > 0 && buyerCanView === 0 && !supplierAccess.canAccessAssignedOrders) {
       return Response.json({ error: "Supplier approval is required to access seller orders." }, { status: 403, headers: noStore });
     }
-    const canViewSellerFinancials = admin || (sellerCanEdit > 0 && supplierAccess.canReceiveOrder);
+    const canViewSellerFinancials = admin || (sellerCanEdit > 0 && supplierAccess.canAccessAssignedOrders);
     return Response.json(
       {
         order: canViewSellerFinancials ? order : buyerSafeOrder(order),
-        sellerCanEdit: sellerCanEdit > 0 && supplierAccess.canShipOrder,
+        sellerCanEdit: sellerCanEdit > 0 && supplierAccess.canShipExistingOrders,
       },
       { headers: noStore },
     );
@@ -121,7 +121,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ or
     const user = await requireCurrentAppUser();
     if (!isTradeOrderSystemEnabledForClerkUser(user.clerkUserId)) return Response.json({ error: "Orders are not enabled for this account." }, { status: 403, headers: noStore });
     const supplierAccess = await getSupplierApplicationCapabilities(user.id);
-    if (!supplierAccess.canShipOrder) return Response.json({ error: "Supplier approval is required to update shipment information." }, { status: 403, headers: noStore });
+    if (!supplierAccess.canShipExistingOrders) return Response.json({ error: "Supplier approval is required to update shipment information." }, { status: 403, headers: noStore });
     const orderNumber = idParam((await params).orderNumber, "orderNumber");
     const order = await getDb().tradeOrder.findFirst({
       where: {

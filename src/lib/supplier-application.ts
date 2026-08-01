@@ -166,8 +166,9 @@ export type SupplierApplicationCapabilities = {
   canCreateProductCandidate: boolean;
   canPublishOffer: boolean;
   canReceiveTestOrder: boolean;
-  canReceiveOrder: boolean;
-  canShipOrder: boolean;
+  canAcceptNewOrders: boolean;
+  canAccessAssignedOrders: boolean;
+  canShipExistingOrders: boolean;
   canReceivePayout: boolean;
   isLegacyFallback: boolean;
 };
@@ -2011,23 +2012,19 @@ export async function reviewSupplierBrandVerification({
   input: {
     status: SupplierBrandVerificationStatus;
     evidenceStatus: SupplierReviewStatus;
-    reviewNotes?: string;
+    reviewNotes?: string | null;
     expiresAt?: Date | null;
-    countryRestrictions?: string[];
+    countryRestrictions?: string[] | null;
     reason: string;
   };
 }) {
   requireSupplierApplicationsEnabled();
   const reason = text(input.reason, "reason", 4_000, true);
-  const reviewNotes = text(input.reviewNotes ?? "", "reviewNotes", 4_000);
   if (
     input.status === SupplierBrandVerificationStatus.VERIFIED &&
     input.evidenceStatus !== SupplierReviewStatus.VERIFIED
   ) {
     throw validationError("Verified brands require verified evidence.");
-  }
-  if (input.expiresAt && input.expiresAt <= new Date()) {
-    throw validationError("expiresAt must be in the future.");
   }
   return getDb().$transaction(async (tx) => {
     const admin = await tx.userProfile.findUnique({
@@ -2044,14 +2041,51 @@ export async function reviewSupplierBrandVerification({
     if (!brand.isActive)
       throw validationError("Removed brands cannot be reviewed.");
     const now = new Date();
+    const hasExpiresAt = Object.hasOwn(input, "expiresAt");
+    const hasCountryRestrictions = Object.hasOwn(
+      input,
+      "countryRestrictions",
+    );
+    const hasReviewNotes = Object.hasOwn(input, "reviewNotes");
+    let effectiveExpiresAt = hasExpiresAt ? input.expiresAt ?? null : brand.expiresAt;
+    const effectiveCountryRestrictions = hasCountryRestrictions
+      ? input.countryRestrictions ?? []
+      : brand.countryRestrictions;
+    if (
+      input.status === SupplierBrandVerificationStatus.VERIFIED &&
+      effectiveExpiresAt &&
+      effectiveExpiresAt <= now
+    ) {
+      throw validationError("Verified brand expiration must be in the future or null.");
+    }
+    if (input.status === SupplierBrandVerificationStatus.EXPIRED) {
+      if (!hasExpiresAt && (!effectiveExpiresAt || effectiveExpiresAt > now)) {
+        effectiveExpiresAt = now;
+      }
+      if (effectiveExpiresAt && effectiveExpiresAt > now) {
+        throw validationError("Expired brand expiration cannot be in the future.");
+      }
+    }
+    if (
+      input.status === SupplierBrandVerificationStatus.RESTRICTED &&
+      effectiveCountryRestrictions.length === 0
+    ) {
+      throw validationError("Restricted brands require at least one country restriction.");
+    }
     const updated = await tx.supplierBrandVerification.update({
       where: { id: brand.id },
       data: {
         status: input.status,
         evidenceStatus: input.evidenceStatus,
-        reviewNotes,
-        expiresAt: input.expiresAt,
-        countryRestrictions: input.countryRestrictions,
+        ...(hasReviewNotes
+          ? { reviewNotes: text(input.reviewNotes, "reviewNotes", 4_000) }
+          : {}),
+        ...(hasExpiresAt || input.status === SupplierBrandVerificationStatus.EXPIRED
+          ? { expiresAt: effectiveExpiresAt }
+          : {}),
+        ...(hasCountryRestrictions
+          ? { countryRestrictions: effectiveCountryRestrictions }
+          : {}),
         verifiedAt:
           input.status === SupplierBrandVerificationStatus.VERIFIED
             ? now
@@ -2289,16 +2323,23 @@ export function resolveSupplierApplicationCapabilities({
       canCreateProductCandidate: legacyVerified,
       canPublishOffer: legacyVerified,
       canReceiveTestOrder: false,
-      canReceiveOrder: legacyVerified,
-      canShipOrder: legacyVerified,
+      canAcceptNewOrders: legacyVerified,
+      canAccessAssignedOrders: legacyVerified,
+      canShipExistingOrders: legacyVerified,
       canReceivePayout:
         legacyVerified && company?.sellerPayoutProfile?.status === "VERIFIED",
       isLegacyFallback: legacyVerified,
     };
   }
   const approvedCompany = application.approvedCompany ?? company;
+  const legacyGrandfatheringStatus = (
+    [
+      SupplierApplicationStatus.CONDITIONALLY_APPROVED,
+      SupplierApplicationStatus.APPROVED,
+    ] as readonly SupplierApplicationStatus[]
+  ).includes(application.status);
   const grandfatheredLegacy = Boolean(
-    application.status !== SupplierApplicationStatus.SUSPENDED &&
+    legacyGrandfatheringStatus &&
       application.legacyClassification ===
         SupplierLegacyClassification.LEGACY_CONDITIONALLY_APPROVED &&
       application.legacyCompanyId &&
@@ -2308,6 +2349,7 @@ export function resolveSupplierApplicationCapabilities({
   );
   const activeApproved =
     application.status === SupplierApplicationStatus.APPROVED &&
+    !approvedCompany?.deletedAt &&
     approvedCompany?.verificationStatus === "verified";
   const verifiedBrand = application.brandVerifications.some(
     (brand) =>
@@ -2317,6 +2359,18 @@ export function resolveSupplierApplicationCapabilities({
   );
   const conditional =
     application.status === SupplierApplicationStatus.CONDITIONALLY_APPROVED;
+  // ON_HOLD stops new commercial activity and legacy grandfathering. A
+  // previously verified company may still finish orders already assigned to it;
+  // REJECTED, WITHDRAWN, and SUSPENDED never retain that operational access.
+  const onHoldExistingOrderAccess = Boolean(
+    application.status === SupplierApplicationStatus.ON_HOLD &&
+      approvedCompany &&
+      !approvedCompany.deletedAt &&
+      approvedCompany.verificationStatus === "verified",
+  );
+  const canOperateExistingOrders = Boolean(
+    grandfatheredLegacy || activeApproved || onHoldExistingOrderAccess,
+  );
   return {
     applicationId: application.id,
     status: application.status,
@@ -2337,8 +2391,11 @@ export function resolveSupplierApplicationCapabilities({
       grandfatheredLegacy || (activeApproved && verifiedBrand),
     ),
     canReceiveTestOrder: conditional && !grandfatheredLegacy,
-    canReceiveOrder: Boolean(grandfatheredLegacy || activeApproved),
-    canShipOrder: Boolean(grandfatheredLegacy || activeApproved),
+    canAcceptNewOrders: Boolean(
+      grandfatheredLegacy || (activeApproved && verifiedBrand),
+    ),
+    canAccessAssignedOrders: canOperateExistingOrders,
+    canShipExistingOrders: canOperateExistingOrders,
     canReceivePayout: Boolean(
       (grandfatheredLegacy || activeApproved) &&
         (grandfatheredLegacy

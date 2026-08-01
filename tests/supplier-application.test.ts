@@ -151,11 +151,13 @@ test("disabled feature flag never loads the SupplierApplication table", async ()
   });
   assert.equal(applicationQueries, 0);
   assert.equal(capabilities.canCreateProductCandidate, true);
-  assert.equal(capabilities.canReceiveOrder, true);
+  assert.equal(capabilities.canAcceptNewOrders, true);
+  assert.equal(capabilities.canAccessAssignedOrders, true);
+  assert.equal(capabilities.canShipExistingOrders, true);
   assert.equal(capabilities.canReceivePayout, true);
 });
 
-test("legacy backfill preserves capabilities until explicit suspension", () => {
+test("legacy grandfathering is limited to conditional and approved states", () => {
   const before = resolveSupplierApplicationCapabilities({
     application: null,
     company: verifiedCompany,
@@ -178,13 +180,23 @@ test("legacy backfill preserves capabilities until explicit suspension", () => {
     "canUploadLiveInventory",
     "canCreateProductCandidate",
     "canPublishOffer",
-    "canReceiveOrder",
-    "canShipOrder",
+    "canAcceptNewOrders",
+    "canAccessAssignedOrders",
+    "canShipExistingOrders",
     "canReceivePayout",
   ] as const) {
     assert.equal(after[capability], before[capability]);
   }
   assert.equal(after.isLegacyFallback, true);
+  const approved = resolveSupplierApplicationCapabilities({
+    application: {
+      ...backfilled,
+      status: SupplierApplicationStatus.APPROVED,
+    },
+    company: verifiedCompany,
+  });
+  assert.equal(approved.isLegacyFallback, true);
+  assert.equal(approved.canAcceptNewOrders, true);
   assert.equal(
     resolveSupplierApplicationCapabilities({
       application: {
@@ -195,16 +207,46 @@ test("legacy backfill preserves capabilities until explicit suspension", () => {
     }).canPublishOffer,
     false,
   );
-  assert.equal(
-    resolveSupplierApplicationCapabilities({
-      application: {
-        ...backfilled,
-        status: SupplierApplicationStatus.SUSPENDED,
-      },
+  const onHold = resolveSupplierApplicationCapabilities({
+    application: {
+      ...backfilled,
+      status: SupplierApplicationStatus.ON_HOLD,
+    },
+    company: verifiedCompany,
+  });
+  assert.equal(onHold.isLegacyFallback, false);
+  assert.equal(onHold.canCreateProductCandidate, false);
+  assert.equal(onHold.canAcceptNewOrders, false);
+  assert.equal(onHold.canReceivePayout, false);
+  // Operational policy: an on-hold verified company may finish already
+  // assigned orders, but cannot receive new orders or exercise grandfathering.
+  assert.equal(onHold.canAccessAssignedOrders, true);
+  assert.equal(onHold.canShipExistingOrders, true);
+
+  for (const status of [
+    SupplierApplicationStatus.REJECTED,
+    SupplierApplicationStatus.WITHDRAWN,
+    SupplierApplicationStatus.SUSPENDED,
+  ]) {
+    const blocked = resolveSupplierApplicationCapabilities({
+      application: { ...backfilled, status },
       company: verifiedCompany,
-    }).canReceiveOrder,
-    false,
-  );
+    });
+    assert.equal(blocked.isLegacyFallback, false, status);
+    assert.equal(blocked.canCreateProductCandidate, false, status);
+    assert.equal(blocked.canAcceptNewOrders, false, status);
+    assert.equal(blocked.canAccessAssignedOrders, false, status);
+    assert.equal(blocked.canShipExistingOrders, false, status);
+    assert.equal(blocked.canReceivePayout, false, status);
+  }
+
+  const restored = resolveSupplierApplicationCapabilities({
+    application: backfilled,
+    company: verifiedCompany,
+  });
+  assert.equal(restored.isLegacyFallback, true);
+  assert.equal(restored.canAcceptNewOrders, true);
+  assert.equal(restored.canReceivePayout, true);
 });
 
 test("conditional approval exposes test-order state but no live order access", () => {
@@ -225,9 +267,48 @@ test("conditional approval exposes test-order state but no live order access", (
     company: null,
   });
   assert.equal(capabilities.canReceiveTestOrder, true);
-  assert.equal(capabilities.canReceiveOrder, false);
-  assert.equal(capabilities.canShipOrder, false);
+  assert.equal(capabilities.canAcceptNewOrders, false);
+  assert.equal(capabilities.canAccessAssignedOrders, false);
+  assert.equal(capabilities.canShipExistingOrders, false);
   assert.equal(capabilities.canCreateProductCandidate, false);
+});
+
+test("approved suppliers keep assigned-order fulfillment when verified brands expire", () => {
+  const application = {
+    id: "application",
+    status: SupplierApplicationStatus.APPROVED,
+    legacyClassification: null,
+    legacyCompanyId: null,
+    approvedCompany: verifiedCompany,
+    legacyCompany: null,
+    brandVerifications: [{
+      status: SupplierBrandVerificationStatus.VERIFIED,
+      isActive: true,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    }],
+  };
+  const active = resolveSupplierApplicationCapabilities({
+    application,
+    company: verifiedCompany,
+    now: new Date("2026-08-01T00:00:00.000Z"),
+  });
+  assert.equal(active.canAcceptNewOrders, true);
+  assert.equal(active.canAccessAssignedOrders, true);
+  assert.equal(active.canShipExistingOrders, true);
+  const capabilities = resolveSupplierApplicationCapabilities({
+    application: {
+      ...application,
+      brandVerifications: application.brandVerifications.map((brand) => ({
+        ...brand,
+        expiresAt: new Date("2020-01-01T00:00:00.000Z"),
+      })),
+    },
+    company: verifiedCompany,
+    now: new Date("2026-08-01T00:00:00.000Z"),
+  });
+  assert.equal(capabilities.canAcceptNewOrders, false);
+  assert.equal(capabilities.canAccessAssignedOrders, true);
+  assert.equal(capabilities.canShipExistingOrders, true);
 });
 
 test("brand normalization and readiness validation use active, unexpired evidence", () => {
@@ -346,6 +427,7 @@ test("inventory samples enforce the dedicated supplier template and row counters
   assert.equal(result.summary.totalRows, 2);
   assert.equal(result.summary.validRows, 1);
   assert.equal(result.summary.invalidRows, 1);
+  assert.equal(result.summary.missingRequiredFieldRows, 1);
   assert.equal(result.summary.duplicateGtinRows, 1);
   assert.equal(result.summary.invalidPriceRows, 1);
   assert.equal(result.summary.invalidQuantityRows, 1);
@@ -383,6 +465,7 @@ test("all supplier mutations use server-side auth, origin checks, and private fi
     source("src/app/api/admin/supplier-applications/[id]/transition/route.ts"),
     source("src/app/api/admin/supplier-applications/[id]/reviews/route.ts"),
     source("src/app/api/admin/supplier-applications/[id]/documents/[documentId]/signed-url/route.ts"),
+    source("src/app/api/admin/supplier-applications/[id]/brands/[brandVerificationId]/review/route.ts"),
   ]);
   for (const file of files) {
     assert.match(file, /require(Auth|Admin)/);
@@ -391,14 +474,19 @@ test("all supplier mutations use server-side auth, origin checks, and private fi
   assert.match(files[2], /createSignedPrivateFileUrl/);
   assert.match(files[3], /validateInventorySample/);
   assert.match(files[6], /ADMIN_DOCUMENT_SIGNED_URL_ISSUED/);
+  assert.match(files[7], /export async function PATCH/);
+  assert.match(files[7], /Object\.hasOwn\(body, "expiresAt"\)/);
+  assert.match(files[7], /Object\.hasOwn\(body, "countryRestrictions"\)/);
 });
 
 test("seller operational APIs are guarded by approval capabilities and legacy onboarding is redirected", async () => {
-  const [products, bulkImport, uploads, orders, payout, dashboard, onboarding, publicSell, capabilities, backfill] = await Promise.all([
+  const [products, bulkImport, uploads, orders, orderList, paymentRequests, payout, dashboard, onboarding, publicSell, capabilities, backfill] = await Promise.all([
     source("src/app/api/account/products/route.ts"),
     source("src/app/api/account/products/bulk/import/route.ts"),
     source("src/app/api/uploads/route.ts"),
     source("src/app/api/orders/[orderNumber]/route.ts"),
+    source("src/app/api/orders/route.ts"),
+    source("src/app/api/inquiries/[id]/payment-requests/route.ts"),
     source("src/app/api/account/payout-profile/route.ts"),
     source("src/app/api/dashboard/summary/route.ts"),
     source("src/app/onboarding/seller/page.tsx"),
@@ -409,7 +497,10 @@ test("seller operational APIs are guarded by approval capabilities and legacy on
   assert.match(products, /requireApprovedSupplierCapability\("canCreateProductCandidate"\)/);
   assert.match(bulkImport, /requireApprovedSupplierCapability\("canUploadLiveInventory"\)/);
   assert.match(uploads, /requireApprovedSupplierCapability\("canCreateProductCandidate"\)/);
-  assert.match(orders, /canShipOrder/);
+  assert.match(orders, /canShipExistingOrders/);
+  assert.match(orders, /canAccessAssignedOrders/);
+  assert.match(orderList, /canAccessAssignedOrders/);
+  assert.match(paymentRequests, /canAcceptNewOrders/);
   assert.match(payout, /requireApprovedSupplierCapability\("canCreateProductCandidate"\)/);
   assert.match(dashboard, /getSupplierApplicationCapabilities/);
   assert.match(onboarding, /redirect\("\/seller\/apply"\)/);

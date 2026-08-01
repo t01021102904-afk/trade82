@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       getSupplierApplicationCapabilities(user.id),
     ]);
     const buyerCompanyIds = companies.filter((company) => company.companyRole === "buyer").map((company) => company.id);
-    const sellerCompanyIds = supplierAccess.canReceiveOrder
+    const sellerCompanyIds = supplierAccess.canAccessAssignedOrders
       ? companies.filter((company) => company.companyRole === "seller").map((company) => company.id)
       : [];
     const where = { OR: [{ buyerCompanyId: { in: buyerCompanyIds } }, { sellerCompanyId: { in: sellerCompanyIds } }] };

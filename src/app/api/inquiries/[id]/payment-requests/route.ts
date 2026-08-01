@@ -11,6 +11,7 @@ import {
 } from "@/lib/api-security";
 import { requireCurrentAppUser } from "@/lib/current-app-user";
 import { getDb } from "@/lib/db";
+import { getSupplierApplicationCapabilities } from "@/lib/supplier-application";
 import { isMessagePaymentFeatureEnabledForUser } from "@/lib/message-payment-feature";
 import { isTradeOrderSystemEnabledForClerkUser } from "@/lib/trade-order-feature";
 import { sendTradeOrderNotification } from "@/lib/trade-order-notifications";
@@ -74,7 +75,12 @@ export async function POST(
       productAmount,
       shippingAmount,
     );
-    const shouldCreateTradeOrder = isTradeOrderSystemEnabledForClerkUser(user.clerkUserId);
+    const tradeOrderSystemEnabled = isTradeOrderSystemEnabledForClerkUser(
+      user.clerkUserId,
+    );
+    const shouldCreateTradeOrder = tradeOrderSystemEnabled
+      ? (await getSupplierApplicationCapabilities(user.id)).canAcceptNewOrders
+      : false;
 
     const inquiry = await getDb().inquiry.findFirst({
       where: {

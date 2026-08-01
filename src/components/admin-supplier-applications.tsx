@@ -364,7 +364,7 @@ export function AdminSupplierApplicationDetail({
     const response = await fetch(
       `/api/admin/supplier-applications/${applicationId}/${path}`,
       {
-        method: "POST",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       },

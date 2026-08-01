@@ -154,20 +154,57 @@ async function prepareApprovalEvidence({
 }
 
 test("supplier migration is additive and protected by RLS", async () => {
+  const supplierTables = [
+    "SupplierApplication",
+    "SupplierApplicationContact",
+    "SupplierBusinessVerification",
+    "SupplierStakeholder",
+    "SupplierWarehouse",
+    "SupplierSupplyChain",
+    "SupplierBrandVerification",
+    "SupplierOperationsProfile",
+    "SupplierSettlementProfile",
+    "SupplierApplicationDocument",
+    "SupplierInventorySample",
+    "SupplierApplicationReview",
+    "SupplierApplicationStatusHistory",
+    "SupplierInformationRequest",
+    "SupplierDuplicateFlag",
+    "SupplierApplicationAuditEvent",
+  ];
   const result = await pool.query<{
     table_name: string;
     relrowsecurity: boolean;
+    anon_select: boolean;
+    anon_insert: boolean;
+    authenticated_select: boolean;
+    authenticated_insert: boolean;
+    authenticated_update: boolean;
+    authenticated_delete: boolean;
   }>(`
-    SELECT c.relname AS table_name, c.relrowsecurity
-    FROM pg_class c
-    WHERE c.relname IN (
-      'SupplierApplication',
-      'SupplierBrandVerification',
-      'SupplierInformationRequest'
-    )
-  `);
-  assert.equal(result.rows.length, 3);
-  assert.equal(result.rows.every((row) => row.relrowsecurity), true);
+    SELECT
+      requested.table_name,
+      c.relrowsecurity,
+      has_table_privilege('anon', format('%I.%I', 'public', requested.table_name), 'SELECT') AS anon_select,
+      has_table_privilege('anon', format('%I.%I', 'public', requested.table_name), 'INSERT') AS anon_insert,
+      has_table_privilege('authenticated', format('%I.%I', 'public', requested.table_name), 'SELECT') AS authenticated_select,
+      has_table_privilege('authenticated', format('%I.%I', 'public', requested.table_name), 'INSERT') AS authenticated_insert,
+      has_table_privilege('authenticated', format('%I.%I', 'public', requested.table_name), 'UPDATE') AS authenticated_update,
+      has_table_privilege('authenticated', format('%I.%I', 'public', requested.table_name), 'DELETE') AS authenticated_delete
+    FROM unnest($1::text[]) AS requested(table_name)
+    JOIN pg_class c
+      ON c.oid = to_regclass(format('%I.%I', 'public', requested.table_name))
+  `, [supplierTables]);
+  assert.equal(result.rows.length, supplierTables.length);
+  for (const table of result.rows) {
+    assert.equal(table.relrowsecurity, true, `${table.table_name} must enable RLS`);
+    assert.equal(table.anon_select, false, `${table.table_name} must revoke anon SELECT`);
+    assert.equal(table.anon_insert, false, `${table.table_name} must revoke anon INSERT`);
+    assert.equal(table.authenticated_select, false, `${table.table_name} must revoke authenticated SELECT`);
+    assert.equal(table.authenticated_insert, false, `${table.table_name} must revoke authenticated INSERT`);
+    assert.equal(table.authenticated_update, false, `${table.table_name} must revoke authenticated UPDATE`);
+    assert.equal(table.authenticated_delete, false, `${table.table_name} must revoke authenticated DELETE`);
+  }
   const columns = await pool.query<{ column_name: string }>(`
     SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public'
@@ -216,6 +253,9 @@ test("individual brand review does not mutate sibling brands", async () => {
         brand: "COSRX",
         normalizedBrand: "cosrx",
         relationshipType: "BRAND_DIRECT",
+        reviewNotes: "Preserve this note",
+        countryRestrictions: ["US"],
+        expiresAt: new Date("2099-01-01T00:00:00.000Z"),
       },
     }),
     db.supplierBrandVerification.create({
@@ -241,8 +281,97 @@ test("individual brand review does not mutate sibling brands", async () => {
     where: { applicationId: application.id },
     orderBy: { normalizedBrand: "asc" },
   });
-  assert.equal(brands.find((brand) => brand.id === first.id)?.status, "VERIFIED");
+  const reviewed = brands.find((brand) => brand.id === first.id);
+  assert.equal(reviewed?.status, "VERIFIED");
+  assert.equal(reviewed?.reviewNotes, "Preserve this note");
+  assert.deepEqual(reviewed?.countryRestrictions, ["US"]);
+  assert.equal(reviewed?.expiresAt?.toISOString(), "2099-01-01T00:00:00.000Z");
   assert.equal(brands.find((brand) => brand.id === second.id)?.status, "PENDING");
+
+  await supplierApplications.reviewSupplierBrandVerification({
+    applicationId: application.id,
+    brandVerificationId: first.id,
+    adminUserId: admin.id,
+    input: {
+      status: SupplierBrandVerificationStatus.VERIFIED,
+      evidenceStatus: SupplierReviewStatus.VERIFIED,
+      reviewNotes: null,
+      countryRestrictions: null,
+      expiresAt: null,
+      reason: "Clear optional review fields explicitly.",
+    },
+  });
+  const cleared = await db.supplierBrandVerification.findUniqueOrThrow({
+    where: { id: first.id },
+  });
+  assert.equal(cleared.reviewNotes, "");
+  assert.deepEqual(cleared.countryRestrictions, []);
+  assert.equal(cleared.expiresAt, null);
+
+  for (const status of [
+    SupplierBrandVerificationStatus.REJECTED,
+    SupplierBrandVerificationStatus.ADDITIONAL_EVIDENCE_REQUIRED,
+  ]) {
+    await assert.rejects(
+      supplierApplications.reviewSupplierBrandVerification({
+        applicationId: application.id,
+        brandVerificationId: first.id,
+        adminUserId: admin.id,
+        input: {
+          status,
+          evidenceStatus: SupplierReviewStatus.REJECTED,
+          reason: "",
+        },
+      }),
+      /reason is required/,
+    );
+  }
+
+  await assert.rejects(
+    supplierApplications.reviewSupplierBrandVerification({
+      applicationId: application.id,
+      brandVerificationId: first.id,
+      adminUserId: admin.id,
+      input: {
+        status: SupplierBrandVerificationStatus.RESTRICTED,
+        evidenceStatus: SupplierReviewStatus.VERIFIED,
+        reason: "Restriction requires a country.",
+      },
+    }),
+    /at least one country restriction/,
+  );
+  await assert.rejects(
+    supplierApplications.reviewSupplierBrandVerification({
+      applicationId: application.id,
+      brandVerificationId: first.id,
+      adminUserId: admin.id,
+      input: {
+        status: SupplierBrandVerificationStatus.EXPIRED,
+        evidenceStatus: SupplierReviewStatus.EXPIRED_DOCUMENT,
+        expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+        reason: "Future expiry is not expired.",
+      },
+    }),
+    /cannot be in the future/,
+  );
+  const expiredAt = new Date("2020-01-01T00:00:00.000Z");
+  await supplierApplications.reviewSupplierBrandVerification({
+    applicationId: application.id,
+    brandVerificationId: first.id,
+    adminUserId: admin.id,
+    input: {
+      status: SupplierBrandVerificationStatus.EXPIRED,
+      evidenceStatus: SupplierReviewStatus.EXPIRED_DOCUMENT,
+      expiresAt: expiredAt,
+      reason: "Authorization has expired.",
+    },
+  });
+  assert.equal(
+    (await db.supplierBrandVerification.findUniqueOrThrow({
+      where: { id: first.id },
+    })).expiresAt?.toISOString(),
+    expiredAt.toISOString(),
+  );
 });
 
 test("removed and changed verified brands are excluded or reset without deleting evidence", async () => {

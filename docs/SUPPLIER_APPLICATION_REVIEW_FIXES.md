@@ -55,9 +55,16 @@ ends grandfathering.
 Before these fixes, conditional approval created or updated a Company as
 `verified`, set `verifiedSellerSince`, and granted both normal receive-order and
 ship-order capabilities. The corrected design exposes only
-`canReceiveTestOrder`; normal order and shipping capabilities require full
-`APPROVED`. A new conditional Company stays `pending_review` and is not a public
-verified seller.
+`canReceiveTestOrder`. `canAcceptNewOrders`, `canAccessAssignedOrders`, and
+`canShipExistingOrders` now express separate policies. New orders require full
+`APPROVED`, a non-deleted verified Company, and an active, unexpired verified
+brand. An approved supplier whose brand evidence later expires may still access
+and ship already assigned orders. `ON_HOLD` blocks new activity and payout but
+allows a previously verified company to finish assigned orders; `REJECTED`,
+`WITHDRAWN`, and `SUSPENDED` block all three order capabilities. The actual order
+creation path in the seller payment-request route checks `canAcceptNewOrders`.
+A new conditional Company stays `pending_review` and is not a public verified
+seller.
 
 ## Brand review behavior found
 
@@ -66,6 +73,14 @@ pending brand together. This is replaced by a per-brand review endpoint and UI.
 The section review remains an audit-only aggregate record and never changes a
 brand row.
 
+The per-brand endpoint uses HTTP PATCH semantics. Omitted optional fields retain
+their stored value, explicit null clears the value, and a supplied value replaces
+it. `VERIFIED` requires verified evidence and a future-or-null expiry;
+`EXPIRED` accepts a past expiry and records the current time when both the input
+and stored expiry are absent; `RESTRICTED` requires at least one country; and all
+review transitions require an audit reason (including `REJECTED` and
+`ADDITIONAL_EVIDENCE_REQUIRED`).
+
 ## Inventory sample gap found
 
 The original validator expected `brand, gtin, sku, name, quantity, stock date,
@@ -73,4 +88,6 @@ currency, price`. The product requirements instead define `gtin, brand,
 product_name, size_or_variant, supply_price, currency, available_quantity, moq,
 mov, lead_time_days, expiration_date, warehouse, allowed_countries,
 stock_updated_at`. The Supplier Application validator and counters are updated
-to that dedicated format; the existing live bulk-product template is not reused.
+to that dedicated format; `size_or_variant` is required for every K-beauty SKU
+and contributes to `missingRequiredFieldRows` when blank. The existing live
+bulk-product template is not reused.
